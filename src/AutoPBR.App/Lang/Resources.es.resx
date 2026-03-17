@@ -195,4 +195,7 @@
   <data name="Status_Done" xml:space="preserve"><value>Listo.</value></data>
   <data name="Status_Cancelled" xml:space="preserve"><value>Cancelado.</value></data>
   <data name="Status_ConversionFailed" xml:space="preserve"><value>Error de conversión.</value></data>
+  <data name="OpenLogFolder" xml:space="preserve"><value>Abrir carpeta de registros</value></data>
+  <data name="NormalOperatorLabel" xml:space="preserve"><value>Operador</value></data>
+  <data name="NormalKernelSizeLabel" xml:space="preserve"><value>Tamaño del kernel</value></data>
 </root>

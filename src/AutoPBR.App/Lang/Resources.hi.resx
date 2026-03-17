@@ -195,4 +195,7 @@
   <data name="Status_Done" xml:space="preserve"><value>हो गया।</value></data>
   <data name="Status_Cancelled" xml:space="preserve"><value>रद्द।</value></data>
   <data name="Status_ConversionFailed" xml:space="preserve"><value>कन्वर्ज़न विफल।</value></data>
+  <data name="OpenLogFolder" xml:space="preserve"><value>लॉग फ़ोल्डर खोलें</value></data>
+  <data name="NormalOperatorLabel" xml:space="preserve"><value>ऑपरेटर</value></data>
+  <data name="NormalKernelSizeLabel" xml:space="preserve"><value>कर्नेल आकार</value></data>
 </root>

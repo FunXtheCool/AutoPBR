@@ -195,4 +195,7 @@
   <data name="Status_Done" xml:space="preserve"><value>完成。</value></data>
   <data name="Status_Cancelled" xml:space="preserve"><value>已取消。</value></data>
   <data name="Status_ConversionFailed" xml:space="preserve"><value>转换失败。</value></data>
+  <data name="OpenLogFolder" xml:space="preserve"><value>打开日志文件夹</value></data>
+  <data name="NormalOperatorLabel" xml:space="preserve"><value>算子</value></data>
+  <data name="NormalKernelSizeLabel" xml:space="preserve"><value>核大小</value></data>
 </root>

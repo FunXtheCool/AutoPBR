@@ -195,4 +195,7 @@
   <data name="Status_Done" xml:space="preserve"><value>تم.</value></data>
   <data name="Status_Cancelled" xml:space="preserve"><value>ملغى.</value></data>
   <data name="Status_ConversionFailed" xml:space="preserve"><value>فشل التحويل.</value></data>
+  <data name="OpenLogFolder" xml:space="preserve"><value>فتح مجلد السجلات</value></data>
+  <data name="NormalOperatorLabel" xml:space="preserve"><value>المعامل</value></data>
+  <data name="NormalKernelSizeLabel" xml:space="preserve"><value>حجم النواة</value></data>
 </root>

@@ -195,4 +195,7 @@
   <data name="Status_Done" xml:space="preserve"><value>Terminé.</value></data>
   <data name="Status_Cancelled" xml:space="preserve"><value>Annulé.</value></data>
   <data name="Status_ConversionFailed" xml:space="preserve"><value>Échec de la conversion.</value></data>
+  <data name="OpenLogFolder" xml:space="preserve"><value>Ouvrir le dossier des journaux</value></data>
+  <data name="NormalOperatorLabel" xml:space="preserve"><value>Opérateur</value></data>
+  <data name="NormalKernelSizeLabel" xml:space="preserve"><value>Taille du noyau</value></data>
 </root>

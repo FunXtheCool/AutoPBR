@@ -195,4 +195,7 @@
   <data name="Status_Done" xml:space="preserve"><value>完了。</value></data>
   <data name="Status_Cancelled" xml:space="preserve"><value>キャンセルしました。</value></data>
   <data name="Status_ConversionFailed" xml:space="preserve"><value>変換に失敗しました。</value></data>
+  <data name="OpenLogFolder" xml:space="preserve"><value>ログフォルダーを開く</value></data>
+  <data name="NormalOperatorLabel" xml:space="preserve"><value>オペレーター</value></data>
+  <data name="NormalKernelSizeLabel" xml:space="preserve"><value>カーネルサイズ</value></data>
 </root>
