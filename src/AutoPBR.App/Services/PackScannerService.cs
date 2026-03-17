@@ -56,7 +56,10 @@ internal static class PackScannerService
 
                 siblingList.Add(new ArchiveChildEntry(segment, path, !isFile));
                 if (isFile)
+                {
                     fileCount++;
+                }
+
                 current = path;
             }
 

@@ -150,7 +150,7 @@
   <data name="DeepBumpOverlapSmall" xml:space="preserve"><value>صغير</value></data>
   <data name="DeepBumpOverlapMedium" xml:space="preserve"><value>متوسط</value></data>
   <data name="DeepBumpOverlapLarge" xml:space="preserve"><value>كبير</value></data>
-  <data name="TextureTypes" xml:space="preserve"><value>أنواع الأنسجة</value></data>
+  <data name="TextureTypes" xml:space="preserve"><value>مرشحات التحويل</value></data>
   <data name="Blocks" xml:space="preserve"><value>الكتل</value></data>
   <data name="BlocksTooltip" xml:space="preserve"><value>معالجة الأنسجة في مجلدات block و blocks.</value></data>
   <data name="Items" xml:space="preserve"><value>العناصر</value></data>

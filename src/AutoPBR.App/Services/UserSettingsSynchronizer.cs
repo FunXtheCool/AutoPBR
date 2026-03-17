@@ -9,7 +9,9 @@ internal static class UserSettingsSynchronizer
     public static void LoadInto(MainWindowViewModel vm, UserSettings settings)
     {
         if (!string.IsNullOrWhiteSpace(settings.OutputDirectory))
+        {
             vm.OutputDirectory = settings.OutputDirectory;
+        }
 
         vm.NormalIntensity = settings.NormalIntensity;
         vm.HeightIntensity = settings.HeightIntensity;

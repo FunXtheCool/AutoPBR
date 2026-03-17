@@ -477,7 +477,7 @@
           }
         }
       },
-      "JetBrains.Annotations/2024.2.0": {
+      "JetBrains.Annotations/2025.2.4": {
         "type": "package",
         "compile": {
           "lib/netstandard2.0/JetBrains.Annotations.dll": {
@@ -804,6 +804,7 @@
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
           "Colourful": "3.2.0",
+          "JetBrains.Annotations": "2025.2.4",
           "MathNet.Numerics": "5.0.0",
           "Microsoft.ML.OnnxRuntime.Gpu": "1.24.3",
           "SixLabors.ImageSharp": "3.1.12",
@@ -1463,17 +1464,16 @@
         "runtimes/win-x86/native/libHarfBuzzSharp.dll"
       ]
     },
-    "JetBrains.Annotations/2024.2.0": {
-      "sha512": "GNnqCFW/163p1fOehKx0CnAqjmpPrUSqrgfHM6qca+P+RN39C9rhlfZHQpJhxmQG/dkOYe/b3Z0P8b6Kv5m1qw==",
+    "JetBrains.Annotations/2025.2.4": {
+      "sha512": "TwbgxAkXxY+vNEhNVx/QXjJ4vqxmepOjsgRvvImQPbHkHMMb4W+ahL3laMsxXKtNT7iMy+E1B3xkqao2hf1n3A==",
       "type": "package",
-      "path": "jetbrains.annotations/2024.2.0",
+      "path": "jetbrains.annotations/2025.2.4",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "icon.png",
-        "jetbrains.annotations.2024.2.0.nupkg.sha512",
+        "jetbrains.annotations.2025.2.4.nupkg.sha512",
         "jetbrains.annotations.nuspec",
-        "lib/JetBrains.Annotations.2024.2.0.snupkg",
         "lib/net20/JetBrains.Annotations.dll",
         "lib/net20/JetBrains.Annotations.xml",
         "lib/netstandard1.0/JetBrains.Annotations.deps.json",
@@ -1483,7 +1483,8 @@
         "lib/netstandard2.0/JetBrains.Annotations.dll",
         "lib/netstandard2.0/JetBrains.Annotations.xml",
         "lib/portable40-net40+sl5+win8+wp8+wpa81/JetBrains.Annotations.dll",
-        "lib/portable40-net40+sl5+win8+wp8+wpa81/JetBrains.Annotations.xml"
+        "lib/portable40-net40+sl5+win8+wp8+wpa81/JetBrains.Annotations.xml",
+        "readme.md"
       ]
     },
     "MathNet.Numerics/5.0.0": {
@@ -1983,7 +1984,7 @@
       "Avalonia.Fonts.Inter >= 11.3.12",
       "Avalonia.Themes.Fluent >= 11.3.12",
       "CommunityToolkit.Mvvm >= 8.2.1",
-      "JetBrains.Annotations >= 2024.2.0"
+      "JetBrains.Annotations >= 2025.2.4"
     ]
   },
   "packageFolders": {
@@ -1993,11 +1994,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "Z:\\Cursor Projects\\AutoPBR\\src\\AutoPBR.App\\AutoPBR.App.csproj",
+      "projectUniqueName": "z:\\Cursor Projects\\AutoPBR\\src\\AutoPBR.App\\AutoPBR.App.csproj",
       "projectName": "AutoPBR.App",
-      "projectPath": "Z:\\Cursor Projects\\AutoPBR\\src\\AutoPBR.App\\AutoPBR.App.csproj",
+      "projectPath": "z:\\Cursor Projects\\AutoPBR\\src\\AutoPBR.App\\AutoPBR.App.csproj",
       "packagesPath": "C:\\Users\\John_Phoenix\\.nuget\\packages\\",
-      "outputPath": "Z:\\Cursor Projects\\AutoPBR\\src\\AutoPBR.App\\obj\\",
+      "outputPath": "z:\\Cursor Projects\\AutoPBR\\src\\AutoPBR.App\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -2019,8 +2020,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "Z:\\Cursor Projects\\AutoPBR\\src\\AutoPBR.Core\\AutoPBR.Core.csproj": {
-              "projectPath": "Z:\\Cursor Projects\\AutoPBR\\src\\AutoPBR.Core\\AutoPBR.Core.csproj"
+            "z:\\Cursor Projects\\AutoPBR\\src\\AutoPBR.Core\\AutoPBR.Core.csproj": {
+              "projectPath": "z:\\Cursor Projects\\AutoPBR\\src\\AutoPBR.Core\\AutoPBR.Core.csproj"
             }
           }
         }
@@ -2067,7 +2068,7 @@
           },
           "JetBrains.Annotations": {
             "target": "Package",
-            "version": "[2024.2.0, )"
+            "version": "[2025.2.4, )"
           }
         },
         "imports": [

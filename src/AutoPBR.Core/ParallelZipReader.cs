@@ -29,7 +29,10 @@ internal static class ParallelZipReader
     {
         List<(string fullName, long dataOffset, long compressedSize, long uncompressedSize, bool isStored)> entries;
         using (var fs = new FileStream(inputZipPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+        {
             entries = ParseZip(fs);
+        }
+
 
         if (entriesToExtractOnly is { Count: > 0 })
         {
@@ -59,7 +62,11 @@ internal static class ParallelZipReader
                 var destPath = Path.Combine(extracted, fullName);
                 var dir = Path.GetDirectoryName(destPath);
                 if (!string.IsNullOrEmpty(dir))
+                {
                     Directory.CreateDirectory(dir);
+                }
+
+
                 using (var fs = new FileStream(inputZipPath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 using (var outFile = new FileStream(destPath, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
@@ -89,7 +96,12 @@ internal static class ParallelZipReader
             cancellationToken.ThrowIfCancellationRequested();
             var toRead = (int)Math.Min(buffer.Length, remaining);
             var n = from.Read(buffer, 0, toRead);
-            if (n <= 0) break;
+            if (n <= 0)
+            {
+                break;
+            }
+
+
             to.Write(buffer, 0, n);
             remaining -= n;
         }
@@ -99,9 +111,13 @@ internal static class ParallelZipReader
         ParseZip(Stream fs)
     {
         var len = fs.Length;
-        if (len < 22) return [];
+        if (len < 22)
+        {
+            return [];
+        }
 
         // Find EOCD: scan from end in chunks so we handle large comments or trailing data
+
         long centralDirOffset;
         int totalEntries;
 
@@ -110,7 +126,11 @@ internal static class ParallelZipReader
         fs.Seek(searchStart, SeekOrigin.Begin);
         var buf = new byte[searchLen];
         var n = fs.Read(buf, 0, buf.Length);
-        if (n < 22) return [];
+        if (n < 22)
+        {
+            return [];
+        }
+
 
         int eocdIndex = -1;
         for (var i = n - 22; i >= 0; i--)
@@ -122,7 +142,11 @@ internal static class ParallelZipReader
             }
         }
 
-        if (eocdIndex < 0) return [];
+        if (eocdIndex < 0)
+        {
+            return [];
+        }
+
 
         var centralDirSize32 = ReadLe32(buf, eocdIndex + 12);
         var centralDirOffset32 = ReadLe32(buf, eocdIndex + 16);
@@ -136,20 +160,31 @@ internal static class ParallelZipReader
             // Zip64: find Zip64 EOCD locator (20 bytes before standard EOCD)
             var eocdFileOffset = searchStart + eocdIndex;
             var locatorOffset = eocdFileOffset - 20;
-            if (locatorOffset < 0) return [];
+            if (locatorOffset < 0)
+            {
+                return [];
+            }
+
 
             fs.Seek(locatorOffset, SeekOrigin.Begin);
             var locatorBuf = new byte[20];
             if (ReadFully(fs, locatorBuf, 0, 20) != 20 ||
                 ReadLe32(locatorBuf, 0) != Zip64EndOfCentralDirLocatorSignature)
+            {
                 return [];
+            }
+
 
             var zip64EocdOffset = ReadLe64(locatorBuf, 8);
             fs.Seek(zip64EocdOffset, SeekOrigin.Begin);
 
             var zip64EocdBuf = new byte[56];
             if (ReadFully(fs, zip64EocdBuf, 0, 56) != 56 || ReadLe32(zip64EocdBuf, 0) != Zip64EndOfCentralDirSignature)
+            {
+
                 return [];
+            }
+
 
             centralDirOffset = ReadLe64(zip64EocdBuf, 48);
             var totalEntries64 = ReadLe64(zip64EocdBuf, 32);
@@ -167,8 +202,17 @@ internal static class ParallelZipReader
         for (var i = 0; i < totalEntries; i++)
         {
             var headerBuf = new byte[46];
-            if (ReadFully(fs, headerBuf, 0, 46) != 46) break;
-            if (ReadLe32(headerBuf, 0) != CentralFileHeaderSignature) break;
+            if (ReadFully(fs, headerBuf, 0, 46) != 46)
+            {
+                break;
+            }
+
+
+            if (ReadLe32(headerBuf, 0) != CentralFileHeaderSignature)
+            {
+                break;
+            }
+
 
             var compression = ReadLe16(headerBuf, 10);
             var compressedSize32 = ReadLe32(headerBuf, 20);
@@ -179,7 +223,12 @@ internal static class ParallelZipReader
             var localHeaderOffset32 = ReadLe32(headerBuf, 42);
 
             var fileNameBytes = new byte[fileNameLen];
-            if (ReadFully(fs, fileNameBytes, 0, fileNameLen) != fileNameLen) break;
+            if (ReadFully(fs, fileNameBytes, 0, fileNameLen) != fileNameLen)
+            {
+                break;
+            }
+
+
             var fullName = System.Text.Encoding.UTF8.GetString(fileNameBytes);
 
             long compressedSize = compressedSize32;
@@ -201,10 +250,16 @@ internal static class ParallelZipReader
                 fs.Seek(commentLen, SeekOrigin.Current);
             }
             else
+            {
                 fs.Seek(commentLen, SeekOrigin.Current);
+            }
+
 
             if (string.IsNullOrEmpty(fullName) || fullName.EndsWith('/'))
+            {
                 continue;
+            }
+
 
             var pos = fs.Position;
             fs.Seek(localHeaderOffset, SeekOrigin.Begin);
@@ -222,9 +277,17 @@ internal static class ParallelZipReader
 
             var isStored = compression == CompressionMethodStored;
             if (compression != CompressionMethodStored && compression != CompressionMethodDeflate)
+            {
                 continue;
+            }
+
+
             if (compressedSize < 0 || uncompressedSize < 0)
+            {
                 continue;
+            }
+
+
             result.Add((fullName, dataOffset, compressedSize, uncompressedSize, isStored));
         }
 
@@ -241,7 +304,12 @@ internal static class ParallelZipReader
             var id = ReadLe16(extra, pos);
             var size = ReadLe16(extra, pos + 2);
             pos += 4;
-            if (pos + size > extra.Length) break;
+            if (pos + size > extra.Length)
+            {
+                break;
+            }
+
+
             if (id == Zip64ExtraId && size >= 8)
             {
                 var offset = 0;
@@ -276,7 +344,12 @@ internal static class ParallelZipReader
         while (total < count)
         {
             var n = s.Read(buffer, offset + total, count - total);
-            if (n == 0) return total;
+            if (n == 0)
+            {
+                return total;
+            }
+
+
             total += n;
         }
 

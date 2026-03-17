@@ -58,7 +58,10 @@ internal static class ParallelZipWriter
 
         var centralDirOffset = fs.Position;
         foreach (var (name, crc32, compressedSize, uncompressedSize, localHeaderOffset) in centralDirEntries)
+        {
             WriteCentralFileHeader(fs, name, crc32, compressedSize, uncompressedSize, localHeaderOffset);
+        }
+
         var centralDirSize = (int)(fs.Position - centralDirOffset);
         WriteEndOfCentralDirectory(fs, centralDirEntries.Count, centralDirSize, centralDirOffset);
     }
@@ -67,7 +70,10 @@ internal static class ParallelZipWriter
     {
         using var ms = new MemoryStream();
         using (var deflate = new DeflateStream(ms, CompressionLevel.Optimal, leaveOpen: true))
+        {
             deflate.Write(data, 0, data.Length);
+        }
+
         return ms.ToArray();
     }
 
@@ -135,14 +141,22 @@ internal static class ParallelZipWriter
     private static void WriteLe(Stream s, ushort value)
     {
         var b = BitConverter.GetBytes(value);
-        if (!BitConverter.IsLittleEndian) Array.Reverse(b);
+        if (!BitConverter.IsLittleEndian)
+        {
+            Array.Reverse(b);
+        }
+
         s.Write(b, 0, 2);
     }
 
     private static void WriteLe(Stream s, uint value)
     {
         var b = BitConverter.GetBytes(value);
-        if (!BitConverter.IsLittleEndian) Array.Reverse(b);
+        if (!BitConverter.IsLittleEndian)
+        {
+            Array.Reverse(b);
+        }
+
         s.Write(b, 0, 4);
     }
 }

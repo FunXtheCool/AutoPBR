@@ -32,14 +32,16 @@ internal static class NormalHeightGenerator
                         : null;
 
                 if (deepBumpGenerator is { IsUsingGpu: false })
+                {
                     progress?.Report(new ConversionProgress(ConversionStage.GeneratingNormals, 0, total, null,
                         "DeepBump: CUDA not available, using CPU."));
+                }
 
                 var generatorForLoop = deepBumpGenerator;
                 Parallel.ForEach(
                     toProcess,
                     new ParallelOptions
-                        { MaxDegreeOfParallelism = ThreadingUtil.GetConversionParallelism(options), CancellationToken = ct },
+                    { MaxDegreeOfParallelism = ThreadingUtil.GetConversionParallelism(options), CancellationToken = ct },
                     t =>
                     {
                         ThreadingUtil.SetThreadName("AutoPBR.Normals");
@@ -89,7 +91,9 @@ internal static class NormalHeightGenerator
                             if (!skipHeightInAlpha && options.FoliageMode == "No Height" &&
                                 (t.Name.Contains("grass", StringComparison.OrdinalIgnoreCase) ||
                                  t.RelativeKey.Contains("grass", StringComparison.OrdinalIgnoreCase)))
+                            {
                                 skipHeightInAlpha = HasSignificantTransparency(croppedDiffuse);
+                            }
 
                             normal.ProcessPixelRows(acc =>
                             {
@@ -100,7 +104,9 @@ internal static class NormalHeightGenerator
                                     {
                                         byte a;
                                         if (skipHeightInAlpha)
+                                        {
                                             a = 255;
+                                        }
                                         else
                                         {
                                             var h = heightMap[x, y];
@@ -129,7 +135,10 @@ internal static class NormalHeightGenerator
     private static bool HasSignificantTransparency(Image<Rgba32> cropped)
     {
         if (!cropped.DangerousTryGetSinglePixelMemory(out var mem))
+        {
             return false;
+        }
+
         var span = mem.Span;
         long sumA = 0;
         int lowAlphaCount = 0;
@@ -138,7 +147,10 @@ internal static class NormalHeightGenerator
         {
             var a = span[i].A;
             sumA += a;
-            if (a < 128) lowAlphaCount++;
+            if (a < 128)
+            {
+                lowAlphaCount++;
+            }
         }
 
         var meanAlpha = (int)(sumA / n);
@@ -176,20 +188,24 @@ internal static class NormalHeightGenerator
         {
             var blurred = new float[n];
             for (var y = 0; y < height; y++)
-            for (var x = 0; x < width; x++)
             {
-                float sum = 0;
-                var count = 0;
-                for (var oy = -1; oy <= 1; oy++)
-                for (var ox = -1; ox <= 1; ox++)
+                for (var x = 0; x < width; x++)
                 {
-                    var rx = Reflect(x + ox, width);
-                    var ry = Reflect(y + oy, height);
-                    sum += grey[ry * width + rx];
-                    count++;
-                }
+                    float sum = 0;
+                    var count = 0;
+                    for (var oy = -1; oy <= 1; oy++)
+                    {
+                        for (var ox = -1; ox <= 1; ox++)
+                        {
+                            var rx = Reflect(x + ox, width);
+                            var ry = Reflect(y + oy, height);
+                            sum += grey[ry * width + rx];
+                            count++;
+                        }
+                    }
 
-                blurred[y * width + x] = sum / count;
+                    blurred[y * width + x] = sum / count;
+                }
             }
 
             const float amount = 0.5f;
@@ -214,47 +230,47 @@ internal static class NormalHeightGenerator
                 ComputeColorGradients(cropped, width, height, kx, ky, radius, gx, gy);
                 break;
             case NormalDerivative.ColorLuminanceBlend:
-            {
-                var gxL = new float[n];
-                var gyL = new float[n];
-                var gxC = new float[n];
-                var gyC = new float[n];
-                ComputeGradients(grey, width, height, kx, ky, radius, gxL, gyL);
-                ComputeColorGradients(cropped, width, height, kx, ky, radius, gxC, gyC);
-                for (var i = 0; i < n; i++)
                 {
-                    gx[i] = 0.5f * gxL[i] + 0.5f * gxC[i];
-                    gy[i] = 0.5f * gyL[i] + 0.5f * gyC[i];
-                }
+                    var gxL = new float[n];
+                    var gyL = new float[n];
+                    var gxC = new float[n];
+                    var gyC = new float[n];
+                    ComputeGradients(grey, width, height, kx, ky, radius, gxL, gyL);
+                    ComputeColorGradients(cropped, width, height, kx, ky, radius, gxC, gyC);
+                    for (var i = 0; i < n; i++)
+                    {
+                        gx[i] = 0.5f * gxL[i] + 0.5f * gxC[i];
+                        gy[i] = 0.5f * gyL[i] + 0.5f * gyC[i];
+                    }
 
-                break;
-            }
+                    break;
+                }
             case NormalDerivative.ColorLuminanceMax:
-            {
-                var gxL = new float[n];
-                var gyL = new float[n];
-                var gxC = new float[n];
-                var gyC = new float[n];
-                ComputeGradients(grey, width, height, kx, ky, radius, gxL, gyL);
-                ComputeColorGradients(cropped, width, height, kx, ky, radius, gxC, gyC);
-                for (var i = 0; i < n; i++)
                 {
-                    var magL = MathF.Sqrt(gxL[i] * gxL[i] + gyL[i] * gyL[i]);
-                    var magC = MathF.Sqrt(gxC[i] * gxC[i] + gyC[i] * gyC[i]);
-                    if (magL >= magC)
+                    var gxL = new float[n];
+                    var gyL = new float[n];
+                    var gxC = new float[n];
+                    var gyC = new float[n];
+                    ComputeGradients(grey, width, height, kx, ky, radius, gxL, gyL);
+                    ComputeColorGradients(cropped, width, height, kx, ky, radius, gxC, gyC);
+                    for (var i = 0; i < n; i++)
                     {
-                        gx[i] = gxL[i];
-                        gy[i] = gyL[i];
+                        var magL = MathF.Sqrt(gxL[i] * gxL[i] + gyL[i] * gyL[i]);
+                        var magC = MathF.Sqrt(gxC[i] * gxC[i] + gyC[i] * gyC[i]);
+                        if (magL >= magC)
+                        {
+                            gx[i] = gxL[i];
+                            gy[i] = gyL[i];
+                        }
+                        else
+                        {
+                            gx[i] = gxC[i];
+                            gy[i] = gyC[i];
+                        }
                     }
-                    else
-                    {
-                        gx[i] = gxC[i];
-                        gy[i] = gyC[i];
-                    }
-                }
 
-                break;
-            }
+                    break;
+                }
         }
 
         const int vcOrientationCount = 12;
@@ -285,17 +301,31 @@ internal static class NormalHeightGenerator
         var maxGradMag = gradMag.Max();
         var maxVcMag = vcMag.Max();
         const float eps = 1e-6f;
-        if (maxGradMag < eps) maxGradMag = 1f;
-        if (maxVcMag < eps) maxVcMag = 1f;
+        if (maxGradMag < eps)
+        {
+            maxGradMag = 1f;
+        }
+
+        if (maxVcMag < eps)
+        {
+            maxVcMag = 1f;
+        }
+
         var vcScale = maxGradMag / maxVcMag;
         var maxValue = 0f;
         for (var i = 0; i < gradMag.Length; i++)
         {
             var enhanced = MathF.Max(gradMag[i], vcMag[i] * vcScale);
-            if (enhanced > maxValue) maxValue = enhanced;
+            if (enhanced > maxValue)
+            {
+                maxValue = enhanced;
+            }
         }
 
-        if (maxValue < eps) maxValue = 1f;
+        if (maxValue < eps)
+        {
+            maxValue = 1f;
+        }
 
         var intensity = 1f / normalIntensity;
         var z = intensity;
@@ -318,7 +348,11 @@ internal static class NormalHeightGenerator
                     var ny = -gyv * scale / maxValue;
 
                     var len = MathF.Sqrt(nx * nx + ny * ny + z * z);
-                    if (len == 0) len = 1;
+                    if (len == 0)
+                    {
+                        len = 1;
+                    }
+
                     nx /= len;
                     ny /= len;
 
@@ -326,8 +360,15 @@ internal static class NormalHeightGenerator
                     var g = ToByte(ny);
                     var b = (byte)255;
 
-                    if (invertR) r = (byte)(255 - r);
-                    if (invertG) g = (byte)(255 - g);
+                    if (invertR)
+                    {
+                        r = (byte)(255 - r);
+                    }
+
+                    if (invertG)
+                    {
+                        g = (byte)(255 - g);
+                    }
 
                     row[x] = new Rgba32(r, g, b, 255);
                 }
@@ -348,21 +389,25 @@ internal static class NormalHeightGenerator
         float[] gyOut)
     {
         for (var y = 0; y < height; y++)
-        for (var x = 0; x < width; x++)
         {
-            float sx = 0, sy = 0;
-            for (var oy = -radius; oy <= radius; oy++)
-            for (var ox = -radius; ox <= radius; ox++)
+            for (var x = 0; x < width; x++)
             {
-                var rx = Reflect(x + ox, width);
-                var ry = Reflect(y + oy, height);
-                var v = scalar[ry * width + rx];
-                sx += v * kx[oy + radius, ox + radius];
-                sy += v * ky[oy + radius, ox + radius];
-            }
+                float sx = 0, sy = 0;
+                for (var oy = -radius; oy <= radius; oy++)
+                {
+                    for (var ox = -radius; ox <= radius; ox++)
+                    {
+                        var rx = Reflect(x + ox, width);
+                        var ry = Reflect(y + oy, height);
+                        var v = scalar[ry * width + rx];
+                        sx += v * kx[oy + radius, ox + radius];
+                        sy += v * ky[oy + radius, ox + radius];
+                    }
+                }
 
-            gxOut[y * width + x] = sx;
-            gyOut[y * width + x] = sy;
+                gxOut[y * width + x] = sx;
+                gyOut[y * width + x] = sy;
+            }
         }
     }
 
@@ -436,9 +481,20 @@ internal static class NormalHeightGenerator
     {
         var n = (int)size;
         if (op == NormalOperator.ScharrVc && n > 5)
+        {
             n = 5;
-        if (n < 3) n = 3;
-        if (n % 2 == 0) n++;
+        }
+
+        if (n < 3)
+        {
+            n = 3;
+        }
+
+        if (n % 2 == 0)
+        {
+            n++;
+        }
+
         radius = n / 2;
 
         if (n == 3)
@@ -484,14 +540,18 @@ internal static class NormalHeightGenerator
         {
             smooth[i] = 1;
             for (var j = i - 1; j > 0; j--)
+            {
                 smooth[j] = smooth[j] + smooth[j - 1];
+            }
         }
 
         var smoothSum = smooth.Sum();
         if (smoothSum > 0)
         {
             for (var i = 0; i < n; i++)
+            {
                 smooth[i] /= smoothSum;
+            }
         }
 
         var center = radius;
@@ -516,16 +576,20 @@ internal static class NormalHeightGenerator
         if (derivSum > 0)
         {
             for (var i = 0; i < n; i++)
+            {
                 deriv[i] /= derivSum;
+            }
         }
 
         kx = new float[n, n];
         ky = new float[n, n];
         for (var y = 0; y < n; y++)
-        for (var x = 0; x < n; x++)
         {
-            kx[y, x] = smooth[y] * deriv[x];
-            ky[y, x] = deriv[y] * smooth[x];
+            for (var x = 0; x < n; x++)
+            {
+                kx[y, x] = smooth[y] * deriv[x];
+                ky[y, x] = deriv[y] * smooth[x];
+            }
         }
     }
 
@@ -589,7 +653,9 @@ internal static class NormalHeightGenerator
             var lowest = outData.Min();
             var highest = outData.Max();
             for (var i = 0; i < outData.Length; i++)
+            {
                 outData[i] = (byte)(highest - outData[i] + lowest);
+            }
         }
 
         return new HeightMap { Width = width, Height = height, Data = outData };
@@ -597,8 +663,16 @@ internal static class NormalHeightGenerator
 
     private static int Reflect(int i, int max)
     {
-        if (i < 0) return -i - 1;
-        if (i >= max) return max - (i - max) - 1;
+        if (i < 0)
+        {
+            return -i - 1;
+        }
+
+        if (i >= max)
+        {
+            return max - (i - max) - 1;
+        }
+
         return i;
     }
 
@@ -607,7 +681,9 @@ internal static class NormalHeightGenerator
         var s = Math.Min(img.Width, img.Height);
         size = s;
         if (img.Width == s && img.Height == s)
+        {
             return img.Clone();
+        }
 
         return img.Clone(ctx => ctx.Crop(new Rectangle(0, 0, s, s)));
     }

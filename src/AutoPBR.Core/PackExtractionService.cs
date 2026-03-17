@@ -56,13 +56,23 @@ internal static class PackExtractionService
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var entry = archive.GetEntry(fullName);
-                if (entry is null) continue;
+                if (entry is null)
+                {
+                    continue;
+                }
+
                 var destPath = Path.Combine(extracted, fullName);
                 var dir = Path.GetDirectoryName(destPath);
                 if (!string.IsNullOrEmpty(dir))
+                {
                     Directory.CreateDirectory(dir);
+                }
+
                 if (!string.IsNullOrEmpty(entry.Name))
+                {
                     entry.ExtractToFile(destPath, overwrite: true);
+                }
+
                 ReportProgress();
             }
 
@@ -76,7 +86,9 @@ internal static class PackExtractionService
             var start = i * partitionSize;
             var count = Math.Min(partitionSize, entryNames.Count - start);
             if (count > 0)
+            {
                 partitions.Add(entryNames.GetRange(start, count));
+            }
         }
 
         Parallel.ForEach(
@@ -90,13 +102,23 @@ internal static class PackExtractionService
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     var entry = archive.GetEntry(fullName);
-                    if (entry is null) continue;
+                    if (entry is null)
+                    {
+                        continue;
+                    }
+
                     var destPath = Path.Combine(extracted, fullName);
                     var dir = Path.GetDirectoryName(destPath);
                     if (!string.IsNullOrEmpty(dir))
+                    {
                         Directory.CreateDirectory(dir);
+                    }
+
                     if (!string.IsNullOrEmpty(entry.Name))
+                    {
                         entry.ExtractToFile(destPath, overwrite: true);
+                    }
+
                     ReportProgress();
                 }
             });
@@ -114,9 +136,14 @@ internal static class PackExtractionService
         var destPath = Path.Combine(extractedRoot, entry.FullName.Replace('/', Path.DirectorySeparatorChar));
         var dir = Path.GetDirectoryName(destPath);
         if (!string.IsNullOrEmpty(dir))
+        {
             Directory.CreateDirectory(dir);
+        }
+
         if (!string.IsNullOrEmpty(entry.Name))
+        {
             entry.ExtractToFile(destPath, overwrite: true);
+        }
     }
 }
 

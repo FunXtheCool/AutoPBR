@@ -21,13 +21,20 @@ public sealed class ScannedArchiveData(
             var parent = queue.Dequeue();
             var children = GetChildren(parent);
             if (children is null)
+            {
                 continue;
+            }
+
             foreach (var c in children)
             {
                 if (c.IsFolder)
+                {
                     queue.Enqueue(c.FullPath);
+                }
                 else
+                {
                     yield return c.FullPath;
+                }
             }
         }
     }

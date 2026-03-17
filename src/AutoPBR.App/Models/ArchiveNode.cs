@@ -1,10 +1,16 @@
 using System.Collections.ObjectModel;
+
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace AutoPBR.App.Models;
 
 /// <summary>Lazy node in the scanned archive tree. Children are loaded on expand; override state is stored in the host.</summary>
-public partial class ArchiveNode(string name, string fullPath, bool isFolder, ArchiveNode? parent, IArchiveNodeHost? host) : ObservableObject
+public partial class ArchiveNode(
+    string name,
+    string fullPath,
+    bool isFolder,
+    ArchiveNode? parent,
+    IArchiveNodeHost? host) : ObservableObject
 {
     public string Name { get; } = name;
     public string FullPath { get; } = fullPath;
@@ -24,7 +30,10 @@ public partial class ArchiveNode(string name, string fullPath, bool isFolder, Ar
         set
         {
             if (host is null)
+            {
                 return;
+            }
+
             host.SetOverride(FullPath, value);
             OnPropertyChanged();
         }
@@ -36,19 +45,26 @@ public partial class ArchiveNode(string name, string fullPath, bool isFolder, Ar
     partial void OnIsExpandedChanged(bool value)
     {
         if (!IsFolder)
+        {
             return;
+        }
+
         if (value && host is not null)
         {
             // Load this folder's children if needed.
             if (Children.Count == 0)
+            {
                 host.EnsureChildrenLoaded(this);
+            }
 
             // Also pre-load one level of children for immediate subfolders
             // so their expand/collapse arrows are visible right away.
             foreach (var child in Children)
             {
                 if (child.IsFolder)
+                {
                     host.EnsureChildrenLoaded(child);
+                }
             }
         }
     }

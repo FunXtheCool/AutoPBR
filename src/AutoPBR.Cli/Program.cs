@@ -20,7 +20,9 @@ static int Usage()
 }
 
 if (args.Length < 2)
+{
     return Usage();
+}
 
 var input = args[0];
 var output = args[1];
@@ -37,17 +39,27 @@ for (var i = 2; i < args.Length; i++)
 {
     if (args[i].Equals("--normal", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length &&
         float.TryParse(args[i + 1], out var n))
+    {
         normal = n;
+    }
+
     if (args[i].Equals("--height", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length &&
         float.TryParse(args[i + 1], out var h))
+    {
         height = h;
+    }
+
     if (args[i].Equals("--normal-operator", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
     {
         var val = args[i + 1];
         if (val.Equals("sobel", StringComparison.OrdinalIgnoreCase))
+        {
             normalOperator = NormalOperator.SobelVc;
+        }
         else if (val.Equals("scharr", StringComparison.OrdinalIgnoreCase))
+        {
             normalOperator = NormalOperator.ScharrVc;
+        }
         else
         {
             Console.Error.WriteLine("Invalid value for --normal-operator. Expected 'sobel' or 'scharr'.");
@@ -59,11 +71,17 @@ for (var i = 2; i < args.Length; i++)
     {
         var val = args[i + 1];
         if (val is "3" or "3x3")
+        {
             normalKernelSize = NormalKernelSize.K3;
+        }
         else if (val is "5" or "5x5")
+        {
             normalKernelSize = NormalKernelSize.K5;
+        }
         else if (val is "7" or "7x7")
+        {
             normalKernelSize = NormalKernelSize.K7;
+        }
         else
         {
             Console.Error.WriteLine("Invalid value for --normal-kernel. Expected 3, 5, or 7.");
@@ -81,13 +99,21 @@ for (var i = 2; i < args.Length; i++)
     {
         var val = args[i + 1];
         if (val.Equals("luminance", StringComparison.OrdinalIgnoreCase))
+        {
             normalDerivative = NormalDerivative.Luminance;
+        }
         else if (val.Equals("color", StringComparison.OrdinalIgnoreCase))
+        {
             normalDerivative = NormalDerivative.Color;
+        }
         else if (val.Equals("blend", StringComparison.OrdinalIgnoreCase))
+        {
             normalDerivative = NormalDerivative.ColorLuminanceBlend;
+        }
         else if (val.Equals("max", StringComparison.OrdinalIgnoreCase))
+        {
             normalDerivative = NormalDerivative.ColorLuminanceMax;
+        }
         else
         {
             Console.Error.WriteLine(
@@ -123,9 +149,13 @@ var converter = new ResourcePackConverter();
 var prog = new Progress<ConversionProgress>(p =>
 {
     if (p.Stage is ConversionStage.Extracting or ConversionStage.Packing or ConversionStage.Done)
+    {
         Console.WriteLine(p.Stage);
+    }
     else
+    {
         Console.WriteLine($"{p.Stage} {p.Completed}/{p.Total} {p.CurrentTextureName}");
+    }
 });
 
 try

@@ -12,10 +12,18 @@ public sealed class ResourcePackConverter
         CancellationToken cancellationToken = default)
     {
         if (!File.Exists(inputZipPath))
+        {
+
             throw new FileNotFoundException("Input pack not found.", inputZipPath);
+        }
+
 
         if (options.SpecularData is null)
+        {
+
             throw new InvalidOperationException("SpecularData is required (load textures_data.json first).");
+        }
+
 
         var baseTemp = string.IsNullOrWhiteSpace(options.TempDirectory)
             ? Path.GetTempPath()
@@ -29,10 +37,16 @@ public sealed class ResourcePackConverter
             await Task.Run(() =>
             {
                 if (options.UseLegacyExtractor)
+                {
                     PackExtractionService.ExtractPack(inputZipPath, extracted, options, progress, cancellationToken);
+                }
                 else
+                {
+
                     ParallelZipReader.ExtractZip(inputZipPath, extracted, progress, ConversionStage.Extracting,
                         cancellationToken, options.EntriesToExtractOnly);
+                }
+
             }, cancellationToken).ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -50,7 +64,10 @@ public sealed class ResourcePackConverter
 
             Directory.CreateDirectory(Path.GetDirectoryName(outputZipPath) ?? ".");
             if (File.Exists(outputZipPath))
+            {
                 File.Delete(outputZipPath);
+            }
+
 
             await Task.Run(() => PackWriter.CreateOutputZip(extracted, outputZipPath, textures, progress, cancellationToken),
                 cancellationToken).ConfigureAwait(false);
@@ -80,10 +97,18 @@ public sealed class ResourcePackConverter
         CancellationToken cancellationToken = default)
     {
         if (!File.Exists(inputZipPath))
+        {
+
             throw new FileNotFoundException("Input pack not found.", inputZipPath);
+        }
+
 
         if (options.SpecularData is null)
+        {
+
             throw new InvalidOperationException("SpecularData is required (load textures_data.json first).");
+        }
+
 
         var baseTemp = string.IsNullOrWhiteSpace(options.TempDirectory)
             ? Path.GetTempPath()
@@ -100,7 +125,11 @@ public sealed class ResourcePackConverter
 
             var textures = TextureScanner.ScanTextures(extracted, options);
             if (textures.Count == 0)
+            {
+
                 throw new InvalidOperationException("No previewable textures found after extraction.");
+            }
+
 
             TextureWorkItem target = textures[0];
             var targetRel = archivePath.Replace('\\', '/');

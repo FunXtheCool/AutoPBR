@@ -22,18 +22,28 @@ internal static class TextureScanner
         }
 
         if (options.ProcessArmor)
+        {
             yield return ("entity", false);
+        }
+
         if (options.ProcessParticles)
+        {
             yield return ("particle", true);
+        }
     }
 
     private static IEnumerable<string> GetAssetNamespaces(string extractedPackRoot)
     {
         var assetsDir = Path.Combine(extractedPackRoot, "assets");
         if (!Directory.Exists(assetsDir))
+        {
             yield break;
+        }
+
         foreach (var dir in Directory.EnumerateDirectories(assetsDir))
+        {
             yield return Path.GetFileName(dir);
+        }
     }
 
     private static bool IsPathUnderPlantOrPlants(string relativePathNoExt)
@@ -45,7 +55,9 @@ internal static class TextureScanner
     private static bool IsPlantForNoHeight(string relativePathNoExt, string foliageMode)
     {
         if (foliageMode != "No Height")
+        {
             return false;
+        }
 
         return AutoPbrDefaults.PlantTextureKeys.Contains(relativePathNoExt)
                || IsPathUnderPlantOrPlants(relativePathNoExt);
@@ -64,23 +76,35 @@ internal static class TextureScanner
                 {
                     var dir = Path.Combine(texturesRoot, folder);
                     if (!Directory.Exists(dir))
+                    {
                         continue;
+                    }
 
                     foreach (var file in Directory.EnumerateFiles(dir, "*.png", SearchOption.AllDirectories))
                     {
                         var fileName = Path.GetFileName(file);
                         if (AutoPbrDefaults.ExcludedFileNames.Contains(fileName))
+                        {
                             continue;
+                        }
+
                         if (fileName.Contains("sapling", StringComparison.OrdinalIgnoreCase))
+                        {
                             continue;
+                        }
+
                         if (fileName.Contains("mcmeta", StringComparison.OrdinalIgnoreCase))
+                        {
                             continue;
+                        }
 
                         var name = Path.GetFileNameWithoutExtension(file);
                         if (name.EndsWith("_n", StringComparison.OrdinalIgnoreCase) ||
                             name.EndsWith("_s", StringComparison.OrdinalIgnoreCase) ||
                             name.EndsWith("_e", StringComparison.OrdinalIgnoreCase))
+                        {
                             continue;
+                        }
 
                         var ext = Path.GetExtension(file);
                         var directoryPath = Path.GetDirectoryName(file) ?? dir;
@@ -92,9 +116,14 @@ internal static class TextureScanner
                         var relativePathNoExt = "\\" + namespaceName + "\\" + relativeToTextures;
 
                         if (options.IgnoreTextureKeys.Contains(relativePathNoExt))
+                        {
                             continue;
+                        }
+
                         if (options.FoliageMode == "Ignore All" && IsPathUnderPlantOrPlants(relativePathNoExt))
+                        {
                             continue;
+                        }
 
                         results.Add(new TextureWorkItem
                         {
@@ -118,13 +147,17 @@ internal static class TextureScanner
                 {
                     var fileName = Path.GetFileName(file);
                     if (fileName.Contains("mcmeta", StringComparison.OrdinalIgnoreCase))
+                    {
                         continue;
+                    }
 
                     var name = Path.GetFileNameWithoutExtension(file);
                     if (name.EndsWith("_n", StringComparison.OrdinalIgnoreCase) ||
                         name.EndsWith("_s", StringComparison.OrdinalIgnoreCase) ||
                         name.EndsWith("_e", StringComparison.OrdinalIgnoreCase))
+                    {
                         continue;
+                    }
 
                     var ext = Path.GetExtension(file);
                     var directoryPath = Path.GetDirectoryName(file) ?? ctmRoot;
@@ -136,7 +169,9 @@ internal static class TextureScanner
                     var relativePathNoExt = "\\" + namespaceName + "\\" + relativeToNamespace;
 
                     if (options.IgnoreTextureKeys.Contains(relativePathNoExt))
+                    {
                         continue;
+                    }
 
                     results.Add(new TextureWorkItem
                     {
@@ -158,17 +193,26 @@ internal static class TextureScanner
                 {
                     var plantRoot = Path.Combine(extractedPackRoot, "assets", namespaceName, "optifine", plantFolder);
                     if (!Directory.Exists(plantRoot))
+                    {
                         continue;
+                    }
+
                     foreach (var file in Directory.EnumerateFiles(plantRoot, "*.png", SearchOption.AllDirectories))
                     {
                         var fileName = Path.GetFileName(file);
                         if (fileName.Contains("mcmeta", StringComparison.OrdinalIgnoreCase))
+                        {
                             continue;
+                        }
+
                         var name = Path.GetFileNameWithoutExtension(file);
                         if (name.EndsWith("_n", StringComparison.OrdinalIgnoreCase) ||
                             name.EndsWith("_s", StringComparison.OrdinalIgnoreCase) ||
                             name.EndsWith("_e", StringComparison.OrdinalIgnoreCase))
+                        {
                             continue;
+                        }
+
                         var ext = Path.GetExtension(file);
                         var directoryPath = Path.GetDirectoryName(file) ?? plantRoot;
                         var relativeToNamespace = Path.GetRelativePath(
@@ -177,7 +221,10 @@ internal static class TextureScanner
                         ).Replace('/', '\\');
                         var relativePathNoExt = "\\" + namespaceName + "\\" + relativeToNamespace;
                         if (options.IgnoreTextureKeys.Contains(relativePathNoExt))
+                        {
                             continue;
+                        }
+
                         results.Add(new TextureWorkItem
                         {
                             FullPath = file,

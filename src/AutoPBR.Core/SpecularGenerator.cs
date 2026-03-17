@@ -34,7 +34,9 @@ internal static class SpecularGenerator
         foreach (var sub in MetalSubstrings)
         {
             if (combined.Contains(sub, StringComparison.OrdinalIgnoreCase))
+            {
                 return true;
+            }
         }
 
         return false;
@@ -58,7 +60,10 @@ internal static class SpecularGenerator
         });
         var sumLum = 0.0;
         foreach (var value in lum)
+        {
             sumLum += value;
+        }
+
         var meanLum = (float)(sumLum / lum.Length);
 
         int[,] kx =
@@ -76,21 +81,25 @@ internal static class SpecularGenerator
         var gx = new float[width * height];
         var gy = new float[width * height];
         for (var y = 0; y < height; y++)
-        for (var x = 0; x < width; x++)
         {
-            float sx = 0, sy = 0;
-            for (var oy = -1; oy <= 1; oy++)
-            for (var ox = -1; ox <= 1; ox++)
+            for (var x = 0; x < width; x++)
             {
-                var rx = Reflect(x + ox, width);
-                var ry = Reflect(y + oy, height);
-                var v = lum[ry * width + rx];
-                sx += v * kx[oy + 1, ox + 1];
-                sy += v * ky[oy + 1, ox + 1];
-            }
+                float sx = 0, sy = 0;
+                for (var oy = -1; oy <= 1; oy++)
+                {
+                    for (var ox = -1; ox <= 1; ox++)
+                    {
+                        var rx = Reflect(x + ox, width);
+                        var ry = Reflect(y + oy, height);
+                        var v = lum[ry * width + rx];
+                        sx += v * kx[oy + 1, ox + 1];
+                        sy += v * ky[oy + 1, ox + 1];
+                    }
+                }
 
-            gx[y * width + x] = sx;
-            gy[y * width + x] = sy;
+                gx[y * width + x] = sx;
+                gy[y * width + x] = sy;
+            }
         }
 
         const int vcOrientationCount = 12;
@@ -113,12 +122,19 @@ internal static class SpecularGenerator
 
         var maxEdge = 0f;
         foreach (var e in edge)
+        {
             if (e > maxEdge)
+            {
                 maxEdge = e;
+            }
+        }
+
         if (maxEdge > 0f)
         {
             for (var i = 0; i < edge.Length; i++)
+            {
                 edge[i] = Math.Clamp(edge[i] / maxEdge, 0f, 1f);
+            }
         }
 
         return (lum, edge, meanLum);
@@ -146,7 +162,7 @@ internal static class SpecularGenerator
             Parallel.ForEach(
                 textures,
                 new ParallelOptions
-                    { MaxDegreeOfParallelism = ThreadingUtil.GetConversionParallelism(options), CancellationToken = ct },
+                { MaxDegreeOfParallelism = ThreadingUtil.GetConversionParallelism(options), CancellationToken = ct },
                 t =>
                 {
                     ThreadingUtil.SetThreadName("AutoPBR.Specular");
@@ -167,7 +183,10 @@ internal static class SpecularGenerator
                          t.RelativeKey.Contains("grass", StringComparison.OrdinalIgnoreCase)))
                     {
                         if (!cropped.DangerousTryGetSinglePixelMemory(out var alphaCheckMem))
+                        {
                             throw new InvalidOperationException("Expected contiguous pixel memory.");
+                        }
+
                         var alphaSpan = alphaCheckMem.Span;
                         long sumA = 0;
                         int lowAlphaCount = 0;
@@ -176,7 +195,10 @@ internal static class SpecularGenerator
                         {
                             var a = alphaSpan[i].A;
                             sumA += a;
-                            if (a < 128) lowAlphaCount++;
+                            if (a < 128)
+                            {
+                                lowAlphaCount++;
+                            }
                         }
 
                         var meanAlpha = (int)(sumA / pixelCount);
@@ -207,7 +229,10 @@ internal static class SpecularGenerator
                     var bBuf = new byte[nPixels];
                     var aBuf = new byte[nPixels];
                     if (!cropped.DangerousTryGetSinglePixelMemory(out var inMem))
+                    {
                         throw new InvalidOperationException("Expected contiguous pixel memory.");
+                    }
+
                     var inSpan = inMem.Span;
 
                     for (var idx = 0; idx < nPixels; idx++)
@@ -230,7 +255,10 @@ internal static class SpecularGenerator
                             rr = (int)Math.Min(255, spec.r * options.SmoothnessScale);
                             rr = (int)(rr * (1f - 0.2f * edge));
                             if (lum > 0.92f && meanLuminance < 0.25f)
+                            {
                                 rr = Math.Min(rr, 220);
+                            }
+
                             bb = Math.Clamp(spec.b + options.PorosityBias, 0, 255);
                         }
 
@@ -245,14 +273,23 @@ internal static class SpecularGenerator
                     for (var i = 0; i < nPixels; i++)
                     {
                         var v = rBuf[i];
-                        if (v < minR) minR = v;
-                        if (v > maxR) maxR = v;
+                        if (v < minR)
+                        {
+                            minR = v;
+                        }
+
+                        if (v > maxR)
+                        {
+                            maxR = v;
+                        }
                     }
 
                     if (maxR > minR)
                     {
                         for (var i = 0; i < nPixels; i++)
+                        {
                             rBuf[i] = (byte)Math.Clamp(10 + (rBuf[i] - minR) * 190 / (maxR - minR), 0, 255);
+                        }
                     }
 
                     var hasData = false;
@@ -273,7 +310,9 @@ internal static class SpecularGenerator
                                     var a = aBuf[idx];
 
                                     if (r != 0 || g != 0 || b != 0 || a != 255)
+                                    {
                                         hasData = true;
+                                    }
 
                                     row[x] = new Rgba32(r, g, b, a);
                                 }
@@ -305,7 +344,9 @@ internal static class SpecularGenerator
         CIEDE2000ColorDifference de2000)
     {
         if (rules is null || rules.Count == 0)
+        {
             return (0, 0, 0, 255); // LabPBR: alpha 255 = no emission
+        }
 
         var pr = pixel.R;
         var pg = pixel.G;
@@ -333,7 +374,9 @@ internal static class SpecularGenerator
 
         var pixLab = rgbToLab.Convert(RGBColor.FromRGB8Bit(pr, pg, pb));
         if (rulesLab is null)
+        {
             return (0, 0, 0, 255);
+        }
 
         for (var i = 0; i < rulesLab.Count; i++)
         {
@@ -360,8 +403,16 @@ internal static class SpecularGenerator
 
     private static int Reflect(int i, int max)
     {
-        if (i < 0) return -i - 1;
-        if (i >= max) return max - (i - max) - 1;
+        if (i < 0)
+        {
+            return -i - 1;
+        }
+
+        if (i >= max)
+        {
+            return max - (i - max) - 1;
+        }
+
         return i;
     }
 
@@ -370,7 +421,9 @@ internal static class SpecularGenerator
         var s = Math.Min(img.Width, img.Height);
         size = s;
         if (img.Width == s && img.Height == s)
+        {
             return img.Clone();
+        }
 
         return img.Clone(ctx => ctx.Crop(new Rectangle(0, 0, s, s)));
     }

@@ -37,10 +37,18 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
     private static void AddAppNativeDirToDllSearchPath()
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
             return;
+        }
+
+
         var nativeDir = Path.Combine(AppContext.BaseDirectory, "runtimes", "win-x64", "native");
         if (!Directory.Exists(nativeDir))
+        {
             return;
+        }
+
+
         try
         {
             SetDllDirectory(nativeDir);
@@ -57,7 +65,12 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
     public static DeepBumpNormalsGenerator? TryCreate(string modelPath)
     {
         if (string.IsNullOrWhiteSpace(modelPath) || !File.Exists(modelPath))
+        {
+
             return null;
+        }
+
+
         AddAppNativeDirToDllSearchPath();
         try
         {
@@ -108,7 +121,12 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         var height = diffuse.Height;
         var gray = ToGrayscaleFloat(diffuse);
         var stride = TileSize - (int)overlap;
-        if (stride % 2 != 0) stride--;
+        if (stride % 2 != 0)
+        {
+            stride--;
+        }
+
+
         TilesSplit(gray, width, height, stride, out var tiles, out var paddings);
         var predTiles = new List<float[]>();
         lock (_runLock)
@@ -152,10 +170,30 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         int padH = 0, padW = 0;
         var remainderH = (imgH - TileSize) % stride;
         var remainderW = (imgW - TileSize) % stride;
-        if (remainderH != 0) padH = stride - remainderH;
-        if (remainderW != 0) padW = stride - remainderW;
-        if (TileSize > imgH) padH = TileSize - imgH;
-        if (TileSize > imgW) padW = TileSize - imgW;
+        if (remainderH != 0)
+        {
+            padH = stride - remainderH;
+        }
+
+
+        if (remainderW != 0)
+        {
+            padW = stride - remainderW;
+        }
+
+
+        if (TileSize > imgH)
+        {
+            padH = TileSize - imgH;
+        }
+
+
+        if (TileSize > imgW)
+        {
+            padW = TileSize - imgW;
+        }
+
+
         var padLeft = padW / 2 + stride;
         var padRight = padLeft + (padW % 2 == 0 ? 0 : 1);
         var padTop = padH / 2 + stride;
@@ -167,11 +205,21 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         for (var y = 0; y < fullH; y++)
         {
             var sy = (y - padTop) % imgH;
-            if (sy < 0) sy += imgH;
+            if (sy < 0)
+            {
+                sy += imgH;
+            }
+
+
             for (var x = 0; x < fullW; x++)
             {
                 var sx = (x - padLeft) % imgW;
-                if (sx < 0) sx += imgW;
+                if (sx < 0)
+                {
+                    sx += imgW;
+                }
+
+
                 padded[y * fullW + x] = img[sy * imgW + sx];
             }
         }
@@ -180,16 +228,24 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         var hRange = (fullH - TileSize) / stride + 1;
         var wRange = (fullW - TileSize) / stride + 1;
         for (var hy = 0; hy < hRange; hy++)
-        for (var wx = 0; wx < wRange; wx++)
         {
-            var tile = new float[1 * 1 * TileSize * TileSize];
-            var y0 = hy * stride;
-            var x0 = wx * stride;
-            for (var y = 0; y < TileSize; y++)
-            for (var x = 0; x < TileSize; x++)
-                tile[y * TileSize + x] = padded[(y0 + y) * fullW + (x0 + x)];
-            tiles.Add(tile);
+            for (var wx = 0; wx < wRange; wx++)
+            {
+                var tile = new float[1 * 1 * TileSize * TileSize];
+                var y0 = hy * stride;
+                var x0 = wx * stride;
+                for (var y = 0; y < TileSize; y++)
+                {
+                    for (var x = 0; x < TileSize; x++)
+                    {
+                        tile[y * TileSize + x] = padded[(y0 + y) * fullW + (x0 + x)];
+                    }
+                }
+
+                tiles.Add(tile);
+            }
         }
+
     }
 
     private float[] RunTile(float[] tile)
@@ -200,7 +256,11 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         var outTensor = outputs[0];
         var outputFloats = outTensor.AsEnumerable<float>().ToArray();
         if (_outputIsNhwc)
+        {
             outputFloats = ConvertNhwcToNchw(outputFloats, 1, TileSize, TileSize, ExpectedChannels);
+        }
+
+
         return outputFloats;
     }
 
@@ -208,10 +268,20 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
     {
         var nchw = new float[n * c * h * w];
         for (var ni = 0; ni < n; ni++)
-        for (var y = 0; y < h; y++)
-        for (var x = 0; x < w; x++)
-        for (var ci = 0; ci < c; ci++)
-            nchw[(ni * c + ci) * h * w + y * w + x] = nhwc[((ni * h + y) * w + x) * c + ci];
+        {
+            for (var y = 0; y < h; y++)
+            {
+                for (var x = 0; x < w; x++)
+                {
+                    for (var ci = 0; ci < c; ci++)
+                    {
+                        nchw[(ni * c + ci) * h * w + y * w + x] = nhwc[((ni * h + y) * w + x) * c + ci];
+                    }
+                }
+            }
+        }
+
+
         return nchw;
     }
 
@@ -222,55 +292,66 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         var mask = new float[TileSize * TileSize];
         var rampMinus1 = ramp > 1 ? ramp - 1 : 1;
         for (var y = 0; y < TileSize; y++)
-        for (var x = 0; x < TileSize; x++)
         {
-            float v = 1f;
-            // Ramps in width direction: mask[ramp:-ramp, :ramp] = linspace(0,1), mask[ramp:-ramp, -ramp:] = linspace(1,0)
-            if (y >= ramp && y < TileSize - ramp)
+            for (var x = 0; x < TileSize; x++)
             {
-                if (x < ramp)
-                    v = (float)x / rampMinus1;
-                else if (x >= TileSize - ramp)
-                    v = (float)(TileSize - 1 - x) / rampMinus1;
-            }
-            // Ramps in height direction
-            else if (x >= ramp && x < TileSize - ramp)
-            {
-                if (y < ramp)
-                    v = (float)y / rampMinus1;
-                else if (y >= TileSize - ramp)
-                    v = (float)(TileSize - 1 - y) / rampMinus1;
-            }
-            else
-            {
-                // Corners: utils_inference uses rot90(corner_mask,2) for top-left, then flip for top-right, flip for bottom-right, flip for bottom-left
-                int ch, cw;
-                if (y < ramp && x < ramp)
+                float v = 1f;
+                // Ramps in width direction: mask[ramp:-ramp, :ramp] = linspace(0,1), mask[ramp:-ramp, -ramp:] = linspace(1,0)
+                if (y >= ramp && y < TileSize - ramp)
                 {
-                    ch = ramp - 1 - y;
-                    cw = ramp - 1 - x;
-                } // top-left
-                else if (y < ramp && x >= TileSize - ramp)
+                    if (x < ramp)
+                    {
+                        v = (float)x / rampMinus1;
+                    }
+                    else if (x >= TileSize - ramp)
+                    {
+                        v = (float)(TileSize - 1 - x) / rampMinus1;
+                    }
+                }
+                // Ramps in height direction
+                else if (x >= ramp && x < TileSize - ramp)
                 {
-                    ch = ramp - 1 - y;
-                    cw = x - (TileSize - ramp);
-                } // top-right
-                else if (y >= TileSize - ramp && x >= TileSize - ramp)
-                {
-                    ch = y - (TileSize - ramp);
-                    cw = x - (TileSize - ramp);
-                } // bottom-right
+                    if (y < ramp)
+                    {
+                        v = (float)y / rampMinus1;
+                    }
+                    else if (y >= TileSize - ramp)
+                    {
+                        v = (float)(TileSize - 1 - y) / rampMinus1;
+                    }
+                }
                 else
                 {
-                    ch = TileSize - 1 - y;
-                    cw = ramp - 1 - x;
-                } // bottom-left
+                    // Corners: utils_inference uses rot90(corner_mask,2) for top-left, then flip for top-right, flip for bottom-right, flip for bottom-left
+                    int ch, cw;
+                    if (y < ramp && x < ramp)
+                    {
+                        ch = ramp - 1 - y;
+                        cw = ramp - 1 - x;
+                    } // top-left
+                    else if (y < ramp && x >= TileSize - ramp)
+                    {
+                        ch = ramp - 1 - y;
+                        cw = x - (TileSize - ramp);
+                    } // top-right
+                    else if (y >= TileSize - ramp && x >= TileSize - ramp)
+                    {
+                        ch = y - (TileSize - ramp);
+                        cw = x - (TileSize - ramp);
+                    } // bottom-right
+                    else
+                    {
+                        ch = TileSize - 1 - y;
+                        cw = ramp - 1 - x;
+                    } // bottom-left
 
-                v = CornerMaskValue(ramp, ch, cw);
+                    v = CornerMaskValue(ramp, ch, cw);
+                }
+
+                mask[y * TileSize + x] = v;
             }
-
-            mask[y * TileSize + x] = v;
         }
+
 
         return mask;
     }
@@ -278,11 +359,21 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
     /// <summary>corner_mask(side_length) - 0.25*scaling_mask(side_length) per utils_inference.</summary>
     private static float CornerMaskValue(int sideLength, int h, int w)
     {
-        if (sideLength <= 0) return 1f;
+        if (sideLength <= 0)
+        {
+            return 1f;
+        }
+
+
         var s = sideLength;
         var s1 = (float)(s - 1);
         float corner = (h >= w) ? (1f - h / s1) : (1f - w / s1);
-        if (corner < 0) corner = 0;
+        if (corner < 0)
+        {
+            corner = 0;
+        }
+
+
         float scaling = ScalingMaskValue(s, h, w); // Python: scaling_mask = 2*scaling, then corner - 0.25*scaling_mask
         return Math.Max(0f, corner - 0.25f * (2f * scaling));
     }
@@ -290,15 +381,40 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
     /// <summary>Inner scaling value; Python returns 2*this as scaling_mask. Corner uses 0.25*scaling_mask = 0.5*this.</summary>
     private static float ScalingMaskValue(int sideLength, int h, int w)
     {
-        if (sideLength <= 0) return 0f;
+        if (sideLength <= 0)
+        {
+            return 0f;
+        }
+
+
         var s = sideLength;
         var s1 = (float)(s - 1);
         var sh = h / s1;
         var sw = w / s1;
-        if (h >= w && h <= s - 1 - w) return sw;
-        if (h <= w && h <= s - 1 - w) return sh;
-        if (h >= w && h >= s - 1 - w) return 1f - sh;
-        if (h <= w && h >= s - 1 - w) return 1f - sw;
+        if (h >= w && h <= s - 1 - w)
+        {
+            return sw;
+        }
+
+
+        if (h <= w && h <= s - 1 - w)
+        {
+            return sh;
+        }
+
+
+        if (h >= w && h >= s - 1 - w)
+        {
+            return 1f - sh;
+        }
+
+
+        if (h <= w && h >= s - 1 - w)
+        {
+            return 1f - sw;
+        }
+
+
         return 0f;
     }
 
@@ -311,22 +427,31 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         var wRange = (fullW - TileSize) / stride + 1;
         var idx = 0;
         for (var hy = 0; hy < hRange; hy++)
-        for (var wx = 0; wx < wRange; wx++)
         {
-            var tile = tiles[idx++];
-            var y0 = hy * stride;
-            var x0 = wx * stride;
-            for (var c = 0; c < channels; c++)
-            for (var y = 0; y < TileSize; y++)
-            for (var x = 0; x < TileSize; x++)
+            for (var wx = 0; wx < wRange; wx++)
             {
-                var my = y0 + y;
-                var mx = x0 + x;
-                if (my < fullH && mx < fullW)
-                    merged[(c * fullH + my) * fullW + mx] +=
+                var tile = tiles[idx++];
+                var y0 = hy * stride;
+                var x0 = wx * stride;
+                for (var c = 0; c < channels; c++)
+                {
+                    for (var y = 0; y < TileSize; y++)
+                    {
+                        for (var x = 0; x < TileSize; x++)
+                        {
+                            var my = y0 + y;
+                            var mx = x0 + x;
+                            if (my < fullH && mx < fullW)
+                            {
+                                merged[(c * fullH + my) * fullW + mx] +=
                         tile[c * TileSize * TileSize + y * TileSize + x] * mask[y * TileSize + x];
+                            }
+                        }
+                    }
+                }
             }
         }
+
 
         var padLeft = paddings.padLeft;
         var padTop = paddings.padTop;
@@ -336,9 +461,17 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         var outW = fullW - padLeft - padRight;
         var result = new float[channels * outH * outW];
         for (var c = 0; c < channels; c++)
-        for (var y = 0; y < outH; y++)
-        for (var x = 0; x < outW; x++)
-            result[(c * outH + y) * outW + x] = merged[(c * fullH + (y + padTop)) * fullW + (x + padLeft)];
+        {
+            for (var y = 0; y < outH; y++)
+            {
+                for (var x = 0; x < outW; x++)
+                {
+                    result[(c * outH + y) * outW + x] = merged[(c * fullH + (y + padTop)) * fullW + (x + padLeft)];
+                }
+            }
+        }
+
+
         return result;
     }
 
@@ -356,9 +489,16 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
             }
 
             var norm = MathF.Sqrt(sumSq);
-            if (norm < 1e-8f) norm = 1f;
+            if (norm < 1e-8f)
+            {
+                norm = 1f;
+            }
+
             for (var c = 0; c < channels; c++)
+            {
                 data[(c * height * width) + i] = (data[(c * height * width) + i] / norm) * 0.5f + 0.5f;
+            }
+
         }
     }
 

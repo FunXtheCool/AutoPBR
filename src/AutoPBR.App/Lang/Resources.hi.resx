@@ -150,7 +150,7 @@
   <data name="DeepBumpOverlapSmall" xml:space="preserve"><value>छोटा</value></data>
   <data name="DeepBumpOverlapMedium" xml:space="preserve"><value>मध्यम</value></data>
   <data name="DeepBumpOverlapLarge" xml:space="preserve"><value>बड़ा</value></data>
-  <data name="TextureTypes" xml:space="preserve"><value>टेक्सचर टाइप</value></data>
+  <data name="TextureTypes" xml:space="preserve"><value>परिवर्तन फ़िल्टर</value></data>
   <data name="Blocks" xml:space="preserve"><value>ब्लॉक</value></data>
   <data name="BlocksTooltip" xml:space="preserve"><value>block और blocks फोल्डर की टेक्सचर प्रोसेस करें।</value></data>
   <data name="Items" xml:space="preserve"><value>आइटम</value></data>

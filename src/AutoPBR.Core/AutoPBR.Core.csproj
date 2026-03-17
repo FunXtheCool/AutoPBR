@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Colourful" Version="3.2.0" />
+    <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     <!-- 1.24.x with CUDA 13.1.x. GPU needs CUDA Toolkit 13.1.x (e.g. 13.1.1) installed (cublasLt64_13.dll etc.); else falls back to CPU. -->
     <PackageReference Include="Microsoft.ML.OnnxRuntime.Gpu" Version="1.24.3" />

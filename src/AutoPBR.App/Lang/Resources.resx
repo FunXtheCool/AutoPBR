@@ -317,7 +317,7 @@
     <value>Large</value>
   </data>
   <data name="TextureTypes" xml:space="preserve">
-    <value>Texture types</value>
+    <value>Conversion Filters</value>
   </data>
   <data name="Blocks" xml:space="preserve">
     <value>Blocks</value>

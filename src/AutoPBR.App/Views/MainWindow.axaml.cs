@@ -2,7 +2,6 @@ using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Layout;
 using Avalonia.Platform.Storage;
 using AutoPBR.App.Models;
 using AutoPBR.App.ViewModels;
@@ -15,6 +14,7 @@ public partial class MainWindow : Window
     private DateTime _lastLogScrollUtc = DateTime.MinValue;
 
     private const double RoundedCornerRadius = 8;
+    private const double JumpToTopThresholdPx = 220;
     private Border? _rootBorder;
 
     public MainWindow()
@@ -34,7 +34,10 @@ public partial class MainWindow : Window
         PropertyChanged += (_, args) =>
         {
             if (args.Property == WindowStateProperty)
+            {
                 UpdateCornerRadiusFromCurrentState();
+            }
+
         };
         Resized += (_, _) => UpdateCornerRadiusFromCurrentState();
         PositionChanged += (_, _) => UpdateCornerRadiusFromCurrentState();
@@ -47,10 +50,16 @@ public partial class MainWindow : Window
         Width = state.Width;
         Height = state.Height;
         if (state.State is >= 0 and <= 2)
+        {
             WindowState = (WindowState)state.State;
+        }
+
         var contentGrid = this.FindControl<Grid>("ContentGrid");
         if (contentGrid?.ColumnDefinitions.Count >= 3)
+        {
             contentGrid.ColumnDefinitions[2].Width = new GridLength(state.PreviewColumnWidth, GridUnitType.Pixel);
+        }
+
     }
 
     private void OnClosing(object? sender, WindowClosingEventArgs e)
@@ -65,16 +74,24 @@ public partial class MainWindow : Window
             State = (int)WindowState,
             PreviewColumnWidth = 280
         };
-        if (contentGrid?.ColumnDefinitions.Count >= 3 &&
+        if (contentGrid?.ColumnDefinitions.Count is >= 3 &&
             contentGrid.ColumnDefinitions[2].Width.IsAbsolute)
+        {
             state.PreviewColumnWidth = contentGrid.ColumnDefinitions[2].Width.Value;
+        }
+
+
         state.Save();
     }
 
     private void UpdateCornerRadiusFromCurrentState()
     {
         if (_rootBorder is null)
+        {
             return;
+        }
+
+
         bool useSquare = WindowState == WindowState.Maximized || IsWindowsSnapped();
         _rootBorder.CornerRadius = useSquare ? new CornerRadius(0) : new CornerRadius(RoundedCornerRadius);
     }
@@ -85,21 +102,47 @@ public partial class MainWindow : Window
     private bool IsWindowsSnapped()
     {
         if (!OperatingSystem.IsWindows())
+        {
             return false;
+        }
+
+
         if (TryGetPlatformHandle()?.Handle is not { } hwnd)
+        {
+
             return false;
+        }
+
+
         try
         {
             if (IsZoomed(hwnd) != 0)
+            {
                 return true;
+            }
+
+
             if (!GetWindowRect(hwnd, out var r))
+            {
                 return false;
+            }
+
+
             IntPtr mon = MonitorFromWindow(hwnd, 2 /* MONITOR_DEFAULTTONEAREST */);
             if (mon == IntPtr.Zero)
+            {
                 return false;
-            var mi = new MONITORINFO { cbSize = (uint)Marshal.SizeOf<MONITORINFO>() };
+            }
+
+
+            var mi = new MonitorInfo { cbSize = (uint)Marshal.SizeOf<MonitorInfo>() };
             if (!GetMonitorInfo(mon, ref mi))
+            {
+
                 return false;
+            }
+
+
             int workW = mi.rcWork.Right - mi.rcWork.Left;
             int workH = mi.rcWork.Bottom - mi.rcWork.Top;
             int winW = r.Right - r.Left;
@@ -113,30 +156,54 @@ public partial class MainWindow : Window
             {
                 int colW = workW / colDiv;
                 if (colW <= 0)
+                {
                     continue;
+                }
+
+
                 for (int rowDiv = 2; rowDiv <= 6; rowDiv++)
                 {
                     int rowH = workH / rowDiv;
                     if (rowH <= 0)
+                    {
                         continue;
+                    }
+
+
                     for (int cols = 1; cols <= colDiv; cols++)
                     {
                         int spanW = cols * colW;
                         if (Math.Abs(winW - spanW) > tolerance)
+                        {
                             continue;
+                        }
+
+
                         for (int rows = 1; rows <= rowDiv; rows++)
                         {
                             int spanH = rows * rowH;
                             if (Math.Abs(winH - spanH) > tolerance)
+                            {
                                 continue;
+                            }
+
+
                             for (int startCol = 0; startCol <= colDiv - cols; startCol++)
                             {
                                 if (Math.Abs(leftOffset - startCol * colW) > tolerance)
+                                {
                                     continue;
+                                }
+
+
                                 for (int startRow = 0; startRow <= rowDiv - rows; startRow++)
                                 {
                                     if (Math.Abs(topOffset - startRow * rowH) <= tolerance)
+                                    {
+
                                         return true;
+                                    }
+
                                 }
                             }
                         }
@@ -152,17 +219,17 @@ public partial class MainWindow : Window
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    private struct RECT
+    private struct Rect
     {
         public int Left, Top, Right, Bottom;
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    private struct MONITORINFO
+    private struct MonitorInfo
     {
         public uint cbSize;
-        public RECT rcMonitor;
-        public RECT rcWork;
+        public Rect rcMonitor;
+        public Rect rcWork;
         public uint dwFlags;
     }
 
@@ -170,13 +237,13 @@ public partial class MainWindow : Window
     private static extern int IsZoomed(IntPtr hWnd);
 
     [DllImport("user32.dll", SetLastError = true)]
-    private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+    private static extern bool GetWindowRect(IntPtr hWnd, out Rect lpRect);
 
     [DllImport("user32.dll")]
     private static extern IntPtr MonitorFromWindow(IntPtr hwnd, int dwFlags);
 
     [DllImport("user32.dll", SetLastError = true)]
-    private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO lpmi);
+    private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MonitorInfo lpmi);
 
     /// <summary>
     /// On Windows, add WS_THICKFRAME and WS_MAXIMIZEBOX to the window style so the window
@@ -185,19 +252,30 @@ public partial class MainWindow : Window
     private void TryEnableWindowsSnap()
     {
         if (!OperatingSystem.IsWindows())
+        {
             return;
+        }
+
+
         if (TryGetPlatformHandle()?.Handle is not { } hwnd)
+        {
             return;
+        }
+
+
         try
         {
-            const int GWL_STYLE = -16;
-            const int WS_THICKFRAME = 0x00040000;
-            const int WS_MAXIMIZEBOX = 0x00010000;
-            const int WS_MINIMIZEBOX = 0x00020000;
-            int style = GetWindowLong(hwnd, GWL_STYLE);
-            int newStyle = style | WS_THICKFRAME | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
+            const int gwlStyle = -16;
+            const int wsThickframe = 0x00040000;
+            const int wsMaximizebox = 0x00010000;
+            const int wsMinimizebox = 0x00020000;
+            int style = GetWindowLong(hwnd, gwlStyle);
+            int newStyle = style | wsThickframe | wsMaximizebox | wsMinimizebox;
             if (newStyle != style)
-                SetWindowLong(hwnd, GWL_STYLE, newStyle);
+            {
+                SetWindowLong(hwnd, gwlStyle, newStyle);
+            }
+
         }
         catch
         {
@@ -214,37 +292,73 @@ public partial class MainWindow : Window
     private void TitleBarDragRegion_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
             BeginMoveDrag(e);
+        }
+
     }
 
     private void ResizeWest_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
             BeginResizeDrag(WindowEdge.West, e);
+        }
+
     }
 
     private void ResizeEast_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
             BeginResizeDrag(WindowEdge.East, e);
+        }
+
     }
 
     private void ResizeSouth_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
             BeginResizeDrag(WindowEdge.South, e);
+        }
+
     }
 
     private void ResizeSouthWest_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
             BeginResizeDrag(WindowEdge.SouthWest, e);
+        }
+
     }
 
     private void ResizeSouthEast_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
             BeginResizeDrag(WindowEdge.SouthEast, e);
+        }
+
+    }
+
+    private void ResizeNorthWest_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
+            BeginResizeDrag(WindowEdge.NorthWest, e);
+        }
+
+    }
+
+    private void ResizeNorthEast_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
+            BeginResizeDrag(WindowEdge.NorthEast, e);
+        }
+
     }
 
     private void WindowMinimize_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -276,6 +390,36 @@ public partial class MainWindow : Window
                 }
             };
         }
+
+        // Jump-to-top (Explorer) button: show only when we're in the Explore tab and the main scroll is down.
+        if (MainScrollViewer is { } mainScroll && MainTabControl is { } tabs && JumpToTopButton is { } jump)
+        {
+            mainScroll.ScrollChanged += (_, _) => UpdateJumpToTopButtonVisibility(tabs.SelectedIndex, mainScroll.Offset.Y);
+            tabs.SelectionChanged += (_, _) => UpdateJumpToTopButtonVisibility(tabs.SelectedIndex, mainScroll.Offset.Y);
+            UpdateJumpToTopButtonVisibility(tabs.SelectedIndex, mainScroll.Offset.Y);
+        }
+    }
+
+    private void UpdateJumpToTopButtonVisibility(int selectedTabIndex, double scrollOffsetY)
+    {
+        if (JumpToTopButton is null)
+            return;
+
+        var isExploreTab = selectedTabIndex == 1; // Scan, Explore, Tune, Settings
+        var show = isExploreTab && scrollOffsetY > JumpToTopThresholdPx;
+
+        JumpToTopButton.IsVisible = show;
+        JumpToTopButton.IsHitTestVisible = show;
+        JumpToTopButton.Opacity = show ? 1 : 0;
+    }
+
+    private void JumpToTopButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (MainScrollViewer is null)
+            return;
+
+        // Scroll the main content area back to the top so Explore filters are immediately visible again.
+        MainScrollViewer.Offset = new Vector(MainScrollViewer.Offset.X, 0);
     }
 
     private async void BrowsePack_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -284,7 +428,10 @@ public partial class MainWindow : Window
         {
             var topLevel = TopLevel.GetTopLevel(this);
             if (topLevel?.StorageProvider is null)
+            {
                 return;
+            }
+
 
             var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
@@ -298,10 +445,16 @@ public partial class MainWindow : Window
 
             var path = files.Count > 0 ? files[0].TryGetLocalPath() : null;
             if (path is null)
+            {
                 return;
+            }
+
 
             if (DataContext is MainWindowViewModel vm)
+            {
                 vm.PackPath = path;
+            }
+
         }
         catch (Exception)
         {
@@ -315,7 +468,10 @@ public partial class MainWindow : Window
         {
             var topLevel = TopLevel.GetTopLevel(this);
             if (topLevel?.StorageProvider is null)
+            {
                 return;
+            }
+
 
             var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
             {
@@ -325,10 +481,16 @@ public partial class MainWindow : Window
 
             var path = folders.Count > 0 ? folders[0].TryGetLocalPath() : null;
             if (path is null)
+            {
                 return;
+            }
+
 
             if (DataContext is MainWindowViewModel vm)
+            {
                 vm.OutputDirectory = path;
+            }
+
         }
         catch (Exception)
         {

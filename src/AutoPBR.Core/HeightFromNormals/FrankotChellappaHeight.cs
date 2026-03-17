@@ -2,6 +2,7 @@
 // This approach is used in the DeepBump ecosystem (NormalHeight add-on by HugoTini).
 // See LICENSE-DeepBump.txt and README for attribution.
 
+using JetBrains.Annotations;
 using MathNet.Numerics;
 using MathNet.Numerics.IntegralTransforms;
 using SixLabors.ImageSharp;
@@ -9,11 +10,15 @@ using SixLabors.ImageSharp.PixelFormats;
 
 namespace AutoPBR.Core.HeightFromNormals;
 
+// ReSharper disable UnusedType.Global
+
 /// <summary>
 /// Reconstructs a height map from a tangent-space normal map using the Frankot-Chellappa
 /// algorithm (Fourier-domain integration). Based on the method used in the DeepBump / NormalHeight
 /// project (HugoTini). Improves height consistency with the normal map.
 /// </summary>
+/// <remarks>Optional implementation; reserved for future use or alternative height-from-normal pipeline.</remarks>
+[UsedImplicitly]
 public static class FrankotChellappaHeight
 {
     private const float Epsilon = 1e-6f;
@@ -23,6 +28,7 @@ public static class FrankotChellappaHeight
     /// R = normal X, G = normal Y, B = AO/unused; Z is reconstructed as sqrt(1 - x² - y²).
     /// Returns (Width, Height, Data) with height in [0,255]; caller can wrap in HeightMap.
     /// </summary>
+    // ReSharper disable once UnusedMember.Global
     public static (int Width, int Height, byte[] Data) FromNormalMap(Image<Rgba32> normalMap)
     {
         var width = normalMap.Width;
@@ -95,12 +101,23 @@ public static class FrankotChellappaHeight
         {
             var h = zFft[i].Real * scale;
             real[i] = h;
-            if (h < minH) minH = h;
-            if (h > maxH) maxH = h;
+            if (h < minH)
+            {
+                minH = h;
+            }
+
+            if (h > maxH)
+            {
+                maxH = h;
+            }
         }
 
         var range = maxH - minH;
-        if (range < 1e-10) range = 1;
+        if (range < 1e-10)
+        {
+            range = 1;
+        }
+
         var outData = new byte[n];
         for (var i = 0; i < n; i++)
         {
@@ -115,7 +132,10 @@ public static class FrankotChellappaHeight
     {
         var c = new Complex32[data.Length];
         for (var i = 0; i < data.Length; i++)
+        {
             c[i] = new Complex32((float)data[i], 0f);
+        }
+
         return c;
     }
 
@@ -125,26 +145,46 @@ public static class FrankotChellappaHeight
         for (var y = 0; y < height; y++)
         {
             for (var x = 0; x < width; x++)
+            {
                 rowBuf[x] = data[y * width + x];
+            }
+
             if (forward)
+            {
                 Fourier.Forward(rowBuf);
+            }
             else
+            {
                 Fourier.Inverse(rowBuf);
+            }
+
             for (var x = 0; x < width; x++)
+            {
                 data[y * width + x] = rowBuf[x];
+            }
         }
 
         var colBuf = new Complex32[height];
         for (var x = 0; x < width; x++)
         {
             for (var y = 0; y < height; y++)
+            {
                 colBuf[y] = data[y * width + x];
+            }
+
             if (forward)
+            {
                 Fourier.Forward(colBuf);
+            }
             else
+            {
                 Fourier.Inverse(colBuf);
+            }
+
             for (var y = 0; y < height; y++)
+            {
                 data[y * width + x] = colBuf[y];
+            }
         }
     }
 }

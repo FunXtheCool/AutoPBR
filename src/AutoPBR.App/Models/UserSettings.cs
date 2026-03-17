@@ -70,7 +70,11 @@ public sealed class UserSettings
         try
         {
             if (!File.Exists(SettingsPath))
+            {
+
                 return new UserSettings();
+            }
+
 
             var json = File.ReadAllText(SettingsPath);
             var settings = JsonSerializer.Deserialize<UserSettings>(json);

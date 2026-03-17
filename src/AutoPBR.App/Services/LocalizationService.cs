@@ -56,7 +56,10 @@ internal static class LocalizationService
             new("5x5", "5")
         };
         if (!isScharr)
+        {
             list.Add(new FoliageModeOption("7x7", "7"));
+        }
+
         return list;
     }
 

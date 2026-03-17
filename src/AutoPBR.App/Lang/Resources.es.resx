@@ -150,7 +150,7 @@
   <data name="DeepBumpOverlapSmall" xml:space="preserve"><value>Pequeño</value></data>
   <data name="DeepBumpOverlapMedium" xml:space="preserve"><value>Mediano</value></data>
   <data name="DeepBumpOverlapLarge" xml:space="preserve"><value>Grande</value></data>
-  <data name="TextureTypes" xml:space="preserve"><value>Tipos de textura</value></data>
+  <data name="TextureTypes" xml:space="preserve"><value>Filtros de conversión</value></data>
   <data name="Blocks" xml:space="preserve"><value>Bloques</value></data>
   <data name="BlocksTooltip" xml:space="preserve"><value>Procesar texturas en carpetas block y blocks.</value></data>
   <data name="Items" xml:space="preserve"><value>Objetos</value></data>

@@ -28,12 +28,16 @@ public sealed class WindowLayoutState
         try
         {
             if (!File.Exists(LayoutPath))
+            {
                 return new WindowLayoutState();
+            }
 
             var json = File.ReadAllText(LayoutPath);
             var state = System.Text.Json.JsonSerializer.Deserialize<WindowLayoutState>(json);
             if (state is null)
+            {
                 return new WindowLayoutState();
+            }
 
             state.PreviewColumnWidth = Math.Clamp(state.PreviewColumnWidth, 260, 600);
             return state;
@@ -50,7 +54,10 @@ public sealed class WindowLayoutState
         {
             var dir = Path.GetDirectoryName(LayoutPath);
             if (!string.IsNullOrEmpty(dir))
+            {
                 Directory.CreateDirectory(dir);
+            }
+
             PreviewColumnWidth = Math.Clamp(PreviewColumnWidth, 260, 600);
             var json = System.Text.Json.JsonSerializer.Serialize(this, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(LayoutPath, json);

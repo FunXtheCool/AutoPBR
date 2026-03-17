@@ -11,7 +11,10 @@ internal static class ThreadingUtil
     {
         var logical = Math.Max(1, Environment.ProcessorCount);
         if (requested <= 0)
+        {
             return Math.Max(1, logical - 2);
+        }
+
         return Math.Clamp(requested, 1, logical);
     }
 

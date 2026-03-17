@@ -16,9 +16,14 @@ internal static class PreviewComposer
         Image<Rgba32>? spec = null;
 
         if (File.Exists(target.NormalPath))
+        {
             normal = Image.Load<Rgba32>(target.NormalPath);
+        }
+
         if (File.Exists(target.SpecularPath))
+        {
             spec = Image.Load<Rgba32>(target.SpecularPath);
+        }
 
         var tileWidth = diffuse.Width;
         var tileHeight = diffuse.Height;
@@ -30,7 +35,9 @@ internal static class PreviewComposer
         static void Blit(Image<Rgba32>? src, Image<Rgba32> dst, int offsetX, int offsetY, int tileWidth, int tileHeight)
         {
             if (src is null)
+            {
                 return;
+            }
 
             var w = Math.Min(tileWidth, src.Width);
             var h = Math.Min(tileHeight, src.Height);

@@ -26,8 +26,16 @@ internal static class IcoWriter
         {
             int w = sizes[i];
             int h = sizes[i];
-            if (w == 256) w = 0;
-            if (h == 256) h = 0;
+            if (w == 256)
+            {
+                w = 0;
+            }
+
+            if (h == 256)
+            {
+                h = 0;
+            }
+
             int size = dibs[i].Length;
 
             bw.Write((byte)w);
@@ -43,6 +51,8 @@ internal static class IcoWriter
         }
 
         foreach (var dib in dibs)
+        {
             bw.Write(dib);
+        }
     }
 }

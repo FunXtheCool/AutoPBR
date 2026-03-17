@@ -11,7 +11,10 @@
         Title="{Binding Strings.AppTitle}"
         Width="1000"
         Height="720"
-        SystemDecorations="None">
+        SystemDecorations="None"
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True"
+        TransparencyLevelHint="None">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
@@ -92,8 +95,9 @@
                 <ColumnDefinition Width="8" />
                 <ColumnDefinition Width="280" MinWidth="260" MaxWidth="600" />
             </Grid.ColumnDefinitions>
-            <ScrollViewer Grid.Column="0">
-            <TabControl Margin="16">
+            <Grid Grid.Column="0">
+                <ScrollViewer x:Name="MainScrollViewer">
+            <TabControl x:Name="MainTabControl" Margin="16">
                 <TabItem Header="{Binding Strings.TabScan}">
                     <StackPanel Margin="0,12,0,0" Spacing="16">
                         <Border CornerRadius="8" Background="{Binding CardBackground}" BorderBrush="{Binding CardBorderBrush}" BorderThickness="1" Padding="16">
@@ -196,12 +200,14 @@
                                                     </Setter.Value>
                                                 </Setter>
                                             </Style>
-                                            <!-- Show "Set as preview" button only when pointer is over the row (Border) -->
+                                            <!-- Show "Set as Preview" button only when pointer is over the row (Border) -->
                                             <Style Selector="Border.preview-row-host Button.preview-btn">
-                                                <Setter Property="IsVisible" Value="False" />
+                                                <Setter Property="Opacity" Value="0" />
+                                                <Setter Property="IsHitTestVisible" Value="False" />
                                             </Style>
                                             <Style Selector="Border.preview-row-host:pointerover Button.preview-btn">
-                                                <Setter Property="IsVisible" Value="True" />
+                                                <Setter Property="Opacity" Value="1" />
+                                                <Setter Property="IsHitTestVisible" Value="True" />
                                             </Style>
                                         </TreeView.Styles>
                                         <TreeView.DataTemplates>
@@ -215,7 +221,7 @@
                                                                 CommandParameter="{Binding}" IsVisible="{Binding IsFolder}" Padding="2,0" />
                                                         <TextBlock Text="{Binding Name}" VerticalAlignment="Center" IsVisible="{Binding !IsFolder}" />
                                                         <Button Classes="preview-btn"
-                                                                Content="Set as preview."
+                                                                Content="Set as Preview"
                                                                 Command="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).SetPreviewTextureCommand, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
                                                                 CommandParameter="{Binding}"
                                                                 IsVisible="{Binding !IsFolder}"
@@ -464,7 +470,22 @@
                     </StackPanel>
                 </TabItem>
             </TabControl>
-            </ScrollViewer>
+                </ScrollViewer>
+
+                <Button x:Name="JumpToTopButton"
+                        Width="42" Height="42"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Margin="0,0,0,18"
+                        Opacity="0"
+                        IsVisible="False"
+                        IsHitTestVisible="False"
+                        Background="#00000000"
+                        BorderThickness="0"
+                        Click="JumpToTopButton_Click">
+                    <TextBlock Text="↑" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Button>
+            </Grid>
 
             <!-- Draggable splitter: 8px hit area; 1px line drawn on top (no nested Grid so splitter sees main Grid) -->
             <GridSplitter Grid.Column="1"
@@ -520,6 +541,10 @@
                 Cursor="RightSide" PointerPressed="ResizeEast_PointerPressed" />
         <Border Height="6" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Background="Transparent"
                 Cursor="BottomSide" PointerPressed="ResizeSouth_PointerPressed" />
+        <Border Width="12" Height="12" HorizontalAlignment="Left" VerticalAlignment="Top" Background="Transparent"
+                Cursor="TopLeftCorner" PointerPressed="ResizeNorthWest_PointerPressed" />
+        <Border Width="12" Height="12" HorizontalAlignment="Right" VerticalAlignment="Top" Background="Transparent"
+                Cursor="TopRightCorner" PointerPressed="ResizeNorthEast_PointerPressed" />
         <Border Width="12" Height="12" HorizontalAlignment="Left" VerticalAlignment="Bottom" Background="Transparent"
                 Cursor="BottomLeftCorner" PointerPressed="ResizeSouthWest_PointerPressed" />
         <Border Width="12" Height="12" HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="Transparent"

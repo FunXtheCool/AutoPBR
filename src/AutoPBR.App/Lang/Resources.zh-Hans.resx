@@ -150,7 +150,7 @@
   <data name="DeepBumpOverlapSmall" xml:space="preserve"><value>小</value></data>
   <data name="DeepBumpOverlapMedium" xml:space="preserve"><value>中</value></data>
   <data name="DeepBumpOverlapLarge" xml:space="preserve"><value>大</value></data>
-  <data name="TextureTypes" xml:space="preserve"><value>纹理类型</value></data>
+  <data name="TextureTypes" xml:space="preserve"><value>转换过滤器</value></data>
   <data name="Blocks" xml:space="preserve"><value>方块</value></data>
   <data name="BlocksTooltip" xml:space="preserve"><value>处理 block 和 blocks 文件夹中的纹理。</value></data>
   <data name="Items" xml:space="preserve"><value>物品</value></data>

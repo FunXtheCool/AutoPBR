@@ -21,10 +21,16 @@ sealed class Program
         AssemblyLoadContext.Default.Resolving += (context, name) =>
         {
             if (name.Name is null || !name.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
+            {
                 return null;
+            }
+
             var culture = name.CultureName;
             if (string.IsNullOrEmpty(culture))
+            {
                 return null;
+            }
+
             var baseDir = AppContext.BaseDirectory;
             var path = Path.Combine(baseDir, LangSubfolder, culture, name.Name + ".dll");
             return File.Exists(path) ? context.LoadFromAssemblyPath(path) : null;

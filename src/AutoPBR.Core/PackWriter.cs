@@ -20,7 +20,9 @@ internal static class PackWriter
                 using var doc = JsonDocument.Parse(json);
                 if (doc.RootElement.TryGetProperty("pack", out var pack) &&
                     pack.TryGetProperty("pack_format", out var pf))
+                {
                     packFormat = pf.GetInt32();
+                }
             }
             catch
             {
@@ -52,25 +54,37 @@ internal static class PackWriter
 
         var packPng = Path.Combine(extracted, "pack.png");
         if (File.Exists(packPng))
+        {
             files.Add(packPng);
+        }
+
         var packMcmeta = Path.Combine(extracted, "pack.mcmeta");
         files.Add(packMcmeta);
         var licensePath = Path.Combine(extracted, "LICENSE");
         if (File.Exists(licensePath))
+        {
             files.Add(licensePath);
+        }
         else
         {
             var licenseLower = Path.Combine(extracted, "license");
             if (File.Exists(licenseLower))
+            {
                 files.Add(licenseLower);
+            }
         }
 
         foreach (var t in textures)
         {
             if (!t.SpecularOnly && File.Exists(t.NormalPath))
+            {
                 files.Add(t.NormalPath);
+            }
+
             if (File.Exists(t.SpecularPath))
+            {
                 files.Add(t.SpecularPath);
+            }
         }
 
         ParallelZipWriter.WriteZip(outputZipPath, files, extracted, progress, ConversionStage.Packing,
