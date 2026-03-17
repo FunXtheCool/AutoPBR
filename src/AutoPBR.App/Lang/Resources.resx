@@ -154,6 +154,9 @@
   <data name="Log" xml:space="preserve">
     <value>Log</value>
   </data>
+  <data name="OpenLogFolder" xml:space="preserve">
+    <value>Open Log Folder</value>
+  </data>
   <data name="Log_Scanning" xml:space="preserve">
     <value>Scanning: {0}</value>
   </data>
@@ -234,6 +237,12 @@
   </data>
   <data name="HeightStrengthTooltip" xml:space="preserve">
     <value>Exponent for height-from-brightness. Higher = more contrast in the height map.</value>
+  </data>
+  <data name="NormalOperatorLabel" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="NormalKernelSizeLabel" xml:space="preserve">
+    <value>Kernel size</value>
   </data>
   <data name="Derivative" xml:space="preserve">
     <value>Derivative</value>

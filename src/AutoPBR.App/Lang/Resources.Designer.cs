@@ -56,6 +56,7 @@ public static class Resources
     public static string ResourcePackWatermark => GetString("ResourcePackWatermark");
     public static string Browse => GetString("Browse");
     public static string Log => GetString("Log");
+    public static string OpenLogFolder => GetString("OpenLogFolder");
     public static string GenerationSettings => GetString("GenerationSettings");
     public static string TuneNormals => GetString("TuneNormals");
     public static string TuneSpecular => GetString("TuneSpecular");
@@ -64,6 +65,8 @@ public static class Resources
     public static string NormalStrengthTooltip => GetString("NormalStrengthTooltip");
     public static string HeightStrength => GetString("HeightStrength");
     public static string HeightStrengthTooltip => GetString("HeightStrengthTooltip");
+    public static string NormalOperatorLabel => GetString("NormalOperatorLabel");
+    public static string NormalKernelSizeLabel => GetString("NormalKernelSizeLabel");
     public static string Derivative => GetString("Derivative");
     public static string SmoothnessScale => GetString("SmoothnessScale");
     public static string SmoothnessScaleTooltip => GetString("SmoothnessScaleTooltip");

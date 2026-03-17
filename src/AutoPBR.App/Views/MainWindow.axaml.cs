@@ -1,9 +1,12 @@
+using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using AutoPBR.App.Models;
+using AutoPBR.App.Services;
 using AutoPBR.App.ViewModels;
 
 namespace AutoPBR.App.Views;
@@ -420,6 +423,23 @@ public partial class MainWindow : Window
 
         // Scroll the main content area back to the top so Explore filters are immediately visible again.
         MainScrollViewer.Offset = new Vector(MainScrollViewer.Offset.X, 0);
+    }
+
+    private void OpenLogFolder_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        try
+        {
+            Directory.CreateDirectory(LogService.LogsDirectory);
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = LogService.LogsDirectory,
+                UseShellExecute = true
+            });
+        }
+        catch
+        {
+            // Opening the log folder should never crash the app.
+        }
     }
 
     private async void BrowsePack_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

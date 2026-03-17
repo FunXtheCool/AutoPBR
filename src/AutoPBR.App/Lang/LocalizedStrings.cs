@@ -35,12 +35,15 @@ public sealed class LocalizedStrings
     public string ResourcePackWatermark => Resources.ResourcePackWatermark;
     public string Browse => Resources.Browse;
     public string Log => Resources.Log;
+    public string OpenLogFolder => Resources.OpenLogFolder;
     public string GenerationSettings => Resources.GenerationSettings;
     public string TuneNormals => Resources.TuneNormals;
     public string TuneSpecular => Resources.TuneSpecular;
     public string TuneHeight => Resources.TuneHeight;
     public string NormalStrength => Resources.NormalStrength;
     public string NormalStrengthTooltip => Resources.NormalStrengthTooltip;
+    public string NormalOperatorLabel => Resources.NormalOperatorLabel;
+    public string NormalKernelSizeLabel => Resources.NormalKernelSizeLabel;
     public string HeightStrength => Resources.HeightStrength;
     public string HeightStrengthTooltip => Resources.HeightStrengthTooltip;
     public string Derivative => Resources.Derivative;

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "OKm5V3zqzI0=",
+  "dgSpecHash": "2L95c26i+8I=",
   "success": true,
-  "projectFilePath": "z:\\Cursor Projects\\AutoPBR\\src\\AutoPBR.Core\\AutoPBR.Core.csproj",
+  "projectFilePath": "Z:\\Cursor Projects\\AutoPBR\\src\\AutoPBR.Core\\AutoPBR.Core.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\John_Phoenix\\.nuget\\packages\\colourful\\3.2.0\\colourful.3.2.0.nupkg.sha512",
     "C:\\Users\\John_Phoenix\\.nuget\\packages\\jetbrains.annotations\\2025.2.4\\jetbrains.annotations.2025.2.4.nupkg.sha512",
