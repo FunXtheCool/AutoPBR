@@ -2,7 +2,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:AutoPBR.App.ViewModels"
         xmlns:m="using:AutoPBR.App.Models"
-        xmlns:lang="clr-namespace:AutoPBR.App.Lang"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -173,34 +172,56 @@
                                             </ItemsControl.ItemsPanel>
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate x:DataType="m:ArchiveNode">
-                                                    <Button Content="{Binding Name}" Command="{Binding #ExplorePanel.((vm:MainWindowViewModel)DataContext).GoToBreadcrumbCommand}"
-                                                        CommandParameter="{Binding}" Padding="4,2" />
+                                                    <Button Content="{Binding Name}"
+                                                            Command="{Binding #ExplorePanel.((vm:MainWindowViewModel)DataContext).GoToBreadcrumbCommand, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                            CommandParameter="{Binding}" Padding="4,2" />
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
                                         <Button Content="{Binding Strings.ExploreExpandAll}" Command="{Binding ExploreExpandAllCommand}" />
                                         <Button Content="{Binding Strings.ExploreCollapseAll}" Command="{Binding ExploreCollapseAllCommand}" />
-                                        <Button Content="Set selection as preview"
-                                                Command="{Binding SetPreviewFromSelectionCommand}" />
                                     </StackPanel>
                                     <TreeView ItemsSource="{Binding ExploreViewItems}"
                                               x:Name="ExploreTreeView"
                                               SelectedItem="{Binding SelectedExploreNode, Mode=TwoWay}">
                                         <TreeView.Styles>
                                             <Style Selector="TreeViewItem">
-                                                <Setter Property="IsExpanded" Value="{Binding $self.((m:ArchiveNode)DataContext).IsExpanded, Mode=TwoWay}" />
-                                                <Setter Property="IsVisible" Value="{Binding $self.((m:ArchiveNode)DataContext).IsVisibleByFilter}" />
+                                                <Setter Property="IsExpanded"
+                                                        Value="{Binding $self.((m:ArchiveNode)DataContext).IsExpanded, Mode=TwoWay, FallbackValue=False, TargetNullValue=False}" />
+                                                <Setter Property="IsVisible">
+                                                    <Setter.Value>
+                                                        <Binding Path="$self.((m:ArchiveNode)DataContext).IsVisibleByFilter"
+                                                                 FallbackValue="True"
+                                                                 TargetNullValue="True" />
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                            <!-- Show "Set as preview" button only when pointer is over the row (Border) -->
+                                            <Style Selector="Border.preview-row-host Button.preview-btn">
+                                                <Setter Property="IsVisible" Value="False" />
+                                            </Style>
+                                            <Style Selector="Border.preview-row-host:pointerover Button.preview-btn">
+                                                <Setter Property="IsVisible" Value="True" />
                                             </Style>
                                         </TreeView.Styles>
                                         <TreeView.DataTemplates>
                                             <TreeDataTemplate DataType="m:ArchiveNode" ItemsSource="{Binding Children}">
-                                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                                    <CheckBox IsChecked="{Binding ManualOverride, Mode=TwoWay}" IsThreeState="True"
-                                                        ToolTip.Tip="Checked = include, Unchecked = exclude, Indeterminate = use other rules" />
-                                                    <Button Content="{Binding Name}" Command="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).EnterFolderCommand}"
-                                                        CommandParameter="{Binding}" IsVisible="{Binding IsFolder}" Padding="2,0" />
-                                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" IsVisible="{Binding !IsFolder}" />
-                                                </StackPanel>
+                                                <Border Classes="preview-row-host" Background="Transparent" Padding="0">
+                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                                        <CheckBox IsChecked="{Binding ManualOverride, Mode=TwoWay}" IsThreeState="True"
+                                                            ToolTip.Tip="Checked = include, Unchecked = exclude, Indeterminate = use other rules" />
+                                                        <Button Content="{Binding Name}"
+                                                                Command="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).EnterFolderCommand, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                                CommandParameter="{Binding}" IsVisible="{Binding IsFolder}" Padding="2,0" />
+                                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" IsVisible="{Binding !IsFolder}" />
+                                                        <Button Classes="preview-btn"
+                                                                Content="Set as preview."
+                                                                Command="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).SetPreviewTextureCommand, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                                CommandParameter="{Binding}"
+                                                                IsVisible="{Binding !IsFolder}"
+                                                                Padding="4,2" />
+                                                    </StackPanel>
+                                                </Border>
                                             </TreeDataTemplate>
                                         </TreeView.DataTemplates>
                                     </TreeView>
