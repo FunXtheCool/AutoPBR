@@ -12,6 +12,9 @@ public sealed class TextureOverrides
 
     public bool? FastSpecular { get; set; }
     public IReadOnlyList<SpecularRule>? CustomSpecularRules { get; set; }
+
+    /// <summary>When true, invert the specular smoothness (R) channel so dark areas become smoother and light rougher (e.g. for brick grout).</summary>
+    public bool InvertSpecular { get; set; }
 }
 
 public sealed class TextureWorkItem

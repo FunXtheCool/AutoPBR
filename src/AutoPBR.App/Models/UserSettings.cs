@@ -1,14 +1,20 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AutoPBR.Core;
+using AutoPBR.Core.Models;
 using NormalOperatorEnum = AutoPBR.Core.Models.NormalOperator;
 using NormalDerivativeEnum = AutoPBR.Core.Models.NormalDerivative;
+using QualityProfileEnum = AutoPBR.Core.Models.QualityProfile;
+using DeepBumpInputModeEnum = AutoPBR.Core.Models.DeepBumpInputMode;
 
 namespace AutoPBR.App.Models;
 
 public sealed class UserSettings
 {
     public string? OutputDirectory { get; set; }
+
+    /// <summary>Folder scanned for batch .zip / .jar resource packs (Scan tab).</summary>
+    public string? BatchFolderPath { get; set; }
     public double NormalIntensity { get; set; } = AutoPbrDefaults.DefaultNormalIntensity;
     public double HeightIntensity { get; set; } = AutoPbrDefaults.DefaultHeightIntensity;
     public bool FastSpecular { get; set; }
@@ -51,6 +57,9 @@ public sealed class UserSettings
     /// <summary>DeepBump tile overlap: "Small", "Medium", or "Large" (default Large = best quality).</summary>
     public string DeepBumpOverlap { get; set; } = "Large";
 
+    public string DeepBumpInputMode { get; set; } = nameof(DeepBumpInputModeEnum.Auto);
+    public bool DeepBumpForceBlue255 { get; set; }
+
     /// <summary>Normal operator when not using DeepBump. \"SobelVc\" or \"ScharrVc\".</summary>
     public string NormalOperator { get; set; } = nameof(NormalOperatorEnum.SobelVc);
 
@@ -59,6 +68,27 @@ public sealed class UserSettings
 
     /// <summary>What to derive normals from: Luminance, Color, ColorLuminanceBlend, or ColorLuminanceMax.</summary>
     public string NormalDerivative { get; set; } = nameof(NormalDerivativeEnum.Luminance);
+
+    public string QualityProfile { get; set; } = nameof(QualityProfileEnum.Balanced);
+
+    public bool PreprocessLinearize { get; set; }
+    public int PreprocessDenoiseRadius { get; set; }
+    public double PreprocessDenoiseBlend { get; set; } = 0.5;
+    public bool PreprocessFrequencySplit { get; set; }
+    public int PreprocessFrequencyRadius { get; set; } = 2;
+    public double PreprocessFrequencyDetailStrength { get; set; } = 1.0;
+
+    public bool SpecularUsePercentileRemap { get; set; } = true;
+    public double SpecularRemapLowPercentile { get; set; } = 0.02;
+    public double SpecularRemapHighPercentile { get; set; } = 0.98;
+    public string? MetalHeuristicSubstrings { get; set; }
+
+    public bool GenerateAo { get; set; }
+    public int AoRadius { get; set; } = 4;
+    public double AoStrength { get; set; } = 1.0;
+
+    /// <summary>User-defined tag rules (keywords + overrides). Applied in addition to built-in rules.</summary>
+    public List<CustomTagRuleEntry> CustomTagRules { get; set; } = [];
 
     private static string SettingsDirectory =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AutoPBR");

@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using System.IO;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -395,7 +395,7 @@ public partial class MainWindow : Window
         }
 
         // Jump-to-top (Explorer) button: show only when we're in the Explore tab and the main scroll is down.
-        if (MainScrollViewer is { } mainScroll && MainTabControl is { } tabs && JumpToTopButton is { } jump)
+        if (MainScrollViewer is { } mainScroll && MainTabControl is { } tabs && JumpToTopButton is not null)
         {
             mainScroll.ScrollChanged += (_, _) => UpdateJumpToTopButtonVisibility(tabs.SelectedIndex, mainScroll.Offset.Y);
             tabs.SelectionChanged += (_, _) => UpdateJumpToTopButtonVisibility(tabs.SelectedIndex, mainScroll.Offset.Y);
@@ -406,7 +406,9 @@ public partial class MainWindow : Window
     private void UpdateJumpToTopButtonVisibility(int selectedTabIndex, double scrollOffsetY)
     {
         if (JumpToTopButton is null)
+        {
             return;
+        }
 
         var isExploreTab = selectedTabIndex == 1; // Scan, Explore, Tune, Settings
         var show = isExploreTab && scrollOffsetY > JumpToTopThresholdPx;
@@ -419,7 +421,9 @@ public partial class MainWindow : Window
     private void JumpToTopButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (MainScrollViewer is null)
+        {
             return;
+        }
 
         // Scroll the main content area back to the top so Explore filters are immediately visible again.
         MainScrollViewer.Offset = new Vector(MainScrollViewer.Offset.X, 0);
@@ -439,6 +443,80 @@ public partial class MainWindow : Window
         catch
         {
             // Opening the log folder should never crash the app.
+        }
+    }
+
+    private async void ExportTagRules_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        try
+        {
+            var topLevel = TopLevel.GetTopLevel(this);
+            if (topLevel?.StorageProvider is null || DataContext is not MainWindowViewModel vm)
+            {
+                return;
+            }
+
+            var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                Title = Lang.Resources.ExportTagRules,
+                DefaultExtension = "json",
+                SuggestedFileName = "auto_pbr_custom_tag_rules.json",
+                FileTypeChoices =
+                [
+                    new FilePickerFileType("JSON") { Patterns = ["*.json"] }
+                ]
+            });
+            var path = file?.TryGetLocalPath();
+            if (path is null)
+            {
+                return;
+            }
+
+            var json = JsonSerializer.Serialize(vm.CustomTagRules.ToList(),
+                new JsonSerializerOptions { WriteIndented = true });
+            await File.WriteAllTextAsync(path, json).ConfigureAwait(true);
+            vm.AppendUserLog(Lang.Resources.Log_TagRulesExported);
+        }
+        catch
+        {
+            // ignore
+        }
+    }
+
+    private async void ImportTagRules_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        try
+        {
+            var topLevel = TopLevel.GetTopLevel(this);
+            if (topLevel?.StorageProvider is null || DataContext is not MainWindowViewModel vm)
+            {
+                return;
+            }
+
+            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = Lang.Resources.ImportTagRules,
+                AllowMultiple = false,
+                FileTypeFilter =
+                [
+                    new FilePickerFileType("JSON") { Patterns = ["*.json"] }
+                ]
+            });
+            var path = files.Count > 0 ? files[0].TryGetLocalPath() : null;
+            if (path is null)
+            {
+                return;
+            }
+
+            var json = await File.ReadAllTextAsync(path).ConfigureAwait(true);
+            var err = vm.ImportCustomTagRulesFromJson(json);
+            vm.AppendUserLog(err is not null
+                ? string.Format(Lang.Resources.Log_TagRulesImportFailed, err)
+                : string.Format(Lang.Resources.Log_TagRulesImported, vm.CustomTagRules.Count));
+        }
+        catch
+        {
+            // ignore
         }
     }
 
@@ -475,6 +553,39 @@ public partial class MainWindow : Window
                 vm.PackPath = path;
             }
 
+        }
+        catch (Exception)
+        {
+            // Prevent unhandled exception in async void from crashing the process
+        }
+    }
+
+    private async void BrowseBatchFolder_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        try
+        {
+            var topLevel = TopLevel.GetTopLevel(this);
+            if (topLevel?.StorageProvider is null)
+            {
+                return;
+            }
+
+            var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+            {
+                Title = Lang.Resources.BatchFolderWatermark,
+                AllowMultiple = false
+            });
+
+            var path = folders.Count > 0 ? folders[0].TryGetLocalPath() : null;
+            if (path is null)
+            {
+                return;
+            }
+
+            if (DataContext is MainWindowViewModel vm)
+            {
+                vm.BatchFolderPath = path;
+            }
         }
         catch (Exception)
         {

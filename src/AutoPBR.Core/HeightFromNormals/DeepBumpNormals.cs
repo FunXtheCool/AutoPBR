@@ -7,6 +7,7 @@ using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using AutoPBR.Core.Models;
 
 namespace AutoPBR.Core.HeightFromNormals;
 
@@ -17,11 +18,15 @@ namespace AutoPBR.Core.HeightFromNormals;
 public sealed class DeepBumpNormalsGenerator : IDisposable
 {
     private const int TileSize = 256;
-    private const int ExpectedChannels = 3;
-    private readonly InferenceSession _session;
     private readonly string _inputName;
+    private readonly bool _inputIsNhwc;
+    private readonly int _inputChannels;
     private readonly bool _outputIsNhwc;
-    private readonly object _runLock = new();
+    private readonly string _modelPath;
+    private readonly bool _preferGpu;
+    private readonly object _poolLock = new();
+    private readonly Queue<InferenceSession> _sessionPool = new();
+    private readonly int _maxConcurrentRuns;
 
     public enum Overlap
     {
@@ -62,7 +67,7 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern bool SetDllDirectory(string? lpPathName);
 
-    public static DeepBumpNormalsGenerator? TryCreate(string modelPath)
+    public static DeepBumpNormalsGenerator? TryCreate(string modelPath, int maxConcurrentRuns = 1)
     {
         if (string.IsNullOrWhiteSpace(modelPath) || !File.Exists(modelPath))
         {
@@ -74,8 +79,10 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         AddAppNativeDirToDllSearchPath();
         try
         {
+            maxConcurrentRuns = Math.Max(1, maxConcurrentRuns);
+
             InferenceSession session;
-            bool useGpu = false;
+            bool useGpu;
             try
             {
                 using var gpuOptions = SessionOptions.MakeSessionOptionWithCudaProvider();
@@ -85,17 +92,45 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
             catch
             {
                 session = new InferenceSession(modelPath);
+                useGpu = false;
             }
 
             var inputName = session.InputMetadata.Keys.FirstOrDefault() ?? "input";
+            var inputIsNhwc = false;
+            var inputChannels = 1;
+            if (session.InputMetadata.Values.FirstOrDefault() is { } inMeta && inMeta.Dimensions.Length == 4)
+            {
+                var dims = inMeta.Dimensions;
+                // Accept NCHW and NHWC, with either 1 or 3 channels.
+                // Common: [1,1,256,256] or [1,3,256,256] (NCHW) OR [1,256,256,1]/[1,256,256,3] (NHWC)
+                if (dims[1] is 1 or 3)
+                {
+                    inputIsNhwc = false;
+                    inputChannels = dims[1];
+                }
+                else if (dims[^1] is 1 or 3)
+                {
+                    inputIsNhwc = true;
+                    inputChannels = dims[^1];
+                }
+            }
+
             var outputIsNhwc = false;
             if (session.OutputMetadata.Values.FirstOrDefault() is { } outMeta && outMeta.Dimensions.Length == 4)
             {
                 var dims = outMeta.Dimensions;
-                outputIsNhwc = dims[^1] == ExpectedChannels;
+                outputIsNhwc = dims[^1] == 3;
             }
 
-            return new DeepBumpNormalsGenerator(session, inputName, outputIsNhwc, useGpu);
+            return new DeepBumpNormalsGenerator(
+                modelPath,
+                inputName,
+                inputIsNhwc,
+                inputChannels,
+                outputIsNhwc,
+                useGpu,
+                maxConcurrentRuns,
+                firstSession: session);
         }
         catch
         {
@@ -103,23 +138,44 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         }
     }
 
-    private DeepBumpNormalsGenerator(InferenceSession session, string inputName, bool outputIsNhwc, bool isUsingGpu)
+    private DeepBumpNormalsGenerator(
+        string modelPath,
+        string inputName,
+        bool inputIsNhwc,
+        int inputChannels,
+        bool outputIsNhwc,
+        bool isUsingGpu,
+        int maxConcurrentRuns,
+        InferenceSession firstSession)
     {
-        _session = session;
+        _modelPath = modelPath;
         _inputName = inputName;
+        _inputIsNhwc = inputIsNhwc;
+        _inputChannels = inputChannels is 1 or 3 ? inputChannels : 1;
         _outputIsNhwc = outputIsNhwc;
         IsUsingGpu = isUsingGpu;
+        _preferGpu = isUsingGpu;
+        _maxConcurrentRuns = maxConcurrentRuns;
+        _sessionPool.Enqueue(firstSession);
+        for (var i = 1; i < _maxConcurrentRuns; i++)
+        {
+            _sessionPool.Enqueue(CreateSession());
+        }
     }
 
 
     /// <summary>
     /// Generates a normal map from the diffuse image. Returns Rgba32 image with R=nx, G=ny, B=255 (LabPBR style).
     /// </summary>
-    public Image<Rgba32> Generate(Image<Rgba32> diffuse, Overlap overlap = Overlap.Medium)
+    public Image<Rgba32> Generate(
+        Image<Rgba32> diffuse,
+        Overlap overlap = Overlap.Medium,
+        DeepBumpInputMode inputMode = DeepBumpInputMode.Auto,
+        bool forceBlue255 = false)
     {
         var width = diffuse.Width;
         var height = diffuse.Height;
-        var gray = ToGrayscaleFloat(diffuse);
+        var input = ToModelInputFloat(diffuse, inputMode);
         var stride = TileSize - (int)overlap;
         if (stride % 2 != 0)
         {
@@ -127,28 +183,34 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         }
 
 
-        TilesSplit(gray, width, height, stride, out var tiles, out var paddings);
+        TilesSplit(input, _inputChannels, width, height, stride, out var tiles, out var paddings);
         var predTiles = new List<float[]>();
-        lock (_runLock)
+        var session = RentSession();
+        try
         {
             foreach (var tile in tiles)
             {
-                var pred = RunTile(tile);
+                var pred = RunTile(session, tile);
                 predTiles.Add(pred);
             }
+        }
+        finally
+        {
+            ReturnSession(session);
         }
 
         var merged = TilesMerge(predTiles, stride, 3, height + paddings.padTop + paddings.padBottom,
             width + paddings.padLeft + paddings.padRight, paddings);
         NormalizeInPlace(merged, 3, height, width);
-        return ToNormalImage(merged, height, width);
+        return ToNormalImage(merged, height, width, forceBlue255);
     }
 
-    private static float[] ToGrayscaleFloat(Image<Rgba32> img)
+    private float[] ToModelInputFloat(Image<Rgba32> img, DeepBumpInputMode mode)
     {
         var w = img.Width;
         var h = img.Height;
-        var data = new float[w * h];
+        var channels = _inputChannels;
+        var data = new float[channels * w * h];
         img.ProcessPixelRows(acc =>
         {
             for (var y = 0; y < h; y++)
@@ -157,14 +219,36 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
                 for (var x = 0; x < w; x++)
                 {
                     var p = row[x];
-                    data[y * w + x] = (p.R + p.G + p.B) / (3f * 255f);
+                    var idx = y * w + x;
+                    if (channels == 1)
+                    {
+                        data[idx] = (p.R + p.G + p.B) / (3f * 255f);
+                    }
+                    else
+                    {
+                        var useRgb = mode == DeepBumpInputMode.Rgb
+                                     || (mode == DeepBumpInputMode.Auto && _inputChannels == 3);
+                        if (!useRgb)
+                        {
+                            var gray = (p.R + p.G + p.B) / (3f * 255f);
+                            data[idx] = gray;
+                            data[w * h + idx] = gray;
+                            data[2 * w * h + idx] = gray;
+                        }
+                        else
+                        {
+                            data[idx] = p.R / 255f;
+                            data[w * h + idx] = p.G / 255f;
+                            data[2 * w * h + idx] = p.B / 255f;
+                        }
+                    }
                 }
             }
         });
         return data;
     }
 
-    private void TilesSplit(float[] img, int imgW, int imgH, int stride, out List<float[]> tiles,
+    private void TilesSplit(float[] img, int channels, int imgW, int imgH, int stride, out List<float[]> tiles,
         out (int padLeft, int padRight, int padTop, int padBottom) paddings)
     {
         int padH = 0, padW = 0;
@@ -201,26 +285,29 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         paddings = (padLeft, padRight, padTop, padBottom);
         var fullW = imgW + padLeft + padRight;
         var fullH = imgH + padTop + padBottom;
-        var padded = new float[fullW * fullH];
-        for (var y = 0; y < fullH; y++)
+        var padded = new float[channels * fullW * fullH];
+        for (var c = 0; c < channels; c++)
         {
-            var sy = (y - padTop) % imgH;
-            if (sy < 0)
+            var srcBase = c * imgW * imgH;
+            var padBase = c * fullW * fullH;
+            for (var y = 0; y < fullH; y++)
             {
-                sy += imgH;
-            }
-
-
-            for (var x = 0; x < fullW; x++)
-            {
-                var sx = (x - padLeft) % imgW;
-                if (sx < 0)
+                var sy = (y - padTop) % imgH;
+                if (sy < 0)
                 {
-                    sx += imgW;
+                    sy += imgH;
                 }
 
+                for (var x = 0; x < fullW; x++)
+                {
+                    var sx = (x - padLeft) % imgW;
+                    if (sx < 0)
+                    {
+                        sx += imgW;
+                    }
 
-                padded[y * fullW + x] = img[sy * imgW + sx];
+                    padded[padBase + y * fullW + x] = img[srcBase + sy * imgW + sx];
+                }
             }
         }
 
@@ -231,14 +318,19 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         {
             for (var wx = 0; wx < wRange; wx++)
             {
-                var tile = new float[1 * 1 * TileSize * TileSize];
+                var tile = new float[channels * TileSize * TileSize];
                 var y0 = hy * stride;
                 var x0 = wx * stride;
-                for (var y = 0; y < TileSize; y++)
+                for (var c = 0; c < channels; c++)
                 {
-                    for (var x = 0; x < TileSize; x++)
+                    var padBase = c * fullW * fullH;
+                    var tileBase = c * TileSize * TileSize;
+                    for (var y = 0; y < TileSize; y++)
                     {
-                        tile[y * TileSize + x] = padded[(y0 + y) * fullW + (x0 + x)];
+                        for (var x = 0; x < TileSize; x++)
+                        {
+                            tile[tileBase + y * TileSize + x] = padded[padBase + (y0 + y) * fullW + (x0 + x)];
+                        }
                     }
                 }
 
@@ -248,20 +340,82 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
 
     }
 
-    private float[] RunTile(float[] tile)
+    private float[] RunTile(InferenceSession session, float[] tile)
     {
-        var inputTensor = new DenseTensor<float>(tile, [1, 1, TileSize, TileSize]);
+        var inputTensor = CreateInputTensor(tile);
         List<NamedOnnxValue> inputs = [NamedOnnxValue.CreateFromTensor(_inputName, inputTensor)];
-        using var outputs = _session.Run(inputs);
+        using var outputs = session.Run(inputs);
         var outTensor = outputs[0];
         var outputFloats = outTensor.AsEnumerable<float>().ToArray();
         if (_outputIsNhwc)
         {
-            outputFloats = ConvertNhwcToNchw(outputFloats, 1, TileSize, TileSize, ExpectedChannels);
+            outputFloats = ConvertNhwcToNchw(outputFloats, 1, TileSize, TileSize, 3);
         }
 
 
         return outputFloats;
+    }
+
+    private DenseTensor<float> CreateInputTensor(float[] tilePlanarNchw)
+    {
+        if (!_inputIsNhwc)
+        {
+            return new DenseTensor<float>(tilePlanarNchw, [1, _inputChannels, TileSize, TileSize]);
+        }
+
+        var nhwc = new float[TileSize * TileSize * _inputChannels];
+        for (var y = 0; y < TileSize; y++)
+        {
+            for (var x = 0; x < TileSize; x++)
+            {
+                var i = y * TileSize + x;
+                for (var c = 0; c < _inputChannels; c++)
+                {
+                    nhwc[i * _inputChannels + c] = tilePlanarNchw[(c * TileSize * TileSize) + i];
+                }
+            }
+        }
+        return new DenseTensor<float>(nhwc, [1, TileSize, TileSize, _inputChannels]);
+    }
+
+    private InferenceSession RentSession()
+    {
+        lock (_poolLock)
+        {
+            return _sessionPool.Count > 0 ? _sessionPool.Dequeue() : CreateSession();
+        }
+    }
+
+    private void ReturnSession(InferenceSession session)
+    {
+        lock (_poolLock)
+        {
+            if (_sessionPool.Count < _maxConcurrentRuns)
+            {
+                _sessionPool.Enqueue(session);
+                return;
+            }
+        }
+
+        session.Dispose();
+    }
+
+    private InferenceSession CreateSession()
+    {
+        if (_preferGpu)
+        {
+            try
+            {
+                using var gpuOptions = SessionOptions.MakeSessionOptionWithCudaProvider();
+                return new InferenceSession(_modelPath, gpuOptions);
+            }
+            catch
+            {
+                // fall through to CPU
+            }
+        }
+
+        return new InferenceSession(_modelPath);
     }
 
     private static float[] ConvertNhwcToNchw(float[] nhwc, int n, int h, int w, int c)
@@ -502,7 +656,7 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         }
     }
 
-    private static Image<Rgba32> ToNormalImage(float[] data, int height, int width)
+    private static Image<Rgba32> ToNormalImage(float[] data, int height, int width, bool forceBlue255)
     {
         var img = new Image<Rgba32>(width, height);
         img.ProcessPixelRows(acc =>
@@ -515,7 +669,9 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
                     var i = y * width + x;
                     var r = (byte)Math.Clamp((int)(data[i] * 255f), 0, 255);
                     var g = (byte)Math.Clamp((int)(data[height * width + i] * 255f), 0, 255);
-                    var b = (byte)Math.Clamp((int)(data[2 * height * width + i] * 255f), 0, 255);
+                    var b = forceBlue255
+                        ? (byte)255
+                        : (byte)Math.Clamp((int)(data[2 * height * width + i] * 255f), 0, 255);
                     row[x] = new Rgba32(r, g, b, 255);
                 }
             }
@@ -523,5 +679,14 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         return img;
     }
 
-    public void Dispose() => _session.Dispose();
+    public void Dispose()
+    {
+        lock (_poolLock)
+        {
+            while (_sessionPool.Count > 0)
+            {
+                _sessionPool.Dequeue().Dispose();
+            }
+        }
+    }
 }

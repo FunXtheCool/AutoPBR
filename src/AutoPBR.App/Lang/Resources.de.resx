@@ -89,9 +89,15 @@
   <data name="TabScan" xml:space="preserve"><value>Scannen</value></data>
   <data name="TabExplore" xml:space="preserve"><value>Durchsuchen</value></data>
   <data name="ScanButton" xml:space="preserve"><value>Scannen</value></data>
+  <data name="BatchConversion" xml:space="preserve"><value>Stapelkonvertierung</value></data>
+  <data name="BatchConversionDescription" xml:space="preserve"><value>Wählen Sie einen Ordner mit .zip- / .jar-Ressourcenpaketen. Beim Scannen entsteht ein Explorer mit jedem Paket als oberstem Ordner. Die Stapelkonvertierung verarbeitet alle Pakete in Ihren Ausgabeordner (je Paket …_PBR.zip). Über „Durchsuchen“ navigieren; Einzelkonvertierung ist bei aktivem Stapelscan deaktiviert.</value></data>
+  <data name="BatchFolderWatermark" xml:space="preserve"><value>Ordner mit Ressourcenpaketen (.zip / .jar)</value></data>
+  <data name="BrowseBatchFolder" xml:space="preserve"><value>Ordner durchsuchen</value></data>
+  <data name="ScanBatchButton" xml:space="preserve"><value>Stapel scannen</value></data>
+  <data name="BatchConvertButton" xml:space="preserve"><value>Stapel konvertieren</value></data>
   <data name="ExploreArchiveContents" xml:space="preserve"><value>Paketinhalt</value></data>
   <data name="ResourceExplorer" xml:space="preserve"><value>Ressourcen-Explorer</value></data>
-  <data name="ExploreEmptyMessage" xml:space="preserve"><value>Scannen Sie auf der Scannen-Registerkarte ein Paket, um den Inhalt anzuzeigen.</value></data>
+  <data name="ExploreEmptyMessage" xml:space="preserve"><value>Scannen Sie auf der Registerkarte „Scannen“ ein Paket oder einen Stapelordner, um Inhalte anzuzeigen.</value></data>
   <data name="ExploreExpandAll" xml:space="preserve"><value>Alle erweitern</value></data>
   <data name="ExploreCollapseAll" xml:space="preserve"><value>Alle reduzieren</value></data>
   <data name="ExploreBack" xml:space="preserve"><value>Zurück</value></data>
@@ -117,6 +123,9 @@
   <data name="Log_Scanning" xml:space="preserve"><value>Scannen: {0}</value></data>
   <data name="Log_ScanningArchive" xml:space="preserve"><value>Archiv wird gescannt: {0}</value></data>
   <data name="Log_ArchiveContentsLoaded" xml:space="preserve"><value>Archivinhalt geladen ({0} Einträge).</value></data>
+  <data name="Log_ScanningBatchFolder" xml:space="preserve"><value>Stapelordner wird gescannt: {0}</value></data>
+  <data name="Log_BatchScanDone" xml:space="preserve"><value>Stapelscan: {0} Paket(e), {1} Textur-Einträge.</value></data>
+  <data name="Log_BatchConvertingPack" xml:space="preserve"><value>Stapel [{0}/{1}] Konvertierung: {2} → {3}</value></data>
   <data name="Log_ScanningPackForExtraction" xml:space="preserve"><value>Paket wird für Extraktionsliste gescannt...</value></data>
   <data name="Log_IndexedPngEntries" xml:space="preserve"><value>{0} .png-Einträge indexiert; es werden nur diese + pack.mcmeta extrahiert.</value></data>
   <data name="Log_ExtractingOnlyPng" xml:space="preserve"><value>Nur .png-Texturen + pack.mcmeta werden extrahiert.</value></data>
@@ -238,6 +247,34 @@
   <data name="DeepBumpOverlapLarge" xml:space="preserve">
     <value>Groß</value>
   </data>
+  <data name="DeepBumpAdvanced" xml:space="preserve"><value>DeepBump (erweitert)</value></data>
+  <data name="DeepBumpInputMode" xml:space="preserve"><value>Eingabemodus</value></data>
+  <data name="DeepBumpInputModeAuto" xml:space="preserve"><value>Auto</value></data>
+  <data name="DeepBumpInputModeGrayscale" xml:space="preserve"><value>Graustufen</value></data>
+  <data name="DeepBumpInputModeRgb" xml:space="preserve"><value>RGB</value></data>
+  <data name="DeepBumpForceBlue255" xml:space="preserve"><value>B=255 in DeepBump-Normalen erzwingen</value></data>
+  <data name="QualityProfile" xml:space="preserve"><value>Qualitätsprofil</value></data>
+  <data name="QualityProfileBalanced" xml:space="preserve"><value>Ausgewogen</value></data>
+  <data name="QualityProfileLowRes" xml:space="preserve"><value>Niedrige Auflösung (16–64)</value></data>
+  <data name="QualityProfileHiRes" xml:space="preserve"><value>Hohe Auflösung (128–512)</value></data>
+  <data name="Advanced" xml:space="preserve"><value>Erweitert</value></data>
+  <data name="Preprocessing" xml:space="preserve"><value>Vorverarbeitung</value></data>
+  <data name="PreprocessLinearize" xml:space="preserve"><value>Linearisieren (sRGB → linear) vor Ableitungen</value></data>
+  <data name="PreprocessDenoiseRadius" xml:space="preserve"><value>Rauschfilter-Radius</value></data>
+  <data name="PreprocessDenoiseBlend" xml:space="preserve"><value>Rauschfilter-Mischung</value></data>
+  <data name="PreprocessFrequencySplit" xml:space="preserve"><value>Frequenzaufteilung (Makro + Detail)</value></data>
+  <data name="PreprocessFrequencyRadius" xml:space="preserve"><value>Frequenzradius</value></data>
+  <data name="PreprocessFrequencyDetailStrength" xml:space="preserve"><value>Detailstärke</value></data>
+  <data name="SpecularAdvanced" xml:space="preserve"><value>Specular (erweitert)</value></data>
+  <data name="SpecularPercentileRemap" xml:space="preserve"><value>Perzentil-Remap für Glätte (R)</value></data>
+  <data name="SpecularRemapLowPercentile" xml:space="preserve"><value>Unteres Perzentil</value></data>
+  <data name="SpecularRemapHighPercentile" xml:space="preserve"><value>Oberes Perzentil</value></data>
+  <data name="MetalHeuristicSubstrings" xml:space="preserve"><value>Metall-Namenshinweise</value></data>
+  <data name="MetalHeuristicSubstringsWatermark" xml:space="preserve"><value>Kommagetrennt (optional), z.B. iron,gold,steel</value></data>
+  <data name="AoAdvanced" xml:space="preserve"><value>Umgebungsverdeckung (AO)</value></data>
+  <data name="GenerateAo" xml:space="preserve"><value>AO in Normal (Blaukanal) backen</value></data>
+  <data name="AoRadius" xml:space="preserve"><value>AO-Radius</value></data>
+  <data name="AoStrength" xml:space="preserve"><value>AO-Stärke</value></data>
   <data name="TextureTypes" xml:space="preserve">
     <value>Konvertierungsfilter</value>
   </data>
@@ -327,6 +364,8 @@
   </data>
   <data name="Status_SelectPack" xml:space="preserve"><value>Ressourcenpaket (.zip oder .jar) und Ausgabeordner wählen.</value></data>
   <data name="Status_ScanningTexturesInPack" xml:space="preserve"><value>Scanne Texturen im Paket...</value></data>
+  <data name="Status_ScanningBatchFolder" xml:space="preserve"><value>Stapelordner wird gescannt...</value></data>
+  <data name="Status_BatchScanDone" xml:space="preserve"><value>Stapel: {0} Paket(e), {1} Texturen.</value></data>
   <data name="Status_ScanningPackProgress" xml:space="preserve"><value>Scanne Paket... ({0}/{1})</value></data>
   <data name="Status_LoadedTextures" xml:space="preserve"><value>{0} Texturen geladen.</value></data>
   <data name="Status_FailedToScan" xml:space="preserve"><value>Texturen konnten nicht gescannt werden.</value></data>

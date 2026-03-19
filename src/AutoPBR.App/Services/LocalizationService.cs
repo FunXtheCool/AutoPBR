@@ -40,6 +40,20 @@ internal static class LocalizationService
         new FoliageModeOption(strings.DeepBumpOverlapLarge, "Large")
     ];
 
+    public static IReadOnlyList<FoliageModeOption> GetDeepBumpInputModeOptions(LocalizedStrings strings) =>
+    [
+        new FoliageModeOption(strings.DeepBumpInputModeAuto, nameof(DeepBumpInputMode.Auto)),
+        new FoliageModeOption(strings.DeepBumpInputModeGrayscale, nameof(DeepBumpInputMode.Grayscale)),
+        new FoliageModeOption(strings.DeepBumpInputModeRgb, nameof(DeepBumpInputMode.Rgb))
+    ];
+
+    public static IReadOnlyList<FoliageModeOption> GetQualityProfileOptions(LocalizedStrings strings) =>
+    [
+        new FoliageModeOption(strings.QualityProfileBalanced, nameof(QualityProfile.Balanced)),
+        new FoliageModeOption(strings.QualityProfileLowRes, nameof(QualityProfile.LowRes)),
+        new FoliageModeOption(strings.QualityProfileHiRes, nameof(QualityProfile.HiRes))
+    ];
+
     public static IReadOnlyList<FoliageModeOption> GetNormalOperatorOptions() =>
     [
         new FoliageModeOption("Sobel + VC (default)", nameof(NormalOperator.SobelVc)),

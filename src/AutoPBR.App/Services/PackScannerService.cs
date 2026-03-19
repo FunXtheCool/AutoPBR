@@ -2,7 +2,7 @@ using AutoPBR.App.Models;
 
 namespace AutoPBR.App.Services;
 
-/// <summary>Builds a lightweight index of a zip/jar archive (path → immediate children, file count). Only .png files are indexed.</summary>
+/// <summary>Builds a lightweight index of a zip/jar archive (path → immediate children, file count). Only .png files are indexed; only entry names are read.</summary>
 internal static class PackScannerService
 {
     /// <summary>Build a lightweight index (path → immediate children) and file count. Only .png files are indexed; only entry names are read.</summary>
@@ -11,6 +11,74 @@ internal static class PackScannerService
     {
         var childLists = new Dictionary<string, List<ArchiveChildEntry>>(StringComparer.OrdinalIgnoreCase);
         var fileCount = 0;
+        AddZipToIndex(zipPath, pathPrefix: "", childLists, ref fileCount, progress);
+        var index = ToReadOnlyIndex(childLists);
+        return new ScannedArchiveData(index, fileCount);
+    }
+
+    /// <summary>Index all .zip/.jar files in <paramref name="directory"/> (non-recursive). Root shows one folder per pack; inner paths are <c>{packRoot}/assets/...</c>.</summary>
+    public static ScannedArchiveData BuildBatchArchiveIndex(string directory,
+        IProgress<(int completed, int total)>? progress = null)
+    {
+        if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
+        {
+            throw new DirectoryNotFoundException(directory);
+        }
+
+        var packFiles = Directory.EnumerateFiles(directory)
+            .Where(f =>
+            {
+                var e = Path.GetExtension(f);
+                return e.Equals(".zip", StringComparison.OrdinalIgnoreCase) ||
+                       e.Equals(".jar", StringComparison.OrdinalIgnoreCase);
+            })
+            .OrderBy(f => Path.GetFileName(f), StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var childLists = new Dictionary<string, List<ArchiveChildEntry>>(StringComparer.OrdinalIgnoreCase);
+        var rootList = new List<ArchiveChildEntry>();
+        childLists[""] = rootList;
+        var batchMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var fileCount = 0;
+
+        foreach (var packPath in packFiles)
+        {
+            var baseName = Path.GetFileName(packPath);
+            var uniqueRoot = baseName;
+            for (var i = 0;
+                 rootList.Exists(c => c.FullPath.Equals(uniqueRoot, StringComparison.OrdinalIgnoreCase));
+                 i++)
+            {
+                uniqueRoot = $"{i}_{baseName}";
+            }
+
+            batchMap[uniqueRoot] = packPath;
+            rootList.Add(new ArchiveChildEntry(uniqueRoot, uniqueRoot, true));
+            AddZipToIndex(packPath, uniqueRoot, childLists, ref fileCount, progress);
+        }
+
+        var index = ToReadOnlyIndex(childLists);
+        return new ScannedArchiveData(
+            index,
+            fileCount,
+            isBatch: true,
+            batchFolderPath: Path.GetFullPath(directory),
+            batchPackRootToPath: batchMap);
+    }
+
+    private static IReadOnlyDictionary<string, IReadOnlyList<ArchiveChildEntry>> ToReadOnlyIndex(
+        Dictionary<string, List<ArchiveChildEntry>> childLists) =>
+        childLists.ToDictionary(kv => kv.Key, kv => (IReadOnlyList<ArchiveChildEntry>)kv.Value.AsReadOnly(),
+            StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Add zip entries under optional <paramref name="pathPrefix"/> (e.g. "" or "MyPack.zip").</summary>
+    private static void AddZipToIndex(
+        string zipPath,
+        string pathPrefix,
+        Dictionary<string, List<ArchiveChildEntry>> childLists,
+        ref int fileCount,
+        IProgress<(int completed, int total)>? progress)
+    {
         using var zip = System.IO.Compression.ZipFile.OpenRead(zipPath);
         var entries = zip.Entries.ToList();
         var total = entries.Count;
@@ -34,13 +102,13 @@ internal static class PackScannerService
             }
 
             var segments = full.Split('/');
-            var current = "";
+            var current = pathPrefix;
             for (var i = 0; i < segments.Length; i++)
             {
                 var segment = segments[i];
                 var isLast = i == segments.Length - 1;
                 var isFile = isLast && !isEntryFolder;
-                var path = current.Length == 0 ? segment : current + "/" + segment;
+                var path = string.IsNullOrEmpty(current) ? segment : current + "/" + segment;
                 var parentPath = current;
                 if (!childLists.TryGetValue(parentPath, out var siblingList))
                 {
@@ -66,9 +134,5 @@ internal static class PackScannerService
             progress?.Report((completed, total));
             completed++;
         }
-
-        var index = childLists.ToDictionary(kv => kv.Key, kv => (IReadOnlyList<ArchiveChildEntry>)kv.Value.AsReadOnly(),
-            StringComparer.OrdinalIgnoreCase);
-        return new ScannedArchiveData(index, fileCount);
     }
 }

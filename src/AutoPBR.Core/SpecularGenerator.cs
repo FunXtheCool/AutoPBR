@@ -18,7 +18,7 @@ internal static class SpecularGenerator
     /// Treat texture as metal if name or relative key contains these substrings (case-insensitive).
     /// Includes vanilla and common mod metals.
     /// </summary>
-    private static readonly string[] MetalSubstrings =
+    private static readonly string[] DefaultMetalSubstrings =
     [
         "iron", "gold", "copper", "diamond", "netherite", "armor", "helmet",
         "adamantite", "mythril", "quadrillum", "silver", "aquarium", "prometheum", "osmium", "bronze", "steel",
@@ -28,10 +28,10 @@ internal static class SpecularGenerator
         "bismuth", "antimony", "cadmium", "iridium", "signalum", "lumium", "enderium", "constantan"
     ];
 
-    private static bool IsMetalTexture(string name, string relativeKey)
+    private static bool IsMetalTexture(string name, string relativeKey, IReadOnlyList<string>? metalSubstrings)
     {
         var combined = name + "\0" + relativeKey;
-        foreach (var sub in MetalSubstrings)
+        foreach (var sub in metalSubstrings ?? DefaultMetalSubstrings)
         {
             if (combined.Contains(sub, StringComparison.OrdinalIgnoreCase))
             {
@@ -43,7 +43,7 @@ internal static class SpecularGenerator
     }
 
     private static (float[] luminance, float[] edgeMagnitude, float meanLuminance) BuildLuminanceAndEdge(
-        Image<Rgba32> cropped, int width, int height)
+        Image<Rgba32> cropped, int width, int height, AutoPbrOptions options)
     {
         var lum = new float[width * height];
         cropped.ProcessPixelRows(acc =>
@@ -54,10 +54,34 @@ internal static class SpecularGenerator
                 for (var x = 0; x < width; x++)
                 {
                     var p = row[x];
-                    lum[y * width + x] = (p.R * 0.3f + p.G * 0.6f + p.B * 0.1f) / 255f;
+                    if (options.PreprocessLinearize)
+                    {
+                        var r = PreprocessUtil.SrgbToLinear(p.R);
+                        var g = PreprocessUtil.SrgbToLinear(p.G);
+                        var b = PreprocessUtil.SrgbToLinear(p.B);
+                        lum[y * width + x] = r * 0.2126f + g * 0.7152f + b * 0.0722f;
+                    }
+                    else
+                    {
+                        lum[y * width + x] = (p.R * 0.3f + p.G * 0.6f + p.B * 0.1f) / 255f;
+                    }
                 }
             }
         });
+
+        if (options.PreprocessDenoiseRadius > 0)
+        {
+            var denoised = new float[lum.Length];
+            Array.Copy(lum, denoised, lum.Length);
+            PreprocessUtil.BoxBlurInPlace(denoised, width, height, options.PreprocessDenoiseRadius);
+            var blend = Math.Clamp(options.PreprocessDenoiseBlend, 0f, 1f);
+            var invBlend = 1f - blend;
+            for (var i = 0; i < lum.Length; i++)
+            {
+                lum[i] = lum[i] * invBlend + denoised[i] * blend;
+            }
+        }
+
         var sumLum = 0.0;
         foreach (var value in lum)
         {
@@ -221,8 +245,8 @@ internal static class SpecularGenerator
                         }
                     }
 
-                    var (luminance, edgeMagnitude, meanLuminance) = BuildLuminanceAndEdge(cropped, width, height);
-                    var isMetal = IsMetalTexture(t.Name, t.RelativeKey);
+                    var (luminance, edgeMagnitude, meanLuminance) = BuildLuminanceAndEdge(cropped, width, height, options);
+                    var isMetal = IsMetalTexture(t.Name, t.RelativeKey, options.MetalHeuristicSubstrings);
                     var nPixels = width * height;
                     var rBuf = new byte[nPixels];
                     var gBuf = new byte[nPixels];
@@ -268,27 +292,58 @@ internal static class SpecularGenerator
                         aBuf[idx] = spec.a;
                     }
 
-                    // Per-texture R normalization: remap to 10–200 when there is variation
-                    byte minR = 255, maxR = 0;
-                    for (var i = 0; i < nPixels; i++)
+                    // Per-texture R normalization: remap to 10–200 when there is variation.
+                    // Percentile remap is more robust than min/max on noisy low-res inputs.
+                    byte minR;
+                    byte maxR;
+                    if (options.SpecularUsePercentileRemap && nPixels > 0)
                     {
-                        var v = rBuf[i];
-                        if (v < minR)
+                        var lowP = Math.Clamp(options.SpecularRemapLowPercentile, 0f, 1f);
+                        var highP = Math.Clamp(options.SpecularRemapHighPercentile, 0f, 1f);
+                        if (highP < lowP)
                         {
-                            minR = v;
+                            (lowP, highP) = (highP, lowP);
                         }
 
-                        if (v > maxR)
+                        var sorted = new byte[nPixels];
+                        Array.Copy(rBuf, sorted, nPixels);
+                        Array.Sort(sorted);
+                        minR = sorted[(int)MathF.Round(lowP * (nPixels - 1))];
+                        maxR = sorted[(int)MathF.Round(highP * (nPixels - 1))];
+                    }
+                    else
+                    {
+                        minR = 255;
+                        maxR = 0;
+                        for (var i = 0; i < nPixels; i++)
                         {
-                            maxR = v;
+                            var v = rBuf[i];
+                            if (v < minR)
+                            {
+                                minR = v;
+                            }
+
+                            if (v > maxR)
+                            {
+                                maxR = v;
+                            }
                         }
                     }
 
                     if (maxR > minR)
                     {
+                        var denom = maxR - minR;
                         for (var i = 0; i < nPixels; i++)
                         {
-                            rBuf[i] = (byte)Math.Clamp(10 + (rBuf[i] - minR) * 190 / (maxR - minR), 0, 255);
+                            rBuf[i] = (byte)Math.Clamp(10 + (rBuf[i] - minR) * 190 / denom, 0, 255);
+                        }
+                    }
+
+                    if (t.Overrides.InvertSpecular)
+                    {
+                        for (var i = 0; i < nPixels; i++)
+                        {
+                            rBuf[i] = (byte)(255 - rBuf[i]);
                         }
                     }
 
@@ -425,7 +480,9 @@ internal static class SpecularGenerator
             return img.Clone();
         }
 
-        return img.Clone(ctx => ctx.Crop(new Rectangle(0, 0, s, s)));
+        var startX = (img.Width - s) / 2;
+        var startY = (img.Height - s) / 2;
+        return img.Clone(ctx => ctx.Crop(new Rectangle(startX, startY, s, s)));
     }
 }
 

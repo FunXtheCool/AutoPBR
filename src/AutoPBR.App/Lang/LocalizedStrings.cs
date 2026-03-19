@@ -1,6 +1,9 @@
+using JetBrains.Annotations;
+
 namespace AutoPBR.App.Lang;
 
 /// <summary>Exposes resource strings as bindable properties. Replace the instance when culture changes so UI updates.</summary>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public sealed class LocalizedStrings
 {
     public string Appearance => Resources.Appearance;
@@ -22,11 +25,41 @@ public sealed class LocalizedStrings
     public string TabScan => Resources.TabScan;
     public string TabExplore => Resources.TabExplore;
     public string ScanButton => Resources.ScanButton;
+    public string BatchConversion => Resources.BatchConversion;
+    public string BatchConversionDescription => Resources.BatchConversionDescription;
+    public string BatchFolderWatermark => Resources.BatchFolderWatermark;
+    public string BrowseBatchFolder => Resources.BrowseBatchFolder;
+    public string ScanBatchButton => Resources.ScanBatchButton;
+    public string BatchConvertButton => Resources.BatchConvertButton;
     public string ExploreArchiveContents => Resources.ExploreArchiveContents;
     public string ResourceExplorer => Resources.ResourceExplorer;
     public string ExploreEmptyMessage => Resources.ExploreEmptyMessage;
     public string ExploreExpandAll => Resources.ExploreExpandAll;
     public string ExploreCollapseAll => Resources.ExploreCollapseAll;
+    public string ClearTagOverrides => Resources.ClearTagOverrides;
+    public string ClearTagOverridesTooltip => Resources.ClearTagOverridesTooltip;
+    public string TagMenuDontApply => Resources.TagMenuDontApply;
+    public string TagMenuApply => Resources.TagMenuApply;
+    public string TagRules => Resources.TagRules;
+    public string TagRulesCustomDescription => Resources.TagRulesCustomDescription;
+    public string TagRuleId => Resources.TagRuleId;
+    public string TagRuleDisplayName => Resources.TagRuleDisplayName;
+    public string TagRuleKeywords => Resources.TagRuleKeywords;
+    public string AddCustomTagRule => Resources.AddCustomTagRule;
+    public string RemoveTagRule => Resources.RemoveTagRule;
+    public string RefreshTagRules => Resources.RefreshTagRules;
+    public string InvertHeight => Resources.InvertHeight;
+    public string InvertSpecular => Resources.InvertSpecular;
+    public string TagRuleNormalIntensityOpt => Resources.TagRuleNormalIntensityOpt;
+    public string TagRuleHeightIntensityOpt => Resources.TagRuleHeightIntensityOpt;
+    public string TagRuleIntensityTooltip => Resources.TagRuleIntensityTooltip;
+    public string TagRuleInvertNormalX => Resources.TagRuleInvertNormalX;
+    public string TagRuleInvertNormalY => Resources.TagRuleInvertNormalY;
+    public string ExportTagRules => Resources.ExportTagRules;
+    public string ImportTagRules => Resources.ImportTagRules;
+    public string ExportTagRulesTooltip => Resources.ExportTagRulesTooltip;
+    public string ImportTagRulesTooltip => Resources.ImportTagRulesTooltip;
+    public string RefreshTagRulesTooltip => Resources.RefreshTagRulesTooltip;
     public string ExploreBack => Resources.ExploreBack;
     public string ExploreFocusAssets => Resources.ExploreFocusAssets;
     public string TabTune => Resources.TabTune;
@@ -37,6 +70,10 @@ public sealed class LocalizedStrings
     public string Log => Resources.Log;
     public string OpenLogFolder => Resources.OpenLogFolder;
     public string GenerationSettings => Resources.GenerationSettings;
+    public string QualityProfile => Resources.QualityProfile;
+    public string QualityProfileBalanced => Resources.QualityProfileBalanced;
+    public string QualityProfileLowRes => Resources.QualityProfileLowRes;
+    public string QualityProfileHiRes => Resources.QualityProfileHiRes;
     public string TuneNormals => Resources.TuneNormals;
     public string TuneSpecular => Resources.TuneSpecular;
     public string TuneHeight => Resources.TuneHeight;
@@ -69,6 +106,30 @@ public sealed class LocalizedStrings
     public string DeepBumpOverlapSmall => Resources.DeepBumpOverlapSmall;
     public string DeepBumpOverlapMedium => Resources.DeepBumpOverlapMedium;
     public string DeepBumpOverlapLarge => Resources.DeepBumpOverlapLarge;
+    public string DeepBumpAdvanced => Resources.DeepBumpAdvanced;
+    public string DeepBumpInputMode => Resources.DeepBumpInputMode;
+    public string DeepBumpInputModeAuto => Resources.DeepBumpInputModeAuto;
+    public string DeepBumpInputModeGrayscale => Resources.DeepBumpInputModeGrayscale;
+    public string DeepBumpInputModeRgb => Resources.DeepBumpInputModeRgb;
+    public string DeepBumpForceBlue255 => Resources.DeepBumpForceBlue255;
+    public string Advanced => Resources.Advanced;
+    public string Preprocessing => Resources.Preprocessing;
+    public string PreprocessLinearize => Resources.PreprocessLinearize;
+    public string PreprocessDenoiseRadius => Resources.PreprocessDenoiseRadius;
+    public string PreprocessDenoiseBlend => Resources.PreprocessDenoiseBlend;
+    public string PreprocessFrequencySplit => Resources.PreprocessFrequencySplit;
+    public string PreprocessFrequencyRadius => Resources.PreprocessFrequencyRadius;
+    public string PreprocessFrequencyDetailStrength => Resources.PreprocessFrequencyDetailStrength;
+    public string SpecularAdvanced => Resources.SpecularAdvanced;
+    public string SpecularPercentileRemap => Resources.SpecularPercentileRemap;
+    public string SpecularRemapLowPercentile => Resources.SpecularRemapLowPercentile;
+    public string SpecularRemapHighPercentile => Resources.SpecularRemapHighPercentile;
+    public string MetalHeuristicSubstrings => Resources.MetalHeuristicSubstrings;
+    public string MetalHeuristicSubstringsWatermark => Resources.MetalHeuristicSubstringsWatermark;
+    public string AoAdvanced => Resources.AoAdvanced;
+    public string GenerateAo => Resources.GenerateAo;
+    public string AoRadius => Resources.AoRadius;
+    public string AoStrength => Resources.AoStrength;
     public string TextureTypes => Resources.TextureTypes;
     public string Blocks => Resources.Blocks;
     public string BlocksTooltip => Resources.BlocksTooltip;
@@ -81,6 +142,14 @@ public sealed class LocalizedStrings
     public string Particles => Resources.Particles;
     public string ParticlesTooltip => Resources.ParticlesTooltip;
     public string FilterWatermark => Resources.FilterWatermark;
+    public string ExploreTagFilter => Resources.ExploreTagFilter;
+    public string ExploreTagFilterAll => Resources.ExploreTagFilterAll;
+    public string TagRuleEnabled => Resources.TagRuleEnabled;
+    public string TagRuleEnabledTooltip => Resources.TagRuleEnabledTooltip;
+    public string TagRuleMoveUp => Resources.TagRuleMoveUp;
+    public string TagRuleMoveDown => Resources.TagRuleMoveDown;
+    public string TagRuleMoveUpTooltip => Resources.TagRuleMoveUpTooltip;
+    public string TagRuleMoveDownTooltip => Resources.TagRuleMoveDownTooltip;
     public string Output => Resources.Output;
     public string OutputFolderWatermark => Resources.OutputFolderWatermark;
     public string OutputPathWatermark => Resources.OutputPathWatermark;
@@ -96,6 +165,6 @@ public sealed class LocalizedStrings
     public string UseLegacyExtractorTooltip => Resources.UseLegacyExtractorTooltip;
     public string Cancel => Resources.Cancel;
     public string Convert => Resources.Convert;
-    public string UIThemeTooltip => Resources.UIThemeTooltip;
-    public string UILanguageTooltip => Resources.UILanguageTooltip;
+    public string UiThemeTooltip => Resources.UIThemeTooltip;
+    public string UiLanguageTooltip => Resources.UILanguageTooltip;
 }

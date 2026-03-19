@@ -28,7 +28,9 @@ internal static class NormalHeightGenerator
             {
                 deepBumpGenerator =
                     options.UseDeepBumpNormals && !string.IsNullOrWhiteSpace(options.DeepBumpModelPath)
-                        ? DeepBumpNormalsGenerator.TryCreate(options.DeepBumpModelPath!)
+                        ? DeepBumpNormalsGenerator.TryCreate(
+                            options.DeepBumpModelPath!,
+                            maxConcurrentRuns: Math.Max(1, ThreadingUtil.GetConversionParallelism(options)))
                         : null;
 
                 if (deepBumpGenerator is { IsUsingGpu: false })
@@ -63,7 +65,11 @@ internal static class NormalHeightGenerator
                             };
 
                             Image<Rgba32> diffuseForNormals = croppedDiffuse;
-                            normal = generatorForLoop.Generate(diffuseForNormals, overlap);
+                            normal = generatorForLoop.Generate(
+                                diffuseForNormals,
+                                overlap,
+                                options.DeepBumpInputMode,
+                                options.DeepBumpForceBlue255);
                         }
                         else
                         {
@@ -75,9 +81,7 @@ internal static class NormalHeightGenerator
                                 normalIntensity,
                                 t.Overrides.InvertNormalRed,
                                 t.Overrides.InvertNormalGreen,
-                                options.NormalOperator,
-                                options.NormalKernelSize,
-                                options.NormalDerivative);
+                                options);
                         }
 
                         using (normal)
@@ -85,7 +89,7 @@ internal static class NormalHeightGenerator
                             var heightIntensity = t.Overrides.HeightIntensity ?? options.HeightIntensity;
                             var brightness = t.Overrides.HeightBrightness ?? AutoPbrDefaults.DefaultHeightBrightness;
                             var heightMap = GenerateHeightMap(croppedDiffuse, width, height, heightIntensity, brightness,
-                                t.Overrides.InvertHeight);
+                                t.Overrides.InvertHeight, options);
 
                             var skipHeightInAlpha = t.IsPlantForNoHeight;
                             if (!skipHeightInAlpha && options.FoliageMode == "No Height" &&
@@ -93,6 +97,13 @@ internal static class NormalHeightGenerator
                                  t.RelativeKey.Contains("grass", StringComparison.OrdinalIgnoreCase)))
                             {
                                 skipHeightInAlpha = HasSignificantTransparency(croppedDiffuse);
+                            }
+
+                            // LabPBR: normal blue channel = AO (0 = 100% occlusion, 255 = 0% occlusion).
+                            byte[]? aoChannel = null;
+                            if (options.GenerateAo && !skipHeightInAlpha)
+                            {
+                                aoChannel = GenerateAoChannelFromHeight(heightMap, options.AoRadius, options.AoStrength);
                             }
 
                             normal.ProcessPixelRows(acc =>
@@ -114,6 +125,10 @@ internal static class NormalHeightGenerator
                                         }
 
                                         row[x].A = a;
+
+                                        // LabPBR: B channel = ambient occlusion when enabled; else 255 (no occlusion).
+                                        var i = y * heightMap.Width + x;
+                                        row[x].B = aoChannel != null ? aoChannel[i] : (byte)255;
                                     }
                                 }
                             });
@@ -164,10 +179,14 @@ internal static class NormalHeightGenerator
         float normalIntensity,
         bool invertR,
         bool invertG,
-        NormalOperator normalOperator = NormalOperator.SobelVc,
-        NormalKernelSize kernelSize = NormalKernelSize.K3,
-        NormalDerivative derivativeMode = NormalDerivative.Luminance)
+        AutoPbrOptions options)
     {
+        normalIntensity = MathF.Max(normalIntensity, 1e-3f);
+
+        var normalOperator = options.NormalOperator;
+        var kernelSize = options.NormalKernelSize;
+        var derivativeMode = options.NormalDerivative;
+
         var n = width * height;
         var grey = new float[n];
         cropped.ProcessPixelRows(acc =>
@@ -178,10 +197,46 @@ internal static class NormalHeightGenerator
                 for (var x = 0; x < width; x++)
                 {
                     var p = row[x];
-                    grey[y * width + x] = (p.R * 0.3f + p.G * 0.6f + p.B * 0.1f) / 255f;
+                    if (options.PreprocessLinearize)
+                    {
+                        var r = PreprocessUtil.SrgbToLinear(p.R);
+                        var g = PreprocessUtil.SrgbToLinear(p.G);
+                        var b = PreprocessUtil.SrgbToLinear(p.B);
+                        grey[y * width + x] = r * 0.2126f + g * 0.7152f + b * 0.0722f;
+                    }
+                    else
+                    {
+                        grey[y * width + x] = (p.R * 0.3f + p.G * 0.6f + p.B * 0.1f) / 255f;
+                    }
                 }
             }
         });
+
+        if (options.PreprocessDenoiseRadius > 0)
+        {
+            var denoised = new float[n];
+            Array.Copy(grey, denoised, n);
+            PreprocessUtil.BoxBlurInPlace(denoised, width, height, options.PreprocessDenoiseRadius);
+            var blend = Math.Clamp(options.PreprocessDenoiseBlend, 0f, 1f);
+            var invBlend = 1f - blend;
+            for (var i = 0; i < n; i++)
+            {
+                grey[i] = grey[i] * invBlend + denoised[i] * blend;
+            }
+        }
+
+        if (options is { PreprocessFrequencySplit: true, PreprocessFrequencyRadius: > 0 })
+        {
+            var low = new float[n];
+            Array.Copy(grey, low, n);
+            PreprocessUtil.BoxBlurInPlace(low, width, height, options.PreprocessFrequencyRadius);
+            var detail = options.PreprocessFrequencyDetailStrength;
+            for (var i = 0; i < n; i++)
+            {
+                var high = grey[i] - low[i];
+                grey[i] = Math.Clamp(low[i] + high * detail, 0f, 1f);
+            }
+        }
 
         if (derivativeMode is NormalDerivative.Luminance or NormalDerivative.ColorLuminanceBlend
             or NormalDerivative.ColorLuminanceMax)
@@ -609,8 +664,10 @@ internal static class NormalHeightGenerator
     }
 
     private static HeightMap GenerateHeightMap(Image<Rgba32> cropped, int width, int height, float heightIntensity,
-        float brightness, bool invertHeight)
+        float brightness, bool invertHeight, AutoPbrOptions options)
     {
+        heightIntensity = MathF.Max(heightIntensity, 1e-3f);
+
         var grey = new byte[width * height];
         cropped.ProcessPixelRows(acc =>
         {
@@ -620,7 +677,18 @@ internal static class NormalHeightGenerator
                 for (var x = 0; x < width; x++)
                 {
                     var p = row[x];
-                    var v = (int)MathF.Round(p.R * 0.3f + p.G * 0.6f + p.B * 0.1f);
+                    int v;
+                    if (options.PreprocessLinearize)
+                    {
+                        var r = PreprocessUtil.SrgbToLinear(p.R);
+                        var g = PreprocessUtil.SrgbToLinear(p.G);
+                        var b = PreprocessUtil.SrgbToLinear(p.B);
+                        v = (int)MathF.Round((r * 0.2126f + g * 0.7152f + b * 0.0722f) * 255f);
+                    }
+                    else
+                    {
+                        v = (int)MathF.Round(p.R * 0.3f + p.G * 0.6f + p.B * 0.1f);
+                    }
                     grey[y * width + x] = (byte)Math.Clamp(v, 0, 255);
                 }
             }
@@ -661,6 +729,39 @@ internal static class NormalHeightGenerator
         return new HeightMap { Width = width, Height = height, Data = outData };
     }
 
+    /// <summary>
+    /// LabPBR: AO in normal blue channel. Returns bytes where 0 = 100% occlusion, 255 = 0% occlusion.
+    /// </summary>
+    private static byte[] GenerateAoChannelFromHeight(HeightMap height, int radius, float strength)
+    {
+        radius = Math.Clamp(radius, 1, 64);
+        strength = Math.Clamp(strength, 0f, 5f);
+
+        var w = height.Width;
+        var h = height.Height;
+        var n = w * h;
+
+        var hf = new float[n];
+        for (var i = 0; i < n; i++)
+        {
+            hf[i] = height.Data[i] / 255f;
+        }
+
+        var blurred = new float[n];
+        Array.Copy(hf, blurred, n);
+        PreprocessUtil.BoxBlurInPlace(blurred, w, h, radius);
+
+        var result = new byte[n];
+        for (var i = 0; i < n; i++)
+        {
+            var cavity = MathF.Max(0f, blurred[i] - hf[i]);
+            var ao = 1f - Math.Clamp(cavity * strength, 0f, 1f);
+            result[i] = (byte)Math.Clamp((int)MathF.Round(ao * 255f), 0, 255);
+        }
+
+        return result;
+    }
+
     private static int Reflect(int i, int max)
     {
         if (i < 0)
@@ -685,7 +786,9 @@ internal static class NormalHeightGenerator
             return img.Clone();
         }
 
-        return img.Clone(ctx => ctx.Crop(new Rectangle(0, 0, s, s)));
+        var startX = (img.Width - s) / 2;
+        var startY = (img.Height - s) / 2;
+        return img.Clone(ctx => ctx.Crop(new Rectangle(startX, startY, s, s)));
     }
 }
 

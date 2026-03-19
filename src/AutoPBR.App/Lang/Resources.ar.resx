@@ -83,9 +83,15 @@
   <data name="TabScan" xml:space="preserve"><value>مسح</value></data>
   <data name="TabExplore" xml:space="preserve"><value>استكشاف</value></data>
   <data name="ScanButton" xml:space="preserve"><value>مسح</value></data>
+  <data name="BatchConversion" xml:space="preserve"><value>تحويل دُفعات</value></data>
+  <data name="BatchConversionDescription" xml:space="preserve"><value>اختر مجلداً يحتوي حزم موارد .zip / .jar. يُنشئ المسح شجرة مستكشف بكل حزمة كمجلد علوي. يحوّل «تحويل الدُفعات» كل الحزم إلى مجلد المخرجات (كل حزمة …_PBR.zip). استخدم الاستكشاف للتصفح؛ تحويل حزمة واحدة معطّل أثناء مسح الدُفعات النشط.</value></data>
+  <data name="BatchFolderWatermark" xml:space="preserve"><value>مجلد يحتوي حزم الموارد (.zip / .jar)</value></data>
+  <data name="BrowseBatchFolder" xml:space="preserve"><value>استعراض المجلد</value></data>
+  <data name="ScanBatchButton" xml:space="preserve"><value>مسح الدُفعة</value></data>
+  <data name="BatchConvertButton" xml:space="preserve"><value>تحويل الدُفعة</value></data>
   <data name="ExploreArchiveContents" xml:space="preserve"><value>محتويات الحزمة</value></data>
   <data name="ResourceExplorer" xml:space="preserve"><value>مستكشف الموارد</value></data>
-  <data name="ExploreEmptyMessage" xml:space="preserve"><value>امسح حزمة في تبويب المسح لاستكشاف محتوياتها.</value></data>
+  <data name="ExploreEmptyMessage" xml:space="preserve"><value>امسح حزمة أو مجلد دُفعات في تبويب المسح لاستكشاف المحتوى.</value></data>
   <data name="ExploreExpandAll" xml:space="preserve"><value>توسيع الكل</value></data>
   <data name="ExploreCollapseAll" xml:space="preserve"><value>طي الكل</value></data>
   <data name="ExploreBack" xml:space="preserve"><value>رجوع</value></data>
@@ -99,6 +105,9 @@
   <data name="Log_Scanning" xml:space="preserve"><value>جاري المسح: {0}</value></data>
   <data name="Log_ScanningArchive" xml:space="preserve"><value>جاري مسح الأرشيف: {0}</value></data>
   <data name="Log_ArchiveContentsLoaded" xml:space="preserve"><value>تم تحميل محتويات الأرشيف ({0} إدخالات).</value></data>
+  <data name="Log_ScanningBatchFolder" xml:space="preserve"><value>جاري مسح مجلد الدُفعات: {0}</value></data>
+  <data name="Log_BatchScanDone" xml:space="preserve"><value>مسح الدُفعات: {0} حزمة/حزم، {1} إدخال أنسجة.</value></data>
+  <data name="Log_BatchConvertingPack" xml:space="preserve"><value>دُفعة [{0}/{1}] جاري التحويل: {2} → {3}</value></data>
   <data name="Log_ScanningPackForExtraction" xml:space="preserve"><value>جاري مسح الحزمة لقائمة الاستخراج...</value></data>
   <data name="Log_IndexedPngEntries" xml:space="preserve"><value>تم فهرسة {0} إدخالات .png؛ سيتم استخراج هذه فقط + pack.mcmeta.</value></data>
   <data name="Log_ExtractingOnlyPng" xml:space="preserve"><value>استخراج أنسجة .png وpack.mcmeta فقط.</value></data>
@@ -150,6 +159,34 @@
   <data name="DeepBumpOverlapSmall" xml:space="preserve"><value>صغير</value></data>
   <data name="DeepBumpOverlapMedium" xml:space="preserve"><value>متوسط</value></data>
   <data name="DeepBumpOverlapLarge" xml:space="preserve"><value>كبير</value></data>
+  <data name="DeepBumpAdvanced" xml:space="preserve"><value>DeepBump (متقدم)</value></data>
+  <data name="DeepBumpInputMode" xml:space="preserve"><value>وضع الإدخال</value></data>
+  <data name="DeepBumpInputModeAuto" xml:space="preserve"><value>تلقائي</value></data>
+  <data name="DeepBumpInputModeGrayscale" xml:space="preserve"><value>تدرج رمادي</value></data>
+  <data name="DeepBumpInputModeRgb" xml:space="preserve"><value>RGB</value></data>
+  <data name="DeepBumpForceBlue255" xml:space="preserve"><value>فرض B=255 في خرائط DeepBump</value></data>
+  <data name="QualityProfile" xml:space="preserve"><value>ملف الجودة</value></data>
+  <data name="QualityProfileBalanced" xml:space="preserve"><value>متوازن</value></data>
+  <data name="QualityProfileLowRes" xml:space="preserve"><value>دقة منخفضة (16–64)</value></data>
+  <data name="QualityProfileHiRes" xml:space="preserve"><value>دقة عالية (128–512)</value></data>
+  <data name="Advanced" xml:space="preserve"><value>متقدم</value></data>
+  <data name="Preprocessing" xml:space="preserve"><value>المعالجة المسبقة</value></data>
+  <data name="PreprocessLinearize" xml:space="preserve"><value>تحويل (sRGB → linear) قبل المشتقات</value></data>
+  <data name="PreprocessDenoiseRadius" xml:space="preserve"><value>نصف قطر إزالة الضوضاء</value></data>
+  <data name="PreprocessDenoiseBlend" xml:space="preserve"><value>مزج إزالة الضوضاء</value></data>
+  <data name="PreprocessFrequencySplit" xml:space="preserve"><value>فصل التردد (ماكرو + تفاصيل)</value></data>
+  <data name="PreprocessFrequencyRadius" xml:space="preserve"><value>نصف قطر التردد</value></data>
+  <data name="PreprocessFrequencyDetailStrength" xml:space="preserve"><value>قوة التفاصيل</value></data>
+  <data name="SpecularAdvanced" xml:space="preserve"><value>اللمعان (متقدم)</value></data>
+  <data name="SpecularPercentileRemap" xml:space="preserve"><value>إعادة تعيين النعومة (R) حسب المئينات</value></data>
+  <data name="SpecularRemapLowPercentile" xml:space="preserve"><value>المئين المنخفض</value></data>
+  <data name="SpecularRemapHighPercentile" xml:space="preserve"><value>المئين العالي</value></data>
+  <data name="MetalHeuristicSubstrings" xml:space="preserve"><value>تلميحات أسماء المعادن</value></data>
+  <data name="MetalHeuristicSubstringsWatermark" xml:space="preserve"><value>مفصول بفواصل (اختياري)، مثل iron,gold,steel</value></data>
+  <data name="AoAdvanced" xml:space="preserve"><value>الإطباق المحيط (AO)</value></data>
+  <data name="GenerateAo" xml:space="preserve"><value>دمج AO في الخريطة العادية (القناة الزرقاء)</value></data>
+  <data name="AoRadius" xml:space="preserve"><value>نصف قطر AO</value></data>
+  <data name="AoStrength" xml:space="preserve"><value>قوة AO</value></data>
   <data name="TextureTypes" xml:space="preserve"><value>مرشحات التحويل</value></data>
   <data name="Blocks" xml:space="preserve"><value>الكتل</value></data>
   <data name="BlocksTooltip" xml:space="preserve"><value>معالجة الأنسجة في مجلدات block و blocks.</value></data>
@@ -181,6 +218,8 @@
   <data name="UILanguageTooltip" xml:space="preserve"><value>لغة الواجهة.</value></data>
   <data name="Status_SelectPack" xml:space="preserve"><value>اختر حزمة الموارد (.zip أو .jar) ومجلد المخرجات.</value></data>
   <data name="Status_ScanningTexturesInPack" xml:space="preserve"><value>جاري فحص الأنسجة في الحزمة...</value></data>
+  <data name="Status_ScanningBatchFolder" xml:space="preserve"><value>جاري مسح مجلد الدُفعات...</value></data>
+  <data name="Status_BatchScanDone" xml:space="preserve"><value>دُفعات: {0} حزمة/حزم، {1} أنسجة.</value></data>
   <data name="Status_ScanningPackProgress" xml:space="preserve"><value>جاري فحص الحزمة... ({0}/{1})</value></data>
   <data name="Status_LoadedTextures" xml:space="preserve"><value>تم تحميل {0} أنسجة.</value></data>
   <data name="Status_FailedToScan" xml:space="preserve"><value>فشل فحص الأنسجة.</value></data>

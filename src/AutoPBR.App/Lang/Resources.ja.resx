@@ -83,9 +83,15 @@
   <data name="TabScan" xml:space="preserve"><value>スキャン</value></data>
   <data name="TabExplore" xml:space="preserve"><value>探索</value></data>
   <data name="ScanButton" xml:space="preserve"><value>スキャン</value></data>
+  <data name="BatchConversion" xml:space="preserve"><value>一括変換</value></data>
+  <data name="BatchConversionDescription" xml:space="preserve"><value>.zip / .jar のリソースパックが入ったフォルダを選びます。スキャンで各パックが最上位フォルダのツリーを作成します。一括変換ですべてのパックを出力フォルダへ処理します（各 …_PBR.zip）。「探索」で閲覧。一括スキャン中は単一パックの変換は無効です。</value></data>
+  <data name="BatchFolderWatermark" xml:space="preserve"><value>リソースパック (.zip / .jar) を含むフォルダ</value></data>
+  <data name="BrowseBatchFolder" xml:space="preserve"><value>フォルダを参照</value></data>
+  <data name="ScanBatchButton" xml:space="preserve"><value>一括スキャン</value></data>
+  <data name="BatchConvertButton" xml:space="preserve"><value>一括変換</value></data>
   <data name="ExploreArchiveContents" xml:space="preserve"><value>パックの内容</value></data>
   <data name="ResourceExplorer" xml:space="preserve"><value>リソース エクスプローラー</value></data>
-  <data name="ExploreEmptyMessage" xml:space="preserve"><value>スキャンタブでパックをスキャンすると、内容を探索できます。</value></data>
+  <data name="ExploreEmptyMessage" xml:space="preserve"><value>スキャンタブでパックまたは一括フォルダをスキャンすると、内容を探索できます。</value></data>
   <data name="ExploreExpandAll" xml:space="preserve"><value>すべて展開</value></data>
   <data name="ExploreCollapseAll" xml:space="preserve"><value>すべて折りたたむ</value></data>
   <data name="ExploreBack" xml:space="preserve"><value>戻る</value></data>
@@ -99,6 +105,9 @@
   <data name="Log_Scanning" xml:space="preserve"><value>スキャン中: {0}</value></data>
   <data name="Log_ScanningArchive" xml:space="preserve"><value>アーカイブをスキャン中: {0}</value></data>
   <data name="Log_ArchiveContentsLoaded" xml:space="preserve"><value>アーカイブの内容を読み込みました（{0} エントリ）。</value></data>
+  <data name="Log_ScanningBatchFolder" xml:space="preserve"><value>一括フォルダをスキャン中: {0}</value></data>
+  <data name="Log_BatchScanDone" xml:space="preserve"><value>一括スキャン: {0} パック、{1} テクスチャエントリ。</value></data>
+  <data name="Log_BatchConvertingPack" xml:space="preserve"><value>一括 [{0}/{1}] 変換中: {2} → {3}</value></data>
   <data name="Log_ScanningPackForExtraction" xml:space="preserve"><value>抽出リスト用にパックをスキャン中...</value></data>
   <data name="Log_IndexedPngEntries" xml:space="preserve"><value>{0} 個の .png エントリをインデックス化しました。これらと pack.mcmeta のみを抽出します。</value></data>
   <data name="Log_ExtractingOnlyPng" xml:space="preserve"><value>.png テクスチャと pack.mcmeta のみを抽出します。</value></data>
@@ -150,6 +159,34 @@
   <data name="DeepBumpOverlapSmall" xml:space="preserve"><value>小</value></data>
   <data name="DeepBumpOverlapMedium" xml:space="preserve"><value>中</value></data>
   <data name="DeepBumpOverlapLarge" xml:space="preserve"><value>大</value></data>
+  <data name="DeepBumpAdvanced" xml:space="preserve"><value>DeepBump（詳細）</value></data>
+  <data name="DeepBumpInputMode" xml:space="preserve"><value>入力モード</value></data>
+  <data name="DeepBumpInputModeAuto" xml:space="preserve"><value>自動</value></data>
+  <data name="DeepBumpInputModeGrayscale" xml:space="preserve"><value>グレースケール</value></data>
+  <data name="DeepBumpInputModeRgb" xml:space="preserve"><value>RGB</value></data>
+  <data name="DeepBumpForceBlue255" xml:space="preserve"><value>DeepBump法線のB=255を強制</value></data>
+  <data name="QualityProfile" xml:space="preserve"><value>品質プロファイル</value></data>
+  <data name="QualityProfileBalanced" xml:space="preserve"><value>バランス</value></data>
+  <data name="QualityProfileLowRes" xml:space="preserve"><value>低解像度（16–64）</value></data>
+  <data name="QualityProfileHiRes" xml:space="preserve"><value>高解像度（128–512）</value></data>
+  <data name="Advanced" xml:space="preserve"><value>詳細設定</value></data>
+  <data name="Preprocessing" xml:space="preserve"><value>前処理</value></data>
+  <data name="PreprocessLinearize" xml:space="preserve"><value>微分前に線形化（sRGB → linear）</value></data>
+  <data name="PreprocessDenoiseRadius" xml:space="preserve"><value>ノイズ除去半径</value></data>
+  <data name="PreprocessDenoiseBlend" xml:space="preserve"><value>ノイズ除去ブレンド</value></data>
+  <data name="PreprocessFrequencySplit" xml:space="preserve"><value>周波数分離（マクロ＋ディテール）</value></data>
+  <data name="PreprocessFrequencyRadius" xml:space="preserve"><value>周波数半径</value></data>
+  <data name="PreprocessFrequencyDetailStrength" xml:space="preserve"><value>ディテール強度</value></data>
+  <data name="SpecularAdvanced" xml:space="preserve"><value>スペキュラ（詳細）</value></data>
+  <data name="SpecularPercentileRemap" xml:space="preserve"><value>滑らかさ（R）のパーセンタイル補正</value></data>
+  <data name="SpecularRemapLowPercentile" xml:space="preserve"><value>低パーセンタイル</value></data>
+  <data name="SpecularRemapHighPercentile" xml:space="preserve"><value>高パーセンタイル</value></data>
+  <data name="MetalHeuristicSubstrings" xml:space="preserve"><value>金属名のヒント</value></data>
+  <data name="MetalHeuristicSubstringsWatermark" xml:space="preserve"><value>カンマ区切り（任意）、例: iron,gold,steel</value></data>
+  <data name="AoAdvanced" xml:space="preserve"><value>アンビエントオクルージョン（AO）</value></data>
+  <data name="GenerateAo" xml:space="preserve"><value>AOを法線マップ（青チャンネル）に焼き込む</value></data>
+  <data name="AoRadius" xml:space="preserve"><value>AO半径</value></data>
+  <data name="AoStrength" xml:space="preserve"><value>AO強度</value></data>
   <data name="TextureTypes" xml:space="preserve"><value>変換フィルター</value></data>
   <data name="Blocks" xml:space="preserve"><value>ブロック</value></data>
   <data name="BlocksTooltip" xml:space="preserve"><value>block/blocksフォルダのテクスチャを処理。</value></data>
@@ -181,6 +218,8 @@
   <data name="UILanguageTooltip" xml:space="preserve"><value>UIの言語。</value></data>
   <data name="Status_SelectPack" xml:space="preserve"><value>リソースパック（.zip または .jar）と出力フォルダを選択してください。</value></data>
   <data name="Status_ScanningTexturesInPack" xml:space="preserve"><value>パック内のテクスチャをスキャン中...</value></data>
+  <data name="Status_ScanningBatchFolder" xml:space="preserve"><value>一括フォルダをスキャン中...</value></data>
+  <data name="Status_BatchScanDone" xml:space="preserve"><value>一括: {0} パック、{1} テクスチャ。</value></data>
   <data name="Status_ScanningPackProgress" xml:space="preserve"><value>パックをスキャン中... ({0}/{1})</value></data>
   <data name="Status_LoadedTextures" xml:space="preserve"><value>{0} 個のテクスチャを読み込みました。</value></data>
   <data name="Status_FailedToScan" xml:space="preserve"><value>テクスチャのスキャンに失敗しました。</value></data>

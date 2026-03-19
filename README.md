@@ -48,6 +48,7 @@ dotnet run --project src/AutoPBR.Cli -- \
 - `--normal <1..3>` – normal intensity (default `1`)
 - `--height <0.01..0.5>` – height intensity exponent (default `0.12`)
 - `--ignore-plants` – skips plant textures (uses a vanilla-style plant ignore list)
+- `--tag-rules <file.json>` – append custom tag rules (JSON array, same shape as the app’s Tune-tab export) after built-in rules (brick, wood, metal, foliage) for keyword-based per-texture overrides
 
 **Input:** `.zip` or `.jar` (JAR is treated as a zip).  
 **Output:** always a **`.zip` PBR layer**; drop it above the base pack in the game’s resource pack stack.

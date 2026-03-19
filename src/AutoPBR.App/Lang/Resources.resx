@@ -115,6 +115,24 @@
   <data name="ScanButton" xml:space="preserve">
     <value>Scan</value>
   </data>
+  <data name="BatchConversion" xml:space="preserve">
+    <value>Batch conversion</value>
+  </data>
+  <data name="BatchConversionDescription" xml:space="preserve">
+    <value>Choose a folder of .zip / .jar resource packs. Scan builds one explorer tree with each pack as a top-level folder. Batch convert runs conversion on every pack into your output folder (each pack becomes …_PBR.zip). Use Explore to browse; Convert (single pack) is disabled while a batch scan is active.</value>
+  </data>
+  <data name="BatchFolderWatermark" xml:space="preserve">
+    <value>Folder containing resource packs (.zip / .jar)</value>
+  </data>
+  <data name="BrowseBatchFolder" xml:space="preserve">
+    <value>Browse folder</value>
+  </data>
+  <data name="ScanBatchButton" xml:space="preserve">
+    <value>Scan batch</value>
+  </data>
+  <data name="BatchConvertButton" xml:space="preserve">
+    <value>Batch convert</value>
+  </data>
   <data name="ExploreArchiveContents" xml:space="preserve">
     <value>Archive contents</value>
   </data>
@@ -122,13 +140,112 @@
     <value>Resource Explorer</value>
   </data>
   <data name="ExploreEmptyMessage" xml:space="preserve">
-    <value>Scan a pack on the Scan tab to explore its contents.</value>
+    <value>Scan a pack or batch folder on the Scan tab to explore contents.</value>
   </data>
   <data name="ExploreExpandAll" xml:space="preserve">
     <value>Expand all</value>
   </data>
   <data name="ExploreCollapseAll" xml:space="preserve">
     <value>Collapse all</value>
+  </data>
+  <data name="ClearTagOverrides" xml:space="preserve">
+    <value>Clear tag overrides</value>
+  </data>
+  <data name="ClearTagOverridesTooltip" xml:space="preserve">
+    <value>Reset all manual tag add/remove for this pack.</value>
+  </data>
+  <data name="TagMenuDontApply" xml:space="preserve">
+    <value>Don't apply '{0}' here</value>
+  </data>
+  <data name="TagMenuApply" xml:space="preserve">
+    <value>Apply '{0}' here</value>
+  </data>
+  <data name="TagRules" xml:space="preserve">
+    <value>Tag rules</value>
+  </data>
+  <data name="TagRulesCustomDescription" xml:space="preserve">
+    <value>Custom rules are applied after built-in presets (Brick, Wood, Metal, Foliage). Export/import JSON for backup or CLI --tag-rules.</value>
+  </data>
+  <data name="TagRuleId" xml:space="preserve">
+    <value>Id</value>
+  </data>
+  <data name="TagRuleDisplayName" xml:space="preserve">
+    <value>Display name</value>
+  </data>
+  <data name="TagRuleKeywords" xml:space="preserve">
+    <value>Keywords (comma-separated)</value>
+  </data>
+  <data name="AddCustomTagRule" xml:space="preserve">
+    <value>Add custom rule</value>
+  </data>
+  <data name="RemoveTagRule" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="RefreshTagRules" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="InvertHeight" xml:space="preserve">
+    <value>Invert height</value>
+  </data>
+  <data name="InvertSpecular" xml:space="preserve">
+    <value>Invert specular</value>
+  </data>
+  <data name="TagRuleNormalIntensityOpt" xml:space="preserve">
+    <value>Normal × (opt.)</value>
+  </data>
+  <data name="TagRuleHeightIntensityOpt" xml:space="preserve">
+    <value>Height × (opt.)</value>
+  </data>
+  <data name="TagRuleIntensityTooltip" xml:space="preserve">
+    <value>Leave empty to use global Tune values. Example: 0.85 softer normals, 0.07 subtler height.</value>
+  </data>
+  <data name="TagRuleInvertNormalX" xml:space="preserve">
+    <value>Invert normal X</value>
+  </data>
+  <data name="TagRuleInvertNormalY" xml:space="preserve">
+    <value>Invert normal Y</value>
+  </data>
+  <data name="TagRuleEnabled" xml:space="preserve">
+    <value>Use this rule</value>
+  </data>
+  <data name="TagRuleEnabledTooltip" xml:space="preserve">
+    <value>When unchecked, this rule is excluded from conversion and the legend. Click Refresh to update.</value>
+  </data>
+  <data name="TagRuleMoveUp" xml:space="preserve">
+    <value>↑</value>
+  </data>
+  <data name="TagRuleMoveDown" xml:space="preserve">
+    <value>↓</value>
+  </data>
+  <data name="TagRuleMoveUpTooltip" xml:space="preserve">
+    <value>Move rule up (merge order)</value>
+  </data>
+  <data name="TagRuleMoveDownTooltip" xml:space="preserve">
+    <value>Move rule down (merge order)</value>
+  </data>
+  <data name="ExportTagRules" xml:space="preserve">
+    <value>Export rules…</value>
+  </data>
+  <data name="ImportTagRules" xml:space="preserve">
+    <value>Import rules…</value>
+  </data>
+  <data name="ExportTagRulesTooltip" xml:space="preserve">
+    <value>Save custom tag rules as JSON (for backup or CLI --tag-rules).</value>
+  </data>
+  <data name="ImportTagRulesTooltip" xml:space="preserve">
+    <value>Replace custom rules from a JSON file.</value>
+  </data>
+  <data name="RefreshTagRulesTooltip" xml:space="preserve">
+    <value>Update explore tree and legend with current rules.</value>
+  </data>
+  <data name="Log_TagRulesExported" xml:space="preserve">
+    <value>Exported custom tag rules.</value>
+  </data>
+  <data name="Log_TagRulesImported" xml:space="preserve">
+    <value>Imported {0} custom tag rule(s).</value>
+  </data>
+  <data name="Log_TagRulesImportFailed" xml:space="preserve">
+    <value>Tag rules import failed: {0}</value>
   </data>
   <data name="ExploreBack" xml:space="preserve">
     <value>Back</value>
@@ -165,6 +282,15 @@
   </data>
   <data name="Log_ArchiveContentsLoaded" xml:space="preserve">
     <value>Archive contents loaded ({0} entries).</value>
+  </data>
+  <data name="Log_ScanningBatchFolder" xml:space="preserve">
+    <value>Scanning batch folder: {0}</value>
+  </data>
+  <data name="Log_BatchScanDone" xml:space="preserve">
+    <value>Batch scan: {0} pack(s), {1} texture entries.</value>
+  </data>
+  <data name="Log_BatchConvertingPack" xml:space="preserve">
+    <value>Batch [{0}/{1}] Converting: {2} → {3}</value>
   </data>
   <data name="Log_ScanningPackForExtraction" xml:space="preserve">
     <value>Scanning pack for extraction list...</value>
@@ -325,6 +451,90 @@
   <data name="DeepBumpOverlapLarge" xml:space="preserve">
     <value>Large</value>
   </data>
+  <data name="DeepBumpAdvanced" xml:space="preserve">
+    <value>DeepBump (advanced)</value>
+  </data>
+  <data name="DeepBumpInputMode" xml:space="preserve">
+    <value>Input mode</value>
+  </data>
+  <data name="DeepBumpInputModeAuto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
+  <data name="DeepBumpInputModeGrayscale" xml:space="preserve">
+    <value>Grayscale</value>
+  </data>
+  <data name="DeepBumpInputModeRgb" xml:space="preserve">
+    <value>RGB</value>
+  </data>
+  <data name="DeepBumpForceBlue255" xml:space="preserve">
+    <value>Force B=255 in DeepBump normals</value>
+  </data>
+  <data name="QualityProfile" xml:space="preserve">
+    <value>Quality profile</value>
+  </data>
+  <data name="QualityProfileBalanced" xml:space="preserve">
+    <value>Balanced</value>
+  </data>
+  <data name="QualityProfileLowRes" xml:space="preserve">
+    <value>LowRes (16–64)</value>
+  </data>
+  <data name="QualityProfileHiRes" xml:space="preserve">
+    <value>HiRes (128–512)</value>
+  </data>
+  <data name="Advanced" xml:space="preserve">
+    <value>Advanced</value>
+  </data>
+  <data name="Preprocessing" xml:space="preserve">
+    <value>Pre-processing</value>
+  </data>
+  <data name="PreprocessLinearize" xml:space="preserve">
+    <value>Linearize (sRGB → linear) before derivatives</value>
+  </data>
+  <data name="PreprocessDenoiseRadius" xml:space="preserve">
+    <value>Denoise radius</value>
+  </data>
+  <data name="PreprocessDenoiseBlend" xml:space="preserve">
+    <value>Denoise blend</value>
+  </data>
+  <data name="PreprocessFrequencySplit" xml:space="preserve">
+    <value>Frequency split (macro + detail)</value>
+  </data>
+  <data name="PreprocessFrequencyRadius" xml:space="preserve">
+    <value>Frequency radius</value>
+  </data>
+  <data name="PreprocessFrequencyDetailStrength" xml:space="preserve">
+    <value>Detail strength</value>
+  </data>
+  <data name="SpecularAdvanced" xml:space="preserve">
+    <value>Specular (advanced)</value>
+  </data>
+  <data name="SpecularPercentileRemap" xml:space="preserve">
+    <value>Percentile remap smoothness (R)</value>
+  </data>
+  <data name="SpecularRemapLowPercentile" xml:space="preserve">
+    <value>Low percentile</value>
+  </data>
+  <data name="SpecularRemapHighPercentile" xml:space="preserve">
+    <value>High percentile</value>
+  </data>
+  <data name="MetalHeuristicSubstrings" xml:space="preserve">
+    <value>Metal name hints</value>
+  </data>
+  <data name="MetalHeuristicSubstringsWatermark" xml:space="preserve">
+    <value>Comma-separated (optional), e.g. iron,gold,steel</value>
+  </data>
+  <data name="AoAdvanced" xml:space="preserve">
+    <value>Ambient Occlusion (AO)</value>
+  </data>
+  <data name="GenerateAo" xml:space="preserve">
+    <value>Bake AO into normal (blue channel)</value>
+  </data>
+  <data name="AoRadius" xml:space="preserve">
+    <value>AO radius</value>
+  </data>
+  <data name="AoStrength" xml:space="preserve">
+    <value>AO strength</value>
+  </data>
   <data name="TextureTypes" xml:space="preserve">
     <value>Conversion Filters</value>
   </data>
@@ -360,6 +570,12 @@
   </data>
   <data name="FilterWatermark" xml:space="preserve">
     <value>Filter (e.g. \block\stone)</value>
+  </data>
+  <data name="ExploreTagFilter" xml:space="preserve">
+    <value>Show tag:</value>
+  </data>
+  <data name="ExploreTagFilterAll" xml:space="preserve">
+    <value>All</value>
   </data>
   <data name="Output" xml:space="preserve">
     <value>Output</value>
@@ -417,6 +633,12 @@
   </data>
   <data name="Status_ScanningTexturesInPack" xml:space="preserve">
     <value>Scanning textures in pack...</value>
+  </data>
+  <data name="Status_ScanningBatchFolder" xml:space="preserve">
+    <value>Scanning batch folder...</value>
+  </data>
+  <data name="Status_BatchScanDone" xml:space="preserve">
+    <value>Batch: {0} pack(s), {1} textures.</value>
   </data>
   <data name="Status_ScanningPackProgress" xml:space="preserve">
     <value>Scanning pack... ({0}/{1})</value>

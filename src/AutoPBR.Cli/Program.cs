@@ -1,3 +1,4 @@
+using System.Text.Json;
 using AutoPBR.Core;
 using AutoPBR.Core.Models;
 
@@ -8,12 +9,13 @@ static int Usage()
         AutoPBR.Cli
 
         Usage:
-          AutoPBR.Cli <input> <output> [--fast] [--normal <1..3>] [--height <0.01..0.5>] [--normal-operator <sobel|scharr>] [--normal-kernel <3|5|7>] [--normal-derivative <luminance|color|blend|max>] [--ignore-plants]
+          AutoPBR.Cli <input> <output> [--fast] [--normal <1..3>] [--height <0.01..0.5>] [--normal-operator <sobel|scharr>] [--normal-kernel <3|5|7>] [--normal-derivative <luminance|color|blend|max>] [--ignore-plants] [--tag-rules <path.json>]
 
         Input: .zip (resource pack) or .jar (Minecraft; opened as zip). Output: always .zip (PBR layer only).
 
         Notes:
           - Specular lookup data is loaded from: <app>/Data/textures_data.json
+          - --tag-rules: JSON array of custom tag rules (same shape as app export); merged after built-in brick/wood/metal/foliage rules.
         """
     );
     return 2;
@@ -34,6 +36,7 @@ var normalOperator = NormalOperator.SobelVc;
 var normalKernelSize = NormalKernelSize.K3;
 var normalDerivative = NormalDerivative.Luminance;
 var ignorePlants = args.Any(a => a.Equals("--ignore-plants", StringComparison.OrdinalIgnoreCase));
+string? tagRulesJsonPath = null;
 
 for (var i = 2; i < args.Length; i++)
 {
@@ -121,6 +124,11 @@ for (var i = 2; i < args.Length; i++)
             return 2;
         }
     }
+
+    if (args[i].Equals("--tag-rules", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+    {
+        tagRulesJsonPath = args[i + 1];
+    }
 }
 
 var dataPath = Path.Combine(AppContext.BaseDirectory, "Data", "textures_data.json");
@@ -128,6 +136,34 @@ if (!File.Exists(dataPath))
 {
     Console.Error.WriteLine($"Missing specular data file: {dataPath}");
     return 1;
+}
+
+IReadOnlyList<TagRule>? tagRules = null;
+if (!string.IsNullOrWhiteSpace(tagRulesJsonPath))
+{
+    if (!File.Exists(tagRulesJsonPath))
+    {
+        Console.Error.WriteLine($"Tag rules file not found: {tagRulesJsonPath}");
+        return 2;
+    }
+
+    try
+    {
+        var json = File.ReadAllText(tagRulesJsonPath);
+        var extra = JsonSerializer.Deserialize<List<CustomTagRuleEntry>>(json);
+        var appended = extra?
+            .Where(e => !string.IsNullOrWhiteSpace(e.Id))
+            .Select(e => e.ToTagRule())
+            .ToList() ?? [];
+        var merged = new List<TagRule>(TagRulePresets.Default);
+        merged.AddRange(appended);
+        tagRules = merged;
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine($"Failed to load --tag-rules: {ex.Message}");
+        return 2;
+    }
 }
 
 var options = new AutoPbrOptions
@@ -142,7 +178,8 @@ var options = new AutoPbrOptions
     FoliageMode = ignorePlants ? "Ignore All" : "Convert All",
     IgnoreTextureKeys = ignorePlants
         ? new HashSet<string>(AutoPbrDefaults.PlantTextureKeys, StringComparer.OrdinalIgnoreCase)
-        : new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        : new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+    TagRules = tagRules
 };
 
 var converter = new ResourcePackConverter();

@@ -240,7 +240,42 @@ internal static class TextureScanner
             }
         }
 
+        ApplyTagRules(results, options);
         return results;
+    }
+
+    private static void ApplyTagRules(List<TextureWorkItem> results, AutoPbrOptions options)
+    {
+        var rules = options.TagRules is { Count: > 0 } ? options.TagRules : TagRulePresets.Default;
+        if (rules.Count == 0)
+        {
+            return;
+        }
+
+        var manual = options.ManualTagOverrides;
+
+        foreach (var item in results)
+        {
+            var autoIds = TagRuleApplicator.GetMatchingTagIds(item.Name, item.RelativeKey, rules);
+            IReadOnlyList<string> tagIds;
+                if (manual is not null && manual.TryGetValue(item.RelativeKey, out var addRemove))
+                {
+                    var removed = new HashSet<string>(addRemove.Removed, StringComparer.OrdinalIgnoreCase);
+                    var added = addRemove.Added;
+                    tagIds = autoIds.Except(removed).Union(added).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+                }
+            else
+            {
+                tagIds = autoIds;
+            }
+
+            if (tagIds.Count == 0)
+            {
+                continue;
+            }
+
+            TagRuleApplicator.MergeTagOverridesInto(item.Overrides, rules, tagIds);
+        }
     }
 }
 

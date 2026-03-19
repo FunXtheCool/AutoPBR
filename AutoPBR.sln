@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.4.11605.240 stable
+VisualStudioVersion = 18.4.11605.240
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
@@ -12,7 +12,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoPBR.App", "src\AutoPBR.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoPBR.Tools.GenerateIcon", "src\AutoPBR.Tools.GenerateIcon\AutoPBR.Tools.GenerateIcon.csproj", "{A1B2C3D4-1234-4E5F-A6B7-1234567890AB}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "AutoPBR-v.0.7.0-install", "AutoPBR\AutoPBR.vdproj", "{71B6405E-6EC5-35F2-0272-DB7CA3C81F08}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "AutoPBR-Publish", "..\AutoPBR-Publish\AutoPBR-Publish\AutoPBR-Publish.vdproj", "{B0F0A6F6-A809-8EEA-FCFE-90C632755ADE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,14 +62,22 @@ Global
 		{5D042A33-0D90-4A33-838A-F2E97653761D}.Release|x86.Build.0 = Release|Any CPU
 		{A1B2C3D4-1234-4E5F-A6B7-1234567890AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A1B2C3D4-1234-4E5F-A6B7-1234567890AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-1234-4E5F-A6B7-1234567890AB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-1234-4E5F-A6B7-1234567890AB}.Debug|x64.Build.0 = Debug|Any CPU
+		{A1B2C3D4-1234-4E5F-A6B7-1234567890AB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-1234-4E5F-A6B7-1234567890AB}.Debug|x86.Build.0 = Debug|Any CPU
 		{A1B2C3D4-1234-4E5F-A6B7-1234567890AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1B2C3D4-1234-4E5F-A6B7-1234567890AB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{71B6405E-6EC5-35F2-0272-DB7CA3C81F08}.Debug|Any CPU.ActiveCfg = Debug
-		{71B6405E-6EC5-35F2-0272-DB7CA3C81F08}.Debug|x64.ActiveCfg = Debug
-		{71B6405E-6EC5-35F2-0272-DB7CA3C81F08}.Debug|x86.ActiveCfg = Debug
-		{71B6405E-6EC5-35F2-0272-DB7CA3C81F08}.Release|Any CPU.ActiveCfg = Release
-		{71B6405E-6EC5-35F2-0272-DB7CA3C81F08}.Release|x64.ActiveCfg = Release
-		{71B6405E-6EC5-35F2-0272-DB7CA3C81F08}.Release|x86.ActiveCfg = Release
+		{A1B2C3D4-1234-4E5F-A6B7-1234567890AB}.Release|x64.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-1234-4E5F-A6B7-1234567890AB}.Release|x64.Build.0 = Release|Any CPU
+		{A1B2C3D4-1234-4E5F-A6B7-1234567890AB}.Release|x86.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-1234-4E5F-A6B7-1234567890AB}.Release|x86.Build.0 = Release|Any CPU
+		{B0F0A6F6-A809-8EEA-FCFE-90C632755ADE}.Debug|Any CPU.ActiveCfg = Debug
+		{B0F0A6F6-A809-8EEA-FCFE-90C632755ADE}.Debug|x64.ActiveCfg = Debug
+		{B0F0A6F6-A809-8EEA-FCFE-90C632755ADE}.Debug|x86.ActiveCfg = Debug
+		{B0F0A6F6-A809-8EEA-FCFE-90C632755ADE}.Release|Any CPU.ActiveCfg = Release
+		{B0F0A6F6-A809-8EEA-FCFE-90C632755ADE}.Release|x64.ActiveCfg = Release
+		{B0F0A6F6-A809-8EEA-FCFE-90C632755ADE}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

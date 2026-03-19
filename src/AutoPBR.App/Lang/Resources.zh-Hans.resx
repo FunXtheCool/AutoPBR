@@ -83,9 +83,15 @@
   <data name="TabScan" xml:space="preserve"><value>扫描</value></data>
   <data name="TabExplore" xml:space="preserve"><value>浏览</value></data>
   <data name="ScanButton" xml:space="preserve"><value>扫描</value></data>
+  <data name="BatchConversion" xml:space="preserve"><value>批量转换</value></data>
+  <data name="BatchConversionDescription" xml:space="preserve"><value>选择包含 .zip / .jar 资源包的文件夹。扫描会生成资源树，每个包作为顶层文件夹。批量转换会将所有包输出到目标文件夹（每个生成 …_PBR.zip）。在“浏览”中查看；批量扫描激活时无法使用单包转换。</value></data>
+  <data name="BatchFolderWatermark" xml:space="preserve"><value>包含资源包 (.zip / .jar) 的文件夹</value></data>
+  <data name="BrowseBatchFolder" xml:space="preserve"><value>浏览文件夹</value></data>
+  <data name="ScanBatchButton" xml:space="preserve"><value>批量扫描</value></data>
+  <data name="BatchConvertButton" xml:space="preserve"><value>批量转换</value></data>
   <data name="ExploreArchiveContents" xml:space="preserve"><value>包内容</value></data>
   <data name="ResourceExplorer" xml:space="preserve"><value>资源管理器</value></data>
-  <data name="ExploreEmptyMessage" xml:space="preserve"><value>请在“扫描”选项卡中扫描包以浏览其内容。</value></data>
+  <data name="ExploreEmptyMessage" xml:space="preserve"><value>请在“扫描”选项卡中扫描单个包或批量文件夹以浏览内容。</value></data>
   <data name="ExploreExpandAll" xml:space="preserve"><value>全部展开</value></data>
   <data name="ExploreCollapseAll" xml:space="preserve"><value>全部折叠</value></data>
   <data name="ExploreBack" xml:space="preserve"><value>返回</value></data>
@@ -99,6 +105,9 @@
   <data name="Log_Scanning" xml:space="preserve"><value>正在扫描：{0}</value></data>
   <data name="Log_ScanningArchive" xml:space="preserve"><value>正在扫描归档：{0}</value></data>
   <data name="Log_ArchiveContentsLoaded" xml:space="preserve"><value>已加载归档内容（{0} 项）。</value></data>
+  <data name="Log_ScanningBatchFolder" xml:space="preserve"><value>正在扫描批量文件夹：{0}</value></data>
+  <data name="Log_BatchScanDone" xml:space="preserve"><value>批量扫描：{0} 个包，{1} 条纹理条目。</value></data>
+  <data name="Log_BatchConvertingPack" xml:space="preserve"><value>批量 [{0}/{1}] 正在转换：{2} → {3}</value></data>
   <data name="Log_ScanningPackForExtraction" xml:space="preserve"><value>正在为提取列表扫描包…</value></data>
   <data name="Log_IndexedPngEntries" xml:space="preserve"><value>已索引 {0} 个 .png 项；将仅提取这些 + pack.mcmeta。</value></data>
   <data name="Log_ExtractingOnlyPng" xml:space="preserve"><value>仅提取 .png 纹理 + pack.mcmeta。</value></data>
@@ -150,6 +159,34 @@
   <data name="DeepBumpOverlapSmall" xml:space="preserve"><value>小</value></data>
   <data name="DeepBumpOverlapMedium" xml:space="preserve"><value>中</value></data>
   <data name="DeepBumpOverlapLarge" xml:space="preserve"><value>大</value></data>
+  <data name="DeepBumpAdvanced" xml:space="preserve"><value>DeepBump（高级）</value></data>
+  <data name="DeepBumpInputMode" xml:space="preserve"><value>输入模式</value></data>
+  <data name="DeepBumpInputModeAuto" xml:space="preserve"><value>自动</value></data>
+  <data name="DeepBumpInputModeGrayscale" xml:space="preserve"><value>灰度</value></data>
+  <data name="DeepBumpInputModeRgb" xml:space="preserve"><value>RGB</value></data>
+  <data name="DeepBumpForceBlue255" xml:space="preserve"><value>强制 DeepBump 法线 B=255</value></data>
+  <data name="QualityProfile" xml:space="preserve"><value>质量配置</value></data>
+  <data name="QualityProfileBalanced" xml:space="preserve"><value>均衡</value></data>
+  <data name="QualityProfileLowRes" xml:space="preserve"><value>低分辨率（16–64）</value></data>
+  <data name="QualityProfileHiRes" xml:space="preserve"><value>高分辨率（128–512）</value></data>
+  <data name="Advanced" xml:space="preserve"><value>高级</value></data>
+  <data name="Preprocessing" xml:space="preserve"><value>预处理</value></data>
+  <data name="PreprocessLinearize" xml:space="preserve"><value>导数前线性化（sRGB → linear）</value></data>
+  <data name="PreprocessDenoiseRadius" xml:space="preserve"><value>降噪半径</value></data>
+  <data name="PreprocessDenoiseBlend" xml:space="preserve"><value>降噪混合</value></data>
+  <data name="PreprocessFrequencySplit" xml:space="preserve"><value>频率分离（宏观 + 细节）</value></data>
+  <data name="PreprocessFrequencyRadius" xml:space="preserve"><value>频率半径</value></data>
+  <data name="PreprocessFrequencyDetailStrength" xml:space="preserve"><value>细节强度</value></data>
+  <data name="SpecularAdvanced" xml:space="preserve"><value>高光（高级）</value></data>
+  <data name="SpecularPercentileRemap" xml:space="preserve"><value>平滑度（R）百分位重映射</value></data>
+  <data name="SpecularRemapLowPercentile" xml:space="preserve"><value>低百分位</value></data>
+  <data name="SpecularRemapHighPercentile" xml:space="preserve"><value>高百分位</value></data>
+  <data name="MetalHeuristicSubstrings" xml:space="preserve"><value>金属名称提示</value></data>
+  <data name="MetalHeuristicSubstringsWatermark" xml:space="preserve"><value>逗号分隔（可选），例如 iron,gold,steel</value></data>
+  <data name="AoAdvanced" xml:space="preserve"><value>环境光遮蔽（AO）</value></data>
+  <data name="GenerateAo" xml:space="preserve"><value>将 AO 烘焙到法线（蓝色通道）</value></data>
+  <data name="AoRadius" xml:space="preserve"><value>AO 半径</value></data>
+  <data name="AoStrength" xml:space="preserve"><value>AO 强度</value></data>
   <data name="TextureTypes" xml:space="preserve"><value>转换过滤器</value></data>
   <data name="Blocks" xml:space="preserve"><value>方块</value></data>
   <data name="BlocksTooltip" xml:space="preserve"><value>处理 block 和 blocks 文件夹中的纹理。</value></data>
@@ -181,6 +218,8 @@
   <data name="UILanguageTooltip" xml:space="preserve"><value>界面语言。</value></data>
   <data name="Status_SelectPack" xml:space="preserve"><value>请选择资源包（.zip 或 .jar）和输出文件夹。</value></data>
   <data name="Status_ScanningTexturesInPack" xml:space="preserve"><value>正在扫描包内纹理…</value></data>
+  <data name="Status_ScanningBatchFolder" xml:space="preserve"><value>正在扫描批量文件夹…</value></data>
+  <data name="Status_BatchScanDone" xml:space="preserve"><value>批量：{0} 个包，{1} 个纹理。</value></data>
   <data name="Status_ScanningPackProgress" xml:space="preserve"><value>正在扫描包… ({0}/{1})</value></data>
   <data name="Status_LoadedTextures" xml:space="preserve"><value>已加载 {0} 个纹理。</value></data>
   <data name="Status_FailedToScan" xml:space="preserve"><value>扫描纹理失败。</value></data>

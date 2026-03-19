@@ -83,9 +83,15 @@
   <data name="TabScan" xml:space="preserve"><value>Escanear</value></data>
   <data name="TabExplore" xml:space="preserve"><value>Explorar</value></data>
   <data name="ScanButton" xml:space="preserve"><value>Escanear</value></data>
+  <data name="BatchConversion" xml:space="preserve"><value>Conversão em lote</value></data>
+  <data name="BatchConversionDescription" xml:space="preserve"><value>Escolha uma pasta com pacotes de recursos .zip / .jar. A varredura monta uma árvore com cada pacote como pasta de topo. A conversão em lote processa todos para a pasta de saída (cada um …_PBR.zip). Use Explorar para navegar; Converter (pacote único) fica desativado com varredura em lote ativa.</value></data>
+  <data name="BatchFolderWatermark" xml:space="preserve"><value>Pasta com pacotes de recursos (.zip / .jar)</value></data>
+  <data name="BrowseBatchFolder" xml:space="preserve"><value>Procurar pasta</value></data>
+  <data name="ScanBatchButton" xml:space="preserve"><value>Escanear lote</value></data>
+  <data name="BatchConvertButton" xml:space="preserve"><value>Converter lote</value></data>
   <data name="ExploreArchiveContents" xml:space="preserve"><value>Conteúdo do pacote</value></data>
   <data name="ResourceExplorer" xml:space="preserve"><value>Explorador de recursos</value></data>
-  <data name="ExploreEmptyMessage" xml:space="preserve"><value>Escaneie um pacote na aba Escanear para explorar o conteúdo.</value></data>
+  <data name="ExploreEmptyMessage" xml:space="preserve"><value>Escaneie um pacote ou uma pasta de lotes na aba Escanear para explorar o conteúdo.</value></data>
   <data name="ExploreExpandAll" xml:space="preserve"><value>Expandir tudo</value></data>
   <data name="ExploreCollapseAll" xml:space="preserve"><value>Recolher tudo</value></data>
   <data name="ExploreBack" xml:space="preserve"><value>Voltar</value></data>
@@ -99,6 +105,9 @@
   <data name="Log_Scanning" xml:space="preserve"><value>Escaneando: {0}</value></data>
   <data name="Log_ScanningArchive" xml:space="preserve"><value>Escaneando arquivo: {0}</value></data>
   <data name="Log_ArchiveContentsLoaded" xml:space="preserve"><value>Conteúdo do arquivo carregado ({0} entradas).</value></data>
+  <data name="Log_ScanningBatchFolder" xml:space="preserve"><value>Escaneando pasta de lotes: {0}</value></data>
+  <data name="Log_BatchScanDone" xml:space="preserve"><value>Varredura em lote: {0} pacote(s), {1} entradas de texturas.</value></data>
+  <data name="Log_BatchConvertingPack" xml:space="preserve"><value>Lote [{0}/{1}] Convertendo: {2} → {3}</value></data>
   <data name="Log_ScanningPackForExtraction" xml:space="preserve"><value>Escaneando pacote para lista de extração...</value></data>
   <data name="Log_IndexedPngEntries" xml:space="preserve"><value>Indexadas {0} entradas .png; serão extraídas apenas essas + pack.mcmeta.</value></data>
   <data name="Log_ExtractingOnlyPng" xml:space="preserve"><value>Extraindo apenas texturas .png + pack.mcmeta.</value></data>
@@ -150,6 +159,34 @@
   <data name="DeepBumpOverlapSmall" xml:space="preserve"><value>Pequeno</value></data>
   <data name="DeepBumpOverlapMedium" xml:space="preserve"><value>Médio</value></data>
   <data name="DeepBumpOverlapLarge" xml:space="preserve"><value>Grande</value></data>
+  <data name="DeepBumpAdvanced" xml:space="preserve"><value>DeepBump (avançado)</value></data>
+  <data name="DeepBumpInputMode" xml:space="preserve"><value>Modo de entrada</value></data>
+  <data name="DeepBumpInputModeAuto" xml:space="preserve"><value>Auto</value></data>
+  <data name="DeepBumpInputModeGrayscale" xml:space="preserve"><value>Escala de cinza</value></data>
+  <data name="DeepBumpInputModeRgb" xml:space="preserve"><value>RGB</value></data>
+  <data name="DeepBumpForceBlue255" xml:space="preserve"><value>Forçar B=255 nas normais do DeepBump</value></data>
+  <data name="QualityProfile" xml:space="preserve"><value>Perfil de qualidade</value></data>
+  <data name="QualityProfileBalanced" xml:space="preserve"><value>Balanceado</value></data>
+  <data name="QualityProfileLowRes" xml:space="preserve"><value>Baixa res. (16–64)</value></data>
+  <data name="QualityProfileHiRes" xml:space="preserve"><value>Alta res. (128–512)</value></data>
+  <data name="Advanced" xml:space="preserve"><value>Avançado</value></data>
+  <data name="Preprocessing" xml:space="preserve"><value>Pré-processamento</value></data>
+  <data name="PreprocessLinearize" xml:space="preserve"><value>Linearizar (sRGB → linear) antes das derivadas</value></data>
+  <data name="PreprocessDenoiseRadius" xml:space="preserve"><value>Raio de redução de ruído</value></data>
+  <data name="PreprocessDenoiseBlend" xml:space="preserve"><value>Mistura de redução de ruído</value></data>
+  <data name="PreprocessFrequencySplit" xml:space="preserve"><value>Separação de frequências (macro + detalhe)</value></data>
+  <data name="PreprocessFrequencyRadius" xml:space="preserve"><value>Raio de frequência</value></data>
+  <data name="PreprocessFrequencyDetailStrength" xml:space="preserve"><value>Força do detalhe</value></data>
+  <data name="SpecularAdvanced" xml:space="preserve"><value>Specular (avançado)</value></data>
+  <data name="SpecularPercentileRemap" xml:space="preserve"><value>Remapeamento por percentis da suavidade (R)</value></data>
+  <data name="SpecularRemapLowPercentile" xml:space="preserve"><value>Percentil baixo</value></data>
+  <data name="SpecularRemapHighPercentile" xml:space="preserve"><value>Percentil alto</value></data>
+  <data name="MetalHeuristicSubstrings" xml:space="preserve"><value>Dicas de nome de metal</value></data>
+  <data name="MetalHeuristicSubstringsWatermark" xml:space="preserve"><value>Separado por vírgulas (opcional), ex. iron,gold,steel</value></data>
+  <data name="AoAdvanced" xml:space="preserve"><value>Oclusão ambiente (AO)</value></data>
+  <data name="GenerateAo" xml:space="preserve"><value>Incrustar AO na normal (canal azul)</value></data>
+  <data name="AoRadius" xml:space="preserve"><value>Raio do AO</value></data>
+  <data name="AoStrength" xml:space="preserve"><value>Intensidade do AO</value></data>
   <data name="TextureTypes" xml:space="preserve"><value>Filtros de conversão</value></data>
   <data name="Blocks" xml:space="preserve"><value>Blocos</value></data>
   <data name="BlocksTooltip" xml:space="preserve"><value>Processar texturas nas pastas block e blocks.</value></data>
@@ -181,6 +218,8 @@
   <data name="UILanguageTooltip" xml:space="preserve"><value>Idioma da interface.</value></data>
   <data name="Status_SelectPack" xml:space="preserve"><value>Selecione um pacote de recursos (.zip ou .jar) e uma pasta de saída.</value></data>
   <data name="Status_ScanningTexturesInPack" xml:space="preserve"><value>Escaneando texturas no pacote...</value></data>
+  <data name="Status_ScanningBatchFolder" xml:space="preserve"><value>Escaneando pasta de lotes...</value></data>
+  <data name="Status_BatchScanDone" xml:space="preserve"><value>Lote: {0} pacote(s), {1} texturas.</value></data>
   <data name="Status_ScanningPackProgress" xml:space="preserve"><value>Escaneando pacote... ({0}/{1})</value></data>
   <data name="Status_LoadedTextures" xml:space="preserve"><value>{0} texturas carregadas.</value></data>
   <data name="Status_FailedToScan" xml:space="preserve"><value>Falha ao escanear texturas.</value></data>
