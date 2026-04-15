@@ -4,7 +4,6 @@ using AutoPBR.Core;
 using AutoPBR.Core.Models;
 using NormalOperatorEnum = AutoPBR.Core.Models.NormalOperator;
 using NormalDerivativeEnum = AutoPBR.Core.Models.NormalDerivative;
-using QualityProfileEnum = AutoPBR.Core.Models.QualityProfile;
 using DeepBumpInputModeEnum = AutoPBR.Core.Models.DeepBumpInputMode;
 
 namespace AutoPBR.App.Models;
@@ -15,10 +14,13 @@ public sealed class UserSettings
 
     /// <summary>Folder scanned for batch .zip / .jar resource packs (Scan tab).</summary>
     public string? BatchFolderPath { get; set; }
+
+    /// <summary>When true, input UI targets batch folder; main Convert runs batch for that folder.</summary>
+    public bool UseBatchFolderInput { get; set; }
     public double NormalIntensity { get; set; } = AutoPbrDefaults.DefaultNormalIntensity;
     public double HeightIntensity { get; set; } = AutoPbrDefaults.DefaultHeightIntensity;
     public bool FastSpecular { get; set; }
-    public string FoliageMode { get; set; } = "Ignore All";
+    public string FoliageMode { get; set; } = "No Height";
 
     /// <summary>Legacy: when loading old settings with "IgnorePlants": false, migrate to FoliageMode "Convert All".</summary>
     [JsonPropertyName("IgnorePlants")]
@@ -40,9 +42,15 @@ public sealed class UserSettings
     public double SmoothnessScale { get; set; } = AutoPbrDefaults.DefaultSmoothnessScale;
     public double MetallicBoost { get; set; } = AutoPbrDefaults.DefaultMetallicBoost;
     public double PorosityBias { get; set; } = AutoPbrDefaults.DefaultPorosityBias;
+
+    /// <summary>Extra porosity B for plant-tagged textures (added to <see cref="PorosityBias"/>). Null = use default on load.</summary>
+    public double? PlantMaterialPorosityExtra { get; set; }
     public int MaxThreads { get; set; } // 0 = auto
     public string? TempDirectory { get; set; }
     public string ColorScheme { get; set; } = "Dark";
+
+    /// <summary>Interface scale (typically 0.75–1.75). 1.0 = 100%.</summary>
+    public double UiScale { get; set; } = 1.0;
 
     /// <summary>UI language culture code (e.g. "en", "de").</summary>
     public string Language { get; set; } = "en";
@@ -59,6 +67,13 @@ public sealed class UserSettings
 
     public string DeepBumpInputMode { get; set; } = nameof(DeepBumpInputModeEnum.Auto);
     public bool DeepBumpForceBlue255 { get; set; }
+    public double DeepBumpNormalIntensity { get; set; } = AutoPbrDefaults.DefaultNormalIntensity;
+    public double DeepBumpNormalSoftClamp { get; set; }
+    public bool DeepBumpEdgeGuidedEnhance { get; set; }
+    public double DeepBumpEdgeGuidedStrength { get; set; } = 1.0;
+    public double DeepBumpEdgeGuidedGamma { get; set; } = 1.0;
+    public double DeepBumpEdgeGuidedDirectionMix { get; set; } = 0.35;
+    public int NormalHeightTransparentAlphaClampMax { get; set; }
 
     /// <summary>Normal operator when not using DeepBump. \"SobelVc\" or \"ScharrVc\".</summary>
     public string NormalOperator { get; set; } = nameof(NormalOperatorEnum.SobelVc);
@@ -68,8 +83,6 @@ public sealed class UserSettings
 
     /// <summary>What to derive normals from: Luminance, Color, ColorLuminanceBlend, or ColorLuminanceMax.</summary>
     public string NormalDerivative { get; set; } = nameof(NormalDerivativeEnum.Luminance);
-
-    public string QualityProfile { get; set; } = nameof(QualityProfileEnum.Balanced);
 
     public bool PreprocessLinearize { get; set; }
     public int PreprocessDenoiseRadius { get; set; }
@@ -81,14 +94,63 @@ public sealed class UserSettings
     public bool SpecularUsePercentileRemap { get; set; } = true;
     public double SpecularRemapLowPercentile { get; set; } = 0.02;
     public double SpecularRemapHighPercentile { get; set; } = 0.98;
-    public string? MetalHeuristicSubstrings { get; set; }
+    public bool UseMlSpecularPredictor { get; set; }
+    public string? MlSpecularModelPath { get; set; }
+
+    /// <summary>Optional override paths for bundled per-resolution specular models (edge length in pixels).</summary>
+    public string? MlSpecularModelPath16 { get; set; }
+    public string? MlSpecularModelPath32 { get; set; }
+    public string? MlSpecularModelPath64 { get; set; }
+    public string? MlSpecularModelPath128 { get; set; }
+    public string? MlSpecularModelPath256 { get; set; }
+
+    /// <summary>Blend toward ML specular (0 = heuristic, 1 = full ML). Null = use default on load.</summary>
+    public double? MlSpecularHeuristicBlend { get; set; }
+
+    /// <summary>Specular ML blend mode enum name (SmoothnessOnly, AiMetalAndEmissive, or Full); null defaults to SmoothnessOnly.</summary>
+    public string? MlSpecularHeuristicBlendMode { get; set; }
+    /// <summary>Specular ML blend math enum name (Linear, Additive, Multiplicative); null defaults to Linear.</summary>
+    public string? MlSpecularBlendMath { get; set; }
+
+    public bool MlSpecularUseEdgeChannel { get; set; } = true;
+    public int MlSpecularTransparentAlphaClampMax { get; set; }
+    public bool SpecularDebugDisableHeuristicSpecular { get; set; }
+    public bool SpecularDebugSkipSpecularRemap { get; set; }
+    public bool SpecularDebugVerboseSpecularMl { get; set; }
 
     public bool GenerateAo { get; set; }
     public int AoRadius { get; set; } = 4;
     public double AoStrength { get; set; } = 1.0;
 
-    /// <summary>User-defined tag rules (keywords + overrides). Applied in addition to built-in rules.</summary>
+    /// <summary>When true, ONNX GPU sessions prefer TensorRT (CUDA fallback). Default false = CUDA only.</summary>
+    public bool PreferOnnxTensorRtExecutionProvider { get; set; }
+
+    /// <summary>User-defined material tag rules (keywords + optional semantic hints).</summary>
     public List<CustomTagRuleEntry> CustomTagRules { get; set; } = [];
+
+    /// <summary>When true, Explore suggests extra tags using MiniLM embeddings (requires ONNX model under Data).</summary>
+    public bool UseSemanticMaterialTags { get; set; } = true;
+
+    /// <summary>Minimum cosine similarity (0–1) for a semantic tag suggestion.</summary>
+    public double MaterialTagMinSimilarity { get; set; } = 0.25;
+
+    /// <summary>When the best ML score is below this (0–1), only the Unknown material tag is suggested.</summary>
+    public double MaterialTagCertaintyThreshold { get; set; } = 0.35;
+
+    /// <summary>Maximum number of ML-suggested tags per texture.</summary>
+    public int MaterialTagMaxCount { get; set; } = 3;
+
+    /// <summary>When true, semantic matching augments MiniLM using dictionary definition evidence.</summary>
+    public bool DictionaryEvidenceEnabled { get; set; }
+
+    /// <summary>Dictionary evidence blend weight (0..1) for fused semantic score.</summary>
+    public double DictionaryEvidenceWeight { get; set; } = 0.35;
+
+    /// <summary>Minimum dictionary evidence cosine score used for fusion.</summary>
+    public double DictionaryMinEvidenceScore { get; set; } = 0.18;
+
+    /// <summary>Dictionary request timeout in milliseconds.</summary>
+    public int DictionaryRequestTimeoutMs { get; set; } = 900;
 
     private static string SettingsDirectory =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AutoPBR");

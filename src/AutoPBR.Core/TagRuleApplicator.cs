@@ -1,27 +1,59 @@
+using System.Text.RegularExpressions;
 using AutoPBR.Core.Models;
 
 namespace AutoPBR.Core;
 
 /// <summary>
-/// Matches textures to tag rules by keyword and merges tag overrides into work item overrides.
+/// Matches textures to tag rules by keyword (file name and path below the pack namespace).
 /// </summary>
 internal static class TagRuleApplicator
 {
     /// <summary>
-    /// Returns tag ids whose keywords match the texture name or relative key (case-insensitive contains).
+    /// Unicode letter/number runs count as one token; other characters (including <c>_</c>, <c>/</c>, <c>\</c>) are boundaries.
     /// </summary>
-    public static IReadOnlyList<string> GetMatchingTagIds(string name, string relativeKey, IReadOnlyList<TagRule> rules)
+    internal static bool KeywordMatches(string haystack, string keyword, bool wholeWord)
+    {
+        if (string.IsNullOrEmpty(keyword))
+        {
+            return false;
+        }
+
+        if (!wholeWord)
+        {
+            return haystack.Contains(keyword, StringComparison.OrdinalIgnoreCase);
+        }
+
+        var escaped = Regex.Escape(keyword);
+        // Avoid $@"..." — '{' in \p{L} would start string interpolation.
+        return Regex.IsMatch(
+            haystack,
+            "(?<![\\p{L}\\p{N}])" + escaped + "(?![\\p{L}\\p{N}])",
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+    }
+
+    /// <summary>
+    /// Returns tag ids whose keywords match the texture file name or the relative path <strong>excluding</strong>
+    /// the first segment (the <c>assets/&lt;namespace&gt;/</c> root / mod id). That way a keyword like <c>metal</c>
+    /// still matches filenames such as <c>metal_ingot</c>, but not the mod folder name <c>mythicmetals</c>.
+    /// </summary>
+    /// <summary>Keyword substring matches for rules of <paramref name="kind"/> (material vs flag).</summary>
+    public static IReadOnlyList<string> GetMatchingTagIds(
+        string name,
+        string relativeKey,
+        IReadOnlyList<TagRule> rules,
+        TagRuleKind kind)
     {
         if (rules.Count == 0)
         {
             return [];
         }
 
-        var combined = name + "\0" + relativeKey;
+        var pathBelowNamespace = PathBelowNamespace(relativeKey);
+        var combined = name + "\0" + pathBelowNamespace;
         var list = new List<string>();
         foreach (var rule in rules)
         {
-            if (string.IsNullOrEmpty(rule.Id) || rule.Keywords.Count == 0)
+            if (rule.Kind != kind || string.IsNullOrEmpty(rule.Id) || rule.Keywords.Count == 0)
             {
                 continue;
             }
@@ -33,7 +65,7 @@ internal static class TagRuleApplicator
                     continue;
                 }
 
-                if (combined.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                if (KeywordMatches(combined, keyword, rule.KeywordsMatchWholeWord))
                 {
                     list.Add(rule.Id);
                     break;
@@ -44,77 +76,20 @@ internal static class TagRuleApplicator
         return list;
     }
 
-    /// <summary>
-    /// Merges overrides from the given tag rules (by id) into the target overrides.
-    /// Only properties that are "set" on the source (non-default) are copied.
-    /// </summary>
-    public static void MergeTagOverridesInto(
-        TextureOverrides target,
-        IReadOnlyList<TagRule> rules,
-        IReadOnlyList<string> tagIds)
+    /// <summary>Everything after the first path segment of <paramref name="relativeKey"/> (the namespace / mod root).</summary>
+    internal static string PathBelowNamespace(string relativeKey)
     {
-        if (rules.Count == 0 || tagIds.Count == 0)
+        if (string.IsNullOrEmpty(relativeKey))
         {
-            return;
+            return string.Empty;
         }
 
-        var idSet = new HashSet<string>(tagIds, StringComparer.OrdinalIgnoreCase);
-        foreach (var rule in rules)
+        var parts = relativeKey.Replace('/', '\\').Split('\\', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length <= 1)
         {
-            if (!idSet.Contains(rule.Id))
-            {
-                continue;
-            }
-
-            MergeOne(target, rule.Overrides);
-        }
-    }
-
-    private static void MergeOne(TextureOverrides target, TextureOverrides source)
-    {
-        if (source.InvertHeight)
-        {
-            target.InvertHeight = true;
+            return string.Empty;
         }
 
-        if (source.InvertSpecular)
-        {
-            target.InvertSpecular = true;
-        }
-
-        if (source.InvertNormalRed)
-        {
-            target.InvertNormalRed = true;
-        }
-
-        if (source.InvertNormalGreen)
-        {
-            target.InvertNormalGreen = true;
-        }
-
-        if (source.NormalIntensity.HasValue)
-        {
-            target.NormalIntensity = source.NormalIntensity;
-        }
-
-        if (source.HeightIntensity.HasValue)
-        {
-            target.HeightIntensity = source.HeightIntensity;
-        }
-
-        if (source.HeightBrightness.HasValue)
-        {
-            target.HeightBrightness = source.HeightBrightness;
-        }
-
-        if (source.FastSpecular.HasValue)
-        {
-            target.FastSpecular = source.FastSpecular;
-        }
-
-        if (source.CustomSpecularRules is not null)
-        {
-            target.CustomSpecularRules = source.CustomSpecularRules;
-        }
+        return string.Join("\\", parts.Skip(1));
     }
 }

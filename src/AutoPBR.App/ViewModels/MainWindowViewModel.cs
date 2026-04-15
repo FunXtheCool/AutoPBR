@@ -1,5 +1,9 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
@@ -13,16 +17,19 @@ using AutoPBR.App.Lang;
 using AutoPBR.App.Models;
 using AutoPBR.App.Services;
 using AutoPBR.Core;
+using AutoPBR.Core.Embeddings;
 using AutoPBR.Core.Models;
 
 namespace AutoPBR.App.ViewModels;
 
-public partial class MainWindowViewModel : ViewModelBase
+public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
 {
     private CancellationTokenSource? _cts;
     private CancellationTokenSource? _scanCts;
     private CancellationTokenSource? _previewCts;
+    private CancellationTokenSource? _previewRefreshDebounceCts;
     private readonly ExploreTreeController _exploreController = new();
+    private MaterialTagSemanticMatcher? _materialTagSemanticMatcher;
     private SpecularData? _specularData;
     private readonly UserSettings _settings;
 
@@ -44,6 +51,98 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
+    private string ResolveBackgroundTaskLabel(string taskId) => taskId switch
+    {
+        BackgroundTaskIds.MaterialTags => Strings.BackgroundTaskMaterialTags,
+        BackgroundTaskIds.ExploreCache => Strings.BackgroundTaskExploreCache,
+        _ => taskId
+    };
+
+    void IBackgroundTaskSink.BeginTask(string taskId) => BackgroundSinkBegin(taskId);
+
+    void IBackgroundTaskSink.ReportTask(string taskId, double? fraction) => BackgroundSinkReport(taskId, fraction);
+
+    void IBackgroundTaskSink.EndTask(string taskId) => BackgroundSinkEnd(taskId);
+
+    private void BackgroundSinkBegin(string taskId)
+    {
+        void Core()
+        {
+            var existing = BackgroundTasks.FirstOrDefault(x => x.Id == taskId);
+            if (existing is not null)
+            {
+                existing.Label = ResolveBackgroundTaskLabel(taskId);
+                existing.IsIndeterminate = true;
+                return;
+            }
+
+            BackgroundTasks.Add(new BackgroundTaskItem(taskId, ResolveBackgroundTaskLabel(taskId)));
+        }
+
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            Core();
+        }
+        else
+        {
+            Dispatcher.UIThread.Invoke(Core);
+        }
+    }
+
+    private void BackgroundSinkReport(string taskId, double? fraction)
+    {
+        void Core()
+        {
+            var item = BackgroundTasks.FirstOrDefault(x => x.Id == taskId);
+            if (item is null)
+            {
+                return;
+            }
+
+            if (fraction is { } f)
+            {
+                item.IsIndeterminate = false;
+                item.Progress = Math.Clamp(f, 0, 1);
+            }
+            else
+            {
+                item.IsIndeterminate = true;
+            }
+        }
+
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            Core();
+        }
+        else
+        {
+            Dispatcher.UIThread.Invoke(Core);
+        }
+    }
+
+    private void BackgroundSinkEnd(string taskId)
+    {
+        void Core()
+        {
+            var item = BackgroundTasks.FirstOrDefault(x => x.Id == taskId);
+            if (item is null)
+            {
+                return;
+            }
+
+            BackgroundTasks.Remove(item);
+        }
+
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            Core();
+        }
+        else
+        {
+            Dispatcher.UIThread.Invoke(Core);
+        }
+    }
+
     private DateTime _conversionStartUtc;
     private ConversionStage? _currentStage;
     private DateTime _stageStartUtc;
@@ -56,11 +155,32 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private double _normalIntensity = AutoPbrDefaults.DefaultNormalIntensity;
     [ObservableProperty] private double _heightIntensity = AutoPbrDefaults.DefaultHeightIntensity;
     [ObservableProperty] private bool _fastSpecular;
-    [ObservableProperty] private string _foliageMode = "Ignore All";
+    [ObservableProperty] private string _foliageMode = "No Height";
     [ObservableProperty] private bool _useLegacyExtractor;
     [ObservableProperty] private double _smoothnessScale = AutoPbrDefaults.DefaultSmoothnessScale;
     [ObservableProperty] private double _metallicBoost = AutoPbrDefaults.DefaultMetallicBoost;
     [ObservableProperty] private double _porosityBias = AutoPbrDefaults.DefaultPorosityBias;
+
+    /// <summary>Extra B-channel bias for plant-tagged textures (added to <see cref="PorosityBias"/>).</summary>
+    [ObservableProperty] private double _plantMaterialPorosityExtra = AutoPbrDefaults.DefaultPlantMaterialPorosityExtra;
+
+    /// <summary>0 = heuristic specular when ML ran; 1 = full ML contribution from the heuristic/AI blend slider.</summary>
+    [ObservableProperty] private double _mlSpecularHeuristicBlend = AutoPbrDefaults.DefaultMlSpecularHeuristicBlend;
+
+    /// <summary>Enum name (SmoothnessOnly, AiMetalAndEmissive, or Full); kept in sync with <see cref="SelectedMlSpecularBlendModeOption"/>.</summary>
+    [ObservableProperty] private string _mlSpecularHeuristicBlendMode =
+        nameof(AutoPBR.Core.Models.MlSpecularHeuristicBlendMode.SmoothnessOnly);
+
+    /// <summary>AI Tuning channel-mode dropdown selection.</summary>
+    [ObservableProperty] private FoliageModeOption? _selectedMlSpecularBlendModeOption;
+
+    /// <summary>Blend math enum name (Linear, Additive, Multiplicative); kept in sync with <see cref="SelectedMlSpecularBlendMathOption"/>.</summary>
+    [ObservableProperty] private string _mlSpecularBlendMath =
+        nameof(AutoPBR.Core.Models.MlSpecularBlendMath.Linear);
+
+    /// <summary>AI Tuning blend-math dropdown selection.</summary>
+    [ObservableProperty] private FoliageModeOption? _selectedMlSpecularBlendMathOption;
+
     [ObservableProperty] private int _maxThreads; // 0 = auto
     [ObservableProperty] private int _maxThreadsMax = Math.Max(1, Environment.ProcessorCount);
     [ObservableProperty] private string? _tempDirectory;
@@ -73,11 +193,16 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private string _deepBumpOverlap = "Large";
     [ObservableProperty] private string _deepBumpInputMode = nameof(AutoPBR.Core.Models.DeepBumpInputMode.Auto);
     [ObservableProperty] private bool _deepBumpForceBlue255;
+    [ObservableProperty] private double _deepBumpNormalIntensity = AutoPbrDefaults.DefaultNormalIntensity;
+    [ObservableProperty] private double _deepBumpNormalSoftClamp;
+    [ObservableProperty] private bool _deepBumpEdgeGuidedEnhance;
+    [ObservableProperty] private double _deepBumpEdgeGuidedStrength = 1.0;
+    [ObservableProperty] private double _deepBumpEdgeGuidedGamma = 1.0;
+    [ObservableProperty] private double _deepBumpEdgeGuidedDirectionMix = 0.35;
+    [ObservableProperty] private int _normalHeightTransparentAlphaClampMax;
     [ObservableProperty] private string _normalOperator = nameof(AutoPBR.Core.Models.NormalOperator.SobelVc);
     [ObservableProperty] private string _normalKernelSize = "3";
     [ObservableProperty] private string _normalDerivative = nameof(AutoPBR.Core.Models.NormalDerivative.Luminance);
-
-    [ObservableProperty] private string _qualityProfile = nameof(AutoPBR.Core.Models.QualityProfile.Balanced);
 
     [ObservableProperty] private bool _preprocessLinearize;
     [ObservableProperty] private int _preprocessDenoiseRadius;
@@ -89,7 +214,48 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private bool _specularUsePercentileRemap = true;
     [ObservableProperty] private double _specularRemapLowPercentile = 0.02;
     [ObservableProperty] private double _specularRemapHighPercentile = 0.98;
-    [ObservableProperty] private string? _metalHeuristicSubstrings;
+    [ObservableProperty] private bool _useMlSpecularPredictor;
+    [ObservableProperty] private string? _mlSpecularModelPath;
+    [ObservableProperty] private string? _mlSpecularModelPath16;
+    [ObservableProperty] private string? _mlSpecularModelPath32;
+    [ObservableProperty] private string? _mlSpecularModelPath64;
+    [ObservableProperty] private string? _mlSpecularModelPath128;
+    [ObservableProperty] private string? _mlSpecularModelPath256;
+    [ObservableProperty] private bool _mlSpecularUseEdgeChannel = true;
+    [ObservableProperty] private int _mlSpecularTransparentAlphaClampMax;
+    [ObservableProperty] private bool _specularDebugDisableHeuristicSpecular;
+    [ObservableProperty] private bool _specularDebugSkipSpecularRemap;
+    [ObservableProperty] private bool _specularDebugVerboseSpecularMl;
+
+    /// <summary>When true, ONNX Runtime uses TensorRT EP for GPU models (CUDA fallback). Default false = CUDA only.</summary>
+    [ObservableProperty] private bool _preferOnnxTensorRtExecutionProvider;
+
+    /// <summary>When true, Explore suggests extra material tags via MiniLM (requires Data/all-MiniLM-L6-v2-onnx/model.onnx).</summary>
+    [ObservableProperty] private bool _useSemanticMaterialTags = true;
+
+    [ObservableProperty] private double _materialTagMinSimilarity = 0.25;
+    [ObservableProperty] private double _materialTagCertaintyThreshold = 0.35;
+    [ObservableProperty] private int _materialTagMaxCount = 3;
+    [ObservableProperty] private bool _dictionaryEvidenceEnabled;
+    [ObservableProperty] private double _dictionaryEvidenceWeight = 0.35;
+    [ObservableProperty] private double _dictionaryMinEvidenceScore = 0.18;
+    [ObservableProperty] private int _dictionaryRequestTimeoutMs = 900;
+    private readonly IDictionaryDefinitionProvider _dictionaryDefinitionProvider = new FreeDictionaryDefinitionProvider();
+
+    /// <summary>Combo options for custom tag rule kind (JSON: Material | Flag).</summary>
+    public IReadOnlyList<string> TagRuleKindOptions { get; } = ["Material", "Flag"];
+
+    public int MlSpecularTransparentAlphaClampMaxSlider
+    {
+        get => Math.Clamp(MlSpecularTransparentAlphaClampMax, 0, 16);
+        set => MlSpecularTransparentAlphaClampMax = Math.Clamp(value, 0, 255);
+    }
+
+    public int NormalHeightTransparentAlphaClampMaxSlider
+    {
+        get => Math.Clamp(NormalHeightTransparentAlphaClampMax, 0, 16);
+        set => NormalHeightTransparentAlphaClampMax = Math.Clamp(value, 0, 255);
+    }
 
     [ObservableProperty] private bool _generateAo;
     [ObservableProperty] private int _aoRadius = 4;
@@ -107,6 +273,9 @@ public partial class MainWindowViewModel : ViewModelBase
     /// <summary>Folder containing multiple .zip/.jar packs for batch scan / batch convert.</summary>
     [ObservableProperty] private string? _batchFolderPath;
 
+    /// <summary>When true, the input bar targets a batch folder and the main Convert runs batch conversion.</summary>
+    [ObservableProperty] private bool _useBatchFolderInput;
+
     /// <summary>True when the explorer is showing a merged batch index (folder of packs).</summary>
     public bool IsBatchScanActive => HasScannedArchive && _exploreController.Data?.IsBatch == true;
 
@@ -116,6 +285,12 @@ public partial class MainWindowViewModel : ViewModelBase
     /// <summary>When set, Explore tree shows only files that have this tag (and their ancestor folders). Empty = no tag filter.</summary>
     [ObservableProperty] private string _exploreTagFilterId = "";
 
+    /// <summary>Explore tree column widths (shared by header and rows via binding). Drag splitters in the header to resize.</summary>
+    [ObservableProperty] private GridLength _exploreTreeColumnResourceWidth = new(1, GridUnitType.Star);
+
+    [ObservableProperty] private GridLength _exploreTreeColumnMaterialsWidth = new(140, GridUnitType.Pixel);
+    [ObservableProperty] private GridLength _exploreTreeColumnFlagsWidth = new(140, GridUnitType.Pixel);
+
     [ObservableProperty] private string _colorScheme = "Dark";
     [ObservableProperty] private LanguageOption? _selectedLanguage;
     [ObservableProperty] private FoliageModeOption? _selectedFoliageMode;
@@ -124,8 +299,26 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private FoliageModeOption? _selectedNormalOperator;
     [ObservableProperty] private FoliageModeOption? _selectedNormalKernelSize;
     [ObservableProperty] private FoliageModeOption? _selectedNormalDerivative;
-    [ObservableProperty] private FoliageModeOption? _selectedQualityProfile;
     [ObservableProperty] private FoliageModeOption? _selectedColorSchemeOption;
+
+    /// <summary>Minimum UI scale (75%).</summary>
+    public const double MinUiScale = 0.75;
+
+    /// <summary>Maximum UI scale (100%).</summary>
+    public const double MaxUiScale = 1.0;
+
+    /// <summary>Dropdown entries: 75%–100% in 5% steps.</summary>
+    public ObservableCollection<FoliageModeOption> UiScaleOptions { get; } = new();
+
+    [ObservableProperty] private FoliageModeOption? _selectedUiScaleOption;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(UiScaleTransform))]
+    private double _uiScale = 1.0;
+
+    /// <summary>Uniform scale for the main window chrome (fonts, spacing, controls) for accessibility.</summary>
+    public ScaleTransform UiScaleTransform => new(UiScale, UiScale);
+
     [ObservableProperty] private IBrush _windowBackground = Brushes.Transparent;
     [ObservableProperty] private IBrush _cardBackground = Brushes.Transparent;
     [ObservableProperty] private IBrush _cardBorderBrush = Brushes.Gray;
@@ -140,6 +333,9 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private Color _previewFadeColor = Color.FromRgb(0x22, 0x22, 0x2A);
 
     public ObservableCollection<string> LogLines { get; } = new();
+
+    /// <summary>Mini progress rows (tab strip, right); updated from background threads via <see cref="IBackgroundTaskSink"/>.</summary>
+    public ObservableCollection<BackgroundTaskItem> BackgroundTasks { get; } = new();
 
     /// <summary>Persist the current in-memory log to a file (delegates to <see cref="LogService"/>).</summary>
     private void SaveLogToFile() => LogService.SaveToFile(LogLines);
@@ -165,11 +361,13 @@ public partial class MainWindowViewModel : ViewModelBase
     /// <summary>Derivative source options: Color, Luminance, Color+Luminance Blend, Color+Luminance Max.</summary>
     public ObservableCollection<FoliageModeOption> NormalDerivativeOptions { get; } = new();
 
-    /// <summary>Quality profile options (Balanced, LowRes, HiRes).</summary>
-    public ObservableCollection<FoliageModeOption> QualityProfileOptions { get; } = new();
-
     /// <summary>Color scheme options for the Appearance dropdown (display name from Resources, value for settings).</summary>
     public ObservableCollection<FoliageModeOption> ColorSchemeOptions { get; } = new();
+
+    /// <summary>Specular ML channel mode options (which channels keep heuristic contribution).</summary>
+    public ObservableCollection<FoliageModeOption> MlSpecularBlendModeOptions { get; } = new();
+    /// <summary>Specular ML blend math options (how heuristic and ML are combined).</summary>
+    public ObservableCollection<FoliageModeOption> MlSpecularBlendMathOptions { get; } = new();
 
     /// <summary>Root of the scanned archive tree for the Explore tab. Null until user clicks Scan or when cleared.</summary>
     [ObservableProperty] private ArchiveNode? _scannedArchiveRoot;
@@ -191,12 +389,13 @@ public partial class MainWindowViewModel : ViewModelBase
     /// <summary>User-defined tag rules (saved in settings). Used together with built-in rules.</summary>
     public ObservableCollection<CustomTagRuleEntry> CustomTagRules { get; } = new();
 
-    /// <summary>Tag legend for Explore: display name + short description of overrides (built-in + custom).</summary>
-    public IReadOnlyList<TagLegendItem> TagLegendItems => GetEffectiveTagRules()
-        .Select(r => new TagLegendItem { DisplayName = r.DisplayName, Description = FormatTagRuleLegend(r) }).ToList();
+    private IReadOnlyList<ExploreTagFilterOption>? _exploreTagFilterOptions;
 
-    /// <summary>Options for "Show tag" dropdown in Explore: All plus each effective tag rule.</summary>
+    /// <summary>Options for "Show tag" dropdown in Explore: All plus each effective tag rule (cached so the ComboBox does not rebuild the list on every binding pass).</summary>
     public IReadOnlyList<ExploreTagFilterOption> ExploreTagFilterOptions =>
+        _exploreTagFilterOptions ??= BuildExploreTagFilterOptions();
+
+    private IReadOnlyList<ExploreTagFilterOption> BuildExploreTagFilterOptions() =>
         [new ExploreTagFilterOption { Id = "", DisplayName = Strings.ExploreTagFilterAll }, .. GetEffectiveTagRules().Select(r => new ExploreTagFilterOption { Id = r.Id, DisplayName = r.DisplayName })];
 
     /// <summary>Built-in + custom tag rules for conversion and explore. Disabled custom rules are excluded.</summary>
@@ -215,34 +414,120 @@ public partial class MainWindowViewModel : ViewModelBase
     /// <summary>Call when CustomTagRules or effective rules change so legend and explore use new rules.</summary>
     private void NotifyTagRulesChanged()
     {
-        OnPropertyChanged(nameof(TagLegendItems));
+        _materialTagSemanticMatcher?.Dispose();
+        _materialTagSemanticMatcher = null;
+        _exploreTagFilterOptions = null;
         OnPropertyChanged(nameof(ExploreTagFilterOptions));
         _exploreController.RefreshAllDisplayTags();
     }
 
-    private static string FormatTagRuleLegend(TagRule r)
+    partial void OnUseSemanticMaterialTagsChanged(bool value)
     {
-        if (r.Id.Equals("brick", StringComparison.OrdinalIgnoreCase))
+        if (!value)
         {
-            return "Invert height, invert specular (reduces grout popping)";
+            _materialTagSemanticMatcher?.Dispose();
+            _materialTagSemanticMatcher = null;
         }
 
-        if (r.Id.Equals("wood", StringComparison.OrdinalIgnoreCase))
+        if (!_loadingSettings)
         {
-            return "Invert height (bark relief)";
+            _exploreController.RefreshAllDisplayTags();
+        }
+    }
+
+    partial void OnMaterialTagMinSimilarityChanged(double value)
+    {
+        SaveSettings();
+        if (!_loadingSettings)
+        {
+            _exploreController.ScheduleRefreshAllDisplayTags();
+        }
+    }
+
+    partial void OnMaterialTagMaxCountChanged(int value)
+    {
+        SaveSettings();
+        if (!_loadingSettings)
+        {
+            _exploreController.ScheduleRefreshAllDisplayTags();
+        }
+    }
+
+    partial void OnMaterialTagCertaintyThresholdChanged(double value)
+    {
+        SaveSettings();
+        if (!_loadingSettings)
+        {
+            _exploreController.ScheduleRefreshAllDisplayTags();
+        }
+    }
+
+    partial void OnDictionaryEvidenceEnabledChanged(bool value)
+    {
+        _ = value;
+        SaveSettings();
+        if (!_loadingSettings)
+        {
+            _exploreController.RefreshAllDisplayTags();
+        }
+    }
+
+    partial void OnDictionaryEvidenceWeightChanged(double value)
+    {
+        _ = value;
+        SaveSettings();
+        if (!_loadingSettings)
+        {
+            _exploreController.ScheduleRefreshAllDisplayTags();
+        }
+    }
+
+    partial void OnDictionaryMinEvidenceScoreChanged(double value)
+    {
+        _ = value;
+        SaveSettings();
+        if (!_loadingSettings)
+        {
+            _exploreController.ScheduleRefreshAllDisplayTags();
+        }
+    }
+
+    partial void OnDictionaryRequestTimeoutMsChanged(int value)
+    {
+        _ = value;
+        SaveSettings();
+        if (!_loadingSettings)
+        {
+            _exploreController.ScheduleRefreshAllDisplayTags();
+        }
+    }
+
+    private MaterialTagSemanticOptions? BuildMaterialTagSemanticOptions()
+    {
+        if (!UseSemanticMaterialTags)
+        {
+            return null;
         }
 
-        if (r.Id.Equals("metal", StringComparison.OrdinalIgnoreCase))
+        _materialTagSemanticMatcher ??= MaterialTagSemanticMatcher.TryCreate();
+        if (_materialTagSemanticMatcher is null)
         {
-            return "Softer normals (×0.85) for ores, ingots, chains";
+            return null;
         }
 
-        if (r.Id.Equals("foliage", StringComparison.OrdinalIgnoreCase))
+        return new MaterialTagSemanticOptions
         {
-            return "Subtler height (×0.07) for leaves, grass, plants";
-        }
-
-        return TagOverrideDescription.Summarize(r.Overrides);
+            Enabled = true,
+            MinSimilarity = MaterialTagMinSimilarity,
+            CertaintyThreshold = MaterialTagCertaintyThreshold,
+            MaxTags = Math.Clamp(MaterialTagMaxCount, 1, 16),
+            Matcher = _materialTagSemanticMatcher,
+            DictionaryEvidenceEnabled = DictionaryEvidenceEnabled,
+            DictionaryEvidenceWeight = Math.Clamp(DictionaryEvidenceWeight, 0.0, 1.0),
+            DictionaryMinEvidenceScore = Math.Clamp(DictionaryMinEvidenceScore, -1.0, 1.0),
+            DictionaryRequestTimeoutMs = Math.Clamp(DictionaryRequestTimeoutMs, 100, 5000),
+            DictionaryProvider = _dictionaryDefinitionProvider
+        };
     }
 
     /// <summary>Breadcrumb path for Explore (from root to current folder); click to navigate.</summary>
@@ -295,23 +580,28 @@ public partial class MainWindowViewModel : ViewModelBase
 
         try
         {
+            RefreshUiScaleOptions();
             UserSettingsSynchronizer.LoadInto(this, _settings);
+            SyncSelectedUiScaleOptionToUiScale();
             _exploreController.SetTagRulesProvider(GetEffectiveTagRules);
+            _exploreController.SetMaterialTagSemanticOptionsProvider(BuildMaterialTagSemanticOptions);
             ApplyColorScheme();
             var lang = string.IsNullOrWhiteSpace(_settings.Language) ? "en" : _settings.Language;
             Strings = LocalizationService.ApplyCulture(lang);
             OnPropertyChanged(nameof(Strings));
+            _exploreController.SetBackgroundTaskSink(this);
             SelectedLanguage = SupportedLanguages.FirstOrDefault(x =>
                                    string.Equals(x.CultureCode, _settings.Language,
                                        StringComparison.OrdinalIgnoreCase)) ??
                                SupportedLanguages[0];
             RefreshFoliageModeOptions();
+            RefreshMlSpecularBlendModeOptions();
+            RefreshMlSpecularBlendMathOptions();
             RefreshDeepBumpOverlapOptions();
             RefreshDeepBumpInputModeOptions();
             RefreshNormalOperatorOptions();
             RefreshNormalKernelSizeOptions();
             RefreshNormalDerivativeOptions();
-            RefreshQualityProfileOptions();
             RefreshColorSchemeOptions();
             SetStatus("Status_SelectPack");
         }
@@ -325,15 +615,59 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         Strings = LocalizationService.ApplyCulture(cultureCode);
         OnPropertyChanged(nameof(Strings));
+        foreach (var t in BackgroundTasks)
+        {
+            t.Label = ResolveBackgroundTaskLabel(t.Id);
+        }
+
         RefreshFoliageModeOptions();
+        RefreshMlSpecularBlendModeOptions();
+        RefreshMlSpecularBlendMathOptions();
         RefreshDeepBumpOverlapOptions();
         RefreshDeepBumpInputModeOptions();
         RefreshNormalOperatorOptions();
         RefreshNormalKernelSizeOptions();
         RefreshNormalDerivativeOptions();
-        RefreshQualityProfileOptions();
         RefreshColorSchemeOptions();
         UpdateStatusText();
+    }
+
+    private void RefreshMlSpecularBlendModeOptions()
+    {
+        MlSpecularBlendModeOptions.Clear();
+        MlSpecularBlendModeOptions.Add(new FoliageModeOption(Strings.MlSpecularBlendModeSmoothnessOnly,
+            nameof(AutoPBR.Core.Models.MlSpecularHeuristicBlendMode.SmoothnessOnly)));
+        MlSpecularBlendModeOptions.Add(new FoliageModeOption(Strings.MlSpecularBlendModeAiMetalAndEmissive,
+            nameof(AutoPBR.Core.Models.MlSpecularHeuristicBlendMode.AiMetalAndEmissive)));
+        MlSpecularBlendModeOptions.Add(new FoliageModeOption(Strings.MlSpecularBlendModeFull,
+            nameof(AutoPBR.Core.Models.MlSpecularHeuristicBlendMode.Full)));
+
+        SelectedMlSpecularBlendModeOption =
+            MlSpecularBlendModeOptions.FirstOrDefault(x =>
+                string.Equals(x.Value, MlSpecularHeuristicBlendMode, StringComparison.OrdinalIgnoreCase)) ??
+            MlSpecularBlendModeOptions[0];
+    }
+
+    private void RefreshMlSpecularBlendMathOptions()
+    {
+        MlSpecularBlendMathOptions.Clear();
+        MlSpecularBlendMathOptions.Add(new FoliageModeOption(Strings.MlSpecularBlendMathLinear,
+            nameof(AutoPBR.Core.Models.MlSpecularBlendMath.Linear)));
+        MlSpecularBlendMathOptions.Add(new FoliageModeOption(Strings.MlSpecularBlendMathSoftLight,
+            nameof(AutoPBR.Core.Models.MlSpecularBlendMath.SoftLight)));
+        MlSpecularBlendMathOptions.Add(new FoliageModeOption(Strings.MlSpecularBlendMathOverlay,
+            nameof(AutoPBR.Core.Models.MlSpecularBlendMath.Overlay)));
+        MlSpecularBlendMathOptions.Add(new FoliageModeOption(Strings.MlSpecularBlendMathScreen,
+            nameof(AutoPBR.Core.Models.MlSpecularBlendMath.Screen)));
+        MlSpecularBlendMathOptions.Add(new FoliageModeOption(Strings.MlSpecularBlendMathBiasGain,
+            nameof(AutoPBR.Core.Models.MlSpecularBlendMath.BiasGain)));
+        MlSpecularBlendMathOptions.Add(new FoliageModeOption(Strings.MlSpecularBlendMathSigmoidCrossfade,
+            nameof(AutoPBR.Core.Models.MlSpecularBlendMath.SigmoidCrossfade)));
+
+        SelectedMlSpecularBlendMathOption =
+            MlSpecularBlendMathOptions.FirstOrDefault(x =>
+                string.Equals(x.Value, MlSpecularBlendMath, StringComparison.OrdinalIgnoreCase)) ??
+            MlSpecularBlendMathOptions[0];
     }
 
     private void RefreshColorSchemeOptions()
@@ -376,20 +710,6 @@ public partial class MainWindowViewModel : ViewModelBase
             DeepBumpInputModeOptions.FirstOrDefault(x =>
                 string.Equals(x.Value, DeepBumpInputMode, StringComparison.OrdinalIgnoreCase)) ??
             DeepBumpInputModeOptions[0];
-    }
-
-    private void RefreshQualityProfileOptions()
-    {
-        QualityProfileOptions.Clear();
-        foreach (var o in LocalizationService.GetQualityProfileOptions(Strings))
-        {
-            QualityProfileOptions.Add(o);
-        }
-
-        SelectedQualityProfile =
-            QualityProfileOptions.FirstOrDefault(x =>
-                string.Equals(x.Value, QualityProfile, StringComparison.OrdinalIgnoreCase)) ??
-            QualityProfileOptions[0];
     }
 
     private void RefreshFoliageModeOptions()
@@ -475,14 +795,30 @@ public partial class MainWindowViewModel : ViewModelBase
         RecomputeOutputZipPath();
         ConvertCommand.NotifyCanExecuteChanged();
         ScanArchiveCommand.NotifyCanExecuteChanged();
-        BatchConvertCommand.NotifyCanExecuteChanged();
+        ScanCurrentInputCommand.NotifyCanExecuteChanged();
     }
 
     partial void OnBatchFolderPathChanged(string? value)
     {
         _ = value;
         ScanBatchCommand.NotifyCanExecuteChanged();
-        BatchConvertCommand.NotifyCanExecuteChanged();
+        ScanCurrentInputCommand.NotifyCanExecuteChanged();
+        ConvertCommand.NotifyCanExecuteChanged();
+        if (_loadingSettings)
+        {
+            return;
+        }
+
+        SaveSettings();
+    }
+
+    partial void OnUseBatchFolderInputChanged(bool value)
+    {
+        _ = value;
+        ScanArchiveCommand.NotifyCanExecuteChanged();
+        ScanBatchCommand.NotifyCanExecuteChanged();
+        ScanCurrentInputCommand.NotifyCanExecuteChanged();
+        ConvertCommand.NotifyCanExecuteChanged();
         if (_loadingSettings)
         {
             return;
@@ -496,7 +832,6 @@ public partial class MainWindowViewModel : ViewModelBase
         _ = value;
         RecomputeOutputZipPath();
         ConvertCommand.NotifyCanExecuteChanged();
-        BatchConvertCommand.NotifyCanExecuteChanged();
         SaveSettings();
     }
 
@@ -511,55 +846,148 @@ public partial class MainWindowViewModel : ViewModelBase
         _ = UpdatePreviewAsync();
     }
 
+    /// <summary>
+    /// Coalesces rapid slider-driven setting changes (same idea as <see cref="ExploreTreeController.ScheduleRefreshAllDisplayTags"/>):
+    /// waits <paramref name="delayMilliseconds"/> after the last call, then runs <see cref="RefreshPreviewIfActive"/>.
+    /// </summary>
+    private void ScheduleRefreshPreviewIfActive(int delayMilliseconds = 200)
+    {
+        _previewRefreshDebounceCts?.Cancel();
+        var cts = new CancellationTokenSource();
+        _previewRefreshDebounceCts = cts;
+        _ = RunDebouncedPreviewRefreshAsync(cts, delayMilliseconds);
+    }
+
+    private async Task RunDebouncedPreviewRefreshAsync(CancellationTokenSource debounceCts, int delayMs)
+    {
+        try
+        {
+            await Task.Delay(delayMs, debounceCts.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        if (!ReferenceEquals(_previewRefreshDebounceCts, debounceCts))
+        {
+            return;
+        }
+
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            if (!ReferenceEquals(_previewRefreshDebounceCts, debounceCts))
+            {
+                return;
+            }
+
+            RefreshPreviewIfActive();
+        });
+    }
+
     partial void OnFastSpecularChanged(bool value)
     {
         _ = value;
         RecomputeOutputZipPath();
         ConvertCommand.NotifyCanExecuteChanged();
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnNormalIntensityChanged(double value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnHeightIntensityChanged(double value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnUseLegacyExtractorChanged(bool value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnSmoothnessScaleChanged(double value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnMetallicBoostChanged(double value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnPorosityBiasChanged(double value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnPlantMaterialPorosityExtraChanged(double value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnMlSpecularHeuristicBlendChanged(double value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnSelectedMlSpecularBlendModeOptionChanged(FoliageModeOption? value)
+    {
+        if (value is null)
+        {
+            return;
+        }
+
+        if (string.Equals(MlSpecularHeuristicBlendMode, value.Value, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        MlSpecularHeuristicBlendMode = value.Value;
+        if (!_loadingSettings)
+        {
+            SaveSettings();
+            ScheduleRefreshPreviewIfActive();
+        }
+    }
+
+    partial void OnSelectedMlSpecularBlendMathOptionChanged(FoliageModeOption? value)
+    {
+        if (value is null)
+        {
+            return;
+        }
+
+        if (string.Equals(MlSpecularBlendMath, value.Value, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        MlSpecularBlendMath = value.Value;
+        if (!_loadingSettings)
+        {
+            SaveSettings();
+            ScheduleRefreshPreviewIfActive();
+        }
     }
 
     partial void OnMaxThreadsChanged(int value)
@@ -593,6 +1021,78 @@ public partial class MainWindowViewModel : ViewModelBase
         SaveSettings();
     }
 
+    /// <summary>Maps legacy or out-of-range values onto allowed 5% steps between <see cref="MinUiScale"/> and <see cref="MaxUiScale"/>.</summary>
+    public static double SnapUiScaleToAllowedStep(double value)
+    {
+        var v = Math.Clamp(value, MinUiScale, MaxUiScale);
+        var snapped = Math.Round(v * 20.0, MidpointRounding.AwayFromZero) / 20.0;
+        return Math.Clamp(snapped, MinUiScale, MaxUiScale);
+    }
+
+    private void RefreshUiScaleOptions()
+    {
+        UiScaleOptions.Clear();
+        for (var p = 75; p <= 100; p += 5)
+        {
+            var scale = p / 100.0;
+            UiScaleOptions.Add(new FoliageModeOption($"{p}%", scale.ToString("0.00", CultureInfo.InvariantCulture)));
+        }
+    }
+
+    private void SyncSelectedUiScaleOptionToUiScale()
+    {
+        var target = UiScaleOptions.FirstOrDefault(o =>
+                         Math.Abs(double.Parse(o.Value, CultureInfo.InvariantCulture) - UiScale) < 0.001)
+                     ?? UiScaleOptions.LastOrDefault();
+        if (target is null)
+        {
+            return;
+        }
+
+        if (string.Equals(SelectedUiScaleOption?.Value, target.Value, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        SelectedUiScaleOption = target;
+    }
+
+    partial void OnUiScaleChanged(double value)
+    {
+        var c = SnapUiScaleToAllowedStep(value);
+        if (Math.Abs(c - value) > 1e-9)
+        {
+            UiScale = c;
+            return;
+        }
+
+        if (_loadingSettings)
+        {
+            return;
+        }
+
+        SaveSettings();
+    }
+
+    partial void OnSelectedUiScaleOptionChanged(FoliageModeOption? value)
+    {
+        if (value is null || _loadingSettings)
+        {
+            return;
+        }
+
+        if (!double.TryParse(value.Value, CultureInfo.InvariantCulture, out var newScale))
+        {
+            return;
+        }
+
+        newScale = SnapUiScaleToAllowedStep(newScale);
+        if (Math.Abs(newScale - UiScale) > 1e-9)
+        {
+            UiScale = newScale;
+        }
+    }
+
     partial void OnSelectedColorSchemeOptionChanged(FoliageModeOption? value)
     {
         if (value != null)
@@ -610,6 +1110,8 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         var code = value?.CultureCode ?? "en";
         ApplyCulture(code);
+        _exploreTagFilterOptions = null;
+        OnPropertyChanged(nameof(ExploreTagFilterOptions));
         _settings.Language = code;
         _settings.Save();
     }
@@ -653,7 +1155,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     [UsedImplicitly] // Invoked by CommunityToolkit.Mvvm source generator when SelectedDeepBumpOverlap changes
@@ -665,7 +1167,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         DeepBumpOverlap = value?.Value ?? "Large";
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     [UsedImplicitly] // Invoked by CommunityToolkit.Mvvm source generator when SelectedDeepBumpInputMode changes
@@ -678,58 +1180,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         DeepBumpInputMode = value?.Value ?? nameof(AutoPBR.Core.Models.DeepBumpInputMode.Auto);
         SaveSettings();
-        RefreshPreviewIfActive();
-    }
-
-    [UsedImplicitly] // Invoked by CommunityToolkit.Mvvm source generator when SelectedQualityProfile changes
-    partial void OnSelectedQualityProfileChanged(FoliageModeOption? value)
-    {
-        if (_loadingSettings)
-        {
-            return;
-        }
-
-        QualityProfile = value?.Value ?? nameof(AutoPBR.Core.Models.QualityProfile.Balanced);
-        ApplyQualityProfileDefaults();
-        SaveSettings();
-        RefreshPreviewIfActive();
-    }
-
-    private void ApplyQualityProfileDefaults()
-    {
-        if (!Enum.TryParse<QualityProfile>(QualityProfile, ignoreCase: true, out var profile))
-        {
-            profile = AutoPBR.Core.Models.QualityProfile.Balanced;
-        }
-
-        var normal = QualityProfilePresets.GetNormalSettings(profile);
-        NormalOperator = normal.NormalOperator.ToString();
-        NormalKernelSize = ((int)normal.NormalKernelSize).ToString();
-        NormalDerivative = normal.NormalDerivative.ToString();
-
-        RefreshNormalKernelSizeOptions();
-        RefreshNormalOperatorOptions();
-        RefreshNormalDerivativeOptions();
-
-        switch (profile)
-        {
-            case AutoPBR.Core.Models.QualityProfile.LowRes:
-                PreprocessLinearize = false;
-                PreprocessDenoiseRadius = 1;
-                PreprocessDenoiseBlend = 0.5;
-                PreprocessFrequencySplit = false;
-                SpecularUsePercentileRemap = true;
-                GenerateAo = false;
-                break;
-            case AutoPBR.Core.Models.QualityProfile.HiRes:
-                PreprocessLinearize = true;
-                PreprocessDenoiseRadius = 0;
-                PreprocessFrequencySplit = true;
-                PreprocessFrequencyRadius = 2;
-                PreprocessFrequencyDetailStrength = 1.1;
-                SpecularUsePercentileRemap = true;
-                break;
-        }
+        ScheduleRefreshPreviewIfActive();
     }
 
     [UsedImplicitly] // Invoked by CommunityToolkit.Mvvm source generator when SelectedNormalOperator changes
@@ -742,7 +1193,7 @@ public partial class MainWindowViewModel : ViewModelBase
         NormalOperator = value?.Value ?? nameof(AutoPBR.Core.Models.NormalOperator.SobelVc);
         RefreshNormalKernelSizeOptions();
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnSelectedNormalKernelSizeChanged(FoliageModeOption? value)
@@ -753,7 +1204,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         NormalKernelSize = value?.Value ?? "3";
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnSelectedNormalDerivativeChanged(FoliageModeOption? value)
@@ -764,105 +1215,240 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         NormalDerivative = value?.Value ?? nameof(AutoPBR.Core.Models.NormalDerivative.Luminance);
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnPreprocessLinearizeChanged(bool value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnPreprocessDenoiseRadiusChanged(int value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnPreprocessDenoiseBlendChanged(double value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnPreprocessFrequencySplitChanged(bool value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnPreprocessFrequencyRadiusChanged(int value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnPreprocessFrequencyDetailStrengthChanged(double value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnDeepBumpForceBlue255Changed(bool value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnDeepBumpNormalIntensityChanged(double value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnDeepBumpNormalSoftClampChanged(double value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnDeepBumpEdgeGuidedEnhanceChanged(bool value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnDeepBumpEdgeGuidedStrengthChanged(double value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnDeepBumpEdgeGuidedGammaChanged(double value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnDeepBumpEdgeGuidedDirectionMixChanged(double value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnNormalHeightTransparentAlphaClampMaxChanged(int value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+        OnPropertyChanged(nameof(NormalHeightTransparentAlphaClampMaxSlider));
     }
 
     partial void OnSpecularUsePercentileRemapChanged(bool value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnSpecularRemapLowPercentileChanged(double value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnSpecularRemapHighPercentileChanged(double value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
-    partial void OnMetalHeuristicSubstringsChanged(string? value)
+    partial void OnUseMlSpecularPredictorChanged(bool value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnPreferOnnxTensorRtExecutionProviderChanged(bool value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnMlSpecularModelPathChanged(string? value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnMlSpecularModelPath16Changed(string? value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnMlSpecularModelPath32Changed(string? value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnMlSpecularModelPath64Changed(string? value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnMlSpecularModelPath128Changed(string? value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnMlSpecularModelPath256Changed(string? value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnMlSpecularUseEdgeChannelChanged(bool value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnMlSpecularTransparentAlphaClampMaxChanged(int value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+        OnPropertyChanged(nameof(MlSpecularTransparentAlphaClampMaxSlider));
+    }
+
+    partial void OnSpecularDebugDisableHeuristicSpecularChanged(bool value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnSpecularDebugSkipSpecularRemapChanged(bool value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnSpecularDebugVerboseSpecularMlChanged(bool value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnGenerateAoChanged(bool value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnAoRadiusChanged(int value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     partial void OnAoStrengthChanged(double value)
     {
         _ = value;
         SaveSettings();
-        RefreshPreviewIfActive();
+        ScheduleRefreshPreviewIfActive();
     }
 
     private void RecomputeOutputZipPath()
@@ -936,7 +1522,7 @@ public partial class MainWindowViewModel : ViewModelBase
         ScannedArchiveRoot = null;
         _exploreController.Clear();
         OnPropertyChanged(nameof(IsBatchScanActive));
-        BatchConvertCommand.NotifyCanExecuteChanged();
+        ScanCurrentInputCommand.NotifyCanExecuteChanged();
         ConvertCommand.NotifyCanExecuteChanged();
     }
 
@@ -1135,26 +1721,84 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand(CanExecute = nameof(CanExecuteTagMenu))]
-    private void ExecuteTagMenu(TagMenuEntry? entry)
+    /// <summary>Debug report text for the MiniLM semantic match dialog. Bound to the dialog TextBlock.</summary>
+    [ObservableProperty] private string _semanticMatchDebugText = "";
+
+    /// <summary>Set by the view so the command can open a dialog.</summary>
+    internal Action<string>? ShowSemanticDebugDialog { get; set; }
+
+    [RelayCommand]
+    private void DebugSemanticMatch(ArchiveNode? node)
     {
-        if (entry is null)
+        if (node is null || node.IsFolder || !UseSemanticMaterialTags)
         {
             return;
         }
 
-        var host = (IArchiveNodeHost)_exploreController;
-        if (entry.IsApplied)
+        var report = _exploreController.GetSemanticMatchDebugReport(node.FullPath);
+        if (report is null)
         {
-            host.SetTagRemoved(entry.Node.FullPath, entry.TagId);
+            SemanticMatchDebugText = "MiniLM is not enabled or the file is not a texture.";
+            ShowSemanticDebugDialog?.Invoke(SemanticMatchDebugText);
+            return;
         }
-        else
-        {
-            host.SetTagAdded(entry.Node.FullPath, entry.TagId);
-        }
+
+        SemanticMatchDebugText = FormatSemanticDebugReport(report, node.FullPath);
+        ShowSemanticDebugDialog?.Invoke(SemanticMatchDebugText);
     }
 
-    private bool CanExecuteTagMenu(TagMenuEntry? entry) => entry is not null;
+    private static string FormatSemanticDebugReport(
+        AutoPBR.Core.Embeddings.SemanticMatchDebugReport report,
+        string archivePath)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine($"File:  {Path.GetFileName(archivePath)}");
+        sb.AppendLine($"Query: \"{report.QueryText}\"");
+        if (report.DictionaryTerms is { Count: > 0 })
+        {
+            sb.AppendLine($"Dictionary terms: {string.Join(", ", report.DictionaryTerms)}");
+            sb.AppendLine($"Dictionary evidence applied: {report.DictionaryEvidenceApplied} (weight={report.DictionaryEvidenceWeight:0.00})");
+            if (report.DictionaryEvidenceApplied)
+            {
+                sb.AppendLine("Fusion note: rules without dictionary evidence are scaled by (1 - weight).");
+            }
+        }
+
+        if (report.DictionaryTermBlocks is { Count: > 0 })
+        {
+            foreach (var block in report.DictionaryTermBlocks)
+            {
+                foreach (var line in block.DefinitionLines)
+                {
+                    sb.AppendLine($"{block.Term} definition: {line}");
+                }
+            }
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("── Per-rule cosine similarity (best/fused first) ──");
+        sb.AppendLine();
+
+        foreach (var entry in report.Entries)
+        {
+            var dictScore = entry.DictionaryBestScore > float.MinValue ? entry.DictionaryBestScore.ToString("F4") : "n/a";
+            var fused = entry.FusedScore > float.MinValue ? entry.FusedScore.ToString("F4") : "n/a";
+            sb.AppendLine($"  {entry.DisplayName,-16}  best = {entry.BestScore:F4}  dict = {dictScore}  fused = {fused}   ← \"{entry.BestPhrase}\"");
+            foreach (var (phrase, score) in entry.AllPhraseScores)
+            {
+                if (phrase == entry.BestPhrase)
+                {
+                    continue;
+                }
+
+                sb.AppendLine($"  {"",16}         {score:F4}   ← \"{phrase}\"");
+            }
+
+            sb.AppendLine();
+        }
+
+        return sb.ToString();
+    }
 
     private async Task UpdatePreviewAsync()
     {
@@ -1277,8 +1921,16 @@ public partial class MainWindowViewModel : ViewModelBase
                 SetStatus("Status_LoadedTextures", data.FileCount);
                 AddLogLine(Resources.GetStatusString("Log_ArchiveContentsLoaded", data.FileCount));
             });
-            await Task.Run(() => _exploreController.PrewarmFolderVisibilityCache(scanToken), scanToken)
-                .ConfigureAwait(false);
+            ((IBackgroundTaskSink)this).BeginTask(BackgroundTaskIds.ExploreCache);
+            try
+            {
+                await Task.Run(() => _exploreController.PrewarmFolderVisibilityCache(scanToken), scanToken)
+                    .ConfigureAwait(false);
+            }
+            finally
+            {
+                ((IBackgroundTaskSink)this).EndTask(BackgroundTaskIds.ExploreCache);
+            }
         }
         catch (OperationCanceledException)
         {
@@ -1302,9 +1954,25 @@ public partial class MainWindowViewModel : ViewModelBase
                 IsBusy = false;
                 ScanArchiveCommand.NotifyCanExecuteChanged();
                 ScanBatchCommand.NotifyCanExecuteChanged();
+                ScanCurrentInputCommand.NotifyCanExecuteChanged();
                 ConvertCommand.NotifyCanExecuteChanged();
-                BatchConvertCommand.NotifyCanExecuteChanged();
             });
+        }
+    }
+
+    private bool CanScanCurrentInput() =>
+        UseBatchFolderInput ? CanScanBatch() : CanScanArchive();
+
+    [RelayCommand(CanExecute = nameof(CanScanCurrentInput))]
+    public async Task ScanCurrentInputAsync()
+    {
+        if (UseBatchFolderInput)
+        {
+            await ScanBatchAsync().ConfigureAwait(false);
+        }
+        else
+        {
+            await ScanArchiveAsync().ConfigureAwait(false);
         }
     }
 
@@ -1363,8 +2031,16 @@ public partial class MainWindowViewModel : ViewModelBase
                 SetStatus("Status_BatchScanDone", packCount, data.FileCount);
                 AddLogLine(Resources.GetStatusString("Log_BatchScanDone", packCount, data.FileCount));
             });
-            await Task.Run(() => _exploreController.PrewarmFolderVisibilityCache(scanToken), scanToken)
-                .ConfigureAwait(false);
+            ((IBackgroundTaskSink)this).BeginTask(BackgroundTaskIds.ExploreCache);
+            try
+            {
+                await Task.Run(() => _exploreController.PrewarmFolderVisibilityCache(scanToken), scanToken)
+                    .ConfigureAwait(false);
+            }
+            finally
+            {
+                ((IBackgroundTaskSink)this).EndTask(BackgroundTaskIds.ExploreCache);
+            }
         }
         catch (OperationCanceledException)
         {
@@ -1387,7 +2063,8 @@ public partial class MainWindowViewModel : ViewModelBase
                 IsBusy = false;
                 ScanBatchCommand.NotifyCanExecuteChanged();
                 ScanArchiveCommand.NotifyCanExecuteChanged();
-                BatchConvertCommand.NotifyCanExecuteChanged();
+                ScanCurrentInputCommand.NotifyCanExecuteChanged();
+                ConvertCommand.NotifyCanExecuteChanged();
             });
         }
     }
@@ -1401,8 +2078,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _exploreController.HaveBatchScanForFolder(BatchFolderPath) &&
         _exploreController.Data?.BatchPackRootToPath is { Count: > 0 };
 
-    [RelayCommand(CanExecute = nameof(CanBatchConvert))]
-    public async Task BatchConvertAsync()
+    private async Task ExecuteBatchConvertAsync()
     {
         if (!CanBatchConvert())
         {
@@ -1428,6 +2104,8 @@ public partial class MainWindowViewModel : ViewModelBase
                 SpecularData.LoadFromFile(Path.Combine(AppContext.BaseDirectory, "Data", "textures_data.json"));
 
             var prog = CreateConversionProgressReporter();
+            await _exploreController.WaitForPendingTagWorkAsync(token).ConfigureAwait(false);
+            _exploreController.FlushTagOverridesToDisk();
             var packIndex = 0;
             foreach (var kv in packs)
             {
@@ -1437,13 +2115,6 @@ public partial class MainWindowViewModel : ViewModelBase
                 token.ThrowIfCancellationRequested();
 
                 var ignore = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                if (FoliageMode == "Ignore All")
-                {
-                    foreach (var p in AutoPbrDefaults.PlantTextureKeys)
-                    {
-                        ignore.Add(p);
-                    }
-                }
 
                 _exploreController.ApplyExploreOverridesToIgnoreSetForBatchPack(ignore, packRoot);
                 var innerPaths = _exploreController.GetFilePathsUnderBatchPackRoot(packRoot);
@@ -1478,21 +2149,23 @@ public partial class MainWindowViewModel : ViewModelBase
             IsConverting = false;
             IsBusy = false;
             CancelCommand.NotifyCanExecuteChanged();
-            BatchConvertCommand.NotifyCanExecuteChanged();
             ConvertCommand.NotifyCanExecuteChanged();
+            ScanCurrentInputCommand.NotifyCanExecuteChanged();
         }
     }
 
     partial void OnScannedArchiveRootChanged(ArchiveNode? value)
     {
         _ = value; // Partial method signature is generated; parameter not needed for this handler.
+        ClearExploreSelection();
         OnPropertyChanged(nameof(HasScannedArchive));
         OnPropertyChanged(nameof(ShowExploreEmptyMessage));
         OnPropertyChanged(nameof(ScannedArchiveTopLevel));
         OnPropertyChanged(nameof(ExploreViewItems));
         OnPropertyChanged(nameof(IsBatchScanActive));
-        BatchConvertCommand.NotifyCanExecuteChanged();
+        ScanCurrentInputCommand.NotifyCanExecuteChanged();
         ConvertCommand.NotifyCanExecuteChanged();
+        ClearTagOverridesCommand.NotifyCanExecuteChanged();
     }
 
     partial void OnFocusedArchiveNodeChanged(ArchiveNode? value)
@@ -1509,6 +2182,128 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [ObservableProperty] private ArchiveNode? _selectedExploreNode;
+    public ObservableCollection<ArchiveNode> SelectedExploreNodes { get; } = new();
+    private ArchiveNode? _selectionAnchorExploreNode;
+
+    public void HandleExploreNodePointerSelection(ArchiveNode node, KeyModifiers modifiers)
+    {
+        var visible = GetVisibleExploreNodesInDisplayOrder();
+        if ((modifiers & KeyModifiers.Shift) != 0 &&
+            _selectionAnchorExploreNode is not null &&
+            visible.Count > 0)
+        {
+            var a = visible.IndexOf(_selectionAnchorExploreNode);
+            var b = visible.IndexOf(node);
+            if (a >= 0 && b >= 0)
+            {
+                if (a > b)
+                {
+                    (a, b) = (b, a);
+                }
+
+                ReplaceExploreSelection(visible.Skip(a).Take(b - a + 1));
+                SelectedExploreNode = node;
+                return;
+            }
+        }
+
+        if ((modifiers & KeyModifiers.Control) != 0)
+        {
+            if (node.IsSelected)
+            {
+                node.IsSelected = false;
+                SelectedExploreNodes.Remove(node);
+                if (ReferenceEquals(SelectedExploreNode, node))
+                {
+                    SelectedExploreNode = SelectedExploreNodes.LastOrDefault();
+                }
+            }
+            else
+            {
+                node.IsSelected = true;
+                if (!SelectedExploreNodes.Contains(node))
+                {
+                    SelectedExploreNodes.Add(node);
+                }
+                SelectedExploreNode = node;
+            }
+
+            _selectionAnchorExploreNode = node;
+            return;
+        }
+
+        ReplaceExploreSelection([node]);
+        SelectedExploreNode = node;
+    }
+
+    private List<ArchiveNode> GetVisibleExploreNodesInDisplayOrder()
+    {
+        var ordered = new List<ArchiveNode>();
+
+        void Walk(ArchiveNode n)
+        {
+            if (!n.IsVisibleByFilter)
+            {
+                return;
+            }
+
+            ordered.Add(n);
+            if (n is { IsFolder: true, IsExpanded: true })
+            {
+                foreach (var ch in n.Children)
+                {
+                    Walk(ch);
+                }
+            }
+        }
+
+        foreach (var n in ExploreViewItems)
+        {
+            Walk(n);
+        }
+
+        return ordered;
+    }
+
+    private void ReplaceExploreSelection(IEnumerable<ArchiveNode> nodes)
+    {
+        var desired = nodes.Distinct().ToList();
+        foreach (var n in SelectedExploreNodes.ToList())
+        {
+            if (!desired.Contains(n))
+            {
+                n.IsSelected = false;
+                SelectedExploreNodes.Remove(n);
+            }
+        }
+
+        foreach (var n in desired)
+        {
+            if (!n.IsSelected)
+            {
+                n.IsSelected = true;
+            }
+
+            if (!SelectedExploreNodes.Contains(n))
+            {
+                SelectedExploreNodes.Add(n);
+            }
+        }
+
+        _selectionAnchorExploreNode = desired.LastOrDefault() ?? _selectionAnchorExploreNode;
+    }
+
+    private void ClearExploreSelection()
+    {
+        foreach (var n in SelectedExploreNodes)
+        {
+            n.IsSelected = false;
+        }
+
+        SelectedExploreNodes.Clear();
+        SelectedExploreNode = null;
+        _selectionAnchorExploreNode = null;
+    }
 
     [RelayCommand]
     private async Task SetPreviewTextureAsync(ArchiveNode? node)
@@ -1520,6 +2315,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
         PreviewArchivePath = node.FullPath;
         PreviewTextureName = node.FullPath;
+        _previewRefreshDebounceCts?.Cancel();
+        _previewRefreshDebounceCts = null;
         await UpdatePreviewAsync().ConfigureAwait(false);
     }
 
@@ -1536,11 +2333,18 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         FoliageMode = value?.Value ?? "Ignore All";
         SaveSettings();
+        ScheduleRefreshPreviewIfActive();
     }
 
     [RelayCommand(CanExecute = nameof(CanConvert))]
     public async Task ConvertAsync()
     {
+        if (UseBatchFolderInput)
+        {
+            await ExecuteBatchConvertAsync().ConfigureAwait(false);
+            return;
+        }
+
         if (!IsPackPath(PackPath) || !File.Exists(PackPath))
         {
             return;
@@ -1571,13 +2375,6 @@ public partial class MainWindowViewModel : ViewModelBase
                 SpecularData.LoadFromFile(Path.Combine(AppContext.BaseDirectory, "Data", "textures_data.json"));
 
             var ignore = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            if (FoliageMode == "Ignore All")
-            {
-                foreach (var p in AutoPbrDefaults.PlantTextureKeys)
-                {
-                    ignore.Add(p);
-                }
-            }
 
             _exploreController.ApplyExploreOverridesToIgnoreSet(ignore);
 
@@ -1608,6 +2405,9 @@ public partial class MainWindowViewModel : ViewModelBase
                 entriesToExtractOnly = list;
                 AddLogLine(Resources.GetString("Log_ExtractingOnlyPng"));
             }
+
+            await _exploreController.WaitForPendingTagWorkAsync(_cts.Token).ConfigureAwait(false);
+            _exploreController.FlushTagOverridesToDisk();
 
             var options = BuildConversionOptions(ignore, entriesToExtractOnly);
             var prog = CreateConversionProgressReporter();
@@ -1643,16 +2443,20 @@ public partial class MainWindowViewModel : ViewModelBase
             ConvertCommand.NotifyCanExecuteChanged();
             CancelCommand.NotifyCanExecuteChanged();
             ScanArchiveCommand.NotifyCanExecuteChanged();
+            ScanCurrentInputCommand.NotifyCanExecuteChanged();
         }
     }
 
-    private bool CanConvert() =>
-        !IsConverting &&
-        !IsBusy &&
+    private bool CanSinglePackConvert() =>
         !IsBatchScanActive &&
         IsPackPath(PackPath) &&
         File.Exists(PackPath) &&
         !string.IsNullOrWhiteSpace(OutputZipPath);
+
+    private bool CanConvert() =>
+        !IsConverting &&
+        !IsBusy &&
+        (UseBatchFolderInput ? CanBatchConvert() : CanSinglePackConvert());
 
     [RelayCommand(CanExecute = nameof(CanCancel))]
     public void Cancel()
@@ -1662,6 +2466,34 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private bool CanCancel() => IsConverting;
 
+    /// <summary>
+    /// Per-resolution paths: explicit text box overrides bundled <c>Data/models/&lt;res&gt;/</c> when empty.
+    /// </summary>
+    private IReadOnlyDictionary<int, string>? BuildMergedSpecularResolutionMap()
+    {
+        var d = new Dictionary<int, string>();
+        var baseDir = AppContext.BaseDirectory;
+        void Put(int res, string? explicitPath)
+        {
+            if (!string.IsNullOrWhiteSpace(explicitPath))
+            {
+                d[res] = explicitPath.Trim();
+                return;
+            }
+
+            var bundled = MlSpecularBundledModelPaths.TryResolveExistingBundledPath(res, baseDir);
+            if (bundled is not null)
+                d[res] = bundled;
+        }
+
+        Put(16, MlSpecularModelPath16);
+        Put(32, MlSpecularModelPath32);
+        Put(64, MlSpecularModelPath64);
+        Put(128, MlSpecularModelPath128);
+        Put(256, MlSpecularModelPath256);
+        return d.Count > 0 ? d : null;
+    }
+
     /// <summary>Build converter options from current VM state and scan data.</summary>
     private AutoPbrOptions BuildConversionOptions(
         HashSet<string> ignore,
@@ -1670,7 +2502,6 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var model = new ConversionSettingsModel
         {
-            QualityProfile = QualityProfile,
             NormalIntensity = NormalIntensity,
             HeightIntensity = HeightIntensity,
             FastSpecular = FastSpecular,
@@ -1678,10 +2509,21 @@ public partial class MainWindowViewModel : ViewModelBase
             SmoothnessScale = SmoothnessScale,
             MetallicBoost = MetallicBoost,
             PorosityBias = PorosityBias,
+            PlantMaterialPorosityExtra = PlantMaterialPorosityExtra,
             SpecularUsePercentileRemap = SpecularUsePercentileRemap,
             SpecularRemapLowPercentile = SpecularRemapLowPercentile,
             SpecularRemapHighPercentile = SpecularRemapHighPercentile,
-            MetalHeuristicSubstrings = MetalHeuristicSubstrings,
+            UseMlSpecularPredictor = UseMlSpecularPredictor,
+            MlSpecularModelPath = MlSpecularModelPath,
+            MlSpecularModelPathsByResolution = BuildMergedSpecularResolutionMap(),
+            MlSpecularHeuristicBlend = MlSpecularHeuristicBlend,
+            MlSpecularHeuristicBlendMode = MlSpecularHeuristicBlendMode,
+            MlSpecularBlendMath = MlSpecularBlendMath,
+            MlSpecularUseEdgeChannel = MlSpecularUseEdgeChannel,
+            MlSpecularTransparentAlphaClampMax = MlSpecularTransparentAlphaClampMax,
+            SpecularDebugDisableHeuristicSpecular = SpecularDebugDisableHeuristicSpecular,
+            SpecularDebugSkipSpecularRemap = SpecularDebugSkipSpecularRemap,
+            SpecularDebugVerboseSpecularMl = SpecularDebugVerboseSpecularMl,
             MaxThreads = MaxThreads,
             TempDirectory = TempDirectory,
             ProcessBlocks = ProcessBlocks,
@@ -1697,6 +2539,13 @@ public partial class MainWindowViewModel : ViewModelBase
             DeepBumpOverlap = DeepBumpOverlap,
             DeepBumpInputMode = DeepBumpInputMode,
             DeepBumpForceBlue255 = DeepBumpForceBlue255,
+            DeepBumpNormalIntensity = DeepBumpNormalIntensity,
+            DeepBumpNormalSoftClamp = DeepBumpNormalSoftClamp,
+            DeepBumpEdgeGuidedEnhance = DeepBumpEdgeGuidedEnhance,
+            DeepBumpEdgeGuidedStrength = DeepBumpEdgeGuidedStrength,
+            DeepBumpEdgeGuidedGamma = DeepBumpEdgeGuidedGamma,
+            DeepBumpEdgeGuidedDirectionMix = DeepBumpEdgeGuidedDirectionMix,
+            NormalHeightTransparentAlphaClampMax = NormalHeightTransparentAlphaClampMax,
             NormalOperator = NormalOperator,
             NormalKernelSize = NormalKernelSize,
             NormalDerivative = NormalDerivative,
@@ -1705,10 +2554,12 @@ public partial class MainWindowViewModel : ViewModelBase
             PreprocessDenoiseBlend = PreprocessDenoiseBlend,
             PreprocessFrequencySplit = PreprocessFrequencySplit,
             PreprocessFrequencyRadius = PreprocessFrequencyRadius,
-            PreprocessFrequencyDetailStrength = PreprocessFrequencyDetailStrength
+            PreprocessFrequencyDetailStrength = PreprocessFrequencyDetailStrength,
+            PreferOnnxTensorRtExecutionProvider = PreferOnnxTensorRtExecutionProvider
         };
         return model.ToAutoPbrOptions(_specularData, ignore, entriesToExtractOnly,
-            manualTagOverrides ?? _exploreController.GetManualTagOverrides(), GetEffectiveTagRules());
+            manualTagOverrides ?? _exploreController.GetManualTagOverrides(), GetEffectiveTagRules(),
+            BuildMaterialTagSemanticOptions());
     }
 
     /// <summary>Progress reporter that marshals conversion progress to the UI thread and updates status/log.</summary>

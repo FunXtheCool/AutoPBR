@@ -1,0 +1,14 @@
+# Optional: ONNX Runtime *training* (on-device training API, onnxblock, CheckpointState).
+# Base requirements.txt already includes onnxruntime (inference). Training is a separate wheel.
+#
+# Windows: plain `pip` may point at an old/missing Python (e.g. 3.5). Use the launcher or venv:
+#   py -3.12 -m pip install onnxruntime-training
+#   tools\MlSpecularTrainer\.venv312\Scripts\python.exe -m pip install onnxruntime-training
+#
+# Pick a build that matches your machine (CPU vs CUDA) and keep versions in sync with onnx/onnxruntime.
+# Docs: https://onnxruntime.ai/docs/install/#install-onnx-runtime-training
+#
+# Examples (CUDA 11.8 / cu118 GPU wheels — use Microsoft's find-links, not version-only PyPI):
+#   py -3.12 -m pip install "onnxruntime-training==1.19.2+cu118" -f https://download.onnxruntime.ai/onnxruntime_stable_cu118.html
+#
+# CUDA builds are published separately; see the install page above.

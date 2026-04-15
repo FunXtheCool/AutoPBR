@@ -37,6 +37,8 @@ public static class Resources
     public static string ColorSchemeSunset => GetString("ColorSchemeSunset");
     public static string Language => GetString("Language");
     public static string Appearance => GetString("Appearance");
+    public static string UiScaling => GetString("UiScaling");
+    public static string UiScalingTooltip => GetString("UiScalingTooltip");
     public static string AppTitle => GetString("AppTitle");
     public static string AppSubtitle => GetString("AppSubtitle");
     public static string TabConvert => GetString("TabConvert");
@@ -63,6 +65,23 @@ public static class Resources
     public static string TagRuleId => GetString("TagRuleId");
     public static string TagRuleDisplayName => GetString("TagRuleDisplayName");
     public static string TagRuleKeywords => GetString("TagRuleKeywords");
+    public static string TagRuleSemanticHints => GetString("TagRuleSemanticHints");
+    public static string MaterialTagSemanticMl => GetString("MaterialTagSemanticMl");
+    public static string MaterialTagSemanticMlDescription => GetString("MaterialTagSemanticMlDescription");
+    public static string MaterialTagMinSimilarity => GetString("MaterialTagMinSimilarity");
+    public static string MaterialTagMaxCount => GetString("MaterialTagMaxCount");
+    public static string MaterialTagMaxCountTooltip => GetString("MaterialTagMaxCountTooltip");
+    public static string MaterialTagCertaintyThreshold => GetString("MaterialTagCertaintyThreshold");
+    public static string MaterialTagCertaintyThresholdTooltip => GetString("MaterialTagCertaintyThresholdTooltip");
+    public static string DictionaryEvidenceEnabled => GetString("DictionaryEvidenceEnabled");
+    public static string DictionaryEvidenceWeight => GetString("DictionaryEvidenceWeight");
+    public static string DictionaryMinEvidenceScore => GetString("DictionaryMinEvidenceScore");
+    public static string DictionaryRequestTimeoutMs => GetString("DictionaryRequestTimeoutMs");
+    public static string TagLegendMaterials => GetString("TagLegendMaterials");
+    public static string TagLegendFlags => GetString("TagLegendFlags");
+    public static string ExploreColumnResource => GetString("ExploreColumnResource");
+    public static string TagRuleKindLabel => GetString("TagRuleKindLabel");
+    public static string UseSemanticMaterialTags => GetString("UseSemanticMaterialTags");
     public static string AddCustomTagRule => GetString("AddCustomTagRule");
     public static string RemoveTagRule => GetString("RemoveTagRule");
     public static string RefreshTagRules => GetString("RefreshTagRules");
@@ -89,9 +108,10 @@ public static class Resources
     public static string Log_TagRulesImportFailed => GetString("Log_TagRulesImportFailed");
     public static string ExploreBack => GetString("ExploreBack");
     public static string ExploreFocusAssets => GetString("ExploreFocusAssets");
-    public static string TabTune => GetString("TabTune");
+    public static string TabNormals => GetString("TabNormals");
     public static string TabSettings => GetString("TabSettings");
     public static string Input => GetString("Input");
+    public static string InputSourceModeTooltip => GetString("InputSourceModeTooltip");
     public static string ResourcePackWatermark => GetString("ResourcePackWatermark");
     public static string Browse => GetString("Browse");
     public static string Log => GetString("Log");
@@ -99,7 +119,11 @@ public static class Resources
     public static string GenerationSettings => GetString("GenerationSettings");
     public static string TuneNormals => GetString("TuneNormals");
     public static string TuneSpecular => GetString("TuneSpecular");
+    public static string NormalsTuning => GetString("NormalsTuning");
+    public static string SpecularTuning => GetString("SpecularTuning");
+    public static string AiTuning => GetString("AiTuning");
     public static string TuneHeight => GetString("TuneHeight");
+    public static string HeightmapTuning => GetString("HeightmapTuning");
     public static string NormalStrength => GetString("NormalStrength");
     public static string NormalStrengthTooltip => GetString("NormalStrengthTooltip");
     public static string HeightStrength => GetString("HeightStrength");
@@ -113,6 +137,23 @@ public static class Resources
     public static string MetallicBoostTooltip => GetString("MetallicBoostTooltip");
     public static string PorosityBias => GetString("PorosityBias");
     public static string PorosityBiasTooltip => GetString("PorosityBiasTooltip");
+    public static string PlantMaterialPorosityExtra => GetString("PlantMaterialPorosityExtra");
+    public static string PlantMaterialPorosityExtraTooltip => GetString("PlantMaterialPorosityExtraTooltip");
+    public static string MlSpecularHeuristicBlend => GetString("MlSpecularHeuristicBlend");
+    public static string MlSpecularHeuristicBlendTooltip => GetString("MlSpecularHeuristicBlendTooltip");
+    public static string MlSpecularBlendMode => GetString("MlSpecularBlendMode");
+    public static string MlSpecularBlendModeTooltip => GetString("MlSpecularBlendModeTooltip");
+    public static string MlSpecularBlendMath => GetString("MlSpecularBlendMath");
+    public static string MlSpecularBlendMathTooltip => GetString("MlSpecularBlendMathTooltip");
+    public static string MlSpecularBlendMathLinear => GetString("MlSpecularBlendMathLinear");
+    public static string MlSpecularBlendMathSoftLight => GetString("MlSpecularBlendMathSoftLight");
+    public static string MlSpecularBlendMathOverlay => GetString("MlSpecularBlendMathOverlay");
+    public static string MlSpecularBlendMathScreen => GetString("MlSpecularBlendMathScreen");
+    public static string MlSpecularBlendMathBiasGain => GetString("MlSpecularBlendMathBiasGain");
+    public static string MlSpecularBlendMathSigmoidCrossfade => GetString("MlSpecularBlendMathSigmoidCrossfade");
+    public static string MlSpecularBlendModeSmoothnessOnly => GetString("MlSpecularBlendModeSmoothnessOnly");
+    public static string MlSpecularBlendModeFull => GetString("MlSpecularBlendModeFull");
+    public static string MlSpecularBlendModeAiMetalAndEmissive => GetString("MlSpecularBlendModeAiMetalAndEmissive");
     public static string FastSpecular => GetString("FastSpecular");
     public static string FastSpecularTooltip => GetString("FastSpecularTooltip");
     public static string Foliage => GetString("Foliage");
@@ -135,11 +176,19 @@ public static class Resources
     public static string DeepBumpInputModeGrayscale => GetString("DeepBumpInputModeGrayscale");
     public static string DeepBumpInputModeRgb => GetString("DeepBumpInputModeRgb");
     public static string DeepBumpForceBlue255 => GetString("DeepBumpForceBlue255");
-
-    public static string QualityProfile => GetString("QualityProfile");
-    public static string QualityProfileBalanced => GetString("QualityProfileBalanced");
-    public static string QualityProfileLowRes => GetString("QualityProfileLowRes");
-    public static string QualityProfileHiRes => GetString("QualityProfileHiRes");
+    public static string DeepBumpNormalIntensity => GetString("DeepBumpNormalIntensity");
+    public static string DeepBumpNormalIntensityTooltip => GetString("DeepBumpNormalIntensityTooltip");
+    public static string DeepBumpNormalSoftClamp => GetString("DeepBumpNormalSoftClamp");
+    public static string DeepBumpNormalSoftClampTooltip => GetString("DeepBumpNormalSoftClampTooltip");
+    public static string DeepBumpEdgeGuidedEnhance => GetString("DeepBumpEdgeGuidedEnhance");
+    public static string DeepBumpEdgeGuidedStrength => GetString("DeepBumpEdgeGuidedStrength");
+    public static string DeepBumpEdgeGuidedStrengthTooltip => GetString("DeepBumpEdgeGuidedStrengthTooltip");
+    public static string DeepBumpEdgeGuidedGamma => GetString("DeepBumpEdgeGuidedGamma");
+    public static string DeepBumpEdgeGuidedGammaTooltip => GetString("DeepBumpEdgeGuidedGammaTooltip");
+    public static string DeepBumpEdgeGuidedDirectionMix => GetString("DeepBumpEdgeGuidedDirectionMix");
+    public static string DeepBumpEdgeGuidedDirectionMixTooltip => GetString("DeepBumpEdgeGuidedDirectionMixTooltip");
+    public static string NormalHeightTransparentAlphaClampMax => GetString("NormalHeightTransparentAlphaClampMax");
+    public static string NormalHeightTransparentAlphaClampMaxTooltip => GetString("NormalHeightTransparentAlphaClampMaxTooltip");
 
     public static string Advanced => GetString("Advanced");
     public static string Preprocessing => GetString("Preprocessing");
@@ -154,8 +203,22 @@ public static class Resources
     public static string SpecularPercentileRemap => GetString("SpecularPercentileRemap");
     public static string SpecularRemapLowPercentile => GetString("SpecularRemapLowPercentile");
     public static string SpecularRemapHighPercentile => GetString("SpecularRemapHighPercentile");
-    public static string MetalHeuristicSubstrings => GetString("MetalHeuristicSubstrings");
-    public static string MetalHeuristicSubstringsWatermark => GetString("MetalHeuristicSubstringsWatermark");
+    public static string UseMlSpecularPredictor => GetString("UseMlSpecularPredictor");
+    public static string UseMlSpecularPredictorTooltip => GetString("UseMlSpecularPredictorTooltip");
+    public static string MlSpecularModelPath => GetString("MlSpecularModelPath");
+    public static string MlSpecularModelPathWatermark => GetString("MlSpecularModelPathWatermark");
+    public static string MlSpecularPerResolutionHeader => GetString("MlSpecularPerResolutionHeader");
+    public static string MlSpecularPerResolutionTooltip => GetString("MlSpecularPerResolutionTooltip");
+    public static string MlSpecularUseEdgeChannel => GetString("MlSpecularUseEdgeChannel");
+    public static string MlSpecularTransparentAlphaClampMax => GetString("MlSpecularTransparentAlphaClampMax");
+    public static string MlSpecularTransparentAlphaClampMaxTooltip => GetString("MlSpecularTransparentAlphaClampMaxTooltip");
+    public static string SpecularDebugSection => GetString("SpecularDebugSection");
+    public static string SpecularDebugDisableHeuristicSpecular => GetString("SpecularDebugDisableHeuristicSpecular");
+    public static string SpecularDebugDisableHeuristicSpecularTooltip => GetString("SpecularDebugDisableHeuristicSpecularTooltip");
+    public static string SpecularDebugSkipSpecularRemap => GetString("SpecularDebugSkipSpecularRemap");
+    public static string SpecularDebugSkipSpecularRemapTooltip => GetString("SpecularDebugSkipSpecularRemapTooltip");
+    public static string SpecularDebugVerboseSpecularMl => GetString("SpecularDebugVerboseSpecularMl");
+    public static string SpecularDebugVerboseSpecularMlTooltip => GetString("SpecularDebugVerboseSpecularMlTooltip");
 
     public static string AoAdvanced => GetString("AoAdvanced");
     public static string GenerateAo => GetString("GenerateAo");
@@ -181,6 +244,8 @@ public static class Resources
     public static string Engine => GetString("Engine");
     public static string MaxThreads => GetString("MaxThreads");
     public static string MaxThreadsTooltip => GetString("MaxThreadsTooltip");
+    public static string OnnxPreferTensorRt => GetString("OnnxPreferTensorRt");
+    public static string OnnxPreferTensorRtTooltip => GetString("OnnxPreferTensorRtTooltip");
     public static string TempFolder => GetString("TempFolder");
     public static string TempFolderTooltip => GetString("TempFolderTooltip");
     public static string TempFolderWatermark => GetString("TempFolderWatermark");
@@ -192,6 +257,9 @@ public static class Resources
     public static string Convert => GetString("Convert");
     public static string UIThemeTooltip => GetString("UIThemeTooltip");
     public static string UILanguageTooltip => GetString("UILanguageTooltip");
+    public static string BackgroundTaskMaterialTags => GetString("BackgroundTaskMaterialTags");
+    public static string BackgroundTaskExploreCache => GetString("BackgroundTaskExploreCache");
+    public static string BackgroundTasksHeader => GetString("BackgroundTasksHeader");
 
     public static string GetStatusString(string key, params object[] args)
     {

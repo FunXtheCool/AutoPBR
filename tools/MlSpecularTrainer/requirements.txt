@@ -1,0 +1,13 @@
+# Python 3.10+ recommended. PyTorch is NOT installed from this file alone — choose one:
+#   CPU (default in README):  pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+#   NVIDIA GPU training:     pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+#   Docker + torch-ort:      see requirements.docker.txt (no standalone onnxruntime; training wheel bundled)
+#   (cu121/cu128 etc. — see https://pytorch.org/get-started/locally/ ; ONNX Runtime CUDA in AutoPBR is separate)
+# Export uses torch.onnx.export(..., dynamo=False) so onnxscript is not required.
+torch>=2.1.0,<3
+torchvision>=0.16.0,<1
+numpy>=1.26.0,<3
+Pillow>=10.0.0,<13
+onnx>=1.16.0,<2
+# Inference / verify scripts; separate from onnxruntime-training used for ORTModule (see requirements.docker.txt).
+onnxruntime>=1.24.0,<2

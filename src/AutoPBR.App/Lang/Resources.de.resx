@@ -77,6 +77,12 @@
   <data name="Appearance" xml:space="preserve">
     <value>Darstellung</value>
   </data>
+  <data name="UiScaling" xml:space="preserve">
+    <value>Skalierung</value>
+  </data>
+  <data name="UiScalingTooltip" xml:space="preserve">
+    <value>Skaliert die gesamte Benutzeroberfläche (Text, Steuerelemente und Abstände). Werte über 100 % verbessern die Lesbarkeit.</value>
+  </data>
   <data name="AppTitle" xml:space="preserve">
     <value>AutoPBR</value>
   </data>
@@ -97,19 +103,22 @@
   <data name="BatchConvertButton" xml:space="preserve"><value>Stapel konvertieren</value></data>
   <data name="ExploreArchiveContents" xml:space="preserve"><value>Paketinhalt</value></data>
   <data name="ResourceExplorer" xml:space="preserve"><value>Ressourcen-Explorer</value></data>
-  <data name="ExploreEmptyMessage" xml:space="preserve"><value>Scannen Sie auf der Registerkarte „Scannen“ ein Paket oder einen Stapelordner, um Inhalte anzuzeigen.</value></data>
+  <data name="ExploreEmptyMessage" xml:space="preserve"><value>Scannen Sie ein Paket oder einen gültigen Ordner, um Inhalte zu erkunden.</value></data>
   <data name="ExploreExpandAll" xml:space="preserve"><value>Alle erweitern</value></data>
   <data name="ExploreCollapseAll" xml:space="preserve"><value>Alle reduzieren</value></data>
   <data name="ExploreBack" xml:space="preserve"><value>Zurück</value></data>
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
-  <data name="TabTune" xml:space="preserve">
-    <value>Anpassen</value>
+  <data name="TabNormals" xml:space="preserve">
+    <value>Normalen</value>
   </data>
   <data name="TabSettings" xml:space="preserve">
     <value>Einstellungen</value>
   </data>
   <data name="Input" xml:space="preserve">
     <value>Eingabe</value>
+  </data>
+  <data name="InputSourceModeTooltip" xml:space="preserve">
+    <value>Aus: einzelnes Ressourcenpaket (.zip / .jar). An: Ordner mit Paketen für Stapelscan und -konvertierung.</value>
   </data>
   <data name="ResourcePackWatermark" xml:space="preserve">
     <value>Ressourcenpaket (.zip oder .jar)</value>
@@ -151,8 +160,20 @@
   <data name="TuneSpecular" xml:space="preserve">
     <value>Specular</value>
   </data>
+  <data name="NormalsTuning" xml:space="preserve">
+    <value>Normalen-Anpassung</value>
+  </data>
+  <data name="SpecularTuning" xml:space="preserve">
+    <value>Specular-Anpassung</value>
+  </data>
+  <data name="AiTuning" xml:space="preserve">
+    <value>KI-Anpassung</value>
+  </data>
   <data name="TuneHeight" xml:space="preserve">
     <value>Höhe</value>
+  </data>
+  <data name="HeightmapTuning" xml:space="preserve">
+    <value>Höhenkarten-Anpassung</value>
   </data>
   <data name="NormalStrength" xml:space="preserve">
     <value>Normalen-Stärke</value>
@@ -253,10 +274,6 @@
   <data name="DeepBumpInputModeGrayscale" xml:space="preserve"><value>Graustufen</value></data>
   <data name="DeepBumpInputModeRgb" xml:space="preserve"><value>RGB</value></data>
   <data name="DeepBumpForceBlue255" xml:space="preserve"><value>B=255 in DeepBump-Normalen erzwingen</value></data>
-  <data name="QualityProfile" xml:space="preserve"><value>Qualitätsprofil</value></data>
-  <data name="QualityProfileBalanced" xml:space="preserve"><value>Ausgewogen</value></data>
-  <data name="QualityProfileLowRes" xml:space="preserve"><value>Niedrige Auflösung (16–64)</value></data>
-  <data name="QualityProfileHiRes" xml:space="preserve"><value>Hohe Auflösung (128–512)</value></data>
   <data name="Advanced" xml:space="preserve"><value>Erweitert</value></data>
   <data name="Preprocessing" xml:space="preserve"><value>Vorverarbeitung</value></data>
   <data name="PreprocessLinearize" xml:space="preserve"><value>Linearisieren (sRGB → linear) vor Ableitungen</value></data>
@@ -269,8 +286,6 @@
   <data name="SpecularPercentileRemap" xml:space="preserve"><value>Perzentil-Remap für Glätte (R)</value></data>
   <data name="SpecularRemapLowPercentile" xml:space="preserve"><value>Unteres Perzentil</value></data>
   <data name="SpecularRemapHighPercentile" xml:space="preserve"><value>Oberes Perzentil</value></data>
-  <data name="MetalHeuristicSubstrings" xml:space="preserve"><value>Metall-Namenshinweise</value></data>
-  <data name="MetalHeuristicSubstringsWatermark" xml:space="preserve"><value>Kommagetrennt (optional), z.B. iron,gold,steel</value></data>
   <data name="AoAdvanced" xml:space="preserve"><value>Umgebungsverdeckung (AO)</value></data>
   <data name="GenerateAo" xml:space="preserve"><value>AO in Normal (Blaukanal) backen</value></data>
   <data name="AoRadius" xml:space="preserve"><value>AO-Radius</value></data>
@@ -328,6 +343,12 @@
   </data>
   <data name="MaxThreadsTooltip" xml:space="preserve">
     <value>Arbeits-Threads für die Konvertierung. 0 = automatisch.</value>
+  </data>
+  <data name="OnnxPreferTensorRt" xml:space="preserve">
+    <value>TensorRT für ONNX-GPU bevorzugen (CUDA-Fallback)</value>
+  </data>
+  <data name="OnnxPreferTensorRtTooltip" xml:space="preserve">
+    <value>Wenn aktiviert, nutzen ONNX-Modelle TensorRT mit CUDA für nicht unterstützte Ops. Wenn deaktiviert, nur CUDA—schnellerer Sitzungsstart; TensorRT kann beim ersten Einsatz Engines kompilieren.</value>
   </data>
   <data name="TempFolder" xml:space="preserve">
     <value>Temp-Ordner</value>

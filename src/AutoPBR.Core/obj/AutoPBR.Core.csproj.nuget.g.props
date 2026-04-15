@@ -15,8 +15,5 @@
   </ItemGroup>
   <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <Import Project="$(NuGetPackageRoot)sixlabors.imagesharp\3.1.12\build\SixLabors.ImageSharp.props" Condition="Exists('$(NuGetPackageRoot)sixlabors.imagesharp\3.1.12\build\SixLabors.ImageSharp.props')" />
-    <Import Project="$(NuGetPackageRoot)microsoft.ml.onnxruntime.gpu.windows\1.24.3\buildTransitive\netstandard2.1\Microsoft.ML.OnnxRuntime.Gpu.Windows.props" Condition="Exists('$(NuGetPackageRoot)microsoft.ml.onnxruntime.gpu.windows\1.24.3\buildTransitive\netstandard2.1\Microsoft.ML.OnnxRuntime.Gpu.Windows.props')" />
-    <Import Project="$(NuGetPackageRoot)microsoft.ml.onnxruntime.gpu.linux\1.24.3\buildTransitive\netstandard2.1\Microsoft.ML.OnnxRuntime.Gpu.Linux.props" Condition="Exists('$(NuGetPackageRoot)microsoft.ml.onnxruntime.gpu.linux\1.24.3\buildTransitive\netstandard2.1\Microsoft.ML.OnnxRuntime.Gpu.Linux.props')" />
-    <Import Project="$(NuGetPackageRoot)microsoft.ml.onnxruntime.gpu\1.24.3\buildTransitive\netstandard2.1\Microsoft.ML.OnnxRuntime.Gpu.props" Condition="Exists('$(NuGetPackageRoot)microsoft.ml.onnxruntime.gpu\1.24.3\buildTransitive\netstandard2.1\Microsoft.ML.OnnxRuntime.Gpu.props')" />
   </ImportGroup>
 </Project>

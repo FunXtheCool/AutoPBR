@@ -10,8 +10,9 @@
     <PackageReference Include="Colourful" Version="3.2.0" />
     <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
-    <!-- 1.24.x with CUDA 13.1.x. GPU needs CUDA Toolkit 13.1.x (e.g. 13.1.1) installed (cublasLt64_13.dll etc.); else falls back to CPU. -->
-    <PackageReference Include="Microsoft.ML.OnnxRuntime.Gpu" Version="1.24.3" />
+    <!-- Managed API only. Do NOT use Microsoft.ML.OnnxRuntime.Gpu here: it pulls Gpu.Windows and CUDA 12–linked onnxruntime_providers_cuda.dll (cublasLt64_12). Ship matching 1.24.x GPU natives from onnxruntime-win-x64-gpu_cuda13 in Data\native. -->
+    <PackageReference Include="Microsoft.ML.OnnxRuntime.Managed" Version="1.24.3" />
+    <PackageReference Include="Microsoft.ML.Tokenizers" Version="1.0.2" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
     <PackageReference Include="System.IO.Hashing" Version="9.0.0" />
   </ItemGroup>
@@ -25,6 +26,20 @@
     </Content>
     <Content Include="Data\upscale256.onnx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\specular_predictor*.onnx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\models\**\*.onnx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\all-MiniLM-L6-v2-onnx\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- CUDA/cuDNN/ORT GPU/TensorRT DLLs you redistribute; same layout as App/CLI -->
+    <Content Include="Data\native\*.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>runtimes\win-x64\native\%(Filename)%(Extension)</Link>
     </Content>
   </ItemGroup>
 

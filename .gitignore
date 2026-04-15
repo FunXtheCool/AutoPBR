@@ -43,6 +43,14 @@ project.lock.json
 project.fragment.lock.json
 artifacts/
 
+# Python ML trainer local envs
+tools/MlMetalTrainer/.venv/
+tools/MlMetalTrainer/.venv*/
+tools/MlMetalTrainer/**/__pycache__/
+tools/MlSpecularTrainer/.venv/
+tools/MlSpecularTrainer/.venv*/
+tools/MlSpecularTrainer/**/__pycache__/
+
 # .NET (build outputs are under bin/obj; optional extra patterns)
 *.vspscc
 *.vssscc
@@ -480,3 +488,11 @@ src/AutoPBR.Cli/obj/project.nuget.cache
 src/AutoPBR.Core/obj/AutoPBR.Core.csproj.nuget.dgspec.json
 src/AutoPBR.Core/obj/project.assets.json
 src/AutoPBR.Core/obj/project.nuget.cache
+src/AutoPBR.App/tensorrt_win
+tools/MlSpecularTrainer/artifacts
+tools/MlSpecularTrainer/ext_dataset
+tools/MlSpecularTrainer/multi_dataset
+tools/MlSpecularTrainer/pixelart_dataset
+tools/MlSpecularTrainer/realism_dataset
+tools/MlSpecularTrainer/stylized_dataset
+tools/MlSpecularTrainer/shuffle_dataset

@@ -1,0 +1,101 @@
+# syntax=docker/dockerfile:1
+# DEVEL STAGE: Compile torch_ort fused_ops & cuDNN linking.
+# Includes nvcc, CUDA headers, build tools — discarded in runtime image.
+FROM pytorch/pytorch:2.4.1-cuda11.8-cudnn9-devel AS devel
+
+ARG TORCH_VER=2.4.1
+ARG TORCHVISION_VER=0.19.1
+ARG ORT_TRAIN_VER=1.19.2
+ARG TORCH_ORT_VER=1.19.2
+ARG DEEPSPEED_VER=0.15.4
+ARG ORT_TRAINING_FIND_LINKS=https://download.onnxruntime.ai/onnxruntime_stable_cu118.html
+ARG PYTORCH_CU118_INDEX=https://download.pytorch.org/whl/cu118
+ARG NVIDIA_CUDNN_CU11_VER=8.9.5.30
+
+ENV CUDA_HOME=/usr/local/cuda \
+    PATH=/usr/local/cuda/bin:${PATH} \
+    LD_LIBRARY_PATH=/usr/local/cuda/lib64:/opt/conda/lib:${LD_LIBRARY_PATH} \
+    DEBIAN_FRONTEND=noninteractive \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    VENV_PATH=/opt/venv
+
+# Minimal build deps (git for ORT/torch-ort install-from-git scenarios, if needed).
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN python -m venv "${VENV_PATH}"
+ENV PATH="${VENV_PATH}/bin:${PATH}"
+
+WORKDIR /workspace/tools/MlSpecularTrainer
+
+# COPY before pip install to leverage cache on requirements change.
+COPY requirements.docker.txt ./
+
+# Single consolidated pip layer for devel + training stack.
+RUN --mount=type=cache,target=/root/.cache/pip set -eux && \
+    pip install -r requirements.docker.txt && \
+    pip install --force-reinstall \
+      torch==${TORCH_VER} torchvision==${TORCHVISION_VER} \
+      --index-url ${PYTORCH_CU118_INDEX} && \
+    pip install ninja && \
+    pip install \
+      "onnxruntime-training==${ORT_TRAIN_VER}+cu118" \
+      -f ${ORT_TRAINING_FIND_LINKS} && \
+    pip install torch-ort==${TORCH_ORT_VER} && \
+    pip install deepspeed==${DEEPSPEED_VER} && \
+    pip install "nvidia-cudnn-cu11==${NVIDIA_CUDNN_CU11_VER}" && \
+    python -c "import onnxruntime.training; import torch_ort; import deepspeed; print('onnxruntime-training + torch-ort + deepspeed import ok')"
+
+# Bake ORTModule fused_ops; torch_ort.configure needs CUDA headers (devel only).
+RUN TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST:-7.5;8.0;8.6;8.9+PTX}" python -m torch_ort.configure && \
+    python -c "import sys; from pathlib import Path; \
+sp=Path(sys.prefix)/'lib'/f'python{sys.version_info.major}.{sys.version_info.minor}'/'site-packages'; \
+ext=sp/'onnxruntime/training/ortmodule/torch_cpp_extensions'; \
+assert ext.is_dir() and any(ext.rglob('*.so')), 'torch_ort.configure did not produce a .so'; \
+print('torch_ort.configure: OK')"
+
+# Verify cuDNN + torch import.
+RUN python -c "import torch; print('torch import ok', torch.__version__)"
+
+# Copy entrypoint from context (not in COPY ./requirements above).
+COPY docker/entrypoint.sh /opt/ml-entrypoint.sh
+RUN sed -i 's/\r$//' /opt/ml-entrypoint.sh && chmod +x /opt/ml-entrypoint.sh
+
+# ─────────────────────────────────────────────────────────────────────────────
+# RUNTIME STAGE: Slim image with only Python venv + GPU runtime libs.
+# No CUDA headers, nvcc, or build tools.
+FROM pytorch/pytorch:2.4.1-cuda11.8-cudnn9-runtime AS runtime
+
+ENV CUDA_HOME=/usr/local/cuda \
+    PATH=/usr/local/cuda/bin:${PATH} \
+    LD_LIBRARY_PATH=/usr/local/cuda/lib64:/opt/conda/lib:${LD_LIBRARY_PATH} \
+    DEBIAN_FRONTEND=noninteractive \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    VENV_PATH=/opt/venv
+
+# Minimal runtime deps (no build tools).
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy compiled venv from devel stage.
+COPY --from=devel ${VENV_PATH} ${VENV_PATH}
+
+ENV PATH="${VENV_PATH}/bin:${PATH}"
+
+WORKDIR /workspace/tools/MlSpecularTrainer
+
+# Copy entrypoint.
+COPY docker/entrypoint.sh /opt/ml-entrypoint.sh
+RUN chmod +x /opt/ml-entrypoint.sh
+
+# Health check: verify PyTorch + ORT can be imported.
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD python -c "import torch, onnxruntime.training, torch_ort, deepspeed; print('ok')" || exit 1
+
+ENTRYPOINT ["/opt/ml-entrypoint.sh"]
+CMD ["bash"]

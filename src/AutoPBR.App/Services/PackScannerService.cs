@@ -101,6 +101,19 @@ internal static class PackScannerService
                 continue;
             }
 
+            // LabPBR emissive maps (*_e.png): hide from explorer index (same idea as TextureScanner skipping _e stems).
+            if (!isEntryFolder && full.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+            {
+                var slash = full.LastIndexOf('/');
+                var namePart = slash >= 0 ? full[(slash + 1)..] : full;
+                if (Path.GetFileNameWithoutExtension(namePart).EndsWith("_e", StringComparison.OrdinalIgnoreCase))
+                {
+                    progress?.Report((completed, total));
+                    completed++;
+                    continue;
+                }
+            }
+
             var segments = full.Split('/');
             var current = pathPrefix;
             for (var i = 0; i < segments.Length; i++)

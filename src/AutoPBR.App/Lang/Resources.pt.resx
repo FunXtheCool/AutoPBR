@@ -77,6 +77,12 @@
   <data name="Appearance" xml:space="preserve">
     <value>Aparência</value>
   </data>
+  <data name="UiScaling" xml:space="preserve">
+    <value>Escala</value>
+  </data>
+  <data name="UiScalingTooltip" xml:space="preserve">
+    <value>Redimensiona toda a interface (texto, controles e espaçamento). Valores acima de 100% melhoram a leitura.</value>
+  </data>
   <data name="AppTitle" xml:space="preserve"><value>AutoPBR</value></data>
   <data name="AppSubtitle" xml:space="preserve"><value>Converte um pacote de recursos do Minecraft em um pacote PBR (specular + normal + height).</value></data>
   <data name="TabConvert" xml:space="preserve"><value>Converter</value></data>
@@ -91,14 +97,15 @@
   <data name="BatchConvertButton" xml:space="preserve"><value>Converter lote</value></data>
   <data name="ExploreArchiveContents" xml:space="preserve"><value>Conteúdo do pacote</value></data>
   <data name="ResourceExplorer" xml:space="preserve"><value>Explorador de recursos</value></data>
-  <data name="ExploreEmptyMessage" xml:space="preserve"><value>Escaneie um pacote ou uma pasta de lotes na aba Escanear para explorar o conteúdo.</value></data>
+  <data name="ExploreEmptyMessage" xml:space="preserve"><value>Escaneie um pacote ou pasta válida para explorar o conteúdo.</value></data>
   <data name="ExploreExpandAll" xml:space="preserve"><value>Expandir tudo</value></data>
   <data name="ExploreCollapseAll" xml:space="preserve"><value>Recolher tudo</value></data>
   <data name="ExploreBack" xml:space="preserve"><value>Voltar</value></data>
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
-  <data name="TabTune" xml:space="preserve"><value>Ajustar</value></data>
+  <data name="TabNormals" xml:space="preserve"><value>Normais</value></data>
   <data name="TabSettings" xml:space="preserve"><value>Configurações</value></data>
   <data name="Input" xml:space="preserve"><value>Entrada</value></data>
+  <data name="InputSourceModeTooltip" xml:space="preserve"><value>Desligado: pacote de recursos único (.zip / .jar). Ligado: pasta de pacotes para digitalização e conversão em lote.</value></data>
   <data name="ResourcePackWatermark" xml:space="preserve"><value>Pacote de recursos (.zip ou .jar)</value></data>
   <data name="Browse" xml:space="preserve"><value>Procurar…</value></data>
   <data name="Log" xml:space="preserve"><value>Registro</value></data>
@@ -127,7 +134,11 @@
   <data name="GenerationSettings" xml:space="preserve"><value>Configurações de geração</value></data>
   <data name="TuneNormals" xml:space="preserve"><value>Normais</value></data>
   <data name="TuneSpecular" xml:space="preserve"><value>Specular</value></data>
+  <data name="NormalsTuning" xml:space="preserve"><value>Ajuste de normais</value></data>
+  <data name="SpecularTuning" xml:space="preserve"><value>Ajuste specular</value></data>
+  <data name="AiTuning" xml:space="preserve"><value>Ajuste de IA</value></data>
   <data name="TuneHeight" xml:space="preserve"><value>Altura</value></data>
+  <data name="HeightmapTuning" xml:space="preserve"><value>Ajuste do mapa de altura</value></data>
   <data name="NormalStrength" xml:space="preserve"><value>Força das normais</value></data>
   <data name="NormalStrengthTooltip" xml:space="preserve"><value>Força do gradiente do mapa de normais. Maior = mais relevo.</value></data>
   <data name="HeightStrength" xml:space="preserve"><value>Força da altura</value></data>
@@ -165,10 +176,6 @@
   <data name="DeepBumpInputModeGrayscale" xml:space="preserve"><value>Escala de cinza</value></data>
   <data name="DeepBumpInputModeRgb" xml:space="preserve"><value>RGB</value></data>
   <data name="DeepBumpForceBlue255" xml:space="preserve"><value>Forçar B=255 nas normais do DeepBump</value></data>
-  <data name="QualityProfile" xml:space="preserve"><value>Perfil de qualidade</value></data>
-  <data name="QualityProfileBalanced" xml:space="preserve"><value>Balanceado</value></data>
-  <data name="QualityProfileLowRes" xml:space="preserve"><value>Baixa res. (16–64)</value></data>
-  <data name="QualityProfileHiRes" xml:space="preserve"><value>Alta res. (128–512)</value></data>
   <data name="Advanced" xml:space="preserve"><value>Avançado</value></data>
   <data name="Preprocessing" xml:space="preserve"><value>Pré-processamento</value></data>
   <data name="PreprocessLinearize" xml:space="preserve"><value>Linearizar (sRGB → linear) antes das derivadas</value></data>
@@ -181,8 +188,6 @@
   <data name="SpecularPercentileRemap" xml:space="preserve"><value>Remapeamento por percentis da suavidade (R)</value></data>
   <data name="SpecularRemapLowPercentile" xml:space="preserve"><value>Percentil baixo</value></data>
   <data name="SpecularRemapHighPercentile" xml:space="preserve"><value>Percentil alto</value></data>
-  <data name="MetalHeuristicSubstrings" xml:space="preserve"><value>Dicas de nome de metal</value></data>
-  <data name="MetalHeuristicSubstringsWatermark" xml:space="preserve"><value>Separado por vírgulas (opcional), ex. iron,gold,steel</value></data>
   <data name="AoAdvanced" xml:space="preserve"><value>Oclusão ambiente (AO)</value></data>
   <data name="GenerateAo" xml:space="preserve"><value>Incrustar AO na normal (canal azul)</value></data>
   <data name="AoRadius" xml:space="preserve"><value>Raio do AO</value></data>
@@ -205,6 +210,8 @@
   <data name="Engine" xml:space="preserve"><value>Motor</value></data>
   <data name="MaxThreads" xml:space="preserve"><value>Máx. threads</value></data>
   <data name="MaxThreadsTooltip" xml:space="preserve"><value>Threads de conversão. 0 = automático.</value></data>
+  <data name="OnnxPreferTensorRt" xml:space="preserve"><value>Preferir TensorRT para ONNX GPU (fallback CUDA)</value></data>
+  <data name="OnnxPreferTensorRtTooltip" xml:space="preserve"><value>Ativado: TensorRT com CUDA para ops não suportadas. Desativado: só CUDA—início de sessão mais rápido; TensorRT pode compilar na primeira vez.</value></data>
   <data name="TempFolder" xml:space="preserve"><value>Pasta temp</value></data>
   <data name="TempFolderTooltip" xml:space="preserve"><value>Pasta para extração temporária. Vazio = temp do sistema.</value></data>
   <data name="TempFolderWatermark" xml:space="preserve"><value>Vazio = temp do sistema</value></data>

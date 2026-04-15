@@ -55,7 +55,7 @@ internal static class PreviewComposer
         Blit(normal, output, tileWidth, 0, tileWidth, tileHeight);
         Blit(spec, output, 0, tileHeight, tileWidth, tileHeight);
 
-        if (normal != null)
+        if (normal != null && !target.IsPlantForNoHeight)
         {
             using var height = new Image<Rgba32>(normal.Width, normal.Height);
             for (var y = 0; y < normal.Height; y++)

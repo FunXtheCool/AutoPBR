@@ -71,6 +71,17 @@ internal static class TagOverridesPersistence
 
         try
         {
+            var path = GetFilePath(packPath);
+            if (overrides.Count == 0)
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+
+                return;
+            }
+
             var dir = DirectoryPath;
             Directory.CreateDirectory(dir);
 
@@ -87,7 +98,6 @@ internal static class TagOverridesPersistence
                     StringComparer.OrdinalIgnoreCase)
             };
 
-            var path = GetFilePath(packPath);
             var json = JsonSerializer.Serialize(snapshot, new JsonSerializerOptions { WriteIndented = false });
             File.WriteAllText(path, json);
         }

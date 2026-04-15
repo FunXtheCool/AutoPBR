@@ -1,0 +1,12 @@
+# Docker / GPU training image only — same stack as requirements.txt but **no** standalone onnxruntime.
+# The image installs onnxruntime-training==1.19.2+cu118 (+ torch-ort), which provides the onnxruntime Python API.
+# Including onnxruntime from PyPI here would force a redundant install + uninstall on every build.
+#
+# Pin torch/torchvision to match docker/Dockerfile + docker-compose TORCH_VER / TORCHVISION_VER so
+# `pip install -r` in the container does not churn torch wheels every start (which can trigger
+# dependency reinstalls and wipe ORTModule *.so baked under onnxruntime/.../torch_cpp_extensions).
+torch==2.4.1
+torchvision==0.19.1
+numpy>=1.26.0,<3
+Pillow>=10.0.0,<13
+onnx>=1.16.0,<2

@@ -1,10 +1,12 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Compression;
+using System.Threading;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
-using AutoPBR.App.Lang;
 using AutoPBR.App.Models;
+using AutoPBR.Core;
+using AutoPBR.Core.Embeddings;
 using AutoPBR.Core.Models;
 
 namespace AutoPBR.App.Services;
@@ -29,9 +31,36 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
     private string _exploreFilter = "";
     private string? _exploreTagFilterId;
     private Func<IReadOnlyList<TagRule>>? _tagRulesProvider;
+    private Func<MaterialTagSemanticOptions?>? _materialTagSemanticOptionsProvider;
+    private IBackgroundTaskSink? _backgroundTaskSink;
+
+    /// <summary>Maps texture storage key → effective tag ids for &quot;Show tag&quot; filtering (avoids re-running ML/keywords per node on every filter pass).</summary>
+    private Dictionary<string, HashSet<string>>? _exploreTagFilterCache;
+
+    /// <summary>Pre-computed effective tags per archive path. Populated by background refresh; read by <see cref="IArchiveNodeHost.GetEffectiveTags"/>.</summary>
+    private readonly ConcurrentDictionary<string, IReadOnlyList<(string Id, string DisplayName, TagRuleKind Kind)>> _effectiveTagCache = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, byte> _effectiveTagComputeInFlight = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Bumped when tag semantics are refreshed so in-flight per-path background computes cannot overwrite newer cache entries.</summary>
+    private int _effectiveTagEpoch;
+
+    private CancellationTokenSource? _tagRefreshCts;
+    private CancellationTokenSource? _refreshDisplayTagsDebounceCts;
+
+    /// <summary>Background tag work: per-path deferred MiniLM/dictionary and full-tree refresh. Conversion waits for this to reach 0.</summary>
+    private int _tagAsyncWorkPending;
+
+    /// <summary>Last full-tree tag refresh; conversion may await this so ONNX work does not overlap convert.</summary>
+    private Task? _tagRefreshAllTask;
+
+    /// <summary>Limits parallel per-texture ML/dictionary work so completion callbacks do not flood the UI thread.</summary>
+    private readonly SemaphoreSlim _tagComputeConcurrency = new(4, 4);
 
     public ArchiveNode? Root { get; private set; }
     public ScannedArchiveData? Data { get; private set; }
+
+    /// <summary>Optional UI progress for background tag work (dictionary + ML per texture).</summary>
+    public void SetBackgroundTaskSink(IBackgroundTaskSink? sink) => _backgroundTaskSink = sink;
 
     /// <summary>Set scanned data and build the tree root. Call on UI thread. Returns the new root (also assign to VM's ScannedArchiveRoot). Loads persisted tag overrides for this pack.</summary>
     /// <param name="data">Scanned index (single archive or merged batch folder).</param>
@@ -43,7 +72,7 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
         _scannedArchivePath = data.IsBatch ? data.BatchFolderPath ?? packPath : packPath;
         _tagAdded.Clear();
         _tagRemoved.Clear();
-        var snapshot = TagOverridesPersistence.Load(packPath);
+        var snapshot = TagOverridesPersistence.Load(_scannedArchivePath);
         if (snapshot?.Overrides is not null)
         {
             foreach (var kv in snapshot.Overrides)
@@ -62,12 +91,17 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
 
         Root = new ArchiveNode("", "", true, null, this);
         ((IArchiveNodeHost)this).EnsureChildrenLoaded(Root);
+        InvalidateExploreTagFilterCache();
         return Root;
     }
 
     /// <summary>Clear all state; call when user clears archive or starts a new scan.</summary>
     public void Clear()
     {
+        _tagRefreshCts?.Cancel();
+        _refreshDisplayTagsDebounceCts?.Cancel();
+        _refreshDisplayTagsDebounceCts = null;
+        Interlocked.Increment(ref _effectiveTagEpoch);
         ClearBatchPackIconCache();
         Root = null;
         Data = null;
@@ -75,7 +109,10 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
         _pathOverrides.Clear();
         _tagAdded.Clear();
         _tagRemoved.Clear();
+        _effectiveTagCache.Clear();
+        _effectiveTagComputeInFlight.Clear();
         _folderVisibilityCache.Clear();
+        InvalidateExploreTagFilterCache();
     }
 
     public bool HaveScanForCurrentPack(string? packPath) =>
@@ -120,6 +157,7 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
             return;
         }
 
+        var deferredTagRefresh = new List<ArchiveNode>();
         foreach (var entry in children)
         {
             if (entry.IsFolder)
@@ -144,6 +182,11 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
 
             var isBatchPackRoot = Data.IsBatch && string.IsNullOrEmpty(node.FullPath) && entry.IsFolder;
             var child = new ArchiveNode(entry.Name, entry.FullPath, entry.IsFolder, node, this, isBatchPackRoot);
+            if (!entry.IsFolder)
+            {
+                deferredTagRefresh.Add(child);
+            }
+
             if (isBatchPackRoot)
             {
                 if (TryGetCachedBatchPackIcon(entry.FullPath, out var icon))
@@ -158,7 +201,31 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
             node.Children.Add(child);
         }
 
-        ApplyExploreFilterInternal();
+        ApplyExploreFilterIfNeeded();
+
+        if (deferredTagRefresh.Count > 0)
+        {
+            // Spread tag row work across frames so a folder with hundreds of textures stays responsive.
+            const int chunk = 40;
+            void PostChunk(int start)
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    var end = Math.Min(start + chunk, deferredTagRefresh.Count);
+                    for (var j = start; j < end; j++)
+                    {
+                        deferredTagRefresh[j].RefreshDisplayTags();
+                    }
+
+                    if (end < deferredTagRefresh.Count)
+                    {
+                        PostChunk(end);
+                    }
+                }, DispatcherPriority.Background);
+            }
+
+            PostChunk(0);
+        }
     }
 
     public bool? GetEffectiveOverrideForPath(string fullPath)
@@ -524,6 +591,7 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
             return;
         }
 
+        InvalidateExploreTagFilterCache();
         ClearChildrenRecursive(Root);
         ((IArchiveNodeHost)this).EnsureChildrenLoaded(Root);
         ApplyExploreFilterInternal();
@@ -536,6 +604,17 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
         ApplyExploreFilterInternal();
     }
 
+    /// <summary>Full-tree filter pass only when a text or tag filter is active (skipped on plain navigation).</summary>
+    private void ApplyExploreFilterIfNeeded()
+    {
+        if (string.IsNullOrWhiteSpace(_exploreFilter) && string.IsNullOrEmpty(_exploreTagFilterId))
+        {
+            return;
+        }
+
+        ApplyExploreFilterInternal();
+    }
+
     private void ApplyExploreFilterInternal()
     {
         if (Root is null)
@@ -544,6 +623,11 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
         }
 
         var f = _exploreFilter.Trim();
+        if (!string.IsNullOrEmpty(_exploreTagFilterId))
+        {
+            EnsureExploreTagFilterCache();
+        }
+
         ApplyExploreFilterRecursive(Root, f);
     }
 
@@ -588,8 +672,11 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
             }
             else
             {
-                var tags = ((IArchiveNodeHost)this).GetEffectiveTags(node.FullPath);
-                var hasTag = tags.Any(t => string.Equals(t.Id, _exploreTagFilterId, StringComparison.OrdinalIgnoreCase));
+                var storageKey = ResolveTagStorageKey(node.FullPath);
+                var hasTag = !string.IsNullOrEmpty(storageKey) &&
+                             _exploreTagFilterCache is { } cache &&
+                             cache.TryGetValue(storageKey, out var idSet) &&
+                             idSet.Contains(_exploreTagFilterId!);
                 visible = textMatch && hasTag;
             }
         }
@@ -600,6 +687,59 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
 
         node.IsVisibleByFilter = visible;
         return visible;
+    }
+
+    private void InvalidateExploreTagFilterCache() => _exploreTagFilterCache = null;
+
+    private void EnsureExploreTagFilterCache()
+    {
+        if (_exploreTagFilterCache is not null || Root is null)
+        {
+            return;
+        }
+
+        _exploreTagFilterCache = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+        BuildExploreTagFilterCacheRecursive(Root);
+    }
+
+    private void BuildExploreTagFilterCacheRecursive(ArchiveNode node)
+    {
+        if (node.IsFolder)
+        {
+            ((IArchiveNodeHost)this).EnsureChildrenLoaded(node);
+            foreach (var child in node.Children)
+            {
+                BuildExploreTagFilterCacheRecursive(child);
+            }
+
+            return;
+        }
+
+        var storageKey = ResolveTagStorageKey(node.FullPath);
+        if (string.IsNullOrEmpty(storageKey))
+        {
+            return;
+        }
+
+        var tags = ((IArchiveNodeHost)this).GetEffectiveTags(node.FullPath);
+        _exploreTagFilterCache![storageKey] = new HashSet<string>(tags.Select(t => t.Id), StringComparer.OrdinalIgnoreCase);
+    }
+
+    private void RefreshExploreTagFilterCacheEntry(string archivePath)
+    {
+        if (_exploreTagFilterCache is null)
+        {
+            return;
+        }
+
+        var storageKey = ResolveTagStorageKey(archivePath);
+        if (string.IsNullOrEmpty(storageKey))
+        {
+            return;
+        }
+
+        var tags = ((IArchiveNodeHost)this).GetEffectiveTags(archivePath);
+        _exploreTagFilterCache[storageKey] = new HashSet<string>(tags.Select(t => t.Id), StringComparer.OrdinalIgnoreCase);
     }
 
     private static void ClearChildrenRecursive(ArchiveNode node)
@@ -786,7 +926,127 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
         }
     }
 
-    IReadOnlyList<(string Id, string DisplayName)> IArchiveNodeHost.GetEffectiveTags(string archivePath)
+    IReadOnlyList<(string Id, string DisplayName, TagRuleKind Kind)> IArchiveNodeHost.GetEffectiveTags(string archivePath)
+    {
+        if (_effectiveTagCache.TryGetValue(archivePath, out var cached))
+        {
+            return cached;
+        }
+
+        // When MiniLM is enabled, do not run ONNX/dictionary on the UI thread: keyword tags first, then async enrichment.
+        var sem = _materialTagSemanticOptionsProvider?.Invoke();
+        var deferMl = sem is { Enabled: true, Matcher: not null };
+        var immediate = ComputeEffectiveTags(archivePath, includeDictionaryEvidence: false, deferSemanticMl: deferMl);
+        _effectiveTagCache[archivePath] = immediate;
+        if (deferMl)
+        {
+            QueueBackgroundEffectiveTagCompute(archivePath);
+        }
+
+        return immediate;
+    }
+
+    private async void QueueBackgroundEffectiveTagCompute(string archivePath)
+    {
+        if (!_effectiveTagComputeInFlight.TryAdd(archivePath, 0))
+        {
+            return;
+        }
+
+        Interlocked.Increment(ref _tagAsyncWorkPending);
+        try
+        {
+            await _tagComputeConcurrency.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                var epoch = Volatile.Read(ref _effectiveTagEpoch);
+                try
+                {
+                    var computed = await Task.Run(() =>
+                            ComputeEffectiveTags(archivePath, includeDictionaryEvidence: true, deferSemanticMl: false))
+                        .ConfigureAwait(false);
+                    if (Volatile.Read(ref _effectiveTagEpoch) != epoch)
+                    {
+                        return;
+                    }
+
+                    _effectiveTagCache[archivePath] = computed;
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        FindNodeByFullPath(archivePath)?.RefreshDisplayTags();
+                        if (string.IsNullOrWhiteSpace(_exploreFilter) && string.IsNullOrEmpty(_exploreTagFilterId))
+                        {
+                            return;
+                        }
+
+                        if (!string.IsNullOrEmpty(_exploreTagFilterId))
+                        {
+                            RefreshExploreTagFilterCacheEntry(archivePath);
+                        }
+
+                        ApplyExploreFilterInternal();
+                    }, DispatcherPriority.Background);
+                }
+                catch
+                {
+                    // Best effort: preserve immediate result.
+                }
+            }
+            finally
+            {
+                _tagComputeConcurrency.Release();
+                _effectiveTagComputeInFlight.TryRemove(archivePath, out _);
+            }
+        }
+        finally
+        {
+            Interlocked.Decrement(ref _tagAsyncWorkPending);
+        }
+    }
+
+    /// <summary>
+    /// Blocks until debounced tag refresh, in-flight per-path MiniLM/dictionary work, and any full-tree tag refresh finish.
+    /// Call before PBR conversion so Explore-side ONNX work does not race with <see cref="TextureScanner"/> tagging,
+    /// and so manual tag overrides are fully persisted.
+    /// </summary>
+    public async Task WaitForPendingTagWorkAsync(CancellationToken cancellationToken = default)
+    {
+        for (var i = 0; i < 200 && _refreshDisplayTagsDebounceCts is not null; i++)
+        {
+            await Task.Delay(25, cancellationToken).ConfigureAwait(false);
+        }
+
+        while (Volatile.Read(ref _tagAsyncWorkPending) > 0)
+        {
+            await Task.Delay(25, cancellationToken).ConfigureAwait(false);
+        }
+
+        var t = _tagRefreshAllTask;
+        if (t is not null && !t.IsCompleted)
+        {
+            try
+            {
+                await t.WaitAsync(cancellationToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch
+            {
+                // Best-effort; conversion still runs full tagging in Core.
+            }
+        }
+    }
+
+    /// <summary>Writes manual tag add/remove to disk for the current scanned pack (safe no-op if nothing scanned).</summary>
+    public void FlushTagOverridesToDisk() => PersistTagOverrides();
+
+    /// <param name="deferSemanticMl">When true with semantic ML enabled, use keyword material tags only (fast); full ML runs later on a background thread.</param>
+    private IReadOnlyList<(string Id, string DisplayName, TagRuleKind Kind)> ComputeEffectiveTags(
+        string archivePath,
+        bool includeDictionaryEvidence,
+        bool deferSemanticMl = false)
     {
         var storageKey = ResolveTagStorageKey(archivePath);
         if (string.IsNullOrEmpty(storageKey))
@@ -797,23 +1057,32 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
         var ruleKey = RuleRelativeKeyFromStorageKey(storageKey);
         var name = Path.GetFileNameWithoutExtension(archivePath);
         var rules = _tagRulesProvider?.Invoke() ?? TagRulePresets.Default;
-        var autoIds = TagRulePresets.GetMatchingTagIds(name, ruleKey, rules);
+        var sem = _materialTagSemanticOptionsProvider?.Invoke();
         var added = _tagAdded.GetValueOrDefault(storageKey);
         var removed = _tagRemoved.GetValueOrDefault(storageKey);
-        var effectiveIds = autoIds.Except(removed ?? []).Union(added ?? []).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-        var result = new List<(string Id, string DisplayName)>();
+        var effectiveIds = ConversionEffectiveTags.ComputeEffectiveTagIds(
+            name,
+            ruleKey,
+            rules,
+            sem,
+            includeDictionaryEvidence,
+            deferSemanticMl,
+            added,
+            removed);
+
+        var result = new List<(string Id, string DisplayName, TagRuleKind Kind)>();
         foreach (var rule in rules)
         {
             if (effectiveIds.Contains(rule.Id, StringComparer.OrdinalIgnoreCase))
             {
-                result.Add((rule.Id, rule.DisplayName));
+                result.Add((rule.Id, rule.DisplayName, rule.Kind));
             }
         }
 
         return result;
     }
 
-    void IArchiveNodeHost.SetTagRemoved(string archivePath, string tagId)
+    void IArchiveNodeHost.ApplyManualTagToggle(string archivePath, string tagId, bool wantApplied)
     {
         var key = ResolveTagStorageKey(archivePath);
         if (string.IsNullOrEmpty(key))
@@ -821,26 +1090,64 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
             return;
         }
 
-        var set = _tagRemoved.GetOrAdd(key, _ => new HashSet<string>(StringComparer.OrdinalIgnoreCase));
-        lock (set) { set.Add(tagId); }
+        if (wantApplied)
+        {
+            RemoveTagIdForPath(_tagRemoved, key, tagId);
+            if (!EffectiveTagsContainId(archivePath, tagId))
+            {
+                var addSet = _tagAdded.GetOrAdd(key, _ => new HashSet<string>(StringComparer.OrdinalIgnoreCase));
+                lock (addSet)
+                {
+                    addSet.Add(tagId);
+                }
+            }
+        }
+        else
+        {
+            RemoveTagIdForPath(_tagAdded, key, tagId);
+            if (EffectiveTagsContainId(archivePath, tagId))
+            {
+                var remSet = _tagRemoved.GetOrAdd(key, _ => new HashSet<string>(StringComparer.OrdinalIgnoreCase));
+                lock (remSet)
+                {
+                    remSet.Add(tagId);
+                }
+            }
+        }
+
         PersistTagOverrides();
+        _effectiveTagCache[archivePath] = ComputeEffectiveTags(archivePath, includeDictionaryEvidence: true);
+        RefreshExploreTagFilterCacheEntry(archivePath);
         var node = FindNodeByFullPath(archivePath);
         node?.RefreshDisplayTags();
+        ApplyExploreFilterIfNeeded();
     }
 
-    void IArchiveNodeHost.SetTagAdded(string archivePath, string tagId)
+    private bool EffectiveTagsContainId(string archivePath, string tagId)
     {
-        var key = ResolveTagStorageKey(archivePath);
-        if (string.IsNullOrEmpty(key))
+        var tags = ComputeEffectiveTags(archivePath, includeDictionaryEvidence: true);
+        return tags.Any(t => string.Equals(t.Id, tagId, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static void RemoveTagIdForPath(
+        ConcurrentDictionary<string, HashSet<string>> dict,
+        string key,
+        string tagId)
+    {
+        if (!dict.TryGetValue(key, out var set))
         {
             return;
         }
 
-        var set = _tagAdded.GetOrAdd(key, _ => new HashSet<string>(StringComparer.OrdinalIgnoreCase));
-        lock (set) { set.Add(tagId); }
-        PersistTagOverrides();
-        var node = FindNodeByFullPath(archivePath);
-        node?.RefreshDisplayTags();
+        lock (set)
+        {
+            set.Remove(tagId);
+        }
+
+        if (set.Count == 0)
+        {
+            dict.TryRemove(key, out _);
+        }
     }
 
     private void PersistTagOverrides()
@@ -853,10 +1160,115 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
         TagOverridesPersistence.Save(_scannedArchivePath, GetManualTagOverrides());
     }
 
-    /// <summary>Refresh displayed tags on all loaded nodes (e.g. after tag rules changed).</summary>
+    /// <summary>
+    /// Coalesces rapid numeric setting changes (sliders/spinners): waits <paramref name="delayMilliseconds"/> after the last call, then runs <see cref="RefreshAllDisplayTags"/>.
+    /// </summary>
+    public void ScheduleRefreshAllDisplayTags(int delayMilliseconds = 200)
+    {
+        _refreshDisplayTagsDebounceCts?.Cancel();
+        var cts = new CancellationTokenSource();
+        _refreshDisplayTagsDebounceCts = cts;
+        _ = RunDebouncedRefreshAllDisplayTagsAsync(cts, delayMilliseconds);
+    }
+
+    private async Task RunDebouncedRefreshAllDisplayTagsAsync(CancellationTokenSource debounceCts, int delayMs)
+    {
+        try
+        {
+            await Task.Delay(delayMs, debounceCts.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        if (!ReferenceEquals(_refreshDisplayTagsDebounceCts, debounceCts))
+        {
+            return;
+        }
+
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            if (!ReferenceEquals(_refreshDisplayTagsDebounceCts, debounceCts))
+            {
+                return;
+            }
+
+            RefreshAllDisplayTags();
+        });
+    }
+
+    /// <summary>Refresh displayed tags on all loaded nodes (e.g. after tag rules changed). ML inference runs on a background thread.</summary>
     public void RefreshAllDisplayTags()
     {
-        RefreshAllDisplayTagsRecursive(Root);
+        _tagRefreshAllTask = RefreshAllDisplayTagsCoreAsync();
+    }
+
+    private async Task RefreshAllDisplayTagsCoreAsync()
+    {
+        _refreshDisplayTagsDebounceCts?.Cancel();
+        _refreshDisplayTagsDebounceCts = null;
+        _tagRefreshCts?.Cancel();
+        var cts = new CancellationTokenSource();
+        _tagRefreshCts = cts;
+        Interlocked.Increment(ref _effectiveTagEpoch);
+
+        _effectiveTagCache.Clear();
+        InvalidateExploreTagFilterCache();
+
+        var paths = CollectFileNodePaths(Root);
+        if (paths.Count == 0)
+        {
+            NotifyAllDisplayTagsRecursive(Root);
+            ApplyExploreFilterIfNeeded();
+            return;
+        }
+
+        Interlocked.Increment(ref _tagAsyncWorkPending);
+        try
+        {
+            var sink = _backgroundTaskSink;
+            sink?.BeginTask(BackgroundTaskIds.MaterialTags);
+            try
+            {
+                await Task.Run(() =>
+                {
+                    var total = paths.Count;
+                    for (var i = 0; i < paths.Count; i++)
+                    {
+                        cts.Token.ThrowIfCancellationRequested();
+                        var path = paths[i];
+                        var tags = ComputeEffectiveTags(path, includeDictionaryEvidence: true);
+                        _effectiveTagCache[path] = tags;
+                        sink?.ReportTask(BackgroundTaskIds.MaterialTags, (double)(i + 1) / total);
+                    }
+                }, cts.Token).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+            finally
+            {
+                sink?.EndTask(BackgroundTaskIds.MaterialTags);
+            }
+
+            if (cts.Token.IsCancellationRequested)
+            {
+                return;
+            }
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                InvalidateExploreTagFilterCache();
+                NotifyAllDisplayTagsRecursive(Root);
+                ApplyExploreFilterIfNeeded();
+            });
+        }
+        finally
+        {
+            Interlocked.Decrement(ref _tagAsyncWorkPending);
+        }
     }
 
     /// <summary>Clear all manual tag add/remove for the current pack, persist, and refresh displayed tags.</summary>
@@ -864,11 +1276,41 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
     {
         _tagAdded.Clear();
         _tagRemoved.Clear();
+        _effectiveTagCache.Clear();
+        Interlocked.Increment(ref _effectiveTagEpoch);
+        InvalidateExploreTagFilterCache();
         PersistTagOverrides();
-        RefreshAllDisplayTagsRecursive(Root);
+        RefreshAllDisplayTags();
     }
 
-    private static void RefreshAllDisplayTagsRecursive(ArchiveNode? node)
+    private static List<string> CollectFileNodePaths(ArchiveNode? root)
+    {
+        var list = new List<string>();
+        if (root is null)
+        {
+            return list;
+        }
+
+        var stack = new Stack<ArchiveNode>();
+        stack.Push(root);
+        while (stack.Count > 0)
+        {
+            var node = stack.Pop();
+            if (!node.IsFolder)
+            {
+                list.Add(node.FullPath);
+            }
+
+            foreach (var child in node.Children)
+            {
+                stack.Push(child);
+            }
+        }
+
+        return list;
+    }
+
+    private static void NotifyAllDisplayTagsRecursive(ArchiveNode? node)
     {
         if (node is null)
         {
@@ -882,7 +1324,7 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
 
         foreach (var child in node.Children)
         {
-            RefreshAllDisplayTagsRecursive(child);
+            NotifyAllDisplayTagsRecursive(child);
         }
     }
 
@@ -894,8 +1336,45 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
         _tagRulesProvider = provider;
     }
 
-    string IArchiveNodeHost.GetTagMenuHeader(string displayName, bool isApplied) =>
-        isApplied ? string.Format(Resources.TagMenuDontApply, displayName) : string.Format(Resources.TagMenuApply, displayName);
+    /// <summary>Optional MiniLM semantic tag options (Explore only). Null provider disables ML suggestions.</summary>
+    public void SetMaterialTagSemanticOptionsProvider(Func<MaterialTagSemanticOptions?>? provider)
+    {
+        _materialTagSemanticOptionsProvider = provider;
+    }
+
+    /// <summary>
+    /// Runs the MiniLM matcher in debug mode and returns a formatted report showing cosine scores for every
+    /// material rule and their prototype phrases. Returns null when MiniLM is not enabled or the path is invalid.
+    /// </summary>
+    public SemanticMatchDebugReport? GetSemanticMatchDebugReport(string archivePath)
+    {
+        var storageKey = ResolveTagStorageKey(archivePath);
+        if (string.IsNullOrEmpty(storageKey))
+        {
+            return null;
+        }
+
+        var sem = _materialTagSemanticOptionsProvider?.Invoke();
+        if (sem is not { Enabled: true, Matcher: { } matcher })
+        {
+            return null;
+        }
+
+        var ruleKey = RuleRelativeKeyFromStorageKey(storageKey);
+        var name = Path.GetFileNameWithoutExtension(archivePath);
+        var rules = _tagRulesProvider?.Invoke() ?? TagRulePresets.Default;
+        var materialRules = rules.Where(r => r.Kind == TagRuleKind.Material).ToList();
+        return matcher.MatchDebug(
+            name,
+            ruleKey,
+            materialRules,
+            sem.DictionaryEvidenceEnabled,
+            sem.DictionaryProvider,
+            sem.DictionaryEvidenceWeight,
+            sem.DictionaryMinEvidenceScore,
+            sem.DictionaryRequestTimeoutMs,
+            sem.DictionaryLanguageCode);
+    }
 
     /// <summary>Returns manual tag add/remove by texture key for conversion. Key = RelativeKey format (e.g. \minecraft\block\stone_brick).</summary>
     public IReadOnlyDictionary<string, (IReadOnlyList<string> Added, IReadOnlyList<string> Removed)> GetManualTagOverrides()

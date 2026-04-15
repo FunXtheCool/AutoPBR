@@ -15,6 +15,19 @@
           }
         }
       },
+      "Google.Protobuf/3.27.1": {
+        "type": "package",
+        "compile": {
+          "lib/net5.0/Google.Protobuf.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/net5.0/Google.Protobuf.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
       "JetBrains.Annotations/2025.2.4": {
         "type": "package",
         "compile": {
@@ -41,90 +54,6 @@
           }
         }
       },
-      "Microsoft.ML.OnnxRuntime.Gpu/1.24.3": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.ML.OnnxRuntime.Gpu.Linux": "1.24.3",
-          "Microsoft.ML.OnnxRuntime.Gpu.Windows": "1.24.3",
-          "Microsoft.ML.OnnxRuntime.Managed": "1.24.3"
-        },
-        "build": {
-          "buildTransitive/netstandard2.1/Microsoft.ML.OnnxRuntime.Gpu.props": {},
-          "buildTransitive/netstandard2.1/Microsoft.ML.OnnxRuntime.Gpu.targets": {}
-        }
-      },
-      "Microsoft.ML.OnnxRuntime.Gpu.Linux/1.24.3": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.ML.OnnxRuntime.Managed": "1.24.3"
-        },
-        "build": {
-          "buildTransitive/netstandard2.1/Microsoft.ML.OnnxRuntime.Gpu.Linux.props": {},
-          "buildTransitive/netstandard2.1/Microsoft.ML.OnnxRuntime.Gpu.Linux.targets": {}
-        },
-        "runtimeTargets": {
-          "runtimes/linux-x64/native/libonnxruntime.so": {
-            "assetType": "native",
-            "rid": "linux-x64"
-          },
-          "runtimes/linux-x64/native/libonnxruntime_providers_cuda.so": {
-            "assetType": "native",
-            "rid": "linux-x64"
-          },
-          "runtimes/linux-x64/native/libonnxruntime_providers_shared.so": {
-            "assetType": "native",
-            "rid": "linux-x64"
-          },
-          "runtimes/linux-x64/native/libonnxruntime_providers_tensorrt.so": {
-            "assetType": "native",
-            "rid": "linux-x64"
-          }
-        }
-      },
-      "Microsoft.ML.OnnxRuntime.Gpu.Windows/1.24.3": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.ML.OnnxRuntime.Managed": "1.24.3"
-        },
-        "build": {
-          "buildTransitive/netstandard2.1/Microsoft.ML.OnnxRuntime.Gpu.Windows.props": {},
-          "buildTransitive/netstandard2.1/Microsoft.ML.OnnxRuntime.Gpu.Windows.targets": {}
-        },
-        "runtimeTargets": {
-          "runtimes/win-x64/native/onnxruntime.dll": {
-            "assetType": "native",
-            "rid": "win-x64"
-          },
-          "runtimes/win-x64/native/onnxruntime.lib": {
-            "assetType": "native",
-            "rid": "win-x64"
-          },
-          "runtimes/win-x64/native/onnxruntime_providers_cuda.dll": {
-            "assetType": "native",
-            "rid": "win-x64"
-          },
-          "runtimes/win-x64/native/onnxruntime_providers_cuda.lib": {
-            "assetType": "native",
-            "rid": "win-x64"
-          },
-          "runtimes/win-x64/native/onnxruntime_providers_shared.dll": {
-            "assetType": "native",
-            "rid": "win-x64"
-          },
-          "runtimes/win-x64/native/onnxruntime_providers_shared.lib": {
-            "assetType": "native",
-            "rid": "win-x64"
-          },
-          "runtimes/win-x64/native/onnxruntime_providers_tensorrt.dll": {
-            "assetType": "native",
-            "rid": "win-x64"
-          },
-          "runtimes/win-x64/native/onnxruntime_providers_tensorrt.lib": {
-            "assetType": "native",
-            "rid": "win-x64"
-          }
-        }
-      },
       "Microsoft.ML.OnnxRuntime.Managed/1.24.3": {
         "type": "package",
         "dependencies": {
@@ -143,6 +72,23 @@
         },
         "build": {
           "build/netstandard2.0/Microsoft.ML.OnnxRuntime.Managed.targets": {}
+        }
+      },
+      "Microsoft.ML.Tokenizers/1.0.2": {
+        "type": "package",
+        "dependencies": {
+          "Google.Protobuf": "3.27.1",
+          "System.Text.Json": "8.0.5"
+        },
+        "compile": {
+          "lib/net8.0/Microsoft.ML.Tokenizers.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.ML.Tokenizers.dll": {
+            "related": ".xml"
+          }
         }
       },
       "SixLabors.ImageSharp/3.1.12": {
@@ -201,6 +147,22 @@
         "build": {
           "buildTransitive/net8.0/_._": {}
         }
+      },
+      "System.Text.Json/8.0.5": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/System.Text.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/System.Text.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net6.0/System.Text.Json.targets": {}
+        }
       }
     }
   },
@@ -231,6 +193,29 @@
         "lib/netstandard2.0/Colourful.pdb",
         "lib/netstandard2.0/Colourful.xml",
         "logo_64.png"
+      ]
+    },
+    "Google.Protobuf/3.27.1": {
+      "sha512": "7IVz9TzhYCZ8qY0rPhXUnyJSXYdshUqmmxmTI763XmDDSJJFnyfKH43FFcMJu/CZgBcE98xlFztrKwhzcRkiPg==",
+      "type": "package",
+      "path": "google.protobuf/3.27.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "google.protobuf.3.27.1.nupkg.sha512",
+        "google.protobuf.nuspec",
+        "lib/net45/Google.Protobuf.dll",
+        "lib/net45/Google.Protobuf.pdb",
+        "lib/net45/Google.Protobuf.xml",
+        "lib/net5.0/Google.Protobuf.dll",
+        "lib/net5.0/Google.Protobuf.pdb",
+        "lib/net5.0/Google.Protobuf.xml",
+        "lib/netstandard1.1/Google.Protobuf.dll",
+        "lib/netstandard1.1/Google.Protobuf.pdb",
+        "lib/netstandard1.1/Google.Protobuf.xml",
+        "lib/netstandard2.0/Google.Protobuf.dll",
+        "lib/netstandard2.0/Google.Protobuf.pdb",
+        "lib/netstandard2.0/Google.Protobuf.xml"
       ]
     },
     "JetBrains.Annotations/2025.2.4": {
@@ -278,108 +263,6 @@
         "mathnet.numerics.nuspec"
       ]
     },
-    "Microsoft.ML.OnnxRuntime.Gpu/1.24.3": {
-      "sha512": "jOpeC4qjdhM1v7adM8RivTBBr/sfaVHeDW7hLyRYF77sOJGJWji9UWr0KeBi6v/RpldrATxowEet4qlODO5dRw==",
-      "type": "package",
-      "path": "microsoft.ml.onnxruntime.gpu/1.24.3",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE",
-        "ORT_icon_for_light_bg.png",
-        "Privacy.md",
-        "README.md",
-        "ThirdPartyNotices.txt",
-        "buildTransitive/native/Microsoft.ML.OnnxRuntime.Gpu.props",
-        "buildTransitive/native/Microsoft.ML.OnnxRuntime.Gpu.targets",
-        "buildTransitive/netstandard2.0/Microsoft.ML.OnnxRuntime.Gpu.props",
-        "buildTransitive/netstandard2.0/Microsoft.ML.OnnxRuntime.Gpu.targets",
-        "buildTransitive/netstandard2.1/Microsoft.ML.OnnxRuntime.Gpu.props",
-        "buildTransitive/netstandard2.1/Microsoft.ML.OnnxRuntime.Gpu.targets",
-        "microsoft.ml.onnxruntime.gpu.1.24.3.nupkg.sha512",
-        "microsoft.ml.onnxruntime.gpu.nuspec"
-      ]
-    },
-    "Microsoft.ML.OnnxRuntime.Gpu.Linux/1.24.3": {
-      "sha512": "NNi+oGIHoP9zmGh61drAQrx77inqrImI+CliZLKpEePLF1KAsy6KYGMe7qkLQsyth9W1EEvGp380RZFDTGc+5Q==",
-      "type": "package",
-      "path": "microsoft.ml.onnxruntime.gpu.linux/1.24.3",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE",
-        "ORT_icon_for_light_bg.png",
-        "Privacy.md",
-        "README.md",
-        "ThirdPartyNotices.txt",
-        "buildTransitive/native/Microsoft.ML.OnnxRuntime.Gpu.Linux.props",
-        "buildTransitive/native/Microsoft.ML.OnnxRuntime.Gpu.Linux.targets",
-        "buildTransitive/native/include/cpu_provider_factory.h",
-        "buildTransitive/native/include/onnxruntime_c_api.h",
-        "buildTransitive/native/include/onnxruntime_cxx_api.h",
-        "buildTransitive/native/include/onnxruntime_cxx_inline.h",
-        "buildTransitive/native/include/onnxruntime_env_config_keys.h",
-        "buildTransitive/native/include/onnxruntime_ep_c_api.h",
-        "buildTransitive/native/include/onnxruntime_ep_device_ep_metadata_keys.h",
-        "buildTransitive/native/include/onnxruntime_float16.h",
-        "buildTransitive/native/include/onnxruntime_lite_custom_op.h",
-        "buildTransitive/native/include/onnxruntime_run_options_config_keys.h",
-        "buildTransitive/native/include/onnxruntime_session_options_config_keys.h",
-        "buildTransitive/native/include/provider_options.h",
-        "buildTransitive/netstandard2.0/Microsoft.ML.OnnxRuntime.Gpu.Linux.props",
-        "buildTransitive/netstandard2.0/Microsoft.ML.OnnxRuntime.Gpu.Linux.targets",
-        "buildTransitive/netstandard2.1/Microsoft.ML.OnnxRuntime.Gpu.Linux.props",
-        "buildTransitive/netstandard2.1/Microsoft.ML.OnnxRuntime.Gpu.Linux.targets",
-        "microsoft.ml.onnxruntime.gpu.linux.1.24.3.nupkg.sha512",
-        "microsoft.ml.onnxruntime.gpu.linux.nuspec",
-        "runtimes/linux-x64/native/libonnxruntime.so",
-        "runtimes/linux-x64/native/libonnxruntime_providers_cuda.so",
-        "runtimes/linux-x64/native/libonnxruntime_providers_shared.so",
-        "runtimes/linux-x64/native/libonnxruntime_providers_tensorrt.so"
-      ]
-    },
-    "Microsoft.ML.OnnxRuntime.Gpu.Windows/1.24.3": {
-      "sha512": "A13nic8Q9jmX4k+1NvHCzKuRSEl4K+fzRPR84xB8I3aGwwNG399G4OcqcSOmxoelDxkc28JsdXNxV8rrP2fKiQ==",
-      "type": "package",
-      "path": "microsoft.ml.onnxruntime.gpu.windows/1.24.3",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE",
-        "ORT_icon_for_light_bg.png",
-        "Privacy.md",
-        "README.md",
-        "ThirdPartyNotices.txt",
-        "buildTransitive/native/Microsoft.ML.OnnxRuntime.Gpu.Windows.props",
-        "buildTransitive/native/Microsoft.ML.OnnxRuntime.Gpu.Windows.targets",
-        "buildTransitive/native/include/cpu_provider_factory.h",
-        "buildTransitive/native/include/onnxruntime_c_api.h",
-        "buildTransitive/native/include/onnxruntime_cxx_api.h",
-        "buildTransitive/native/include/onnxruntime_cxx_inline.h",
-        "buildTransitive/native/include/onnxruntime_env_config_keys.h",
-        "buildTransitive/native/include/onnxruntime_ep_c_api.h",
-        "buildTransitive/native/include/onnxruntime_ep_device_ep_metadata_keys.h",
-        "buildTransitive/native/include/onnxruntime_float16.h",
-        "buildTransitive/native/include/onnxruntime_lite_custom_op.h",
-        "buildTransitive/native/include/onnxruntime_run_options_config_keys.h",
-        "buildTransitive/native/include/onnxruntime_session_options_config_keys.h",
-        "buildTransitive/native/include/provider_options.h",
-        "buildTransitive/netstandard2.0/Microsoft.ML.OnnxRuntime.Gpu.Windows.props",
-        "buildTransitive/netstandard2.0/Microsoft.ML.OnnxRuntime.Gpu.Windows.targets",
-        "buildTransitive/netstandard2.1/Microsoft.ML.OnnxRuntime.Gpu.Windows.props",
-        "buildTransitive/netstandard2.1/Microsoft.ML.OnnxRuntime.Gpu.Windows.targets",
-        "microsoft.ml.onnxruntime.gpu.windows.1.24.3.nupkg.sha512",
-        "microsoft.ml.onnxruntime.gpu.windows.nuspec",
-        "runtimes/win-x64/native/onnxruntime.dll",
-        "runtimes/win-x64/native/onnxruntime.lib",
-        "runtimes/win-x64/native/onnxruntime_providers_cuda.dll",
-        "runtimes/win-x64/native/onnxruntime_providers_cuda.lib",
-        "runtimes/win-x64/native/onnxruntime_providers_shared.dll",
-        "runtimes/win-x64/native/onnxruntime_providers_shared.lib",
-        "runtimes/win-x64/native/onnxruntime_providers_tensorrt.dll",
-        "runtimes/win-x64/native/onnxruntime_providers_tensorrt.lib"
-      ]
-    },
     "Microsoft.ML.OnnxRuntime.Managed/1.24.3": {
       "sha512": "XWyszzywN+uuMEEPzrTYLSKM2TJKOGHsjcq0ZY+AeaqJpPB7xi0OikxXhXTc7fcOJ8K0oqvD0dk86fROm3TaRA==",
       "type": "package",
@@ -406,6 +289,25 @@
         "lib/netstandard2.0/Microsoft.ML.OnnxRuntime.pdb",
         "microsoft.ml.onnxruntime.managed.1.24.3.nupkg.sha512",
         "microsoft.ml.onnxruntime.managed.nuspec"
+      ]
+    },
+    "Microsoft.ML.Tokenizers/1.0.2": {
+      "sha512": "MefL5+IakSE/CWzx4BQQairgY1fXFBVTPtnn7/01Wngsk2248loViqQ1M5+YB8KBwbi0HjcfoMo86h+cSjiEOA==",
+      "type": "package",
+      "path": "microsoft.ml.tokenizers/1.0.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net8.0/Microsoft.ML.Tokenizers.dll",
+        "lib/net8.0/Microsoft.ML.Tokenizers.xml",
+        "lib/netstandard2.0/Microsoft.ML.Tokenizers.dll",
+        "lib/netstandard2.0/Microsoft.ML.Tokenizers.xml",
+        "microsoft.ml.tokenizers.1.0.2.nupkg.sha512",
+        "microsoft.ml.tokenizers.nuspec",
+        "mlnetlogo.png"
       ]
     },
     "SixLabors.ImageSharp/3.1.12": {
@@ -502,6 +404,79 @@
         "system.numerics.tensors.nuspec",
         "useSharedDesignerContext.txt"
       ]
+    },
+    "System.Text.Json/8.0.5": {
+      "sha512": "0f1B50Ss7rqxXiaBJyzUu9bWFOO2/zSlifZ/UNMdiIpDYe4cY4LQQicP4nirK1OS31I43rn062UIJ1Q9bpmHpg==",
+      "type": "package",
+      "path": "system.text.json/8.0.5",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "analyzers/dotnet/roslyn3.11/cs/System.Text.Json.SourceGeneration.dll",
+        "analyzers/dotnet/roslyn3.11/cs/cs/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/de/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/es/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/fr/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/it/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/ja/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/ko/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/pl/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/pt-BR/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/ru/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/tr/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/zh-Hans/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/zh-Hant/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/System.Text.Json.SourceGeneration.dll",
+        "analyzers/dotnet/roslyn4.0/cs/cs/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/de/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/es/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/fr/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/it/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/ja/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/ko/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/pl/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/pt-BR/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/ru/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/tr/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/zh-Hans/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/zh-Hant/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/System.Text.Json.SourceGeneration.dll",
+        "analyzers/dotnet/roslyn4.4/cs/cs/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/de/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/es/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/fr/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/it/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/ja/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/ko/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/pl/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/pt-BR/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/ru/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/tr/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/zh-Hans/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/zh-Hant/System.Text.Json.SourceGeneration.resources.dll",
+        "buildTransitive/net461/System.Text.Json.targets",
+        "buildTransitive/net462/System.Text.Json.targets",
+        "buildTransitive/net6.0/System.Text.Json.targets",
+        "buildTransitive/netcoreapp2.0/System.Text.Json.targets",
+        "buildTransitive/netstandard2.0/System.Text.Json.targets",
+        "lib/net462/System.Text.Json.dll",
+        "lib/net462/System.Text.Json.xml",
+        "lib/net6.0/System.Text.Json.dll",
+        "lib/net6.0/System.Text.Json.xml",
+        "lib/net7.0/System.Text.Json.dll",
+        "lib/net7.0/System.Text.Json.xml",
+        "lib/net8.0/System.Text.Json.dll",
+        "lib/net8.0/System.Text.Json.xml",
+        "lib/netstandard2.0/System.Text.Json.dll",
+        "lib/netstandard2.0/System.Text.Json.xml",
+        "system.text.json.8.0.5.nupkg.sha512",
+        "system.text.json.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
     }
   },
   "projectFileDependencyGroups": {
@@ -509,7 +484,8 @@
       "Colourful >= 3.2.0",
       "JetBrains.Annotations >= 2025.2.4",
       "MathNet.Numerics >= 5.0.0",
-      "Microsoft.ML.OnnxRuntime.Gpu >= 1.24.3",
+      "Microsoft.ML.OnnxRuntime.Managed >= 1.24.3",
+      "Microsoft.ML.Tokenizers >= 1.0.2",
       "SixLabors.ImageSharp >= 3.1.12",
       "System.IO.Hashing >= 9.0.0"
     ]
@@ -577,9 +553,13 @@
             "target": "Package",
             "version": "[5.0.0, )"
           },
-          "Microsoft.ML.OnnxRuntime.Gpu": {
+          "Microsoft.ML.OnnxRuntime.Managed": {
             "target": "Package",
             "version": "[1.24.3, )"
+          },
+          "Microsoft.ML.Tokenizers": {
+            "target": "Package",
+            "version": "[1.0.2, )"
           },
           "SixLabors.ImageSharp": {
             "target": "Package",

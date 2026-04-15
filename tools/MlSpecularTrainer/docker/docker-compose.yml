@@ -1,0 +1,40 @@
+volumes:
+  # Persists pip download cache across container runs (speeds rebuilds when requirements change).
+  ml-specular-pip-cache:
+
+services:
+  ml-specular:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: autopbr-ml-specular:latest
+    working_dir: /workspace/tools/MlSpecularTrainer
+    volumes:
+      - ../../../:/workspace
+      - ml-specular-pip-cache:/root/.cache/pip
+    environment:
+      # 1 = skip pip on container start — keeps onnxruntime-training + baked ORTModule *.so intact
+      # (pip reinstall of that wheel wipes torch_cpp_extensions; then every train runs torch_ort.configure).
+      # Set to 0 only when you need to sync requirements; expect a slow torch_ort.configure if ORT was reinstalled.
+      SKIP_BASE_PIP_INSTALL: "1"
+      INSTALL_BASE_DEPS: "1"
+      INSTALL_ORT_TRAINING: "0"
+      INSTALL_TORCH_ORT: "0"
+      INSTALL_DEEPSPEED: "0"
+      # GPU training wheel (+cu118) — must use -f find-links (see Dockerfile / entrypoint).
+      ORT_TRAINING_PIP_SPEC: "onnxruntime-training==1.19.2+cu118"
+      ORT_TRAINING_FIND_LINKS: "https://download.onnxruntime.ai/onnxruntime_stable_cu118.html"
+      TORCH_ORT_PIP_SPEC: "torch-ort==1.19.2"
+      DEEPSPEED_PIP_SPEC: "deepspeed"
+      TORCH_VER: "2.4.1"
+      TORCHVISION_VER: "0.19.1"
+      PYTORCH_CU118_INDEX: "https://download.pytorch.org/whl/cu118"
+      PIP_EXTRA_INDEX_URL: ""
+      PYTHON: /opt/venv/bin/python
+      PYTHONPATH: /workspace/tools/MlSpecularTrainer
+      PIP_CACHE_DIR: /root/.cache/pip
+    stdin_open: true
+    tty: true
+    # PyTorch DataLoader multiprocessing needs enough /dev/shm; Docker default 64MB causes bus errors.
+    shm_size: 2g
+    gpus: all

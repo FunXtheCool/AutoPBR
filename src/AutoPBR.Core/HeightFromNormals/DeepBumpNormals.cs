@@ -1,8 +1,7 @@
 // Uses DeepBump deepbump256.onnx (https://github.com/HugoTini/DeepBump) via ONNX Runtime
 // for color → normal map generation. GPL-3.0; see LICENSE-DeepBump.txt.
-// GPU: OnnxRuntime.Gpu 1.24.x (CUDA 13). Required CUDA/cuDNN DLLs are bundled in Data/native and copied to runtimes\win-x64\native by the App/CLI build.
+// GPU: OnnxRuntime.Managed 1.24.x + redistributed CUDA 13 ORT/CUDA/cuDNN/TensorRT DLLs: Data\native → runtimes\win-x64\native.
 
-using System.Runtime.InteropServices;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using SixLabors.ImageSharp;
@@ -24,6 +23,7 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
     private readonly bool _outputIsNhwc;
     private readonly string _modelPath;
     private readonly bool _preferGpu;
+    private readonly bool _preferOnnxTensorRt;
     private readonly object _poolLock = new();
     private readonly Queue<InferenceSession> _sessionPool = new();
     private readonly int _maxConcurrentRuns;
@@ -38,36 +38,10 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
     /// <summary>True if the session is using the CUDA execution provider (GPU/Tensor Cores).</summary>
     public bool IsUsingGpu { get; }
 
-    /// <summary>On Windows, adds the app's runtimes\win-x64\native folder to the DLL search path so the loader finds bundled CUDA/cuDNN DLLs.</summary>
-    private static void AddAppNativeDirToDllSearchPath()
-    {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            return;
-        }
-
-
-        var nativeDir = Path.Combine(AppContext.BaseDirectory, "runtimes", "win-x64", "native");
-        if (!Directory.Exists(nativeDir))
-        {
-            return;
-        }
-
-
-        try
-        {
-            SetDllDirectory(nativeDir);
-        }
-        catch
-        {
-            // Ignore if SetDllDirectory fails
-        }
-    }
-
-    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern bool SetDllDirectory(string? lpPathName);
-
-    public static DeepBumpNormalsGenerator? TryCreate(string modelPath, int maxConcurrentRuns = 1)
+    public static DeepBumpNormalsGenerator? TryCreate(
+        string modelPath,
+        int maxConcurrentRuns = 1,
+        bool preferOnnxTensorRtExecutionProvider = false)
     {
         if (string.IsNullOrWhiteSpace(modelPath) || !File.Exists(modelPath))
         {
@@ -76,24 +50,19 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         }
 
 
-        AddAppNativeDirToDllSearchPath();
         try
         {
             maxConcurrentRuns = Math.Max(1, maxConcurrentRuns);
 
             InferenceSession session;
             bool useGpu;
-            try
-            {
-                using var gpuOptions = SessionOptions.MakeSessionOptionWithCudaProvider();
-                session = new InferenceSession(modelPath, gpuOptions);
-                useGpu = true;
-            }
-            catch
-            {
-                session = new InferenceSession(modelPath);
-                useGpu = false;
-            }
+            session = OnnxRuntimeWindowsNative.TryCreateGpuSession(
+                          modelPath,
+                          preferOnnxTensorRtExecutionProvider,
+                          out var provider,
+                          out _) ??
+                      new InferenceSession(modelPath);
+            useGpu = provider is "CUDA" or "TensorRT";
 
             var inputName = session.InputMetadata.Keys.FirstOrDefault() ?? "input";
             var inputIsNhwc = false;
@@ -129,6 +98,7 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
                 inputChannels,
                 outputIsNhwc,
                 useGpu,
+                preferOnnxTensorRtExecutionProvider,
                 maxConcurrentRuns,
                 firstSession: session);
         }
@@ -145,6 +115,7 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         int inputChannels,
         bool outputIsNhwc,
         bool isUsingGpu,
+        bool preferOnnxTensorRtExecutionProvider,
         int maxConcurrentRuns,
         InferenceSession firstSession)
     {
@@ -155,6 +126,7 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         _outputIsNhwc = outputIsNhwc;
         IsUsingGpu = isUsingGpu;
         _preferGpu = isUsingGpu;
+        _preferOnnxTensorRt = preferOnnxTensorRtExecutionProvider;
         _maxConcurrentRuns = maxConcurrentRuns;
         _sessionPool.Enqueue(firstSession);
         for (var i = 1; i < _maxConcurrentRuns; i++)
@@ -406,8 +378,8 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         {
             try
             {
-                using var gpuOptions = SessionOptions.MakeSessionOptionWithCudaProvider();
-                return new InferenceSession(_modelPath, gpuOptions);
+                return OnnxRuntimeWindowsNative.TryCreateGpuSession(_modelPath, _preferOnnxTensorRt, out _, out _) ??
+                       new InferenceSession(_modelPath);
             }
             catch
             {

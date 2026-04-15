@@ -77,6 +77,12 @@
   <data name="Appearance" xml:space="preserve">
     <value>Внешний вид</value>
   </data>
+  <data name="UiScaling" xml:space="preserve">
+    <value>Масштаб</value>
+  </data>
+  <data name="UiScalingTooltip" xml:space="preserve">
+    <value>Масштабирует весь интерфейс (текст, элементы и отступы). Значения выше 100% улучшают читаемость.</value>
+  </data>
   <data name="AppTitle" xml:space="preserve"><value>AutoPBR</value></data>
   <data name="AppSubtitle" xml:space="preserve"><value>Преобразование ресурспака Minecraft в PBR-пакет (specular + normal + height).</value></data>
   <data name="TabConvert" xml:space="preserve"><value>Конвертировать</value></data>
@@ -91,14 +97,15 @@
   <data name="BatchConvertButton" xml:space="preserve"><value>Конвертировать пакетно</value></data>
   <data name="ExploreArchiveContents" xml:space="preserve"><value>Содержимое пакета</value></data>
   <data name="ResourceExplorer" xml:space="preserve"><value>Обозреватель ресурсов</value></data>
-  <data name="ExploreEmptyMessage" xml:space="preserve"><value>Отсканируйте пакет или папку пакетов на вкладке «Сканировать», чтобы просмотреть содержимое.</value></data>
+  <data name="ExploreEmptyMessage" xml:space="preserve"><value>Отсканируйте пакет или допустимую папку, чтобы просмотреть содержимое.</value></data>
   <data name="ExploreExpandAll" xml:space="preserve"><value>Развернуть все</value></data>
   <data name="ExploreCollapseAll" xml:space="preserve"><value>Свернуть все</value></data>
   <data name="ExploreBack" xml:space="preserve"><value>Назад</value></data>
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
-  <data name="TabTune" xml:space="preserve"><value>Настройки</value></data>
+  <data name="TabNormals" xml:space="preserve"><value>Нормали</value></data>
   <data name="TabSettings" xml:space="preserve"><value>Параметры</value></data>
   <data name="Input" xml:space="preserve"><value>Ввод</value></data>
+  <data name="InputSourceModeTooltip" xml:space="preserve"><value>Выкл.: один ресурс-пак (.zip / .jar). Вкл.: папка с пакетами для пакетного сканирования и конвертации.</value></data>
   <data name="ResourcePackWatermark" xml:space="preserve"><value>Ресурспак (.zip или .jar)</value></data>
   <data name="Browse" xml:space="preserve"><value>Обзор…</value></data>
   <data name="Log" xml:space="preserve"><value>Журнал</value></data>
@@ -127,7 +134,11 @@
   <data name="GenerationSettings" xml:space="preserve"><value>Параметры генерации</value></data>
   <data name="TuneNormals" xml:space="preserve"><value>Нормали</value></data>
   <data name="TuneSpecular" xml:space="preserve"><value>Specular</value></data>
+  <data name="NormalsTuning" xml:space="preserve"><value>Настройка нормалей</value></data>
+  <data name="SpecularTuning" xml:space="preserve"><value>Настройка specular</value></data>
+  <data name="AiTuning" xml:space="preserve"><value>Настройка ИИ</value></data>
   <data name="TuneHeight" xml:space="preserve"><value>Высота</value></data>
+  <data name="HeightmapTuning" xml:space="preserve"><value>Настройка карты высот</value></data>
   <data name="NormalStrength" xml:space="preserve"><value>Сила нормалей</value></data>
   <data name="NormalStrengthTooltip" xml:space="preserve"><value>Сила градиента карты нормалей. Выше = более выраженный рельеф.</value></data>
   <data name="HeightStrength" xml:space="preserve"><value>Сила высоты</value></data>
@@ -165,10 +176,6 @@
   <data name="DeepBumpInputModeGrayscale" xml:space="preserve"><value>Оттенки серого</value></data>
   <data name="DeepBumpInputModeRgb" xml:space="preserve"><value>RGB</value></data>
   <data name="DeepBumpForceBlue255" xml:space="preserve"><value>Принудительно B=255 в нормалях DeepBump</value></data>
-  <data name="QualityProfile" xml:space="preserve"><value>Профиль качества</value></data>
-  <data name="QualityProfileBalanced" xml:space="preserve"><value>Сбалансированный</value></data>
-  <data name="QualityProfileLowRes" xml:space="preserve"><value>Низкое разреш. (16–64)</value></data>
-  <data name="QualityProfileHiRes" xml:space="preserve"><value>Высокое разреш. (128–512)</value></data>
   <data name="Advanced" xml:space="preserve"><value>Дополнительно</value></data>
   <data name="Preprocessing" xml:space="preserve"><value>Предобработка</value></data>
   <data name="PreprocessLinearize" xml:space="preserve"><value>Линеаризация (sRGB → linear) перед производными</value></data>
@@ -181,8 +188,6 @@
   <data name="SpecularPercentileRemap" xml:space="preserve"><value>Перцентильный ремап гладкости (R)</value></data>
   <data name="SpecularRemapLowPercentile" xml:space="preserve"><value>Нижний перцентиль</value></data>
   <data name="SpecularRemapHighPercentile" xml:space="preserve"><value>Верхний перцентиль</value></data>
-  <data name="MetalHeuristicSubstrings" xml:space="preserve"><value>Подсказки названий металла</value></data>
-  <data name="MetalHeuristicSubstringsWatermark" xml:space="preserve"><value>Через запятую (необязательно), напр. iron,gold,steel</value></data>
   <data name="AoAdvanced" xml:space="preserve"><value>Окклюзия окружения (AO)</value></data>
   <data name="GenerateAo" xml:space="preserve"><value>Записать AO в нормаль (синий канал)</value></data>
   <data name="AoRadius" xml:space="preserve"><value>Радиус AO</value></data>
@@ -205,6 +210,8 @@
   <data name="Engine" xml:space="preserve"><value>Движок</value></data>
   <data name="MaxThreads" xml:space="preserve"><value>Макс. потоков</value></data>
   <data name="MaxThreadsTooltip" xml:space="preserve"><value>Рабочие потоки. 0 = авто.</value></data>
+  <data name="OnnxPreferTensorRt" xml:space="preserve"><value>Предпочитать TensorRT для ONNX GPU (запас CUDA)</value></data>
+  <data name="OnnxPreferTensorRtTooltip" xml:space="preserve"><value>Вкл.: TensorRT с CUDA для неподдерживаемых операций. Выкл.: только CUDA — быстрее старт сессии; при первом запуске TensorRT может собирать движки.</value></data>
   <data name="TempFolder" xml:space="preserve"><value>Временная папка</value></data>
   <data name="TempFolderTooltip" xml:space="preserve"><value>Папка для временной распаковки. Пусто = системный temp.</value></data>
   <data name="TempFolderWatermark" xml:space="preserve"><value>Пусто = системный temp</value></data>

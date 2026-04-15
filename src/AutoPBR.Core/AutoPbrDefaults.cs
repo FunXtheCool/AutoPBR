@@ -1,3 +1,5 @@
+using AutoPBR.Core.Models;
+
 namespace AutoPBR.Core;
 
 public static class AutoPbrDefaults
@@ -8,6 +10,18 @@ public static class AutoPbrDefaults
     public const float DefaultSmoothnessScale = 1f;
     public const float DefaultMetallicBoost = 1f;
     public const int DefaultPorosityBias = 0;
+
+    /// <summary>Extra B-channel offset for plant-tagged textures (added to <see cref="AutoPbrOptions.PorosityBias"/>).</summary>
+    public const int DefaultPlantMaterialPorosityExtra = 48;
+
+    /// <summary>See <see cref="AutoPbrOptions.MlSpecularHeuristicBlend"/>.</summary>
+    public const float DefaultMlSpecularHeuristicBlend = 1f;
+
+    /// <summary>See <see cref="AutoPbrOptions.MlSpecularHeuristicBlendMode"/>.</summary>
+    public const MlSpecularHeuristicBlendMode DefaultMlSpecularHeuristicBlendMode = MlSpecularHeuristicBlendMode.SmoothnessOnly;
+
+    /// <summary>See <see cref="AutoPbrOptions.MlSpecularBlendMath"/>.</summary>
+    public const MlSpecularBlendMath DefaultMlSpecularBlendMath = MlSpecularBlendMath.Linear;
 
     // Matches upstream Python `excluded_names` list (by filename).
     public static readonly HashSet<string> ExcludedFileNames = new(StringComparer.OrdinalIgnoreCase)

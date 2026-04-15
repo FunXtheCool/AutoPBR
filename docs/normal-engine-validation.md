@@ -1,5 +1,7 @@
 ## Normal/Spec/AO validation pack set (16×–512×)
 
+For ML metal segmentation evaluation and A/B against heuristics, see [Metal ML spec](metal-ml-spec.md).
+
 This repo intentionally does **not** ship texture assets. Instead, use this doc to curate a small local test set and keep a consistent “before/after” comparison workflow.
 
 ### Suggested test set

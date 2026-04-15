@@ -1,57 +1,56 @@
-using System.Text.Json.Serialization;
-
 namespace AutoPBR.Core.Models;
 
-/// <summary>User-defined tag rule (settings + optional JSON file for CLI).</summary>
+/// <summary>User-defined material tag (settings + optional JSON for CLI).</summary>
 public sealed class CustomTagRuleEntry
 {
-    /// <summary>When false, this rule is excluded from effective rules (merge and legend).</summary>
+    /// <summary>When false, this rule is excluded from effective rules (legend and explore).</summary>
     public bool Enabled { get; set; } = true;
 
     public string Id { get; set; } = "";
     public string DisplayName { get; set; } = "";
+
+    /// <summary><see cref="TagRuleKind.Material"/> or <see cref="TagRuleKind.Flag"/>.</summary>
+    public string Kind { get; set; } = "Material";
+
     /// <summary>Comma-separated keywords; match when texture name or path contains any (case-insensitive).</summary>
     public string Keywords { get; set; } = "";
-    public bool InvertHeight { get; set; }
-    public bool InvertSpecular { get; set; }
-    public bool InvertNormalRed { get; set; }
-    public bool InvertNormalGreen { get; set; }
 
-    /// <summary>When set, scales normal strength for matching textures (same range as global normal intensity, e.g. 0.85).</summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public float? NormalIntensity { get; set; }
+    /// <summary>When true, keywords use whole-word/token matching (see <see cref="TagRule.KeywordsMatchWholeWord"/>).</summary>
+    public bool KeywordsMatchWholeWord { get; set; }
 
-    /// <summary>When set, scales height strength for matching textures (e.g. 0.07 for subtler height).</summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public float? HeightIntensity { get; set; }
-
-    /// <summary>When true/false, forces fast/full specular path for matching textures.</summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public bool? FastSpecular { get; set; }
+    /// <summary>Comma-separated English phrases for MiniLM semantic matching (optional).</summary>
+    public string SemanticHints { get; set; } = "";
 
     public TagRule ToTagRule()
     {
-        var keywords = string.IsNullOrWhiteSpace(Keywords)
-            ? []
-            : Keywords.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Where(s => s.Length > 0)
-                .ToList();
-        var o = new TextureOverrides
+        var keywords = SplitCommaList(Keywords);
+        var hints = SplitCommaList(SemanticHints);
+        var kind = TagRuleKind.Material;
+        if (!string.IsNullOrWhiteSpace(Kind) && Enum.TryParse(Kind.Trim(), ignoreCase: true, out TagRuleKind parsed))
         {
-            InvertHeight = InvertHeight,
-            InvertSpecular = InvertSpecular,
-            InvertNormalRed = InvertNormalRed,
-            InvertNormalGreen = InvertNormalGreen,
-            NormalIntensity = NormalIntensity,
-            HeightIntensity = HeightIntensity,
-            FastSpecular = FastSpecular
-        };
+            kind = parsed;
+        }
+
         return new TagRule
         {
             Id = Id.Trim(),
             DisplayName = DisplayName.Trim(),
+            Kind = kind,
             Keywords = keywords,
-            Overrides = o
+            KeywordsMatchWholeWord = KeywordsMatchWholeWord,
+            SemanticHints = hints
         };
+    }
+
+    private static IReadOnlyList<string> SplitCommaList(string raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            return [];
+        }
+
+        return raw.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(s => s.Length > 0)
+            .ToList();
     }
 }

@@ -1,13 +1,9 @@
+using AutoPBR.Core.Embeddings;
+
 namespace AutoPBR.Core.Models;
 
 public sealed class AutoPbrOptions
 {
-    /// <summary>
-    /// Optional preset that can be used to tune defaults for different target resolutions.
-    /// When set, higher layers (UI/CLI) may apply recommended settings for the selected profile.
-    /// </summary>
-    public QualityProfile QualityProfile { get; init; } = QualityProfile.Balanced;
-
     public float NormalIntensity { get; init; } = AutoPbrDefaults.DefaultNormalIntensity;
     public float HeightIntensity { get; init; } = AutoPbrDefaults.DefaultHeightIntensity;
     public bool FastSpecular { get; init; } = false;
@@ -89,6 +85,12 @@ public sealed class AutoPbrOptions
     public int PorosityBias { get; init; } = AutoPbrDefaults.DefaultPorosityBias;
 
     /// <summary>
+    /// Extra porosity B offset for textures with the plant material tag (or OptiFine plant/plants paths).
+    /// Added to <see cref="PorosityBias"/> for heuristic and ML specular B.
+    /// </summary>
+    public int PlantMaterialPorosityExtra { get; init; } = AutoPbrDefaults.DefaultPlantMaterialPorosityExtra;
+
+    /// <summary>
     /// When true, normalize per-texture smoothness (R) using percentile remap (more robust than min/max on noisy low-res inputs).
     /// </summary>
     public bool SpecularUsePercentileRemap { get; init; } = true;
@@ -98,11 +100,6 @@ public sealed class AutoPbrOptions
 
     /// <summary>High percentile (0..1) for smoothness remap window.</summary>
     public float SpecularRemapHighPercentile { get; init; } = 0.98f;
-
-    /// <summary>
-    /// Optional list of substrings used by the "metal" heuristic. When null, the built-in list is used.
-    /// </summary>
-    public IReadOnlyList<string>? MetalHeuristicSubstrings { get; init; }
 
     /// <summary>
     /// When true, process block/textures (block, blocks folders).
@@ -141,19 +138,27 @@ public sealed class AutoPbrOptions
     public ISet<string> IgnoreTextureKeys { get; init; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Tag rules for keyword-based conversion overrides (e.g. "brick" → invert height + specular).
-    /// When null or empty, <see cref="TagRulePresets.Default"/> is used.
+    /// Material tag definitions (keywords). Used by <see cref="TextureScanner"/> for plant-tag detection
+    /// (<see cref="FoliageMode"/> "No Height" / "Ignore All"). When null or empty,
+    /// <see cref="TagRulePresets.Default"/> is used.
     /// </summary>
     public IReadOnlyList<TagRule>? TagRules { get; init; }
 
     /// <summary>
+    /// Optional semantic ML options (MiniLM) used at scan time for plant-tag detection.
+    /// When non-null with <see cref="MaterialTagSemanticOptions.Enabled"/> = true, the scanner uses
+    /// ML-based material matching instead of keyword-only matching for foliage/plant handling.
+    /// </summary>
+    public MaterialTagSemanticOptions? SemanticOptions { get; init; }
+
+    /// <summary>
     /// Per-texture-key manual tag add/remove from the explorer. Key = RelativeKey (e.g. \minecraft\block\stone_brick).
-    /// When non-null, effective tags = (auto \ removed) ∪ added before merging overrides.
+    /// When non-null, effective tags = (auto \ removed) ∪ added.
     /// </summary>
     public IReadOnlyDictionary<string, (IReadOnlyList<string> Added, IReadOnlyList<string> Removed)>? ManualTagOverrides { get; init; }
 
-    /// <summary>Foliage handling: "Ignore All", "No Height", or "Convert All".</summary>
-    public string FoliageMode { get; init; } = "Ignore All";
+    /// <summary>Foliage handling for 2D Sprite–tagged textures only: "Ignore All", "No Height", or "Convert All".</summary>
+    public string FoliageMode { get; init; } = "No Height";
 
     /// <summary>When true and DeepBumpModelPath is valid, generate normals from diffuse using the DeepBump ONNX model (deepbump256.onnx) instead of Sobel/VC.</summary>
     public bool UseDeepBumpNormals { get; init; } = false;
@@ -174,7 +179,176 @@ public sealed class AutoPbrOptions
     /// </summary>
     public bool DeepBumpForceBlue255 { get; init; } = false;
 
+    /// <summary>
+    /// DeepBump-only normal strength multiplier applied after ONNX output. 1 = unchanged.
+    /// </summary>
+    public float DeepBumpNormalIntensity { get; init; } = AutoPbrDefaults.DefaultNormalIntensity;
+
+    /// <summary>
+    /// Optional soft clamp (0..2) applied to DeepBump normal XY magnitude after strength scaling.
+    /// 0 = linear behavior; higher values preserve punch while reducing near-90 degree saturation.
+    /// </summary>
+    public float DeepBumpNormalSoftClamp { get; init; } = 0f;
+
+    /// <summary>
+    /// When true, blend DeepBump normals with diffuse-derived edge guidance so strength follows image structure
+    /// similarly to heuristic Sobel/Scharr normals.
+    /// </summary>
+    public bool DeepBumpEdgeGuidedEnhance { get; init; } = false;
+
+    /// <summary>Edge-guided XY magnitude gain (0..6 typical). Higher values amplify edges more strongly.</summary>
+    public float DeepBumpEdgeGuidedStrength { get; init; } = 1f;
+
+    /// <summary>Gamma for edge-guidance weighting (0.5..3 typical). Higher values bias enhancement toward strongest edges.</summary>
+    public float DeepBumpEdgeGuidedGamma { get; init; } = 1f;
+
+    /// <summary>
+    /// Direction blend factor toward diffuse-derived gradient direction (0..1).
+    /// 0 = keep model direction; 1 = fully align to edge direction where edges are strong.
+    /// </summary>
+    public float DeepBumpEdgeGuidedDirectionMix { get; init; } = 0.35f;
+
+    /// <summary>
+    /// When true, diffuse pixels with alpha less than or equal to <see cref="NormalHeightTransparentAlphaClampMax"/>
+    /// are hard-clamped to RGBA 0 in generated normal/height output (_n).
+    /// </summary>
+    public bool NormalHeightZeroTransparentPixels { get; init; } = true;
+
+    /// <summary>
+    /// Alpha threshold (0..255) for transparent-pixel clamp when <see cref="NormalHeightZeroTransparentPixels"/> is true.
+    /// 0 means only fully transparent pixels; values like 4-16 also clamp anti-aliased fringes.
+    /// </summary>
+    public int NormalHeightTransparentAlphaClampMax { get; init; } = 0;
+
+    /// <summary>
+    /// When true, register the ONNX Runtime TensorRT execution provider (with CUDA fallback) for GPU sessions.
+    /// When false (default), use CUDA only—faster session startup; TensorRT compiles engines on first use.
+    /// </summary>
+    public bool PreferOnnxTensorRtExecutionProvider { get; init; }
+
+    /// <summary>
+    /// When true, use ONNX direct specular predictor (diffuse → RGBA) before heuristic/class paths.
+    /// </summary>
+    public bool UseMlSpecularPredictor { get; init; }
+
+    /// <summary>Path to direct specular ONNX model (fallback when <see cref="MlSpecularModelPathsByResolution"/> is null or empty).</summary>
+    public string? MlSpecularModelPath { get; init; }
+
+    /// <summary>
+    /// Optional per-texture-resolution paths to specular ONNX models (edge length in pixels, e.g. 16, 32, 64, 128, 256).
+    /// When non-empty, selection uses <b>ceil</b>: smallest configured resolution &gt;= texture size; if texture is larger than all keys, the largest key is used.
+    /// Invalid entries (non-positive keys, empty paths) are ignored. When null or empty, <see cref="MlSpecularModelPath"/> alone is used.
+    /// </summary>
+    public IReadOnlyDictionary<int, string>? MlSpecularModelPathsByResolution { get; init; }
+
+    /// <summary>
+    /// 0 = heuristic-only specular when ML inference ran; 1 = full ML contribution (linear blend per pixel between
+    /// heuristic and model; which channels follow <see cref="MlSpecularHeuristicBlendMode"/>).
+    /// </summary>
+    public float MlSpecularHeuristicBlend { get; init; } = AutoPbrDefaults.DefaultMlSpecularHeuristicBlend;
+
+    /// <summary>
+    /// Which channels receive heuristic contribution when <see cref="MlSpecularHeuristicBlend"/> &gt; 0.
+    /// </summary>
+    public MlSpecularHeuristicBlendMode MlSpecularHeuristicBlendMode { get; init; } =
+        AutoPbrDefaults.DefaultMlSpecularHeuristicBlendMode;
+
+    /// <summary>
+    /// Blend math used when combining heuristic and ML for channels selected by <see cref="MlSpecularHeuristicBlendMode"/>.
+    /// </summary>
+    public MlSpecularBlendMath MlSpecularBlendMath { get; init; } = AutoPbrDefaults.DefaultMlSpecularBlendMath;
+
+    /// <summary>When true, append edge magnitude as 4th input channel if direct spec model expects it.</summary>
+    public bool MlSpecularUseEdgeChannel { get; init; } = true;
+
+    /// <summary>
+    /// When true and ML inference ran, per-texture smoothness (R) remap uses only non-ML pixels for min/max (or percentiles)
+    /// and is applied only to non-ML pixels — model R stays as predicted. Heuristic pixels keep the usual remap. When false,
+    /// behavior matches older builds (entire texture remapped together). Ignored when <see cref="SpecularDebugSkipSpecularRemap"/> is true.
+    /// </summary>
+    public bool MlSpecularSkipSmoothnessRemap { get; init; } = true;
+
+    /// <summary>
+    /// When true, diffuse pixels with alpha less than or equal to <see cref="MlSpecularTransparentAlphaClampMax"/> are hard-clamped to RGBA 0
+    /// in generated _s output. This suppresses model hallucinations in empty/near-empty sprite regions.
+    /// </summary>
+    public bool MlSpecularZeroTransparentPixels { get; init; } = true;
+
+    /// <summary>
+    /// Alpha threshold (0..255) for transparent-pixel clamp when <see cref="MlSpecularZeroTransparentPixels"/> is true.
+    /// 0 means only fully transparent pixels; values like 4-16 also clamp anti-aliased fringes.
+    /// </summary>
+    public int MlSpecularTransparentAlphaClampMax { get; init; } = 0;
+
+    /// <summary>
+    /// Debug: when ML specular is enabled, never use the heuristic/tag specular path. Pixels that would fall back
+    /// (or the whole texture if inference fails) are filled with magenta (255,0,255) so they are obvious in previews.
+    /// </summary>
+    public bool SpecularDebugDisableHeuristicSpecular { get; init; }
+
+    /// <summary>Debug: skip per-texture smoothness (R) percentile/min-max remap so _s matches model output more closely.</summary>
+    public bool SpecularDebugSkipSpecularRemap { get; init; }
+
+    /// <summary>Debug: log extra specular-ML diagnostics (load errors, tensor shapes, first-pixel sample) per texture.</summary>
+    public bool SpecularDebugVerboseSpecularMl { get; init; }
+
     public SpecularData? SpecularData { get; init; }
+}
+
+/// <summary>How ML specular is mixed with heuristic output when both are available.</summary>
+public enum MlSpecularHeuristicBlendMode
+{
+    /// <summary>
+    /// Only smoothness (R) mixes heuristic vs ML. Metallic (G), porosity (B), and emissive (A) use the model only
+    /// (heuristic does not contribute hg/hb/ha in the blend). When blend is 0, all channels match heuristics.
+    /// </summary>
+    SmoothnessOnly = 0,
+
+    /// <summary>Heuristic contributes to every channel: R, G, B, and A each lerp between heuristic and ML.</summary>
+    Full = 1,
+
+    /// <summary>
+    /// Same as <see cref="SmoothnessOnly"/> for R/G/A: only R blends heuristic↔ML while G/A come from ML.
+    /// B (porosity) stays heuristic.
+    /// </summary>
+    AiMetalAndEmissive = 2
+}
+
+/// <summary>Math function for heuristic↔ML channel mixing.</summary>
+public enum MlSpecularBlendMath
+{
+    /// <summary>Linear interpolation: <c>(1-mix)*heuristic + mix*ml</c>.</summary>
+    Linear = 0,
+
+    /// <summary>
+    /// Soft-light composite target with heuristic-preserving crossfade:
+    /// <c>lerp(heuristic, softLight(heuristic, ml), mix)</c>.
+    /// </summary>
+    SoftLight = 1,
+
+    /// <summary>
+    /// Overlay composite target with heuristic-preserving crossfade:
+    /// <c>lerp(heuristic, overlay(heuristic, ml), mix)</c>.
+    /// </summary>
+    Overlay = 2,
+
+    /// <summary>
+    /// Screen composite target with heuristic-preserving crossfade:
+    /// <c>lerp(heuristic, screen(heuristic, ml), mix)</c>.
+    /// </summary>
+    Screen = 3,
+
+    /// <summary>
+    /// Gain-curve remap (controlled by ML) with heuristic-preserving crossfade:
+    /// <c>lerp(heuristic, gain(heuristic, ml), mix)</c>.
+    /// </summary>
+    BiasGain = 4,
+
+    /// <summary>
+    /// Logit-space interpolation between heuristic and ML:
+    /// <c>sigmoid(lerp(logit(heuristic), logit(ml), mix))</c>.
+    /// </summary>
+    SigmoidCrossfade = 5
 }
 
 public enum NormalOperator
@@ -196,13 +370,6 @@ public enum NormalDerivative
     Color,
     ColorLuminanceBlend,
     ColorLuminanceMax
-}
-
-public enum QualityProfile
-{
-    Balanced,
-    LowRes,
-    HiRes
 }
 
 public enum DeepBumpInputMode

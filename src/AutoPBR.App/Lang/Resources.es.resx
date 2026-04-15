@@ -77,6 +77,12 @@
   <data name="Appearance" xml:space="preserve">
     <value>Apariencia</value>
   </data>
+  <data name="UiScaling" xml:space="preserve">
+    <value>Escala</value>
+  </data>
+  <data name="UiScalingTooltip" xml:space="preserve">
+    <value>Escala toda la interfaz (texto, controles y espacio). Use un valor superior al 100 % para legibilidad.</value>
+  </data>
   <data name="AppTitle" xml:space="preserve"><value>AutoPBR</value></data>
   <data name="AppSubtitle" xml:space="preserve"><value>Convierte un paquete de recursos de Minecraft en un paquete PBR (specular + normal + height).</value></data>
   <data name="TabConvert" xml:space="preserve"><value>Convertir</value></data>
@@ -91,14 +97,15 @@
   <data name="BatchConvertButton" xml:space="preserve"><value>Convertir lote</value></data>
   <data name="ExploreArchiveContents" xml:space="preserve"><value>Contenido del paquete</value></data>
   <data name="ResourceExplorer" xml:space="preserve"><value>Explorador de recursos</value></data>
-  <data name="ExploreEmptyMessage" xml:space="preserve"><value>Escanea un paquete o una carpeta de lotes en la pestaña Escanear para explorar el contenido.</value></data>
+  <data name="ExploreEmptyMessage" xml:space="preserve"><value>Escanea un paquete o una carpeta válida para explorar el contenido.</value></data>
   <data name="ExploreExpandAll" xml:space="preserve"><value>Expandir todo</value></data>
   <data name="ExploreCollapseAll" xml:space="preserve"><value>Contraer todo</value></data>
   <data name="ExploreBack" xml:space="preserve"><value>Atrás</value></data>
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
-  <data name="TabTune" xml:space="preserve"><value>Ajustar</value></data>
+  <data name="TabNormals" xml:space="preserve"><value>Normales</value></data>
   <data name="TabSettings" xml:space="preserve"><value>Configuración</value></data>
   <data name="Input" xml:space="preserve"><value>Entrada</value></data>
+  <data name="InputSourceModeTooltip" xml:space="preserve"><value>Desactivado: paquete de recursos único (.zip / .jar). Activado: carpeta de paquetes para escaneo y conversión por lotes.</value></data>
   <data name="ResourcePackWatermark" xml:space="preserve"><value>Paquete de recursos (.zip o .jar)</value></data>
   <data name="Browse" xml:space="preserve"><value>Examinar…</value></data>
   <data name="Log" xml:space="preserve"><value>Registro</value></data>
@@ -127,7 +134,11 @@
   <data name="GenerationSettings" xml:space="preserve"><value>Configuración de generación</value></data>
   <data name="TuneNormals" xml:space="preserve"><value>Normales</value></data>
   <data name="TuneSpecular" xml:space="preserve"><value>Specular</value></data>
+  <data name="NormalsTuning" xml:space="preserve"><value>Ajuste de normales</value></data>
+  <data name="SpecularTuning" xml:space="preserve"><value>Ajuste specular</value></data>
+  <data name="AiTuning" xml:space="preserve"><value>Ajuste de IA</value></data>
   <data name="TuneHeight" xml:space="preserve"><value>Altura</value></data>
+  <data name="HeightmapTuning" xml:space="preserve"><value>Ajuste del mapa de alturas</value></data>
   <data name="NormalStrength" xml:space="preserve"><value>Fuerza de normales</value></data>
   <data name="NormalStrengthTooltip" xml:space="preserve"><value>Fuerza del gradiente del mapa de normales. Mayor = más relieve.</value></data>
   <data name="HeightStrength" xml:space="preserve"><value>Fuerza de altura</value></data>
@@ -165,10 +176,6 @@
   <data name="DeepBumpInputModeGrayscale" xml:space="preserve"><value>Escala de grises</value></data>
   <data name="DeepBumpInputModeRgb" xml:space="preserve"><value>RGB</value></data>
   <data name="DeepBumpForceBlue255" xml:space="preserve"><value>Forzar B=255 en normales DeepBump</value></data>
-  <data name="QualityProfile" xml:space="preserve"><value>Perfil de calidad</value></data>
-  <data name="QualityProfileBalanced" xml:space="preserve"><value>Equilibrado</value></data>
-  <data name="QualityProfileLowRes" xml:space="preserve"><value>Baja res. (16–64)</value></data>
-  <data name="QualityProfileHiRes" xml:space="preserve"><value>Alta res. (128–512)</value></data>
   <data name="Advanced" xml:space="preserve"><value>Avanzado</value></data>
   <data name="Preprocessing" xml:space="preserve"><value>Preprocesado</value></data>
   <data name="PreprocessLinearize" xml:space="preserve"><value>Linearizar (sRGB → lineal) antes de derivadas</value></data>
@@ -181,8 +188,6 @@
   <data name="SpecularPercentileRemap" xml:space="preserve"><value>Remap por percentiles de suavidad (R)</value></data>
   <data name="SpecularRemapLowPercentile" xml:space="preserve"><value>Percentil bajo</value></data>
   <data name="SpecularRemapHighPercentile" xml:space="preserve"><value>Percentil alto</value></data>
-  <data name="MetalHeuristicSubstrings" xml:space="preserve"><value>Pistas de nombre de metal</value></data>
-  <data name="MetalHeuristicSubstringsWatermark" xml:space="preserve"><value>Separado por comas (opcional), ej. iron,gold,steel</value></data>
   <data name="AoAdvanced" xml:space="preserve"><value>Oclusión ambiental (AO)</value></data>
   <data name="GenerateAo" xml:space="preserve"><value>Incrustar AO en normal (canal azul)</value></data>
   <data name="AoRadius" xml:space="preserve"><value>Radio de AO</value></data>
@@ -205,6 +210,8 @@
   <data name="Engine" xml:space="preserve"><value>Motor</value></data>
   <data name="MaxThreads" xml:space="preserve"><value>Máx. hilos</value></data>
   <data name="MaxThreadsTooltip" xml:space="preserve"><value>Hilos de trabajo. 0 = automático.</value></data>
+  <data name="OnnxPreferTensorRt" xml:space="preserve"><value>Preferir TensorRT para ONNX GPU (reserva CUDA)</value></data>
+  <data name="OnnxPreferTensorRtTooltip" xml:space="preserve"><value>Si está activado, los modelos ONNX usan TensorRT con CUDA para ops no soportadas. Si no, solo CUDA—inicio de sesión más rápido; TensorRT puede compilar motores la primera vez.</value></data>
   <data name="TempFolder" xml:space="preserve"><value>Carpeta temporal</value></data>
   <data name="TempFolderTooltip" xml:space="preserve"><value>Carpeta para extracción temporal. Vacío = temp del sistema.</value></data>
   <data name="TempFolderWatermark" xml:space="preserve"><value>Vacío = temp del sistema</value></data>

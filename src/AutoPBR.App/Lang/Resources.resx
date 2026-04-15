@@ -97,6 +97,12 @@
   <data name="Appearance" xml:space="preserve">
     <value>Appearance</value>
   </data>
+  <data name="UiScaling" xml:space="preserve">
+    <value>Scaling</value>
+  </data>
+  <data name="UiScalingTooltip" xml:space="preserve">
+    <value>Scales the entire interface (text, controls, and spacing). Choose from 75% to 100% in 5% steps; 100% is default.</value>
+  </data>
   <data name="AppTitle" xml:space="preserve">
     <value>AutoPBR</value>
   </data>
@@ -140,7 +146,7 @@
     <value>Resource Explorer</value>
   </data>
   <data name="ExploreEmptyMessage" xml:space="preserve">
-    <value>Scan a pack or batch folder on the Scan tab to explore contents.</value>
+    <value>Scan a pack or valid folder to explore contents.</value>
   </data>
   <data name="ExploreExpandAll" xml:space="preserve">
     <value>Expand all</value>
@@ -164,7 +170,7 @@
     <value>Tag rules</value>
   </data>
   <data name="TagRulesCustomDescription" xml:space="preserve">
-    <value>Custom rules are applied after built-in presets (Brick, Wood, Metal, Foliage). Export/import JSON for backup or CLI --tag-rules.</value>
+    <value>Material tags are informational (Explore + future use). Built-in presets: Brick, Wood, Metal, Organic. Add custom rules for keywords and optional ML hints. Export/import JSON for backup or CLI --tag-rules.</value>
   </data>
   <data name="TagRuleId" xml:space="preserve">
     <value>Id</value>
@@ -174,6 +180,57 @@
   </data>
   <data name="TagRuleKeywords" xml:space="preserve">
     <value>Keywords (comma-separated)</value>
+  </data>
+  <data name="TagRuleSemanticHints" xml:space="preserve">
+    <value>Semantic hints (comma-separated, optional)</value>
+  </data>
+  <data name="MaterialTagSemanticMl" xml:space="preserve">
+    <value>Semantic tag suggestions (MiniLM)</value>
+  </data>
+  <data name="MaterialTagSemanticMlDescription" xml:space="preserve">
+    <value>Uses the bundled ONNX model under Data/all-MiniLM-L6-v2-onnx (requires model.onnx). When enabled, automatic tags come only from MiniLM (keyword rules are not used for auto-tagging). Manual tag add/remove still applies on top.</value>
+  </data>
+  <data name="UseSemanticMaterialTags" xml:space="preserve">
+    <value>Enable semantic suggestions</value>
+  </data>
+  <data name="MaterialTagMinSimilarity" xml:space="preserve">
+    <value>Min. similarity</value>
+  </data>
+  <data name="MaterialTagMaxCount" xml:space="preserve">
+    <value>Max. ML tags</value>
+  </data>
+  <data name="MaterialTagMaxCountTooltip" xml:space="preserve">
+    <value>Maximum material tags returned by semantic matching. Some built-in ore/material pairing rules and automatic flags may still add required tags beyond this value.</value>
+  </data>
+  <data name="MaterialTagCertaintyThreshold" xml:space="preserve">
+    <value>Min. certainty</value>
+  </data>
+  <data name="MaterialTagCertaintyThresholdTooltip" xml:space="preserve">
+    <value>If the best semantic match is below this score, only Unknown is suggested (cosine similarity 0–1).</value>
+  </data>
+  <data name="DictionaryEvidenceEnabled" xml:space="preserve">
+    <value>Augment with dictionary evidence (FreeDictionaryAPI)</value>
+  </data>
+  <data name="DictionaryEvidenceWeight" xml:space="preserve">
+    <value>Dictionary blend weight</value>
+  </data>
+  <data name="DictionaryMinEvidenceScore" xml:space="preserve">
+    <value>Dictionary min evidence</value>
+  </data>
+  <data name="DictionaryRequestTimeoutMs" xml:space="preserve">
+    <value>Dictionary timeout (ms)</value>
+  </data>
+  <data name="TagLegendMaterials" xml:space="preserve">
+    <value>Materials</value>
+  </data>
+  <data name="TagLegendFlags" xml:space="preserve">
+    <value>Flags</value>
+  </data>
+  <data name="ExploreColumnResource" xml:space="preserve">
+    <value>Resource</value>
+  </data>
+  <data name="TagRuleKindLabel" xml:space="preserve">
+    <value>Kind</value>
   </data>
   <data name="AddCustomTagRule" xml:space="preserve">
     <value>Add custom rule</value>
@@ -209,7 +266,7 @@
     <value>Use this rule</value>
   </data>
   <data name="TagRuleEnabledTooltip" xml:space="preserve">
-    <value>When unchecked, this rule is excluded from conversion and the legend. Click Refresh to update.</value>
+    <value>When unchecked, this rule is excluded from the legend and Explore. Click Refresh to update.</value>
   </data>
   <data name="TagRuleMoveUp" xml:space="preserve">
     <value>↑</value>
@@ -253,14 +310,17 @@
   <data name="ExploreFocusAssets" xml:space="preserve">
     <value>assets</value>
   </data>
-  <data name="TabTune" xml:space="preserve">
-    <value>Tune</value>
+  <data name="TabNormals" xml:space="preserve">
+    <value>Normals</value>
   </data>
   <data name="TabSettings" xml:space="preserve">
     <value>Settings</value>
   </data>
   <data name="Input" xml:space="preserve">
     <value>Input</value>
+  </data>
+  <data name="InputSourceModeTooltip" xml:space="preserve">
+    <value>Off: single resource pack (.zip / .jar). On: folder of packs for batch scan and convert.</value>
   </data>
   <data name="ResourcePackWatermark" xml:space="preserve">
     <value>Resource pack (.zip or .jar)</value>
@@ -349,8 +409,20 @@
   <data name="TuneSpecular" xml:space="preserve">
     <value>Specular</value>
   </data>
+  <data name="NormalsTuning" xml:space="preserve">
+    <value>Normals Tuning</value>
+  </data>
+  <data name="SpecularTuning" xml:space="preserve">
+    <value>Specular Tuning</value>
+  </data>
+  <data name="AiTuning" xml:space="preserve">
+    <value>AI Tuning</value>
+  </data>
   <data name="TuneHeight" xml:space="preserve">
     <value>Height</value>
+  </data>
+  <data name="HeightmapTuning" xml:space="preserve">
+    <value>Heightmap Tuning</value>
   </data>
   <data name="NormalStrength" xml:space="preserve">
     <value>Normal strength</value>
@@ -401,7 +473,58 @@
     <value>Porosity bias</value>
   </data>
   <data name="PorosityBiasTooltip" xml:space="preserve">
-    <value>Offset added to the porosity/subsurface channel (LabPBR B). Can be negative.</value>
+    <value>Offset added to the porosity/subsurface channel (LabPBR B) for heuristic and AI specular. Can be negative.</value>
+  </data>
+  <data name="PlantMaterialPorosityExtra" xml:space="preserve">
+    <value>Organic material extra porosity</value>
+  </data>
+  <data name="PlantMaterialPorosityExtraTooltip" xml:space="preserve">
+    <value>Additional B-channel offset for textures with the Organic material tag (or OptiFine plant paths). Added on top of Porosity bias.</value>
+  </data>
+  <data name="MlSpecularHeuristicBlend" xml:space="preserve">
+    <value>Heuristic / AI blend</value>
+  </data>
+  <data name="MlSpecularHeuristicBlendTooltip" xml:space="preserve">
+    <value>0 = pure heuristic specular when the AI model runs; 1 = full AI contribution. Intermediate values mix both.</value>
+  </data>
+  <data name="MlSpecularBlendMode" xml:space="preserve">
+    <value>Channel Mode</value>
+  </data>
+  <data name="MlSpecularBlendModeTooltip" xml:space="preserve">
+    <value>Determines which channels receive heuristic contribution when blending with AI.</value>
+  </data>
+  <data name="MlSpecularBlendMath" xml:space="preserve">
+    <value>Blend Mode</value>
+  </data>
+  <data name="MlSpecularBlendMathTooltip" xml:space="preserve">
+    <value>Selects the blend math used to combine heuristic and AI values for channels that are blended.</value>
+  </data>
+  <data name="MlSpecularBlendMathLinear" xml:space="preserve">
+    <value>Linear</value>
+  </data>
+  <data name="MlSpecularBlendMathSoftLight" xml:space="preserve">
+    <value>Soft Light</value>
+  </data>
+  <data name="MlSpecularBlendMathOverlay" xml:space="preserve">
+    <value>Overlay</value>
+  </data>
+  <data name="MlSpecularBlendMathScreen" xml:space="preserve">
+    <value>Screen</value>
+  </data>
+  <data name="MlSpecularBlendMathBiasGain" xml:space="preserve">
+    <value>Bias/Gain</value>
+  </data>
+  <data name="MlSpecularBlendMathSigmoidCrossfade" xml:space="preserve">
+    <value>Sigmoid Crossfade</value>
+  </data>
+  <data name="MlSpecularBlendModeSmoothnessOnly" xml:space="preserve">
+    <value>Smoothness Only</value>
+  </data>
+  <data name="MlSpecularBlendModeFull" xml:space="preserve">
+    <value>Full</value>
+  </data>
+  <data name="MlSpecularBlendModeAiMetalAndEmissive" xml:space="preserve">
+    <value>AI Metal &amp; Emissive</value>
   </data>
   <data name="FastSpecular" xml:space="preserve">
     <value>Fast specular</value>
@@ -413,7 +536,7 @@
     <value>Foliage:</value>
   </data>
   <data name="FoliageTooltip" xml:space="preserve">
-    <value>Ignore All: skip plant textures. No Height: convert plants but no height in normal alpha. Convert All: process plants like everything else.</value>
+    <value>Applies only to textures with the 2D Sprite flag (organic material, not block). Ignore All: skip those. No Height: convert but omit height in normal alpha. Convert All: same as other textures.</value>
   </data>
   <data name="IgnoreAll" xml:space="preserve">
     <value>Ignore All</value>
@@ -469,17 +592,44 @@
   <data name="DeepBumpForceBlue255" xml:space="preserve">
     <value>Force B=255 in DeepBump normals</value>
   </data>
-  <data name="QualityProfile" xml:space="preserve">
-    <value>Quality profile</value>
+  <data name="DeepBumpNormalIntensity" xml:space="preserve">
+    <value>DeepBump normal strength</value>
   </data>
-  <data name="QualityProfileBalanced" xml:space="preserve">
-    <value>Balanced</value>
+  <data name="DeepBumpNormalIntensityTooltip" xml:space="preserve">
+    <value>DeepBump-only normal XY strength multiplier. 1 = unchanged, higher = stronger details, lower = flatter normals.</value>
   </data>
-  <data name="QualityProfileLowRes" xml:space="preserve">
-    <value>LowRes (16–64)</value>
+  <data name="DeepBumpNormalSoftClamp" xml:space="preserve">
+    <value>DeepBump soft clamp</value>
   </data>
-  <data name="QualityProfileHiRes" xml:space="preserve">
-    <value>HiRes (128–512)</value>
+  <data name="DeepBumpNormalSoftClampTooltip" xml:space="preserve">
+    <value>0 = linear strength scaling. Higher values apply a soft tanh clamp to XY magnitude, keeping strong details while reducing near-90° saturation artifacts.</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedEnhance" xml:space="preserve">
+    <value>Edge-guided DeepBump enhancement</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedStrength" xml:space="preserve">
+    <value>Edge guidance strength</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedStrengthTooltip" xml:space="preserve">
+    <value>Amplifies model normal XY magnitude more on strong diffuse edges. 0 = disabled, 1 = moderate, higher = sharper edges.</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedGamma" xml:space="preserve">
+    <value>Edge guidance gamma</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedGammaTooltip" xml:space="preserve">
+    <value>Controls where enhancement is concentrated. Higher values focus on the strongest edges; lower values spread across softer edges.</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedDirectionMix" xml:space="preserve">
+    <value>Edge direction mix</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedDirectionMixTooltip" xml:space="preserve">
+    <value>Blends DeepBump normal direction toward diffuse-derived gradient direction on edges. 0 = keep model direction, 1 = fully align on strong edges.</value>
+  </data>
+  <data name="NormalHeightTransparentAlphaClampMax" xml:space="preserve">
+    <value>Normal/height transparent alpha clamp max</value>
+  </data>
+  <data name="NormalHeightTransparentAlphaClampMaxTooltip" xml:space="preserve">
+    <value>Post-process clamp: if diffuse alpha ≤ this value, force normal/height RGBA to 0 to avoid artifacts in transparent regions. Slider caps at 16; you can type up to 255.</value>
   </data>
   <data name="Advanced" xml:space="preserve">
     <value>Advanced</value>
@@ -517,11 +667,53 @@
   <data name="SpecularRemapHighPercentile" xml:space="preserve">
     <value>High percentile</value>
   </data>
-  <data name="MetalHeuristicSubstrings" xml:space="preserve">
-    <value>Metal name hints</value>
+  <data name="UseMlSpecularPredictor" xml:space="preserve">
+    <value>Use ML specular generator/predictor (ONNX)</value>
   </data>
-  <data name="MetalHeuristicSubstringsWatermark" xml:space="preserve">
-    <value>Comma-separated (optional), e.g. iron,gold,steel</value>
+  <data name="UseMlSpecularPredictorTooltip" xml:space="preserve">
+    <value>When enabled and a default or per-resolution model path is valid, direct per-pixel specular RGBA is predicted from diffuse. Optional per-resolution paths (or bundled Data/models/&lt;size&gt;/) choose the ONNX by texture size (ceil). The heuristic/AI blend slider controls how much of the model is used versus the classic heuristic. Check the log for ML diagnostics.</value>
+  </data>
+  <data name="MlSpecularModelPath" xml:space="preserve">
+    <value>Specular model path</value>
+  </data>
+  <data name="MlSpecularModelPathWatermark" xml:space="preserve">
+    <value>Path to specular generator/predictor ONNX file</value>
+  </data>
+  <data name="MlSpecularPerResolutionHeader" xml:space="preserve">
+    <value>Per-resolution specular models (optional)</value>
+  </data>
+  <data name="MlSpecularPerResolutionTooltip" xml:space="preserve">
+    <value>Override ONNX per training resolution. Leave blank to use bundled files under Data/models/&lt;size&gt;/ when present. The runtime picks the smallest configured resolution ≥ texture size (ceil); if the texture is larger than all keys, the largest key is used. Fallback default path above applies only when no per-resolution map is available.</value>
+  </data>
+  <data name="MlSpecularUseEdgeChannel" xml:space="preserve">
+    <value>Include edge channel for specular model input (if model expects 4 channels)</value>
+  </data>
+  <data name="MlSpecularTransparentAlphaClampMax" xml:space="preserve">
+    <value>Transparent alpha clamp max</value>
+  </data>
+  <data name="MlSpecularTransparentAlphaClampMaxTooltip" xml:space="preserve">
+    <value>Post-process clamp: if diffuse alpha ≤ this value, force specular RGBA to 0 to avoid ML artifacts in transparent regions. Slider caps at 16; you can type up to 255.</value>
+  </data>
+  <data name="SpecularDebugSection" xml:space="preserve">
+    <value>Specular ML debug</value>
+  </data>
+  <data name="SpecularDebugDisableHeuristicSpecular" xml:space="preserve">
+    <value>Disable heuristic fallback (magenta = non-ML)</value>
+  </data>
+  <data name="SpecularDebugDisableHeuristicSpecularTooltip" xml:space="preserve">
+    <value>Pixels that would use the classic specular path are forced to magenta (255,0,255). If ML failed entirely, the whole texture is magenta. Makes it obvious whether the model is driving pixels.</value>
+  </data>
+  <data name="SpecularDebugSkipSpecularRemap" xml:space="preserve">
+    <value>Skip smoothness (R) percentile remap</value>
+  </data>
+  <data name="SpecularDebugSkipSpecularRemapTooltip" xml:space="preserve">
+    <value>Disables the post-step that remaps R to the 10–200 range so you can judge model output directly.</value>
+  </data>
+  <data name="SpecularDebugVerboseSpecularMl" xml:space="preserve">
+    <value>Verbose ML diagnostics (log)</value>
+  </data>
+  <data name="SpecularDebugVerboseSpecularMlTooltip" xml:space="preserve">
+    <value>Per texture, logs load/runtime details and a first-pixel sample when inference succeeds. Also logs precise errors when the model fails to load or output shape mismatches.</value>
   </data>
   <data name="AoAdvanced" xml:space="preserve">
     <value>Ambient Occlusion (AO)</value>
@@ -594,6 +786,12 @@
   </data>
   <data name="MaxThreadsTooltip" xml:space="preserve">
     <value>Worker threads for conversion. 0 = auto (typically CPU count minus 2).</value>
+  </data>
+  <data name="OnnxPreferTensorRt" xml:space="preserve">
+    <value>Prefer TensorRT for ONNX GPU (CUDA fallback)</value>
+  </data>
+  <data name="OnnxPreferTensorRtTooltip" xml:space="preserve">
+    <value>When checked, ONNX models use the TensorRT execution provider with CUDA for unsupported ops. When unchecked, CUDA only—faster session startup; TensorRT may compile engines on first use.</value>
   </data>
   <data name="TempFolder" xml:space="preserve">
     <value>Temp folder</value>
@@ -681,5 +879,14 @@
   </data>
   <data name="Status_ConversionFailed" xml:space="preserve">
     <value>Conversion failed.</value>
+  </data>
+  <data name="BackgroundTaskMaterialTags" xml:space="preserve">
+    <value>Material tags</value>
+  </data>
+  <data name="BackgroundTaskExploreCache" xml:space="preserve">
+    <value>Explore cache</value>
+  </data>
+  <data name="BackgroundTasksHeader" xml:space="preserve">
+    <value>Background tasks</value>
   </data>
 </root>

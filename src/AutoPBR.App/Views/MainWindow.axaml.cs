@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -19,6 +20,7 @@ public partial class MainWindow : Window
     private const double RoundedCornerRadius = 8;
     private const double JumpToTopThresholdPx = 220;
     private Border? _rootBorder;
+    private double _lastUiScaleForWindow = 1.0;
 
     public MainWindow()
     {
@@ -33,6 +35,12 @@ public partial class MainWindow : Window
         TryEnableWindowsSnap();
         _rootBorder = this.FindControl<Border>("RootBorder");
         RestoreWindowLayout();
+        if (DataContext is MainWindowViewModel vmOpen)
+        {
+            _lastUiScaleForWindow = vmOpen.UiScale;
+            vmOpen.PropertyChanged += ViewModel_OnPropertyChanged;
+        }
+
         UpdateCornerRadiusFromCurrentState();
         PropertyChanged += (_, args) =>
         {
@@ -67,6 +75,11 @@ public partial class MainWindow : Window
 
     private void OnClosing(object? sender, WindowClosingEventArgs e)
     {
+        if (DataContext is MainWindowViewModel vmClose)
+        {
+            vmClose.PropertyChanged -= ViewModel_OnPropertyChanged;
+        }
+
         var contentGrid = this.FindControl<Grid>("ContentGrid");
         var state = new WindowLayoutState
         {
@@ -85,6 +98,67 @@ public partial class MainWindow : Window
 
 
         state.Save();
+    }
+
+    private void ViewModel_OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(MainWindowViewModel.UiScale))
+        {
+            return;
+        }
+
+        if (sender is not MainWindowViewModel vm)
+        {
+            return;
+        }
+
+        if (WindowState != WindowState.Normal)
+        {
+            _lastUiScaleForWindow = vm.UiScale;
+            return;
+        }
+
+        var newS = vm.UiScale;
+        var oldS = _lastUiScaleForWindow;
+        if (Math.Abs(newS - oldS) < 1e-9)
+        {
+            return;
+        }
+
+        _lastUiScaleForWindow = newS;
+        Width *= newS / oldS;
+        Height *= newS / oldS;
+    }
+
+    private void ExploreTreeHeaderSplitter_OnPointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (sender is GridSplitter splitter && e.Pointer.Captured == splitter)
+        {
+            SyncExploreTreeColumnWidthsFromHeader();
+        }
+    }
+
+    private void ExploreTreeHeaderSplitter_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        SyncExploreTreeColumnWidthsFromHeader();
+    }
+
+    private void SyncExploreTreeColumnWidthsFromHeader()
+    {
+        if (DataContext is not MainWindowViewModel vm)
+        {
+            return;
+        }
+
+        var grid = this.FindControl<Grid>("ExploreTreeHeaderGrid");
+        if (grid is null || grid.ColumnDefinitions.Count < 5)
+        {
+            return;
+        }
+
+        vm.ExploreTreeColumnResourceWidth = grid.ColumnDefinitions[0].Width;
+        vm.ExploreTreeColumnMaterialsWidth = grid.ColumnDefinitions[2].Width;
+        vm.ExploreTreeColumnFlagsWidth = grid.ColumnDefinitions[4].Width;
     }
 
     private void UpdateCornerRadiusFromCurrentState()
@@ -392,26 +466,53 @@ public partial class MainWindow : Window
                     scroll.ScrollToEnd();
                 }
             };
+
+            vm.ShowSemanticDebugDialog = text => ShowSemanticDebugWindow(text);
         }
 
-        // Jump-to-top (Explorer) button: show only when we're in the Explore tab and the main scroll is down.
-        if (MainScrollViewer is { } mainScroll && MainTabControl is { } tabs && JumpToTopButton is not null)
+        // Jump-to-top (Explorer) button: show when Explore tab is active and the tree list is scrolled.
+        if (ExploreTreeScrollViewer is { } exploreTree && MainTabControl is { } tabs && JumpToTopButton is not null)
         {
-            mainScroll.ScrollChanged += (_, _) => UpdateJumpToTopButtonVisibility(tabs.SelectedIndex, mainScroll.Offset.Y);
-            tabs.SelectionChanged += (_, _) => UpdateJumpToTopButtonVisibility(tabs.SelectedIndex, mainScroll.Offset.Y);
-            UpdateJumpToTopButtonVisibility(tabs.SelectedIndex, mainScroll.Offset.Y);
+            exploreTree.ScrollChanged += (_, _) => UpdateJumpToTopButtonVisibility(tabs.SelectedIndex, exploreTree.Offset.Y);
+            tabs.SelectionChanged += (_, _) => UpdateJumpToTopButtonVisibility(tabs.SelectedIndex, exploreTree.Offset.Y);
+            UpdateJumpToTopButtonVisibility(tabs.SelectedIndex, exploreTree.Offset.Y);
         }
     }
 
-    private void UpdateJumpToTopButtonVisibility(int selectedTabIndex, double scrollOffsetY)
+    private void ShowSemanticDebugWindow(string text)
+    {
+        var window = new Window
+        {
+            Title = "MiniLM Semantic Match Debug",
+            Width = 620,
+            Height = 520,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            Content = new ScrollViewer
+            {
+                HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto,
+                Content = new SelectableTextBlock
+                {
+                    Text = text,
+                    FontFamily = new Avalonia.Media.FontFamily("Cascadia Mono, Consolas, Courier New, monospace"),
+                    FontSize = 12,
+                    Margin = new Thickness(12),
+                    TextWrapping = Avalonia.Media.TextWrapping.NoWrap
+                }
+            }
+        };
+
+        window.Show(this);
+    }
+
+    private void UpdateJumpToTopButtonVisibility(int selectedTabIndex, double exploreTreeOffsetY)
     {
         if (JumpToTopButton is null)
         {
             return;
         }
 
-        var isExploreTab = selectedTabIndex == 1; // Scan, Explore, Tune, Settings
-        var show = isExploreTab && scrollOffsetY > JumpToTopThresholdPx;
+        var isExploreTab = selectedTabIndex == 0;
+        var show = isExploreTab && exploreTreeOffsetY > JumpToTopThresholdPx;
 
         JumpToTopButton.IsVisible = show;
         JumpToTopButton.IsHitTestVisible = show;
@@ -420,13 +521,10 @@ public partial class MainWindow : Window
 
     private void JumpToTopButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        if (MainScrollViewer is null)
+        if (ExploreTreeScrollViewer is { } tree)
         {
-            return;
+            tree.Offset = new Vector(tree.Offset.X, 0);
         }
-
-        // Scroll the main content area back to the top so Explore filters are immediately visible again.
-        MainScrollViewer.Offset = new Vector(MainScrollViewer.Offset.X, 0);
     }
 
     private void OpenLogFolder_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -520,71 +618,52 @@ public partial class MainWindow : Window
         }
     }
 
-    private async void BrowsePack_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private async void BrowseInput_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         try
         {
+            if (DataContext is not MainWindowViewModel vm)
+            {
+                return;
+            }
+
             var topLevel = TopLevel.GetTopLevel(this);
             if (topLevel?.StorageProvider is null)
             {
                 return;
             }
 
-
-            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            if (vm.UseBatchFolderInput)
             {
-                Title = "Select resource pack (.zip or .jar)",
-                AllowMultiple = false,
-                FileTypeFilter =
-                [
-                    new FilePickerFileType("Zip / JAR") { Patterns = ["*.zip", "*.jar"] }
-                ]
-            });
+                var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+                {
+                    Title = Lang.Resources.BatchFolderWatermark,
+                    AllowMultiple = false
+                });
 
-            var path = files.Count > 0 ? files[0].TryGetLocalPath() : null;
-            if (path is null)
-            {
-                return;
+                var folderPath = folders.Count > 0 ? folders[0].TryGetLocalPath() : null;
+                if (folderPath is not null)
+                {
+                    vm.BatchFolderPath = folderPath;
+                }
             }
-
-
-            if (DataContext is MainWindowViewModel vm)
+            else
             {
-                vm.PackPath = path;
-            }
+                var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+                {
+                    Title = "Select resource pack (.zip or .jar)",
+                    AllowMultiple = false,
+                    FileTypeFilter =
+                    [
+                        new FilePickerFileType("Zip / JAR") { Patterns = ["*.zip", "*.jar"] }
+                    ]
+                });
 
-        }
-        catch (Exception)
-        {
-            // Prevent unhandled exception in async void from crashing the process
-        }
-    }
-
-    private async void BrowseBatchFolder_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    {
-        try
-        {
-            var topLevel = TopLevel.GetTopLevel(this);
-            if (topLevel?.StorageProvider is null)
-            {
-                return;
-            }
-
-            var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
-            {
-                Title = Lang.Resources.BatchFolderWatermark,
-                AllowMultiple = false
-            });
-
-            var path = folders.Count > 0 ? folders[0].TryGetLocalPath() : null;
-            if (path is null)
-            {
-                return;
-            }
-
-            if (DataContext is MainWindowViewModel vm)
-            {
-                vm.BatchFolderPath = path;
+                var filePath = files.Count > 0 ? files[0].TryGetLocalPath() : null;
+                if (filePath is not null)
+                {
+                    vm.PackPath = filePath;
+                }
             }
         }
         catch (Exception)

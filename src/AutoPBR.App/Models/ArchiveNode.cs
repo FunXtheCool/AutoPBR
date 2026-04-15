@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 
 using Avalonia.Media.Imaging;
+using AutoPBR.Core.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace AutoPBR.App.Models;
@@ -22,6 +23,7 @@ public partial class ArchiveNode(
     public ObservableCollection<ArchiveNode> Children { get; } = new();
 
     [ObservableProperty] private bool _isExpanded;
+    [ObservableProperty] private bool _isSelected;
     [ObservableProperty] private Bitmap? _packIcon;
 
     /// <summary>When true, this node is shown in the tree; when false, hidden by the Resource Explorer search filter.</summary>
@@ -49,38 +51,92 @@ public partial class ArchiveNode(
     /// <summary>Call when host overrides were updated externally so the checkbox binding re-reads ManualOverride.</summary>
     public void NotifyOverrideChanged() => OnPropertyChanged(nameof(ManualOverride));
 
-    /// <summary>Effective tags for this path (from host). Empty for folders. Call RefreshDisplayTags when host tag overrides change.</summary>
-    public IReadOnlyList<DisplayTagItem> DisplayTags => IsFolder
-        ? []
-        : (host?.GetEffectiveTags(FullPath) ?? []).Select(t => new DisplayTagItem { Id = t.Id, DisplayName = t.DisplayName }).ToList();
+    /// <summary>Material tag glyphs for the Explore row. Mutated by <see cref="RefreshDisplayTags"/> so ItemsControl sees collection changes.</summary>
+    public ObservableCollection<DisplayTagItem> MaterialDisplayTags { get; } = new();
 
-    /// <summary>Call when host tag add/remove changed so the UI re-reads DisplayTags and TagMenuItems.</summary>
+    /// <summary>Flag tag glyphs for the Explore row. Mutated by <see cref="RefreshDisplayTags"/> so ItemsControl sees collection changes.</summary>
+    public ObservableCollection<DisplayTagItem> FlagDisplayTags { get; } = new();
+
+    /// <summary>Effective tags for this path (menus, diagnostics). Mirrors <see cref="MaterialDisplayTags"/> and <see cref="FlagDisplayTags"/>.</summary>
+    public IReadOnlyList<DisplayTagItem> DisplayTags =>
+        IsFolder ? [] : MaterialDisplayTags.Concat(FlagDisplayTags).ToList();
+
+    /// <summary>Call when host tag add/remove changed so the UI re-reads display tags and context menu rows.</summary>
     public void RefreshDisplayTags()
     {
+        MaterialDisplayTags.Clear();
+        FlagDisplayTags.Clear();
+        if (!IsFolder && host is not null)
+        {
+            foreach (var t in host.GetEffectiveTags(FullPath))
+            {
+                var item = new DisplayTagItem
+                {
+                    Id = t.Id,
+                    DisplayName = t.DisplayName,
+                    Kind = t.Kind,
+                    TagIcon = MaterialTagGlyphs.BitmapForTag(t.Id, t.Kind),
+                    IconGlyph = MaterialTagGlyphs.ForTagId(t.Id, t.Kind)
+                };
+                if (t.Kind == TagRuleKind.Material)
+                {
+                    MaterialDisplayTags.Add(item);
+                }
+                else
+                {
+                    FlagDisplayTags.Add(item);
+                }
+            }
+        }
+
         OnPropertyChanged(nameof(DisplayTags));
-        OnPropertyChanged(nameof(TagMenuEntries));
+        RebuildTagMenuItems();
     }
 
-    /// <summary>For context menu: entries with Node reference for commands. Refreshes when DisplayTags changes.</summary>
-    public IReadOnlyList<TagMenuEntry> TagMenuEntries
-    {
-        get
-        {
-            if (IsFolder || host is null)
-            {
-                return [];
-            }
+    /// <summary>Material tag rows for the context submenu (icon, label, checkbox).</summary>
+    public ObservableCollection<TagMenuEntry> MaterialTagMenuItems { get; } = new();
 
-            var rules = host.GetTagRules();
-            var displayTags = DisplayTags;
-            return rules
-                .Select(r =>
-                {
-                    var isApplied = displayTags.Any(t => string.Equals(t.Id, r.Id, StringComparison.OrdinalIgnoreCase));
-                    var menuHeader = host.GetTagMenuHeader(r.DisplayName, isApplied);
-                    return new TagMenuEntry(this, r.Id, isApplied, menuHeader);
-                })
-                .ToList();
+    /// <summary>Flag tag rows for the context submenu (icon, label, checkbox).</summary>
+    public ObservableCollection<TagMenuEntry> FlagTagMenuItems { get; } = new();
+
+    /// <summary>Syncs manual add/remove from a checkbox; host refreshes effective tags.</summary>
+    internal void ApplyTagMenuToggle(string tagId, bool wantApplied)
+    {
+        if (host is null || IsFolder)
+        {
+            return;
+        }
+
+        var applied = MaterialDisplayTags.Concat(FlagDisplayTags)
+            .Any(t => string.Equals(t.Id, tagId, StringComparison.OrdinalIgnoreCase));
+        if (wantApplied == applied)
+        {
+            return;
+        }
+
+        host.ApplyManualTagToggle(FullPath, tagId, wantApplied);
+    }
+
+    private void RebuildTagMenuItems()
+    {
+        MaterialTagMenuItems.Clear();
+        FlagTagMenuItems.Clear();
+        if (IsFolder || host is null)
+        {
+            return;
+        }
+
+        var rules = host.GetTagRules();
+        foreach (var r in rules.Where(r => r.Kind == TagRuleKind.Material))
+        {
+            var isApplied = MaterialDisplayTags.Any(t => string.Equals(t.Id, r.Id, StringComparison.OrdinalIgnoreCase));
+            MaterialTagMenuItems.Add(new TagMenuEntry(this, r.Id, r.DisplayName, TagRuleKind.Material, isApplied));
+        }
+
+        foreach (var r in rules.Where(r => r.Kind == TagRuleKind.Flag))
+        {
+            var isApplied = FlagDisplayTags.Any(t => string.Equals(t.Id, r.Id, StringComparison.OrdinalIgnoreCase));
+            FlagTagMenuItems.Add(new TagMenuEntry(this, r.Id, r.DisplayName, TagRuleKind.Flag, isApplied));
         }
     }
 
@@ -99,8 +155,7 @@ public partial class ArchiveNode(
                 host.EnsureChildrenLoaded(this);
             }
 
-            // Also pre-load one level of children for immediate subfolders
-            // so their expand/collapse arrows are visible right away.
+            // Pre-load one level under immediate subfolders so expand arrows exist and nested folders can open.
             foreach (var child in Children)
             {
                 if (child.IsFolder)

@@ -63,9 +63,13 @@
               "target": "Package",
               "version": "[5.0.0, )"
             },
-            "Microsoft.ML.OnnxRuntime.Gpu": {
+            "Microsoft.ML.OnnxRuntime.Managed": {
               "target": "Package",
               "version": "[1.24.3, )"
+            },
+            "Microsoft.ML.Tokenizers": {
+              "target": "Package",
+              "version": "[1.0.2, )"
             },
             "SixLabors.ImageSharp": {
               "target": "Package",

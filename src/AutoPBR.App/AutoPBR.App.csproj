@@ -79,7 +79,17 @@
     <Content Include="..\AutoPBR.Core\Data\upscale256.onnx" Link="Data\upscale256.onnx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <!-- CUDA/cuDNN runtime DLLs from Core Data; copied to runtimes\win-x64\native for ONNX GPU -->
+    <Content Include="..\AutoPBR.Core\Data\specular_predictor*.onnx" Link="Data\%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\AutoPBR.Core\Data\models\**\*.onnx" Link="Data\models\%(RecursiveDir)%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\AutoPBR.Core\Data\all-MiniLM-L6-v2-onnx\**\*">
+      <Link>Data\all-MiniLM-L6-v2-onnx\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- CUDA/cuDNN/TensorRT DLLs from Core Data\native; copied to runtimes\win-x64\native for ONNX GPU -->
     <Content Include="..\AutoPBR.Core\Data\native\*.dll" Link="runtimes\win-x64\native\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
@@ -103,30 +113,5 @@
     <RemoveDir Directories="$(PublishDir)lang\%(_SatelliteCulture.Identity)" Condition="Exists('$(PublishDir)lang\%(_SatelliteCulture.Identity)')" />
     <Exec Command="move /Y &quot;$(PublishDir)%(_SatelliteCulture.Identity)&quot; &quot;$(PublishDir)lang\%(_SatelliteCulture.Identity)&quot;" Condition="Exists('$(PublishDir)%(_SatelliteCulture.Identity)') and '$(OS)' == 'Windows_NT'" />
     <Exec Command="mv &quot;$(PublishDir)%(_SatelliteCulture.Identity)&quot; &quot;$(PublishDir)lang/%(_SatelliteCulture.Identity)&quot;" Condition="Exists('$(PublishDir)%(_SatelliteCulture.Identity)') and '$(OS)' != 'Windows_NT'" />
-  </Target>
-
-  <!-- Overlay ONNX Runtime CUDA 13 native binaries from GitHub release (replaces default CUDA 12 from NuGet). -->
-  <PropertyGroup>
-    <OnnxRuntimeCuda13ZipUrl>https://github.com/microsoft/onnxruntime/releases/download/v1.24.3/onnxruntime-win-x64-gpu_cuda13-1.24.3.zip</OnnxRuntimeCuda13ZipUrl>
-    <OnnxRuntimeCuda13ExtractDir>$(IntermediateOutputPath)onnxruntime_cuda13</OnnxRuntimeCuda13ExtractDir>
-  </PropertyGroup>
-  <!-- Run after build; overlay on Windows when native runtimes exist (use OutDir for correct output path). -->
-  <Target Name="OverlayOnnxRuntimeCuda13" AfterTargets="Build" Condition="'$(OS)' == 'Windows_NT'">
-    <PropertyGroup>
-      <_OnnxNativeDir>$([System.IO.Path]::Combine('$(OutDir)','runtimes','win-x64','native'))</_OnnxNativeDir>
-    </PropertyGroup>
-    <Message Importance="high" Text="Checking for ONNX Runtime native dir: $(_OnnxNativeDir)" />
-    <PropertyGroup Condition="Exists('$(_OnnxNativeDir)')">
-      <_DoCuda13Overlay>true</_DoCuda13Overlay>
-    </PropertyGroup>
-    <Message Importance="high" Text="Overlaying ONNX Runtime with CUDA 13 build from GitHub releases..." Condition="'$(_DoCuda13Overlay)' == 'true'" />
-    <DownloadFile SourceUrl="$(OnnxRuntimeCuda13ZipUrl)" DestinationFolder="$(IntermediateOutputPath)" SkipUnchangedFiles="true" Condition="'$(_DoCuda13Overlay)' == 'true'" />
-    <Message Importance="high" Text="Extracting CUDA 13 native binaries..." Condition="'$(_DoCuda13Overlay)' == 'true'" />
-    <Exec Command="powershell -NoProfile -Command &quot;Expand-Archive -Path '$(IntermediateOutputPath)onnxruntime-win-x64-gpu_cuda13-1.24.3.zip' -DestinationPath '$(OnnxRuntimeCuda13ExtractDir)' -Force&quot;" Condition="'$(_DoCuda13Overlay)' == 'true'" />
-    <ItemGroup Condition="'$(_DoCuda13Overlay)' == 'true'">
-      <_Cuda13Dlls Include="$(OnnxRuntimeCuda13ExtractDir)\**\*.dll" />
-    </ItemGroup>
-    <Copy SourceFiles="@(_Cuda13Dlls)" DestinationFolder="$(_OnnxNativeDir)" SkipUnchangedFiles="false" OverwriteReadOnlyFiles="true" Condition="'$(_DoCuda13Overlay)' == 'true'" />
-    <Message Importance="high" Text="ONNX Runtime CUDA 13 native binaries overlay complete." Condition="'$(_DoCuda13Overlay)' == 'true'" />
   </Target>
 </Project>

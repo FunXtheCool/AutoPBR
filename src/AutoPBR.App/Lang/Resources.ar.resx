@@ -77,6 +77,12 @@
   <data name="Appearance" xml:space="preserve">
     <value>المظهر</value>
   </data>
+  <data name="UiScaling" xml:space="preserve">
+    <value>التحجيم</value>
+  </data>
+  <data name="UiScalingTooltip" xml:space="preserve">
+    <value>يغيّر مقياس الواجهة بالكامل (النص والعناصر والمسافات). استخدم قيمة أعلى من 100٪ لسهولة القراءة.</value>
+  </data>
   <data name="AppTitle" xml:space="preserve"><value>AutoPBR</value></data>
   <data name="AppSubtitle" xml:space="preserve"><value>تحويل حزمة موارد Minecraft إلى حزمة متوافقة مع PBR (specular + normal + height).</value></data>
   <data name="TabConvert" xml:space="preserve"><value>تحويل</value></data>
@@ -91,14 +97,15 @@
   <data name="BatchConvertButton" xml:space="preserve"><value>تحويل الدُفعة</value></data>
   <data name="ExploreArchiveContents" xml:space="preserve"><value>محتويات الحزمة</value></data>
   <data name="ResourceExplorer" xml:space="preserve"><value>مستكشف الموارد</value></data>
-  <data name="ExploreEmptyMessage" xml:space="preserve"><value>امسح حزمة أو مجلد دُفعات في تبويب المسح لاستكشاف المحتوى.</value></data>
+  <data name="ExploreEmptyMessage" xml:space="preserve"><value>امسح حزمة أو مجلدًا صالحًا لاستكشاف المحتوى.</value></data>
   <data name="ExploreExpandAll" xml:space="preserve"><value>توسيع الكل</value></data>
   <data name="ExploreCollapseAll" xml:space="preserve"><value>طي الكل</value></data>
   <data name="ExploreBack" xml:space="preserve"><value>رجوع</value></data>
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
-  <data name="TabTune" xml:space="preserve"><value>ضبط</value></data>
+  <data name="TabNormals" xml:space="preserve"><value>المعتدلات</value></data>
   <data name="TabSettings" xml:space="preserve"><value>الإعدادات</value></data>
   <data name="Input" xml:space="preserve"><value>الإدخال</value></data>
+  <data name="InputSourceModeTooltip" xml:space="preserve"><value>إيقاف: حزمة موارد واحدة (.zip / .jar). تشغيل: مجلد يحتوي عدة حزم للمسح والتحويل المُجَمَّع.</value></data>
   <data name="ResourcePackWatermark" xml:space="preserve"><value>حزمة الموارد (.zip أو .jar)</value></data>
   <data name="Browse" xml:space="preserve"><value>استعراض…</value></data>
   <data name="Log" xml:space="preserve"><value>السجل</value></data>
@@ -127,7 +134,11 @@
   <data name="GenerationSettings" xml:space="preserve"><value>إعدادات التوليد</value></data>
   <data name="TuneNormals" xml:space="preserve"><value>العاديات</value></data>
   <data name="TuneSpecular" xml:space="preserve"><value>اللمعان</value></data>
+  <data name="NormalsTuning" xml:space="preserve"><value>ضبط العاديات</value></data>
+  <data name="SpecularTuning" xml:space="preserve"><value>ضبط اللمعان</value></data>
+  <data name="AiTuning" xml:space="preserve"><value>ضبط الذكاء الاصطناعي</value></data>
   <data name="TuneHeight" xml:space="preserve"><value>الارتفاع</value></data>
+  <data name="HeightmapTuning" xml:space="preserve"><value>ضبط خريطة الارتفاع</value></data>
   <data name="NormalStrength" xml:space="preserve"><value>قوة الطبيعية</value></data>
   <data name="NormalStrengthTooltip" xml:space="preserve"><value>قوة تدرج خريطة الطبيعية. أعلى = مزيد من النقوش.</value></data>
   <data name="HeightStrength" xml:space="preserve"><value>قوة الارتفاع</value></data>
@@ -165,10 +176,6 @@
   <data name="DeepBumpInputModeGrayscale" xml:space="preserve"><value>تدرج رمادي</value></data>
   <data name="DeepBumpInputModeRgb" xml:space="preserve"><value>RGB</value></data>
   <data name="DeepBumpForceBlue255" xml:space="preserve"><value>فرض B=255 في خرائط DeepBump</value></data>
-  <data name="QualityProfile" xml:space="preserve"><value>ملف الجودة</value></data>
-  <data name="QualityProfileBalanced" xml:space="preserve"><value>متوازن</value></data>
-  <data name="QualityProfileLowRes" xml:space="preserve"><value>دقة منخفضة (16–64)</value></data>
-  <data name="QualityProfileHiRes" xml:space="preserve"><value>دقة عالية (128–512)</value></data>
   <data name="Advanced" xml:space="preserve"><value>متقدم</value></data>
   <data name="Preprocessing" xml:space="preserve"><value>المعالجة المسبقة</value></data>
   <data name="PreprocessLinearize" xml:space="preserve"><value>تحويل (sRGB → linear) قبل المشتقات</value></data>
@@ -181,8 +188,6 @@
   <data name="SpecularPercentileRemap" xml:space="preserve"><value>إعادة تعيين النعومة (R) حسب المئينات</value></data>
   <data name="SpecularRemapLowPercentile" xml:space="preserve"><value>المئين المنخفض</value></data>
   <data name="SpecularRemapHighPercentile" xml:space="preserve"><value>المئين العالي</value></data>
-  <data name="MetalHeuristicSubstrings" xml:space="preserve"><value>تلميحات أسماء المعادن</value></data>
-  <data name="MetalHeuristicSubstringsWatermark" xml:space="preserve"><value>مفصول بفواصل (اختياري)، مثل iron,gold,steel</value></data>
   <data name="AoAdvanced" xml:space="preserve"><value>الإطباق المحيط (AO)</value></data>
   <data name="GenerateAo" xml:space="preserve"><value>دمج AO في الخريطة العادية (القناة الزرقاء)</value></data>
   <data name="AoRadius" xml:space="preserve"><value>نصف قطر AO</value></data>
@@ -205,6 +210,8 @@
   <data name="Engine" xml:space="preserve"><value>المحرك</value></data>
   <data name="MaxThreads" xml:space="preserve"><value>الحد الأقصى للخيوط</value></data>
   <data name="MaxThreadsTooltip" xml:space="preserve"><value>خيوط العمل للتحويل. 0 = تلقائي.</value></data>
+  <data name="OnnxPreferTensorRt" xml:space="preserve"><value>تفضيل TensorRT لـ ONNX GPU (احتياطي CUDA)</value></data>
+  <data name="OnnxPreferTensorRtTooltip" xml:space="preserve"><value>عند التفعيل: TensorRT مع CUDA للعمليات غير المدعومة. عند الإلغاء: CUDA فقط—بدء أسرع؛ قد يُجمّع TensorRT المحركات في المرة الأولى.</value></data>
   <data name="TempFolder" xml:space="preserve"><value>مجلد مؤقت</value></data>
   <data name="TempFolderTooltip" xml:space="preserve"><value>مجلد الاستخراج المؤقت. فارغ = مؤقت النظام.</value></data>
   <data name="TempFolderWatermark" xml:space="preserve"><value>فارغ = مؤقت النظام</value></data>

@@ -1,13 +1,23 @@
 namespace AutoPBR.Core.Models;
 
 /// <summary>
-/// A tag rule: when a texture's Name or RelativeKey contains any of the keywords (case-insensitive),
-/// the associated overrides are applied during conversion.
+/// Tag definition: <see cref="TagRuleKind.Material"/> uses keywords / MiniLM; <see cref="TagRuleKind.Flag"/> uses path rules and optional keywords.
 /// </summary>
 public sealed class TagRule
 {
     public required string Id { get; init; }
     public required string DisplayName { get; init; }
+    public TagRuleKind Kind { get; init; } = TagRuleKind.Material;
+
     public IReadOnlyList<string> Keywords { get; init; } = [];
-    public TextureOverrides Overrides { get; init; } = new();
+
+    /// <summary>
+    /// When true, each <see cref="Keywords"/> entry must match as a whole token (not as a substring inside a longer
+    /// letter/number run). Underscores and path separators count as boundaries (e.g. <c>iron_ore</c> matches <c>ore</c>;
+    /// <c>forests</c> does not).
+    /// </summary>
+    public bool KeywordsMatchWholeWord { get; init; }
+
+    /// <summary>Short English phrases used only for semantic (embedding) matching; optional.</summary>
+    public IReadOnlyList<string> SemanticHints { get; init; } = [];
 }

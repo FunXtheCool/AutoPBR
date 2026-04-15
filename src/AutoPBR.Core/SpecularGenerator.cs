@@ -14,32 +14,46 @@ internal static class SpecularGenerator
     /// <summary>LabPBR: G channel &lt;= this value is F0 (dielectric); 230+ = metal.</summary>
     private const byte LabPbrF0CapDielectric = 229;
 
-    /// <summary>
-    /// Treat texture as metal if name or relative key contains these substrings (case-insensitive).
-    /// Includes vanilla and common mod metals.
-    /// </summary>
-    private static readonly string[] DefaultMetalSubstrings =
-    [
-        "iron", "gold", "copper", "diamond", "netherite", "armor", "helmet",
-        "adamantite", "mythril", "quadrillum", "silver", "aquarium", "prometheum", "osmium", "bronze", "steel",
-        "durasteel", "hallowed", "celestium", "metallurgium", "palladium", "carmot", "starrite", "platinum",
-        "orichalcum", "manganese", "cobalt", "ardite", "manyullyn", "zinc", "brass", "tin", "lead",
-        "aluminum", "aluminium", "nickel", "invar", "electrum", "chrome", "titanium", "tungsten",
-        "bismuth", "antimony", "cadmium", "iridium", "signalum", "lumium", "enderium", "constantan"
-    ];
-
-    private static bool IsMetalTexture(string name, string relativeKey, IReadOnlyList<string>? metalSubstrings)
+    private static string? BuildSpecularModelLogLine(
+        string textureName,
+        AutoPbrOptions options,
+        bool useMlSpecular,
+        string? mlDiagnostic)
     {
-        var combined = name + "\0" + relativeKey;
-        foreach (var sub in metalSubstrings ?? DefaultMetalSubstrings)
+        if (!options.UseMlSpecularPredictor)
         {
-            if (combined.Contains(sub, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
+            return null;
         }
 
-        return false;
+        string? core;
+        if (!useMlSpecular)
+        {
+            core = $"[{textureName}] Specular: heuristic/tag path only (ML specular did not produce a tensor — see diagnostic below if present).";
+        }
+        else
+        {
+            var blend = Math.Clamp(options.MlSpecularHeuristicBlend, 0f, 1f);
+            var mode = options.MlSpecularHeuristicBlendMode;
+            core = $"[{textureName}] Specular: ML+heuristic mix (blend {blend:0.##}, mode {mode}).";
+        }
+
+        var parts = new List<string> { core };
+        if (options.SpecularDebugDisableHeuristicSpecular)
+        {
+            parts.Add("debugNoHeuristic=magenta fallback");
+        }
+
+        if (options.SpecularDebugSkipSpecularRemap)
+        {
+            parts.Add("debugSkipRRemap");
+        }
+
+        if (!string.IsNullOrWhiteSpace(mlDiagnostic))
+        {
+            parts.Add(mlDiagnostic);
+        }
+
+        return string.Join(" | ", parts);
     }
 
     private static (float[] luminance, float[] edgeMagnitude, float meanLuminance) BuildLuminanceAndEdge(
@@ -164,6 +178,71 @@ internal static class SpecularGenerator
         return (lum, edge, meanLum);
     }
 
+    internal static double BlendChannel(double heuristic, double ml, float mix, MlSpecularBlendMath math)
+    {
+        var h = Math.Clamp(heuristic / 255.0, 0.0, 1.0);
+        var m = Math.Clamp(ml / 255.0, 0.0, 1.0);
+        var t = Math.Clamp(mix, 0f, 1f);
+        if (t <= 0f)
+        {
+            return heuristic;
+        }
+
+        static double Lerp(double a, double b, double u) => a + (b - a) * u;
+        static double ToByte(double unit) => Math.Clamp(unit * 255.0, 0.0, 255.0);
+        static double SoftLight(double baseVal, double blendVal)
+        {
+            if (blendVal <= 0.5)
+            {
+                return baseVal - (1.0 - 2.0 * blendVal) * baseVal * (1.0 - baseVal);
+            }
+
+            var d = baseVal <= 0.25
+                ? ((16.0 * baseVal - 12.0) * baseVal + 4.0) * baseVal
+                : Math.Sqrt(baseVal);
+            return baseVal + (2.0 * blendVal - 1.0) * (d - baseVal);
+        }
+
+        static double Overlay(double baseVal, double blendVal) =>
+            baseVal < 0.5 ? 2.0 * baseVal * blendVal : 1.0 - 2.0 * (1.0 - baseVal) * (1.0 - blendVal);
+        static double Screen(double baseVal, double blendVal) => 1.0 - (1.0 - baseVal) * (1.0 - blendVal);
+        static double Bias(double x, double b)
+        {
+            var bb = Math.Clamp(b, 0.001, 0.999);
+            return x / ((((1.0 / bb) - 2.0) * (1.0 - x)) + 1.0);
+        }
+
+        static double Gain(double x, double g)
+        {
+            if (x < 0.5)
+            {
+                return 0.5 * Bias(2.0 * x, g);
+            }
+
+            return 1.0 - 0.5 * Bias(2.0 - 2.0 * x, g);
+        }
+
+        static double Logit(double x)
+        {
+            var xx = Math.Clamp(x, 0.001, 0.999);
+            return Math.Log(xx / (1.0 - xx));
+        }
+
+        static double Sigmoid(double x) => 1.0 / (1.0 + Math.Exp(-x));
+
+        var blended = math switch
+        {
+            MlSpecularBlendMath.SoftLight => Lerp(h, SoftLight(h, m), t),
+            MlSpecularBlendMath.Overlay => Lerp(h, Overlay(h, m), t),
+            MlSpecularBlendMath.Screen => Lerp(h, Screen(h, m), t),
+            MlSpecularBlendMath.BiasGain => Lerp(h, Gain(h, m), t),
+            MlSpecularBlendMath.SigmoidCrossfade => Sigmoid(Lerp(Logit(h), Logit(m), t)),
+            _ => Lerp(h, m, t)
+        };
+
+        return ToByte(blended);
+    }
+
     public static Task GenerateAsync(
         IReadOnlyList<TextureWorkItem> textures,
         AutoPbrOptions options,
@@ -191,6 +270,13 @@ internal static class SpecularGenerator
                 {
                     ThreadingUtil.SetThreadName("AutoPBR.Specular");
                     ct.ThrowIfCancellationRequested();
+                    if (FoliageModeResolver.IsIgnoreAll(options.FoliageMode) && t.Sprite2DFoliageTarget)
+                    {
+                        var skipped = Interlocked.Increment(ref completed);
+                        progress?.Report(new ConversionProgress(stage, skipped, total, t.Name));
+                        return;
+                    }
+
                     var fast = t.Overrides.FastSpecular ?? options.FastSpecular;
                     var rules = t.Overrides.CustomSpecularRules
                                 ?? options.SpecularData!.ByTextureName.GetValueOrDefault(t.Name)
@@ -201,8 +287,9 @@ internal static class SpecularGenerator
                     var width = size;
                     var height = size;
 
-                    // Ignore All: skip grass textures with significant transparency in diffuse
-                    if (options.FoliageMode == "Ignore All" &&
+                    // Ignore All: skip grass textures with significant transparency in diffuse (2D Sprite / foliage targets only)
+                    if (FoliageModeResolver.IsIgnoreAll(options.FoliageMode) &&
+                        t.Sprite2DFoliageTarget &&
                         (t.Name.Contains("grass", StringComparison.OrdinalIgnoreCase) ||
                          t.RelativeKey.Contains("grass", StringComparison.OrdinalIgnoreCase)))
                     {
@@ -246,7 +333,15 @@ internal static class SpecularGenerator
                     }
 
                     var (luminance, edgeMagnitude, meanLuminance) = BuildLuminanceAndEdge(cropped, width, height, options);
-                    var isMetal = IsMetalTexture(t.Name, t.RelativeKey, options.MetalHeuristicSubstrings);
+                    var useMlSpec = MlSpecularInference.TryPredictSpecular(
+                        cropped,
+                        edgeMagnitude,
+                        options,
+                        out var mlSpecR,
+                        out var mlSpecG,
+                        out var mlSpecB,
+                        out var mlSpecA,
+                        out var mlSpecularDiagnostic);
                     var nPixels = width * height;
                     var rBuf = new byte[nPixels];
                     var gBuf = new byte[nPixels];
@@ -259,44 +354,198 @@ internal static class SpecularGenerator
 
                     var inSpan = inMem.Span;
 
-                    for (var idx = 0; idx < nPixels; idx++)
-                    {
-                        var p = inSpan[idx];
-                        var spec = GetSpecularRgba(p, rules, rulesLab, fast, rgbToLab, de2000);
-                        var lum = luminance[idx];
-                        var edge = edgeMagnitude[idx];
+                    var noHeuristic = options is { SpecularDebugDisableHeuristicSpecular: true, UseMlSpecularPredictor: true };
+                    var blendSlider = Math.Clamp(options.MlSpecularHeuristicBlend, 0f, 1f);
+                    var heuristicBlendMode = options.MlSpecularHeuristicBlendMode;
+                    var blendMath = options.MlSpecularBlendMath;
+                    var porosityExtra = options.PorosityBias +
+                                        (t.HasPlantMaterialTag ? options.PlantMaterialPorosityExtra : 0);
+                    porosityExtra = Math.Clamp(porosityExtra, -512, 512);
+                    var mlDriven = new bool[nPixels];
 
-                        int rr, gg, bb;
-                        if (isMetal)
+                    if (!useMlSpec && noHeuristic)
+                    {
+                        for (var idx = 0; idx < nPixels; idx++)
                         {
-                            rr = (int)Math.Min(255, spec.r * options.MetallicBoost);
-                            gg = 255;
-                            bb = 0;
+                            rBuf[idx] = 255;
+                            gBuf[idx] = 0;
+                            bBuf[idx] = 255;
+                            aBuf[idx] = 255;
+                            mlDriven[idx] = false;
                         }
-                        else
+                    }
+                    else
+                    {
+                        for (var idx = 0; idx < nPixels; idx++)
                         {
-                            gg = Math.Min(spec.g, LabPbrF0CapDielectric);
-                            rr = (int)Math.Min(255, spec.r * options.SmoothnessScale);
-                            rr = (int)(rr * (1f - 0.2f * edge));
+                            var p = inSpan[idx];
+                            var spec = GetSpecularRgba(p, rules, rulesLab, fast, rgbToLab, de2000);
+                            var lum = luminance[idx];
+                            var edge = edgeMagnitude[idx];
+
+                            var hg = Math.Min(spec.g, LabPbrF0CapDielectric);
+                            var smoothMul = options.SmoothnessScale;
+                            var hr = (int)Math.Min(255, spec.r * smoothMul);
+                            hr = (int)(hr * (1f - 0.2f * edge));
                             if (lum > 0.92f && meanLuminance < 0.25f)
                             {
-                                rr = Math.Min(rr, 220);
+                                hr = Math.Min(hr, 220);
                             }
 
-                            bb = Math.Clamp(spec.b + options.PorosityBias, 0, 255);
-                        }
+                            var hb = Math.Clamp(spec.b + porosityExtra, 0, 255);
+                            var ha = spec.a;
 
-                        rBuf[idx] = (byte)Math.Clamp(rr, 0, 255);
-                        gBuf[idx] = (byte)Math.Clamp(gg, 0, 255);
-                        bBuf[idx] = (byte)bb;
-                        aBuf[idx] = spec.a;
+                            if (noHeuristic && useMlSpec)
+                            {
+                                rBuf[idx] = mlSpecR[idx];
+                                gBuf[idx] = mlSpecG[idx];
+                                bBuf[idx] = (byte)Math.Clamp(mlSpecB[idx] + porosityExtra, 0, 255);
+                                aBuf[idx] = mlSpecA[idx];
+                                mlDriven[idx] = true;
+                                continue;
+                            }
+
+                            if (!useMlSpec)
+                            {
+                                rBuf[idx] = (byte)Math.Clamp(hr, 0, 255);
+                                gBuf[idx] = (byte)Math.Clamp((int)hg, 0, 255);
+                                bBuf[idx] = (byte)Math.Clamp(hb, 0, 255);
+                                aBuf[idx] = ha;
+                                mlDriven[idx] = false;
+                                continue;
+                            }
+
+                            var mix = useMlSpec ? blendSlider : 0f;
+                            if (mix > 0f)
+                            {
+                                var mr = mlSpecR[idx];
+                                var mg = mlSpecG[idx];
+                                var mb = mlSpecB[idx];
+                                var ma = mlSpecA[idx];
+                                var mbAdj = Math.Clamp(mb + porosityExtra, 0, 255);
+
+                                // Full: heuristic contributes to R/G/B/A — lerp every channel.
+                                // Smoothness only: heuristic contributes only to R; G/B/A come from model.
+                                // AI Metal & Emissive: like Smoothness only, but B (porosity) stays heuristic.
+                                if (heuristicBlendMode == MlSpecularHeuristicBlendMode.SmoothnessOnly)
+                                {
+                                    var fr = BlendChannel(hr, mr, mix, blendMath);
+                                    rBuf[idx] = (byte)Math.Clamp(Math.Round(fr), 0, 255);
+                                    gBuf[idx] = mg;
+                                    bBuf[idx] = (byte)mbAdj;
+                                    aBuf[idx] = ma;
+                                    mlDriven[idx] = mix >= 0.999f;
+                                }
+                                else if (heuristicBlendMode == MlSpecularHeuristicBlendMode.AiMetalAndEmissive)
+                                {
+                                    var fr = BlendChannel(hr, mr, mix, blendMath);
+                                    rBuf[idx] = (byte)Math.Clamp(Math.Round(fr), 0, 255);
+                                    gBuf[idx] = mg;
+                                    bBuf[idx] = (byte)Math.Clamp(hb, 0, 255);
+                                    aBuf[idx] = ma;
+                                    mlDriven[idx] = mix >= 0.999f;
+                                }
+                                else
+                                {
+                                    var fr = BlendChannel(hr, mr, mix, blendMath);
+                                    var fg = BlendChannel(hg, mg, mix, blendMath);
+                                    var fb = BlendChannel(hb, mbAdj, mix, blendMath);
+                                    var fa = BlendChannel(ha, ma, mix, blendMath);
+
+                                    rBuf[idx] = (byte)Math.Clamp(Math.Round(fr), 0, 255);
+                                    gBuf[idx] = (byte)Math.Clamp(Math.Round(fg), 0, 255);
+                                    bBuf[idx] = (byte)Math.Clamp(Math.Round(fb), 0, 255);
+                                    aBuf[idx] = (byte)Math.Clamp(Math.Round(fa), 0, 255);
+                                    mlDriven[idx] = mix >= 0.999f;
+                                }
+                            }
+                            else
+                            {
+                                rBuf[idx] = (byte)Math.Clamp(hr, 0, 255);
+                                gBuf[idx] = (byte)Math.Clamp((int)hg, 0, 255);
+                                bBuf[idx] = (byte)Math.Clamp(hb, 0, 255);
+                                aBuf[idx] = ha;
+                                mlDriven[idx] = false;
+                            }
+                        }
                     }
 
                     // Per-texture R normalization: remap to 10–200 when there is variation.
+                    // With MlSpecularSkipSmoothnessRemap + ML, stats and remap apply only to non-ML pixels so model R stays faithful.
                     // Percentile remap is more robust than min/max on noisy low-res inputs.
+                    var selectiveMlRemap = options.MlSpecularSkipSmoothnessRemap && useMlSpec;
                     byte minR;
                     byte maxR;
-                    if (options.SpecularUsePercentileRemap && nPixels > 0)
+                    if (options.SpecularDebugSkipSpecularRemap)
+                    {
+                        minR = 0;
+                        maxR = 0;
+                    }
+                    else if (selectiveMlRemap)
+                    {
+                        var nHeuristic = 0;
+                        for (var i = 0; i < nPixels; i++)
+                        {
+                            if (!mlDriven[i])
+                            {
+                                nHeuristic++;
+                            }
+                        }
+
+                        if (nHeuristic == 0)
+                        {
+                            minR = 0;
+                            maxR = 0;
+                        }
+                        else if (nPixels > 0 && options.SpecularUsePercentileRemap)
+                        {
+                            var lowP = Math.Clamp(options.SpecularRemapLowPercentile, 0f, 1f);
+                            var highP = Math.Clamp(options.SpecularRemapHighPercentile, 0f, 1f);
+                            if (highP < lowP)
+                            {
+                                (lowP, highP) = (highP, lowP);
+                            }
+
+                            var sorted = new byte[nHeuristic];
+                            var w = 0;
+                            for (var i = 0; i < nPixels; i++)
+                            {
+                                if (!mlDriven[i])
+                                {
+                                    sorted[w++] = rBuf[i];
+                                }
+                            }
+
+                            Array.Sort(sorted);
+                            var last = nHeuristic - 1;
+                            minR = sorted[(int)MathF.Round(lowP * last)];
+                            maxR = sorted[(int)MathF.Round(highP * last)];
+                        }
+                        else
+                        {
+                            minR = 255;
+                            maxR = 0;
+                            for (var i = 0; i < nPixels; i++)
+                            {
+                                if (mlDriven[i])
+                                {
+                                    continue;
+                                }
+
+                                var v = rBuf[i];
+                                if (v < minR)
+                                {
+                                    minR = v;
+                                }
+
+                                if (v > maxR)
+                                {
+                                    maxR = v;
+                                }
+                            }
+                        }
+                    }
+                    else if (nPixels > 0 && options.SpecularUsePercentileRemap)
                     {
                         var lowP = Math.Clamp(options.SpecularRemapLowPercentile, 0f, 1f);
                         var highP = Math.Clamp(options.SpecularRemapHighPercentile, 0f, 1f);
@@ -330,12 +579,27 @@ internal static class SpecularGenerator
                         }
                     }
 
-                    if (maxR > minR)
+                    if (!options.SpecularDebugSkipSpecularRemap && maxR > minR)
                     {
                         var denom = maxR - minR;
-                        for (var i = 0; i < nPixels; i++)
+                        if (selectiveMlRemap)
                         {
-                            rBuf[i] = (byte)Math.Clamp(10 + (rBuf[i] - minR) * 190 / denom, 0, 255);
+                            for (var i = 0; i < nPixels; i++)
+                            {
+                                if (mlDriven[i])
+                                {
+                                    continue;
+                                }
+
+                                rBuf[i] = (byte)Math.Clamp(10 + (rBuf[i] - minR) * 190 / denom, 0, 255);
+                            }
+                        }
+                        else
+                        {
+                            for (var i = 0; i < nPixels; i++)
+                            {
+                                rBuf[i] = (byte)Math.Clamp(10 + (rBuf[i] - minR) * 190 / denom, 0, 255);
+                            }
                         }
                     }
 
@@ -344,6 +608,21 @@ internal static class SpecularGenerator
                         for (var i = 0; i < nPixels; i++)
                         {
                             rBuf[i] = (byte)(255 - rBuf[i]);
+                        }
+                    }
+
+                    if (options.MlSpecularZeroTransparentPixels)
+                    {
+                        var alphaClampMax = Math.Clamp(options.MlSpecularTransparentAlphaClampMax, 0, 255);
+                        for (var i = 0; i < nPixels; i++)
+                        {
+                            if (inSpan[i].A <= alphaClampMax)
+                            {
+                                rBuf[i] = 0;
+                                gBuf[i] = 0;
+                                bBuf[i] = 0;
+                                aBuf[i] = 0;
+                            }
                         }
                     }
 
@@ -384,8 +663,15 @@ internal static class SpecularGenerator
                         }
                     }
 
+                    var specLog = BuildSpecularModelLogLine(
+                        t.Name,
+                        options,
+                        useMlSpec,
+                        mlSpecularDiagnostic);
+                    var combinedLog = string.Join(" | ", new[] { specLog }.Where(s => !string.IsNullOrWhiteSpace(s)));
+
                     var n = Interlocked.Increment(ref completed);
-                    progress?.Report(new ConversionProgress(stage, n, total, t.Name));
+                    progress?.Report(new ConversionProgress(stage, n, total, t.Name, string.IsNullOrWhiteSpace(combinedLog) ? null : combinedLog));
                 });
         }, ct);
     }

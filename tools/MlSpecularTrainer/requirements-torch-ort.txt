@@ -1,0 +1,31 @@
+# Optional: torch-ort — ONNX Runtime backend for the *PyTorch* training loop (ORTModule).
+# Docs: https://docs.pytorch.org/ort/install.html
+# ORTModule API: https://pytorch.org/ort/ortmodule.html
+#
+# Version coupling: torch-ort + onnxruntime-training expect a **matching** PyTorch release.
+# PyTorch 2.5+ removed/changed `torch.onnx._internal.jit_utils`; unpinned `pip install torch` can
+# break imports. The Linux ml-specular Docker image uses `requirements.docker.txt` + Dockerfile ARGs:
+# `torch==2.4.1` + `torchvision==0.19.1` (**cu118**), `onnxruntime-training==1.19.2+cu118` (latest stable
+# **cu118** wheel on https://download.onnxruntime.ai/onnxruntime_stable_cu118.html — **not** plain PyPI)
+# and `torch-ort==1.19.2`. Rebuild the image after changing pins.
+#
+# Upstream notes:
+# - torch-ort depends on onnxruntime-training and matching GPU runtimes (CUDA / ROCm).
+# - After install, run the configure step (official post-installation requirement).
+#
+# Windows: use py -3.12 or your venv python — not a stale Python 3.5 `pip` on PATH.
+#
+# Typical flow (NVIDIA — pick onnxruntime-training that matches YOUR CUDA / PyTorch wheel):
+#
+#   py -3.12 -m pip install ninja
+#   py -3.12 -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+#   py -3.12 -m pip install "onnxruntime-training==1.19.2+cu118" \
+#       -f https://download.onnxruntime.ai/onnxruntime_stable_cu118.html
+#   # Plain `pip install onnxruntime-training` often pulls a CUDA 11–linked GPU build; match cu118 + GPU drivers.
+#   py -3.12 -m pip install torch-ort
+#   py -3.12 -m torch_ort.configure
+#
+# Train (PyTorch backend only):
+#   py -3.12 -m ml_specular.train_spec --trainer-backend pytorch --device cuda --torch-ort ...
+#
+# PyPI torch-ort readme (versions, CUDA hints): https://pypi.org/project/torch-ort/

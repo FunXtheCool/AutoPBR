@@ -46,21 +46,66 @@ internal static class TextureScanner
         }
     }
 
-    private static bool IsPathUnderPlantOrPlants(string relativePathNoExt)
+    /// <summary>True when effective tags include <see cref="FlagTagResolver.Sprite2DId"/> (same rules as Explore).</summary>
+    private static bool GetSprite2DFoliageTarget(AutoPbrOptions options, string textureName, string relativePathNoExt)
     {
-        return relativePathNoExt.Contains("\\plant\\", StringComparison.OrdinalIgnoreCase)
-               || relativePathNoExt.Contains("\\plants\\", StringComparison.OrdinalIgnoreCase);
-    }
-
-    private static bool IsPlantForNoHeight(string relativePathNoExt, string foliageMode)
-    {
-        if (foliageMode != "No Height")
+        var rules = options.TagRules ?? TagRulePresets.Default;
+        var sem = options.SemanticOptions;
+        IReadOnlyCollection<string>? added = null;
+        IReadOnlyCollection<string>? removed = null;
+        if (options.ManualTagOverrides?.TryGetValue(relativePathNoExt, out var o) == true)
         {
-            return false;
+            added = o.Added;
+            removed = o.Removed;
         }
 
-        return AutoPbrDefaults.PlantTextureKeys.Contains(relativePathNoExt)
-               || IsPathUnderPlantOrPlants(relativePathNoExt);
+        var includeDict = sem?.DictionaryEvidenceEnabled ?? false;
+        var effective = ConversionEffectiveTags.ComputeEffectiveTagIds(
+            textureName,
+            relativePathNoExt,
+            rules,
+            sem,
+            includeDict,
+            deferSemanticMl: false,
+            added,
+            removed);
+        return effective.Contains(FlagTagResolver.Sprite2DId, StringComparer.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Effective material tag ids (keywords / ML / post-processor / explorer manual add-remove) for a texture key.
+    /// </summary>
+    private static HashSet<string> GetEffectiveMaterialTagIds(string relativePathNoExt, AutoPbrOptions options)
+    {
+        var rules = options.TagRules ?? TagRulePresets.Default;
+        var name = Path.GetFileNameWithoutExtension(relativePathNoExt.Replace('\\', '/'));
+
+        var sem = options.SemanticOptions;
+        var autoMaterialIds = MaterialTagSemanticResolution.ResolveMaterialTags(
+            name,
+            relativePathNoExt,
+            rules,
+            sem,
+            deferSemanticMl: false,
+            sem?.DictionaryEvidenceEnabled ?? false,
+            out _);
+
+        var effective = new HashSet<string>(autoMaterialIds, StringComparer.OrdinalIgnoreCase);
+        if (options.ManualTagOverrides is not null &&
+            options.ManualTagOverrides.TryGetValue(relativePathNoExt, out var overrides))
+        {
+            foreach (var removed in overrides.Removed)
+            {
+                effective.Remove(removed);
+            }
+
+            foreach (var added in overrides.Added)
+            {
+                effective.Add(added);
+            }
+        }
+
+        return effective;
     }
 
     public static IReadOnlyList<TextureWorkItem> ScanTextures(string extractedPackRoot, AutoPbrOptions options)
@@ -120,12 +165,15 @@ internal static class TextureScanner
                             continue;
                         }
 
-                        if (options.FoliageMode == "Ignore All" && IsPathUnderPlantOrPlants(relativePathNoExt))
+                        var effectiveMaterialIds = GetEffectiveMaterialTagIds(relativePathNoExt, options);
+                        var sprite2DFoliage = GetSprite2DFoliageTarget(options, name, relativePathNoExt);
+
+                        if (FoliageModeResolver.IsIgnoreAll(options.FoliageMode) && sprite2DFoliage)
                         {
                             continue;
                         }
 
-                        results.Add(new TextureWorkItem
+                        var blockItem = new TextureWorkItem
                         {
                             FullPath = file,
                             DirectoryPath = directoryPath,
@@ -133,8 +181,13 @@ internal static class TextureScanner
                             Extension = ext,
                             RelativeKey = relativePathNoExt,
                             SpecularOnly = specularOnly,
-                            IsPlantForNoHeight = IsPlantForNoHeight(relativePathNoExt, options.FoliageMode)
-                        });
+                            IsPlantForNoHeight = FoliageModeResolver.IsNoHeight(options.FoliageMode) && sprite2DFoliage,
+                            Sprite2DFoliageTarget = sprite2DFoliage,
+                            HasPlantMaterialTag = effectiveMaterialIds.Contains("plant")
+                        };
+                        blockItem.Overrides.InvertSpecular = effectiveMaterialIds.Contains("brick");
+                        blockItem.Overrides.InvertHeight = OreCoalTextureRules.ShouldInvertHeight(name, relativePathNoExt);
+                        results.Add(blockItem);
                     }
                 }
             }
@@ -173,7 +226,14 @@ internal static class TextureScanner
                         continue;
                     }
 
-                    results.Add(new TextureWorkItem
+                    var ctmEffectiveMaterialIds = GetEffectiveMaterialTagIds(relativePathNoExt, options);
+                    var ctmSprite2DFoliage = GetSprite2DFoliageTarget(options, name, relativePathNoExt);
+                    if (FoliageModeResolver.IsIgnoreAll(options.FoliageMode) && ctmSprite2DFoliage)
+                    {
+                        continue;
+                    }
+
+                    var ctmItem = new TextureWorkItem
                     {
                         FullPath = file,
                         DirectoryPath = directoryPath,
@@ -181,8 +241,13 @@ internal static class TextureScanner
                         Extension = ext,
                         RelativeKey = relativePathNoExt,
                         SpecularOnly = false,
-                        IsPlantForNoHeight = false
-                    });
+                        IsPlantForNoHeight = FoliageModeResolver.IsNoHeight(options.FoliageMode) && ctmSprite2DFoliage,
+                        Sprite2DFoliageTarget = ctmSprite2DFoliage,
+                        HasPlantMaterialTag = ctmEffectiveMaterialIds.Contains("plant")
+                    };
+                    ctmItem.Overrides.InvertSpecular = ctmEffectiveMaterialIds.Contains("brick");
+                    ctmItem.Overrides.InvertHeight = OreCoalTextureRules.ShouldInvertHeight(name, relativePathNoExt);
+                    results.Add(ctmItem);
                 }
             }
 
@@ -225,7 +290,14 @@ internal static class TextureScanner
                             continue;
                         }
 
-                        results.Add(new TextureWorkItem
+                        var plantFolderSprite2DFoliage = GetSprite2DFoliageTarget(options, name, relativePathNoExt);
+                        if (FoliageModeResolver.IsIgnoreAll(options.FoliageMode) && plantFolderSprite2DFoliage)
+                        {
+                            continue;
+                        }
+
+                        var plantFolderMaterialIds = GetEffectiveMaterialTagIds(relativePathNoExt, options);
+                        var plantFolderItem = new TextureWorkItem
                         {
                             FullPath = file,
                             DirectoryPath = directoryPath,
@@ -233,49 +305,19 @@ internal static class TextureScanner
                             Extension = ext,
                             RelativeKey = relativePathNoExt,
                             SpecularOnly = false,
-                            IsPlantForNoHeight = options.FoliageMode == "No Height"
-                        });
+                            IsPlantForNoHeight = FoliageModeResolver.IsNoHeight(options.FoliageMode) && plantFolderSprite2DFoliage,
+                            Sprite2DFoliageTarget = plantFolderSprite2DFoliage,
+                            HasPlantMaterialTag = true
+                        };
+                        plantFolderItem.Overrides.InvertSpecular = plantFolderMaterialIds.Contains("brick");
+                        plantFolderItem.Overrides.InvertHeight = OreCoalTextureRules.ShouldInvertHeight(name, relativePathNoExt);
+                        results.Add(plantFolderItem);
                     }
                 }
             }
         }
 
-        ApplyTagRules(results, options);
         return results;
-    }
-
-    private static void ApplyTagRules(List<TextureWorkItem> results, AutoPbrOptions options)
-    {
-        var rules = options.TagRules is { Count: > 0 } ? options.TagRules : TagRulePresets.Default;
-        if (rules.Count == 0)
-        {
-            return;
-        }
-
-        var manual = options.ManualTagOverrides;
-
-        foreach (var item in results)
-        {
-            var autoIds = TagRuleApplicator.GetMatchingTagIds(item.Name, item.RelativeKey, rules);
-            IReadOnlyList<string> tagIds;
-                if (manual is not null && manual.TryGetValue(item.RelativeKey, out var addRemove))
-                {
-                    var removed = new HashSet<string>(addRemove.Removed, StringComparer.OrdinalIgnoreCase);
-                    var added = addRemove.Added;
-                    tagIds = autoIds.Except(removed).Union(added).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-                }
-            else
-            {
-                tagIds = autoIds;
-            }
-
-            if (tagIds.Count == 0)
-            {
-                continue;
-            }
-
-            TagRuleApplicator.MergeTagOverridesInto(item.Overrides, rules, tagIds);
-        }
     }
 }
 

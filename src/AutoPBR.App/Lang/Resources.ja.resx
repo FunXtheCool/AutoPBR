@@ -77,6 +77,12 @@
   <data name="Appearance" xml:space="preserve">
     <value>外観</value>
   </data>
+  <data name="UiScaling" xml:space="preserve">
+    <value>表示倍率</value>
+  </data>
+  <data name="UiScalingTooltip" xml:space="preserve">
+    <value>インターフェース全体（テキスト、コントロール、余白）を拡大します。読みやすさのため100%より大きくできます。</value>
+  </data>
   <data name="AppTitle" xml:space="preserve"><value>AutoPBR</value></data>
   <data name="AppSubtitle" xml:space="preserve"><value>MinecraftリソースパックをPBR対応パック（specular + normal + height）に変換します。</value></data>
   <data name="TabConvert" xml:space="preserve"><value>変換</value></data>
@@ -91,14 +97,15 @@
   <data name="BatchConvertButton" xml:space="preserve"><value>一括変換</value></data>
   <data name="ExploreArchiveContents" xml:space="preserve"><value>パックの内容</value></data>
   <data name="ResourceExplorer" xml:space="preserve"><value>リソース エクスプローラー</value></data>
-  <data name="ExploreEmptyMessage" xml:space="preserve"><value>スキャンタブでパックまたは一括フォルダをスキャンすると、内容を探索できます。</value></data>
+  <data name="ExploreEmptyMessage" xml:space="preserve"><value>パックまたは有効なフォルダーをスキャンして内容を表示します。</value></data>
   <data name="ExploreExpandAll" xml:space="preserve"><value>すべて展開</value></data>
   <data name="ExploreCollapseAll" xml:space="preserve"><value>すべて折りたたむ</value></data>
   <data name="ExploreBack" xml:space="preserve"><value>戻る</value></data>
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
-  <data name="TabTune" xml:space="preserve"><value>調整</value></data>
+  <data name="TabNormals" xml:space="preserve"><value>法線</value></data>
   <data name="TabSettings" xml:space="preserve"><value>設定</value></data>
   <data name="Input" xml:space="preserve"><value>入力</value></data>
+  <data name="InputSourceModeTooltip" xml:space="preserve"><value>オフ：単一のリソースパック（.zip / .jar）。オン：一括スキャン・変換用の複数パックを含むフォルダ。</value></data>
   <data name="ResourcePackWatermark" xml:space="preserve"><value>リソースパック（.zip または .jar）</value></data>
   <data name="Browse" xml:space="preserve"><value>参照…</value></data>
   <data name="Log" xml:space="preserve"><value>ログ</value></data>
@@ -127,7 +134,11 @@
   <data name="GenerationSettings" xml:space="preserve"><value>生成設定</value></data>
   <data name="TuneNormals" xml:space="preserve"><value>法線</value></data>
   <data name="TuneSpecular" xml:space="preserve"><value>スペキュラ</value></data>
+  <data name="NormalsTuning" xml:space="preserve"><value>法線の調整</value></data>
+  <data name="SpecularTuning" xml:space="preserve"><value>スペキュラの調整</value></data>
+  <data name="AiTuning" xml:space="preserve"><value>AI調整</value></data>
   <data name="TuneHeight" xml:space="preserve"><value>高さ</value></data>
+  <data name="HeightmapTuning" xml:space="preserve"><value>ハイトマップの調整</value></data>
   <data name="NormalStrength" xml:space="preserve"><value>法線の強さ</value></data>
   <data name="NormalStrengthTooltip" xml:space="preserve"><value>法線マップのグラデーション強度。高いほど立体感が強くなります。</value></data>
   <data name="HeightStrength" xml:space="preserve"><value>高さの強さ</value></data>
@@ -165,10 +176,6 @@
   <data name="DeepBumpInputModeGrayscale" xml:space="preserve"><value>グレースケール</value></data>
   <data name="DeepBumpInputModeRgb" xml:space="preserve"><value>RGB</value></data>
   <data name="DeepBumpForceBlue255" xml:space="preserve"><value>DeepBump法線のB=255を強制</value></data>
-  <data name="QualityProfile" xml:space="preserve"><value>品質プロファイル</value></data>
-  <data name="QualityProfileBalanced" xml:space="preserve"><value>バランス</value></data>
-  <data name="QualityProfileLowRes" xml:space="preserve"><value>低解像度（16–64）</value></data>
-  <data name="QualityProfileHiRes" xml:space="preserve"><value>高解像度（128–512）</value></data>
   <data name="Advanced" xml:space="preserve"><value>詳細設定</value></data>
   <data name="Preprocessing" xml:space="preserve"><value>前処理</value></data>
   <data name="PreprocessLinearize" xml:space="preserve"><value>微分前に線形化（sRGB → linear）</value></data>
@@ -181,8 +188,6 @@
   <data name="SpecularPercentileRemap" xml:space="preserve"><value>滑らかさ（R）のパーセンタイル補正</value></data>
   <data name="SpecularRemapLowPercentile" xml:space="preserve"><value>低パーセンタイル</value></data>
   <data name="SpecularRemapHighPercentile" xml:space="preserve"><value>高パーセンタイル</value></data>
-  <data name="MetalHeuristicSubstrings" xml:space="preserve"><value>金属名のヒント</value></data>
-  <data name="MetalHeuristicSubstringsWatermark" xml:space="preserve"><value>カンマ区切り（任意）、例: iron,gold,steel</value></data>
   <data name="AoAdvanced" xml:space="preserve"><value>アンビエントオクルージョン（AO）</value></data>
   <data name="GenerateAo" xml:space="preserve"><value>AOを法線マップ（青チャンネル）に焼き込む</value></data>
   <data name="AoRadius" xml:space="preserve"><value>AO半径</value></data>
@@ -205,6 +210,8 @@
   <data name="Engine" xml:space="preserve"><value>エンジン</value></data>
   <data name="MaxThreads" xml:space="preserve"><value>最大スレッド数</value></data>
   <data name="MaxThreadsTooltip" xml:space="preserve"><value>変換用ワーカースレッド。0=自動。</value></data>
+  <data name="OnnxPreferTensorRt" xml:space="preserve"><value>ONNX GPU で TensorRT を優先（CUDA フォールバック）</value></data>
+  <data name="OnnxPreferTensorRtTooltip" xml:space="preserve"><value>オンにすると TensorRT EP を使用し、未対応は CUDA。オフは CUDA のみ—セッション開始が速い。初回は TensorRT がエンジンをビルドする場合があります。</value></data>
   <data name="TempFolder" xml:space="preserve"><value>一時フォルダ</value></data>
   <data name="TempFolderTooltip" xml:space="preserve"><value>変換時の一時展開先。空=システムのTemp。</value></data>
   <data name="TempFolderWatermark" xml:space="preserve"><value>空=システムのTemp</value></data>

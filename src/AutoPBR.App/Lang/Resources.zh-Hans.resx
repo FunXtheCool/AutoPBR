@@ -77,6 +77,12 @@
   <data name="Appearance" xml:space="preserve">
     <value>外观</value>
   </data>
+  <data name="UiScaling" xml:space="preserve">
+    <value>缩放</value>
+  </data>
+  <data name="UiScalingTooltip" xml:space="preserve">
+    <value>缩放整个界面（文字、控件和间距）。高于 100% 便于阅读。</value>
+  </data>
   <data name="AppTitle" xml:space="preserve"><value>AutoPBR</value></data>
   <data name="AppSubtitle" xml:space="preserve"><value>将 Minecraft 资源包转换为 PBR 友好包（高光 + 法线 + 高度）。</value></data>
   <data name="TabConvert" xml:space="preserve"><value>转换</value></data>
@@ -91,14 +97,15 @@
   <data name="BatchConvertButton" xml:space="preserve"><value>批量转换</value></data>
   <data name="ExploreArchiveContents" xml:space="preserve"><value>包内容</value></data>
   <data name="ResourceExplorer" xml:space="preserve"><value>资源管理器</value></data>
-  <data name="ExploreEmptyMessage" xml:space="preserve"><value>请在“扫描”选项卡中扫描单个包或批量文件夹以浏览内容。</value></data>
+  <data name="ExploreEmptyMessage" xml:space="preserve"><value>扫描资源包或有效文件夹以浏览内容。</value></data>
   <data name="ExploreExpandAll" xml:space="preserve"><value>全部展开</value></data>
   <data name="ExploreCollapseAll" xml:space="preserve"><value>全部折叠</value></data>
   <data name="ExploreBack" xml:space="preserve"><value>返回</value></data>
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
-  <data name="TabTune" xml:space="preserve"><value>调整</value></data>
+  <data name="TabNormals" xml:space="preserve"><value>法线</value></data>
   <data name="TabSettings" xml:space="preserve"><value>设置</value></data>
   <data name="Input" xml:space="preserve"><value>输入</value></data>
+  <data name="InputSourceModeTooltip" xml:space="preserve"><value>关闭：单个资源包（.zip / .jar）。开启：包含多个资源包的文件夹，用于批量扫描与转换。</value></data>
   <data name="ResourcePackWatermark" xml:space="preserve"><value>资源包（.zip 或 .jar）</value></data>
   <data name="Browse" xml:space="preserve"><value>浏览…</value></data>
   <data name="Log" xml:space="preserve"><value>日志</value></data>
@@ -127,7 +134,11 @@
   <data name="GenerationSettings" xml:space="preserve"><value>生成设置</value></data>
   <data name="TuneNormals" xml:space="preserve"><value>法线</value></data>
   <data name="TuneSpecular" xml:space="preserve"><value>高光</value></data>
+  <data name="NormalsTuning" xml:space="preserve"><value>法线调整</value></data>
+  <data name="SpecularTuning" xml:space="preserve"><value>高光调整</value></data>
+  <data name="AiTuning" xml:space="preserve"><value>AI 调整</value></data>
   <data name="TuneHeight" xml:space="preserve"><value>高度</value></data>
+  <data name="HeightmapTuning" xml:space="preserve"><value>高度图调整</value></data>
   <data name="NormalStrength" xml:space="preserve"><value>法线强度</value></data>
   <data name="NormalStrengthTooltip" xml:space="preserve"><value>法线贴图梯度强度。越高 = 表面凹凸越明显。</value></data>
   <data name="HeightStrength" xml:space="preserve"><value>高度强度</value></data>
@@ -165,10 +176,6 @@
   <data name="DeepBumpInputModeGrayscale" xml:space="preserve"><value>灰度</value></data>
   <data name="DeepBumpInputModeRgb" xml:space="preserve"><value>RGB</value></data>
   <data name="DeepBumpForceBlue255" xml:space="preserve"><value>强制 DeepBump 法线 B=255</value></data>
-  <data name="QualityProfile" xml:space="preserve"><value>质量配置</value></data>
-  <data name="QualityProfileBalanced" xml:space="preserve"><value>均衡</value></data>
-  <data name="QualityProfileLowRes" xml:space="preserve"><value>低分辨率（16–64）</value></data>
-  <data name="QualityProfileHiRes" xml:space="preserve"><value>高分辨率（128–512）</value></data>
   <data name="Advanced" xml:space="preserve"><value>高级</value></data>
   <data name="Preprocessing" xml:space="preserve"><value>预处理</value></data>
   <data name="PreprocessLinearize" xml:space="preserve"><value>导数前线性化（sRGB → linear）</value></data>
@@ -181,8 +188,6 @@
   <data name="SpecularPercentileRemap" xml:space="preserve"><value>平滑度（R）百分位重映射</value></data>
   <data name="SpecularRemapLowPercentile" xml:space="preserve"><value>低百分位</value></data>
   <data name="SpecularRemapHighPercentile" xml:space="preserve"><value>高百分位</value></data>
-  <data name="MetalHeuristicSubstrings" xml:space="preserve"><value>金属名称提示</value></data>
-  <data name="MetalHeuristicSubstringsWatermark" xml:space="preserve"><value>逗号分隔（可选），例如 iron,gold,steel</value></data>
   <data name="AoAdvanced" xml:space="preserve"><value>环境光遮蔽（AO）</value></data>
   <data name="GenerateAo" xml:space="preserve"><value>将 AO 烘焙到法线（蓝色通道）</value></data>
   <data name="AoRadius" xml:space="preserve"><value>AO 半径</value></data>
@@ -205,6 +210,8 @@
   <data name="Engine" xml:space="preserve"><value>引擎</value></data>
   <data name="MaxThreads" xml:space="preserve"><value>最大线程数</value></data>
   <data name="MaxThreadsTooltip" xml:space="preserve"><value>转换工作线程。0 = 自动。</value></data>
+  <data name="OnnxPreferTensorRt" xml:space="preserve"><value>ONNX GPU 优先使用 TensorRT（CUDA 回退）</value></data>
+  <data name="OnnxPreferTensorRtTooltip" xml:space="preserve"><value>勾选：TensorRT 执行提供程序，不支持的操作用 CUDA。不勾选：仅 CUDA—会话启动更快；首次运行 TensorRT 可能编译引擎。</value></data>
   <data name="TempFolder" xml:space="preserve"><value>临时文件夹</value></data>
   <data name="TempFolderTooltip" xml:space="preserve"><value>转换时临时解压目录。空 = 系统临时目录。</value></data>
   <data name="TempFolderWatermark" xml:space="preserve"><value>留空为系统临时目录</value></data>

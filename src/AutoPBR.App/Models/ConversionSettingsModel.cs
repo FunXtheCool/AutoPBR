@@ -1,10 +1,12 @@
 using AutoPBR.Core;
+using AutoPBR.Core.Embeddings;
 using AutoPBR.Core.Models;
 using NormalOperatorEnum = AutoPBR.Core.Models.NormalOperator;
 using NormalKernelSizeEnum = AutoPBR.Core.Models.NormalKernelSize;
 using NormalDerivativeEnum = AutoPBR.Core.Models.NormalDerivative;
-using QualityProfileEnum = AutoPBR.Core.Models.QualityProfile;
 using DeepBumpInputModeEnum = AutoPBR.Core.Models.DeepBumpInputMode;
+using MlSpecularBlendModeEnum = AutoPBR.Core.Models.MlSpecularHeuristicBlendMode;
+using MlSpecularBlendMathEnum = AutoPBR.Core.Models.MlSpecularBlendMath;
 
 namespace AutoPBR.App.Models;
 
@@ -21,6 +23,9 @@ internal sealed class ConversionSettingsModel
     public double SmoothnessScale { get; set; } = AutoPbrDefaults.DefaultSmoothnessScale;
     public double MetallicBoost { get; set; } = AutoPbrDefaults.DefaultMetallicBoost;
     public double PorosityBias { get; set; } = AutoPbrDefaults.DefaultPorosityBias;
+
+    /// <summary>Extra B offset for plant-tagged textures (added to <see cref="PorosityBias"/>).</summary>
+    public double PlantMaterialPorosityExtra { get; set; } = AutoPbrDefaults.DefaultPlantMaterialPorosityExtra;
     public int MaxThreads { get; set; }
     public string? TempDirectory { get; set; }
     public bool ProcessBlocks { get; set; } = true;
@@ -28,16 +33,21 @@ internal sealed class ConversionSettingsModel
     public bool ProcessArmor { get; set; } = true;
     public bool ProcessEntity { get; set; } = true;
     public bool ProcessParticles { get; set; } = true;
-    public string FoliageMode { get; set; } = "Ignore All";
+    public string FoliageMode { get; set; } = "No Height";
     public bool UseDeepBumpNormals { get; set; }
     public string DeepBumpOverlap { get; set; } = "Large";
     public string DeepBumpInputMode { get; set; } = nameof(DeepBumpInputModeEnum.Auto);
     public bool DeepBumpForceBlue255 { get; set; }
+    public double DeepBumpNormalIntensity { get; set; } = AutoPbrDefaults.DefaultNormalIntensity;
+    public double DeepBumpNormalSoftClamp { get; set; }
+    public bool DeepBumpEdgeGuidedEnhance { get; set; }
+    public double DeepBumpEdgeGuidedStrength { get; set; } = 1.0;
+    public double DeepBumpEdgeGuidedGamma { get; set; } = 1.0;
+    public double DeepBumpEdgeGuidedDirectionMix { get; set; } = 0.35;
+    public int NormalHeightTransparentAlphaClampMax { get; set; } = 0;
     public string NormalOperator { get; set; } = nameof(NormalOperatorEnum.SobelVc);
     public string NormalKernelSize { get; set; } = "3";
     public string NormalDerivative { get; set; } = nameof(NormalDerivativeEnum.Luminance);
-    public string QualityProfile { get; set; } = nameof(QualityProfileEnum.Balanced);
-
     public bool PreprocessLinearize { get; set; }
     public int PreprocessDenoiseRadius { get; set; }
     public double PreprocessDenoiseBlend { get; set; } = 0.5;
@@ -48,19 +58,44 @@ internal sealed class ConversionSettingsModel
     public bool SpecularUsePercentileRemap { get; set; } = true;
     public double SpecularRemapLowPercentile { get; set; } = 0.02;
     public double SpecularRemapHighPercentile { get; set; } = 0.98;
-    public string? MetalHeuristicSubstrings { get; set; }
+    public bool UseMlSpecularPredictor { get; set; }
+    public string? MlSpecularModelPath { get; set; }
+
+    /// <summary>
+    /// Per-resolution ONNX paths (16, 32, 64, 128, 256). When null, only <see cref="MlSpecularModelPath"/> is used unless
+    /// the host merges bundled defaults at conversion time.
+    /// </summary>
+    public IReadOnlyDictionary<int, string>? MlSpecularModelPathsByResolution { get; set; }
+
+    /// <summary>0 = heuristic specular when ML ran; 1 = full ML weight from the blend toward model output.</summary>
+    public double MlSpecularHeuristicBlend { get; set; } = AutoPbrDefaults.DefaultMlSpecularHeuristicBlend;
+
+    /// <summary><see cref="MlSpecularBlendModeEnum"/> as enum name string (e.g. SmoothnessOnly, AiMetalAndEmissive, Full).</summary>
+    public string MlSpecularHeuristicBlendMode { get; set; } = nameof(MlSpecularBlendModeEnum.SmoothnessOnly);
+    /// <summary><see cref="MlSpecularBlendMathEnum"/> as enum name string (e.g. Linear, Additive, Multiplicative).</summary>
+    public string MlSpecularBlendMath { get; set; } = nameof(MlSpecularBlendMathEnum.Linear);
+
+    public bool MlSpecularUseEdgeChannel { get; set; } = true;
+    public int MlSpecularTransparentAlphaClampMax { get; set; } = 0;
+    public bool SpecularDebugDisableHeuristicSpecular { get; set; }
+    public bool SpecularDebugSkipSpecularRemap { get; set; }
+    public bool SpecularDebugVerboseSpecularMl { get; set; }
 
     public bool GenerateAo { get; set; }
     public int AoRadius { get; set; } = 4;
     public double AoStrength { get; set; } = 1.0;
 
-    /// <summary>Builds Core options from this snapshot plus runtime data (specular, ignore set, entries filter, tag overrides, tag rules).</summary>
+    /// <summary>When true, ONNX GPU uses TensorRT EP (CUDA fallback). When false, CUDA only.</summary>
+    public bool PreferOnnxTensorRtExecutionProvider { get; set; }
+
+    /// <summary>Builds Core options from this snapshot plus runtime data (specular, ignore set, entries filter, tag overrides, tag rules, semantic options).</summary>
     public AutoPbrOptions ToAutoPbrOptions(
         SpecularData? specularData,
         HashSet<string> ignore,
         IReadOnlyList<string>? entriesToExtractOnly,
         IReadOnlyDictionary<string, (IReadOnlyList<string> Added, IReadOnlyList<string> Removed)>? manualTagOverrides = null,
-        IReadOnlyList<TagRule>? tagRules = null)
+        IReadOnlyList<TagRule>? tagRules = null,
+        MaterialTagSemanticOptions? semanticOptions = null)
     {
         var op = Enum.TryParse<NormalOperatorEnum>(NormalOperator, ignoreCase: true, out var parsedOp)
             ? parsedOp
@@ -74,28 +109,20 @@ internal sealed class ConversionSettingsModel
         var deriv = Enum.TryParse<NormalDerivativeEnum>(NormalDerivative, ignoreCase: true, out var parsedDeriv)
             ? parsedDeriv
             : NormalDerivativeEnum.Luminance;
-        var profile = Enum.TryParse<QualityProfileEnum>(QualityProfile, ignoreCase: true, out var parsedProfile)
-            ? parsedProfile
-            : QualityProfileEnum.Balanced;
         var deepBumpInputMode = Enum.TryParse<DeepBumpInputModeEnum>(DeepBumpInputMode, ignoreCase: true,
             out var parsedDeepBumpInputMode)
             ? parsedDeepBumpInputMode
             : DeepBumpInputModeEnum.Auto;
-
-        IReadOnlyList<string>? metalSubs = null;
-        if (!string.IsNullOrWhiteSpace(MetalHeuristicSubstrings))
-        {
-            metalSubs = MetalHeuristicSubstrings
-                .Split([',', ';', '\n', '\r', '\t'], StringSplitOptions.RemoveEmptyEntries)
-                .Select(s => s.Trim())
-                .Where(s => s.Length > 0)
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToArray();
-        }
-
+        var mlBlendMode = Enum.TryParse<MlSpecularBlendModeEnum>(MlSpecularHeuristicBlendMode, ignoreCase: true,
+            out var parsedMlBlend)
+            ? parsedMlBlend
+            : MlSpecularBlendModeEnum.SmoothnessOnly;
+        var mlBlendMath = Enum.TryParse<MlSpecularBlendMathEnum>(MlSpecularBlendMath, ignoreCase: true,
+            out var parsedMlBlendMath)
+            ? parsedMlBlendMath
+            : MlSpecularBlendMathEnum.Linear;
         return new AutoPbrOptions
         {
-            QualityProfile = profile,
             NormalIntensity = (float)NormalIntensity,
             HeightIntensity = (float)HeightIntensity,
             FastSpecular = FastSpecular,
@@ -103,10 +130,23 @@ internal sealed class ConversionSettingsModel
             SmoothnessScale = (float)SmoothnessScale,
             MetallicBoost = (float)MetallicBoost,
             PorosityBias = (int)Math.Round(PorosityBias),
+            PlantMaterialPorosityExtra = Math.Clamp((int)Math.Round(PlantMaterialPorosityExtra), -128, 128),
             SpecularUsePercentileRemap = SpecularUsePercentileRemap,
             SpecularRemapLowPercentile = (float)SpecularRemapLowPercentile,
             SpecularRemapHighPercentile = (float)SpecularRemapHighPercentile,
-            MetalHeuristicSubstrings = metalSubs,
+            UseMlSpecularPredictor = UseMlSpecularPredictor,
+            MlSpecularModelPath = string.IsNullOrWhiteSpace(MlSpecularModelPath) ? null : MlSpecularModelPath.Trim(),
+            MlSpecularModelPathsByResolution = MlSpecularModelPathsByResolution is { Count: > 0 }
+                ? MlSpecularModelPathsByResolution
+                : null,
+            MlSpecularHeuristicBlend = (float)Math.Clamp(MlSpecularHeuristicBlend, 0.0, 1.0),
+            MlSpecularHeuristicBlendMode = mlBlendMode,
+            MlSpecularBlendMath = mlBlendMath,
+            MlSpecularUseEdgeChannel = MlSpecularUseEdgeChannel,
+            MlSpecularTransparentAlphaClampMax = Math.Clamp(MlSpecularTransparentAlphaClampMax, 0, 255),
+            SpecularDebugDisableHeuristicSpecular = SpecularDebugDisableHeuristicSpecular,
+            SpecularDebugSkipSpecularRemap = SpecularDebugSkipSpecularRemap,
+            SpecularDebugVerboseSpecularMl = SpecularDebugVerboseSpecularMl,
             MaxThreads = MaxThreads,
             TempDirectory = string.IsNullOrWhiteSpace(TempDirectory) ? null : TempDirectory,
             ProcessBlocks = ProcessBlocks,
@@ -116,6 +156,7 @@ internal sealed class ConversionSettingsModel
             GenerateAo = GenerateAo,
             AoRadius = AoRadius,
             AoStrength = (float)AoStrength,
+            PreferOnnxTensorRtExecutionProvider = PreferOnnxTensorRtExecutionProvider,
             IgnoreTextureKeys = ignore,
             FoliageMode = FoliageMode,
             UseDeepBumpNormals = UseDeepBumpNormals,
@@ -125,6 +166,13 @@ internal sealed class ConversionSettingsModel
             DeepBumpOverlap = DeepBumpOverlap,
             DeepBumpInputMode = deepBumpInputMode,
             DeepBumpForceBlue255 = DeepBumpForceBlue255,
+            DeepBumpNormalIntensity = (float)Math.Clamp(DeepBumpNormalIntensity, 0.05, 8.0),
+            DeepBumpNormalSoftClamp = (float)Math.Clamp(DeepBumpNormalSoftClamp, 0.0, 2.0),
+            DeepBumpEdgeGuidedEnhance = DeepBumpEdgeGuidedEnhance,
+            DeepBumpEdgeGuidedStrength = (float)Math.Clamp(DeepBumpEdgeGuidedStrength, 0.0, 6.0),
+            DeepBumpEdgeGuidedGamma = (float)Math.Clamp(DeepBumpEdgeGuidedGamma, 0.1, 8.0),
+            DeepBumpEdgeGuidedDirectionMix = (float)Math.Clamp(DeepBumpEdgeGuidedDirectionMix, 0.0, 1.0),
+            NormalHeightTransparentAlphaClampMax = Math.Clamp(NormalHeightTransparentAlphaClampMax, 0, 255),
             NormalOperator = op,
             NormalKernelSize = ks,
             NormalDerivative = deriv,
@@ -137,7 +185,8 @@ internal sealed class ConversionSettingsModel
             SpecularData = specularData,
             EntriesToExtractOnly = entriesToExtractOnly,
             ManualTagOverrides = manualTagOverrides,
-            TagRules = tagRules
+            TagRules = tagRules,
+            SemanticOptions = semanticOptions
         };
     }
 }
