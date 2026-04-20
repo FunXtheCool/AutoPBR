@@ -17,11 +17,10 @@ internal static class ParallelZipReader
 
     private const int MaxEocdSearch = 65536 * 2; // scan last 128KB for EOCD (handles large comments / trailing data)
 
-    public static int ZipParallelism => Math.Max(1, Environment.ProcessorCount - 2);
-
     public static void ExtractZip(
         string inputZipPath,
         string extracted,
+        AutoPbrOptions options,
         IProgress<ConversionProgress>? progress,
         ConversionStage stage,
         CancellationToken cancellationToken,
@@ -43,19 +42,13 @@ internal static class ParallelZipReader
         var total = entries.Count;
         progress?.Report(new ConversionProgress(stage, 0, total));
 
-        var degree = Math.Min(ZipParallelism, entries.Count);
+        var degree = Math.Min(ThreadingUtil.GetZipParallelism(options), entries.Count);
         var completed = 0;
 
         Parallel.ForEach(entries,
             new ParallelOptions { MaxDegreeOfParallelism = degree, CancellationToken = cancellationToken }, entry =>
             {
-                try
-                {
-                    Thread.CurrentThread.Name ??= "AutoPBR.Extract";
-                }
-                catch (InvalidOperationException)
-                {
-                }
+                ThreadingUtil.SetThreadName("AutoPBR.Extract");
 
                 cancellationToken.ThrowIfCancellationRequested();
                 var (fullName, dataOffset, compressedSize, uncompressedSize, isStored) = entry;

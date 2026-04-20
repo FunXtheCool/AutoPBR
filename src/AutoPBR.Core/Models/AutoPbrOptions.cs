@@ -4,9 +4,11 @@ namespace AutoPBR.Core.Models;
 
 public sealed class AutoPbrOptions
 {
+    // Members that match CLR defaults (false / 0) omit redundant initializers; behavior is unchanged.
+
     public float NormalIntensity { get; init; } = AutoPbrDefaults.DefaultNormalIntensity;
     public float HeightIntensity { get; init; } = AutoPbrDefaults.DefaultHeightIntensity;
-    public bool FastSpecular { get; init; } = false;
+    public bool FastSpecular { get; init; }
 
     /// <summary>
     /// Normal generation operator when not using DeepBump. "SobelVc" = current default
@@ -30,12 +32,12 @@ public sealed class AutoPbrOptions
     /// When true, convert sRGB bytes to linear-light before deriving luminance/gradients.
     /// Improves physical plausibility but can reduce perceived contrast on very low-res pixel art.
     /// </summary>
-    public bool PreprocessLinearize { get; init; } = false;
+    public bool PreprocessLinearize { get; init; }
 
     /// <summary>
     /// Optional denoise radius applied to derived luminance before gradients (0 = off). Low-res friendly.
     /// </summary>
-    public int PreprocessDenoiseRadius { get; init; } = 0;
+    public int PreprocessDenoiseRadius { get; init; }
 
     /// <summary>
     /// Blend factor for denoise (0 = keep original, 1 = fully denoised). Only used when radius &gt; 0.
@@ -45,7 +47,7 @@ public sealed class AutoPbrOptions
     /// <summary>
     /// When true, apply a simple frequency-split to luminance before gradients: low-pass + (high-pass * strength).
     /// </summary>
-    public bool PreprocessFrequencySplit { get; init; } = false;
+    public bool PreprocessFrequencySplit { get; init; }
 
     /// <summary>Radius for the low-pass used by frequency split (pixels).</summary>
     public int PreprocessFrequencyRadius { get; init; } = 2;
@@ -57,7 +59,7 @@ public sealed class AutoPbrOptions
     /// When true, use the legacy ZipFile-based extractor instead of the default parallel extractor.
     /// Use only if you hit issues with the default (e.g. exotic zip format).
     /// </summary>
-    public bool UseLegacyExtractor { get; init; } = false;
+    public bool UseLegacyExtractor { get; init; }
 
     /// <summary>
     /// When non-null and non-empty, only these zip entry paths are extracted (e.g. from a prior scan).
@@ -68,7 +70,7 @@ public sealed class AutoPbrOptions
     /// <summary>
     /// Maximum worker threads to use for conversion (specular/normal/height). 0 or less = auto (CPU-2, minimum 1).
     /// </summary>
-    public int MaxThreads { get; init; } = 0;
+    public int MaxThreads { get; init; }
 
     /// <summary>
     /// Optional base directory for temporary working files. When null or empty, the system temp directory is used.
@@ -124,7 +126,7 @@ public sealed class AutoPbrOptions
     /// <summary>
     /// When true, bake ambient occlusion into the normal map blue channel (LabPBR: 0 = 100% occlusion, 255 = 0% occlusion).
     /// </summary>
-    public bool GenerateAo { get; init; } = false;
+    public bool GenerateAo { get; init; }
 
     /// <summary>AO blur radius (pixels) used for cavity-style approximation.</summary>
     public int AoRadius { get; init; } = 4;
@@ -161,7 +163,7 @@ public sealed class AutoPbrOptions
     public string FoliageMode { get; init; } = "No Height";
 
     /// <summary>When true and DeepBumpModelPath is valid, generate normals from diffuse using the DeepBump ONNX model (deepbump256.onnx) instead of Sobel/VC.</summary>
-    public bool UseDeepBumpNormals { get; init; } = false;
+    public bool UseDeepBumpNormals { get; init; }
 
     /// <summary>Path to deepbump256.onnx (from https://github.com/HugoTini/DeepBump). Used when UseDeepBumpNormals is true.</summary>
     public string? DeepBumpModelPath { get; init; }
@@ -177,7 +179,7 @@ public sealed class AutoPbrOptions
     /// <summary>
     /// When true, force DeepBump output B channel to 255 for workflows expecting "RG + height-in-alpha" style packing.
     /// </summary>
-    public bool DeepBumpForceBlue255 { get; init; } = false;
+    public bool DeepBumpForceBlue255 { get; init; }
 
     /// <summary>
     /// DeepBump-only normal strength multiplier applied after ONNX output. 1 = unchanged.
@@ -188,13 +190,13 @@ public sealed class AutoPbrOptions
     /// Optional soft clamp (0..2) applied to DeepBump normal XY magnitude after strength scaling.
     /// 0 = linear behavior; higher values preserve punch while reducing near-90 degree saturation.
     /// </summary>
-    public float DeepBumpNormalSoftClamp { get; init; } = 0f;
+    public float DeepBumpNormalSoftClamp { get; init; }
 
     /// <summary>
     /// When true, blend DeepBump normals with diffuse-derived edge guidance so strength follows image structure
     /// similarly to heuristic Sobel/Scharr normals.
     /// </summary>
-    public bool DeepBumpEdgeGuidedEnhance { get; init; } = false;
+    public bool DeepBumpEdgeGuidedEnhance { get; init; }
 
     /// <summary>Edge-guided XY magnitude gain (0..6 typical). Higher values amplify edges more strongly.</summary>
     public float DeepBumpEdgeGuidedStrength { get; init; } = 1f;
@@ -218,7 +220,7 @@ public sealed class AutoPbrOptions
     /// Alpha threshold (0..255) for transparent-pixel clamp when <see cref="NormalHeightZeroTransparentPixels"/> is true.
     /// 0 means only fully transparent pixels; values like 4-16 also clamp anti-aliased fringes.
     /// </summary>
-    public int NormalHeightTransparentAlphaClampMax { get; init; } = 0;
+    public int NormalHeightTransparentAlphaClampMax { get; init; }
 
     /// <summary>
     /// When true, register the ONNX Runtime TensorRT execution provider (with CUDA fallback) for GPU sessions.
@@ -278,7 +280,7 @@ public sealed class AutoPbrOptions
     /// Alpha threshold (0..255) for transparent-pixel clamp when <see cref="MlSpecularZeroTransparentPixels"/> is true.
     /// 0 means only fully transparent pixels; values like 4-16 also clamp anti-aliased fringes.
     /// </summary>
-    public int MlSpecularTransparentAlphaClampMax { get; init; } = 0;
+    public int MlSpecularTransparentAlphaClampMax { get; init; }
 
     /// <summary>
     /// Debug: when ML specular is enabled, never use the heuristic/tag specular path. Pixels that would fall back
@@ -291,6 +293,46 @@ public sealed class AutoPbrOptions
 
     /// <summary>Debug: log extra specular-ML diagnostics (load errors, tensor shapes, first-pixel sample) per texture.</summary>
     public bool SpecularDebugVerboseSpecularMl { get; init; }
+
+    /// <summary>
+    /// When true and the texture has the <c>brick</c> material tag, apply structural mortar detection and height post-processing.
+    /// </summary>
+    public bool BrickHeightMapPostProcessEnabled { get; init; } = AutoPbrDefaults.DefaultBrickHeightMapPostProcessEnabled;
+
+    /// <summary>With <see cref="BrickHeightInvertConfidenceFloor"/> sets the minimum mean structural response for the strong global invert path.</summary>
+    public float BrickHeightMinStructuralConfidence { get; init; } = AutoPbrDefaults.DefaultBrickHeightMinStructuralConfidence;
+
+    /// <summary>Mean mortar response must reach this for the strong Δ-only global invert path.</summary>
+    public float BrickHeightInvertConfidenceFloor { get; init; } = AutoPbrDefaults.DefaultBrickHeightInvertConfidenceFloor;
+
+    /// <summary>Mortar mean height minus brick mean height (0–255) above this may trigger global invert on the strong path.</summary>
+    public float BrickHeightInvertDeltaThreshold { get; init; } = AutoPbrDefaults.DefaultBrickHeightInvertDeltaThreshold;
+
+    /// <summary>
+    /// Minimum weighted diffuse luminance gap (mortar minus brick, 0–1) to allow the light-grout global invert path when Δ &gt; 0. Set to a large value (e.g. 1) to disable.
+    /// </summary>
+    public float BrickLightGroutDiffuseDeltaMin { get; init; } = AutoPbrDefaults.DefaultBrickLightGroutDiffuseDeltaMin;
+
+    /// <summary>Local depression: <c>H *= (1 - alpha * S)</c> for soft mortar mask S.</summary>
+    public float BrickMortarDepressionAlpha { get; init; } = AutoPbrDefaults.DefaultBrickMortarDepressionAlpha;
+
+    /// <summary>Lift added proportionally on bulk brick areas after depression (0–255 scale).</summary>
+    public float BrickBulkLiftBeta { get; init; } = AutoPbrDefaults.DefaultBrickBulkLiftBeta;
+
+    /// <summary>Maximum morphological radius for multi-scale top-hat (actual radii also scale with texture size).</summary>
+    public int BrickMortarTopHatMaxRadius { get; init; } = AutoPbrDefaults.DefaultBrickMortarTopHatMaxRadius;
+
+    /// <summary>When true, append brick height probe summary to conversion progress <see cref="ConversionProgress.InfoMessage"/>.</summary>
+    public bool BrickHeightMapVerboseLog { get; init; }
+
+    /// <summary>When true, brick height probe fills <see cref="TextureWorkItem.BrickProbeDebugText"/> during preview (single-texture path).</summary>
+    public bool BrickProbePreviewDebug { get; init; } = AutoPbrDefaults.DefaultBrickProbePreviewDebug;
+
+    /// <summary>
+    /// When true, invert specular smoothness (R) for <c>brick</c>-tagged textures using the same global invert decision as brick height
+    /// (requires normals/height to run before specular). When false, use legacy <see cref="TextureOverrides.InvertSpecular"/> for brick.
+    /// </summary>
+    public bool BrickSpecularAlignWithHeightProbe { get; init; } = AutoPbrDefaults.DefaultBrickSpecularAlignWithHeightProbe;
 
     public SpecularData? SpecularData { get; init; }
 }

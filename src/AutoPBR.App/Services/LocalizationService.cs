@@ -26,25 +26,25 @@ internal static class LocalizationService
         return new LocalizedStrings();
     }
 
-    public static IReadOnlyList<FoliageModeOption> GetFoliageModeOptions(LocalizedStrings strings) =>
+    public static IReadOnlyList<FoliageModeOption> GetFoliageModeOptions(LocalizedStrings _) =>
     [
-        new FoliageModeOption(strings.IgnoreAll, "Ignore All"),
-        new FoliageModeOption(strings.NoHeight, "No Height"),
-        new FoliageModeOption(strings.ConvertAll, "Convert All")
+        new FoliageModeOption(LocalizedStrings.IgnoreAll, "Ignore All"),
+        new FoliageModeOption(LocalizedStrings.NoHeight, "No Height"),
+        new FoliageModeOption(LocalizedStrings.ConvertAll, "Convert All")
     ];
 
-    public static IReadOnlyList<FoliageModeOption> GetDeepBumpOverlapOptions(LocalizedStrings strings) =>
+    public static IReadOnlyList<FoliageModeOption> GetDeepBumpOverlapOptions(LocalizedStrings _) =>
     [
-        new FoliageModeOption(strings.DeepBumpOverlapSmall, "Small"),
-        new FoliageModeOption(strings.DeepBumpOverlapMedium, "Medium"),
-        new FoliageModeOption(strings.DeepBumpOverlapLarge, "Large")
+        new FoliageModeOption(LocalizedStrings.DeepBumpOverlapSmall, "Small"),
+        new FoliageModeOption(LocalizedStrings.DeepBumpOverlapMedium, "Medium"),
+        new FoliageModeOption(LocalizedStrings.DeepBumpOverlapLarge, "Large")
     ];
 
-    public static IReadOnlyList<FoliageModeOption> GetDeepBumpInputModeOptions(LocalizedStrings strings) =>
+    public static IReadOnlyList<FoliageModeOption> GetDeepBumpInputModeOptions(LocalizedStrings _) =>
     [
-        new FoliageModeOption(strings.DeepBumpInputModeAuto, nameof(DeepBumpInputMode.Auto)),
-        new FoliageModeOption(strings.DeepBumpInputModeGrayscale, nameof(DeepBumpInputMode.Grayscale)),
-        new FoliageModeOption(strings.DeepBumpInputModeRgb, nameof(DeepBumpInputMode.Rgb))
+        new FoliageModeOption(LocalizedStrings.DeepBumpInputModeAuto, nameof(DeepBumpInputMode.Auto)),
+        new FoliageModeOption(LocalizedStrings.DeepBumpInputModeGrayscale, nameof(DeepBumpInputMode.Grayscale)),
+        new FoliageModeOption(LocalizedStrings.DeepBumpInputModeRgb, nameof(DeepBumpInputMode.Rgb))
     ];
 
     public static IReadOnlyList<FoliageModeOption> GetNormalOperatorOptions() =>

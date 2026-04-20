@@ -20,4 +20,8 @@
     <ProjectReference Include="..\..\src\AutoPBR.Core\AutoPBR.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="AutoPBR.Core" />
+  </ItemGroup>
+
 </Project>

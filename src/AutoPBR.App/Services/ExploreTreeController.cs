@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Compression;
-using System.Threading;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using AutoPBR.App.Models;
@@ -12,7 +11,7 @@ using AutoPBR.Core.Models;
 namespace AutoPBR.App.Services;
 
 /// <summary>Owns scanned archive data, path overrides, folder visibility cache, and the explore tree root. Implements <see cref="IArchiveNodeHost"/> for lazy loading and override storage.</summary>
-internal sealed class ExploreTreeController : IArchiveNodeHost
+internal sealed class ExploreTreeController : IArchiveNodeHost, IDisposable
 {
     private static readonly HashSet<string> TextureTypeFolderNames = new(StringComparer.OrdinalIgnoreCase)
         { "block", "blocks", "item", "items", "entity", "particle" };
@@ -940,13 +939,13 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
         _effectiveTagCache[archivePath] = immediate;
         if (deferMl)
         {
-            QueueBackgroundEffectiveTagCompute(archivePath);
+            _ = QueueBackgroundEffectiveTagComputeAsync(archivePath);
         }
 
         return immediate;
     }
 
-    private async void QueueBackgroundEffectiveTagCompute(string archivePath)
+    private async Task QueueBackgroundEffectiveTagComputeAsync(string archivePath)
     {
         if (!_effectiveTagComputeInFlight.TryAdd(archivePath, 0))
         {
@@ -1009,16 +1008,38 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
     /// Call before PBR conversion so Explore-side ONNX work does not race with <see cref="TextureScanner"/> tagging,
     /// and so manual tag overrides are fully persisted.
     /// </summary>
-    public async Task WaitForPendingTagWorkAsync(CancellationToken cancellationToken = default)
+    public int GetPendingTagWorkCount()
     {
+        var pending = Volatile.Read(ref _tagAsyncWorkPending);
+        if (_refreshDisplayTagsDebounceCts is not null)
+        {
+            pending++;
+        }
+
+        var refreshTask = _tagRefreshAllTask;
+        if (refreshTask is not null && !refreshTask.IsCompleted)
+        {
+            pending++;
+        }
+
+        return Math.Max(0, pending);
+    }
+
+    public async Task WaitForPendingTagWorkAsync(
+        Action<int>? onPendingWorkChanged = null,
+        CancellationToken cancellationToken = default)
+    {
+        onPendingWorkChanged?.Invoke(GetPendingTagWorkCount());
         for (var i = 0; i < 200 && _refreshDisplayTagsDebounceCts is not null; i++)
         {
             await Task.Delay(25, cancellationToken).ConfigureAwait(false);
+            onPendingWorkChanged?.Invoke(GetPendingTagWorkCount());
         }
 
         while (Volatile.Read(ref _tagAsyncWorkPending) > 0)
         {
             await Task.Delay(25, cancellationToken).ConfigureAwait(false);
+            onPendingWorkChanged?.Invoke(GetPendingTagWorkCount());
         }
 
         var t = _tagRefreshAllTask;
@@ -1037,13 +1058,17 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
                 // Best-effort; conversion still runs full tagging in Core.
             }
         }
+
+        onPendingWorkChanged?.Invoke(GetPendingTagWorkCount());
     }
 
     /// <summary>Writes manual tag add/remove to disk for the current scanned pack (safe no-op if nothing scanned).</summary>
     public void FlushTagOverridesToDisk() => PersistTagOverrides();
 
+    /// <param name="archivePath">Archive entry path for the texture being evaluated.</param>
+    /// <param name="includeDictionaryEvidence">Whether dictionary evidence should influence semantic material scoring.</param>
     /// <param name="deferSemanticMl">When true with semantic ML enabled, use keyword material tags only (fast); full ML runs later on a background thread.</param>
-    private IReadOnlyList<(string Id, string DisplayName, TagRuleKind Kind)> ComputeEffectiveTags(
+    private List<(string Id, string DisplayName, TagRuleKind Kind)> ComputeEffectiveTags(
         string archivePath,
         bool includeDictionaryEvidence,
         bool deferSemanticMl = false)
@@ -1206,9 +1231,17 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
 
     private async Task RefreshAllDisplayTagsCoreAsync()
     {
-        _refreshDisplayTagsDebounceCts?.Cancel();
+        if (_refreshDisplayTagsDebounceCts is { } oldDebounce)
+        {
+            await oldDebounce.CancelAsync().ConfigureAwait(false);
+            oldDebounce.Dispose();
+        }
         _refreshDisplayTagsDebounceCts = null;
-        _tagRefreshCts?.Cancel();
+        if (_tagRefreshCts is { } oldRefresh)
+        {
+            await oldRefresh.CancelAsync().ConfigureAwait(false);
+            oldRefresh.Dispose();
+        }
         var cts = new CancellationTokenSource();
         _tagRefreshCts = cts;
         Interlocked.Increment(ref _effectiveTagEpoch);
@@ -1438,5 +1471,14 @@ internal sealed class ExploreTreeController : IArchiveNodeHost
             }
         }
         return null;
+    }
+
+    public void Dispose()
+    {
+        _tagRefreshCts?.Cancel();
+        _refreshDisplayTagsDebounceCts?.Cancel();
+        _tagRefreshCts?.Dispose();
+        _refreshDisplayTagsDebounceCts?.Dispose();
+        _tagComputeConcurrency.Dispose();
     }
 }

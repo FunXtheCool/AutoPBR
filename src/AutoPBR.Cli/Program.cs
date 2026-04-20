@@ -1,13 +1,7 @@
 using System.Text.Json;
-using AutoPBR.Cli;
 using AutoPBR.Core;
 using AutoPBR.Core.Embeddings;
 using AutoPBR.Core.Models;
-
-if (args.Length > 0 && args[0].Equals("train-ort-specular", StringComparison.OrdinalIgnoreCase))
-{
-    return OrtSpecularTrainingCliDispatch.Run(args.AsSpan(1));
-}
 
 static int Usage()
 {
@@ -18,8 +12,6 @@ static int Usage()
         Usage:
           AutoPBR.Cli <input> <output> [--fast] [--normal <1..3>] [--height <0.01..0.5>] [--normal-operator <sobel|scharr>] [--normal-kernel <3|5|7>] [--normal-derivative <luminance|color|blend|max>] [--foliage-mode <ignore-all|no-height|convert-all>] [--ignore-plants] [--no-semantic-material-tags] [--semantic-min-similarity <0..1>] [--semantic-certainty-threshold <0..1>] [--semantic-max-tags <1..16>] [--dictionary-evidence] [--dictionary-evidence-weight <0..1>] [--dictionary-min-evidence-score <-1..1>] [--dictionary-timeout-ms <100..5000>] [--tag-rules <path.json>] [--deepbump-normal-strength <0.05..8>] [--deepbump-normal-soft-clamp <0..2>] [--deepbump-edge-guided] [--deepbump-edge-strength <0..6>] [--deepbump-edge-gamma <0.1..8>] [--deepbump-edge-direction-mix <0..1>] [--normal-height-transparent-alpha-max <0..255>] [--ml-spec-model <path.onnx>|--ml-spec-generator-model <path.onnx>|--ml-spec-predictor-model <path.onnx>] [--ml-spec-model-map <res>=<path.onnx> ...] [--ml-spec-blend-math <linear|softlight|overlay|screen|biasgain|sigmoidcrossfade>] [--ml-spec-no-edge] [--ml-spec-transparent-alpha-max <0..255>] [--debug-spec-no-heuristic] [--debug-spec-no-remap] [--debug-spec-verbose]
 
-          AutoPBR.Cli train-ort-specular [--data-root <path>] [--ort-artifacts-dir <path>] ...  (see AutoPBR.Training.Ort; runs isolated launcher exe)
-
         Input: .zip (resource pack) or .jar (Minecraft; opened as zip). Output: always .zip (PBR layer only).
 
         Notes:
@@ -27,7 +19,7 @@ static int Usage()
           - Tag rules / MiniLM / weighted-unweighted flags match the desktop app defaults (see --foliage-mode, semantic flags).
           - --foliage-mode defaults to no-height (same as app). --ignore-plants is a legacy alias for ignore-all (does not skip textures by path).
           - --tag-rules: JSON array of custom tag rules (same shape as app export); merged after built-in brick/wood/metal/foliage rules.
-          - Specular ML: use --ml-spec-model for a single fallback ONNX, and/or repeat --ml-spec-model-map <res>=<path> (e.g. 16=models\\16\\a.onnx). If neither is set, models under Data/models/<res>/ are auto-discovered when present. Per-texture selection picks the smallest configured resolution >= texture size (ceil), else the largest.
+          - Specular ML: use --ml-spec-model for a single fallback ONNX, and/or repeat --ml-spec-model-map <res>=<path> (e.g. 16=Data\\ONNX-AI\\SpecLab\\SpecLab_16x.onnx). If neither is set, bundled models under Data/ONNX-AI/SpecLab are auto-discovered when present. Per-texture selection picks the smallest configured resolution >= texture size (ceil), else the largest.
         """
     );
     return 2;
@@ -385,7 +377,6 @@ var options = new AutoPbrOptions
     SpecularDebugVerboseSpecularMl = debugSpecVerbose
 };
 
-var converter = new ResourcePackConverter();
 var prog = new Progress<ConversionProgress>(p =>
 {
     if (!string.IsNullOrEmpty(p.InfoMessage))
@@ -405,7 +396,7 @@ var prog = new Progress<ConversionProgress>(p =>
 
 try
 {
-    await converter.ConvertAsync(input, output, options, prog);
+    await ResourcePackConverter.ConvertAsync(input, output, options, prog);
     return 0;
 }
 catch (OperationCanceledException)

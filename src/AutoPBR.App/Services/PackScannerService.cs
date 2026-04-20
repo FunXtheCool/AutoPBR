@@ -10,8 +10,9 @@ internal static class PackScannerService
         IProgress<(int completed, int total)>? progress = null)
     {
         var childLists = new Dictionary<string, List<ArchiveChildEntry>>(StringComparer.OrdinalIgnoreCase);
+        var seenChildren = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
         var fileCount = 0;
-        AddZipToIndex(zipPath, pathPrefix: "", childLists, ref fileCount, progress);
+        AddZipToIndex(zipPath, pathPrefix: "", childLists, seenChildren, ref fileCount, progress);
         var index = ToReadOnlyIndex(childLists);
         return new ScannedArchiveData(index, fileCount);
     }
@@ -36,8 +37,11 @@ internal static class PackScannerService
             .ToList();
 
         var childLists = new Dictionary<string, List<ArchiveChildEntry>>(StringComparer.OrdinalIgnoreCase);
+        var seenChildren = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
         var rootList = new List<ArchiveChildEntry>();
         childLists[""] = rootList;
+        var rootSeen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        seenChildren[""] = rootSeen;
         var batchMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var fileCount = 0;
 
@@ -45,16 +49,15 @@ internal static class PackScannerService
         {
             var baseName = Path.GetFileName(packPath);
             var uniqueRoot = baseName;
-            for (var i = 0;
-                 rootList.Exists(c => c.FullPath.Equals(uniqueRoot, StringComparison.OrdinalIgnoreCase));
-                 i++)
+            for (var i = 0; rootSeen.Contains(uniqueRoot); i++)
             {
                 uniqueRoot = $"{i}_{baseName}";
             }
 
             batchMap[uniqueRoot] = packPath;
             rootList.Add(new ArchiveChildEntry(uniqueRoot, uniqueRoot, true));
-            AddZipToIndex(packPath, uniqueRoot, childLists, ref fileCount, progress);
+            rootSeen.Add(uniqueRoot);
+            AddZipToIndex(packPath, uniqueRoot, childLists, seenChildren, ref fileCount, progress);
         }
 
         var index = ToReadOnlyIndex(childLists);
@@ -66,7 +69,7 @@ internal static class PackScannerService
             batchPackRootToPath: batchMap);
     }
 
-    private static IReadOnlyDictionary<string, IReadOnlyList<ArchiveChildEntry>> ToReadOnlyIndex(
+    private static Dictionary<string, IReadOnlyList<ArchiveChildEntry>> ToReadOnlyIndex(
         Dictionary<string, List<ArchiveChildEntry>> childLists) =>
         childLists.ToDictionary(kv => kv.Key, kv => (IReadOnlyList<ArchiveChildEntry>)kv.Value.AsReadOnly(),
             StringComparer.OrdinalIgnoreCase);
@@ -76,6 +79,7 @@ internal static class PackScannerService
         string zipPath,
         string pathPrefix,
         Dictionary<string, List<ArchiveChildEntry>> childLists,
+        Dictionary<string, HashSet<string>> seenChildren,
         ref int fileCount,
         IProgress<(int completed, int total)>? progress)
     {
@@ -128,14 +132,20 @@ internal static class PackScannerService
                     siblingList = new List<ArchiveChildEntry>();
                     childLists[parentPath] = siblingList;
                 }
+                if (!seenChildren.TryGetValue(parentPath, out var siblingSet))
+                {
+                    siblingSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    seenChildren[parentPath] = siblingSet;
+                }
 
-                if (siblingList.Exists(c => c.FullPath.Equals(path, StringComparison.OrdinalIgnoreCase)))
+                if (siblingSet.Contains(path))
                 {
                     current = path;
                     continue;
                 }
 
                 siblingList.Add(new ArchiveChildEntry(segment, path, !isFile));
+                siblingSet.Add(path);
                 if (isFile)
                 {
                     fileCount++;

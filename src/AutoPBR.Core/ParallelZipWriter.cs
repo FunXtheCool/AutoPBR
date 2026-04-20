@@ -13,12 +13,11 @@ internal static class ParallelZipWriter
     private const ushort CompressionMethodDeflate = 8;
     private const ushort VersionNeeded = 20;
 
-    public static int ZipParallelism => Math.Max(1, Environment.ProcessorCount - 2);
-
     public static void WriteZip(
         string outputPath,
         IReadOnlyList<string> files,
         string basePath,
+        AutoPbrOptions options,
         IProgress<ConversionProgress>? progress,
         ConversionStage stage,
         CancellationToken cancellationToken)
@@ -26,13 +25,13 @@ internal static class ParallelZipWriter
         var total = files.Count;
         progress?.Report(new ConversionProgress(stage, 0, total));
 
-        var degree = Math.Min(ZipParallelism, files.Count);
+        var degree = Math.Min(ThreadingUtil.GetZipParallelism(options), files.Count);
         var entries = new (string relativePath, uint crc32, int uncompressedSize, byte[] compressed)[files.Count];
         var completed = 0;
 
         Parallel.For(0, files.Count, new ParallelOptions { MaxDegreeOfParallelism = degree, CancellationToken = cancellationToken }, i =>
         {
-            try { Thread.CurrentThread.Name ??= "AutoPBR.Pack"; } catch (InvalidOperationException) { }
+            ThreadingUtil.SetThreadName("AutoPBR.Pack");
             cancellationToken.ThrowIfCancellationRequested();
             var fullPath = files[i];
             var relativePath = Path.GetRelativePath(basePath, fullPath).Replace('\\', '/');

@@ -8,6 +8,11 @@ namespace AutoPBR.App.Models;
 /// </summary>
 public sealed class WindowLayoutState
 {
+    private static readonly System.Text.Json.JsonSerializerOptions SerializerOptions = new()
+    {
+        WriteIndented = true
+    };
+
     public double X { get; set; }
     public double Y { get; set; }
     public double Width { get; set; } = 1000;
@@ -59,7 +64,7 @@ public sealed class WindowLayoutState
             }
 
             PreviewColumnWidth = Math.Clamp(PreviewColumnWidth, 260, 600);
-            var json = System.Text.Json.JsonSerializer.Serialize(this, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+            var json = System.Text.Json.JsonSerializer.Serialize(this, SerializerOptions);
             File.WriteAllText(LayoutPath, json);
         }
         catch

@@ -13,5 +13,5 @@ internal static class ConversionCoordinator
         AutoPbrOptions options,
         IProgress<ConversionProgress>? progress,
         CancellationToken cancellationToken = default) =>
-        new ResourcePackConverter().ConvertAsync(inputZipPath, outputZipPath, options, progress, cancellationToken);
+        ResourcePackConverter.ConvertAsync(inputZipPath, outputZipPath, options, progress, cancellationToken);
 }

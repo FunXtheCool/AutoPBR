@@ -188,7 +188,7 @@
     <value>Semantic tag suggestions (MiniLM)</value>
   </data>
   <data name="MaterialTagSemanticMlDescription" xml:space="preserve">
-    <value>Uses the bundled ONNX model under Data/all-MiniLM-L6-v2-onnx (requires model.onnx). When enabled, automatic tags come only from MiniLM (keyword rules are not used for auto-tagging). Manual tag add/remove still applies on top.</value>
+    <value>Uses the bundled ONNX model under Data/ONNX-AI/all-MiniLM-L6-v2-onnx (requires model.onnx). When enabled, automatic tags come only from MiniLM (keyword rules are not used for auto-tagging). Manual tag add/remove still applies on top.</value>
   </data>
   <data name="UseSemanticMaterialTags" xml:space="preserve">
     <value>Enable semantic suggestions</value>
@@ -436,6 +436,39 @@
   <data name="HeightStrengthTooltip" xml:space="preserve">
     <value>Exponent for height-from-brightness. Higher = more contrast in the height map.</value>
   </data>
+  <data name="BrickProbeTuning" xml:space="preserve">
+    <value>Brick probe tuning</value>
+  </data>
+  <data name="BrickProbeEnable" xml:space="preserve">
+    <value>Enable brick probe inversion</value>
+  </data>
+  <data name="BrickProbeMinStructure" xml:space="preserve">
+    <value>Min structure confidence</value>
+  </data>
+  <data name="BrickProbeInvertDelta" xml:space="preserve">
+    <value>Invert delta threshold</value>
+  </data>
+  <data name="BrickProbeLightGroutDelta" xml:space="preserve">
+    <value>Light grout luminance delta</value>
+  </data>
+  <data name="BrickProbeEnableTooltip" xml:space="preserve">
+    <value>For textures tagged brick, decide whether to globally invert the height map when the probe detects light mortar that should be recessed. Requires the brick material tag (keyword or semantic).</value>
+  </data>
+  <data name="BrickProbeMinStructureTooltip" xml:space="preserve">
+    <value>Minimum mean structural mortar response (0–1) for the strong invert path (large height delta with high joint confidence). Thin joints often stay below this; the light-grout path does not use this threshold.</value>
+  </data>
+  <data name="BrickProbeInvertDeltaTooltip" xml:space="preserve">
+    <value>Strong path only: mortar mean height minus brick mean height must exceed this (0–255 scale) before a global invert. Lower values trigger more easily on subtle height separation.</value>
+  </data>
+  <data name="BrickProbeLightGroutDeltaTooltip" xml:space="preserve">
+    <value>Light-grout path: weighted diffuse luminance on mortar minus brick must exceed this (0–1). Lower if mortar and brick are similar in brightness. When Δ&gt;0 and this passes, the height map is inverted so faces read higher than joints.</value>
+  </data>
+  <data name="PreviewBrickProbeDebug" xml:space="preserve">
+    <value>Show brick probe debug (preview)</value>
+  </data>
+  <data name="PreviewBrickProbeDebugTooltip" xml:space="preserve">
+    <value>When enabled, the preview panel shows probe metrics (mask, meanS, height delta, lum gap, which invert path ran) for the selected texture. Conversion is unchanged.</value>
+  </data>
   <data name="NormalOperatorLabel" xml:space="preserve">
     <value>Operator</value>
   </data>
@@ -671,7 +704,7 @@
     <value>Use ML specular generator/predictor (ONNX)</value>
   </data>
   <data name="UseMlSpecularPredictorTooltip" xml:space="preserve">
-    <value>When enabled and a default or per-resolution model path is valid, direct per-pixel specular RGBA is predicted from diffuse. Optional per-resolution paths (or bundled Data/models/&lt;size&gt;/) choose the ONNX by texture size (ceil). The heuristic/AI blend slider controls how much of the model is used versus the classic heuristic. Check the log for ML diagnostics.</value>
+    <value>When enabled and a default or per-resolution model path is valid, direct per-pixel specular RGBA is predicted from diffuse. Optional per-resolution paths (or bundled Data/ONNX-AI/SpecLab models) choose the ONNX by texture size (ceil). The heuristic/AI blend slider controls how much of the model is used versus the classic heuristic. Check the log for ML diagnostics.</value>
   </data>
   <data name="MlSpecularModelPath" xml:space="preserve">
     <value>Specular model path</value>
@@ -683,7 +716,7 @@
     <value>Per-resolution specular models (optional)</value>
   </data>
   <data name="MlSpecularPerResolutionTooltip" xml:space="preserve">
-    <value>Override ONNX per training resolution. Leave blank to use bundled files under Data/models/&lt;size&gt;/ when present. The runtime picks the smallest configured resolution ≥ texture size (ceil); if the texture is larger than all keys, the largest key is used. Fallback default path above applies only when no per-resolution map is available.</value>
+    <value>Override ONNX per training resolution. Leave blank to use bundled files under Data/ONNX-AI/SpecLab when present. The runtime picks the smallest configured resolution ≥ texture size (ceil); if the texture is larger than all keys, the largest key is used. Fallback default path above applies only when no per-resolution map is available.</value>
   </data>
   <data name="MlSpecularUseEdgeChannel" xml:space="preserve">
     <value>Include edge channel for specular model input (if model expects 4 channels)</value>
@@ -858,6 +891,9 @@
   </data>
   <data name="Status_ScanningTextures" xml:space="preserve">
     <value>Scanning textures...</value>
+  </data>
+  <data name="Status_TagWorkDrainProgress" xml:space="preserve">
+    <value>Finalizing tag processing... ({0}/{1})</value>
   </data>
   <data name="Status_SpecularCurrent" xml:space="preserve">
     <value>Specular: {0}</value>

@@ -43,6 +43,12 @@ dotnet run --project src/AutoPBR.App
 dotnet build AutoPBR.sln
 ```
 
+## Quality Standards
+
+- [Project quality standards](docs/project-quality-standards.md)
+- [Tag / keyword system](docs/tag-keyword-system.md)
+- [Weighted vs Unweighted (heuristic vs ML)](docs/semantic-material-weighted-unweighted.md)
+
 ## ML specular (optional)
 
 AutoPBR can use an ONNX **specular predictor** (`diffuse -> _s RGBA`) when enabled in the app/CLI.

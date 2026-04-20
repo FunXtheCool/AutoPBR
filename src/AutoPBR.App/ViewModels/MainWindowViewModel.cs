@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
 
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
@@ -22,12 +21,13 @@ using AutoPBR.Core.Models;
 
 namespace AutoPBR.App.ViewModels;
 
-public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
+public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, IDisposable
 {
     private CancellationTokenSource? _cts;
     private CancellationTokenSource? _scanCts;
     private CancellationTokenSource? _previewCts;
     private CancellationTokenSource? _previewRefreshDebounceCts;
+    private readonly SettingsPersistenceCoordinator _settingsPersistence;
     private readonly ExploreTreeController _exploreController = new();
     private MaterialTagSemanticMatcher? _materialTagSemanticMatcher;
     private SpecularData? _specularData;
@@ -51,10 +51,10 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
         }
     }
 
-    private string ResolveBackgroundTaskLabel(string taskId) => taskId switch
+    private static string ResolveBackgroundTaskLabel(string taskId) => taskId switch
     {
-        BackgroundTaskIds.MaterialTags => Strings.BackgroundTaskMaterialTags,
-        BackgroundTaskIds.ExploreCache => Strings.BackgroundTaskExploreCache,
+        BackgroundTaskIds.MaterialTags => LocalizedStrings.BackgroundTaskMaterialTags,
+        BackgroundTaskIds.ExploreCache => LocalizedStrings.BackgroundTaskExploreCache,
         _ => taskId
     };
 
@@ -154,6 +154,13 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
 
     [ObservableProperty] private double _normalIntensity = AutoPbrDefaults.DefaultNormalIntensity;
     [ObservableProperty] private double _heightIntensity = AutoPbrDefaults.DefaultHeightIntensity;
+    [ObservableProperty] private bool _brickHeightMapPostProcessEnabled = AutoPbrDefaults.DefaultBrickHeightMapPostProcessEnabled;
+    [ObservableProperty] private double _brickHeightMinStructuralConfidence = AutoPbrDefaults.DefaultBrickHeightMinStructuralConfidence;
+    [ObservableProperty] private double _brickHeightInvertDeltaThreshold = AutoPbrDefaults.DefaultBrickHeightInvertDeltaThreshold;
+    [ObservableProperty] private double _brickLightGroutDiffuseDeltaMin = AutoPbrDefaults.DefaultBrickLightGroutDiffuseDeltaMin;
+    /// <summary>When true, preview refresh captures brick probe metrics into <see cref="PreviewBrickProbeDebugText"/>.</summary>
+    [ObservableProperty] private bool _previewBrickProbeDebug = AutoPbrDefaults.DefaultBrickProbePreviewDebug;
+    [ObservableProperty] private string? _previewBrickProbeDebugText;
     [ObservableProperty] private bool _fastSpecular;
     [ObservableProperty] private string _foliageMode = "No Height";
     [ObservableProperty] private bool _useLegacyExtractor;
@@ -230,7 +237,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
     /// <summary>When true, ONNX Runtime uses TensorRT EP for GPU models (CUDA fallback). Default false = CUDA only.</summary>
     [ObservableProperty] private bool _preferOnnxTensorRtExecutionProvider;
 
-    /// <summary>When true, Explore suggests extra material tags via MiniLM (requires Data/all-MiniLM-L6-v2-onnx/model.onnx).</summary>
+    /// <summary>When true, Explore suggests extra material tags via MiniLM (requires Data/ONNX-AI/all-MiniLM-L6-v2-onnx/model.onnx).</summary>
     [ObservableProperty] private bool _useSemanticMaterialTags = true;
 
     [ObservableProperty] private double _materialTagMinSimilarity = 0.25;
@@ -396,7 +403,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
         _exploreTagFilterOptions ??= BuildExploreTagFilterOptions();
 
     private IReadOnlyList<ExploreTagFilterOption> BuildExploreTagFilterOptions() =>
-        [new ExploreTagFilterOption { Id = "", DisplayName = Strings.ExploreTagFilterAll }, .. GetEffectiveTagRules().Select(r => new ExploreTagFilterOption { Id = r.Id, DisplayName = r.DisplayName })];
+        [new ExploreTagFilterOption { Id = "", DisplayName = LocalizedStrings.ExploreTagFilterAll }, .. GetEffectiveTagRules().Select(r => new ExploreTagFilterOption { Id = r.Id, DisplayName = r.DisplayName })];
 
     /// <summary>Built-in + custom tag rules for conversion and explore. Disabled custom rules are excluded.</summary>
     public IReadOnlyList<TagRule> GetEffectiveTagRules()
@@ -437,6 +444,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
 
     partial void OnMaterialTagMinSimilarityChanged(double value)
     {
+        _ = value;
         SaveSettings();
         if (!_loadingSettings)
         {
@@ -446,6 +454,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
 
     partial void OnMaterialTagMaxCountChanged(int value)
     {
+        _ = value;
         SaveSettings();
         if (!_loadingSettings)
         {
@@ -455,6 +464,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
 
     partial void OnMaterialTagCertaintyThresholdChanged(double value)
     {
+        _ = value;
         SaveSettings();
         if (!_loadingSettings)
         {
@@ -576,6 +586,10 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
     public MainWindowViewModel()
     {
         _settings = UserSettings.Load();
+        _settingsPersistence = new SettingsPersistenceCoordinator(
+            Dispatcher.UIThread,
+            TimeSpan.FromMilliseconds(250),
+            () => UserSettingsSynchronizer.SaveFrom(this, _settings));
         _loadingSettings = true;
 
         try
@@ -635,11 +649,11 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
     private void RefreshMlSpecularBlendModeOptions()
     {
         MlSpecularBlendModeOptions.Clear();
-        MlSpecularBlendModeOptions.Add(new FoliageModeOption(Strings.MlSpecularBlendModeSmoothnessOnly,
+        MlSpecularBlendModeOptions.Add(new FoliageModeOption(LocalizedStrings.MlSpecularBlendModeSmoothnessOnly,
             nameof(AutoPBR.Core.Models.MlSpecularHeuristicBlendMode.SmoothnessOnly)));
-        MlSpecularBlendModeOptions.Add(new FoliageModeOption(Strings.MlSpecularBlendModeAiMetalAndEmissive,
+        MlSpecularBlendModeOptions.Add(new FoliageModeOption(LocalizedStrings.MlSpecularBlendModeAiMetalAndEmissive,
             nameof(AutoPBR.Core.Models.MlSpecularHeuristicBlendMode.AiMetalAndEmissive)));
-        MlSpecularBlendModeOptions.Add(new FoliageModeOption(Strings.MlSpecularBlendModeFull,
+        MlSpecularBlendModeOptions.Add(new FoliageModeOption(LocalizedStrings.MlSpecularBlendModeFull,
             nameof(AutoPBR.Core.Models.MlSpecularHeuristicBlendMode.Full)));
 
         SelectedMlSpecularBlendModeOption =
@@ -651,17 +665,17 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
     private void RefreshMlSpecularBlendMathOptions()
     {
         MlSpecularBlendMathOptions.Clear();
-        MlSpecularBlendMathOptions.Add(new FoliageModeOption(Strings.MlSpecularBlendMathLinear,
+        MlSpecularBlendMathOptions.Add(new FoliageModeOption(LocalizedStrings.MlSpecularBlendMathLinear,
             nameof(AutoPBR.Core.Models.MlSpecularBlendMath.Linear)));
-        MlSpecularBlendMathOptions.Add(new FoliageModeOption(Strings.MlSpecularBlendMathSoftLight,
+        MlSpecularBlendMathOptions.Add(new FoliageModeOption(LocalizedStrings.MlSpecularBlendMathSoftLight,
             nameof(AutoPBR.Core.Models.MlSpecularBlendMath.SoftLight)));
-        MlSpecularBlendMathOptions.Add(new FoliageModeOption(Strings.MlSpecularBlendMathOverlay,
+        MlSpecularBlendMathOptions.Add(new FoliageModeOption(LocalizedStrings.MlSpecularBlendMathOverlay,
             nameof(AutoPBR.Core.Models.MlSpecularBlendMath.Overlay)));
-        MlSpecularBlendMathOptions.Add(new FoliageModeOption(Strings.MlSpecularBlendMathScreen,
+        MlSpecularBlendMathOptions.Add(new FoliageModeOption(LocalizedStrings.MlSpecularBlendMathScreen,
             nameof(AutoPBR.Core.Models.MlSpecularBlendMath.Screen)));
-        MlSpecularBlendMathOptions.Add(new FoliageModeOption(Strings.MlSpecularBlendMathBiasGain,
+        MlSpecularBlendMathOptions.Add(new FoliageModeOption(LocalizedStrings.MlSpecularBlendMathBiasGain,
             nameof(AutoPBR.Core.Models.MlSpecularBlendMath.BiasGain)));
-        MlSpecularBlendMathOptions.Add(new FoliageModeOption(Strings.MlSpecularBlendMathSigmoidCrossfade,
+        MlSpecularBlendMathOptions.Add(new FoliageModeOption(LocalizedStrings.MlSpecularBlendMathSigmoidCrossfade,
             nameof(AutoPBR.Core.Models.MlSpecularBlendMath.SigmoidCrossfade)));
 
         SelectedMlSpecularBlendMathOption =
@@ -902,6 +916,45 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
     }
 
     partial void OnHeightIntensityChanged(double value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnPreviewBrickProbeDebugChanged(bool value)
+    {
+        _ = value;
+        if (!_loadingSettings)
+        {
+            SaveSettings();
+        }
+
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnBrickHeightMapPostProcessEnabledChanged(bool value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnBrickHeightMinStructuralConfidenceChanged(double value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnBrickHeightInvertDeltaThresholdChanged(double value)
+    {
+        _ = value;
+        SaveSettings();
+        ScheduleRefreshPreviewIfActive();
+    }
+
+    partial void OnBrickLightGroutDiffuseDeltaMinChanged(double value)
     {
         _ = value;
         SaveSettings();
@@ -1480,9 +1533,11 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
             return;
         }
 
-
-        UserSettingsSynchronizer.SaveFrom(this, _settings);
+        _settingsPersistence.RequestSave();
     }
+
+    private async Task FlushPendingSettingsSaveAsync()
+        => await _settingsPersistence.FlushAsync().ConfigureAwait(false);
 
     private void ApplyColorScheme()
     {
@@ -1586,7 +1641,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
         }
     }
 
-    private void ExpandAllInSubtree(ArchiveNode node, bool expand)
+    private static void ExpandAllInSubtree(ArchiveNode node, bool expand)
     {
         node.IsExpanded = expand;
         foreach (var c in node.Children)
@@ -1646,7 +1701,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
         }
     }
 
-    private bool CanRemoveCustomTagRule(CustomTagRuleEntry? entry) => entry is not null;
+    private static bool CanRemoveCustomTagRule(CustomTagRuleEntry? entry) => entry is not null;
 
     [RelayCommand(CanExecute = nameof(CanMoveCustomTagRuleUp))]
     private void MoveCustomTagRuleUp(CustomTagRuleEntry? entry)
@@ -1748,16 +1803,16 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
     }
 
     private static string FormatSemanticDebugReport(
-        AutoPBR.Core.Embeddings.SemanticMatchDebugReport report,
+        SemanticMatchDebugReport report,
         string archivePath)
     {
         var sb = new System.Text.StringBuilder();
-        sb.AppendLine($"File:  {Path.GetFileName(archivePath)}");
-        sb.AppendLine($"Query: \"{report.QueryText}\"");
+        sb.AppendLine(FormattableString.Invariant($"File:  {Path.GetFileName(archivePath)}"));
+        sb.AppendLine(FormattableString.Invariant($"Query: \"{report.QueryText}\""));
         if (report.DictionaryTerms is { Count: > 0 })
         {
-            sb.AppendLine($"Dictionary terms: {string.Join(", ", report.DictionaryTerms)}");
-            sb.AppendLine($"Dictionary evidence applied: {report.DictionaryEvidenceApplied} (weight={report.DictionaryEvidenceWeight:0.00})");
+            sb.AppendLine(FormattableString.Invariant($"Dictionary terms: {string.Join(", ", report.DictionaryTerms)}"));
+            sb.AppendLine(FormattableString.Invariant($"Dictionary evidence applied: {report.DictionaryEvidenceApplied} (weight={report.DictionaryEvidenceWeight:0.00})"));
             if (report.DictionaryEvidenceApplied)
             {
                 sb.AppendLine("Fusion note: rules without dictionary evidence are scaled by (1 - weight).");
@@ -1770,7 +1825,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
             {
                 foreach (var line in block.DefinitionLines)
                 {
-                    sb.AppendLine($"{block.Term} definition: {line}");
+                    sb.AppendLine(FormattableString.Invariant($"{block.Term} definition: {line}"));
                 }
             }
         }
@@ -1781,9 +1836,9 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
 
         foreach (var entry in report.Entries)
         {
-            var dictScore = entry.DictionaryBestScore > float.MinValue ? entry.DictionaryBestScore.ToString("F4") : "n/a";
-            var fused = entry.FusedScore > float.MinValue ? entry.FusedScore.ToString("F4") : "n/a";
-            sb.AppendLine($"  {entry.DisplayName,-16}  best = {entry.BestScore:F4}  dict = {dictScore}  fused = {fused}   ← \"{entry.BestPhrase}\"");
+            var dictScore = entry.DictionaryBestScore > float.MinValue ? entry.DictionaryBestScore.ToString("F4", CultureInfo.InvariantCulture) : "n/a";
+            var fused = entry.FusedScore > float.MinValue ? entry.FusedScore.ToString("F4", CultureInfo.InvariantCulture) : "n/a";
+            sb.AppendLine(FormattableString.Invariant($"  {entry.DisplayName,-16}  best = {entry.BestScore:F4}  dict = {dictScore}  fused = {fused}   ← \"{entry.BestPhrase}\""));
             foreach (var (phrase, score) in entry.AllPhraseScores)
             {
                 if (phrase == entry.BestPhrase)
@@ -1791,7 +1846,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
                     continue;
                 }
 
-                sb.AppendLine($"  {"",16}         {score:F4}   ← \"{phrase}\"");
+                sb.AppendLine(FormattableString.Invariant($"  {"",16}         {score:F4}   ← \"{phrase}\""));
             }
 
             sb.AppendLine();
@@ -1841,8 +1896,12 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
                 }
             }
 
-            var options = BuildConversionOptions(new HashSet<string>(StringComparer.OrdinalIgnoreCase), null, manualPreview);
-            var pngBytes = await PreviewService.RenderPreviewAsync(diskPack, entryPath, options, ct)
+            var options = BuildConversionOptions(
+                new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+                null,
+                manualPreview,
+                PreviewBrickProbeDebug);
+            var previewResult = await PreviewService.RenderPreviewAsync(diskPack, entryPath, options, ct)
                 .ConfigureAwait(false);
 
             if (ct.IsCancellationRequested)
@@ -1853,8 +1912,9 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                using var ms = new MemoryStream(pngBytes);
+                using var ms = new MemoryStream(previewResult.PngBytes);
                 PreviewImage = new Bitmap(ms);
+                PreviewBrickProbeDebugText = PreviewBrickProbeDebug ? previewResult.BrickProbeDebugText : null;
             });
         }
         catch (OperationCanceledException)
@@ -2078,6 +2138,37 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
         _exploreController.HaveBatchScanForFolder(BatchFolderPath) &&
         _exploreController.Data?.BatchPackRootToPath is { Count: > 0 };
 
+    private async Task WaitForPendingTagWorkWithProgressAsync(CancellationToken token)
+    {
+        var initialPending = _exploreController.GetPendingTagWorkCount();
+        if (initialPending <= 0)
+        {
+            await _exploreController.WaitForPendingTagWorkAsync(cancellationToken: token).ConfigureAwait(false);
+            return;
+        }
+
+        var progressTotal = Math.Max(1, initialPending);
+        void UpdatePending(int pending)
+        {
+            var remaining = Math.Clamp(pending, 0, progressTotal);
+            var completed = progressTotal - remaining;
+            Dispatcher.UIThread.Post(() =>
+            {
+                ProgressMax = progressTotal;
+                ProgressValue = completed;
+                SetStatus("Status_TagWorkDrainProgress", completed, progressTotal);
+            });
+        }
+
+        UpdatePending(initialPending);
+        await _exploreController.WaitForPendingTagWorkAsync(UpdatePending, token).ConfigureAwait(false);
+        Dispatcher.UIThread.Post(() =>
+        {
+            ProgressMax = 1;
+            ProgressValue = 0;
+        });
+    }
+
     private async Task ExecuteBatchConvertAsync()
     {
         if (!CanBatchConvert())
@@ -2099,12 +2190,13 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
 
         try
         {
+            await FlushPendingSettingsSaveAsync().ConfigureAwait(false);
             SetStatus("Status_LoadingSpecularData");
             _specularData ??=
                 SpecularData.LoadFromFile(Path.Combine(AppContext.BaseDirectory, "Data", "textures_data.json"));
 
             var prog = CreateConversionProgressReporter();
-            await _exploreController.WaitForPendingTagWorkAsync(token).ConfigureAwait(false);
+            await WaitForPendingTagWorkWithProgressAsync(token).ConfigureAwait(false);
             _exploreController.FlushTagOverridesToDisk();
             var packIndex = 0;
             foreach (var kv in packs)
@@ -2185,6 +2277,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
     public ObservableCollection<ArchiveNode> SelectedExploreNodes { get; } = new();
     private ArchiveNode? _selectionAnchorExploreNode;
 
+    [UsedImplicitly] // Called from view pointer-selection handler.
     public void HandleExploreNodePointerSelection(ArchiveNode node, KeyModifiers modifiers)
     {
         var visible = GetVisibleExploreNodesInDisplayOrder();
@@ -2315,7 +2408,11 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
 
         PreviewArchivePath = node.FullPath;
         PreviewTextureName = node.FullPath;
-        _previewRefreshDebounceCts?.Cancel();
+        if (_previewRefreshDebounceCts is { } oldDebounce)
+        {
+            await oldDebounce.CancelAsync().ConfigureAwait(false);
+            oldDebounce.Dispose();
+        }
         _previewRefreshDebounceCts = null;
         await UpdatePreviewAsync().ConfigureAwait(false);
     }
@@ -2406,7 +2503,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
                 AddLogLine(Resources.GetString("Log_ExtractingOnlyPng"));
             }
 
-            await _exploreController.WaitForPendingTagWorkAsync(_cts.Token).ConfigureAwait(false);
+            await WaitForPendingTagWorkWithProgressAsync(_cts.Token).ConfigureAwait(false);
             _exploreController.FlushTagOverridesToDisk();
 
             var options = BuildConversionOptions(ignore, entriesToExtractOnly);
@@ -2467,9 +2564,9 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
     private bool CanCancel() => IsConverting;
 
     /// <summary>
-    /// Per-resolution paths: explicit text box overrides bundled <c>Data/models/&lt;res&gt;/</c> when empty.
+    /// Per-resolution paths: explicit text box overrides bundled <c>Data/ONNX-AI/SpecLab</c> models when empty.
     /// </summary>
-    private IReadOnlyDictionary<int, string>? BuildMergedSpecularResolutionMap()
+    private Dictionary<int, string>? BuildMergedSpecularResolutionMap()
     {
         var d = new Dictionary<int, string>();
         var baseDir = AppContext.BaseDirectory;
@@ -2483,7 +2580,9 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
 
             var bundled = MlSpecularBundledModelPaths.TryResolveExistingBundledPath(res, baseDir);
             if (bundled is not null)
+            {
                 d[res] = bundled;
+            }
         }
 
         Put(16, MlSpecularModelPath16);
@@ -2498,12 +2597,18 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
     private AutoPbrOptions BuildConversionOptions(
         HashSet<string> ignore,
         IReadOnlyList<string>? entriesToExtractOnly,
-        IReadOnlyDictionary<string, (IReadOnlyList<string> Added, IReadOnlyList<string> Removed)>? manualTagOverrides = null)
+        IReadOnlyDictionary<string, (IReadOnlyList<string> Added, IReadOnlyList<string> Removed)>? manualTagOverrides = null,
+        bool brickProbePreviewDebug = false)
     {
         var model = new ConversionSettingsModel
         {
             NormalIntensity = NormalIntensity,
             HeightIntensity = HeightIntensity,
+            BrickHeightMapPostProcessEnabled = BrickHeightMapPostProcessEnabled,
+            BrickHeightMinStructuralConfidence = BrickHeightMinStructuralConfidence,
+            BrickHeightInvertDeltaThreshold = BrickHeightInvertDeltaThreshold,
+            BrickLightGroutDiffuseDeltaMin = BrickLightGroutDiffuseDeltaMin,
+            BrickProbePreviewDebug = brickProbePreviewDebug,
             FastSpecular = FastSpecular,
             UseLegacyExtractor = UseLegacyExtractor,
             SmoothnessScale = SmoothnessScale,
@@ -2563,7 +2668,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
     }
 
     /// <summary>Progress reporter that marshals conversion progress to the UI thread and updates status/log.</summary>
-    private IProgress<ConversionProgress> CreateConversionProgressReporter() =>
+    private Progress<ConversionProgress> CreateConversionProgressReporter() =>
         new Progress<ConversionProgress>(OnConversionProgress);
 
     private void OnConversionProgress(ConversionProgress p)
@@ -2651,5 +2756,20 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink
             _ => null
         };
         return key != null ? Resources.GetString(key) : stage.ToString();
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _scanCts?.Cancel();
+        _previewCts?.Cancel();
+        _previewRefreshDebounceCts?.Cancel();
+        _cts?.Dispose();
+        _scanCts?.Dispose();
+        _previewCts?.Dispose();
+        _previewRefreshDebounceCts?.Dispose();
+        _materialTagSemanticMatcher?.Dispose();
+        _exploreController.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

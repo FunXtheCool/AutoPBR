@@ -234,6 +234,7 @@
   <data name="Status_ExtractingPack" xml:space="preserve"><value>पैक एक्सट्रैक्ट हो रहा है...</value></data>
   <data name="Status_ExtractingPackProgress" xml:space="preserve"><value>पैक एक्सट्रैक्ट हो रहा है... ({0}/{1})</value></data>
   <data name="Status_ScanningTextures" xml:space="preserve"><value>टेक्सचर स्कैन हो रहे हैं...</value></data>
+  <data name="Status_TagWorkDrainProgress" xml:space="preserve"><value>टैग प्रोसेसिंग पूरी की जा रही है... ({0}/{1})</value></data>
   <data name="Status_SpecularCurrent" xml:space="preserve"><value>स्पेक्युलर: {0}</value></data>
   <data name="Status_NormalsCurrent" xml:space="preserve"><value>नॉर्मल: {0}</value></data>
   <data name="Status_PackingOutput" xml:space="preserve"><value>आउटपुट zip बन रहा है...</value></data>

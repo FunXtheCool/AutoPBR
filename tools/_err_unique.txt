@@ -1,0 +1,34 @@
+﻿/Z:/Cursor Projects/AutoPBR/src/AutoPBR.App/App.axaml.cs	Member 'DisableAvaloniaDataAnnotationValidation' does not access instance data and can be marked as static	4	1
+/Z:/Cursor Projects/AutoPBR/src/AutoPBR.App/App.axaml.cs	Type 'App' owns disposable field(s) '_mainWindowViewModel' but is not disposable	4	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.App/Models/ConversionSettingsModel.cs	Member 'MlSpecularTransparentAlphaClampMax' is explicitly initialized to its default value	4	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.App/Models/ConversionSettingsModel.cs	Member 'NormalHeightTransparentAlphaClampMax' is explicitly initialized to its default value	4	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.App/Views/MainWindow.axaml	Possible 'null' value in the path of binding without fallback value	2	11
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/AutoPbrDefaults.cs	Field 'PlantTextureKeys' is never used	2	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/BrickHeightPostProcessor.cs	Auto-property accessor 'BrickFaceWeight.get' is never used	4	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/BrickHeightPostProcessor.cs	Auto-property accessor 'MortarWeight.get' is never used	4	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/BrickHeightPostProcessor.cs	'for' loop can be converted into 'foreach' loop	2	2
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/Models/AutoPbrOptions.cs	Member 'DeepBumpEdgeGuidedEnhance' is explicitly initialized to its default value	4	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/Models/AutoPbrOptions.cs	Member 'DeepBumpForceBlue255' is explicitly initialized to its default value	4	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/Models/AutoPbrOptions.cs	Member 'DeepBumpNormalSoftClamp' is explicitly initialized to its default value	4	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/Models/AutoPbrOptions.cs	Member 'FastSpecular' is explicitly initialized to its default value	4	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/Models/AutoPbrOptions.cs	Member 'GenerateAo' is explicitly initialized to its default value	4	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/Models/AutoPbrOptions.cs	Member 'MaxThreads' is explicitly initialized to its default value	4	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/Models/AutoPbrOptions.cs	Member 'MlSpecularTransparentAlphaClampMax' is explicitly initialized to its default value	4	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/Models/AutoPbrOptions.cs	Member 'NormalHeightTransparentAlphaClampMax' is explicitly initialized to its default value	4	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/Models/AutoPbrOptions.cs	Member 'PreprocessDenoiseRadius' is explicitly initialized to its default value	4	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/Models/AutoPbrOptions.cs	Member 'PreprocessFrequencySplit' is explicitly initialized to its default value	4	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/Models/AutoPbrOptions.cs	Member 'PreprocessLinearize' is explicitly initialized to its default value	4	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/Models/AutoPbrOptions.cs	Member 'UseDeepBumpNormals' is explicitly initialized to its default value	4	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/Models/AutoPbrOptions.cs	Member 'UseLegacyExtractor' is explicitly initialized to its default value	4	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/NormalHeightGenerator.cs	Simplify conditional ternary expression	2	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/SpecularGenerator.cs	Merge into pattern	2	1
+/z:/Cursor Projects/AutoPBR/src/AutoPBR.Core/TextureScanner.cs	Use object initializer	2	3
+/z:/Cursor Projects/AutoPBR/tests/AutoPBR.Core.Tests/BrickHeightPostProcessorTests.cs	Field 'GoldBrickTextureKeyExamples' is never used	2	1
+/z:/Cursor Projects/AutoPBR/tests/AutoPBR.Core.Tests/BrickHeightPostProcessorTests.cs	Remove the underscores from member name AutoPBR.Core.Tests.BrickHeightPostProcessorTests.Apply_GridMortar_NoInvert_LeavesHeightUnchanged()	4	1
+/z:/Cursor Projects/AutoPBR/tests/AutoPBR.Core.Tests/BrickHeightPostProcessorTests.cs	Remove the underscores from member name AutoPBR.Core.Tests.BrickHeightPostProcessorTests.Apply_LightGroutDiffuse_InvertsGlobalHeightWhenMortarIsHigher()	4	1
+/z:/Cursor Projects/AutoPBR/tests/AutoPBR.Core.Tests/BrickHeightPostProcessorTests.cs	Remove the underscores from member name AutoPBR.Core.Tests.BrickHeightPostProcessorTests.Apply_UniformDiffuse_SkipsDueToLowStructure()	4	1
+/z:/Cursor Projects/AutoPBR/tests/AutoPBR.Core.Tests/BrickHeightPostProcessorTests.cs	Remove the underscores from member name AutoPBR.Core.Tests.BrickHeightPostProcessorTests.Apply_WhenMortarHeightHigher_TriggersInvertWhenConfident()	4	1
+/z:/Cursor Projects/AutoPBR/tests/AutoPBR.Core.Tests/BrickProbeResolutionTests.cs	Remove the underscores from member name AutoPBR.Core.Tests.BrickProbeResolutionTests.GetTopHatRadii_256_UsesCoarseScalesWhenUserDefault()	4	1
+/z:/Cursor Projects/AutoPBR/tests/AutoPBR.Core.Tests/BrickProbeResolutionTests.cs	Remove the underscores from member name AutoPBR.Core.Tests.BrickProbeResolutionTests.GetTopHatRadii_IncludesResolutionScaledCap(int, int, int, int)	4	1
+/z:/Cursor Projects/AutoPBR/tests/AutoPBR.Core.Tests/BrickProbeResolutionTests.cs	Remove the underscores from member name AutoPBR.Core.Tests.BrickProbeResolutionTests.MortarBrickFaceDilateRadius_ScalesWithMinDim(int, int, int)	4	1
+/z:/Cursor Projects/AutoPBR/tests/AutoPBR.Core.Tests/BrickProbeResolutionTests.cs	Using directive is not required by the code and can be safely removed	4	1

@@ -128,6 +128,17 @@ public static class Resources
     public static string NormalStrengthTooltip => GetString("NormalStrengthTooltip");
     public static string HeightStrength => GetString("HeightStrength");
     public static string HeightStrengthTooltip => GetString("HeightStrengthTooltip");
+    public static string BrickProbeTuning => GetString("BrickProbeTuning");
+    public static string BrickProbeEnable => GetString("BrickProbeEnable");
+    public static string BrickProbeMinStructure => GetString("BrickProbeMinStructure");
+    public static string BrickProbeInvertDelta => GetString("BrickProbeInvertDelta");
+    public static string BrickProbeLightGroutDelta => GetString("BrickProbeLightGroutDelta");
+    public static string BrickProbeEnableTooltip => GetString("BrickProbeEnableTooltip");
+    public static string BrickProbeMinStructureTooltip => GetString("BrickProbeMinStructureTooltip");
+    public static string BrickProbeInvertDeltaTooltip => GetString("BrickProbeInvertDeltaTooltip");
+    public static string BrickProbeLightGroutDeltaTooltip => GetString("BrickProbeLightGroutDeltaTooltip");
+    public static string PreviewBrickProbeDebug => GetString("PreviewBrickProbeDebug");
+    public static string PreviewBrickProbeDebugTooltip => GetString("PreviewBrickProbeDebugTooltip");
     public static string NormalOperatorLabel => GetString("NormalOperatorLabel");
     public static string NormalKernelSizeLabel => GetString("NormalKernelSizeLabel");
     public static string Derivative => GetString("Derivative");

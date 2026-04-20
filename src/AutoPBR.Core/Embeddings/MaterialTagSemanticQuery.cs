@@ -163,9 +163,9 @@ public static class MaterialTagSemanticQuery
             return false;
         }
 
-        for (var i = 0; i < token.Length; i++)
+        foreach (var ch in token)
         {
-            if (!char.IsAsciiDigit(token[i]))
+            if (!char.IsAsciiDigit(ch))
             {
                 return false;
             }
@@ -176,9 +176,9 @@ public static class MaterialTagSemanticQuery
 
     private static bool ContainsOptifineSegment(ReadOnlySpan<string> segments)
     {
-        for (var i = 0; i < segments.Length; i++)
+        foreach (var segment in segments)
         {
-            if (segments[i].Equals("optifine", StringComparison.OrdinalIgnoreCase))
+            if (segment.Equals("optifine", StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }

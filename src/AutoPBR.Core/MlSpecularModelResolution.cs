@@ -16,16 +16,23 @@ public static class MlSpecularModelResolution
         IReadOnlyDictionary<int, string>? map)
     {
         if (map is null || map.Count == 0)
+        {
             return new Dictionary<int, string>();
+        }
 
         var d = new Dictionary<int, string>();
         foreach (var kv in map)
         {
             if (kv.Key <= 0)
+            {
                 continue;
-            var p = kv.Value?.Trim();
+            }
+
+            var p = kv.Value.Trim();
             if (string.IsNullOrEmpty(p))
+            {
                 continue;
+            }
             d[kv.Key] = p;
         }
 
@@ -35,7 +42,11 @@ public static class MlSpecularModelResolution
     /// <summary>
     /// Resolves the model path for <paramref name="textureSize"/> (typically square edge length after crop).
     /// </summary>
+    /// <param name="options">Conversion options including ML specular paths and enable flag.</param>
+    /// <param name="textureSize">Texture edge length used to pick the smallest map key &gt;= size (ceil policy).</param>
+    /// <param name="modelPath">Resolved absolute or relative model path, or null on failure.</param>
     /// <param name="selectedResolution">The resolution key chosen from the map, or null when using fallback path only.</param>
+    /// <param name="diagnostic">Human-readable failure reason when the method returns false.</param>
     public static bool TryResolveModelPath(
         AutoPbrOptions options,
         int textureSize,

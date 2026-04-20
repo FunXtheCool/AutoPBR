@@ -7,8 +7,11 @@ using AutoPBR.App.Views;
 
 namespace AutoPBR.App;
 
-public class App : Application
+public sealed class App : Application, IDisposable
 {
+    private MainWindowViewModel? _mainWindowViewModel;
+    private bool _disposed;
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -18,21 +21,44 @@ public class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var viewModel = new MainWindowViewModel();
+            _mainWindowViewModel = new MainWindowViewModel();
 
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
             desktop.MainWindow = new MainWindow
             {
-                DataContext = viewModel,
+                DataContext = _mainWindowViewModel,
             };
+            desktop.Exit += OnDesktopExit;
         }
 
         base.OnFrameworkInitializationCompleted();
     }
 
-    private void DisableAvaloniaDataAnnotationValidation()
+    private void OnDesktopExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            desktop.Exit -= OnDesktopExit;
+        }
+
+        Dispose();
+    }
+
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        _mainWindowViewModel?.Dispose();
+        _mainWindowViewModel = null;
+    }
+
+    private static void DisableAvaloniaDataAnnotationValidation()
     {
         // Get an array of plugins to remove
         var dataValidationPluginsToRemove =

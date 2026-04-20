@@ -5,27 +5,15 @@ using CommunityToolkit.Mvvm.ComponentModel;
 namespace AutoPBR.App.Models;
 
 /// <summary>Context menu row for tag add/remove on a file node: icon, label, checkbox.</summary>
-public sealed class TagMenuEntry : ObservableObject
+public sealed class TagMenuEntry(ArchiveNode node, string tagId, string displayName, TagRuleKind kind, bool isApplied) : ObservableObject
 {
-    private readonly ArchiveNode _node;
-    private bool _isApplied;
+    private bool _isApplied = isApplied;
 
-    public TagMenuEntry(ArchiveNode node, string tagId, string displayName, TagRuleKind kind, bool isApplied)
-    {
-        _node = node;
-        TagId = tagId;
-        DisplayName = displayName;
-        Kind = kind;
-        _isApplied = isApplied;
-        TagIcon = MaterialTagGlyphs.BitmapForTag(tagId, kind);
-        IconGlyph = MaterialTagGlyphs.ForTagId(tagId, kind);
-    }
-
-    public string TagId { get; }
-    public string DisplayName { get; }
-    public TagRuleKind Kind { get; }
-    public Bitmap? TagIcon { get; }
-    public string IconGlyph { get; }
+    public string TagId { get; } = tagId;
+    public string DisplayName { get; } = displayName;
+    public TagRuleKind Kind { get; } = kind;
+    public Bitmap? TagIcon { get; } = MaterialTagGlyphs.BitmapForTag(tagId, kind);
+    public string IconGlyph { get; } = MaterialTagGlyphs.ForTagId(tagId, kind);
     public bool HasTagIcon => TagIcon is not null;
 
     public bool IsApplied
@@ -38,7 +26,7 @@ public sealed class TagMenuEntry : ObservableObject
                 return;
             }
 
-            _node.ApplyTagMenuToggle(TagId, value);
+            node.ApplyTagMenuToggle(TagId, value);
         }
     }
 }

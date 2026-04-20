@@ -81,25 +81,26 @@ public sealed class MiniLmEmbeddingEngine : IDisposable
             NamedOnnxValue.CreateFromTensor("attention_mask", attentionTensor),
         };
 
-        DenseTensor<float>? sentence;
+        // Copy outputs to managed memory before disposing Run results — native tensor buffers are freed with the session run.
+        float[]? vec;
         lock (_runLock)
         {
             using var results = _session.Run(inputs);
-            sentence = results.FirstOrDefault(o => o.Name == "sentence_embedding")?.AsTensor<float>() as DenseTensor<float>;
+            var sentence = results.FirstOrDefault(o => o.Name == "sentence_embedding")?.AsTensor<float>() as DenseTensor<float>;
+            if (sentence is null || sentence.Length == 0)
+            {
+                return null;
+            }
+
+            var dim = sentence.Dimensions[^1];
+            if (dim <= 0)
+            {
+                return null;
+            }
+
+            vec = sentence.ToArray();
         }
 
-        if (sentence is null || sentence.Length == 0)
-        {
-            return null;
-        }
-
-        var dim = sentence.Dimensions[^1];
-        if (dim <= 0)
-        {
-            return null;
-        }
-
-        var vec = sentence.ToArray();
         NormalizeInPlace(vec);
         return vec;
     }

@@ -18,6 +18,12 @@ internal sealed class ConversionSettingsModel
 {
     public double NormalIntensity { get; set; } = AutoPbrDefaults.DefaultNormalIntensity;
     public double HeightIntensity { get; set; } = AutoPbrDefaults.DefaultHeightIntensity;
+    public bool BrickHeightMapPostProcessEnabled { get; set; } = AutoPbrDefaults.DefaultBrickHeightMapPostProcessEnabled;
+    public double BrickHeightMinStructuralConfidence { get; set; } = AutoPbrDefaults.DefaultBrickHeightMinStructuralConfidence;
+    public double BrickHeightInvertDeltaThreshold { get; set; } = AutoPbrDefaults.DefaultBrickHeightInvertDeltaThreshold;
+    public double BrickLightGroutDiffuseDeltaMin { get; set; } = AutoPbrDefaults.DefaultBrickLightGroutDiffuseDeltaMin;
+    /// <summary>Single-texture preview only: populate brick probe diagnostics on the work item.</summary>
+    public bool BrickProbePreviewDebug { get; set; }
     public bool FastSpecular { get; set; }
     public bool UseLegacyExtractor { get; set; }
     public double SmoothnessScale { get; set; } = AutoPbrDefaults.DefaultSmoothnessScale;
@@ -44,7 +50,8 @@ internal sealed class ConversionSettingsModel
     public double DeepBumpEdgeGuidedStrength { get; set; } = 1.0;
     public double DeepBumpEdgeGuidedGamma { get; set; } = 1.0;
     public double DeepBumpEdgeGuidedDirectionMix { get; set; } = 0.35;
-    public int NormalHeightTransparentAlphaClampMax { get; set; } = 0;
+    /// <summary>0 = only fully transparent pixels (aligned with <see cref="AutoPbrOptions.NormalHeightTransparentAlphaClampMax"/> default).</summary>
+    public int NormalHeightTransparentAlphaClampMax { get; set; }
     public string NormalOperator { get; set; } = nameof(NormalOperatorEnum.SobelVc);
     public string NormalKernelSize { get; set; } = "3";
     public string NormalDerivative { get; set; } = nameof(NormalDerivativeEnum.Luminance);
@@ -76,7 +83,8 @@ internal sealed class ConversionSettingsModel
     public string MlSpecularBlendMath { get; set; } = nameof(MlSpecularBlendMathEnum.Linear);
 
     public bool MlSpecularUseEdgeChannel { get; set; } = true;
-    public int MlSpecularTransparentAlphaClampMax { get; set; } = 0;
+    /// <summary>0 = only fully transparent pixels (aligned with <see cref="AutoPbrOptions.MlSpecularTransparentAlphaClampMax"/> default).</summary>
+    public int MlSpecularTransparentAlphaClampMax { get; set; }
     public bool SpecularDebugDisableHeuristicSpecular { get; set; }
     public bool SpecularDebugSkipSpecularRemap { get; set; }
     public bool SpecularDebugVerboseSpecularMl { get; set; }
@@ -125,6 +133,11 @@ internal sealed class ConversionSettingsModel
         {
             NormalIntensity = (float)NormalIntensity,
             HeightIntensity = (float)HeightIntensity,
+            BrickHeightMapPostProcessEnabled = BrickHeightMapPostProcessEnabled,
+            BrickHeightMinStructuralConfidence = (float)Math.Clamp(BrickHeightMinStructuralConfidence, 0.001, 0.25),
+            BrickHeightInvertDeltaThreshold = (float)Math.Clamp(BrickHeightInvertDeltaThreshold, 0.0, 32.0),
+            BrickLightGroutDiffuseDeltaMin = (float)Math.Clamp(BrickLightGroutDiffuseDeltaMin, 0.0, 0.25),
+            BrickProbePreviewDebug = BrickProbePreviewDebug,
             FastSpecular = FastSpecular,
             UseLegacyExtractor = UseLegacyExtractor,
             SmoothnessScale = (float)SmoothnessScale,
@@ -161,7 +174,7 @@ internal sealed class ConversionSettingsModel
             FoliageMode = FoliageMode,
             UseDeepBumpNormals = UseDeepBumpNormals,
             DeepBumpModelPath = UseDeepBumpNormals
-                ? Path.Combine(AppContext.BaseDirectory, "Data", "deepbump256.onnx")
+                ? Path.Combine(AppContext.BaseDirectory, "Data", "ONNX-AI", "DeepBump", "deepbump256.onnx")
                 : null,
             DeepBumpOverlap = DeepBumpOverlap,
             DeepBumpInputMode = deepBumpInputMode,

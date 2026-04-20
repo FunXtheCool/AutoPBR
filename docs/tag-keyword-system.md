@@ -4,7 +4,7 @@
 
 > **Semantic ML + Weighted/Unweighted flags**: heuristic-first material matching and the `weighted` / `unweighted` flag tags are documented in [semantic-material-weighted-unweighted.md](semantic-material-weighted-unweighted.md).
 
-Material tags classify textures in the **Resource Explorer** (and feed future tuning). They are **informational only** right now: **tag rules do not change normals, height, or specular output.** Per-tag conversion overrides (e.g. invert height for brick) may be reintroduced later.
+Material tags classify textures in the **Resource Explorer** and drive **selected** conversion behavior: the **`brick`** material tag participates in **height** and **specular R** tuning when brick height post-processing is enabled (structural mortar probe). Other material tags remain primarily informational for Explore and future tuning.
 
 ## Goals
 
@@ -19,7 +19,7 @@ Material tags classify textures in the **Resource Explorer** (and feed future tu
 
 Ship the Optimum export of `sentence-transformers/all-MiniLM-L6-v2` next to the app:
 
-- **Graph**: `Data/all-MiniLM-L6-v2-onnx/model.onnx`
+- **Graph**: `Data/ONNX-AI/all-MiniLM-L6-v2-onnx/model.onnx`
 - **Tokenizer**: `vocab.txt` (and companion JSON in the same folder)
 
 Enable semantic suggestions in **Tune → Semantic tag suggestions (MiniLM)**. If `model.onnx` is missing or load fails while MiniLM is enabled, there are **no** ML auto-tags (keywords are not used as a fallback until you turn MiniLM off).
@@ -65,7 +65,7 @@ User rules in settings / CLI JSON: **Id**, **DisplayName**, **Keywords** (comma-
 
 ### Conversion / scan
 
-`TextureScanner` **does not** apply tag overrides to `TextureWorkItem.Overrides`. Tags are for Explore (and future use). `AutoPbrOptions.TagRules` and `ManualTagOverrides` remain available for callers that need the same definitions / manual state; they do not drive PBR outputs until overrides are wired again.
+`TextureScanner` resolves effective material tags (same rules as Explore) and sets **`TextureWorkItem`** fields such as **`HasBrickMaterialTag`**, **`HasPlantMaterialTag`**, and **`TextureOverrides.InvertSpecular`** (legacy **brick** default: invert specular R when the `brick` tag matches). During conversion, **normals/height run before specular** so the brick mortar probe can record **`TextureOverrides.BrickProbeAppliedGlobalInvert`**; when **`AutoPbrOptions.BrickSpecularAlignWithHeightProbe`** is true (default), specular R inversion for brick follows that same probe result instead of always inverting.
 
 ---
 
@@ -109,11 +109,11 @@ Explorer archive paths and scanner `RelativeKey` are normalized to a common stor
 
 | Area | Behavior |
 |------|----------|
-| **TagRule** | Id, DisplayName, Keywords, SemanticHints — **no conversion overrides**. |
+| **TagRule** | Id, DisplayName, Keywords, SemanticHints — no per-rule conversion fields. |
 | **Keywords** | Substring match on name + path below namespace; used alone when ML off, and as **heuristic-first** material pass when ML on. |
 | **MiniLM** | When **on** (and matcher loads): runs for **material** tags **only if** keyword heuristics matched nothing; optional **Weighted** flag when ML ran ([details](semantic-material-weighted-unweighted.md)). |
 | **Effective tags** | Auto (material: heuristic → else ML; flags: path + weighted/unweighted), then manual add/remove on top. |
 | **Explore** | Glyphs, tooltips, legend, filter, context menu, persistence. |
-| **Conversion** | Tags are **not** applied to `TextureOverrides` in the current implementation. |
+| **Conversion** | **`brick`**: optional structural mortar height post-process (`AutoPbrOptions.BrickHeightMapPostProcessEnabled`); specular R can align with the same global invert probe (`BrickSpecularAlignWithHeightProbe`, default on). **`plant`**: extra porosity bias. Other tags: Explore / future tuning unless wired elsewhere. |
 
-Future work: reattach **TextureOverrides** (or a dedicated material-tuning layer) to tag ids once product rules for merge order and UI are defined.
+Future work: extend **TextureOverrides** (or a dedicated material-tuning layer) for additional tag-driven knobs once product rules for merge order and UI are defined.

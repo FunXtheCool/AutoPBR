@@ -1,5 +1,3 @@
-using AutoPBR.Core;
-
 namespace AutoPBR.Core.Models;
 
 /// <summary>

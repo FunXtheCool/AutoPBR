@@ -14,7 +14,7 @@ internal static class LogService
         try
         {
             Directory.CreateDirectory(LogsDirectory);
-            var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss", System.Globalization.CultureInfo.InvariantCulture);
             var fileName = $"AutoPBR_{timestamp}.log";
             var fullPath = Path.Combine(LogsDirectory, fileName);
             File.WriteAllLines(fullPath, lines);

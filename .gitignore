@@ -490,6 +490,7 @@ src/AutoPBR.Core/obj/project.assets.json
 src/AutoPBR.Core/obj/project.nuget.cache
 src/AutoPBR.App/tensorrt_win
 tools/MlSpecularTrainer/artifacts
+tools/MlSpecularTrainer/128_dataset
 tools/MlSpecularTrainer/ext_dataset
 tools/MlSpecularTrainer/multi_dataset
 tools/MlSpecularTrainer/pixelart_dataset

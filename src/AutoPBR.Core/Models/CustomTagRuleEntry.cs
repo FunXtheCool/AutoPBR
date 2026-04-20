@@ -42,7 +42,7 @@ public sealed class CustomTagRuleEntry
         };
     }
 
-    private static IReadOnlyList<string> SplitCommaList(string raw)
+    private static List<string> SplitCommaList(string raw)
     {
         if (string.IsNullOrWhiteSpace(raw))
         {

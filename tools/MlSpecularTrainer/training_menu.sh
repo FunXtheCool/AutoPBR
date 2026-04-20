@@ -180,8 +180,8 @@ repeat_last() {
 }
 
 export_only() {
-  local ex_ckpt="artifacts/specular_predictor.pt"
-  local ex_out="artifacts/specular_predictor.onnx"
+  local ex_ckpt="artifacts/SpecLab.pt"
+  local ex_out="artifacts/SpecLab.onnx"
   echo
   echo "Export ONNX without retraining (reads in_channels, out_channels, width from .pt)."
   read -r -p "Checkpoint .pt path [${ex_ckpt}]: " v
@@ -315,8 +315,8 @@ train_spec_menu() {
   local spec_resume="--resume-auto"
   local spec_resetopt=""
   local spec_ort_dir="artifacts/ort"
-  local spec_onnx="artifacts/specular_predictor.onnx"
-  local spec_ckpt="artifacts/specular_predictor.pt"
+  local spec_onnx="artifacts/SpecLab.onnx"
+  local spec_ckpt="artifacts/SpecLab.pt"
 
   echo
   echo "Direct artist-spec training presets (PyTorch backend):"
@@ -511,8 +511,8 @@ train_spec_menu_torch_ort() {
   local spec_resume="--resume-auto"
   local spec_resetopt=""
   local spec_ort_dir="artifacts/ort"
-  local spec_onnx="artifacts/specular_predictor.onnx"
-  local spec_ckpt="artifacts/specular_predictor.pt"
+  local spec_onnx="artifacts/SpecLab.onnx"
+  local spec_ckpt="artifacts/SpecLab.pt"
   local tp="cuda"
   local spec_trt_fp16=""
   local spec_torch_ort_debug=""
@@ -712,7 +712,7 @@ ort_export_loss() {
 
 ort_artifacts_chain() {
   local ort_adir="artifacts/ort"
-  local ort_fckpt="artifacts/specular_predictor.pt"
+  local ort_fckpt="artifacts/SpecLab.pt"
   local ort_inch="4"
   local ort_outch="5"
   local ort_wid="64"
@@ -779,8 +779,8 @@ train_spec_ort_menu() {
   local spec_resume="--resume-auto"
   local spec_resetopt=""
   local spec_ort_dir="artifacts/ort"
-  local spec_onnx="artifacts/specular_predictor.onnx"
-  local spec_ckpt="artifacts/specular_predictor.pt"
+  local spec_onnx="artifacts/SpecLab.onnx"
+  local spec_ckpt="artifacts/SpecLab.pt"
 
   echo
   echo "ORT backend training (requires training_model.onnx or train_model.onnx + eval + optimizer):"

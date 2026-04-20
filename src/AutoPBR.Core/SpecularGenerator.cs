@@ -582,28 +582,25 @@ internal static class SpecularGenerator
                     if (!options.SpecularDebugSkipSpecularRemap && maxR > minR)
                     {
                         var denom = maxR - minR;
-                        if (selectiveMlRemap)
+                        for (var i = 0; i < nPixels; i++)
                         {
-                            for (var i = 0; i < nPixels; i++)
+                            if (selectiveMlRemap && mlDriven[i])
                             {
-                                if (mlDriven[i])
-                                {
-                                    continue;
-                                }
+                                continue;
+                            }
 
-                                rBuf[i] = (byte)Math.Clamp(10 + (rBuf[i] - minR) * 190 / denom, 0, 255);
-                            }
-                        }
-                        else
-                        {
-                            for (var i = 0; i < nPixels; i++)
-                            {
-                                rBuf[i] = (byte)Math.Clamp(10 + (rBuf[i] - minR) * 190 / denom, 0, 255);
-                            }
+                            rBuf[i] = (byte)Math.Clamp(10 + (rBuf[i] - minR) * 190 / denom, 0, 255);
                         }
                     }
 
-                    if (t.Overrides.InvertSpecular)
+                    var invertSpecularR = t.Overrides.InvertSpecular;
+                    var brickProbeGlobalInvert = t.Overrides.BrickProbeAppliedGlobalInvert;
+                    if (t.HasBrickMaterialTag && options is { BrickSpecularAlignWithHeightProbe: true, BrickHeightMapPostProcessEnabled: true } && brickProbeGlobalInvert.HasValue)
+                    {
+                        invertSpecularR = brickProbeGlobalInvert.Value;
+                    }
+
+                    if (invertSpecularR)
                     {
                         for (var i = 0; i < nPixels; i++)
                         {

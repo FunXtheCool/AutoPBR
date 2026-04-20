@@ -6,7 +6,7 @@ Place redistributable native libraries here so the App and CLI build copy them t
 
 **ONNX Runtime GPU (CUDA 13):** `AutoPBR.Core` references **`Microsoft.ML.OnnxRuntime.Managed`** only (not **`Microsoft.ML.OnnxRuntime.Gpu`**), so NuGet does **not** ship Windows GPU natives—the default Gpu package carries **CUDA 12**–linked providers. Copy the full set of GPU runtime DLLs from the official **`onnxruntime-win-x64-gpu_cuda13`** zip for the **same version** as `Microsoft.ML.OnnxRuntime.Managed` (e.g. **1.24.3**), including at least `onnxruntime.dll`, `onnxruntime_providers_shared.dll`, `onnxruntime_providers_cuda.dll`, and `onnxruntime_providers_tensorrt.dll` if you use TensorRT. See the [ONNX Runtime license](https://github.com/microsoft/onnxruntime/blob/main/LICENSE).
 
-**Training:** `Microsoft.ML.OnnxRuntime.Training` is only used by **`AutoPBR.Training.Ort`** (Docker/tooling), not by the App or Core inference path.
+**Training:** Specular ONNX models are trained with **`tools/MlSpecularTrainer`** (Python; use **`tools/MlSpecularTrainer/docker`** for a CUDA container). The App and Core use **`Microsoft.ML.OnnxRuntime.Managed`** for inference only, not `Microsoft.ML.OnnxRuntime.Training`.
 
 Official dependency list (see [ONNX Runtime CUDA EP](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html)): **libcudart**, **libcufft**, **libcurand**, **libcublasLt**, **libcublas**, **libcudnn**.
 

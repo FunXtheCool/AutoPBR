@@ -20,6 +20,8 @@ public sealed class TagOverridesSnapshot
 /// <summary>Load/save manual tag overrides per pack under AppData/AutoPBR/tag_overrides.</summary>
 internal static class TagOverridesPersistence
 {
+    private static readonly JsonSerializerOptions SerializeOptions = new() { WriteIndented = false };
+
     private static string DirectoryPath =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AutoPBR", "tag_overrides");
 
@@ -98,7 +100,7 @@ internal static class TagOverridesPersistence
                     StringComparer.OrdinalIgnoreCase)
             };
 
-            var json = JsonSerializer.Serialize(snapshot, new JsonSerializerOptions { WriteIndented = false });
+            var json = JsonSerializer.Serialize(snapshot, SerializeOptions);
             File.WriteAllText(path, json);
         }
         catch

@@ -73,20 +73,14 @@
     <Content Include="..\AutoPBR.Core\Data\textures_data.json" Link="Data\textures_data.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\AutoPBR.Core\Data\deepbump256.onnx" Link="Data\deepbump256.onnx">
+    <Content Include="..\AutoPBR.Core\Data\ONNX-AI\DeepBump\*.onnx" Link="Data\ONNX-AI\DeepBump\%(Filename)%(Extension)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\AutoPBR.Core\Data\upscale256.onnx" Link="Data\upscale256.onnx">
+    <Content Include="..\AutoPBR.Core\Data\ONNX-AI\SpecLab\*.onnx" Link="Data\ONNX-AI\SpecLab\%(Filename)%(Extension)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\AutoPBR.Core\Data\specular_predictor*.onnx" Link="Data\%(Filename)%(Extension)">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\AutoPBR.Core\Data\models\**\*.onnx" Link="Data\models\%(RecursiveDir)%(Filename)%(Extension)">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\AutoPBR.Core\Data\all-MiniLM-L6-v2-onnx\**\*">
-      <Link>Data\all-MiniLM-L6-v2-onnx\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    <Content Include="..\AutoPBR.Core\Data\ONNX-AI\all-MiniLM-L6-v2-onnx\**\*">
+      <Link>Data\ONNX-AI\all-MiniLM-L6-v2-onnx\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <!-- CUDA/cuDNN/TensorRT DLLs from Core Data\native; copied to runtimes\win-x64\native for ONNX GPU -->

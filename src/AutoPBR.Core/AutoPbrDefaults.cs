@@ -23,6 +23,41 @@ public static class AutoPbrDefaults
     /// <summary>See <see cref="AutoPbrOptions.MlSpecularBlendMath"/>.</summary>
     public const MlSpecularBlendMath DefaultMlSpecularBlendMath = MlSpecularBlendMath.Linear;
 
+    /// <summary>See <see cref="AutoPbrOptions.BrickHeightMapPostProcessEnabled"/>.</summary>
+    public const bool DefaultBrickHeightMapPostProcessEnabled = true;
+
+    /// <summary>Combined with the invert confidence floor as the minimum mean structural response for the strong invert path (large height delta).</summary>
+    public const float DefaultBrickHeightMinStructuralConfidence = 0.012f;
+
+    /// <summary>Minimum mean mortar response for the strong Δ global invert path (thin joints often stay below this).</summary>
+    public const float DefaultBrickHeightInvertConfidenceFloor = 0.038f;
+
+    /// <summary>Mortar minus brick mean height (0–255) above this may trigger global invert on the strong path.</summary>
+    public const float DefaultBrickHeightInvertDeltaThreshold = 2f;
+
+    /// <summary>
+    /// Weighted diffuse luminance on mortar minus brick (0–1); above this enables the light-grout invert path when Δ&gt;0.
+    /// </summary>
+    public const float DefaultBrickLightGroutDiffuseDeltaMin = 0.004f;
+
+    /// <summary>Strength of local depression along detected mortar (0–1).</summary>
+    public const float DefaultBrickMortarDepressionAlpha = 0.42f;
+
+    /// <summary>Max lift added on bulk brick regions (0–255 scale) via brick-face mask.</summary>
+    public const float DefaultBrickBulkLiftBeta = 10f;
+
+    /// <summary>
+    /// Upper bound for top-hat radii; <see cref="BrickProbeResolution.GetTopHatRadii"/> also applies a resolution-based
+    /// floor (max(user, minDim/16 clamped)) so 64²–256² joints are detected when this default is left in place.
+    /// </summary>
+    public const int DefaultBrickMortarTopHatMaxRadius = 3;
+
+    /// <summary>See <see cref="AutoPbrOptions.BrickSpecularAlignWithHeightProbe"/>.</summary>
+    public const bool DefaultBrickSpecularAlignWithHeightProbe = true;
+
+    /// <summary>When true, preview captures a brick probe diagnostics string on the work item (UI / debugging).</summary>
+    public const bool DefaultBrickProbePreviewDebug = false;
+
     // Matches upstream Python `excluded_names` list (by filename).
     public static readonly HashSet<string> ExcludedFileNames = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -66,9 +101,9 @@ public static class AutoPbrDefaults
         "water_still.png",
     };
 
-    // Relative keys for plant textures (namespace-prefixed: \minecraft\block\foo).
-    public static readonly IReadOnlyList<string> PlantTextureKeys =
-    [
+    /// <summary>Known vanilla block texture keys (namespace-prefixed) used when the <c>plant</c> material tag is absent.</summary>
+    public static readonly HashSet<string> PlantTextureKeys = new(StringComparer.OrdinalIgnoreCase)
+    {
         "\\minecraft\\block\\acacia_sapling",
         "\\minecraft\\block\\birch_sapling",
         "\\minecraft\\block\\dark_oak_sapling",
@@ -140,5 +175,5 @@ public static class AutoPbrDefaults
         "\\minecraft\\block\\cocoa_stage0",
         "\\minecraft\\block\\cocoa_stage1",
         "\\minecraft\\block\\cocoa_stage2",
-    ];
+    };
 }

@@ -2,7 +2,7 @@
 // loads GPU execution providers. Without this, Windows may pick a system cudnn from PATH and fail with
 // e.g. "Invalid handle. Cannot load symbol cudnnCreate".
 
-using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using Microsoft.ML.OnnxRuntime;
 
@@ -77,7 +77,7 @@ internal static class OnnxRuntimeWindowsNative
         {
             try
             {
-                using var cudaOptions = SessionOptions.MakeSessionOptionWithCudaProvider(DefaultGpuDeviceId);
+                using var cudaOptions = SessionOptions.MakeSessionOptionWithCudaProvider();
                 provider = "CUDA";
                 return new InferenceSession(modelPath, cudaOptions);
             }
@@ -96,7 +96,7 @@ internal static class OnnxRuntimeWindowsNative
             {
                 trtOpts.UpdateOptions(new Dictionary<string, string>
                 {
-                    ["device_id"] = DefaultGpuDeviceId.ToString(),
+                    ["device_id"] = DefaultGpuDeviceId.ToString(CultureInfo.InvariantCulture),
                     ["trt_engine_cache_enable"] = "1",
                     ["trt_engine_cache_path"] = cacheDir,
                     ["trt_timing_cache_enable"] = "1",
@@ -105,7 +105,7 @@ internal static class OnnxRuntimeWindowsNative
                 so.AppendExecutionProvider_Tensorrt(trtOpts);
             }
 
-            so.AppendExecutionProvider_CUDA(DefaultGpuDeviceId);
+            so.AppendExecutionProvider_CUDA();
             provider = "TensorRT";
             return new InferenceSession(modelPath, so);
         }
@@ -113,7 +113,7 @@ internal static class OnnxRuntimeWindowsNative
         {
             try
             {
-                using var cudaOptions = SessionOptions.MakeSessionOptionWithCudaProvider(DefaultGpuDeviceId);
+                using var cudaOptions = SessionOptions.MakeSessionOptionWithCudaProvider();
                 provider = "CUDA";
                 return new InferenceSession(modelPath, cudaOptions);
             }

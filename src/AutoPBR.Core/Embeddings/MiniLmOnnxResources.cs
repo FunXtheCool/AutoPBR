@@ -4,18 +4,19 @@ namespace AutoPBR.Core.Embeddings;
 
 /// <summary>
 /// Paths and tokenizer setup for the Optimum-exported <c>sentence-transformers/all-MiniLM-L6-v2</c> bundle under
-/// <c>Data/all-MiniLM-L6-v2-onnx</c>. Files are shipped next to the app (see Core/App/CLI csproj Content items), same as other ONNX assets.
+/// <c>Data/ONNX-AI/all-MiniLM-L6-v2-onnx</c>. Files are shipped next to the app (see Core/App/CLI csproj Content items), same as other ONNX assets.
 /// Tokenization uses <see cref="BertTokenizer"/> over <c>vocab.txt</c> (BERT WordPiece), matching the Hugging Face checkpoint.
 /// </summary>
 public static class MiniLmOnnxResources
 {
+    public const string OnnxRootFolderName = "ONNX-AI";
     public const string BundleFolderName = "all-MiniLM-L6-v2-onnx";
     public const string VocabFileName = "vocab.txt";
     public const string PrimaryModelFileName = "model.onnx";
 
     /// <param name="baseDirectory">Host base directory; default <see cref="AppContext.BaseDirectory"/>.</param>
     public static string GetBundleDirectory(string? baseDirectory = null) =>
-        Path.Combine(baseDirectory ?? AppContext.BaseDirectory, "Data", BundleFolderName);
+        Path.Combine(baseDirectory ?? AppContext.BaseDirectory, "Data", OnnxRootFolderName, BundleFolderName);
 
     public static string GetVocabPath(string? baseDirectory = null) =>
         Path.Combine(GetBundleDirectory(baseDirectory), VocabFileName);
@@ -49,11 +50,12 @@ public static class MiniLmOnnxResources
     /// </summary>
     public static BertTokenizer? TryCreateBertTokenizer(string? baseDirectory = null)
     {
-        var vocab = GetVocabPath(baseDirectory);
-        if (!File.Exists(vocab))
+        if (!IsVocabPresent(baseDirectory))
         {
             return null;
         }
+
+        var vocab = GetVocabPath(baseDirectory);
 
         try
         {

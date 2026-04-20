@@ -48,9 +48,9 @@ pip install -r requirements.txt
 
 python -m ml_specular.gen_sample_dataset --out sample_dataset
 python -m ml_specular.train_spec --data-root sample_dataset --epochs 30 --batch 4 ^
-  --out-onnx artifacts/specular_predictor.onnx --ckpt artifacts/specular_predictor.pt
+  --out-onnx artifacts/SpecLab.onnx --ckpt artifacts/SpecLab.pt
 
-python -m ml_specular.verify_spec_onnx artifacts/specular_predictor.onnx
+python -m ml_specular.verify_spec_onnx artifacts/SpecLab.onnx
 ```
 
 ### Native resolution (optional)
@@ -59,7 +59,7 @@ Train at each texture’s real size instead of resizing everything to `--train-r
 
 ```bash
 python -m ml_specular.train_spec --data-root sample_dataset --spatial-mode native --epochs 30 --batch 4 ^
-  --out-onnx artifacts/specular_predictor.onnx --ckpt artifacts/specular_predictor.pt
+  --out-onnx artifacts/SpecLab.onnx --ckpt artifacts/SpecLab.pt
 ```
 
 Use **`--max-train-side 512`** and **`--downscale-for-memory box`** (or `lanczos`, `nearest`) when VRAM limits require downscaling large inputs. **`--grad-accum-steps`** accumulates gradients across microbatches (e.g. size-1 batches for 512×512). See **`docs/ml-specular-labpbr-contract.md`** (native resolution section) for tags vs pixel dimensions.
@@ -154,7 +154,7 @@ The model is small; **low GPU % is normal** for small manifests. Increase **`--b
 ## Export ONNX without retraining
 
 ```bash
-python -m ml_specular.train_spec --export-only --ckpt artifacts/specular_predictor.pt --out-onnx artifacts/specular_predictor.onnx
+python -m ml_specular.train_spec --export-only --ckpt artifacts/SpecLab.pt --out-onnx artifacts/SpecLab.onnx
 ```
 
 Architecture (`in_channels`, `out_channels`, `width`) is read from the checkpoint.
@@ -163,7 +163,7 @@ Architecture (`in_channels`, `out_channels`, `width`) is read from the checkpoin
 
 ```bash
 python -m ml_specular.train_spec --data-root sample_dataset --epochs 40 --batch 8 ^
-  --out-onnx artifacts/specular_predictor.onnx --ckpt artifacts/specular_predictor.pt
+  --out-onnx artifacts/SpecLab.onnx --ckpt artifacts/SpecLab.pt
 ```
 
 `--out-channels` is **4** (RGBA logits).
@@ -225,13 +225,13 @@ It expects ORT training artifacts in `--ort-artifacts-dir` (default `artifacts/o
 Export train/eval loss ONNX (optionally warm-start core from a `.pt` checkpoint):
 
 ```bash
-python -m ml_specular.export_ort_specular_graphs --out-dir artifacts/ort --ckpt artifacts/specular_predictor.pt
+python -m ml_specular.export_ort_specular_graphs --out-dir artifacts/ort --ckpt artifacts/SpecLab.pt
 ```
 
 Forward-only ONNX (for `onnxruntime.training.artifacts`) and optimizer graph generation:
 
 ```bash
-python -m ml_specular.export_ort_forward_core --out artifacts/ort/forward_model.onnx --ckpt artifacts/specular_predictor.pt
+python -m ml_specular.export_ort_forward_core --out artifacts/ort/forward_model.onnx --ckpt artifacts/SpecLab.pt
 python -m ml_specular.generate_ort_training_artifacts --loss spec --out-channels 4 --base-onnx artifacts/ort/forward_model.onnx --artifact-directory artifacts/ort
 ```
 
@@ -244,7 +244,7 @@ Requires **`onnxruntime-training`** (and a base env with `onnx`) so `onnxblock_s
 Verify IO names and optional PyTorch vs ONNXRuntime numerical parity:
 
 ```bash
-python -m ml_specular.verify_ort_specular_training --ort-artifacts-dir artifacts/ort --ckpt artifacts/specular_predictor.pt
+python -m ml_specular.verify_ort_specular_training --ort-artifacts-dir artifacts/ort --ckpt artifacts/SpecLab.pt
 ```
 
 If artifacts or ORT training API are missing, the script exits with actionable errors.
@@ -252,7 +252,7 @@ If artifacts or ORT training API are missing, the script exits with actionable e
 Verify ONNX:
 
 ```bash
-python -m ml_specular.verify_spec_onnx artifacts/specular_predictor.onnx
+python -m ml_specular.verify_spec_onnx artifacts/SpecLab.onnx
 ```
 
 ## Ops

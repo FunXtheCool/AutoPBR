@@ -394,6 +394,7 @@
   <data name="Status_ExtractingPack" xml:space="preserve"><value>Paket wird entpackt...</value></data>
   <data name="Status_ExtractingPackProgress" xml:space="preserve"><value>Paket wird entpackt... ({0}/{1})</value></data>
   <data name="Status_ScanningTextures" xml:space="preserve"><value>Scanne Texturen...</value></data>
+  <data name="Status_TagWorkDrainProgress" xml:space="preserve"><value>Tag-Verarbeitung wird abgeschlossen... ({0}/{1})</value></data>
   <data name="Status_SpecularCurrent" xml:space="preserve"><value>Specular: {0}</value></data>
   <data name="Status_NormalsCurrent" xml:space="preserve"><value>Normalen: {0}</value></data>
   <data name="Status_PackingOutput" xml:space="preserve"><value>Erstelle Ausgabe-Zip...</value></data>

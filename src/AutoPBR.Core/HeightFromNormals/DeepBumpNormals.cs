@@ -54,15 +54,13 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         {
             maxConcurrentRuns = Math.Max(1, maxConcurrentRuns);
 
-            InferenceSession session;
-            bool useGpu;
-            session = OnnxRuntimeWindowsNative.TryCreateGpuSession(
-                          modelPath,
-                          preferOnnxTensorRtExecutionProvider,
-                          out var provider,
-                          out _) ??
-                      new InferenceSession(modelPath);
-            useGpu = provider is "CUDA" or "TensorRT";
+            var session = OnnxRuntimeWindowsNative.TryCreateGpuSession(
+                              modelPath,
+                              preferOnnxTensorRtExecutionProvider,
+                              out var provider,
+                              out _) ??
+                          new InferenceSession(modelPath);
+            var useGpu = provider is "CUDA" or "TensorRT";
 
             var inputName = session.InputMetadata.Keys.FirstOrDefault() ?? "input";
             var inputIsNhwc = false;
@@ -220,7 +218,7 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         return data;
     }
 
-    private void TilesSplit(float[] img, int channels, int imgW, int imgH, int stride, out List<float[]> tiles,
+    private static void TilesSplit(float[] img, int channels, int imgW, int imgH, int stride, out List<float[]> tiles,
         out (int padLeft, int padRight, int padTop, int padBottom) paddings)
     {
         int padH = 0, padW = 0;

@@ -53,10 +53,16 @@ internal static class NormalHeightGenerator
                         ThreadingUtil.SetThreadName("AutoPBR.Normals");
                         ct.ThrowIfCancellationRequested();
 
+                        if (!options.BrickProbePreviewDebug)
+                        {
+                            t.BrickProbeDebugText = null;
+                        }
+
                         using var diffuseImg = Image.Load<Rgba32>(t.DiffusePath);
                         using var croppedDiffuse = CropToSquare(diffuseImg, out var size);
                         var width = size;
                         var height = size;
+                        string? brickInfo = null;
 
                         Image<Rgba32> normal;
                         if (generatorForLoop != null)
@@ -111,6 +117,47 @@ internal static class NormalHeightGenerator
                             var brightness = t.Overrides.HeightBrightness ?? AutoPbrDefaults.DefaultHeightBrightness;
                             var heightMap = GenerateHeightMap(croppedDiffuse, width, height, heightIntensity, brightness,
                                 t.Overrides.InvertHeight, options);
+
+                            BrickHeightPostProcessResult? brickProbeResult = null;
+                            if (t.HasBrickMaterialTag && options.BrickHeightMapPostProcessEnabled)
+                            {
+                                var newHeightData = BrickHeightPostProcessor.Apply(
+                                    heightMap.Data,
+                                    width,
+                                    height,
+                                    croppedDiffuse,
+                                    options,
+                                    out var brickRes);
+                                brickProbeResult = brickRes;
+                                heightMap = ReplaceHeightMapData(heightMap, newHeightData);
+                                t.Overrides.BrickProbeAppliedGlobalInvert =
+                                    brickRes is { SkippedLowConfidence: false, AppliedGlobalInvert: true };
+                                if (options.BrickHeightMapVerboseLog)
+                                {
+                                    brickInfo =
+                                        $"brick: conf={brickRes.StructuralConfidence:F3} d={brickRes.DeltaMortarMinusBrick:F1} inv={brickRes.AppliedGlobalInvert} skip={brickRes.SkippedLowConfidence}";
+                                }
+                            }
+
+                            if (options.BrickProbePreviewDebug)
+                            {
+                                if (brickProbeResult is { } res)
+                                {
+                                    t.BrickProbeDebugText =
+                                        $"name={t.Name}\nrelativeKey={t.RelativeKey}\n" +
+                                        (res.DebugText ?? "");
+                                }
+                                else if (!t.HasBrickMaterialTag)
+                                {
+                                    t.BrickProbeDebugText =
+                                        "Brick probe: skipped — this texture does not have the brick material tag (keyword or semantic match).";
+                                }
+                                else if (!options.BrickHeightMapPostProcessEnabled)
+                                {
+                                    t.BrickProbeDebugText =
+                                        "Brick probe: disabled — turn on \"Enable brick probe inversion\" under Height Tuning.";
+                                }
+                            }
 
                             var skipHeightInAlpha = t.IsPlantForNoHeight;
                             if (!skipHeightInAlpha && FoliageModeResolver.IsNoHeight(options.FoliageMode) &&
@@ -167,7 +214,7 @@ internal static class NormalHeightGenerator
                         }
 
                         var n = Interlocked.Increment(ref completed);
-                        progress?.Report(new ConversionProgress(stage, n, total, t.Name));
+                        progress?.Report(new ConversionProgress(stage, n, total, t.Name, brickInfo));
                     });
             }
             finally
@@ -981,6 +1028,12 @@ internal static class NormalHeightGenerator
         public required byte[] Data { get; init; }
 
         public byte this[int x, int y] => Data[y * Width + x];
+    }
+
+    private static HeightMap ReplaceHeightMapData(HeightMap h, byte[] data)
+    {
+        ArgumentOutOfRangeException.ThrowIfNotEqual(data.Length, h.Width * h.Height);
+        return new HeightMap { Width = h.Width, Height = h.Height, Data = data };
     }
 
     private static HeightMap GenerateHeightMap(Image<Rgba32> cropped, int width, int height, float heightIntensity,

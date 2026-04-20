@@ -19,6 +19,11 @@ public sealed class UserSettings
     public bool UseBatchFolderInput { get; set; }
     public double NormalIntensity { get; set; } = AutoPbrDefaults.DefaultNormalIntensity;
     public double HeightIntensity { get; set; } = AutoPbrDefaults.DefaultHeightIntensity;
+    public bool BrickHeightMapPostProcessEnabled { get; set; } = AutoPbrDefaults.DefaultBrickHeightMapPostProcessEnabled;
+    public double BrickHeightMinStructuralConfidence { get; set; } = AutoPbrDefaults.DefaultBrickHeightMinStructuralConfidence;
+    public double BrickHeightInvertDeltaThreshold { get; set; } = AutoPbrDefaults.DefaultBrickHeightInvertDeltaThreshold;
+    public double BrickLightGroutDiffuseDeltaMin { get; set; } = AutoPbrDefaults.DefaultBrickLightGroutDiffuseDeltaMin;
+    public bool PreviewBrickProbeDebug { get; set; } = AutoPbrDefaults.DefaultBrickProbePreviewDebug;
     public bool FastSpecular { get; set; }
     public string FoliageMode { get; set; } = "No Height";
 
@@ -156,6 +161,7 @@ public sealed class UserSettings
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AutoPBR");
 
     private static string SettingsPath => Path.Combine(SettingsDirectory, "settings.json");
+    private static readonly JsonSerializerOptions SaveJsonSerializerOptions = new() { WriteIndented = true };
 
     public static UserSettings Load()
     {
@@ -183,7 +189,7 @@ public sealed class UserSettings
         try
         {
             Directory.CreateDirectory(SettingsDirectory);
-            var json = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
+            var json = JsonSerializer.Serialize(this, SaveJsonSerializerOptions);
             File.WriteAllText(SettingsPath, json);
         }
         catch

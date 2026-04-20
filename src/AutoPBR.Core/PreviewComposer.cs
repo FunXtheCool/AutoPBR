@@ -52,7 +52,21 @@ internal static class PreviewComposer
         }
 
         Blit(diffuse, output, 0, 0, tileWidth, tileHeight);
-        Blit(normal, output, tileWidth, 0, tileWidth, tileHeight);
+        if (normal is not null)
+        {
+            // Preview should show normal RGB only; height lives in alpha and would otherwise darken the tile via UI compositing.
+            using var normalOpaque = new Image<Rgba32>(normal.Width, normal.Height);
+            for (var y = 0; y < normal.Height; y++)
+            {
+                for (var x = 0; x < normal.Width; x++)
+                {
+                    var npx = normal[x, y];
+                    normalOpaque[x, y] = new Rgba32(npx.R, npx.G, npx.B, 255);
+                }
+            }
+
+            Blit(normalOpaque, output, tileWidth, 0, tileWidth, tileHeight);
+        }
         Blit(spec, output, 0, tileHeight, tileWidth, tileHeight);
 
         if (normal != null && !target.IsPlantForNoHeight)

@@ -127,12 +127,11 @@ internal static class MlSpecularInference
         private readonly string _inputName;
         private readonly bool _inputIsNhwc;
         private readonly int _inputChannels;
-        private readonly string _executionProvider;
         private readonly object _runLock = new();
 
         /// <summary>Declared input channel count (3 = RGB, 4 = RGB+edge).</summary>
         public int InputChannelCount => _inputChannels;
-        public string ExecutionProvider => _executionProvider;
+        public string ExecutionProvider { get; }
 
         private Runner(
             InferenceSession session,
@@ -145,7 +144,7 @@ internal static class MlSpecularInference
             _inputName = inputName;
             _inputIsNhwc = inputIsNhwc;
             _inputChannels = inputChannels;
-            _executionProvider = string.IsNullOrWhiteSpace(executionProvider) ? "CPU" : executionProvider;
+            ExecutionProvider = string.IsNullOrWhiteSpace(executionProvider) ? "CPU" : executionProvider;
         }
 
         public static Runner? TryCreate(string modelPath, bool preferTensorRtExecutionProvider, out string? diagnostic)
@@ -257,7 +256,7 @@ internal static class MlSpecularInference
             lock (_runLock)
             {
                 using IDisposableReadOnlyCollection<DisposableNamedOnnxValue> results = _session.Run(inputs);
-                outputTensor = results.First().AsTensor<float>();
+                outputTensor = results[0].AsTensor<float>();
             }
 
             return Postprocess(outputTensor, w, h, r, g, b, a, out postprocessError);

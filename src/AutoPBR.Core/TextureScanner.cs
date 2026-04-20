@@ -184,9 +184,14 @@ internal static class TextureScanner
                             IsPlantForNoHeight = FoliageModeResolver.IsNoHeight(options.FoliageMode) && sprite2DFoliage,
                             Sprite2DFoliageTarget = sprite2DFoliage,
                             HasPlantMaterialTag = effectiveMaterialIds.Contains("plant")
+                                || AutoPbrDefaults.PlantTextureKeys.Contains(relativePathNoExt),
+                            HasBrickMaterialTag = effectiveMaterialIds.Contains("brick"),
+                            Overrides =
+                            {
+                                InvertSpecular = effectiveMaterialIds.Contains("brick"),
+                                InvertHeight = OreCoalTextureRules.ShouldInvertHeight(name, relativePathNoExt)
+                            }
                         };
-                        blockItem.Overrides.InvertSpecular = effectiveMaterialIds.Contains("brick");
-                        blockItem.Overrides.InvertHeight = OreCoalTextureRules.ShouldInvertHeight(name, relativePathNoExt);
                         results.Add(blockItem);
                     }
                 }
@@ -244,9 +249,14 @@ internal static class TextureScanner
                         IsPlantForNoHeight = FoliageModeResolver.IsNoHeight(options.FoliageMode) && ctmSprite2DFoliage,
                         Sprite2DFoliageTarget = ctmSprite2DFoliage,
                         HasPlantMaterialTag = ctmEffectiveMaterialIds.Contains("plant")
+                            || AutoPbrDefaults.PlantTextureKeys.Contains(relativePathNoExt),
+                        HasBrickMaterialTag = ctmEffectiveMaterialIds.Contains("brick"),
+                        Overrides =
+                        {
+                            InvertSpecular = ctmEffectiveMaterialIds.Contains("brick"),
+                            InvertHeight = OreCoalTextureRules.ShouldInvertHeight(name, relativePathNoExt)
+                        }
                     };
-                    ctmItem.Overrides.InvertSpecular = ctmEffectiveMaterialIds.Contains("brick");
-                    ctmItem.Overrides.InvertHeight = OreCoalTextureRules.ShouldInvertHeight(name, relativePathNoExt);
                     results.Add(ctmItem);
                 }
             }
@@ -307,10 +317,14 @@ internal static class TextureScanner
                             SpecularOnly = false,
                             IsPlantForNoHeight = FoliageModeResolver.IsNoHeight(options.FoliageMode) && plantFolderSprite2DFoliage,
                             Sprite2DFoliageTarget = plantFolderSprite2DFoliage,
-                            HasPlantMaterialTag = true
+                            HasPlantMaterialTag = true,
+                            HasBrickMaterialTag = plantFolderMaterialIds.Contains("brick"),
+                            Overrides =
+                            {
+                                InvertSpecular = plantFolderMaterialIds.Contains("brick"),
+                                InvertHeight = OreCoalTextureRules.ShouldInvertHeight(name, relativePathNoExt)
+                            }
                         };
-                        plantFolderItem.Overrides.InvertSpecular = plantFolderMaterialIds.Contains("brick");
-                        plantFolderItem.Overrides.InvertHeight = OreCoalTextureRules.ShouldInvertHeight(name, relativePathNoExt);
                         results.Add(plantFolderItem);
                     }
                 }

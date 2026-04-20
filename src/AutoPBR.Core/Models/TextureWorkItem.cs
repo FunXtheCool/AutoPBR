@@ -16,9 +16,15 @@ public sealed class TextureOverrides
 
     /// <summary>
     /// When true, invert the specular smoothness (R) channel after heuristic/ML composition (LabPBR R) so dark↔light swap;
-    /// set automatically for the <c>brick</c> material rule to align with height, or manually for grout-style fixes.
+    /// set automatically for the <c>brick</c> material rule when <see cref="BrickProbeAppliedGlobalInvert"/> is not set (legacy fallback), or manually for grout-style fixes.
     /// </summary>
     public bool InvertSpecular { get; set; }
+
+    /// <summary>
+    /// When normals/height run first (conversion order), <c>brick</c> + brick height post-process stores the same global invert decision as height here so specular R can match.
+    /// Null when brick height rules did not run or did not apply (use <see cref="InvertSpecular"/>).
+    /// </summary>
+    public bool? BrickProbeAppliedGlobalInvert { get; set; }
 }
 
 public sealed class TextureWorkItem
@@ -45,7 +51,13 @@ public sealed class TextureWorkItem
     /// <summary>When true, texture has the plant material tag (or OptiFine plant/plants path) for extra porosity bias.</summary>
     public bool HasPlantMaterialTag { get; init; }
 
+    /// <summary>When true, effective material tags include <c>brick</c> — enables structural mortar height post-processing.</summary>
+    public bool HasBrickMaterialTag { get; init; }
+
     public TextureOverrides Overrides { get; } = new();
+
+    /// <summary>Set during single-texture preview when <see cref="AutoPbrOptions.BrickProbePreviewDebug"/> is true.</summary>
+    public string? BrickProbeDebugText { get; set; }
 
     public string DiffusePath => FullPath;
     public string NormalPath => Path.Combine(DirectoryPath, Name + "_n" + Extension);

@@ -24,6 +24,11 @@ internal static class UserSettingsSynchronizer
 
         vm.NormalIntensity = settings.NormalIntensity;
         vm.HeightIntensity = settings.HeightIntensity;
+        vm.BrickHeightMapPostProcessEnabled = settings.BrickHeightMapPostProcessEnabled;
+        vm.BrickHeightMinStructuralConfidence = settings.BrickHeightMinStructuralConfidence;
+        vm.BrickHeightInvertDeltaThreshold = settings.BrickHeightInvertDeltaThreshold;
+        vm.BrickLightGroutDiffuseDeltaMin = settings.BrickLightGroutDiffuseDeltaMin;
+        vm.PreviewBrickProbeDebug = settings.PreviewBrickProbeDebug;
         vm.FastSpecular = settings.FastSpecular;
         vm.FoliageMode = string.IsNullOrWhiteSpace(settings.FoliageMode) ? "No Height" : settings.FoliageMode;
         vm.UseLegacyExtractor = settings.UseLegacyExtractor;
@@ -91,7 +96,7 @@ internal static class UserSettingsSynchronizer
             1.0);
         {
             var mode = string.IsNullOrWhiteSpace(settings.MlSpecularHeuristicBlendMode)
-                ? nameof(AutoPBR.Core.Models.MlSpecularHeuristicBlendMode.SmoothnessOnly)
+                ? nameof(MlSpecularHeuristicBlendMode.SmoothnessOnly)
                 : settings.MlSpecularHeuristicBlendMode.Trim();
             if (!Enum.TryParse<MlSpecularHeuristicBlendMode>(mode, ignoreCase: true, out _))
             {
@@ -149,6 +154,11 @@ internal static class UserSettingsSynchronizer
         settings.UseBatchFolderInput = vm.UseBatchFolderInput;
         settings.NormalIntensity = vm.NormalIntensity;
         settings.HeightIntensity = vm.HeightIntensity;
+        settings.BrickHeightMapPostProcessEnabled = vm.BrickHeightMapPostProcessEnabled;
+        settings.BrickHeightMinStructuralConfidence = vm.BrickHeightMinStructuralConfidence;
+        settings.BrickHeightInvertDeltaThreshold = vm.BrickHeightInvertDeltaThreshold;
+        settings.BrickLightGroutDiffuseDeltaMin = vm.BrickLightGroutDiffuseDeltaMin;
+        settings.PreviewBrickProbeDebug = vm.PreviewBrickProbeDebug;
         settings.FastSpecular = vm.FastSpecular;
         settings.FoliageMode = vm.FoliageMode;
         settings.UseLegacyExtractor = vm.UseLegacyExtractor;

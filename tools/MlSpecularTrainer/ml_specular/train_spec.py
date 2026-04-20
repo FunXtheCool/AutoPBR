@@ -1624,11 +1624,11 @@ def main(argv: list[str] | None = None) -> int:
         choices=(4,),
         help="Logits channel count (RGBA only).",
     )
-    p.add_argument("--out-onnx", type=Path, default=Path("artifacts/specular_predictor.onnx"))
+    p.add_argument("--out-onnx", type=Path, default=Path("artifacts/SpecLab.onnx"))
     p.add_argument(
         "--ckpt",
         type=Path,
-        default=Path("artifacts/specular_predictor.pt"),
+        default=Path("artifacts/SpecLab.pt"),
         help="Primary training checkpoint: full state saved each epoch; use with --resume-auto to continue.",
     )
     p.add_argument(

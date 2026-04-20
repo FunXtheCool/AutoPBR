@@ -321,7 +321,7 @@
                                                     <Border Classes="preview-row-host" Background="Transparent" Padding="0">
                                                         <Border.ContextMenu>
                                                             <ContextMenu IsVisible="{Binding !IsFolder}">
-                                                                <MenuItem Header="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).Strings.TagLegendMaterials}"
+                                                                <MenuItem Header="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).Strings.TagLegendMaterials, FallbackValue='', TargetNullValue=''}"
                                                                           ItemsSource="{Binding MaterialTagMenuItems}">
                                                                     <MenuItem.ItemTemplate>
                                                                         <DataTemplate x:DataType="m:TagMenuEntry">
@@ -338,7 +338,7 @@
                                                                         </DataTemplate>
                                                                     </MenuItem.ItemTemplate>
                                                                 </MenuItem>
-                                                                <MenuItem Header="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).Strings.TagLegendFlags}"
+                                                                <MenuItem Header="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).Strings.TagLegendFlags, FallbackValue='', TargetNullValue=''}"
                                                                           ItemsSource="{Binding FlagTagMenuItems}">
                                                                     <MenuItem.ItemTemplate>
                                                                         <DataTemplate x:DataType="m:TagMenuEntry">
@@ -355,20 +355,20 @@
                                                                         </DataTemplate>
                                                                     </MenuItem.ItemTemplate>
                                                                 </MenuItem>
-                                                                <Separator IsVisible="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).UseSemanticMaterialTags}" />
+                                                                <Separator IsVisible="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).UseSemanticMaterialTags, FallbackValue=False, TargetNullValue=False}" />
                                                                 <MenuItem Header="Debug ML Match…"
-                                                                          IsVisible="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).UseSemanticMaterialTags}"
+                                                                          IsVisible="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).UseSemanticMaterialTags, FallbackValue=False, TargetNullValue=False}"
                                                                           Command="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).DebugSemanticMatchCommand, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
                                                                           CommandParameter="{Binding}" />
                                                             </ContextMenu>
                                                         </Border.ContextMenu>
                                                         <Grid ColumnSpacing="0">
                                                             <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).ExploreTreeColumnResourceWidth}" MinWidth="48" />
+                                                                <ColumnDefinition Width="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).ExploreTreeColumnResourceWidth, FallbackValue=48, TargetNullValue=48}" MinWidth="48" />
                                                                 <ColumnDefinition Width="6" MinWidth="6" MaxWidth="6" />
-                                                                <ColumnDefinition Width="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).ExploreTreeColumnMaterialsWidth}" MinWidth="48" />
+                                                                <ColumnDefinition Width="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).ExploreTreeColumnMaterialsWidth, FallbackValue=48, TargetNullValue=48}" MinWidth="48" />
                                                                 <ColumnDefinition Width="6" MinWidth="6" MaxWidth="6" />
-                                                                <ColumnDefinition Width="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).ExploreTreeColumnFlagsWidth}" MinWidth="48" />
+                                                                <ColumnDefinition Width="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).ExploreTreeColumnFlagsWidth, FallbackValue=48, TargetNullValue=48}" MinWidth="48" />
                                                             </Grid.ColumnDefinitions>
                                                             <Border Grid.Column="0" ClipToBounds="True" HorizontalAlignment="Stretch" VerticalAlignment="Center">
                                                                 <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left">
@@ -517,6 +517,40 @@
                                              VerticalAlignment="Center"
                                              HorizontalContentAlignment="Right"
                                              Text="{Binding HeightIntensity, Mode=TwoWay, StringFormat={}{0:0.###}, UpdateSourceTrigger=PropertyChanged}" />
+                                </Grid>
+                                <TextBlock FontWeight="SemiBold" Text="{Binding Strings.BrickProbeTuning}" TextWrapping="Wrap" />
+                                <CheckBox IsChecked="{Binding BrickHeightMapPostProcessEnabled, Mode=TwoWay}"
+                                          ToolTip.Tip="{Binding Strings.BrickProbeEnableTooltip}">
+                                    <TextBlock Text="{Binding Strings.BrickProbeEnable}" TextWrapping="Wrap" />
+                                </CheckBox>
+                                <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="8" RowSpacing="6"
+                                      IsVisible="{Binding BrickHeightMapPostProcessEnabled}">
+                                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.BrickProbeMinStructure}"
+                                               ToolTip.Tip="{Binding Strings.BrickProbeMinStructureTooltip}" />
+                                    <Slider Grid.Row="0" Grid.Column="1" Minimum="0.001" Maximum="0.08" SmallChange="0.001" LargeChange="0.005"
+                                            Value="{Binding BrickHeightMinStructuralConfidence, Mode=TwoWay}"
+                                            ToolTip.Tip="{Binding Strings.BrickProbeMinStructureTooltip}" />
+                                    <TextBox Grid.Row="0" Grid.Column="2" Width="70" VerticalAlignment="Center" HorizontalContentAlignment="Right"
+                                             Text="{Binding BrickHeightMinStructuralConfidence, Mode=TwoWay, StringFormat={}{0:0.###}, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip.Tip="{Binding Strings.BrickProbeMinStructureTooltip}" />
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.BrickProbeInvertDelta}"
+                                               ToolTip.Tip="{Binding Strings.BrickProbeInvertDeltaTooltip}" />
+                                    <Slider Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="12" SmallChange="0.1" LargeChange="0.5"
+                                            Value="{Binding BrickHeightInvertDeltaThreshold, Mode=TwoWay}"
+                                            ToolTip.Tip="{Binding Strings.BrickProbeInvertDeltaTooltip}" />
+                                    <TextBox Grid.Row="1" Grid.Column="2" Width="70" VerticalAlignment="Center" HorizontalContentAlignment="Right"
+                                             Text="{Binding BrickHeightInvertDeltaThreshold, Mode=TwoWay, StringFormat={}{0:0.##}, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip.Tip="{Binding Strings.BrickProbeInvertDeltaTooltip}" />
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.BrickProbeLightGroutDelta}"
+                                               ToolTip.Tip="{Binding Strings.BrickProbeLightGroutDeltaTooltip}" />
+                                    <Slider Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="0.08" SmallChange="0.001" LargeChange="0.005"
+                                            Value="{Binding BrickLightGroutDiffuseDeltaMin, Mode=TwoWay}"
+                                            ToolTip.Tip="{Binding Strings.BrickProbeLightGroutDeltaTooltip}" />
+                                    <TextBox Grid.Row="2" Grid.Column="2" Width="70" VerticalAlignment="Center" HorizontalContentAlignment="Right"
+                                             Text="{Binding BrickLightGroutDiffuseDeltaMin, Mode=TwoWay, StringFormat={}{0:0.###}, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip.Tip="{Binding Strings.BrickProbeLightGroutDeltaTooltip}" />
                                 </Grid>
 
                                 <Border Height="1" Background="{Binding CardBorderBrush}" Opacity="0.5" Margin="0,2,0,2" />
@@ -962,23 +996,23 @@
                                                    TextWrapping="Wrap"
                                                    ToolTip.Tip="{Binding Strings.MlSpecularPerResolutionTooltip}" />
                                         <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="4" ColumnSpacing="8">
-                                            <TextBlock Grid.Row="0" VerticalAlignment="Center" Text="16×16" />
+                                            <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="16×16" />
                                             <TextBox Grid.Row="0" Grid.Column="1" Classes="path-entry" MinWidth="0"
                                                      Watermark="{Binding Strings.MlSpecularModelPathWatermark}"
                                                      Text="{Binding MlSpecularModelPath16, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                            <TextBlock Grid.Row="1" VerticalAlignment="Center" Text="32×32" />
+                                            <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="32×32" />
                                             <TextBox Grid.Row="1" Grid.Column="1" Classes="path-entry" MinWidth="0"
                                                      Watermark="{Binding Strings.MlSpecularModelPathWatermark}"
                                                      Text="{Binding MlSpecularModelPath32, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                            <TextBlock Grid.Row="2" VerticalAlignment="Center" Text="64×64" />
+                                            <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="64×64" />
                                             <TextBox Grid.Row="2" Grid.Column="1" Classes="path-entry" MinWidth="0"
                                                      Watermark="{Binding Strings.MlSpecularModelPathWatermark}"
                                                      Text="{Binding MlSpecularModelPath64, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                            <TextBlock Grid.Row="3" VerticalAlignment="Center" Text="128×128" />
+                                            <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Text="128×128" />
                                             <TextBox Grid.Row="3" Grid.Column="1" Classes="path-entry" MinWidth="0"
                                                      Watermark="{Binding Strings.MlSpecularModelPathWatermark}"
                                                      Text="{Binding MlSpecularModelPath128, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                            <TextBlock Grid.Row="4" VerticalAlignment="Center" Text="256×256" />
+                                            <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Text="256×256" />
                                             <TextBox Grid.Row="4" Grid.Column="1" Classes="path-entry" MinWidth="0"
                                                      Watermark="{Binding Strings.MlSpecularModelPathWatermark}"
                                                      Text="{Binding MlSpecularModelPath256, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -1059,7 +1093,7 @@
                                                              Text="{Binding DisplayName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                                     <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleKindLabel, RelativeSource={RelativeSource AncestorType=Window}, FallbackValue='', TargetNullValue=''}" VerticalAlignment="Center" />
                                                     <ComboBox Grid.Row="2" Grid.Column="1"
-                                                              ItemsSource="{Binding ((vm:MainWindowViewModel)DataContext).TagRuleKindOptions, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                              ItemsSource="{Binding ((vm:MainWindowViewModel)DataContext).TagRuleKindOptions, RelativeSource={RelativeSource AncestorType=Window}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
                                                               SelectedItem="{Binding Kind, Mode=TwoWay}" />
                                                     <TextBlock Grid.Row="3" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleKeywords, RelativeSource={RelativeSource AncestorType=Window}, FallbackValue='', TargetNullValue=''}" VerticalAlignment="Center" />
                                                     <TextBox Grid.Row="3" Grid.Column="1" Watermark="e.g. stone, rock"
@@ -1162,7 +1196,7 @@
                            FontWeight="SemiBold"
                            Opacity="0.72"
                            HorizontalAlignment="Right"
-                           Foreground="{Binding #MainTabControl.DataContext.ForegroundBrush}" />
+                           Foreground="{Binding ((vm:MainWindowViewModel)DataContext).ForegroundBrush, ElementName=MainTabControl, FallbackValue={x:Null}, TargetNullValue={x:Null}}" />
                 <ItemsControl ItemsSource="{Binding BackgroundTasks}"
                               MinHeight="4">
                     <ItemsControl.ItemsPanel>
@@ -1180,7 +1214,7 @@
                                            TextTrimming="CharacterEllipsis"
                                            TextAlignment="Right"
                                            MaxWidth="240"
-                                           Foreground="{Binding #MainTabControl.DataContext.ForegroundBrush}" />
+                                           Foreground="{Binding ((vm:MainWindowViewModel)DataContext).ForegroundBrush, ElementName=MainTabControl, FallbackValue={x:Null}, TargetNullValue={x:Null}}" />
                                 <ProgressBar Height="3"
                                              MinWidth="120"
                                              MaxWidth="220"
@@ -1189,7 +1223,7 @@
                                              Minimum="0"
                                              Maximum="1"
                                              Value="{Binding Progress}"
-                                             Foreground="{Binding #MainTabControl.DataContext.AccentBrush}"
+                                             Foreground="{Binding ((vm:MainWindowViewModel)DataContext).AccentBrush, ElementName=MainTabControl, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
                                              Background="Transparent"
                                              BorderThickness="0" />
                             </StackPanel>
@@ -1240,6 +1274,25 @@
                                    TextTrimming="CharacterEllipsis"
                                    TextWrapping="NoWrap"
                                    Opacity="0.9" />
+                        <CheckBox IsChecked="{Binding PreviewBrickProbeDebug, Mode=TwoWay}"
+                                  ToolTip.Tip="{Binding Strings.PreviewBrickProbeDebugTooltip}">
+                            <TextBlock Text="{Binding Strings.PreviewBrickProbeDebug}" TextWrapping="Wrap" />
+                        </CheckBox>
+                        <Border IsVisible="{Binding PreviewBrickProbeDebug}"
+                                CornerRadius="4"
+                                BorderBrush="{Binding CardBorderBrush}"
+                                BorderThickness="1"
+                                Padding="6"
+                                MaxHeight="140">
+                            <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                                          VerticalScrollBarVisibility="Auto">
+                                <TextBlock Text="{Binding PreviewBrickProbeDebugText}"
+                                           FontFamily="Consolas"
+                                           FontSize="11"
+                                           Foreground="{Binding ForegroundBrush}"
+                                           TextWrapping="Wrap" />
+                            </ScrollViewer>
+                        </Border>
                     </StackPanel>
                     <Grid Grid.Row="1" ClipToBounds="True" MinHeight="80">
                         <Image Source="{Binding PreviewImage}" Stretch="Uniform" />

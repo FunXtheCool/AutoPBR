@@ -340,7 +340,7 @@ set "PY=%~dp0.venv312\Scripts\python.exe"
 
 set "ORT_ADIR=artifacts\ort"
 
-set "ORT_FCKPT=artifacts\specular_predictor.pt"
+set "ORT_FCKPT=artifacts\SpecLab.pt"
 
 set "ORT_INCH=4"
 
@@ -503,9 +503,9 @@ set "SPEC_RESETOPT="
 
 set "SPEC_ORT_DIR=artifacts\ort"
 
-set "SPEC_ONNX=artifacts\specular_predictor.onnx"
+set "SPEC_ONNX=artifacts\SpecLab.onnx"
 
-set "SPEC_CKPT=artifacts\specular_predictor.pt"
+set "SPEC_CKPT=artifacts\SpecLab.pt"
 
 echo.
 
@@ -565,11 +565,11 @@ if "!SPEC_ORT_DIR!"=="" set "SPEC_ORT_DIR=artifacts\ort"
 
 set /p SPEC_ONNX=Output .onnx path ^(inference export after train^) [!SPEC_ONNX!]: 
 
-if "!SPEC_ONNX!"=="" set "SPEC_ONNX=artifacts\specular_predictor.onnx"
+if "!SPEC_ONNX!"=="" set "SPEC_ONNX=artifacts\SpecLab.onnx"
 
 set /p SPEC_CKPT=Checkpoint .pt path [!SPEC_CKPT!]: 
 
-if "!SPEC_CKPT!"=="" set "SPEC_CKPT=artifacts\specular_predictor.pt"
+if "!SPEC_CKPT!"=="" set "SPEC_CKPT=artifacts\SpecLab.pt"
 
 set /p SPEC_AMPN=Disable AMP on CUDA? y/N: 
 
@@ -659,9 +659,9 @@ goto !RETURN_TO!
 
 set "PY=%~dp0.venv312\Scripts\python.exe"
 
-set "EX_CKPT=artifacts\specular_predictor.pt"
+set "EX_CKPT=artifacts\SpecLab.pt"
 
-set "EX_OUT=artifacts\specular_predictor.onnx"
+set "EX_OUT=artifacts\SpecLab.onnx"
 
 echo.
 
@@ -669,11 +669,11 @@ echo Export ONNX without retraining ^(reads in_channels, out_channels, width fro
 
 set /p EX_CKPT=Checkpoint .pt path [!EX_CKPT!]: 
 
-if "!EX_CKPT!"=="" set "EX_CKPT=artifacts\specular_predictor.pt"
+if "!EX_CKPT!"=="" set "EX_CKPT=artifacts\SpecLab.pt"
 
 set /p EX_OUT=Output .onnx path [!EX_OUT!]: 
 
-if "!EX_OUT!"=="" set "EX_OUT=artifacts\specular_predictor.onnx"
+if "!EX_OUT!"=="" set "EX_OUT=artifacts\SpecLab.onnx"
 
 echo.
 
@@ -858,9 +858,9 @@ set "SPEC_RESETOPT="
 
 set "SPEC_ORT_DIR=artifacts\ort"
 
-set "SPEC_ONNX=artifacts\specular_predictor.onnx"
+set "SPEC_ONNX=artifacts\SpecLab.onnx"
 
-set "SPEC_CKPT=artifacts\specular_predictor.pt"
+set "SPEC_CKPT=artifacts\SpecLab.pt"
 
 echo.
 
@@ -998,11 +998,11 @@ if /i "!SPEC_BACKEND!"=="ort" if /i "!SPEC_SPATIAL!"=="native" (
 
 set /p SPEC_ONNX=Output .onnx path [!SPEC_ONNX!]: 
 
-if "!SPEC_ONNX!"=="" set "SPEC_ONNX=artifacts\specular_predictor.onnx"
+if "!SPEC_ONNX!"=="" set "SPEC_ONNX=artifacts\SpecLab.onnx"
 
 set /p SPEC_CKPT=Checkpoint .pt path [!SPEC_CKPT!]: 
 
-if "!SPEC_CKPT!"=="" set "SPEC_CKPT=artifacts\specular_predictor.pt"
+if "!SPEC_CKPT!"=="" set "SPEC_CKPT=artifacts\SpecLab.pt"
 
 set /p SPEC_AMPN=Disable AMP on CUDA? y/N: 
 
@@ -1141,9 +1141,9 @@ set "SPEC_RESETOPT="
 
 set "SPEC_ORT_DIR=artifacts\ort"
 
-set "SPEC_ONNX=artifacts\specular_predictor.onnx"
+set "SPEC_ONNX=artifacts\SpecLab.onnx"
 
-set "SPEC_CKPT=artifacts\specular_predictor.pt"
+set "SPEC_CKPT=artifacts\SpecLab.pt"
 
 echo.
 
@@ -1302,11 +1302,11 @@ if /i "!SPEC_RESETYN!"=="y" (set "SPEC_RESETOPT=--reset-optimizer") else (set "S
 
 set /p SPEC_ONNX=Output .onnx path [!SPEC_ONNX!]: 
 
-if "!SPEC_ONNX!"=="" set "SPEC_ONNX=artifacts\specular_predictor.onnx"
+if "!SPEC_ONNX!"=="" set "SPEC_ONNX=artifacts\SpecLab.onnx"
 
 set /p SPEC_CKPT=Checkpoint .pt path [!SPEC_CKPT!]: 
 
-if "!SPEC_CKPT!"=="" set "SPEC_CKPT=artifacts\specular_predictor.pt"
+if "!SPEC_CKPT!"=="" set "SPEC_CKPT=artifacts\SpecLab.pt"
 
 set /p SPEC_AMPN=Disable AMP on CUDA? y/N: 
 

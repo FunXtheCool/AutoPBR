@@ -23,7 +23,7 @@ def _trainer_tool_root() -> Path:
 
 
 def _base_name_stem(path: Path) -> str:
-    """specular_predictor / specular_predictor.best / specular_predictor.resume -> specular_predictor."""
+    """SpecLab / SpecLab.best / SpecLab.resume -> SpecLab."""
     s = path.stem
     if s.endswith(".best"):
         return s[: -len(".best")]
@@ -338,7 +338,7 @@ def run_interactive(torch_ort_workflow: bool) -> int:
         "Usually safe to change: total --epochs (extend run), --batch, --lr, --workers, --device, output paths.\n"
     )
 
-    ckpt_write = Path(_inp("Primary training checkpoint path (--ckpt; written each epoch)", "artifacts/specular_predictor.pt"))
+    ckpt_write = Path(_inp("Primary training checkpoint path (--ckpt; written each epoch)", "artifacts/SpecLab.pt"))
     ns = argparse.Namespace(resume_from=None, ckpt=ckpt_write)
     resume_load = _resolve_resume_load_path(ns)
     if not resume_load.is_file():
@@ -551,7 +551,7 @@ def run_interactive(torch_ort_workflow: bool) -> int:
     ckpt_out = Path(_inp("Write training state to (--ckpt)", ck_default))
     best_def = str(g("best_ckpt", str(ckpt_out.with_name(f"{ckpt_out.stem}.best{ckpt_out.suffix}"))))
     best_ck = Path(_inp("Best-val checkpoint (--best-ckpt)", best_def))
-    out_onnx = Path(_inp("Output ONNX (--out-onnx)", str(g("out_onnx", "artifacts/specular_predictor.onnx"))))
+    out_onnx = Path(_inp("Output ONNX (--out-onnx)", str(g("out_onnx", "artifacts/SpecLab.onnx"))))
     backup = _inp("Optional backup duplicate path (--resume-ckpt, empty=none)", "").strip()
     resume_ckpt_arg: list[str] = []
     if backup:
