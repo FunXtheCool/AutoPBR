@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.Json;
 using Avalonia;
 using Avalonia.Controls;
@@ -14,6 +16,12 @@ namespace AutoPBR.App.Views;
 
 public partial class MainWindow : Window
 {
+    private static readonly JsonSerializerOptions IndentedJsonSerializerOptions = new() { WriteIndented = true };
+    private static readonly CompositeFormat LogTagRulesImportFailedFormat =
+        CompositeFormat.Parse(Lang.Resources.Log_TagRulesImportFailed);
+    private static readonly CompositeFormat LogTagRulesImportedFormat =
+        CompositeFormat.Parse(Lang.Resources.Log_TagRulesImported);
+
     private const int LogScrollThrottleMs = 200;
     private DateTime _lastLogScrollUtc = DateTime.MinValue;
 
@@ -132,7 +140,7 @@ public partial class MainWindow : Window
 
     private void ExploreTreeHeaderSplitter_OnPointerMoved(object? sender, PointerEventArgs e)
     {
-        if (sender is GridSplitter splitter && e.Pointer.Captured == splitter)
+        if (sender is GridSplitter splitter && ReferenceEquals(e.Pointer.Captured, splitter))
         {
             SyncExploreTreeColumnWidthsFromHeader();
         }
@@ -350,7 +358,9 @@ public partial class MainWindow : Window
             int newStyle = style | wsThickframe | wsMaximizebox | wsMinimizebox;
             if (newStyle != style)
             {
-                SetWindowLong(hwnd, gwlStyle, newStyle);
+                NativeSetLastError(0);
+                var previousStyle = SetWindowLong(hwnd, gwlStyle, newStyle);
+                _ = previousStyle;
             }
 
         }
@@ -359,6 +369,9 @@ public partial class MainWindow : Window
             // Ignore if Win32 calls fail (e.g. handle invalid)
         }
     }
+
+    [DllImport("kernel32.dll", EntryPoint = "SetLastError")]
+    private static extern void NativeSetLastError(uint dwErrCode);
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
@@ -467,7 +480,7 @@ public partial class MainWindow : Window
                 }
             };
 
-            vm.ShowSemanticDebugDialog = text => ShowSemanticDebugWindow(text);
+            vm.ShowSemanticDebugDialog = ShowSemanticDebugWindow;
         }
 
         // Jump-to-top (Explorer) button: show when Explore tab is active and the tree list is scrolled.
@@ -570,8 +583,7 @@ public partial class MainWindow : Window
                 return;
             }
 
-            var json = JsonSerializer.Serialize(vm.CustomTagRules.ToList(),
-                new JsonSerializerOptions { WriteIndented = true });
+            var json = JsonSerializer.Serialize(vm.CustomTagRules.ToList(), IndentedJsonSerializerOptions);
             await File.WriteAllTextAsync(path, json).ConfigureAwait(true);
             vm.AppendUserLog(Lang.Resources.Log_TagRulesExported);
         }
@@ -609,8 +621,8 @@ public partial class MainWindow : Window
             var json = await File.ReadAllTextAsync(path).ConfigureAwait(true);
             var err = vm.ImportCustomTagRulesFromJson(json);
             vm.AppendUserLog(err is not null
-                ? string.Format(Lang.Resources.Log_TagRulesImportFailed, err)
-                : string.Format(Lang.Resources.Log_TagRulesImported, vm.CustomTagRules.Count));
+                ? string.Format(CultureInfo.InvariantCulture, LogTagRulesImportFailedFormat, err)
+                : string.Format(CultureInfo.InvariantCulture, LogTagRulesImportedFormat, vm.CustomTagRules.Count));
         }
         catch
         {

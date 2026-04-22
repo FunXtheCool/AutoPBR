@@ -9,7 +9,7 @@ public sealed class MaterialTagMlPostProcessorTests
     private static readonly IReadOnlyList<TagRule> MaterialRules = TagRulePresets.DefaultMaterials;
 
     [Fact]
-    public void Apply_OrePath_KeepsMetalAndAddsStone()
+    public void ApplyOrePathKeepsMetalAndAddsStone()
     {
         var rules = MaterialRules;
         var result = MaterialTagMlPostProcessor.Apply(
@@ -24,7 +24,7 @@ public sealed class MaterialTagMlPostProcessorTests
     }
 
     [Fact]
-    public void Apply_NonOrePath_KeepsMetal()
+    public void ApplyNonOrePathKeepsMetal()
     {
         var rules = MaterialRules;
         var result = MaterialTagMlPostProcessor.Apply(
@@ -38,7 +38,7 @@ public sealed class MaterialTagMlPostProcessorTests
     }
 
     [Fact]
-    public void Apply_ForestsName_DoesNotTriggerOreStoneHeuristic()
+    public void ApplyForestsNameDoesNotTriggerOreStoneHeuristic()
     {
         var result = MaterialTagMlPostProcessor.Apply(
             "forests",
@@ -51,7 +51,7 @@ public sealed class MaterialTagMlPostProcessorTests
     }
 
     [Fact]
-    public void Apply_OrePath_GemAndStone_LowMaxTag_KeepsBoth()
+    public void ApplyOrePathGemAndStoneLowMaxTagKeepsBoth()
     {
         var result = MaterialTagMlPostProcessor.Apply(
             "diamond_ore",
@@ -66,7 +66,7 @@ public sealed class MaterialTagMlPostProcessorTests
     }
 
     [Fact]
-    public void Apply_OrePath_GemStoneAndExtras_PrioritizesStoneGemWhenTrimming()
+    public void ApplyOrePathGemStoneAndExtrasPrioritizesStoneGemWhenTrimming()
     {
         var result = MaterialTagMlPostProcessor.Apply(
             "diamond_ore",
@@ -81,7 +81,7 @@ public sealed class MaterialTagMlPostProcessorTests
     }
 
     [Fact]
-    public void Apply_OrePath_MetalResolved_LowMaxTag_KeepsStoneAndMetal()
+    public void ApplyOrePathMetalResolvedLowMaxTagKeepsStoneAndMetal()
     {
         var result = MaterialTagMlPostProcessor.Apply(
             "iron_ore",
@@ -96,7 +96,7 @@ public sealed class MaterialTagMlPostProcessorTests
     }
 
     [Fact]
-    public void Apply_OrePath_Coal_DoesNotApplyCapPairing()
+    public void ApplyOrePathCoalDoesNotApplyCapPairing()
     {
         var result = MaterialTagMlPostProcessor.Apply(
             "deepslate_coal_ore",

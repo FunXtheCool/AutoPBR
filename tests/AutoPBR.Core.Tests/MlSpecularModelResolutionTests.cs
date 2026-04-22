@@ -17,7 +17,7 @@ public sealed class MlSpecularModelResolutionTests
         };
 
     [Fact]
-    public void Ceil_smallest_key_greater_or_equal_texture_size()
+    public void CeilSmallestKeyGreaterOrEqualTextureSize()
     {
         var map = new Dictionary<int, string>
         {
@@ -39,7 +39,7 @@ public sealed class MlSpecularModelResolutionTests
     }
 
     [Fact]
-    public void Ceil_when_texture_larger_than_all_keys_uses_largest()
+    public void CeilWhenTextureLargerThanAllKeysUsesLargest()
     {
         var map = new Dictionary<int, string>
         {
@@ -53,7 +53,7 @@ public sealed class MlSpecularModelResolutionTests
     }
 
     [Fact]
-    public void Empty_map_uses_fallback_path()
+    public void EmptyMapUsesFallbackPath()
     {
         var o = Options(true, "only.onnx", null);
         Assert.True(MlSpecularModelResolution.TryResolveModelPath(o, 64, out var path, out var sel, out _));
@@ -62,7 +62,7 @@ public sealed class MlSpecularModelResolutionTests
     }
 
     [Fact]
-    public void Disabled_returns_false()
+    public void DisabledReturnsFalse()
     {
         var o = Options(false, "x.onnx", new Dictionary<int, string> { [16] = "y.onnx" });
         Assert.False(MlSpecularModelResolution.TryResolveModelPath(o, 16, out _, out _, out var diag));
@@ -70,7 +70,7 @@ public sealed class MlSpecularModelResolutionTests
     }
 
     [Fact]
-    public void SanitizeMap_ignores_invalid_entries()
+    public void SanitizeMapIgnoresInvalidEntries()
     {
         var raw = new Dictionary<int, string>
         {

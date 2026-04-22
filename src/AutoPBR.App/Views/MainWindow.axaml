@@ -119,7 +119,7 @@
             </Grid>
         </Border>
 
-        <Grid x:Name="ContentGrid" Grid.Row="1" Background="{Binding WindowBackground}">
+        <Grid x:Name="ContentGrid" Grid.Row="1" RowDefinitions="*" Background="{Binding WindowBackground}" ClipToBounds="True">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" MinWidth="0" />
                 <ColumnDefinition Width="8" />
@@ -1260,13 +1260,16 @@
                     IsHitTestVisible="False" />
 
             <!-- Preview + log: right column, persistent -->
-            <Border Grid.Column="2"
+            <Border Grid.Row="0" Grid.Column="2"
                     MinWidth="0"
+                    MinHeight="0"
+                    VerticalAlignment="Stretch"
+                    ClipToBounds="True"
                     Background="{Binding CardBackground}"
                     BorderBrush="{Binding CardBorderBrush}"
                     BorderThickness="1,0,0,0"
                     Padding="12">
-                <Grid RowDefinitions="Auto,2*,1*" RowSpacing="8" MinWidth="0">
+                <Grid RowDefinitions="Auto,2*,1*" RowSpacing="8" MinWidth="0" MinHeight="0" ClipToBounds="True">
                     <StackPanel Orientation="Vertical" Spacing="4" MinWidth="0">
                         <TextBlock Text="Preview" FontWeight="SemiBold" Foreground="{Binding ForegroundBrush}" TextWrapping="Wrap" />
                         <TextBlock Text="{Binding PreviewTextureName}"
@@ -1297,8 +1300,19 @@
                     <Grid Grid.Row="1" ClipToBounds="True" MinHeight="80">
                         <Image Source="{Binding PreviewImage}" Stretch="Uniform" />
                     </Grid>
-                    <StackPanel Grid.Row="2" Spacing="6" MinWidth="0">
-                        <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="6" VerticalAlignment="Center">
+                    <Grid Grid.Row="2" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="6" MinWidth="0" MinHeight="0">
+                        <TextBlock Text="{Binding ConversionScanDebugText}"
+                                   Foreground="{Binding ForegroundBrush}"
+                                   Opacity="0.78"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"
+                                   IsVisible="{Binding IsConverting}" />
+                        <TextBlock Text="{Binding ExploreMlDebugText}"
+                                   Foreground="{Binding ForegroundBrush}"
+                                   Opacity="0.78"
+                                   FontSize="11"
+                                   TextWrapping="Wrap" />
+                        <WrapPanel Grid.Row="2" Orientation="Horizontal" ItemSpacing="8" LineSpacing="6" VerticalAlignment="Center">
                             <TextBlock VerticalAlignment="Center"
                                        FontWeight="SemiBold"
                                        Foreground="{Binding ForegroundBrush}"
@@ -1309,26 +1323,18 @@
                                     VerticalAlignment="Center"
                                     Click="OpenLogFolder_Click" />
                         </WrapPanel>
-                        <Border CornerRadius="6" BorderBrush="{Binding CardBorderBrush}" BorderThickness="1" Padding="6">
+                        <Border Grid.Row="3" CornerRadius="6" BorderBrush="{Binding CardBorderBrush}" BorderThickness="1" Padding="6" MinHeight="0">
                             <ScrollViewer x:Name="LogScrollViewer"
                                           HorizontalScrollBarVisibility="Disabled"
                                           VerticalScrollBarVisibility="Auto"
                                           MinHeight="72">
-                                <ItemsControl ItemsSource="{Binding LogLines}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBox Text="{Binding}"
+                                <SelectableTextBlock Text="{Binding LogText}"
                                                      FontFamily="Consolas"
                                                      FontSize="11"
-                                                     IsReadOnly="True"
-                                                     BorderThickness="0"
-                                                     Background="Transparent"/>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                                                     TextWrapping="Wrap" />
                             </ScrollViewer>
                         </Border>
-                    </StackPanel>
+                    </Grid>
                 </Grid>
             </Border>
         </Grid>

@@ -49,6 +49,8 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
         {
             LogLines.RemoveAt(0);
         }
+
+        LogText = string.Join(Environment.NewLine, LogLines);
     }
 
     private static string ResolveBackgroundTaskLabel(string taskId) => taskId switch
@@ -335,6 +337,9 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
     [ObservableProperty] private string? _previewArchivePath;
     [ObservableProperty] private string? _previewTextureName;
     [ObservableProperty] private Bitmap? _previewImage;
+    [ObservableProperty] private string _logText = "";
+    [ObservableProperty] private string _exploreMlDebugText = "";
+    [ObservableProperty] private string _conversionScanDebugText = "";
 
     /// <summary>Color used for preview panel top/bottom gradient fade (matches CardBackground).</summary>
     [ObservableProperty] private Color _previewFadeColor = Color.FromRgb(0x22, 0x22, 0x2A);
@@ -604,6 +609,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
             Strings = LocalizationService.ApplyCulture(lang);
             OnPropertyChanged(nameof(Strings));
             _exploreController.SetBackgroundTaskSink(this);
+            _exploreController.SetDebugSink(msg => Dispatcher.UIThread.Post(() => { ExploreMlDebugText = msg; }));
             SelectedLanguage = SupportedLanguages.FirstOrDefault(x =>
                                    string.Equals(x.CultureCode, _settings.Language,
                                        StringComparison.OrdinalIgnoreCase)) ??
@@ -2701,6 +2707,17 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
                 AddLogLine(p.InfoMessage);
             }
 
+            if (p.Stage == ConversionStage.ScanningTextures)
+            {
+                ConversionScanDebugText = p.Total > 0
+                    ? $"Scanning debug: {p.Completed}/{p.Total} {(string.IsNullOrWhiteSpace(p.CurrentTextureName) ? "" : p.CurrentTextureName)}"
+                    : "Scanning debug: phase started";
+                if (!string.IsNullOrWhiteSpace(p.InfoMessage))
+                {
+                    ConversionScanDebugText = $"{ConversionScanDebugText} | {p.InfoMessage}";
+                }
+            }
+
 
             if (p.Stage == ConversionStage.Extracting && p is { Completed: 0, Total: > 0 })
             {
@@ -2729,7 +2746,9 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
                 ConversionStage.Extracting => p.Total > 0
                     ? ("Status_ExtractingPackProgress", [p.Completed, p.Total])
                     : ("Status_ExtractingPack", null),
-                ConversionStage.ScanningTextures => ("Status_ScanningTextures", null),
+                ConversionStage.ScanningTextures => p.Total > 0
+                    ? ("Status_ScanningPackProgress", [p.Completed, p.Total])
+                    : ("Status_ScanningTextures", null),
                 ConversionStage.GeneratingSpecular => ("Status_SpecularCurrent",
                     [p.CurrentTextureName ?? ""]),
                 ConversionStage.GeneratingNormals => ("Status_NormalsCurrent",

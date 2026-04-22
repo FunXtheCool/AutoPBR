@@ -5,8 +5,9 @@ namespace AutoPBR.Core.Tests;
 
 public sealed class DictionarySemanticTests
 {
+    private static readonly string[] OrderedExpectedTerms = ["oak", "door", "iron", "trapdoor", "extra"];
     [Fact]
-    public void ParseDefinitions_ExtractsSenseDefinitions()
+    public void ParseDefinitionsExtractsSenseDefinitions()
     {
         const string json = """
         {
@@ -31,14 +32,14 @@ public sealed class DictionarySemanticTests
     }
 
     [Fact]
-    public void ParseDefinitions_InvalidJson_ReturnsEmpty()
+    public void ParseDefinitionsInvalidJsonReturnsEmpty()
     {
         var defs = FreeDictionaryDefinitionProvider.ParseDefinitions("{not-json}");
         Assert.Empty(defs);
     }
 
     [Fact]
-    public void ExtractTerms_RemovesDirectionalFlippedAndNumericTokens()
+    public void ExtractTermsRemovesDirectionalFlippedAndNumericTokens()
     {
         var terms = MaterialTagSemanticQuery.ExtractTerms("stone_top_flipped_01 side sides granite");
 
@@ -52,7 +53,7 @@ public sealed class DictionarySemanticTests
     }
 
     [Fact]
-    public void ExtractTerms_RemovesBridgingStopWords()
+    public void ExtractTermsRemovesBridgingStopWords()
     {
         var terms = MaterialTagSemanticQuery.ExtractTerms("the_and_or_but_granite_of_in_for");
 
@@ -67,9 +68,9 @@ public sealed class DictionarySemanticTests
     }
 
     [Fact]
-    public void ExtractOrderedDictionaryTerms_MinLengthThree_MaxEight_FirstOccurrenceOrder()
+    public void ExtractOrderedDictionaryTermsMinLengthThreeMaxEightFirstOccurrenceOrder()
     {
         var ordered = MaterialTagSemanticQuery.ExtractOrderedDictionaryTerms("oak_door_iron_trapdoor_extra");
-        Assert.Equal(new[] { "oak", "door", "iron", "trapdoor", "extra" }, ordered);
+        Assert.Equal(OrderedExpectedTerms, ordered);
     }
 }

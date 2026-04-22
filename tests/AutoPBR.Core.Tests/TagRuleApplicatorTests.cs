@@ -6,7 +6,7 @@ namespace AutoPBR.Core.Tests;
 public sealed class TagRuleApplicatorTests
 {
     [Fact]
-    public void OreKeyword_WholeWord_DoesNotMatchForests()
+    public void OreKeywordWholeWordDoesNotMatchForests()
     {
         var ids = TagRuleApplicator.GetMatchingTagIds(
             "forests",
@@ -18,7 +18,7 @@ public sealed class TagRuleApplicatorTests
     }
 
     [Fact]
-    public void OreKeyword_WholeWord_MatchesIronOre()
+    public void OreKeywordWholeWordMatchesIronOre()
     {
         var ids = TagRuleApplicator.GetMatchingTagIds(
             "iron_ore",
@@ -30,7 +30,7 @@ public sealed class TagRuleApplicatorTests
     }
 
     [Fact]
-    public void OreKeyword_WholeWord_MatchesFilenameOre()
+    public void OreKeywordWholeWordMatchesFilenameOre()
     {
         var ids = TagRuleApplicator.GetMatchingTagIds(
             "ore",
@@ -42,7 +42,7 @@ public sealed class TagRuleApplicatorTests
     }
 
     [Fact]
-    public void SubstringMatch_StillWorksWhenWholeWordFalse()
+    public void SubstringMatchStillWorksWhenWholeWordFalse()
     {
         var rules = new List<TagRule>
         {

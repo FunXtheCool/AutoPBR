@@ -1,4 +1,3 @@
-using AutoPBR.Core;
 using AutoPBR.Core.Embeddings;
 using Xunit;
 
@@ -7,7 +6,7 @@ namespace AutoPBR.Core.Tests;
 public sealed class MaterialTagSemanticResolutionTests
 {
     [Fact]
-    public void AppendWeightedUnweightedFlags_SemanticDisabled_AddsUnweighted()
+    public void AppendWeightedUnweightedFlagsSemanticDisabledAddsUnweighted()
     {
         var flags = new List<string> { "block" };
         MaterialTagSemanticResolution.AppendWeightedUnweightedFlags(flags, null, deferSemanticMl: false, usedSemanticMl: true);
@@ -15,7 +14,7 @@ public sealed class MaterialTagSemanticResolutionTests
     }
 
     [Fact]
-    public void AppendWeightedUnweightedFlags_DeferSemanticMl_AddsUnweighted()
+    public void AppendWeightedUnweightedFlagsDeferSemanticMlAddsUnweighted()
     {
         var sem = new MaterialTagSemanticOptions { Enabled = true, Matcher = null };
         var flags = new List<string>();
@@ -24,7 +23,7 @@ public sealed class MaterialTagSemanticResolutionTests
     }
 
     [Fact]
-    public void AppendWeightedUnweightedFlags_ReplacesExistingWeightedUnweighted()
+    public void AppendWeightedUnweightedFlagsReplacesExistingWeightedUnweighted()
     {
         var flags = new List<string> { FlagTagResolver.WeightedId, "block" };
         MaterialTagSemanticResolution.AppendWeightedUnweightedFlags(flags, null, deferSemanticMl: false, usedSemanticMl: false);
@@ -32,7 +31,7 @@ public sealed class MaterialTagSemanticResolutionTests
     }
 
     [Fact]
-    public void AppendTwoDSpriteFlagIfNeeded_OrganicWithoutBlock_AddsSprite2D()
+    public void AppendTwoDSpriteFlagIfNeededOrganicWithoutBlockAddsSprite2D()
     {
         var ids = new List<string> { "plant", FlagTagResolver.ItemId };
         MaterialTagSemanticResolution.AppendTwoDSpriteFlagIfNeeded(ids, removedTagIds: null);
@@ -40,7 +39,7 @@ public sealed class MaterialTagSemanticResolutionTests
     }
 
     [Fact]
-    public void AppendTwoDSpriteFlagIfNeeded_WithBlock_DoesNotAdd()
+    public void AppendTwoDSpriteFlagIfNeededWithBlockDoesNotAdd()
     {
         var ids = new List<string> { "plant", FlagTagResolver.BlockId };
         MaterialTagSemanticResolution.AppendTwoDSpriteFlagIfNeeded(ids, null);
@@ -48,7 +47,7 @@ public sealed class MaterialTagSemanticResolutionTests
     }
 
     [Fact]
-    public void AppendTwoDSpriteFlagIfNeeded_NoPlant_DoesNotAdd()
+    public void AppendTwoDSpriteFlagIfNeededNoPlantDoesNotAdd()
     {
         var ids = new List<string> { "wood", FlagTagResolver.ItemId };
         MaterialTagSemanticResolution.AppendTwoDSpriteFlagIfNeeded(ids, null);
@@ -56,7 +55,7 @@ public sealed class MaterialTagSemanticResolutionTests
     }
 
     [Fact]
-    public void AppendTwoDSpriteFlagIfNeeded_UserRemovedSprite_DoesNotAdd()
+    public void AppendTwoDSpriteFlagIfNeededUserRemovedSpriteDoesNotAdd()
     {
         var ids = new List<string> { "plant", FlagTagResolver.ItemId };
         var removed = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { FlagTagResolver.Sprite2DId };

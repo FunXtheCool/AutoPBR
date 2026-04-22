@@ -39,7 +39,7 @@ public sealed class MinecraftFormattedTextBlock : TextBlock
     private void RebuildSegments()
     {
         // Avoid TextBlock's built-in text rendering path; we render via inlines only.
-        base.Text = string.Empty;
+        Text = string.Empty;
         _segments.Clear();
         ParseSegments(FormattedText ?? string.Empty, _segments);
         _hasObfuscatedSegments = _segments.Any(s => s.Obfuscated);

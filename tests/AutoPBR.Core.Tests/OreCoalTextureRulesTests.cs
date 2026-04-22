@@ -1,4 +1,3 @@
-using AutoPBR.Core;
 using Xunit;
 
 namespace AutoPBR.Core.Tests;
@@ -11,7 +10,7 @@ public sealed class OreCoalTextureRulesTests
     [InlineData("iron_ore", @"\minecraft\textures\block\iron_ore", false)]
     [InlineData("deepslate_iron_ore", @"\minecraft\textures\block\deepslate_iron_ore", false)]
     [InlineData("forests", @"\minecraft\textures\block\forests", false)]
-    public void ShouldInvertHeight_MatchesWholeWordOreAndCoal(string name, string relativeKey, bool expected)
+    public void ShouldInvertHeightMatchesWholeWordOreAndCoal(string name, string relativeKey, bool expected)
     {
         Assert.Equal(expected, OreCoalTextureRules.ShouldInvertHeight(name, relativeKey));
     }

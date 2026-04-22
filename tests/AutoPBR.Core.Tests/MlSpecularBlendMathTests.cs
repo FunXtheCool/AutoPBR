@@ -12,7 +12,7 @@ public sealed class MlSpecularBlendMathTests
     [InlineData(MlSpecularBlendMath.Screen)]
     [InlineData(MlSpecularBlendMath.BiasGain)]
     [InlineData(MlSpecularBlendMath.SigmoidCrossfade)]
-    public void MixZero_ReturnsHeuristic(MlSpecularBlendMath math)
+    public void MixZeroReturnsHeuristic(MlSpecularBlendMath math)
     {
         var h = 73.0;
         var ml = 220.0;
@@ -27,7 +27,7 @@ public sealed class MlSpecularBlendMathTests
     [InlineData(MlSpecularBlendMath.Screen)]
     [InlineData(MlSpecularBlendMath.BiasGain)]
     [InlineData(MlSpecularBlendMath.SigmoidCrossfade)]
-    public void BlendOutput_IsAlwaysByteRange(MlSpecularBlendMath math)
+    public void BlendOutputIsAlwaysByteRange(MlSpecularBlendMath math)
     {
         var heuristics = new[] { 0.0, 16.0, 64.0, 128.0, 220.0, 255.0 };
         var mlVals = new[] { 0.0, 12.0, 80.0, 128.0, 240.0, 255.0 };
@@ -46,7 +46,7 @@ public sealed class MlSpecularBlendMathTests
     }
 
     [Fact]
-    public void Linear_MixOne_EqualsModel()
+    public void LinearMixOneEqualsModel()
     {
         var v = SpecularGenerator.BlendChannel(32.0, 214.0, 1f, MlSpecularBlendMath.Linear);
         Assert.Equal(214.0, v, 10);
@@ -58,7 +58,7 @@ public sealed class MlSpecularBlendMathTests
     [InlineData(MlSpecularBlendMath.Screen)]
     [InlineData(MlSpecularBlendMath.BiasGain)]
     [InlineData(MlSpecularBlendMath.SigmoidCrossfade)]
-    public void CandidateModes_DifferFromLinear_OnReferenceVector(MlSpecularBlendMath math)
+    public void CandidateModesDifferFromLinearOnReferenceVector(MlSpecularBlendMath math)
     {
         const double h = 80.0;
         const double ml = 220.0;
@@ -69,7 +69,7 @@ public sealed class MlSpecularBlendMathTests
     }
 
     [Fact]
-    public void SigmoidCrossfade_StaysBetweenInputs_WhenMixInRange()
+    public void SigmoidCrossfadeStaysBetweenInputsWhenMixInRange()
     {
         const double h = 40.0;
         const double ml = 210.0;

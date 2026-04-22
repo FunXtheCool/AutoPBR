@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using AutoPBR.Core.Models;
 
 namespace AutoPBR.Core;
@@ -7,6 +8,20 @@ namespace AutoPBR.Core;
 /// </summary>
 internal static class TextureScanner
 {
+    private sealed record ScanCandidate(
+        string File,
+        string Name,
+        string Extension,
+        string DirectoryPath,
+        string RelativePathNoExt,
+        bool SpecularOnly);
+
+    private sealed record TagComputationResult(
+        bool Sprite2DFoliageTarget,
+        bool HasPlantMaterialTag,
+        bool HasBrickMaterialTag,
+        IReadOnlyList<string> EffectiveTagIds);
+
     private static IEnumerable<(string folder, bool specularOnly)> GetEnabledFolders(AutoPbrOptions options)
     {
         if (options.ProcessBlocks)
@@ -46,72 +61,302 @@ internal static class TextureScanner
         }
     }
 
-    /// <summary>True when effective tags include <see cref="FlagTagResolver.Sprite2DId"/> (same rules as Explore).</summary>
-    private static bool GetSprite2DFoliageTarget(AutoPbrOptions options, string textureName, string relativePathNoExt)
+    private static int ResolveMaxParallelism(AutoPbrOptions options)
     {
-        var rules = options.TagRules ?? TagRulePresets.Default;
+        if (options.MaxThreads > 0)
+        {
+            return Math.Max(1, options.MaxThreads);
+        }
+
+        return Math.Max(1, Environment.ProcessorCount - 2);
+    }
+
+    private static IReadOnlyList<TagRule> ResolveTagRules(AutoPbrOptions options) =>
+        options.TagRules is { Count: > 0 } rules ? rules : TagRulePresets.Default;
+
+    private static bool ShouldRunSemanticMlForCandidate(
+        ScanCandidate candidate,
+        AutoPbrOptions options,
+        IReadOnlyList<TagRule> rules)
+    {
+        if (IsNumericOnlyOptifineTile(candidate.Name, candidate.RelativePathNoExt))
+        {
+            return false;
+        }
+
         var sem = options.SemanticOptions;
+        if (sem is not { Enabled: true, Matcher: not null })
+        {
+            return false;
+        }
+
+        var heuristicMaterialIds = TagRuleApplicator.GetMatchingTagIds(
+            candidate.Name,
+            candidate.RelativePathNoExt,
+            rules,
+            TagRuleKind.Material);
+        if (heuristicMaterialIds.Count > 0)
+        {
+            return false;
+        }
+
+        if (options.ManualTagOverrides is not null &&
+            options.ManualTagOverrides.TryGetValue(candidate.RelativePathNoExt, out var overrides))
+        {
+            var materialRuleIds = new HashSet<string>(
+                rules.Where(r => r.Kind == TagRuleKind.Material).Select(r => r.Id),
+                StringComparer.OrdinalIgnoreCase);
+            foreach (var id in overrides.Added)
+            {
+                if (materialRuleIds.Contains(id))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private static bool IsNumericOnlyOptifineTile(string textureName, string relativePathNoExt)
+    {
+        if (!IsOptifinePath(relativePathNoExt))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(textureName))
+        {
+            return false;
+        }
+
+        for (var i = 0; i < textureName.Length; i++)
+        {
+            if (!char.IsDigit(textureName[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool IsOptifinePath(string relativePathNoExt) =>
+        relativePathNoExt.Contains("\\optifine\\", StringComparison.OrdinalIgnoreCase);
+
+    private static string? GetParentRelativePathNoExt(string relativePathNoExt)
+    {
+        var lastSlash = relativePathNoExt.LastIndexOf('\\');
+        if (lastSlash <= 0)
+        {
+            return null;
+        }
+
+        return relativePathNoExt[..lastSlash];
+    }
+
+    private static string GetLeafSegment(string pathNoExt)
+    {
+        var lastSlash = pathNoExt.LastIndexOf('\\');
+        if (lastSlash < 0 || lastSlash == pathNoExt.Length - 1)
+        {
+            return pathNoExt;
+        }
+
+        return pathNoExt[(lastSlash + 1)..];
+    }
+
+    private static TagComputationResult BuildTagComputationResultFromEffectiveIds(
+        ScanCandidate candidate,
+        IReadOnlyCollection<string> effectiveIds)
+    {
+        var effective = new HashSet<string>(effectiveIds, StringComparer.OrdinalIgnoreCase);
+        return new TagComputationResult(
+            effective.Contains(FlagTagResolver.Sprite2DId),
+            effective.Contains("plant") ||
+            AutoPbrDefaults.PlantTextureKeys.Contains(candidate.RelativePathNoExt),
+            effective.Contains("brick"),
+            effective.ToList());
+    }
+
+    private static TagComputationResult ComputeTagsForCandidate(
+        ScanCandidate candidate,
+        AutoPbrOptions options,
+        IReadOnlyList<TagRule> rules,
+        bool deferSemanticMl,
+        IReadOnlyCollection<string>? inheritedMaterialTagIds = null)
+    {
         IReadOnlyCollection<string>? added = null;
         IReadOnlyCollection<string>? removed = null;
-        if (options.ManualTagOverrides?.TryGetValue(relativePathNoExt, out var o) == true)
+        if (options.ManualTagOverrides?.TryGetValue(candidate.RelativePathNoExt, out var o) == true)
         {
             added = o.Added;
             removed = o.Removed;
         }
 
+        var sem = options.SemanticOptions;
         var includeDict = sem?.DictionaryEvidenceEnabled ?? false;
-        var effective = ConversionEffectiveTags.ComputeEffectiveTagIds(
-            textureName,
-            relativePathNoExt,
+        var effectiveTagIds = ConversionEffectiveTags.ComputeEffectiveTagIds(
+            candidate.Name,
+            candidate.RelativePathNoExt,
             rules,
             sem,
             includeDict,
-            deferSemanticMl: false,
+            deferSemanticMl,
             added,
             removed);
-        return effective.Contains(FlagTagResolver.Sprite2DId, StringComparer.OrdinalIgnoreCase);
-    }
-
-    /// <summary>
-    /// Effective material tag ids (keywords / ML / post-processor / explorer manual add-remove) for a texture key.
-    /// </summary>
-    private static HashSet<string> GetEffectiveMaterialTagIds(string relativePathNoExt, AutoPbrOptions options)
-    {
-        var rules = options.TagRules ?? TagRulePresets.Default;
-        var name = Path.GetFileNameWithoutExtension(relativePathNoExt.Replace('\\', '/'));
-
-        var sem = options.SemanticOptions;
-        var autoMaterialIds = MaterialTagSemanticResolution.ResolveMaterialTags(
-            name,
-            relativePathNoExt,
-            rules,
-            sem,
-            deferSemanticMl: false,
-            sem?.DictionaryEvidenceEnabled ?? false,
-            out _);
-
-        var effective = new HashSet<string>(autoMaterialIds, StringComparer.OrdinalIgnoreCase);
-        if (options.ManualTagOverrides is not null &&
-            options.ManualTagOverrides.TryGetValue(relativePathNoExt, out var overrides))
+        var effective = new HashSet<string>(effectiveTagIds, StringComparer.OrdinalIgnoreCase);
+        if (inheritedMaterialTagIds is { Count: > 0 })
         {
-            foreach (var removed in overrides.Removed)
+            HashSet<string>? removedSet = null;
+            if (removed is { Count: > 0 })
             {
-                effective.Remove(removed);
+                removedSet = new HashSet<string>(removed, StringComparer.OrdinalIgnoreCase);
             }
 
-            foreach (var added in overrides.Added)
+            foreach (var inheritedId in inheritedMaterialTagIds)
             {
-                effective.Add(added);
+                if (removedSet is not null && removedSet.Contains(inheritedId))
+                {
+                    continue;
+                }
+
+                effective.Add(inheritedId);
             }
         }
 
-        return effective;
+        return BuildTagComputationResultFromEffectiveIds(candidate, effective);
     }
 
-    public static IReadOnlyList<TextureWorkItem> ScanTextures(string extractedPackRoot, AutoPbrOptions options)
+    private static Dictionary<string, IReadOnlyCollection<string>> BuildNumericOptifineFolderMaterialHints(
+        IReadOnlyList<ScanCandidate> candidates,
+        AutoPbrOptions options,
+        IReadOnlyList<TagRule> rules,
+        CancellationToken cancellationToken)
     {
-        var results = new List<TextureWorkItem>();
+        var hints = new Dictionary<string, IReadOnlyCollection<string>>(StringComparer.OrdinalIgnoreCase);
+        var sem = options.SemanticOptions;
+        if (sem is not { Enabled: true, Matcher: not null })
+        {
+            return hints;
+        }
 
+        var includeDict = sem.DictionaryEvidenceEnabled;
+        var materialRuleIds = new HashSet<string>(
+            rules.Where(r => r.Kind == TagRuleKind.Material).Select(r => r.Id),
+            StringComparer.OrdinalIgnoreCase);
+        if (materialRuleIds.Count == 0)
+        {
+            return hints;
+        }
+
+        var parentFolders = candidates
+            .Where(static c => IsNumericOnlyOptifineTile(c.Name, c.RelativePathNoExt))
+            .Select(static c => GetParentRelativePathNoExt(c.RelativePathNoExt))
+            .Where(static p => !string.IsNullOrWhiteSpace(p))
+            .Select(static p => p!)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        foreach (var folderKey in parentFolders)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var folderName = GetLeafSegment(folderKey);
+            if (string.IsNullOrWhiteSpace(folderName))
+            {
+                continue;
+            }
+
+            var heuristicMaterialIds = TagRuleApplicator.GetMatchingTagIds(
+                folderName,
+                folderKey,
+                rules,
+                TagRuleKind.Material);
+            if (heuristicMaterialIds.Count > 0)
+            {
+                hints[folderKey] = heuristicMaterialIds
+                    .Where(materialRuleIds.Contains)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToArray();
+                continue;
+            }
+
+            var inferredIds = ConversionEffectiveTags.ComputeEffectiveTagIds(
+                folderName,
+                folderKey,
+                rules,
+                sem,
+                includeDict,
+                deferSemanticMl: false,
+                added: null,
+                removed: null);
+            var inferredMaterialIds = inferredIds
+                .Where(materialRuleIds.Contains)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+            if (inferredMaterialIds.Length > 0)
+            {
+                hints[folderKey] = inferredMaterialIds;
+            }
+        }
+
+        return hints;
+    }
+
+    private static TextureWorkItem BuildWorkItem(
+        ScanCandidate candidate,
+        TagComputationResult tags,
+        AutoPbrOptions options)
+    {
+        return new TextureWorkItem
+        {
+            FullPath = candidate.File,
+            DirectoryPath = candidate.DirectoryPath,
+            Name = candidate.Name,
+            Extension = candidate.Extension,
+            RelativeKey = candidate.RelativePathNoExt,
+            SpecularOnly = candidate.SpecularOnly,
+            IsPlantForNoHeight = FoliageModeResolver.IsNoHeight(options.FoliageMode) && tags.Sprite2DFoliageTarget,
+            Sprite2DFoliageTarget = tags.Sprite2DFoliageTarget,
+            HasPlantMaterialTag = tags.HasPlantMaterialTag,
+            HasBrickMaterialTag = tags.HasBrickMaterialTag,
+            Overrides =
+            {
+                InvertSpecular = tags.HasBrickMaterialTag,
+                InvertHeight = OreCoalTextureRules.ShouldInvertHeight(candidate.Name, candidate.RelativePathNoExt)
+            }
+        };
+    }
+
+    private static bool IsSkippableByFilename(string file)
+    {
+        var fileName = Path.GetFileName(file);
+        if (AutoPbrDefaults.ExcludedFileNames.Contains(fileName))
+        {
+            return true;
+        }
+
+        if (fileName.Contains("sapling", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (fileName.Contains("mcmeta", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        var name = Path.GetFileNameWithoutExtension(file);
+        return name.EndsWith("_n", StringComparison.OrdinalIgnoreCase) ||
+               name.EndsWith("_s", StringComparison.OrdinalIgnoreCase) ||
+               name.EndsWith("_e", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsIgnoredByKey(ScanCandidate candidate, AutoPbrOptions options) =>
+        options.IgnoreTextureKeys.Contains(candidate.RelativePathNoExt);
+
+    private static IEnumerable<ScanCandidate> EnumerateScanCandidates(string extractedPackRoot, AutoPbrOptions options)
+    {
         foreach (var namespaceName in GetAssetNamespaces(extractedPackRoot))
         {
             var texturesRoot = Path.Combine(extractedPackRoot, "assets", namespaceName, "textures");
@@ -127,142 +372,35 @@ internal static class TextureScanner
 
                     foreach (var file in Directory.EnumerateFiles(dir, "*.png", SearchOption.AllDirectories))
                     {
-                        var fileName = Path.GetFileName(file);
-                        if (AutoPbrDefaults.ExcludedFileNames.Contains(fileName))
-                        {
-                            continue;
-                        }
-
-                        if (fileName.Contains("sapling", StringComparison.OrdinalIgnoreCase))
-                        {
-                            continue;
-                        }
-
-                        if (fileName.Contains("mcmeta", StringComparison.OrdinalIgnoreCase))
-                        {
-                            continue;
-                        }
-
                         var name = Path.GetFileNameWithoutExtension(file);
-                        if (name.EndsWith("_n", StringComparison.OrdinalIgnoreCase) ||
-                            name.EndsWith("_s", StringComparison.OrdinalIgnoreCase) ||
-                            name.EndsWith("_e", StringComparison.OrdinalIgnoreCase))
-                        {
-                            continue;
-                        }
-
                         var ext = Path.GetExtension(file);
                         var directoryPath = Path.GetDirectoryName(file) ?? dir;
-
                         var relativeToTextures = Path.GetRelativePath(
                             texturesRoot,
-                            Path.Combine(directoryPath, name)
-                        ).Replace('/', '\\');
+                            Path.Combine(directoryPath, name)).Replace('/', '\\');
                         var relativePathNoExt = "\\" + namespaceName + "\\" + relativeToTextures;
-
-                        if (options.IgnoreTextureKeys.Contains(relativePathNoExt))
-                        {
-                            continue;
-                        }
-
-                        var effectiveMaterialIds = GetEffectiveMaterialTagIds(relativePathNoExt, options);
-                        var sprite2DFoliage = GetSprite2DFoliageTarget(options, name, relativePathNoExt);
-
-                        if (FoliageModeResolver.IsIgnoreAll(options.FoliageMode) && sprite2DFoliage)
-                        {
-                            continue;
-                        }
-
-                        var blockItem = new TextureWorkItem
-                        {
-                            FullPath = file,
-                            DirectoryPath = directoryPath,
-                            Name = name,
-                            Extension = ext,
-                            RelativeKey = relativePathNoExt,
-                            SpecularOnly = specularOnly,
-                            IsPlantForNoHeight = FoliageModeResolver.IsNoHeight(options.FoliageMode) && sprite2DFoliage,
-                            Sprite2DFoliageTarget = sprite2DFoliage,
-                            HasPlantMaterialTag = effectiveMaterialIds.Contains("plant")
-                                || AutoPbrDefaults.PlantTextureKeys.Contains(relativePathNoExt),
-                            HasBrickMaterialTag = effectiveMaterialIds.Contains("brick"),
-                            Overrides =
-                            {
-                                InvertSpecular = effectiveMaterialIds.Contains("brick"),
-                                InvertHeight = OreCoalTextureRules.ShouldInvertHeight(name, relativePathNoExt)
-                            }
-                        };
-                        results.Add(blockItem);
+                        yield return new ScanCandidate(file, name, ext, directoryPath, relativePathNoExt, specularOnly);
                     }
                 }
             }
 
-            // OptiFine CTM
             var ctmRoot = Path.Combine(extractedPackRoot, "assets", namespaceName, "optifine", "ctm");
             if (Directory.Exists(ctmRoot))
             {
                 foreach (var file in Directory.EnumerateFiles(ctmRoot, "*.png", SearchOption.AllDirectories))
                 {
-                    var fileName = Path.GetFileName(file);
-                    if (fileName.Contains("mcmeta", StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
                     var name = Path.GetFileNameWithoutExtension(file);
-                    if (name.EndsWith("_n", StringComparison.OrdinalIgnoreCase) ||
-                        name.EndsWith("_s", StringComparison.OrdinalIgnoreCase) ||
-                        name.EndsWith("_e", StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
                     var ext = Path.GetExtension(file);
                     var directoryPath = Path.GetDirectoryName(file) ?? ctmRoot;
-
                     var relativeToNamespace = Path.GetRelativePath(
                         Path.Combine(extractedPackRoot, "assets", namespaceName),
-                        Path.Combine(directoryPath, name)
-                    ).Replace('/', '\\');
+                        Path.Combine(directoryPath, name)).Replace('/', '\\');
                     var relativePathNoExt = "\\" + namespaceName + "\\" + relativeToNamespace;
-
-                    if (options.IgnoreTextureKeys.Contains(relativePathNoExt))
-                    {
-                        continue;
-                    }
-
-                    var ctmEffectiveMaterialIds = GetEffectiveMaterialTagIds(relativePathNoExt, options);
-                    var ctmSprite2DFoliage = GetSprite2DFoliageTarget(options, name, relativePathNoExt);
-                    if (FoliageModeResolver.IsIgnoreAll(options.FoliageMode) && ctmSprite2DFoliage)
-                    {
-                        continue;
-                    }
-
-                    var ctmItem = new TextureWorkItem
-                    {
-                        FullPath = file,
-                        DirectoryPath = directoryPath,
-                        Name = name,
-                        Extension = ext,
-                        RelativeKey = relativePathNoExt,
-                        SpecularOnly = false,
-                        IsPlantForNoHeight = FoliageModeResolver.IsNoHeight(options.FoliageMode) && ctmSprite2DFoliage,
-                        Sprite2DFoliageTarget = ctmSprite2DFoliage,
-                        HasPlantMaterialTag = ctmEffectiveMaterialIds.Contains("plant")
-                            || AutoPbrDefaults.PlantTextureKeys.Contains(relativePathNoExt),
-                        HasBrickMaterialTag = ctmEffectiveMaterialIds.Contains("brick"),
-                        Overrides =
-                        {
-                            InvertSpecular = ctmEffectiveMaterialIds.Contains("brick"),
-                            InvertHeight = OreCoalTextureRules.ShouldInvertHeight(name, relativePathNoExt)
-                        }
-                    };
-                    results.Add(ctmItem);
+                    yield return new ScanCandidate(file, name, ext, directoryPath, relativePathNoExt, false);
                 }
             }
 
-            // OptiFine plant/plants
-            if (options.FoliageMode != "Ignore All")
+            if (!FoliageModeResolver.IsIgnoreAll(options.FoliageMode))
             {
                 foreach (var plantFolder in new[] { "plant", "plants" })
                 {
@@ -274,62 +412,180 @@ internal static class TextureScanner
 
                     foreach (var file in Directory.EnumerateFiles(plantRoot, "*.png", SearchOption.AllDirectories))
                     {
-                        var fileName = Path.GetFileName(file);
-                        if (fileName.Contains("mcmeta", StringComparison.OrdinalIgnoreCase))
-                        {
-                            continue;
-                        }
-
                         var name = Path.GetFileNameWithoutExtension(file);
-                        if (name.EndsWith("_n", StringComparison.OrdinalIgnoreCase) ||
-                            name.EndsWith("_s", StringComparison.OrdinalIgnoreCase) ||
-                            name.EndsWith("_e", StringComparison.OrdinalIgnoreCase))
-                        {
-                            continue;
-                        }
-
                         var ext = Path.GetExtension(file);
                         var directoryPath = Path.GetDirectoryName(file) ?? plantRoot;
                         var relativeToNamespace = Path.GetRelativePath(
                             Path.Combine(extractedPackRoot, "assets", namespaceName),
-                            Path.Combine(directoryPath, name)
-                        ).Replace('/', '\\');
+                            Path.Combine(directoryPath, name)).Replace('/', '\\');
                         var relativePathNoExt = "\\" + namespaceName + "\\" + relativeToNamespace;
-                        if (options.IgnoreTextureKeys.Contains(relativePathNoExt))
-                        {
-                            continue;
-                        }
-
-                        var plantFolderSprite2DFoliage = GetSprite2DFoliageTarget(options, name, relativePathNoExt);
-                        if (FoliageModeResolver.IsIgnoreAll(options.FoliageMode) && plantFolderSprite2DFoliage)
-                        {
-                            continue;
-                        }
-
-                        var plantFolderMaterialIds = GetEffectiveMaterialTagIds(relativePathNoExt, options);
-                        var plantFolderItem = new TextureWorkItem
-                        {
-                            FullPath = file,
-                            DirectoryPath = directoryPath,
-                            Name = name,
-                            Extension = ext,
-                            RelativeKey = relativePathNoExt,
-                            SpecularOnly = false,
-                            IsPlantForNoHeight = FoliageModeResolver.IsNoHeight(options.FoliageMode) && plantFolderSprite2DFoliage,
-                            Sprite2DFoliageTarget = plantFolderSprite2DFoliage,
-                            HasPlantMaterialTag = true,
-                            HasBrickMaterialTag = plantFolderMaterialIds.Contains("brick"),
-                            Overrides =
-                            {
-                                InvertSpecular = plantFolderMaterialIds.Contains("brick"),
-                                InvertHeight = OreCoalTextureRules.ShouldInvertHeight(name, relativePathNoExt)
-                            }
-                        };
-                        results.Add(plantFolderItem);
+                        yield return new ScanCandidate(file, name, ext, directoryPath, relativePathNoExt, false);
                     }
                 }
             }
         }
+    }
+
+    public static IReadOnlyList<TextureWorkItem> ScanTextures(
+        string extractedPackRoot,
+        AutoPbrOptions options,
+        IProgress<ConversionProgress>? progress = null,
+        string? cachePackPath = null,
+        CancellationToken cancellationToken = default)
+    {
+        var results = new List<TextureWorkItem>();
+        var candidates = EnumerateScanCandidates(extractedPackRoot, options).ToList();
+        var totalCandidates = Math.Max(1, candidates.Count);
+        var processedCandidates = 0;
+        var rules = ResolveTagRules(options);
+        var tagCache = new ConcurrentDictionary<string, TagComputationResult>(StringComparer.OrdinalIgnoreCase);
+        var includedCandidates = new List<ScanCandidate>(candidates.Count);
+        var manualOverrides = options.ManualTagOverrides?.ToDictionary(
+            static kv => kv.Key,
+            static kv => (kv.Value.Added, kv.Value.Removed),
+            StringComparer.OrdinalIgnoreCase);
+        var signature = SharedEffectiveTagsCacheSignature.Compute(rules, options.SemanticOptions, manualOverrides);
+        var persistedSnapshot = SharedEffectiveTagsCachePersistence.Load(cachePackPath ?? extractedPackRoot);
+        var persistedEffectiveIdsByKey = new Dictionary<string, IReadOnlyList<string>>(StringComparer.OrdinalIgnoreCase);
+        if (persistedSnapshot is not null &&
+            string.Equals(persistedSnapshot.Signature, signature, StringComparison.Ordinal))
+        {
+            foreach (var kv in persistedSnapshot.EffectiveTagIdsByStorageKey)
+            {
+                persistedEffectiveIdsByKey[kv.Key] = kv.Value;
+            }
+        }
+
+        var noMlCandidates = new List<ScanCandidate>();
+        var mlCandidates = new List<ScanCandidate>();
+        var optifineCandidates = 0;
+        var optifineNumericMlSkipped = 0;
+
+        foreach (var candidate in candidates)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var processed = Interlocked.Increment(ref processedCandidates);
+            progress?.Report(new ConversionProgress(
+                ConversionStage.ScanningTextures,
+                processed,
+                totalCandidates,
+                Path.GetFileName(candidate.File)));
+
+            if (IsSkippableByFilename(candidate.File) || IsIgnoredByKey(candidate, options))
+            {
+                continue;
+            }
+
+            includedCandidates.Add(candidate);
+
+            if (persistedEffectiveIdsByKey.TryGetValue(candidate.RelativePathNoExt, out var persistedIds))
+            {
+                tagCache[candidate.RelativePathNoExt] = BuildTagComputationResultFromEffectiveIds(candidate, persistedIds);
+                continue;
+            }
+
+            if (IsOptifinePath(candidate.RelativePathNoExt))
+            {
+                optifineCandidates++;
+                if (IsNumericOnlyOptifineTile(candidate.Name, candidate.RelativePathNoExt))
+                {
+                    optifineNumericMlSkipped++;
+                }
+            }
+
+            if (ShouldRunSemanticMlForCandidate(candidate, options, rules))
+            {
+                mlCandidates.Add(candidate);
+            }
+            else
+            {
+                noMlCandidates.Add(candidate);
+            }
+        }
+
+        var optifineFolderMaterialHints = BuildNumericOptifineFolderMaterialHints(
+            noMlCandidates,
+            options,
+            rules,
+            cancellationToken);
+
+        Parallel.ForEach(
+            noMlCandidates,
+            new ParallelOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = ResolveMaxParallelism(options)
+            },
+            candidate =>
+            {
+                IReadOnlyCollection<string>? inheritedMaterialTagIds = null;
+                if (IsNumericOnlyOptifineTile(candidate.Name, candidate.RelativePathNoExt) &&
+                    GetParentRelativePathNoExt(candidate.RelativePathNoExt) is { } parentKey &&
+                    optifineFolderMaterialHints.TryGetValue(parentKey, out var parentMaterialIds))
+                {
+                    inheritedMaterialTagIds = parentMaterialIds;
+                }
+
+                var computed = ComputeTagsForCandidate(
+                    candidate,
+                    options,
+                    rules,
+                    deferSemanticMl: true,
+                    inheritedMaterialTagIds);
+                tagCache.TryAdd(candidate.RelativePathNoExt, computed);
+            });
+
+        // Phase 2: only ambiguous textures run semantic ML.
+        var totalWork = totalCandidates + mlCandidates.Count;
+        var optifineMlCandidates = mlCandidates.Count(static c =>
+            IsOptifinePath(c.RelativePathNoExt));
+        progress?.Report(new ConversionProgress(
+            ConversionStage.ScanningTextures,
+            totalCandidates,
+            Math.Max(1, totalWork),
+            null,
+            $"Scan candidates: {totalCandidates} (OptiFine: {optifineCandidates}) | ML candidates: {mlCandidates.Count} (OptiFine: {optifineMlCandidates}) | OptiFine numeric ML skipped: {optifineNumericMlSkipped} | OptiFine folder hints: {optifineFolderMaterialHints.Count} | Cached tags: {persistedEffectiveIdsByKey.Count}"));
+        var mlDone = 0;
+        foreach (var candidate in mlCandidates)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (tagCache.ContainsKey(candidate.RelativePathNoExt))
+            {
+                continue;
+            }
+
+            tagCache[candidate.RelativePathNoExt] = ComputeTagsForCandidate(candidate, options, rules, deferSemanticMl: false);
+            mlDone++;
+            progress?.Report(new ConversionProgress(
+                ConversionStage.ScanningTextures,
+                totalCandidates + mlDone,
+                Math.Max(1, totalWork),
+                Path.GetFileName(candidate.File)));
+        }
+
+        foreach (var candidate in includedCandidates)
+        {
+            if (!tagCache.TryGetValue(candidate.RelativePathNoExt, out var tags))
+            {
+                continue;
+            }
+
+            if (FoliageModeResolver.IsIgnoreAll(options.FoliageMode) && tags.Sprite2DFoliageTarget)
+            {
+                continue;
+            }
+
+            results.Add(BuildWorkItem(candidate, tags, options));
+        }
+
+        var persistMap = tagCache.ToDictionary(
+            static kv => kv.Key,
+            static kv => kv.Value.EffectiveTagIds,
+            StringComparer.OrdinalIgnoreCase);
+        SharedEffectiveTagsCachePersistence.Save(
+            cachePackPath ?? extractedPackRoot,
+            signature,
+            persistMap);
 
         return results;
     }

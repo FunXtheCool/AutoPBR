@@ -5,7 +5,7 @@ namespace AutoPBR.Core.Tests;
 public sealed class MlSpecularModelMapParsingTests
 {
     [Fact]
-    public void Parses_resolution_and_path()
+    public void ParsesResolutionAndPath()
     {
         Assert.True(MlSpecularModelMapParsing.TryParseMapEntry("16=C:\\models\\m.onnx", out var res, out var path, out var err));
         Assert.Equal(16, res);
@@ -14,14 +14,14 @@ public sealed class MlSpecularModelMapParsingTests
     }
 
     [Fact]
-    public void Rejects_missing_equals()
+    public void RejectsMissingEquals()
     {
         Assert.False(MlSpecularModelMapParsing.TryParseMapEntry("16xfile.onnx", out _, out _, out var err));
         Assert.NotNull(err);
     }
 
     [Fact]
-    public void Rejects_empty_path()
+    public void RejectsEmptyPath()
     {
         Assert.False(MlSpecularModelMapParsing.TryParseMapEntry("32=", out _, out _, out var err));
         Assert.NotNull(err);

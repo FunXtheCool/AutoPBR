@@ -32,12 +32,15 @@ internal sealed class ExploreTreeController : IArchiveNodeHost, IDisposable
     private Func<IReadOnlyList<TagRule>>? _tagRulesProvider;
     private Func<MaterialTagSemanticOptions?>? _materialTagSemanticOptionsProvider;
     private IBackgroundTaskSink? _backgroundTaskSink;
+    private Action<string>? _debugSink;
 
     /// <summary>Maps texture storage key → effective tag ids for &quot;Show tag&quot; filtering (avoids re-running ML/keywords per node on every filter pass).</summary>
     private Dictionary<string, HashSet<string>>? _exploreTagFilterCache;
 
     /// <summary>Pre-computed effective tags per archive path. Populated by background refresh; read by <see cref="IArchiveNodeHost.GetEffectiveTags"/>.</summary>
     private readonly ConcurrentDictionary<string, IReadOnlyList<(string Id, string DisplayName, TagRuleKind Kind)>> _effectiveTagCache = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, IReadOnlyList<string>> _effectiveTagIdsByStorageKey = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, IReadOnlyList<string>> _optifineFolderMaterialHintIdsByRuleKey = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, byte> _effectiveTagComputeInFlight = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>Bumped when tag semantics are refreshed so in-flight per-path background computes cannot overwrite newer cache entries.</summary>
@@ -60,6 +63,7 @@ internal sealed class ExploreTreeController : IArchiveNodeHost, IDisposable
 
     /// <summary>Optional UI progress for background tag work (dictionary + ML per texture).</summary>
     public void SetBackgroundTaskSink(IBackgroundTaskSink? sink) => _backgroundTaskSink = sink;
+    public void SetDebugSink(Action<string>? sink) => _debugSink = sink;
 
     /// <summary>Set scanned data and build the tree root. Call on UI thread. Returns the new root (also assign to VM's ScannedArchiveRoot). Loads persisted tag overrides for this pack.</summary>
     /// <param name="data">Scanned index (single archive or merged batch folder).</param>
@@ -71,6 +75,8 @@ internal sealed class ExploreTreeController : IArchiveNodeHost, IDisposable
         _scannedArchivePath = data.IsBatch ? data.BatchFolderPath ?? packPath : packPath;
         _tagAdded.Clear();
         _tagRemoved.Clear();
+        _effectiveTagIdsByStorageKey.Clear();
+        _optifineFolderMaterialHintIdsByRuleKey.Clear();
         var snapshot = TagOverridesPersistence.Load(_scannedArchivePath);
         if (snapshot?.Overrides is not null)
         {
@@ -88,6 +94,8 @@ internal sealed class ExploreTreeController : IArchiveNodeHost, IDisposable
             }
         }
 
+        TryLoadEffectiveTagsCache();
+        _debugSink?.Invoke("Explore: scan data loaded, tag cache restored if signature matched.");
         Root = new ArchiveNode("", "", true, null, this);
         ((IArchiveNodeHost)this).EnsureChildrenLoaded(Root);
         InvalidateExploreTagFilterCache();
@@ -109,6 +117,8 @@ internal sealed class ExploreTreeController : IArchiveNodeHost, IDisposable
         _tagAdded.Clear();
         _tagRemoved.Clear();
         _effectiveTagCache.Clear();
+        _effectiveTagIdsByStorageKey.Clear();
+        _optifineFolderMaterialHintIdsByRuleKey.Clear();
         _effectiveTagComputeInFlight.Clear();
         _folderVisibilityCache.Clear();
         InvalidateExploreTagFilterCache();
@@ -204,6 +214,7 @@ internal sealed class ExploreTreeController : IArchiveNodeHost, IDisposable
 
         if (deferredTagRefresh.Count > 0)
         {
+            _ = QueueBackgroundEffectiveTagComputeBatchAsync(deferredTagRefresh.Select(static n => n.FullPath).ToList());
             // Spread tag row work across frames so a folder with hundreds of textures stays responsive.
             const int chunk = 40;
             void PostChunk(int start)
@@ -970,6 +981,11 @@ internal sealed class ExploreTreeController : IArchiveNodeHost, IDisposable
                     }
 
                     _effectiveTagCache[archivePath] = computed;
+                    var storageKey = ResolveTagStorageKey(archivePath);
+                    if (!string.IsNullOrEmpty(storageKey))
+                    {
+                        _effectiveTagIdsByStorageKey[storageKey] = computed.Select(static t => t.Id).ToList();
+                    }
                     await Dispatcher.UIThread.InvokeAsync(() =>
                     {
                         FindNodeByFullPath(archivePath)?.RefreshDisplayTags();
@@ -1000,6 +1016,61 @@ internal sealed class ExploreTreeController : IArchiveNodeHost, IDisposable
         finally
         {
             Interlocked.Decrement(ref _tagAsyncWorkPending);
+        }
+    }
+
+    private async Task QueueBackgroundEffectiveTagComputeBatchAsync(List<string> archivePaths)
+    {
+        if (archivePaths.Count == 0)
+        {
+            return;
+        }
+
+        _debugSink?.Invoke($"Explore ML batch: queued {archivePaths.Count} path(s).");
+        Interlocked.Increment(ref _tagAsyncWorkPending);
+        try
+        {
+            foreach (var archivePath in archivePaths)
+            {
+                if (!_effectiveTagComputeInFlight.TryAdd(archivePath, 0))
+                {
+                    continue;
+                }
+
+                await _tagComputeConcurrency.WaitAsync().ConfigureAwait(false);
+                try
+                {
+                    var epoch = Volatile.Read(ref _effectiveTagEpoch);
+                    var computed = await Task.Run(() =>
+                            ComputeEffectiveTags(archivePath, includeDictionaryEvidence: true, deferSemanticMl: false))
+                        .ConfigureAwait(false);
+                    if (Volatile.Read(ref _effectiveTagEpoch) != epoch)
+                    {
+                        continue;
+                    }
+
+                    _effectiveTagCache[archivePath] = computed;
+                    var storageKey = ResolveTagStorageKey(archivePath);
+                    if (!string.IsNullOrEmpty(storageKey))
+                    {
+                        _effectiveTagIdsByStorageKey[storageKey] = computed.Select(static t => t.Id).ToList();
+                    }
+                }
+                catch
+                {
+                    // best effort
+                }
+                finally
+                {
+                    _tagComputeConcurrency.Release();
+                    _effectiveTagComputeInFlight.TryRemove(archivePath, out _);
+                }
+            }
+        }
+        finally
+        {
+            Interlocked.Decrement(ref _tagAsyncWorkPending);
+            _debugSink?.Invoke("Explore ML batch: complete.");
         }
     }
 
@@ -1083,6 +1154,16 @@ internal sealed class ExploreTreeController : IArchiveNodeHost, IDisposable
         var name = Path.GetFileNameWithoutExtension(archivePath);
         var rules = _tagRulesProvider?.Invoke() ?? TagRulePresets.Default;
         var sem = _materialTagSemanticOptionsProvider?.Invoke();
+        var isNumericOptifineTile = IsNumericOnlyOptifineTile(name, ruleKey);
+        if (isNumericOptifineTile)
+        {
+            deferSemanticMl = true;
+        }
+
+        if (deferSemanticMl && !includeDictionaryEvidence)
+        {
+            deferSemanticMl = ShouldDeferSemanticMl(archivePath);
+        }
         var added = _tagAdded.GetValueOrDefault(storageKey);
         var removed = _tagRemoved.GetValueOrDefault(storageKey);
         var effectiveIds = ConversionEffectiveTags.ComputeEffectiveTagIds(
@@ -1094,17 +1175,197 @@ internal sealed class ExploreTreeController : IArchiveNodeHost, IDisposable
             deferSemanticMl,
             added,
             removed);
+        var effective = new HashSet<string>(effectiveIds, StringComparer.OrdinalIgnoreCase);
+        if (isNumericOptifineTile && includeDictionaryEvidence)
+        {
+            var parentRuleKey = GetParentRuleRelativeKey(ruleKey);
+            if (!string.IsNullOrEmpty(parentRuleKey))
+            {
+                var inheritedMaterialIds = GetOrComputeOptifineFolderMaterialHintIds(parentRuleKey, rules, sem);
+                if (inheritedMaterialIds.Count > 0)
+                {
+                    HashSet<string>? removedSet = null;
+                    if (removed is { Count: > 0 })
+                    {
+                        removedSet = new HashSet<string>(removed, StringComparer.OrdinalIgnoreCase);
+                    }
+
+                    foreach (var inheritedId in inheritedMaterialIds)
+                    {
+                        if (removedSet is not null && removedSet.Contains(inheritedId))
+                        {
+                            continue;
+                        }
+
+                        effective.Add(inheritedId);
+                    }
+                }
+            }
+        }
 
         var result = new List<(string Id, string DisplayName, TagRuleKind Kind)>();
         foreach (var rule in rules)
         {
-            if (effectiveIds.Contains(rule.Id, StringComparer.OrdinalIgnoreCase))
+            if (effective.Contains(rule.Id))
             {
                 result.Add((rule.Id, rule.DisplayName, rule.Kind));
             }
         }
 
+        _effectiveTagIdsByStorageKey[storageKey] = result.Select(static t => t.Id).ToList();
         return result;
+    }
+
+    private bool ShouldDeferSemanticMl(string archivePath)
+    {
+        var sem = _materialTagSemanticOptionsProvider?.Invoke();
+        if (sem is not { Enabled: true, Matcher: not null })
+        {
+            return false;
+        }
+
+        var storageKey = ResolveTagStorageKey(archivePath);
+        if (string.IsNullOrEmpty(storageKey))
+        {
+            return true;
+        }
+
+        var rules = _tagRulesProvider?.Invoke() ?? TagRulePresets.Default;
+        var ruleKey = RuleRelativeKeyFromStorageKey(storageKey);
+        var name = Path.GetFileNameWithoutExtension(archivePath);
+        if (IsNumericOnlyOptifineTile(name, ruleKey))
+        {
+            return true;
+        }
+
+        var heuristicMaterialIds = TagRulePresets.GetMatchingMaterialTagIds(name, ruleKey, rules);
+        if (heuristicMaterialIds.Count > 0)
+        {
+            return false;
+        }
+
+        var materialRuleIds = new HashSet<string>(
+            rules.Where(r => r.Kind == TagRuleKind.Material).Select(r => r.Id),
+            StringComparer.OrdinalIgnoreCase);
+        if (_tagAdded.TryGetValue(storageKey, out var addedSet))
+        {
+            lock (addedSet)
+            {
+                foreach (var id in addedSet)
+                {
+                    if (materialRuleIds.Contains(id))
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private static bool IsNumericOnlyOptifineTile(string textureName, string ruleRelativeKey)
+    {
+        if (!IsOptifineRuleRelativeKey(ruleRelativeKey))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(textureName))
+        {
+            return false;
+        }
+
+        for (var i = 0; i < textureName.Length; i++)
+        {
+            if (!char.IsDigit(textureName[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool IsOptifineRuleRelativeKey(string ruleRelativeKey) =>
+        ruleRelativeKey.Contains("\\optifine\\", StringComparison.OrdinalIgnoreCase);
+
+    private static string? GetParentRuleRelativeKey(string ruleRelativeKey)
+    {
+        var lastSlash = ruleRelativeKey.LastIndexOf('\\');
+        if (lastSlash <= 0)
+        {
+            return null;
+        }
+
+        return ruleRelativeKey[..lastSlash];
+    }
+
+    private static string GetRuleRelativeLeafName(string ruleRelativeKey)
+    {
+        var lastSlash = ruleRelativeKey.LastIndexOf('\\');
+        if (lastSlash < 0 || lastSlash == ruleRelativeKey.Length - 1)
+        {
+            return ruleRelativeKey;
+        }
+
+        return ruleRelativeKey[(lastSlash + 1)..];
+    }
+
+    private IReadOnlyList<string> GetOrComputeOptifineFolderMaterialHintIds(
+        string folderRuleKey,
+        IReadOnlyList<TagRule> rules,
+        MaterialTagSemanticOptions? sem)
+    {
+        if (string.IsNullOrWhiteSpace(folderRuleKey) || !IsOptifineRuleRelativeKey(folderRuleKey))
+        {
+            return [];
+        }
+
+        return _optifineFolderMaterialHintIdsByRuleKey.GetOrAdd(folderRuleKey, key =>
+        {
+            var materialRuleIds = new HashSet<string>(
+                rules.Where(r => r.Kind == TagRuleKind.Material).Select(r => r.Id),
+                StringComparer.OrdinalIgnoreCase);
+            if (materialRuleIds.Count == 0)
+            {
+                return [];
+            }
+
+            var folderName = GetRuleRelativeLeafName(key);
+            if (string.IsNullOrWhiteSpace(folderName))
+            {
+                return [];
+            }
+
+            var heuristicMaterialIds = TagRulePresets.GetMatchingMaterialTagIds(folderName, key, rules);
+            if (heuristicMaterialIds.Count > 0)
+            {
+                return heuristicMaterialIds
+                    .Where(materialRuleIds.Contains)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToArray();
+            }
+
+            if (sem is not { Enabled: true, Matcher: not null })
+            {
+                return [];
+            }
+
+            var inferredMaterialIds = ConversionEffectiveTags.ComputeEffectiveTagIds(
+                folderName,
+                key,
+                rules,
+                sem,
+                includeDictionaryEvidence: sem.DictionaryEvidenceEnabled,
+                deferSemanticMl: false,
+                added: null,
+                removed: null)
+                .Where(materialRuleIds.Contains)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+            return inferredMaterialIds;
+        });
     }
 
     void IArchiveNodeHost.ApplyManualTagToggle(string archivePath, string tagId, bool wantApplied)
@@ -1141,6 +1402,7 @@ internal sealed class ExploreTreeController : IArchiveNodeHost, IDisposable
         }
 
         PersistTagOverrides();
+        PersistEffectiveTagCache();
         _effectiveTagCache[archivePath] = ComputeEffectiveTags(archivePath, includeDictionaryEvidence: true);
         RefreshExploreTagFilterCacheEntry(archivePath);
         var node = FindNodeByFullPath(archivePath);
@@ -1247,6 +1509,7 @@ internal sealed class ExploreTreeController : IArchiveNodeHost, IDisposable
         Interlocked.Increment(ref _effectiveTagEpoch);
 
         _effectiveTagCache.Clear();
+        _optifineFolderMaterialHintIdsByRuleKey.Clear();
         InvalidateExploreTagFilterCache();
 
         var paths = CollectFileNodePaths(Root);
@@ -1271,7 +1534,7 @@ internal sealed class ExploreTreeController : IArchiveNodeHost, IDisposable
                     {
                         cts.Token.ThrowIfCancellationRequested();
                         var path = paths[i];
-                        var tags = ComputeEffectiveTags(path, includeDictionaryEvidence: true);
+                        var tags = ComputeEffectiveTags(path, includeDictionaryEvidence: true, deferSemanticMl: ShouldDeferSemanticMl(path));
                         _effectiveTagCache[path] = tags;
                         sink?.ReportTask(BackgroundTaskIds.MaterialTags, (double)(i + 1) / total);
                     }
@@ -1297,6 +1560,7 @@ internal sealed class ExploreTreeController : IArchiveNodeHost, IDisposable
                 NotifyAllDisplayTagsRecursive(Root);
                 ApplyExploreFilterIfNeeded();
             });
+            PersistEffectiveTagCache();
         }
         finally
         {
@@ -1310,9 +1574,12 @@ internal sealed class ExploreTreeController : IArchiveNodeHost, IDisposable
         _tagAdded.Clear();
         _tagRemoved.Clear();
         _effectiveTagCache.Clear();
+        _effectiveTagIdsByStorageKey.Clear();
+        _optifineFolderMaterialHintIdsByRuleKey.Clear();
         Interlocked.Increment(ref _effectiveTagEpoch);
         InvalidateExploreTagFilterCache();
         PersistTagOverrides();
+        PersistEffectiveTagCache();
         RefreshAllDisplayTags();
     }
 
@@ -1475,10 +1742,137 @@ internal sealed class ExploreTreeController : IArchiveNodeHost, IDisposable
 
     public void Dispose()
     {
+        PersistEffectiveTagCache();
         _tagRefreshCts?.Cancel();
         _refreshDisplayTagsDebounceCts?.Cancel();
         _tagRefreshCts?.Dispose();
         _refreshDisplayTagsDebounceCts?.Dispose();
         _tagComputeConcurrency.Dispose();
+    }
+
+    private string ComputeEffectiveTagCacheSignature()
+    {
+        var rules = _tagRulesProvider?.Invoke() ?? TagRulePresets.Default;
+        var sem = _materialTagSemanticOptionsProvider?.Invoke();
+        var manualOverrides = new Dictionary<string, (IReadOnlyList<string> Added, IReadOnlyList<string> Removed)>(
+            StringComparer.OrdinalIgnoreCase);
+        foreach (var key in _tagAdded.Keys.Union(_tagRemoved.Keys))
+        {
+            IReadOnlyList<string> added = [];
+            if (_tagAdded.TryGetValue(key, out var addSet))
+            {
+                lock (addSet)
+                {
+                    added = addSet.ToList();
+                }
+            }
+
+            IReadOnlyList<string> removed = [];
+            if (_tagRemoved.TryGetValue(key, out var remSet))
+            {
+                lock (remSet)
+                {
+                    removed = remSet.ToList();
+                }
+            }
+
+            manualOverrides[key] = (added, removed);
+        }
+
+        return SharedEffectiveTagsCacheSignature.Compute(rules, sem, manualOverrides);
+    }
+
+    private void TryLoadEffectiveTagsCache()
+    {
+        if (string.IsNullOrWhiteSpace(_scannedArchivePath))
+        {
+            return;
+        }
+
+        var snapshot = SharedEffectiveTagsCachePersistence.Load(_scannedArchivePath);
+        if (snapshot is null)
+        {
+            _debugSink?.Invoke("Explore cache: no persisted effective-tag cache found.");
+            return;
+        }
+
+        var signature = ComputeEffectiveTagCacheSignature();
+        if (!string.Equals(snapshot.Signature, signature, StringComparison.Ordinal))
+        {
+            _debugSink?.Invoke("Explore cache: signature mismatch, persisted cache ignored.");
+            return;
+        }
+
+        var rules = _tagRulesProvider?.Invoke() ?? TagRulePresets.Default;
+        foreach (var kv in snapshot.EffectiveTagIdsByStorageKey)
+        {
+            var tuples = new List<(string Id, string DisplayName, TagRuleKind Kind)>();
+            foreach (var id in kv.Value)
+            {
+                var rule = rules.FirstOrDefault(r => string.Equals(r.Id, id, StringComparison.OrdinalIgnoreCase));
+                if (rule is not null)
+                {
+                    tuples.Add((rule.Id, rule.DisplayName, rule.Kind));
+                }
+            }
+
+            var archivePath = StorageKeyToArchivePath(kv.Key);
+            if (archivePath is not null)
+            {
+                _effectiveTagCache[archivePath] = tuples;
+            }
+
+            _effectiveTagIdsByStorageKey[kv.Key] = kv.Value;
+        }
+
+        _debugSink?.Invoke($"Explore cache: loaded {_effectiveTagIdsByStorageKey.Count} effective-tag entries.");
+    }
+
+    private void PersistEffectiveTagCache()
+    {
+        if (string.IsNullOrWhiteSpace(_scannedArchivePath))
+        {
+            return;
+        }
+
+        SharedEffectiveTagsCachePersistence.Save(
+            _scannedArchivePath,
+            ComputeEffectiveTagCacheSignature(),
+            _effectiveTagIdsByStorageKey);
+    }
+
+    private string? StorageKeyToArchivePath(string storageKey)
+    {
+        if (Data is null)
+        {
+            return null;
+        }
+
+        if (Data.IsBatch)
+        {
+            var split = storageKey.IndexOf('|');
+            if (split <= 0)
+            {
+                return null;
+            }
+
+            var packRoot = storageKey[..split];
+            var key = storageKey[(split + 1)..];
+            var archive = TextureKeyToArchivePath(key);
+            return archive is null ? null : packRoot + "/" + archive;
+        }
+
+        return TextureKeyToArchivePath(storageKey);
+    }
+
+    private static string? TextureKeyToArchivePath(string key)
+    {
+        var normalized = key.Replace('\\', '/').TrimStart('/');
+        if (string.IsNullOrWhiteSpace(normalized))
+        {
+            return null;
+        }
+
+        return "assets/" + normalized + ".png";
     }
 }

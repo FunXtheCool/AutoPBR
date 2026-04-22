@@ -10,15 +10,23 @@ namespace AutoPBR.Core.Embeddings;
 public sealed class MiniLmEmbeddingEngine : IDisposable
 {
     private const int MaxSequenceLength = 128;
+    private const int MaxPersistentEntries = 40000;
 
     private readonly InferenceSession _session;
     private readonly BertTokenizer _tokenizer;
     private readonly object _runLock = new();
+    private readonly object _cacheLock = new();
+    private readonly string _modelSignature;
+    private readonly Dictionary<string, MiniLmEmbeddingCacheEntry> _persistentCache = new(StringComparer.Ordinal);
+    private bool _persistentCacheDirty;
+    private int _vectorDimension;
 
-    private MiniLmEmbeddingEngine(InferenceSession session, BertTokenizer tokenizer)
+    private MiniLmEmbeddingEngine(InferenceSession session, BertTokenizer tokenizer, string modelSignature)
     {
         _session = session;
         _tokenizer = tokenizer;
+        _modelSignature = modelSignature;
+        LoadPersistentCache();
     }
 
     public static MiniLmEmbeddingEngine? TryCreate(string? baseDirectory = null)
@@ -33,7 +41,10 @@ public sealed class MiniLmEmbeddingEngine : IDisposable
         try
         {
             var session = new InferenceSession(modelPath);
-            return new MiniLmEmbeddingEngine(session, tokenizer);
+            var modelSignature = MiniLmEmbeddingPersistentCache.ComputeModelSignature(
+                modelPath,
+                MiniLmOnnxResources.GetVocabPath(baseDirectory));
+            return new MiniLmEmbeddingEngine(session, tokenizer, modelSignature);
         }
         catch
         {
@@ -44,65 +55,231 @@ public sealed class MiniLmEmbeddingEngine : IDisposable
     /// <summary>Returns a normalized embedding, or null if the model run fails.</summary>
     public float[]? EmbedText(string text)
     {
-        if (string.IsNullOrWhiteSpace(text))
+        var map = EmbedTexts([text]);
+        return map.GetValueOrDefault(text);
+    }
+
+    /// <summary>
+    /// Returns normalized embeddings for a batch of distinct texts.
+    /// Missing entries indicate failed tokenization/inference for that input.
+    /// </summary>
+    public Dictionary<string, float[]> EmbedTexts(IReadOnlyCollection<string> texts)
+    {
+        var result = new Dictionary<string, float[]>(StringComparer.Ordinal);
+        if (texts.Count == 0)
         {
-            return null;
+            return result;
         }
 
-        var ids = _tokenizer.EncodeToIds(
-            text,
-            MaxSequenceLength,
-            addSpecialTokens: true,
-            out _,
-            out _);
-
-        var seqLen = Math.Min(MaxSequenceLength, ids.Count);
-        var inputIds = new long[MaxSequenceLength];
-        var attention = new long[MaxSequenceLength];
-        for (var i = 0; i < seqLen; i++)
+        var unique = new List<string>(texts.Count);
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var t in texts)
         {
-            inputIds[i] = ids[i];
-            attention[i] = 1;
+            if (string.IsNullOrWhiteSpace(t))
+            {
+                continue;
+            }
+
+            if (seen.Add(t))
+            {
+                unique.Add(t);
+            }
+        }
+        if (unique.Count == 0)
+        {
+            return result;
         }
 
+        var nowTicks = DateTime.UtcNow.Ticks;
+        var missing = new List<string>(unique.Count);
+        lock (_cacheLock)
+        {
+            foreach (var text in unique)
+            {
+                if (_persistentCache.TryGetValue(text, out var cached))
+                {
+                    if (_vectorDimension <= 0)
+                    {
+                        _vectorDimension = cached.Vector.Length;
+                    }
+
+                    if (_vectorDimension > 0 && cached.Vector.Length != _vectorDimension)
+                    {
+                        missing.Add(text);
+                        continue;
+                    }
+
+                    cached.LastAccessUtcTicks = nowTicks;
+                    result[text] = cached.Vector;
+                }
+                else
+                {
+                    missing.Add(text);
+                }
+            }
+        }
+
+        if (missing.Count == 0)
+        {
+            return result;
+        }
+
+        var batchSize = missing.Count;
+        var inputIds = new long[batchSize * MaxSequenceLength];
+        var attention = new long[batchSize * MaxSequenceLength];
         var padId = (long)_tokenizer.PaddingTokenId;
-        for (var i = seqLen; i < MaxSequenceLength; i++)
+
+        for (var row = 0; row < batchSize; row++)
         {
-            inputIds[i] = padId;
-            attention[i] = 0;
+            var ids = _tokenizer.EncodeToIds(
+                missing[row],
+                MaxSequenceLength,
+                addSpecialTokens: true,
+                out _,
+                out _);
+            var seqLen = Math.Min(MaxSequenceLength, ids.Count);
+            var rowOffset = row * MaxSequenceLength;
+            for (var i = 0; i < seqLen; i++)
+            {
+                inputIds[rowOffset + i] = ids[i];
+                attention[rowOffset + i] = 1;
+            }
+
+            for (var i = seqLen; i < MaxSequenceLength; i++)
+            {
+                inputIds[rowOffset + i] = padId;
+                attention[rowOffset + i] = 0;
+            }
         }
 
-        var inputIdsTensor = new DenseTensor<long>(inputIds, [1, MaxSequenceLength]);
-        var attentionTensor = new DenseTensor<long>(attention, [1, MaxSequenceLength]);
-
+        var inputIdsTensor = new DenseTensor<long>(inputIds, [batchSize, MaxSequenceLength]);
+        var attentionTensor = new DenseTensor<long>(attention, [batchSize, MaxSequenceLength]);
         var inputs = new List<NamedOnnxValue>
         {
             NamedOnnxValue.CreateFromTensor("input_ids", inputIdsTensor),
             NamedOnnxValue.CreateFromTensor("attention_mask", attentionTensor),
         };
 
-        // Copy outputs to managed memory before disposing Run results — native tensor buffers are freed with the session run.
-        float[]? vec;
+        float[] flat;
+        int embeddingDim;
         lock (_runLock)
         {
             using var results = _session.Run(inputs);
-            var sentence = results.FirstOrDefault(o => o.Name == "sentence_embedding")?.AsTensor<float>() as DenseTensor<float>;
-            if (sentence is null || sentence.Length == 0)
+            DenseTensor<float>? sentence = null;
+            foreach (var output in results)
             {
-                return null;
+                if (!string.Equals(output.Name, "sentence_embedding", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                sentence = output.AsTensor<float>() as DenseTensor<float>;
+                break;
             }
 
-            var dim = sentence.Dimensions[^1];
-            if (dim <= 0)
+            if (sentence is null || sentence.Length == 0 || sentence.Rank < 2)
             {
-                return null;
+                return result;
             }
 
-            vec = sentence.ToArray();
+            embeddingDim = sentence.Dimensions[^1];
+            if (embeddingDim <= 0)
+            {
+                return result;
+            }
+
+            flat = sentence.ToArray();
         }
 
-        NormalizeInPlace(vec);
-        return vec;
+        for (var row = 0; row < batchSize; row++)
+        {
+            var vec = new float[embeddingDim];
+            Array.Copy(flat, row * embeddingDim, vec, 0, embeddingDim);
+            NormalizeInPlace(vec);
+            var text = missing[row];
+            result[text] = vec;
+            lock (_cacheLock)
+            {
+                _vectorDimension = embeddingDim;
+                _persistentCache[text] = new MiniLmEmbeddingCacheEntry
+                {
+                    Text = text,
+                    Vector = vec,
+                    LastAccessUtcTicks = nowTicks
+                };
+                _persistentCacheDirty = true;
+            }
+        }
+
+        return result;
+    }
+
+    private void LoadPersistentCache()
+    {
+        var snapshot = MiniLmEmbeddingPersistentCache.Load(_modelSignature);
+        if (snapshot is null || snapshot.Entries.Count == 0)
+        {
+            return;
+        }
+
+        if (snapshot.VectorDimension <= 0)
+        {
+            return;
+        }
+
+        lock (_cacheLock)
+        {
+            _vectorDimension = snapshot.VectorDimension;
+            foreach (var entry in snapshot.Entries)
+            {
+                if (string.IsNullOrWhiteSpace(entry.Text) ||
+                    entry.Vector is null ||
+                    entry.Vector.Length != _vectorDimension)
+                {
+                    continue;
+                }
+
+                _persistentCache[entry.Text] = entry;
+            }
+        }
+    }
+
+    private void PersistCacheIfNeeded()
+    {
+        MiniLmEmbeddingCacheSnapshot? snapshot = null;
+        lock (_cacheLock)
+        {
+            if (!_persistentCacheDirty || _persistentCache.Count == 0 || _vectorDimension <= 0)
+            {
+                return;
+            }
+
+            if (_persistentCache.Count > MaxPersistentEntries)
+            {
+                var toRemove = _persistentCache.Values
+                    .OrderBy(static e => e.LastAccessUtcTicks)
+                    .Take(_persistentCache.Count - MaxPersistentEntries)
+                    .Select(static e => e.Text)
+                    .ToList();
+                foreach (var key in toRemove)
+                {
+                    _persistentCache.Remove(key);
+                }
+            }
+
+            snapshot = new MiniLmEmbeddingCacheSnapshot
+            {
+                ModelSignature = _modelSignature,
+                VectorDimension = _vectorDimension,
+                Entries = _persistentCache.Values
+                    .OrderByDescending(static e => e.LastAccessUtcTicks)
+                    .Take(MaxPersistentEntries)
+                    .ToList()
+            };
+            _persistentCacheDirty = false;
+        }
+
+        MiniLmEmbeddingPersistentCache.Save(snapshot);
     }
 
     private static void NormalizeInPlace(float[] v)
@@ -125,5 +302,9 @@ public sealed class MiniLmEmbeddingEngine : IDisposable
         }
     }
 
-    public void Dispose() => _session.Dispose();
+    public void Dispose()
+    {
+        PersistCacheIfNeeded();
+        _session.Dispose();
+    }
 }

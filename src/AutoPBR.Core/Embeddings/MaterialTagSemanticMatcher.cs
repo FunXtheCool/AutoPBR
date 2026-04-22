@@ -74,10 +74,14 @@ public sealed class MaterialTagSemanticMatcher : IDisposable
         var materialRules = rules
             .Where(r => !string.IsNullOrWhiteSpace(r.Id) && !r.Id.Equals("unknown", StringComparison.OrdinalIgnoreCase))
             .ToList();
+        var prototypesByRuleId = materialRules
+            .ToDictionary(r => r.Id, r => BuildPrototypePhrases(r, rules), StringComparer.OrdinalIgnoreCase);
+        PrimePrototypeCache(prototypesByRuleId.Values.SelectMany(static p => p));
 
         var dictionary = BuildDictionaryEvidence(
             queryText,
             materialRules,
+            prototypesByRuleId,
             dictionaryEvidenceEnabled,
             dictionaryProvider,
             dictionaryEvidenceWeight,
@@ -90,7 +94,7 @@ public sealed class MaterialTagSemanticMatcher : IDisposable
 
         foreach (var rule in materialRules)
         {
-            var protos = BuildPrototypePhrases(rule, rules);
+            var protos = prototypesByRuleId[rule.Id];
             if (protos.Count == 0)
             {
                 continue;
@@ -317,9 +321,13 @@ public sealed class MaterialTagSemanticMatcher : IDisposable
         var materialRules = rules
             .Where(r => !string.IsNullOrWhiteSpace(r.Id) && !r.Id.Equals("unknown", StringComparison.OrdinalIgnoreCase))
             .ToList();
+        var prototypesByRuleId = materialRules
+            .ToDictionary(r => r.Id, r => BuildPrototypePhrases(r, rules), StringComparer.OrdinalIgnoreCase);
+        PrimePrototypeCache(prototypesByRuleId.Values.SelectMany(static p => p));
         var dictionary = BuildDictionaryEvidence(
             queryText,
             materialRules,
+            prototypesByRuleId,
             dictionaryEvidenceEnabled,
             dictionaryProvider,
             dictionaryEvidenceWeight,
@@ -330,7 +338,7 @@ public sealed class MaterialTagSemanticMatcher : IDisposable
         var entries = new List<SemanticMatchDebugEntry>();
         foreach (var rule in materialRules)
         {
-            var protos = BuildPrototypePhrases(rule, rules);
+            var protos = prototypesByRuleId[rule.Id];
             if (protos.Count == 0)
             {
                 continue;
@@ -357,7 +365,7 @@ public sealed class MaterialTagSemanticMatcher : IDisposable
             }
 
             phraseScores.Sort((a, b) => b.Score.CompareTo(a.Score));
-            var dictScore = dictionary.ScoreByRuleId.TryGetValue(rule.Id, out var d) ? d : float.MinValue;
+            var dictScore = dictionary.ScoreByRuleId.GetValueOrDefault(rule.Id, float.MinValue);
             var fusedScore = bestScore > float.MinValue
                 ? (dictScore > float.MinValue
                     ? (1f - dictionary.Weight) * bestScore + dictionary.Weight * dictScore
@@ -380,7 +388,8 @@ public sealed class MaterialTagSemanticMatcher : IDisposable
 
     private DictionaryEvidence BuildDictionaryEvidence(
         string queryText,
-        IReadOnlyList<TagRule> materialRules,
+        List<TagRule> materialRules,
+        Dictionary<string, List<string>> prototypesByRuleId,
         bool dictionaryEvidenceEnabled,
         IDictionaryDefinitionProvider? dictionaryProvider,
         double dictionaryEvidenceWeight,
@@ -421,7 +430,7 @@ public sealed class MaterialTagSemanticMatcher : IDisposable
                 maxDefsPerTerm);
             if (termDefs.Count > 0)
             {
-                buckets.Add((term, termDefs.ToList(), termWeights[ti]));
+                buckets.Add((term, termDefs, termWeights[ti]));
             }
         }
 
@@ -487,10 +496,11 @@ public sealed class MaterialTagSemanticMatcher : IDisposable
 
         var weightedDefVecs = new List<(float[] Vec, float Weight)>(weightedDefs.Count);
         var defs = new List<string>(weightedDefs.Count);
+        var defVectors = _engine.EmbedTexts(weightedDefs.Select(static wd => wd.Def).ToList());
         foreach (var (def, w) in weightedDefs)
         {
             defs.Add(def);
-            var vec = _engine.EmbedText(def);
+            var vec = defVectors.GetValueOrDefault(def);
             if (vec is not null)
             {
                 weightedDefVecs.Add((vec, w));
@@ -512,7 +522,11 @@ public sealed class MaterialTagSemanticMatcher : IDisposable
         var scoreByRule = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase);
         foreach (var rule in materialRules)
         {
-            var protos = BuildPrototypePhrases(rule, materialRules);
+            if (!prototypesByRuleId.TryGetValue(rule.Id, out var protos))
+            {
+                continue;
+            }
+
             if (protos.Count == 0)
             {
                 continue;
@@ -561,10 +575,30 @@ public sealed class MaterialTagSemanticMatcher : IDisposable
         return new DictionaryEvidence(terms, defs, scoreByRule, applied, weight, debugTermBlocks);
     }
 
+    private void PrimePrototypeCache(IEnumerable<string> phrases)
+    {
+        var missing = phrases
+            .Where(static p => !string.IsNullOrWhiteSpace(p))
+            .Select(static p => p.Trim())
+            .Where(p => !_prototypeCache.ContainsKey(p))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        if (missing.Count == 0)
+        {
+            return;
+        }
+
+        var embedded = _engine.EmbedTexts(missing);
+        foreach (var kv in embedded)
+        {
+            _prototypeCache[kv.Key] = kv.Value;
+        }
+    }
+
     /// <summary>
     /// Down-weights <c>door</c> / <c>trapdoor</c> glosses; boosts the preceding term so material words (e.g. oak, iron) dominate.
     /// </summary>
-    private static float[] ComputeDoorTrapdoorDictionaryTermWeights(IReadOnlyList<string> terms)
+    private static float[] ComputeDoorTrapdoorDictionaryTermWeights(List<string> terms)
     {
         var w = new float[terms.Count];
         for (var i = 0; i < terms.Count; i++)
@@ -596,7 +630,7 @@ public sealed class MaterialTagSemanticMatcher : IDisposable
 
     /// <summary>Round-robin merge of definition lines; each line carries its source bucket weight for <see cref="Dot"/> scaling.</summary>
     private static List<(string Def, float Weight)> InterleaveWeightedDefinitionBuckets(
-        IReadOnlyList<(string Term, List<string> Defs, float Weight)> buckets,
+        List<(string Term, List<string> Defs, float Weight)> buckets,
         int maxTotal)
     {
         if (buckets.Count == 0 || maxTotal <= 0)
@@ -642,7 +676,7 @@ public sealed class MaterialTagSemanticMatcher : IDisposable
     }
 
     /// <summary>Calls the dictionary for every lemma variant and merges distinct gloss lines (per-term cap).</summary>
-    private static IReadOnlyList<string> LookupDefinitionsWithVariants(
+    private static List<string> LookupDefinitionsWithVariants(
         IDictionaryDefinitionProvider provider,
         string languageCode,
         string term,
@@ -668,7 +702,7 @@ public sealed class MaterialTagSemanticMatcher : IDisposable
             .ToList();
     }
 
-    private static IReadOnlyList<string> BuildDictionaryVariants(string term)
+    private static List<string> BuildDictionaryVariants(string term)
     {
         var t = term.Trim().ToLowerInvariant();
         if (t.Length == 0)
