@@ -11,7 +11,7 @@ public static class AutoPbrDefaults
     public const float DefaultMetallicBoost = 1f;
     public const int DefaultPorosityBias = 0;
 
-    /// <summary>Extra B-channel offset for plant-tagged textures (added to <see cref="AutoPbrOptions.PorosityBias"/>).</summary>
+    /// <summary>Extra B-channel offset for organic-tagged textures (added to <see cref="AutoPbrOptions.PorosityBias"/>).</summary>
     public const int DefaultPlantMaterialPorosityExtra = 48;
 
     /// <summary>See <see cref="AutoPbrOptions.MlSpecularHeuristicBlend"/>.</summary>
@@ -101,7 +101,7 @@ public static class AutoPbrDefaults
         "water_still.png",
     };
 
-    /// <summary>Known vanilla block texture keys (namespace-prefixed) used when the <c>plant</c> material tag is absent.</summary>
+    /// <summary>Known vanilla block texture keys (namespace-prefixed) used when the organic material tag is absent.</summary>
     public static readonly HashSet<string> PlantTextureKeys = new(StringComparer.OrdinalIgnoreCase)
     {
         "\\minecraft\\block\\acacia_sapling",

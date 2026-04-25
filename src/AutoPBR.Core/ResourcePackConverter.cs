@@ -51,7 +51,7 @@ public static class ResourcePackConverter
             cancellationToken.ThrowIfCancellationRequested();
 
             // ScanTextures enumerates PNGs and resolves per-texture material/flag tags (keyword + MiniLM + post-process + manual overrides).
-            // This must finish before conversion so brick/ore/plant rules apply to TextureWorkItem.Overrides.
+            // This must finish before conversion so brick/ore/organic rules apply to TextureWorkItem.Overrides.
             progress?.Report(new ConversionProgress(ConversionStage.ScanningTextures, 0, 1));
             var textures = TextureScanner.ScanTextures(
                 extracted,

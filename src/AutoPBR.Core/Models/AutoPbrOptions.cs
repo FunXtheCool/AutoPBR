@@ -87,7 +87,7 @@ public sealed class AutoPbrOptions
     public int PorosityBias { get; init; } = AutoPbrDefaults.DefaultPorosityBias;
 
     /// <summary>
-    /// Extra porosity B offset for textures with the plant material tag (or OptiFine plant/plants paths).
+    /// Extra porosity B offset for textures with the organic material tag (or OptiFine plant/plants paths).
     /// Added to <see cref="PorosityBias"/> for heuristic and ML specular B.
     /// </summary>
     public int PlantMaterialPorosityExtra { get; init; } = AutoPbrDefaults.DefaultPlantMaterialPorosityExtra;
@@ -140,16 +140,16 @@ public sealed class AutoPbrOptions
     public ISet<string> IgnoreTextureKeys { get; init; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Material tag definitions (keywords). Used by <see cref="TextureScanner"/> for plant-tag detection
+    /// Material tag definitions (keywords). Used by <see cref="TextureScanner"/> for organic-tag detection
     /// (<see cref="FoliageMode"/> "No Height" / "Ignore All"). When null or empty,
     /// <see cref="TagRulePresets.Default"/> is used.
     /// </summary>
     public IReadOnlyList<TagRule>? TagRules { get; init; }
 
     /// <summary>
-    /// Optional semantic ML options (MiniLM) used at scan time for plant-tag detection.
+    /// Optional semantic ML options (MiniLM) used at scan time for organic-tag detection.
     /// When non-null with <see cref="MaterialTagSemanticOptions.Enabled"/> = true, the scanner uses
-    /// ML-based material matching instead of keyword-only matching for foliage/plant handling.
+    /// ML-based material matching instead of keyword-only matching for foliage/organic handling.
     /// </summary>
     public MaterialTagSemanticOptions? SemanticOptions { get; init; }
 

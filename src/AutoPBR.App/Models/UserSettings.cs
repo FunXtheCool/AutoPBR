@@ -52,6 +52,7 @@ public sealed class UserSettings
     public double? PlantMaterialPorosityExtra { get; set; }
     public int MaxThreads { get; set; } // 0 = auto
     public string? TempDirectory { get; set; }
+    public bool DebugMode { get; set; }
     public string ColorScheme { get; set; } = "Dark";
 
     /// <summary>Interface scale (typically 0.75–1.75). 1.0 = 100%.</summary>

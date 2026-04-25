@@ -178,7 +178,7 @@
   <data name="DeepBumpForceBlue255" xml:space="preserve"><value>DeepBump नॉर्मल्स में B=255 मजबूर करें</value></data>
   <data name="Advanced" xml:space="preserve"><value>उन्नत</value></data>
   <data name="Preprocessing" xml:space="preserve"><value>प्री-प्रोसेसिंग</value></data>
-  <data name="PreprocessLinearize" xml:space="preserve"><value>डेरिवेटिव से पहले लीनियराइज़ (sRGB → linear)</value></data>
+  <data name="PreprocessLinearize" xml:space="preserve"><value>डेरिवेटिव से पहले लीनियराइज़ (sRGB → Linear)</value></data>
   <data name="PreprocessDenoiseRadius" xml:space="preserve"><value>डीनॉइज़ रेडियस</value></data>
   <data name="PreprocessDenoiseBlend" xml:space="preserve"><value>डीनॉइज़ ब्लेंड</value></data>
   <data name="PreprocessFrequencySplit" xml:space="preserve"><value>फ्रीक्वेंसी स्प्लिट (मैक्रो + डिटेल)</value></data>
@@ -204,10 +204,13 @@
   <data name="Particles" xml:space="preserve"><value>पार्टिकल</value></data>
   <data name="ParticlesTooltip" xml:space="preserve"><value>पार्टिकल टेक्सचर। सिर्फ स्पेक्युलर मैप जनरेट होते हैं।</value></data>
   <data name="FilterWatermark" xml:space="preserve"><value>फ़िल्टर (जैसे \block\stone)</value></data>
+  <data name="ExploreTagFilter" xml:space="preserve"><value>टैग दिखाएँ:</value></data>
+  <data name="ExploreTagFilterAll" xml:space="preserve"><value>सभी</value></data>
   <data name="Output" xml:space="preserve"><value>आउटपुट</value></data>
   <data name="OutputFolderWatermark" xml:space="preserve"><value>आउटपुट फोल्डर</value></data>
   <data name="OutputPathWatermark" xml:space="preserve"><value>आउटपुट पाथ</value></data>
   <data name="Engine" xml:space="preserve"><value>इंजन</value></data>
+  <data name="DebugMode" xml:space="preserve"><value>डिबग</value></data>
   <data name="MaxThreads" xml:space="preserve"><value>मैक्स थ्रेड</value></data>
   <data name="MaxThreadsTooltip" xml:space="preserve"><value>कन्वर्ज़न वर्कर थ्रेड। 0 = ऑटो।</value></data>
   <data name="OnnxPreferTensorRt" xml:space="preserve"><value>ONNX GPU के लिए TensorRT प्राथमिक (CUDA फ़ॉलबैक)</value></data>

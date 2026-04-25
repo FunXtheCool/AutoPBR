@@ -1,4 +1,5 @@
 using AutoPBR.Core.Models;
+using AutoPBR.Core.Atlas;
 using Colourful;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -277,381 +278,49 @@ internal static class SpecularGenerator
                         return;
                     }
 
-                    var fast = t.Overrides.FastSpecular ?? options.FastSpecular;
-                    var rules = t.Overrides.CustomSpecularRules
-                                ?? options.SpecularData!.ByTextureName.GetValueOrDefault(t.Name)
-                                ?? options.SpecularData.ByTextureName.GetValueOrDefault("*");
-
                     using var img = Image.Load<Rgba32>(t.DiffusePath);
-                    using var cropped = CropToSquare(img, out var size);
-                    var width = size;
-                    var height = size;
-
-                    // Ignore All: skip grass textures with significant transparency in diffuse (2D Sprite / foliage targets only)
-                    if (FoliageModeResolver.IsIgnoreAll(options.FoliageMode) &&
-                        t.Sprite2DFoliageTarget &&
-                        (t.Name.Contains("grass", StringComparison.OrdinalIgnoreCase) ||
-                         t.RelativeKey.Contains("grass", StringComparison.OrdinalIgnoreCase)))
-                    {
-                        if (!cropped.DangerousTryGetSinglePixelMemory(out var alphaCheckMem))
-                        {
-                            throw new InvalidOperationException("Expected contiguous pixel memory.");
-                        }
-
-                        var alphaSpan = alphaCheckMem.Span;
-                        long sumA = 0;
-                        int lowAlphaCount = 0;
-                        var pixelCount = width * height;
-                        for (var i = 0; i < pixelCount; i++)
-                        {
-                            var a = alphaSpan[i].A;
-                            sumA += a;
-                            if (a < 128)
-                            {
-                                lowAlphaCount++;
-                            }
-                        }
-
-                        var meanAlpha = (int)(sumA / pixelCount);
-                        if (meanAlpha < 200 || lowAlphaCount > 0.3 * pixelCount)
-                        {
-                            var done = Interlocked.Increment(ref completed);
-                            progress?.Report(new ConversionProgress(stage, done, total, t.Name));
-                            return;
-                        }
-                    }
-
-                    List<(SpecularRule Rule, LabColor Lab)>? rulesLab = null;
-                    if (!fast && rules is not null)
-                    {
-                        rulesLab = new List<(SpecularRule, LabColor)>(rules.Count);
-                        foreach (var r in rules)
-                        {
-                            var rgb = RGBColor.FromRGB8Bit(r.ColorR, r.ColorG, r.ColorB);
-                            rulesLab.Add((r, rgbToLab.Convert(rgb)));
-                        }
-                    }
-
-                    var (luminance, edgeMagnitude, meanLuminance) = BuildLuminanceAndEdge(cropped, width, height, options);
-                    var useMlSpec = MlSpecularInference.TryPredictSpecular(
-                        cropped,
-                        edgeMagnitude,
-                        options,
-                        out var mlSpecR,
-                        out var mlSpecG,
-                        out var mlSpecB,
-                        out var mlSpecA,
-                        out var mlSpecularDiagnostic);
-                    var nPixels = width * height;
-                    var rBuf = new byte[nPixels];
-                    var gBuf = new byte[nPixels];
-                    var bBuf = new byte[nPixels];
-                    var aBuf = new byte[nPixels];
-                    if (!cropped.DangerousTryGetSinglePixelMemory(out var inMem))
-                    {
-                        throw new InvalidOperationException("Expected contiguous pixel memory.");
-                    }
-
-                    var inSpan = inMem.Span;
-
-                    var noHeuristic = options is { SpecularDebugDisableHeuristicSpecular: true, UseMlSpecularPredictor: true };
-                    var blendSlider = Math.Clamp(options.MlSpecularHeuristicBlend, 0f, 1f);
-                    var heuristicBlendMode = options.MlSpecularHeuristicBlendMode;
-                    var blendMath = options.MlSpecularBlendMath;
-                    var porosityExtra = options.PorosityBias +
-                                        (t.HasPlantMaterialTag ? options.PlantMaterialPorosityExtra : 0);
-                    porosityExtra = Math.Clamp(porosityExtra, -512, 512);
-                    var mlDriven = new bool[nPixels];
-
-                    if (!useMlSpec && noHeuristic)
-                    {
-                        for (var idx = 0; idx < nPixels; idx++)
-                        {
-                            rBuf[idx] = 255;
-                            gBuf[idx] = 0;
-                            bBuf[idx] = 255;
-                            aBuf[idx] = 255;
-                            mlDriven[idx] = false;
-                        }
-                    }
-                    else
-                    {
-                        for (var idx = 0; idx < nPixels; idx++)
-                        {
-                            var p = inSpan[idx];
-                            var spec = GetSpecularRgba(p, rules, rulesLab, fast, rgbToLab, de2000);
-                            var lum = luminance[idx];
-                            var edge = edgeMagnitude[idx];
-
-                            var hg = Math.Min(spec.g, LabPbrF0CapDielectric);
-                            var smoothMul = options.SmoothnessScale;
-                            var hr = (int)Math.Min(255, spec.r * smoothMul);
-                            hr = (int)(hr * (1f - 0.2f * edge));
-                            if (lum > 0.92f && meanLuminance < 0.25f)
-                            {
-                                hr = Math.Min(hr, 220);
-                            }
-
-                            var hb = Math.Clamp(spec.b + porosityExtra, 0, 255);
-                            var ha = spec.a;
-
-                            if (noHeuristic && useMlSpec)
-                            {
-                                rBuf[idx] = mlSpecR[idx];
-                                gBuf[idx] = mlSpecG[idx];
-                                bBuf[idx] = (byte)Math.Clamp(mlSpecB[idx] + porosityExtra, 0, 255);
-                                aBuf[idx] = mlSpecA[idx];
-                                mlDriven[idx] = true;
-                                continue;
-                            }
-
-                            if (!useMlSpec)
-                            {
-                                rBuf[idx] = (byte)Math.Clamp(hr, 0, 255);
-                                gBuf[idx] = (byte)Math.Clamp((int)hg, 0, 255);
-                                bBuf[idx] = (byte)Math.Clamp(hb, 0, 255);
-                                aBuf[idx] = ha;
-                                mlDriven[idx] = false;
-                                continue;
-                            }
-
-                            var mix = useMlSpec ? blendSlider : 0f;
-                            if (mix > 0f)
-                            {
-                                var mr = mlSpecR[idx];
-                                var mg = mlSpecG[idx];
-                                var mb = mlSpecB[idx];
-                                var ma = mlSpecA[idx];
-                                var mbAdj = Math.Clamp(mb + porosityExtra, 0, 255);
-
-                                // Full: heuristic contributes to R/G/B/A — lerp every channel.
-                                // Smoothness only: heuristic contributes only to R; G/B/A come from model.
-                                // AI Metal & Emissive: like Smoothness only, but B (porosity) stays heuristic.
-                                if (heuristicBlendMode == MlSpecularHeuristicBlendMode.SmoothnessOnly)
-                                {
-                                    var fr = BlendChannel(hr, mr, mix, blendMath);
-                                    rBuf[idx] = (byte)Math.Clamp(Math.Round(fr), 0, 255);
-                                    gBuf[idx] = mg;
-                                    bBuf[idx] = (byte)mbAdj;
-                                    aBuf[idx] = ma;
-                                    mlDriven[idx] = mix >= 0.999f;
-                                }
-                                else if (heuristicBlendMode == MlSpecularHeuristicBlendMode.AiMetalAndEmissive)
-                                {
-                                    var fr = BlendChannel(hr, mr, mix, blendMath);
-                                    rBuf[idx] = (byte)Math.Clamp(Math.Round(fr), 0, 255);
-                                    gBuf[idx] = mg;
-                                    bBuf[idx] = (byte)Math.Clamp(hb, 0, 255);
-                                    aBuf[idx] = ma;
-                                    mlDriven[idx] = mix >= 0.999f;
-                                }
-                                else
-                                {
-                                    var fr = BlendChannel(hr, mr, mix, blendMath);
-                                    var fg = BlendChannel(hg, mg, mix, blendMath);
-                                    var fb = BlendChannel(hb, mbAdj, mix, blendMath);
-                                    var fa = BlendChannel(ha, ma, mix, blendMath);
-
-                                    rBuf[idx] = (byte)Math.Clamp(Math.Round(fr), 0, 255);
-                                    gBuf[idx] = (byte)Math.Clamp(Math.Round(fg), 0, 255);
-                                    bBuf[idx] = (byte)Math.Clamp(Math.Round(fb), 0, 255);
-                                    aBuf[idx] = (byte)Math.Clamp(Math.Round(fa), 0, 255);
-                                    mlDriven[idx] = mix >= 0.999f;
-                                }
-                            }
-                            else
-                            {
-                                rBuf[idx] = (byte)Math.Clamp(hr, 0, 255);
-                                gBuf[idx] = (byte)Math.Clamp((int)hg, 0, 255);
-                                bBuf[idx] = (byte)Math.Clamp(hb, 0, 255);
-                                aBuf[idx] = ha;
-                                mlDriven[idx] = false;
-                            }
-                        }
-                    }
-
-                    // Per-texture R normalization: remap to 10–200 when there is variation.
-                    // With MlSpecularSkipSmoothnessRemap + ML, stats and remap apply only to non-ML pixels so model R stays faithful.
-                    // Percentile remap is more robust than min/max on noisy low-res inputs.
-                    var selectiveMlRemap = options.MlSpecularSkipSmoothnessRemap && useMlSpec;
-                    byte minR;
-                    byte maxR;
-                    if (options.SpecularDebugSkipSpecularRemap)
-                    {
-                        minR = 0;
-                        maxR = 0;
-                    }
-                    else if (selectiveMlRemap)
-                    {
-                        var nHeuristic = 0;
-                        for (var i = 0; i < nPixels; i++)
-                        {
-                            if (!mlDriven[i])
-                            {
-                                nHeuristic++;
-                            }
-                        }
-
-                        if (nHeuristic == 0)
-                        {
-                            minR = 0;
-                            maxR = 0;
-                        }
-                        else if (nPixels > 0 && options.SpecularUsePercentileRemap)
-                        {
-                            var lowP = Math.Clamp(options.SpecularRemapLowPercentile, 0f, 1f);
-                            var highP = Math.Clamp(options.SpecularRemapHighPercentile, 0f, 1f);
-                            if (highP < lowP)
-                            {
-                                (lowP, highP) = (highP, lowP);
-                            }
-
-                            var sorted = new byte[nHeuristic];
-                            var w = 0;
-                            for (var i = 0; i < nPixels; i++)
-                            {
-                                if (!mlDriven[i])
-                                {
-                                    sorted[w++] = rBuf[i];
-                                }
-                            }
-
-                            Array.Sort(sorted);
-                            var last = nHeuristic - 1;
-                            minR = sorted[(int)MathF.Round(lowP * last)];
-                            maxR = sorted[(int)MathF.Round(highP * last)];
-                        }
-                        else
-                        {
-                            minR = 255;
-                            maxR = 0;
-                            for (var i = 0; i < nPixels; i++)
-                            {
-                                if (mlDriven[i])
-                                {
-                                    continue;
-                                }
-
-                                var v = rBuf[i];
-                                if (v < minR)
-                                {
-                                    minR = v;
-                                }
-
-                                if (v > maxR)
-                                {
-                                    maxR = v;
-                                }
-                            }
-                        }
-                    }
-                    else if (nPixels > 0 && options.SpecularUsePercentileRemap)
-                    {
-                        var lowP = Math.Clamp(options.SpecularRemapLowPercentile, 0f, 1f);
-                        var highP = Math.Clamp(options.SpecularRemapHighPercentile, 0f, 1f);
-                        if (highP < lowP)
-                        {
-                            (lowP, highP) = (highP, lowP);
-                        }
-
-                        var sorted = new byte[nPixels];
-                        Array.Copy(rBuf, sorted, nPixels);
-                        Array.Sort(sorted);
-                        minR = sorted[(int)MathF.Round(lowP * (nPixels - 1))];
-                        maxR = sorted[(int)MathF.Round(highP * (nPixels - 1))];
-                    }
-                    else
-                    {
-                        minR = 255;
-                        maxR = 0;
-                        for (var i = 0; i < nPixels; i++)
-                        {
-                            var v = rBuf[i];
-                            if (v < minR)
-                            {
-                                minR = v;
-                            }
-
-                            if (v > maxR)
-                            {
-                                maxR = v;
-                            }
-                        }
-                    }
-
-                    if (!options.SpecularDebugSkipSpecularRemap && maxR > minR)
-                    {
-                        var denom = maxR - minR;
-                        for (var i = 0; i < nPixels; i++)
-                        {
-                            if (selectiveMlRemap && mlDriven[i])
-                            {
-                                continue;
-                            }
-
-                            rBuf[i] = (byte)Math.Clamp(10 + (rBuf[i] - minR) * 190 / denom, 0, 255);
-                        }
-                    }
-
-                    var invertSpecularR = t.Overrides.InvertSpecular;
-                    var brickProbeGlobalInvert = t.Overrides.BrickProbeAppliedGlobalInvert;
-                    if (t.HasBrickMaterialTag && options is { BrickSpecularAlignWithHeightProbe: true, BrickHeightMapPostProcessEnabled: true } && brickProbeGlobalInvert.HasValue)
-                    {
-                        invertSpecularR = brickProbeGlobalInvert.Value;
-                    }
-
-                    if (invertSpecularR)
-                    {
-                        for (var i = 0; i < nPixels; i++)
-                        {
-                            rBuf[i] = (byte)(255 - rBuf[i]);
-                        }
-                    }
-
-                    if (options.MlSpecularZeroTransparentPixels)
-                    {
-                        var alphaClampMax = Math.Clamp(options.MlSpecularTransparentAlphaClampMax, 0, 255);
-                        for (var i = 0; i < nPixels; i++)
-                        {
-                            if (inSpan[i].A <= alphaClampMax)
-                            {
-                                rBuf[i] = 0;
-                                gBuf[i] = 0;
-                                bBuf[i] = 0;
-                                aBuf[i] = 0;
-                            }
-                        }
-                    }
-
+                    var atlasPlan = AtlasTiling.Decide(img.Width, img.Height);
+                    string? mlDiagnostic = null;
+                    var anyUseMlSpec = false;
                     var hasData = false;
 
-                    using (var outImg = new Image<Rgba32>(width, height))
+                    if (atlasPlan.IsAtlas)
                     {
-                        outImg.ProcessPixelRows(acc =>
+                        using var atlasOut = new Image<Rgba32>(img.Width, img.Height);
+                        foreach (var tile in AtlasTiling.EnumerateTiles(atlasPlan))
                         {
-                            for (var y = 0; y < height; y++)
+                            using var tileDiffuse = AtlasTiling.ExtractTile(img, tile);
+                            var tileResult = GenerateSpecularForDiffuseTile(tileDiffuse, t, options, rgbToLab, de2000);
+                            anyUseMlSpec |= tileResult.UseMlSpec;
+                            mlDiagnostic ??= tileResult.MlDiagnostic;
+                            if (!tileResult.HasData || tileResult.Image is null)
                             {
-                                var row = acc.GetRowSpan(y);
-                                for (var x = 0; x < width; x++)
-                                {
-                                    var idx = y * width + x;
-                                    var r = rBuf[idx];
-                                    var g = gBuf[idx];
-                                    var b = bBuf[idx];
-                                    var a = aBuf[idx];
-
-                                    if (r != 0 || g != 0 || b != 0 || a != 255)
-                                    {
-                                        hasData = true;
-                                    }
-
-                                    row[x] = new Rgba32(r, g, b, a);
-                                }
+                                continue;
                             }
-                        });
+
+                            hasData = true;
+                            using var tileImage = tileResult.Image;
+                            AtlasTiling.PasteTile(atlasOut, tile, tileImage);
+                        }
 
                         if (hasData)
                         {
+                            atlasOut.Save(t.SpecularPath);
+                        }
+                        else if (File.Exists(t.SpecularPath))
+                        {
+                            File.Delete(t.SpecularPath);
+                        }
+                    }
+                    else
+                    {
+                        using var cropped = CropToSquare(img);
+                        var result = GenerateSpecularForDiffuseTile(cropped, t, options, rgbToLab, de2000);
+                        anyUseMlSpec = result.UseMlSpec;
+                        mlDiagnostic = result.MlDiagnostic;
+                        if (result.Image is not null)
+                        {
+                            using var outImg = result.Image;
                             outImg.Save(t.SpecularPath);
                         }
                         else if (File.Exists(t.SpecularPath))
@@ -663,14 +332,273 @@ internal static class SpecularGenerator
                     var specLog = BuildSpecularModelLogLine(
                         t.Name,
                         options,
-                        useMlSpec,
-                        mlSpecularDiagnostic);
+                        anyUseMlSpec,
+                        mlDiagnostic);
                     var combinedLog = string.Join(" | ", new[] { specLog }.Where(s => !string.IsNullOrWhiteSpace(s)));
 
                     var n = Interlocked.Increment(ref completed);
                     progress?.Report(new ConversionProgress(stage, n, total, t.Name, string.IsNullOrWhiteSpace(combinedLog) ? null : combinedLog));
                 });
         }, ct);
+    }
+
+    private sealed class SpecularTileResult
+    {
+        public required bool HasData { get; init; }
+        public required bool UseMlSpec { get; init; }
+        public required string? MlDiagnostic { get; init; }
+        public Image<Rgba32>? Image { get; init; }
+    }
+
+    private static SpecularTileResult GenerateSpecularForDiffuseTile(
+        Image<Rgba32> cropped,
+        TextureWorkItem t,
+        AutoPbrOptions options,
+        IColorConverter<RGBColor, LabColor> rgbToLab,
+        CIEDE2000ColorDifference de2000)
+    {
+        var fast = t.Overrides.FastSpecular ?? options.FastSpecular;
+        var rules = t.Overrides.CustomSpecularRules
+                    ?? options.SpecularData!.ByTextureName.GetValueOrDefault(t.Name)
+                    ?? options.SpecularData.ByTextureName.GetValueOrDefault("*");
+
+        var width = cropped.Width;
+        var height = cropped.Height;
+        if (FoliageModeResolver.IsIgnoreAll(options.FoliageMode) &&
+            t.Sprite2DFoliageTarget &&
+            (t.Name.Contains("grass", StringComparison.OrdinalIgnoreCase) ||
+             t.RelativeKey.Contains("grass", StringComparison.OrdinalIgnoreCase)))
+        {
+            if (!cropped.DangerousTryGetSinglePixelMemory(out var alphaCheckMem))
+            {
+                throw new InvalidOperationException("Expected contiguous pixel memory.");
+            }
+
+            var alphaSpan = alphaCheckMem.Span;
+            long sumA = 0;
+            var lowAlphaCount = 0;
+            var pixelCount = width * height;
+            for (var i = 0; i < pixelCount; i++)
+            {
+                var a = alphaSpan[i].A;
+                sumA += a;
+                if (a < 128)
+                {
+                    lowAlphaCount++;
+                }
+            }
+
+            var meanAlpha = (int)(sumA / pixelCount);
+            if (meanAlpha < 200 || lowAlphaCount > 0.3 * pixelCount)
+            {
+                return new SpecularTileResult { HasData = false, UseMlSpec = false, MlDiagnostic = null, Image = null };
+            }
+        }
+
+        List<(SpecularRule Rule, LabColor Lab)>? rulesLab = null;
+        if (!fast && rules is not null)
+        {
+            rulesLab = new List<(SpecularRule, LabColor)>(rules.Count);
+            foreach (var r in rules)
+            {
+                var rgb = RGBColor.FromRGB8Bit(r.ColorR, r.ColorG, r.ColorB);
+                rulesLab.Add((r, rgbToLab.Convert(rgb)));
+            }
+        }
+
+        var (luminance, edgeMagnitude, meanLuminance) = BuildLuminanceAndEdge(cropped, width, height, options);
+        var useMlSpec = MlSpecularInference.TryPredictSpecular(
+            cropped,
+            edgeMagnitude,
+            options,
+            out var mlSpecR,
+            out var mlSpecG,
+            out var mlSpecB,
+            out var mlSpecA,
+            out var mlSpecularDiagnostic);
+        var nPixels = width * height;
+        var rBuf = new byte[nPixels];
+        var gBuf = new byte[nPixels];
+        var bBuf = new byte[nPixels];
+        var aBuf = new byte[nPixels];
+        if (!cropped.DangerousTryGetSinglePixelMemory(out var inMem))
+        {
+            throw new InvalidOperationException("Expected contiguous pixel memory.");
+        }
+
+        var inSpan = inMem.Span;
+        var noHeuristic = options is { SpecularDebugDisableHeuristicSpecular: true, UseMlSpecularPredictor: true };
+        var blendSlider = Math.Clamp(options.MlSpecularHeuristicBlend, 0f, 1f);
+        var heuristicBlendMode = options.MlSpecularHeuristicBlendMode;
+        var blendMath = options.MlSpecularBlendMath;
+        var porosityExtra = options.PorosityBias + (t.HasPlantMaterialTag ? options.PlantMaterialPorosityExtra : 0);
+        porosityExtra = Math.Clamp(porosityExtra, -512, 512);
+        var mlDriven = new bool[nPixels];
+
+        for (var idx = 0; idx < nPixels; idx++)
+        {
+            var p = inSpan[idx];
+            var spec = GetSpecularRgba(p, rules, rulesLab, fast, rgbToLab, de2000);
+            var lum = luminance[idx];
+            var edge = edgeMagnitude[idx];
+            var hg = Math.Min(spec.g, LabPbrF0CapDielectric);
+            var smoothMul = options.SmoothnessScale;
+            var hr = (int)Math.Min(255, spec.r * smoothMul);
+            hr = (int)(hr * (1f - 0.2f * edge));
+            if (lum > 0.92f && meanLuminance < 0.25f)
+            {
+                hr = Math.Min(hr, 220);
+            }
+
+            var hb = Math.Clamp(spec.b + porosityExtra, 0, 255);
+            var ha = spec.a;
+
+            if (noHeuristic && useMlSpec)
+            {
+                rBuf[idx] = mlSpecR[idx];
+                gBuf[idx] = mlSpecG[idx];
+                bBuf[idx] = (byte)Math.Clamp(mlSpecB[idx] + porosityExtra, 0, 255);
+                aBuf[idx] = mlSpecA[idx];
+                mlDriven[idx] = true;
+                continue;
+            }
+
+            if (!useMlSpec || blendSlider <= 0f)
+            {
+                rBuf[idx] = (byte)Math.Clamp(hr, 0, 255);
+                gBuf[idx] = (byte)Math.Clamp((int)hg, 0, 255);
+                bBuf[idx] = (byte)Math.Clamp(hb, 0, 255);
+                aBuf[idx] = ha;
+                mlDriven[idx] = false;
+                continue;
+            }
+
+            var mr = mlSpecR[idx];
+            var mg = mlSpecG[idx];
+            var mb = mlSpecB[idx];
+            var ma = mlSpecA[idx];
+            var mbAdj = Math.Clamp(mb + porosityExtra, 0, 255);
+
+            if (heuristicBlendMode == MlSpecularHeuristicBlendMode.SmoothnessOnly)
+            {
+                var fr = BlendChannel(hr, mr, blendSlider, blendMath);
+                rBuf[idx] = (byte)Math.Clamp(Math.Round(fr), 0, 255);
+                gBuf[idx] = mg;
+                bBuf[idx] = (byte)mbAdj;
+                aBuf[idx] = ma;
+                mlDriven[idx] = blendSlider >= 0.999f;
+            }
+            else if (heuristicBlendMode == MlSpecularHeuristicBlendMode.AiMetalAndEmissive)
+            {
+                var fr = BlendChannel(hr, mr, blendSlider, blendMath);
+                rBuf[idx] = (byte)Math.Clamp(Math.Round(fr), 0, 255);
+                gBuf[idx] = mg;
+                bBuf[idx] = (byte)Math.Clamp(hb, 0, 255);
+                aBuf[idx] = ma;
+                mlDriven[idx] = blendSlider >= 0.999f;
+            }
+            else
+            {
+                var fr = BlendChannel(hr, mr, blendSlider, blendMath);
+                var fg = BlendChannel(hg, mg, blendSlider, blendMath);
+                var fb = BlendChannel(hb, mbAdj, blendSlider, blendMath);
+                var fa = BlendChannel(ha, ma, blendSlider, blendMath);
+                rBuf[idx] = (byte)Math.Clamp(Math.Round(fr), 0, 255);
+                gBuf[idx] = (byte)Math.Clamp(Math.Round(fg), 0, 255);
+                bBuf[idx] = (byte)Math.Clamp(Math.Round(fb), 0, 255);
+                aBuf[idx] = (byte)Math.Clamp(Math.Round(fa), 0, 255);
+                mlDriven[idx] = blendSlider >= 0.999f;
+            }
+        }
+
+        byte minR = rBuf.Min();
+        byte maxR = rBuf.Max();
+        if (!options.SpecularDebugSkipSpecularRemap && maxR > minR)
+        {
+            var denom = maxR - minR;
+            for (var i = 0; i < nPixels; i++)
+            {
+                if (options.MlSpecularSkipSmoothnessRemap && useMlSpec && mlDriven[i])
+                {
+                    continue;
+                }
+
+                rBuf[i] = (byte)Math.Clamp(10 + (rBuf[i] - minR) * 190 / denom, 0, 255);
+            }
+        }
+
+        var invertSpecularR = t.Overrides.InvertSpecular;
+        var brickProbeGlobalInvert = t.Overrides.BrickProbeAppliedGlobalInvert;
+        if (t.HasBrickMaterialTag && options is { BrickSpecularAlignWithHeightProbe: true, BrickHeightMapPostProcessEnabled: true } && brickProbeGlobalInvert.HasValue)
+        {
+            invertSpecularR = brickProbeGlobalInvert.Value;
+        }
+
+        if (invertSpecularR)
+        {
+            for (var i = 0; i < nPixels; i++)
+            {
+                rBuf[i] = (byte)(255 - rBuf[i]);
+            }
+        }
+
+        // Guardrail: particles and organic/plant-like textures should never become metallic.
+        if (t.SpecularOnly || t.HasPlantMaterialTag)
+        {
+            Array.Fill(gBuf, (byte)0);
+        }
+
+        if (options.MlSpecularZeroTransparentPixels)
+        {
+            var alphaClampMax = Math.Clamp(options.MlSpecularTransparentAlphaClampMax, 0, 255);
+            for (var i = 0; i < nPixels; i++)
+            {
+                if (inSpan[i].A <= alphaClampMax)
+                {
+                    rBuf[i] = 0;
+                    gBuf[i] = 0;
+                    bBuf[i] = 0;
+                    aBuf[i] = 0;
+                }
+            }
+        }
+
+        var outImg = new Image<Rgba32>(width, height);
+        var hasData = false;
+        outImg.ProcessPixelRows(acc =>
+        {
+            for (var y = 0; y < height; y++)
+            {
+                var row = acc.GetRowSpan(y);
+                for (var x = 0; x < width; x++)
+                {
+                    var idx = y * width + x;
+                    var r = rBuf[idx];
+                    var g = gBuf[idx];
+                    var b = bBuf[idx];
+                    var a = aBuf[idx];
+                    if (r != 0 || g != 0 || b != 0 || a != 255)
+                    {
+                        hasData = true;
+                    }
+
+                    row[x] = new Rgba32(r, g, b, a);
+                }
+            }
+        });
+
+        if (!hasData)
+        {
+            outImg.Dispose();
+        }
+
+        return new SpecularTileResult
+        {
+            HasData = hasData,
+            UseMlSpec = useMlSpec,
+            MlDiagnostic = mlSpecularDiagnostic,
+            Image = hasData ? outImg : null
+        };
     }
 
     private static (byte r, byte g, byte b, byte a) GetSpecularRgba(
@@ -754,10 +682,9 @@ internal static class SpecularGenerator
         return i;
     }
 
-    private static Image<Rgba32> CropToSquare(Image<Rgba32> img, out int size)
+    private static Image<Rgba32> CropToSquare(Image<Rgba32> img)
     {
         var s = Math.Min(img.Width, img.Height);
-        size = s;
         if (img.Width == s && img.Height == s)
         {
             return img.Clone();

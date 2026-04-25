@@ -41,6 +41,7 @@ internal static class UserSettingsSynchronizer
             128);
         vm.MaxThreads = settings.MaxThreads;
         vm.TempDirectory = settings.TempDirectory;
+        vm.DebugMode = settings.DebugMode;
         vm.ColorScheme = string.IsNullOrWhiteSpace(settings.ColorScheme) ? "Dark" : settings.ColorScheme;
         vm.UiScale = settings.UiScale <= 0
             ? 1.0
@@ -168,6 +169,7 @@ internal static class UserSettingsSynchronizer
         settings.PlantMaterialPorosityExtra = vm.PlantMaterialPorosityExtra;
         settings.MaxThreads = vm.MaxThreads;
         settings.TempDirectory = vm.TempDirectory;
+        settings.DebugMode = vm.DebugMode;
         settings.ColorScheme = vm.ColorScheme;
         settings.UiScale = Math.Clamp(vm.UiScale, MainWindowViewModel.MinUiScale, MainWindowViewModel.MaxUiScale);
         settings.Language = vm.SelectedLanguage?.CultureCode ?? "en";

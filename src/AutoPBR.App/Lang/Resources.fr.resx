@@ -204,10 +204,13 @@
   <data name="Particles" xml:space="preserve"><value>Particules</value></data>
   <data name="ParticlesTooltip" xml:space="preserve"><value>Textures de particules. Seules les maps specular sont générées.</value></data>
   <data name="FilterWatermark" xml:space="preserve"><value>Filtre (ex. \block\stone)</value></data>
+  <data name="ExploreTagFilter" xml:space="preserve"><value>Afficher le tag :</value></data>
+  <data name="ExploreTagFilterAll" xml:space="preserve"><value>Tous</value></data>
   <data name="Output" xml:space="preserve"><value>Sortie</value></data>
   <data name="OutputFolderWatermark" xml:space="preserve"><value>Dossier de sortie</value></data>
   <data name="OutputPathWatermark" xml:space="preserve"><value>Chemin de sortie</value></data>
   <data name="Engine" xml:space="preserve"><value>Moteur</value></data>
+  <data name="DebugMode" xml:space="preserve"><value>Débogage</value></data>
   <data name="MaxThreads" xml:space="preserve"><value>Threads max</value></data>
   <data name="MaxThreadsTooltip" xml:space="preserve"><value>Threads de conversion. 0 = auto.</value></data>
   <data name="OnnxPreferTensorRt" xml:space="preserve"><value>Préférer TensorRT pour ONNX GPU (repli CUDA)</value></data>

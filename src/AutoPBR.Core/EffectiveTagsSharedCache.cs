@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using AutoPBR.Core.Embeddings;
 using AutoPBR.Core.Models;
+using AutoPBR.Core.Models.RuleExpressions;
 
 namespace AutoPBR.Core;
 
@@ -103,12 +104,17 @@ public static class SharedEffectiveTagsCachePersistence
 
 public static class SharedEffectiveTagsCacheSignature
 {
+    // Bump when effective-tag logic changes in a way not captured by rules/settings/manual-override inputs.
+    // This prevents stale persisted tags (for example "unknown" from older matching behavior) from surviving upgrades.
+    private const int SignatureSchemaVersion = 3;
+
     public static string Compute(
         IReadOnlyList<TagRule> rules,
         MaterialTagSemanticOptions? sem,
         IReadOnlyDictionary<string, (IReadOnlyList<string> Added, IReadOnlyList<string> Removed)>? manualOverrides)
     {
         var sb = new StringBuilder();
+        sb.Append("schema:").Append(SignatureSchemaVersion).AppendLine();
         foreach (var rule in rules.OrderBy(r => r.Id, StringComparer.OrdinalIgnoreCase))
         {
             sb.Append(rule.Id).Append('|').Append(rule.DisplayName).Append('|').Append((int)rule.Kind).Append('|');
@@ -121,6 +127,13 @@ public static class SharedEffectiveTagsCacheSignature
             foreach (var h in rule.SemanticHints.OrderBy(static h => h, StringComparer.OrdinalIgnoreCase))
             {
                 sb.Append(h).Append(',');
+            }
+
+            var expression = TagRuleExpressionAccessor.GetExpression(rule);
+            if (expression is not null)
+            {
+                sb.Append('|');
+                AppendExpression(sb, expression);
             }
 
             sb.AppendLine();
@@ -181,5 +194,38 @@ public static class SharedEffectiveTagsCacheSignature
 
             sb.AppendLine();
         }
+    }
+
+    private static void AppendExpression(StringBuilder sb, RuleExpressionDefinition expression)
+    {
+        sb.Append(expression.Id).Append('|')
+            .Append(expression.DisplayName).Append('|')
+            .Append(expression.Enabled).Append('|')
+            .Append(expression.Priority).Append('|')
+            .Append(expression.StopProcessing).Append('|');
+        AppendCondition(sb, expression.Condition);
+        sb.Append('|');
+        foreach (var action in expression.Actions)
+        {
+            sb.Append((int)action.Type).Append(':').Append(action.Value).Append(':').Append(action.BoolValue).Append(';');
+        }
+    }
+
+    private static void AppendCondition(StringBuilder sb, RuleConditionNode? node)
+    {
+        if (node is null)
+        {
+            sb.Append("null");
+            return;
+        }
+
+        sb.Append('(').Append((int)node.Type).Append(':').Append(node.Value).Append(':');
+        foreach (var child in node.Children)
+        {
+            AppendCondition(sb, child);
+            sb.Append(',');
+        }
+
+        sb.Append(')');
     }
 }

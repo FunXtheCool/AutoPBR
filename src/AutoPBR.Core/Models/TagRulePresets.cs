@@ -1,5 +1,7 @@
 namespace AutoPBR.Core.Models;
 
+using RuleExpressions;
+
 /// <summary>
 /// Built-in material and flag tags when options.TagRules is null or empty.
 /// </summary>
@@ -56,7 +58,7 @@ public static class TagRulePresets
         },
         new TagRule
         {
-            Id = "plant",
+            Id = "organic",
             DisplayName = "Organic",
             Kind = TagRuleKind.Material,
             Keywords =
@@ -208,6 +210,67 @@ public static class TagRulePresets
 
     /// <summary>All built-in rules: materials first, then flags.</summary>
     public static IReadOnlyList<TagRule> Default { get; } = DefaultMaterials.Concat(DefaultFlags).ToList();
+
+    /// <summary>Built-in expression rules evaluated after automatic material/flag discovery.</summary>
+    public static IReadOnlyList<RuleExpressionDefinition> BuiltInExpressions { get; } =
+    [
+        new RuleExpressionDefinition
+        {
+            Id = "builtin_no_sprite_for_entity_uv",
+            DisplayName = "No 2D Sprite for Entity UV Organic",
+            IsBuiltIn = true,
+            Priority = 100,
+            Condition = new RuleConditionNode
+            {
+                Type = RuleConditionNodeType.All,
+                Children =
+                [
+                    new RuleConditionNode
+                    {
+                        Type = RuleConditionNodeType.Any,
+                        Children =
+                        [
+                            new RuleConditionNode { Type = RuleConditionNodeType.HasTag, Value = "organic" },
+                            new RuleConditionNode { Type = RuleConditionNodeType.HasTag, Value = "plant" }
+                        ]
+                    },
+                    new RuleConditionNode { Type = RuleConditionNodeType.HasFlag, Value = FlagTagResolver.EntityId },
+                    new RuleConditionNode { Type = RuleConditionNodeType.HasFlag, Value = FlagTagResolver.UvWrapId }
+                ]
+            },
+            Actions = [new RuleActionDefinition { Type = RuleActionType.RemoveFlag, Value = FlagTagResolver.Sprite2DId }]
+        },
+        new RuleExpressionDefinition
+        {
+            Id = "builtin_remove_block_for_non_block_name",
+            DisplayName = "Remove Block for Organic Non-Block Name",
+            IsBuiltIn = true,
+            Priority = 80,
+            Condition = new RuleConditionNode
+            {
+                Type = RuleConditionNodeType.All,
+                Children =
+                [
+                    new RuleConditionNode
+                    {
+                        Type = RuleConditionNodeType.Any,
+                        Children =
+                        [
+                            new RuleConditionNode { Type = RuleConditionNodeType.HasTag, Value = "organic" },
+                            new RuleConditionNode { Type = RuleConditionNodeType.HasTag, Value = "plant" }
+                        ]
+                    },
+                    new RuleConditionNode { Type = RuleConditionNodeType.HasFlag, Value = FlagTagResolver.BlockId },
+                    new RuleConditionNode
+                    {
+                        Type = RuleConditionNodeType.Not,
+                        Children = [new RuleConditionNode { Type = RuleConditionNodeType.NameContains, Value = "block" }]
+                    }
+                ]
+            },
+            Actions = [new RuleActionDefinition { Type = RuleActionType.RemoveFlag, Value = FlagTagResolver.BlockId }]
+        }
+    ];
 
     /// <summary>Returns material tag ids whose keywords match the texture name or relative key (case-insensitive).</summary>
     public static IReadOnlyList<string> GetMatchingMaterialTagIds(string name, string relativeKey, IReadOnlyList<TagRule> rules) =>

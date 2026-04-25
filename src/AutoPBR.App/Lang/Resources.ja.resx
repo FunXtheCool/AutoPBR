@@ -178,7 +178,7 @@
   <data name="DeepBumpForceBlue255" xml:space="preserve"><value>DeepBump法線のB=255を強制</value></data>
   <data name="Advanced" xml:space="preserve"><value>詳細設定</value></data>
   <data name="Preprocessing" xml:space="preserve"><value>前処理</value></data>
-  <data name="PreprocessLinearize" xml:space="preserve"><value>微分前に線形化（sRGB → linear）</value></data>
+  <data name="PreprocessLinearize" xml:space="preserve"><value>微分前に線形化（sRGB → Linear）</value></data>
   <data name="PreprocessDenoiseRadius" xml:space="preserve"><value>ノイズ除去半径</value></data>
   <data name="PreprocessDenoiseBlend" xml:space="preserve"><value>ノイズ除去ブレンド</value></data>
   <data name="PreprocessFrequencySplit" xml:space="preserve"><value>周波数分離（マクロ＋ディテール）</value></data>
@@ -204,10 +204,13 @@
   <data name="Particles" xml:space="preserve"><value>パーティクル</value></data>
   <data name="ParticlesTooltip" xml:space="preserve"><value>パーティクルテクスチャ。スペキュラマップのみ生成。</value></data>
   <data name="FilterWatermark" xml:space="preserve"><value>フィルター（例: \block\stone）</value></data>
+  <data name="ExploreTagFilter" xml:space="preserve"><value>タグを表示:</value></data>
+  <data name="ExploreTagFilterAll" xml:space="preserve"><value>すべて</value></data>
   <data name="Output" xml:space="preserve"><value>出力</value></data>
   <data name="OutputFolderWatermark" xml:space="preserve"><value>出力フォルダ</value></data>
   <data name="OutputPathWatermark" xml:space="preserve"><value>出力パス</value></data>
   <data name="Engine" xml:space="preserve"><value>エンジン</value></data>
+  <data name="DebugMode" xml:space="preserve"><value>デバッグ</value></data>
   <data name="MaxThreads" xml:space="preserve"><value>最大スレッド数</value></data>
   <data name="MaxThreadsTooltip" xml:space="preserve"><value>変換用ワーカースレッド。0=自動。</value></data>
   <data name="OnnxPreferTensorRt" xml:space="preserve"><value>ONNX GPU で TensorRT を優先（CUDA フォールバック）</value></data>

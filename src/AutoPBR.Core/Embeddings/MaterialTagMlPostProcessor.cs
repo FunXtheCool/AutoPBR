@@ -3,8 +3,8 @@ using AutoPBR.Core.Models;
 namespace AutoPBR.Core.Embeddings;
 
 /// <summary>
-/// Deterministic cleanup after MiniLM material tags. Resolves wood+plant confusion: timber paths drop
-/// plant; leaf/leaves paths drop wood. The organic (id plant) material tag is intended for plants/coral/grass, not lumber.
+    /// Deterministic cleanup after MiniLM material tags. Resolves wood+organic confusion: timber paths drop
+    /// organic; leaf/leaves paths drop wood. The organic material tag is intended for plants/coral/grass, not lumber.
 /// Paths whose name or relative key matches the Ore flag keyword <c>ore</c> as a whole token ensure
 /// <c>stone</c> so ore blocks keep stone-like LabPBR heuristics while preserving semantic material tags.
 /// </summary>
@@ -58,11 +58,11 @@ public static class MaterialTagMlPostProcessor
     /// <summary>
     /// Post-processes ML material tags:
     /// <list type="bullet">
-    ///   <item>Drop <c>plant</c> when the path/title looks like timber (unless a plant keyword matches).</item>
+    ///   <item>Drop <c>organic</c> when the path/title looks like timber (unless an organic keyword matches).</item>
     ///   <item>Drop <c>wood</c> when the path/title looks like leaves/leaf (unless a wood keyword matches).</item>
     /// </list>
     /// When <paramref name="maxMaterialTags"/> is set (MiniLM path), the list is trimmed to that many ids in order
-    /// so inserts like forced <c>plant</c> cannot exceed the user's max ML material tag count. On ore paths (whole-word
+    /// so inserts like forced <c>organic</c> cannot exceed the user's max ML material tag count. On ore paths (whole-word
     /// <c>ore</c>), when both <c>stone</c> and <c>gem</c> or <c>metal</c> are present, the cap is raised by one so
     /// gem/metal ores can keep stone without dropping either tag. Coal (whole-word <c>coal</c> in name/path) does not
     /// use this extra slot.
@@ -85,7 +85,7 @@ public static class MaterialTagMlPostProcessor
         var result = materialTagIds.ToList();
         result = EnsurePlantForLeafHints(result, combined);
 
-        result = TryDropTag(result, "plant", combined, TimberPathOrNameHints, materialRules);
+        result = TryDropTag(result, "organic", combined, TimberPathOrNameHints, materialRules);
         result = TryDropTag(result, "wood", combined, LeafPathOrNameHints, materialRules);
 
         result = EnsureStoneForOrePaths(result, combined);
@@ -265,7 +265,7 @@ public static class MaterialTagMlPostProcessor
             return ids;
         }
 
-        if (Contains(ids, "plant"))
+        if (Contains(ids, "organic") || Contains(ids, "plant"))
         {
             return ids;
         }
@@ -279,7 +279,7 @@ public static class MaterialTagMlPostProcessor
             }
         }
 
-        result.Insert(0, "plant");
+        result.Insert(0, "organic");
         return result;
     }
 

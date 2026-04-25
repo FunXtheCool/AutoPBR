@@ -45,6 +45,12 @@ namespace AutoPBR.Core;
 /// </remarks>
 public static class MaterialTagSemanticResolution
 {
+    private static readonly HashSet<string> VanillaBedColorTextureNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray",
+        "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"
+    };
+
     /// <summary>
     /// Resolves material tag ids: keyword rules first when ML is on and not deferred; otherwise keyword-only or full ML.
     /// </summary>
@@ -63,6 +69,17 @@ public static class MaterialTagSemanticResolution
     {
         usedSemanticMl = false;
         var materialRules = allRules.Where(r => r.Kind == TagRuleKind.Material).ToList();
+
+        if (IsVanillaEntityBedColorTexture(textureName, ruleRelativeKey))
+        {
+            // Explicit unweighted override: vanilla entity bed color variants should be organic.
+            return MaterialTagMlPostProcessor.Apply(
+                textureName,
+                ruleRelativeKey,
+                ["organic"],
+                materialRules,
+                sem is { Enabled: true, Matcher: not null } ? sem.MaxTags : null);
+        }
 
         if (sem is not { Enabled: true, Matcher: { } matcher } || deferSemanticMl)
         {
@@ -140,7 +157,7 @@ public static class MaterialTagSemanticResolution
     }
 
     /// <summary>
-    /// Adds <see cref="FlagTagResolver.Sprite2DId"/> when the organic material tag (<c>plant</c>) is present and the Block flag is not.
+    /// Adds <see cref="FlagTagResolver.Sprite2DId"/> when the organic material tag is present and the Block flag is not.
     /// </summary>
     /// <param name="effectiveTagIds">Effective tag ids after auto resolution and manual add/remove.</param>
     /// <param name="removedTagIds">When non-null and containing <see cref="FlagTagResolver.Sprite2DId"/>, the user hid this flag — do not re-add.</param>
@@ -154,12 +171,19 @@ public static class MaterialTagSemanticResolution
             return;
         }
 
-        if (!effectiveTagIds.Contains("plant", StringComparer.OrdinalIgnoreCase))
+        if (!ContainsOrganicMaterialTag(effectiveTagIds))
         {
             return;
         }
 
         if (effectiveTagIds.Contains(FlagTagResolver.BlockId, StringComparer.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        // Entity UV textures are model-mapped surfaces; do not classify as flat 2D sprites.
+        if (effectiveTagIds.Contains(FlagTagResolver.EntityId, StringComparer.OrdinalIgnoreCase) &&
+            effectiveTagIds.Contains(FlagTagResolver.UvWrapId, StringComparer.OrdinalIgnoreCase))
         {
             return;
         }
@@ -183,5 +207,39 @@ public static class MaterialTagSemanticResolution
                 flagIds.RemoveAt(i);
             }
         }
+    }
+
+    private static bool ContainsOrganicMaterialTag(IEnumerable<string> effectiveTagIds)
+    {
+        foreach (var id in effectiveTagIds)
+        {
+            if (id.Equals("organic", StringComparison.OrdinalIgnoreCase) ||
+                id.Equals("plant", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsVanillaEntityBedColorTexture(string textureName, string ruleRelativeKey)
+    {
+        if (string.IsNullOrWhiteSpace(textureName) || string.IsNullOrWhiteSpace(ruleRelativeKey))
+        {
+            return false;
+        }
+
+        if (!ruleRelativeKey.StartsWith("\\minecraft\\", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (!ruleRelativeKey.Contains("\\entity\\bed\\", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return VanillaBedColorTextureNames.Contains(textureName.Trim());
     }
 }

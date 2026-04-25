@@ -276,7 +276,7 @@
   <data name="DeepBumpForceBlue255" xml:space="preserve"><value>B=255 in DeepBump-Normalen erzwingen</value></data>
   <data name="Advanced" xml:space="preserve"><value>Erweitert</value></data>
   <data name="Preprocessing" xml:space="preserve"><value>Vorverarbeitung</value></data>
-  <data name="PreprocessLinearize" xml:space="preserve"><value>Linearisieren (sRGB → linear) vor Ableitungen</value></data>
+  <data name="PreprocessLinearize" xml:space="preserve"><value>Linearisieren (sRGB → Linear) vor Ableitungen</value></data>
   <data name="PreprocessDenoiseRadius" xml:space="preserve"><value>Rauschfilter-Radius</value></data>
   <data name="PreprocessDenoiseBlend" xml:space="preserve"><value>Rauschfilter-Mischung</value></data>
   <data name="PreprocessFrequencySplit" xml:space="preserve"><value>Frequenzaufteilung (Makro + Detail)</value></data>
@@ -326,6 +326,12 @@
   <data name="FilterWatermark" xml:space="preserve">
     <value>Filter (z. B. \block\stone)</value>
   </data>
+  <data name="ExploreTagFilter" xml:space="preserve">
+    <value>Tag anzeigen:</value>
+  </data>
+  <data name="ExploreTagFilterAll" xml:space="preserve">
+    <value>Alle</value>
+  </data>
   <data name="Output" xml:space="preserve">
     <value>Ausgabe</value>
   </data>
@@ -337,6 +343,9 @@
   </data>
   <data name="Engine" xml:space="preserve">
     <value>Engine</value>
+  </data>
+  <data name="DebugMode" xml:space="preserve">
+    <value>Debug</value>
   </data>
   <data name="MaxThreads" xml:space="preserve">
     <value>Max. Threads</value>

@@ -1,10 +1,29 @@
 using AutoPBR.Core.Embeddings;
+using AutoPBR.Core.Models;
 using Xunit;
 
 namespace AutoPBR.Core.Tests;
 
 public sealed class MaterialTagSemanticResolutionTests
 {
+    [Fact]
+    public void ResolveMaterialTagsVanillaEntityBedColorForcesPlantUnweighted()
+    {
+        var rules = TagRulePresets.Default;
+        var ids = MaterialTagSemanticResolution.ResolveMaterialTags(
+            "red",
+            @"\minecraft\entity\bed\red",
+            rules,
+            sem: null,
+            deferSemanticMl: false,
+            includeDictionaryEvidence: false,
+            out var usedSemanticMl);
+
+        Assert.False(usedSemanticMl);
+        Assert.Contains("organic", ids, StringComparer.OrdinalIgnoreCase);
+        Assert.DoesNotContain("unknown", ids, StringComparer.OrdinalIgnoreCase);
+    }
+
     [Fact]
     public void AppendWeightedUnweightedFlagsSemanticDisabledAddsUnweighted()
     {
@@ -33,17 +52,17 @@ public sealed class MaterialTagSemanticResolutionTests
     [Fact]
     public void AppendTwoDSpriteFlagIfNeededOrganicWithoutBlockAddsSprite2D()
     {
-        var ids = new List<string> { "plant", FlagTagResolver.ItemId };
+        var ids = new List<string> { "organic", FlagTagResolver.ItemId };
         MaterialTagSemanticResolution.AppendTwoDSpriteFlagIfNeeded(ids, removedTagIds: null);
-        Assert.Equal(new[] { "plant", FlagTagResolver.ItemId, FlagTagResolver.Sprite2DId }, ids);
+        Assert.Equal(new[] { "organic", FlagTagResolver.ItemId, FlagTagResolver.Sprite2DId }, ids);
     }
 
     [Fact]
     public void AppendTwoDSpriteFlagIfNeededWithBlockDoesNotAdd()
     {
-        var ids = new List<string> { "plant", FlagTagResolver.BlockId };
+        var ids = new List<string> { "organic", FlagTagResolver.BlockId };
         MaterialTagSemanticResolution.AppendTwoDSpriteFlagIfNeeded(ids, null);
-        Assert.Equal(new[] { "plant", FlagTagResolver.BlockId }, ids);
+        Assert.Equal(new[] { "organic", FlagTagResolver.BlockId }, ids);
     }
 
     [Fact]
@@ -57,9 +76,17 @@ public sealed class MaterialTagSemanticResolutionTests
     [Fact]
     public void AppendTwoDSpriteFlagIfNeededUserRemovedSpriteDoesNotAdd()
     {
-        var ids = new List<string> { "plant", FlagTagResolver.ItemId };
+        var ids = new List<string> { "organic", FlagTagResolver.ItemId };
         var removed = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { FlagTagResolver.Sprite2DId };
         MaterialTagSemanticResolution.AppendTwoDSpriteFlagIfNeeded(ids, removed);
-        Assert.Equal(new[] { "plant", FlagTagResolver.ItemId }, ids);
+        Assert.Equal(new[] { "organic", FlagTagResolver.ItemId }, ids);
+    }
+
+    [Fact]
+    public void AppendTwoDSpriteFlagIfNeededEntityUvWrapDoesNotAdd()
+    {
+        var ids = new List<string> { "organic", FlagTagResolver.EntityId, FlagTagResolver.UvWrapId };
+        MaterialTagSemanticResolution.AppendTwoDSpriteFlagIfNeeded(ids, removedTagIds: null);
+        Assert.Equal(new[] { "organic", FlagTagResolver.EntityId, FlagTagResolver.UvWrapId }, ids);
     }
 }

@@ -1,5 +1,7 @@
 namespace AutoPBR.Core.Models;
 
+using AutoPBR.Core.Models.RuleExpressions;
+
 /// <summary>
 /// Tag definition: <see cref="TagRuleKind.Material"/> uses keywords / MiniLM; <see cref="TagRuleKind.Flag"/> uses path rules and optional keywords.
 /// </summary>
@@ -20,4 +22,10 @@ public sealed class TagRule
 
     /// <summary>Short English phrases used only for semantic (embedding) matching; optional.</summary>
     public IReadOnlyList<string> SemanticHints { get; init; } = [];
+
+    /// <summary>
+    /// Optional expression rule attached to this tag/flag rule. When provided, runtime expression evaluation can apply
+    /// condition + actions in addition to keyword/semantic matching behavior.
+    /// </summary>
+    public RuleExpressionDefinition? Expression { get; init; }
 }

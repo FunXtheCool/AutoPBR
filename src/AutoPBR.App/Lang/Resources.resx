@@ -59,7 +59,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ColorScheme" xml:space="preserve">
-    <value>Color scheme</value>
+    <value>Color Scheme</value>
   </data>
   <data name="ColorSchemeDark" xml:space="preserve">
     <value>Dark</value>
@@ -122,7 +122,7 @@
     <value>Scan</value>
   </data>
   <data name="BatchConversion" xml:space="preserve">
-    <value>Batch conversion</value>
+    <value>Batch Conversion</value>
   </data>
   <data name="BatchConversionDescription" xml:space="preserve">
     <value>Choose a folder of .zip / .jar resource packs. Scan builds one explorer tree with each pack as a top-level folder. Batch convert runs conversion on every pack into your output folder (each pack becomes …_PBR.zip). Use Explore to browse; Convert (single pack) is disabled while a batch scan is active.</value>
@@ -131,16 +131,16 @@
     <value>Folder containing resource packs (.zip / .jar)</value>
   </data>
   <data name="BrowseBatchFolder" xml:space="preserve">
-    <value>Browse folder</value>
+    <value>Browse Folder</value>
   </data>
   <data name="ScanBatchButton" xml:space="preserve">
-    <value>Scan batch</value>
+    <value>Scan Batch</value>
   </data>
   <data name="BatchConvertButton" xml:space="preserve">
-    <value>Batch convert</value>
+    <value>Batch Convert</value>
   </data>
   <data name="ExploreArchiveContents" xml:space="preserve">
-    <value>Archive contents</value>
+    <value>Archive Contents</value>
   </data>
   <data name="ResourceExplorer" xml:space="preserve">
     <value>Resource Explorer</value>
@@ -149,13 +149,13 @@
     <value>Scan a pack or valid folder to explore contents.</value>
   </data>
   <data name="ExploreExpandAll" xml:space="preserve">
-    <value>Expand all</value>
+    <value>Expand All</value>
   </data>
   <data name="ExploreCollapseAll" xml:space="preserve">
-    <value>Collapse all</value>
+    <value>Collapse All</value>
   </data>
   <data name="ClearTagOverrides" xml:space="preserve">
-    <value>Clear tag overrides</value>
+    <value>Clear Tag Overrides</value>
   </data>
   <data name="ClearTagOverridesTooltip" xml:space="preserve">
     <value>Reset all manual tag add/remove for this pack.</value>
@@ -167,19 +167,79 @@
     <value>Apply '{0}' here</value>
   </data>
   <data name="TagRules" xml:space="preserve">
-    <value>Tag rules</value>
+    <value>Tag Rules</value>
   </data>
   <data name="TagRulesCustomDescription" xml:space="preserve">
-    <value>Material tags are informational (Explore + future use). Built-in presets: Brick, Wood, Metal, Organic. Add custom rules for keywords and optional ML hints. Export/import JSON for backup or CLI --tag-rules.</value>
+    <value>Edit your own rulesets to guide heuristic and/or AI processing</value>
+  </data>
+  <data name="RulesetsBuiltInTags" xml:space="preserve">
+    <value>Built-in Tags</value>
+  </data>
+  <data name="RulesetsBuiltInFlags" xml:space="preserve">
+    <value>Built-in Flags</value>
+  </data>
+  <data name="RulesetsBuiltInExpressions" xml:space="preserve">
+    <value>Built-in Rules</value>
+  </data>
+  <data name="RulesetsSystemRules" xml:space="preserve">
+    <value>System-computed Rules</value>
+  </data>
+  <data name="RulesetsSystemRulesDescription" xml:space="preserve">
+    <value>Weighted and Unweighted are computed by semantic resolution at runtime and are not editable.</value>
+  </data>
+  <data name="RulesetsCustomExpressions" xml:space="preserve">
+    <value>Custom Rules</value>
+  </data>
+  <data name="RulesetsKeywords" xml:space="preserve">
+    <value>Keywords</value>
+  </data>
+  <data name="RulesetsSemanticHints" xml:space="preserve">
+    <value>Semantic Hints</value>
+  </data>
+  <data name="RulesetsManageTokens" xml:space="preserve">
+    <value>Manage Tokens</value>
+  </data>
+  <data name="RulesetsAddCondition" xml:space="preserve">
+    <value>Add Condition</value>
+  </data>
+  <data name="RulesetsAddAction" xml:space="preserve">
+    <value>Add Action</value>
+  </data>
+  <data name="RulesetsEnableExpression" xml:space="preserve">
+    <value>Enable Expression</value>
+  </data>
+  <data name="RulesetsExpression" xml:space="preserve">
+    <value>Expression</value>
+  </data>
+  <data name="RulesetsConditions" xml:space="preserve">
+    <value>Conditions</value>
+  </data>
+  <data name="RulesetsActions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="RulesetsRemove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="RulesetsRemoveLast" xml:space="preserve">
+    <value>Remove Last</value>
+  </data>
+  <data name="RulesetsValueWatermark" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="RulesetsShowLess" xml:space="preserve">
+    <value>Show Less</value>
+  </data>
+  <data name="RulesetsMoreCount" xml:space="preserve">
+    <value>{0} more</value>
   </data>
   <data name="TagRuleId" xml:space="preserve">
     <value>Id</value>
   </data>
   <data name="TagRuleDisplayName" xml:space="preserve">
-    <value>Display name</value>
+    <value>Display Name</value>
   </data>
   <data name="TagRuleKeywords" xml:space="preserve">
-    <value>Keywords (comma-separated)</value>
+    <value>Keywords</value>
   </data>
   <data name="TagRuleSemanticHints" xml:space="preserve">
     <value>Semantic hints (comma-separated, optional)</value>
@@ -232,8 +292,11 @@
   <data name="TagRuleKindLabel" xml:space="preserve">
     <value>Kind</value>
   </data>
-  <data name="AddCustomTagRule" xml:space="preserve">
-    <value>Add custom rule</value>
+  <data name="AddCustomTag" xml:space="preserve">
+    <value>Add Custom Tag</value>
+  </data>
+  <data name="AddCustomRule" xml:space="preserve">
+    <value>Add Custom Rule</value>
   </data>
   <data name="RemoveTagRule" xml:space="preserve">
     <value>Remove</value>
@@ -242,10 +305,10 @@
     <value>Refresh</value>
   </data>
   <data name="InvertHeight" xml:space="preserve">
-    <value>Invert height</value>
+    <value>Invert Height</value>
   </data>
   <data name="InvertSpecular" xml:space="preserve">
-    <value>Invert specular</value>
+    <value>Invert Specular</value>
   </data>
   <data name="TagRuleNormalIntensityOpt" xml:space="preserve">
     <value>Normal × (opt.)</value>
@@ -308,13 +371,19 @@
     <value>Back</value>
   </data>
   <data name="ExploreFocusAssets" xml:space="preserve">
-    <value>assets</value>
+    <value>Assets</value>
   </data>
   <data name="TabNormals" xml:space="preserve">
     <value>Normals</value>
   </data>
+  <data name="TabRulesets" xml:space="preserve">
+    <value>Rulesets</value>
+  </data>
   <data name="TabSettings" xml:space="preserve">
     <value>Settings</value>
+  </data>
+  <data name="TabDebug" xml:space="preserve">
+    <value>Debug</value>
   </data>
   <data name="Input" xml:space="preserve">
     <value>Input</value>
@@ -401,7 +470,7 @@
     <value>Packing</value>
   </data>
   <data name="GenerationSettings" xml:space="preserve">
-    <value>Generation settings</value>
+    <value>Generation Settings</value>
   </data>
   <data name="TuneNormals" xml:space="preserve">
     <value>Normals</value>
@@ -425,31 +494,31 @@
     <value>Heightmap Tuning</value>
   </data>
   <data name="NormalStrength" xml:space="preserve">
-    <value>Normal strength</value>
+    <value>Normal Strength</value>
   </data>
   <data name="NormalStrengthTooltip" xml:space="preserve">
     <value>Strength of the normal map gradient. Higher = more pronounced surface relief.</value>
   </data>
   <data name="HeightStrength" xml:space="preserve">
-    <value>Height strength</value>
+    <value>Height Strength</value>
   </data>
   <data name="HeightStrengthTooltip" xml:space="preserve">
     <value>Exponent for height-from-brightness. Higher = more contrast in the height map.</value>
   </data>
   <data name="BrickProbeTuning" xml:space="preserve">
-    <value>Brick probe tuning</value>
+    <value>Brick Probe Tuning</value>
   </data>
   <data name="BrickProbeEnable" xml:space="preserve">
-    <value>Enable brick probe inversion</value>
+    <value>Enable Brick Probe Inversion</value>
   </data>
   <data name="BrickProbeMinStructure" xml:space="preserve">
-    <value>Min structure confidence</value>
+    <value>Min Structure Confidence</value>
   </data>
   <data name="BrickProbeInvertDelta" xml:space="preserve">
-    <value>Invert delta threshold</value>
+    <value>Invert Delta Threshold</value>
   </data>
   <data name="BrickProbeLightGroutDelta" xml:space="preserve">
-    <value>Light grout luminance delta</value>
+    <value>Light Grout Luminance Delta</value>
   </data>
   <data name="BrickProbeEnableTooltip" xml:space="preserve">
     <value>For textures tagged brick, decide whether to globally invert the height map when the probe detects light mortar that should be recessed. Requires the brick material tag (keyword or semantic).</value>
@@ -473,7 +542,7 @@
     <value>Operator</value>
   </data>
   <data name="NormalKernelSizeLabel" xml:space="preserve">
-    <value>Kernel size</value>
+    <value>Kernel Size</value>
   </data>
   <data name="Derivative" xml:space="preserve">
     <value>Derivative</value>
@@ -491,31 +560,31 @@
     <value>Color + Luminance Max</value>
   </data>
   <data name="SmoothnessScale" xml:space="preserve">
-    <value>Smoothness scale</value>
+    <value>Smoothness Scale</value>
   </data>
   <data name="SmoothnessScaleTooltip" xml:space="preserve">
     <value>Scales the specular smoothness (R channel) for non-metal textures.</value>
   </data>
   <data name="MetallicBoost" xml:space="preserve">
-    <value>Metallic boost</value>
+    <value>Metallic Boost</value>
   </data>
   <data name="MetallicBoostTooltip" xml:space="preserve">
     <value>Scales the specular response for textures detected as metal.</value>
   </data>
   <data name="PorosityBias" xml:space="preserve">
-    <value>Porosity bias</value>
+    <value>Porosity Bias</value>
   </data>
   <data name="PorosityBiasTooltip" xml:space="preserve">
     <value>Offset added to the porosity/subsurface channel (LabPBR B) for heuristic and AI specular. Can be negative.</value>
   </data>
   <data name="PlantMaterialPorosityExtra" xml:space="preserve">
-    <value>Organic material extra porosity</value>
+    <value>Organic Material Extra Porosity</value>
   </data>
   <data name="PlantMaterialPorosityExtraTooltip" xml:space="preserve">
     <value>Additional B-channel offset for textures with the Organic material tag (or OptiFine plant paths). Added on top of Porosity bias.</value>
   </data>
   <data name="MlSpecularHeuristicBlend" xml:space="preserve">
-    <value>Heuristic / AI blend</value>
+    <value>Heuristic / AI Blend</value>
   </data>
   <data name="MlSpecularHeuristicBlendTooltip" xml:space="preserve">
     <value>0 = pure heuristic specular when the AI model runs; 1 = full AI contribution. Intermediate values mix both.</value>
@@ -560,7 +629,7 @@
     <value>AI Metal &amp; Emissive</value>
   </data>
   <data name="FastSpecular" xml:space="preserve">
-    <value>Fast specular</value>
+    <value>Fast Specular</value>
   </data>
   <data name="FastSpecularTooltip" xml:space="preserve">
     <value>Use approximate RGB distance for specular matching. Faster but less accurate than full color difference.</value>
@@ -581,7 +650,7 @@
     <value>Convert All</value>
   </data>
   <data name="HeightFromNormals" xml:space="preserve">
-    <value>Height from normals</value>
+    <value>Height From Normals</value>
   </data>
   <data name="HeightFromNormalsTooltip" xml:space="preserve">
     <value>Derive height from the generated normal map (Frankot-Chellappa) instead of from diffuse brightness. Keeps height consistent with normals.</value>
@@ -593,7 +662,7 @@
     <value>Generate normals from the diffuse using the DeepBump ONNX model (deepbump256.onnx). Replaces the built-in Sobel/VC normal generation.</value>
   </data>
   <data name="DeepBumpOverlap" xml:space="preserve">
-    <value>Tile overlap</value>
+    <value>Tile Overlap</value>
   </data>
   <data name="DeepBumpOverlapTooltip" xml:space="preserve">
     <value>Larger overlap reduces tile seams but is slower. Large is recommended for best quality.</value>
@@ -608,10 +677,10 @@
     <value>Large</value>
   </data>
   <data name="DeepBumpAdvanced" xml:space="preserve">
-    <value>DeepBump (advanced)</value>
+    <value>DeepBump (Advanced)</value>
   </data>
   <data name="DeepBumpInputMode" xml:space="preserve">
-    <value>Input mode</value>
+    <value>Input Mode</value>
   </data>
   <data name="DeepBumpInputModeAuto" xml:space="preserve">
     <value>Auto</value>
@@ -623,43 +692,43 @@
     <value>RGB</value>
   </data>
   <data name="DeepBumpForceBlue255" xml:space="preserve">
-    <value>Force B=255 in DeepBump normals</value>
+    <value>Force B=255 in DeepBump Normals</value>
   </data>
   <data name="DeepBumpNormalIntensity" xml:space="preserve">
-    <value>DeepBump normal strength</value>
+    <value>DeepBump Normal Strength</value>
   </data>
   <data name="DeepBumpNormalIntensityTooltip" xml:space="preserve">
     <value>DeepBump-only normal XY strength multiplier. 1 = unchanged, higher = stronger details, lower = flatter normals.</value>
   </data>
   <data name="DeepBumpNormalSoftClamp" xml:space="preserve">
-    <value>DeepBump soft clamp</value>
+    <value>DeepBump Soft Clamp</value>
   </data>
   <data name="DeepBumpNormalSoftClampTooltip" xml:space="preserve">
     <value>0 = linear strength scaling. Higher values apply a soft tanh clamp to XY magnitude, keeping strong details while reducing near-90° saturation artifacts.</value>
   </data>
   <data name="DeepBumpEdgeGuidedEnhance" xml:space="preserve">
-    <value>Edge-guided DeepBump enhancement</value>
+    <value>Edge-Guided DeepBump Enhancement</value>
   </data>
   <data name="DeepBumpEdgeGuidedStrength" xml:space="preserve">
-    <value>Edge guidance strength</value>
+    <value>Edge Guidance Strength</value>
   </data>
   <data name="DeepBumpEdgeGuidedStrengthTooltip" xml:space="preserve">
     <value>Amplifies model normal XY magnitude more on strong diffuse edges. 0 = disabled, 1 = moderate, higher = sharper edges.</value>
   </data>
   <data name="DeepBumpEdgeGuidedGamma" xml:space="preserve">
-    <value>Edge guidance gamma</value>
+    <value>Edge Guidance Gamma</value>
   </data>
   <data name="DeepBumpEdgeGuidedGammaTooltip" xml:space="preserve">
     <value>Controls where enhancement is concentrated. Higher values focus on the strongest edges; lower values spread across softer edges.</value>
   </data>
   <data name="DeepBumpEdgeGuidedDirectionMix" xml:space="preserve">
-    <value>Edge direction mix</value>
+    <value>Edge Direction Mix</value>
   </data>
   <data name="DeepBumpEdgeGuidedDirectionMixTooltip" xml:space="preserve">
     <value>Blends DeepBump normal direction toward diffuse-derived gradient direction on edges. 0 = keep model direction, 1 = fully align on strong edges.</value>
   </data>
   <data name="NormalHeightTransparentAlphaClampMax" xml:space="preserve">
-    <value>Normal/height transparent alpha clamp max</value>
+    <value>Normal/Height Transparent Alpha Clamp Max</value>
   </data>
   <data name="NormalHeightTransparentAlphaClampMaxTooltip" xml:space="preserve">
     <value>Post-process clamp: if diffuse alpha ≤ this value, force normal/height RGBA to 0 to avoid artifacts in transparent regions. Slider caps at 16; you can type up to 255.</value>
@@ -668,67 +737,67 @@
     <value>Advanced</value>
   </data>
   <data name="Preprocessing" xml:space="preserve">
-    <value>Pre-processing</value>
+    <value>Pre-Processing</value>
   </data>
   <data name="PreprocessLinearize" xml:space="preserve">
-    <value>Linearize (sRGB → linear) before derivatives</value>
+    <value>Linearize (sRGB → Linear) Before Derivatives</value>
   </data>
   <data name="PreprocessDenoiseRadius" xml:space="preserve">
-    <value>Denoise radius</value>
+    <value>Denoise Radius</value>
   </data>
   <data name="PreprocessDenoiseBlend" xml:space="preserve">
-    <value>Denoise blend</value>
+    <value>Denoise Blend</value>
   </data>
   <data name="PreprocessFrequencySplit" xml:space="preserve">
-    <value>Frequency split (macro + detail)</value>
+    <value>Frequency Split (Macro + Detail)</value>
   </data>
   <data name="PreprocessFrequencyRadius" xml:space="preserve">
-    <value>Frequency radius</value>
+    <value>Frequency Radius</value>
   </data>
   <data name="PreprocessFrequencyDetailStrength" xml:space="preserve">
-    <value>Detail strength</value>
+    <value>Detail Strength</value>
   </data>
   <data name="SpecularAdvanced" xml:space="preserve">
-    <value>Specular (advanced)</value>
+    <value>Specular (Advanced)</value>
   </data>
   <data name="SpecularPercentileRemap" xml:space="preserve">
-    <value>Percentile remap smoothness (R)</value>
+    <value>Percentile Remap Smoothness (R)</value>
   </data>
   <data name="SpecularRemapLowPercentile" xml:space="preserve">
-    <value>Low percentile</value>
+    <value>Low Percentile</value>
   </data>
   <data name="SpecularRemapHighPercentile" xml:space="preserve">
-    <value>High percentile</value>
+    <value>High Percentile</value>
   </data>
   <data name="UseMlSpecularPredictor" xml:space="preserve">
-    <value>Use ML specular generator/predictor (ONNX)</value>
+    <value>Use ML Specular Generator/Predictor (ONNX)</value>
   </data>
   <data name="UseMlSpecularPredictorTooltip" xml:space="preserve">
     <value>When enabled and a default or per-resolution model path is valid, direct per-pixel specular RGBA is predicted from diffuse. Optional per-resolution paths (or bundled Data/ONNX-AI/SpecLab models) choose the ONNX by texture size (ceil). The heuristic/AI blend slider controls how much of the model is used versus the classic heuristic. Check the log for ML diagnostics.</value>
   </data>
   <data name="MlSpecularModelPath" xml:space="preserve">
-    <value>Specular model path</value>
+    <value>Specular Model Path</value>
   </data>
   <data name="MlSpecularModelPathWatermark" xml:space="preserve">
     <value>Path to specular generator/predictor ONNX file</value>
   </data>
   <data name="MlSpecularPerResolutionHeader" xml:space="preserve">
-    <value>Per-resolution specular models (optional)</value>
+    <value>Per-Resolution Specular Models (Optional)</value>
   </data>
   <data name="MlSpecularPerResolutionTooltip" xml:space="preserve">
     <value>Override ONNX per training resolution. Leave blank to use bundled files under Data/ONNX-AI/SpecLab when present. The runtime picks the smallest configured resolution ≥ texture size (ceil); if the texture is larger than all keys, the largest key is used. Fallback default path above applies only when no per-resolution map is available.</value>
   </data>
   <data name="MlSpecularUseEdgeChannel" xml:space="preserve">
-    <value>Include edge channel for specular model input (if model expects 4 channels)</value>
+    <value>Include Edge Channel for Specular Model Input (if Model Expects 4 Channels)</value>
   </data>
   <data name="MlSpecularTransparentAlphaClampMax" xml:space="preserve">
-    <value>Transparent alpha clamp max</value>
+    <value>Transparent Alpha Clamp Max</value>
   </data>
   <data name="MlSpecularTransparentAlphaClampMaxTooltip" xml:space="preserve">
     <value>Post-process clamp: if diffuse alpha ≤ this value, force specular RGBA to 0 to avoid ML artifacts in transparent regions. Slider caps at 16; you can type up to 255.</value>
   </data>
   <data name="SpecularDebugSection" xml:space="preserve">
-    <value>Specular ML debug</value>
+    <value>Specular ML Debug</value>
   </data>
   <data name="SpecularDebugDisableHeuristicSpecular" xml:space="preserve">
     <value>Disable heuristic fallback (magenta = non-ML)</value>
@@ -797,7 +866,7 @@
     <value>Filter (e.g. \block\stone)</value>
   </data>
   <data name="ExploreTagFilter" xml:space="preserve">
-    <value>Show tag:</value>
+    <value>Show Tag:</value>
   </data>
   <data name="ExploreTagFilterAll" xml:space="preserve">
     <value>All</value>
@@ -813,6 +882,9 @@
   </data>
   <data name="Engine" xml:space="preserve">
     <value>Engine</value>
+  </data>
+  <data name="DebugMode" xml:space="preserve">
+    <value>Debug</value>
   </data>
   <data name="MaxThreads" xml:space="preserve">
     <value>Max threads</value>

@@ -1,5 +1,6 @@
 using AutoPBR.Core.HeightFromNormals;
 using AutoPBR.Core.Models;
+using AutoPBR.Core.Atlas;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -59,157 +60,25 @@ internal static class NormalHeightGenerator
                         }
 
                         using var diffuseImg = Image.Load<Rgba32>(t.DiffusePath);
-                        using var croppedDiffuse = CropToSquare(diffuseImg, out var size);
-                        var width = size;
-                        var height = size;
+                        var atlasPlan = AtlasTiling.Decide(diffuseImg.Width, diffuseImg.Height);
                         string? brickInfo = null;
-
-                        Image<Rgba32> normal;
-                        if (generatorForLoop != null)
+                        if (atlasPlan.IsAtlas)
                         {
-                            var overlap = options.DeepBumpOverlap switch
+                            using var atlasNormal = new Image<Rgba32>(diffuseImg.Width, diffuseImg.Height);
+                            foreach (var tile in AtlasTiling.EnumerateTiles(atlasPlan))
                             {
-                                "Small" => DeepBumpNormalsGenerator.Overlap.Small,
-                                "Medium" => DeepBumpNormalsGenerator.Overlap.Medium,
-                                _ => DeepBumpNormalsGenerator.Overlap.Large
-                            };
-
-                            Image<Rgba32> diffuseForNormals = croppedDiffuse;
-                            normal = generatorForLoop.Generate(
-                                diffuseForNormals,
-                                overlap,
-                                options.DeepBumpInputMode,
-                                options.DeepBumpForceBlue255);
-                            var deepBumpIntensity = t.Overrides.NormalIntensity ?? options.DeepBumpNormalIntensity;
-                            DeepBumpEdgeGuidance? edgeGuidance = null;
-                            if (options.DeepBumpEdgeGuidedEnhance)
-                            {
-                                edgeGuidance = BuildDeepBumpEdgeGuidance(croppedDiffuse, width, height, options);
+                                using var tileDiffuse = AtlasTiling.ExtractTile(diffuseImg, tile);
+                                using var tileNormal = GenerateNormalForDiffuse(tileDiffuse, t, options, generatorForLoop, out var tileBrickInfo);
+                                AtlasTiling.PasteTile(atlasNormal, tile, tileNormal);
+                                brickInfo ??= tileBrickInfo;
                             }
 
-                            ApplyDeepBumpNormalIntensity(
-                                normal,
-                                deepBumpIntensity,
-                                options.DeepBumpNormalSoftClamp,
-                                t.Overrides.InvertNormalRed,
-                                t.Overrides.InvertNormalGreen,
-                                edgeGuidance,
-                                options.DeepBumpEdgeGuidedStrength,
-                                options.DeepBumpEdgeGuidedGamma,
-                                options.DeepBumpEdgeGuidedDirectionMix);
+                            atlasNormal.Save(t.NormalPath);
                         }
                         else
                         {
-                            var normalIntensity = t.Overrides.NormalIntensity ?? options.NormalIntensity;
-                            normal = GenerateNormalMap(
-                                croppedDiffuse,
-                                width,
-                                height,
-                                normalIntensity,
-                                t.Overrides.InvertNormalRed,
-                                t.Overrides.InvertNormalGreen,
-                                options);
-                        }
-
-                        using (normal)
-                        {
-                            var heightIntensity = t.Overrides.HeightIntensity ?? options.HeightIntensity;
-                            var brightness = t.Overrides.HeightBrightness ?? AutoPbrDefaults.DefaultHeightBrightness;
-                            var heightMap = GenerateHeightMap(croppedDiffuse, width, height, heightIntensity, brightness,
-                                t.Overrides.InvertHeight, options);
-
-                            BrickHeightPostProcessResult? brickProbeResult = null;
-                            if (t.HasBrickMaterialTag && options.BrickHeightMapPostProcessEnabled)
-                            {
-                                var newHeightData = BrickHeightPostProcessor.Apply(
-                                    heightMap.Data,
-                                    width,
-                                    height,
-                                    croppedDiffuse,
-                                    options,
-                                    out var brickRes);
-                                brickProbeResult = brickRes;
-                                heightMap = ReplaceHeightMapData(heightMap, newHeightData);
-                                t.Overrides.BrickProbeAppliedGlobalInvert =
-                                    brickRes is { SkippedLowConfidence: false, AppliedGlobalInvert: true };
-                                if (options.BrickHeightMapVerboseLog)
-                                {
-                                    brickInfo =
-                                        $"brick: conf={brickRes.StructuralConfidence:F3} d={brickRes.DeltaMortarMinusBrick:F1} inv={brickRes.AppliedGlobalInvert} skip={brickRes.SkippedLowConfidence}";
-                                }
-                            }
-
-                            if (options.BrickProbePreviewDebug)
-                            {
-                                if (brickProbeResult is { } res)
-                                {
-                                    t.BrickProbeDebugText =
-                                        $"name={t.Name}\nrelativeKey={t.RelativeKey}\n" +
-                                        (res.DebugText ?? "");
-                                }
-                                else if (!t.HasBrickMaterialTag)
-                                {
-                                    t.BrickProbeDebugText =
-                                        "Brick probe: skipped — this texture does not have the brick material tag (keyword or semantic match).";
-                                }
-                                else if (!options.BrickHeightMapPostProcessEnabled)
-                                {
-                                    t.BrickProbeDebugText =
-                                        "Brick probe: disabled — turn on \"Enable brick probe inversion\" under Height Tuning.";
-                                }
-                            }
-
-                            var skipHeightInAlpha = t.IsPlantForNoHeight;
-                            if (!skipHeightInAlpha && FoliageModeResolver.IsNoHeight(options.FoliageMode) &&
-                                t.Sprite2DFoliageTarget &&
-                                (t.Name.Contains("grass", StringComparison.OrdinalIgnoreCase) ||
-                                 t.RelativeKey.Contains("grass", StringComparison.OrdinalIgnoreCase)))
-                            {
-                                skipHeightInAlpha = HasSignificantTransparency(croppedDiffuse);
-                            }
-
-                            // LabPBR: normal blue channel = AO (0 = 100% occlusion, 255 = 0% occlusion).
-                            byte[]? aoChannel = null;
-                            if (options.GenerateAo && !skipHeightInAlpha)
-                            {
-                                aoChannel = GenerateAoChannelFromHeight(heightMap, options.AoRadius, options.AoStrength);
-                            }
-
-                            normal.ProcessPixelRows(acc =>
-                            {
-                                for (var y = 0; y < heightMap.Height; y++)
-                                {
-                                    var row = acc.GetRowSpan(y);
-                                    for (var x = 0; x < heightMap.Width; x++)
-                                    {
-                                        byte a;
-                                        if (skipHeightInAlpha)
-                                        {
-                                            a = 255;
-                                        }
-                                        else
-                                        {
-                                            var h = heightMap[x, y];
-                                            a = h == 0 ? (byte)1 : h;
-                                        }
-
-                                        row[x].A = a;
-
-                                        // LabPBR: B channel = ambient occlusion when enabled; else 255 (no occlusion).
-                                        var i = y * heightMap.Width + x;
-                                        row[x].B = aoChannel != null ? aoChannel[i] : (byte)255;
-                                    }
-                                }
-                            });
-
-                            if (options.NormalHeightZeroTransparentPixels)
-                            {
-                                ApplyTransparentZeroClamp(
-                                    normal,
-                                    croppedDiffuse,
-                                    Math.Clamp(options.NormalHeightTransparentAlphaClampMax, 0, 255));
-                            }
-
+                            using var croppedDiffuse = CropToSquare(diffuseImg);
+                            using var normal = GenerateNormalForDiffuse(croppedDiffuse, t, options, generatorForLoop, out brickInfo);
                             normal.Save(t.NormalPath);
                         }
 
@@ -222,6 +91,159 @@ internal static class NormalHeightGenerator
                 deepBumpGenerator?.Dispose();
             }
         }, ct);
+    }
+
+    private static Image<Rgba32> GenerateNormalForDiffuse(
+        Image<Rgba32> diffuse,
+        TextureWorkItem t,
+        AutoPbrOptions options,
+        DeepBumpNormalsGenerator? generatorForLoop,
+        out string? brickInfo)
+    {
+        var width = diffuse.Width;
+        var height = diffuse.Height;
+        brickInfo = null;
+
+        Image<Rgba32> normal;
+        if (generatorForLoop != null)
+        {
+            var overlap = options.DeepBumpOverlap switch
+            {
+                "Small" => DeepBumpNormalsGenerator.Overlap.Small,
+                "Medium" => DeepBumpNormalsGenerator.Overlap.Medium,
+                _ => DeepBumpNormalsGenerator.Overlap.Large
+            };
+
+            normal = generatorForLoop.Generate(
+                diffuse,
+                overlap,
+                options.DeepBumpInputMode,
+                options.DeepBumpForceBlue255);
+            var deepBumpIntensity = t.Overrides.NormalIntensity ?? options.DeepBumpNormalIntensity;
+            DeepBumpEdgeGuidance? edgeGuidance = null;
+            if (options.DeepBumpEdgeGuidedEnhance)
+            {
+                edgeGuidance = BuildDeepBumpEdgeGuidance(diffuse, width, height, options);
+            }
+
+            ApplyDeepBumpNormalIntensity(
+                normal,
+                deepBumpIntensity,
+                options.DeepBumpNormalSoftClamp,
+                t.Overrides.InvertNormalRed,
+                t.Overrides.InvertNormalGreen,
+                edgeGuidance,
+                options.DeepBumpEdgeGuidedStrength,
+                options.DeepBumpEdgeGuidedGamma,
+                options.DeepBumpEdgeGuidedDirectionMix);
+        }
+        else
+        {
+            var normalIntensity = t.Overrides.NormalIntensity ?? options.NormalIntensity;
+            normal = GenerateNormalMap(
+                diffuse,
+                width,
+                height,
+                normalIntensity,
+                t.Overrides.InvertNormalRed,
+                t.Overrides.InvertNormalGreen,
+                options);
+        }
+
+        var heightIntensity = t.Overrides.HeightIntensity ?? options.HeightIntensity;
+        var brightness = t.Overrides.HeightBrightness ?? AutoPbrDefaults.DefaultHeightBrightness;
+        var heightMap = GenerateHeightMap(diffuse, width, height, heightIntensity, brightness, t.Overrides.InvertHeight, options);
+
+        BrickHeightPostProcessResult? brickProbeResult = null;
+        if (t.HasBrickMaterialTag && options.BrickHeightMapPostProcessEnabled)
+        {
+            var newHeightData = BrickHeightPostProcessor.Apply(
+                heightMap.Data,
+                width,
+                height,
+                diffuse,
+                options,
+                out var brickRes);
+            brickProbeResult = brickRes;
+            heightMap = ReplaceHeightMapData(heightMap, newHeightData);
+            t.Overrides.BrickProbeAppliedGlobalInvert =
+                brickRes is { SkippedLowConfidence: false, AppliedGlobalInvert: true };
+            if (options.BrickHeightMapVerboseLog)
+            {
+                brickInfo =
+                    $"brick: conf={brickRes.StructuralConfidence:F3} d={brickRes.DeltaMortarMinusBrick:F1} inv={brickRes.AppliedGlobalInvert} skip={brickRes.SkippedLowConfidence}";
+            }
+        }
+
+        if (options.BrickProbePreviewDebug)
+        {
+            if (brickProbeResult is { } res)
+            {
+                t.BrickProbeDebugText =
+                    $"name={t.Name}\nrelativeKey={t.RelativeKey}\n" +
+                    (res.DebugText ?? "");
+            }
+            else if (!t.HasBrickMaterialTag)
+            {
+                t.BrickProbeDebugText =
+                    "Brick probe: skipped — this texture does not have the brick material tag (keyword or semantic match).";
+            }
+            else if (!options.BrickHeightMapPostProcessEnabled)
+            {
+                t.BrickProbeDebugText =
+                    "Brick probe: disabled — turn on \"Enable brick probe inversion\" under Height Tuning.";
+            }
+        }
+
+        var skipHeightInAlpha = t.IsPlantForNoHeight;
+        if (!skipHeightInAlpha && FoliageModeResolver.IsNoHeight(options.FoliageMode) &&
+            t.Sprite2DFoliageTarget &&
+            (t.Name.Contains("grass", StringComparison.OrdinalIgnoreCase) ||
+             t.RelativeKey.Contains("grass", StringComparison.OrdinalIgnoreCase)))
+        {
+            skipHeightInAlpha = HasSignificantTransparency(diffuse);
+        }
+
+        byte[]? aoChannel = null;
+        if (options.GenerateAo && !skipHeightInAlpha)
+        {
+            aoChannel = GenerateAoChannelFromHeight(heightMap, options.AoRadius, options.AoStrength);
+        }
+
+        normal.ProcessPixelRows(acc =>
+        {
+            for (var y = 0; y < heightMap.Height; y++)
+            {
+                var row = acc.GetRowSpan(y);
+                for (var x = 0; x < heightMap.Width; x++)
+                {
+                    byte a;
+                    if (skipHeightInAlpha)
+                    {
+                        a = 255;
+                    }
+                    else
+                    {
+                        var h = heightMap[x, y];
+                        a = h == 0 ? (byte)1 : h;
+                    }
+
+                    row[x].A = a;
+                    var i = y * heightMap.Width + x;
+                    row[x].B = aoChannel != null ? aoChannel[i] : (byte)255;
+                }
+            }
+        });
+
+        if (options.NormalHeightZeroTransparentPixels)
+        {
+            ApplyTransparentZeroClamp(
+                normal,
+                diffuse,
+                Math.Clamp(options.NormalHeightTransparentAlphaClampMax, 0, 255));
+        }
+
+        return normal;
     }
 
     private static bool HasSignificantTransparency(Image<Rgba32> cropped)
@@ -1150,10 +1172,9 @@ internal static class NormalHeightGenerator
         return i;
     }
 
-    private static Image<Rgba32> CropToSquare(Image<Rgba32> img, out int size)
+    private static Image<Rgba32> CropToSquare(Image<Rgba32> img)
     {
         var s = Math.Min(img.Width, img.Height);
-        size = s;
         if (img.Width == s && img.Height == s)
         {
             return img.Clone();

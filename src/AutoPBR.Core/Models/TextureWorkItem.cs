@@ -48,7 +48,7 @@ public sealed class TextureWorkItem
     /// </summary>
     public bool Sprite2DFoliageTarget { get; init; }
 
-    /// <summary>When true, texture has the plant material tag (or OptiFine plant/plants path) for extra porosity bias.</summary>
+    /// <summary>When true, texture has the organic material tag (or OptiFine plant/plants path) for extra porosity bias.</summary>
     public bool HasPlantMaterialTag { get; init; }
 
     /// <summary>When true, effective material tags include <c>brick</c> — enables structural mortar height post-processing.</summary>

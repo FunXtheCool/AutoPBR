@@ -178,7 +178,7 @@
   <data name="DeepBumpForceBlue255" xml:space="preserve"><value>强制 DeepBump 法线 B=255</value></data>
   <data name="Advanced" xml:space="preserve"><value>高级</value></data>
   <data name="Preprocessing" xml:space="preserve"><value>预处理</value></data>
-  <data name="PreprocessLinearize" xml:space="preserve"><value>导数前线性化（sRGB → linear）</value></data>
+  <data name="PreprocessLinearize" xml:space="preserve"><value>导数前线性化（sRGB → Linear）</value></data>
   <data name="PreprocessDenoiseRadius" xml:space="preserve"><value>降噪半径</value></data>
   <data name="PreprocessDenoiseBlend" xml:space="preserve"><value>降噪混合</value></data>
   <data name="PreprocessFrequencySplit" xml:space="preserve"><value>频率分离（宏观 + 细节）</value></data>
@@ -204,10 +204,13 @@
   <data name="Particles" xml:space="preserve"><value>粒子</value></data>
   <data name="ParticlesTooltip" xml:space="preserve"><value>处理粒子纹理。仅生成高光贴图。</value></data>
   <data name="FilterWatermark" xml:space="preserve"><value>筛选（例如 \block\stone）</value></data>
+  <data name="ExploreTagFilter" xml:space="preserve"><value>显示标签：</value></data>
+  <data name="ExploreTagFilterAll" xml:space="preserve"><value>全部</value></data>
   <data name="Output" xml:space="preserve"><value>输出</value></data>
   <data name="OutputFolderWatermark" xml:space="preserve"><value>输出文件夹</value></data>
   <data name="OutputPathWatermark" xml:space="preserve"><value>输出路径</value></data>
   <data name="Engine" xml:space="preserve"><value>引擎</value></data>
+  <data name="DebugMode" xml:space="preserve"><value>调试</value></data>
   <data name="MaxThreads" xml:space="preserve"><value>最大线程数</value></data>
   <data name="MaxThreadsTooltip" xml:space="preserve"><value>转换工作线程。0 = 自动。</value></data>
   <data name="OnnxPreferTensorRt" xml:space="preserve"><value>ONNX GPU 优先使用 TensorRT（CUDA 回退）</value></data>

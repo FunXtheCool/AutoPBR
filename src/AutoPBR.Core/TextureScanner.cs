@@ -20,6 +20,8 @@ internal static class TextureScanner
         bool Sprite2DFoliageTarget,
         bool HasPlantMaterialTag,
         bool HasBrickMaterialTag,
+        bool InvertSpecular,
+        bool InvertHeight,
         IReadOnlyList<string> EffectiveTagIds);
 
     private static IEnumerable<(string folder, bool specularOnly)> GetEnabledFolders(AutoPbrOptions options)
@@ -130,9 +132,9 @@ internal static class TextureScanner
             return false;
         }
 
-        for (var i = 0; i < textureName.Length; i++)
+        foreach (var c in textureName)
         {
-            if (!char.IsDigit(textureName[i]))
+            if (!char.IsDigit(c))
             {
                 return false;
             }
@@ -168,14 +170,33 @@ internal static class TextureScanner
 
     private static TagComputationResult BuildTagComputationResultFromEffectiveIds(
         ScanCandidate candidate,
-        IReadOnlyCollection<string> effectiveIds)
+        IReadOnlyCollection<string> effectiveIds,
+        IReadOnlyDictionary<string, bool>? overrideDecisions = null)
     {
         var effective = new HashSet<string>(effectiveIds, StringComparer.OrdinalIgnoreCase);
+        var invertSpecular = effective.Contains("brick");
+        var invertHeight = OreCoalTextureRules.ShouldInvertHeight(candidate.Name, candidate.RelativePathNoExt);
+        if (overrideDecisions is not null)
+        {
+            if (overrideDecisions.TryGetValue("invert_specular", out var invSpec))
+            {
+                invertSpecular = invSpec;
+            }
+
+            if (overrideDecisions.TryGetValue("invert_height", out var invHeight))
+            {
+                invertHeight = invHeight;
+            }
+        }
+
         return new TagComputationResult(
             effective.Contains(FlagTagResolver.Sprite2DId),
+            effective.Contains("organic") ||
             effective.Contains("plant") ||
             AutoPbrDefaults.PlantTextureKeys.Contains(candidate.RelativePathNoExt),
             effective.Contains("brick"),
+            invertSpecular,
+            invertHeight,
             effective.ToList());
     }
 
@@ -196,16 +217,17 @@ internal static class TextureScanner
 
         var sem = options.SemanticOptions;
         var includeDict = sem?.DictionaryEvidenceEnabled ?? false;
-        var effectiveTagIds = ConversionEffectiveTags.ComputeEffectiveTagIds(
+        var resolution = ConversionEffectiveTags.ComputeResolution(
             candidate.Name,
             candidate.RelativePathNoExt,
+            candidate.File,
             rules,
             sem,
             includeDict,
             deferSemanticMl,
             added,
             removed);
-        var effective = new HashSet<string>(effectiveTagIds, StringComparer.OrdinalIgnoreCase);
+        var effective = new HashSet<string>(resolution.EffectiveIds, StringComparer.OrdinalIgnoreCase);
         if (inheritedMaterialTagIds is { Count: > 0 })
         {
             HashSet<string>? removedSet = null;
@@ -225,7 +247,7 @@ internal static class TextureScanner
             }
         }
 
-        return BuildTagComputationResultFromEffectiveIds(candidate, effective);
+        return BuildTagComputationResultFromEffectiveIds(candidate, effective, resolution.OverrideDecisions);
     }
 
     private static Dictionary<string, IReadOnlyCollection<string>> BuildNumericOptifineFolderMaterialHints(
@@ -284,6 +306,7 @@ internal static class TextureScanner
             var inferredIds = ConversionEffectiveTags.ComputeEffectiveTagIds(
                 folderName,
                 folderKey,
+                texturePath: null,
                 rules,
                 sem,
                 includeDict,
@@ -322,8 +345,8 @@ internal static class TextureScanner
             HasBrickMaterialTag = tags.HasBrickMaterialTag,
             Overrides =
             {
-                InvertSpecular = tags.HasBrickMaterialTag,
-                InvertHeight = OreCoalTextureRules.ShouldInvertHeight(candidate.Name, candidate.RelativePathNoExt)
+                InvertSpecular = tags.InvertSpecular,
+                InvertHeight = tags.InvertHeight
             }
         };
     }

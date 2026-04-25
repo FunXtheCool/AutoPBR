@@ -15,6 +15,7 @@ using JetBrains.Annotations;
 using AutoPBR.App.Lang;
 using AutoPBR.App.Models;
 using AutoPBR.App.Services;
+using AutoPBR.App.ViewModels.Rulesets;
 using AutoPBR.Core;
 using AutoPBR.Core.Embeddings;
 using AutoPBR.Core.Models;
@@ -193,6 +194,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
     [ObservableProperty] private int _maxThreads; // 0 = auto
     [ObservableProperty] private int _maxThreadsMax = Math.Max(1, Environment.ProcessorCount);
     [ObservableProperty] private string? _tempDirectory;
+    [ObservableProperty] private bool _debugMode;
     [ObservableProperty] private bool _processBlocks = true;
     [ObservableProperty] private bool _processItems = true;
     [ObservableProperty] private bool _processArmor = true;
@@ -251,8 +253,10 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
     [ObservableProperty] private int _dictionaryRequestTimeoutMs = 900;
     private readonly IDictionaryDefinitionProvider _dictionaryDefinitionProvider = new FreeDictionaryDefinitionProvider();
 
-    /// <summary>Combo options for custom tag rule kind (JSON: Material | Flag).</summary>
-    public IReadOnlyList<string> TagRuleKindOptions { get; } = ["Material", "Flag"];
+    public RulesetsViewModel Rulesets { get; }
+
+    /// <summary>Compatibility proxy for settings sync and existing bindings.</summary>
+    public ObservableCollection<CustomTagRuleEntry> CustomTagRules => Rulesets.CustomTagRules;
 
     public int MlSpecularTransparentAlphaClampMaxSlider
     {
@@ -398,9 +402,6 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
     /// <summary>Items to show in Explore tree: children of focused folder, or root's children when no focus.</summary>
     public ObservableCollection<ArchiveNode> ExploreViewItems => FocusedArchiveNode?.Children ?? ScannedArchiveTopLevel;
 
-    /// <summary>User-defined tag rules (saved in settings). Used together with built-in rules.</summary>
-    public ObservableCollection<CustomTagRuleEntry> CustomTagRules { get; } = new();
-
     private IReadOnlyList<ExploreTagFilterOption>? _exploreTagFilterOptions;
 
     /// <summary>Options for "Show tag" dropdown in Explore: All plus each effective tag rule (cached so the ComboBox does not rebuild the list on every binding pass).</summary>
@@ -411,26 +412,21 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
         [new ExploreTagFilterOption { Id = "", DisplayName = LocalizedStrings.ExploreTagFilterAll }, .. GetEffectiveTagRules().Select(r => new ExploreTagFilterOption { Id = r.Id, DisplayName = r.DisplayName })];
 
     /// <summary>Built-in + custom tag rules for conversion and explore. Disabled custom rules are excluded.</summary>
-    public IReadOnlyList<TagRule> GetEffectiveTagRules()
-    {
-        var custom = CustomTagRules
-            .Where(c => c.Enabled)
-            .Select(c => c.ToTagRule())
-            .Where(r => !string.IsNullOrWhiteSpace(r.Id))
-            .ToList();
-        return custom.Count == 0
-            ? TagRulePresets.Default
-            : TagRulePresets.Default.Concat(custom).ToList();
-    }
+    public IReadOnlyList<TagRule> GetEffectiveTagRules() => Rulesets.GetEffectiveTagRules();
 
     /// <summary>Call when CustomTagRules or effective rules change so legend and explore use new rules.</summary>
     private void NotifyTagRulesChanged()
     {
+        Rulesets.RefreshPresentation();
         _materialTagSemanticMatcher?.Dispose();
         _materialTagSemanticMatcher = null;
         _exploreTagFilterOptions = null;
         OnPropertyChanged(nameof(ExploreTagFilterOptions));
         _exploreController.RefreshAllDisplayTags();
+        if (!_loadingSettings)
+        {
+            SaveSettings();
+        }
     }
 
     partial void OnUseSemanticMaterialTagsChanged(bool value)
@@ -591,6 +587,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
     public MainWindowViewModel()
     {
         _settings = UserSettings.Load();
+        Rulesets = new RulesetsViewModel(NotifyTagRulesChanged);
         _settingsPersistence = new SettingsPersistenceCoordinator(
             Dispatcher.UIThread,
             TimeSpan.FromMilliseconds(250),
@@ -1056,6 +1053,12 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
     }
 
     partial void OnTempDirectoryChanged(string? value)
+    {
+        _ = value;
+        SaveSettings();
+    }
+
+    partial void OnDebugModeChanged(bool value)
     {
         _ = value;
         SaveSettings();
@@ -1690,71 +1693,6 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
 
     private bool CanClearTagOverrides() => HasScannedArchive;
 
-    [RelayCommand]
-    private void AddCustomTagRule()
-    {
-        CustomTagRules.Add(new CustomTagRuleEntry { Id = "custom", DisplayName = "Custom" });
-        NotifyTagRulesChanged();
-    }
-
-    [RelayCommand(CanExecute = nameof(CanRemoveCustomTagRule))]
-    private void RemoveCustomTagRule(CustomTagRuleEntry? entry)
-    {
-        if (entry is not null)
-        {
-            CustomTagRules.Remove(entry);
-            NotifyTagRulesChanged();
-        }
-    }
-
-    private static bool CanRemoveCustomTagRule(CustomTagRuleEntry? entry) => entry is not null;
-
-    [RelayCommand(CanExecute = nameof(CanMoveCustomTagRuleUp))]
-    private void MoveCustomTagRuleUp(CustomTagRuleEntry? entry)
-    {
-        if (entry is null)
-        {
-            return;
-        }
-
-        var i = CustomTagRules.IndexOf(entry);
-        if (i > 0)
-        {
-            CustomTagRules.RemoveAt(i);
-            CustomTagRules.Insert(i - 1, entry);
-            NotifyTagRulesChanged();
-        }
-    }
-
-    private bool CanMoveCustomTagRuleUp(CustomTagRuleEntry? entry) =>
-        entry is not null && CustomTagRules.IndexOf(entry) > 0;
-
-    [RelayCommand(CanExecute = nameof(CanMoveCustomTagRuleDown))]
-    private void MoveCustomTagRuleDown(CustomTagRuleEntry? entry)
-    {
-        if (entry is null)
-        {
-            return;
-        }
-
-        var i = CustomTagRules.IndexOf(entry);
-        if (i >= 0 && i < CustomTagRules.Count - 1)
-        {
-            CustomTagRules.RemoveAt(i);
-            CustomTagRules.Insert(i + 1, entry);
-            NotifyTagRulesChanged();
-        }
-    }
-
-    private bool CanMoveCustomTagRuleDown(CustomTagRuleEntry? entry) =>
-        entry is not null && CustomTagRules.IndexOf(entry) >= 0 && CustomTagRules.IndexOf(entry) < CustomTagRules.Count - 1;
-
-    [RelayCommand]
-    private void RefreshTagRules()
-    {
-        NotifyTagRulesChanged();
-    }
-
     /// <summary>Replace custom tag rules from JSON (file picker calls this). Persists settings.</summary>
     public string? ImportCustomTagRulesFromJson(string json)
     {
@@ -1766,11 +1704,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
                 return "Invalid or empty tag rules file.";
             }
 
-            CustomTagRules.Clear();
-            foreach (var e in list)
-            {
-                CustomTagRules.Add(e);
-            }
+            Rulesets.ReplaceCustomRules(list);
 
             SaveSettings();
             NotifyTagRulesChanged();
@@ -1796,69 +1730,16 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
             return;
         }
 
-        var report = _exploreController.GetSemanticMatchDebugReport(node.FullPath);
-        if (report is null)
+        var debugText = _exploreController.GetSemanticMatchDebugText(node.FullPath);
+        if (string.IsNullOrWhiteSpace(debugText))
         {
             SemanticMatchDebugText = "MiniLM is not enabled or the file is not a texture.";
             ShowSemanticDebugDialog?.Invoke(SemanticMatchDebugText);
             return;
         }
 
-        SemanticMatchDebugText = FormatSemanticDebugReport(report, node.FullPath);
+        SemanticMatchDebugText = debugText;
         ShowSemanticDebugDialog?.Invoke(SemanticMatchDebugText);
-    }
-
-    private static string FormatSemanticDebugReport(
-        SemanticMatchDebugReport report,
-        string archivePath)
-    {
-        var sb = new System.Text.StringBuilder();
-        sb.AppendLine(FormattableString.Invariant($"File:  {Path.GetFileName(archivePath)}"));
-        sb.AppendLine(FormattableString.Invariant($"Query: \"{report.QueryText}\""));
-        if (report.DictionaryTerms is { Count: > 0 })
-        {
-            sb.AppendLine(FormattableString.Invariant($"Dictionary terms: {string.Join(", ", report.DictionaryTerms)}"));
-            sb.AppendLine(FormattableString.Invariant($"Dictionary evidence applied: {report.DictionaryEvidenceApplied} (weight={report.DictionaryEvidenceWeight:0.00})"));
-            if (report.DictionaryEvidenceApplied)
-            {
-                sb.AppendLine("Fusion note: rules without dictionary evidence are scaled by (1 - weight).");
-            }
-        }
-
-        if (report.DictionaryTermBlocks is { Count: > 0 })
-        {
-            foreach (var block in report.DictionaryTermBlocks)
-            {
-                foreach (var line in block.DefinitionLines)
-                {
-                    sb.AppendLine(FormattableString.Invariant($"{block.Term} definition: {line}"));
-                }
-            }
-        }
-
-        sb.AppendLine();
-        sb.AppendLine("── Per-rule cosine similarity (best/fused first) ──");
-        sb.AppendLine();
-
-        foreach (var entry in report.Entries)
-        {
-            var dictScore = entry.DictionaryBestScore > float.MinValue ? entry.DictionaryBestScore.ToString("F4", CultureInfo.InvariantCulture) : "n/a";
-            var fused = entry.FusedScore > float.MinValue ? entry.FusedScore.ToString("F4", CultureInfo.InvariantCulture) : "n/a";
-            sb.AppendLine(FormattableString.Invariant($"  {entry.DisplayName,-16}  best = {entry.BestScore:F4}  dict = {dictScore}  fused = {fused}   ← \"{entry.BestPhrase}\""));
-            foreach (var (phrase, score) in entry.AllPhraseScores)
-            {
-                if (phrase == entry.BestPhrase)
-                {
-                    continue;
-                }
-
-                sb.AppendLine(FormattableString.Invariant($"  {"",16}         {score:F4}   ← \"{phrase}\""));
-            }
-
-            sb.AppendLine();
-        }
-
-        return sb.ToString();
     }
 
     private async Task UpdatePreviewAsync()

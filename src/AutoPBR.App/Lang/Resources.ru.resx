@@ -154,7 +154,7 @@
   <data name="MetallicBoostTooltip" xml:space="preserve"><value>Масштаб отклика specular для текстур, определяемых как металл.</value></data>
   <data name="PorosityBias" xml:space="preserve"><value>Смещение пористости</value></data>
   <data name="PorosityBiasTooltip" xml:space="preserve"><value>Смещение канала пористости/subsurface (LabPBR B). Может быть отрицательным.</value></data>
-  <data name="FastSpecular" xml:space="preserve"><value>Быстрый specular</value></data>
+  <data name="FastSpecular" xml:space="preserve"><value>Быстрый Specular</value></data>
   <data name="FastSpecularTooltip" xml:space="preserve"><value>Приближённая RGB-дистанция. Быстрее, но менее точно.</value></data>
   <data name="Foliage" xml:space="preserve"><value>Растительность:</value></data>
   <data name="FoliageTooltip" xml:space="preserve"><value>Ignore All: пропускать растения. No Height: растения без высоты. Convert All: конвертировать всё.</value></data>
@@ -178,7 +178,7 @@
   <data name="DeepBumpForceBlue255" xml:space="preserve"><value>Принудительно B=255 в нормалях DeepBump</value></data>
   <data name="Advanced" xml:space="preserve"><value>Дополнительно</value></data>
   <data name="Preprocessing" xml:space="preserve"><value>Предобработка</value></data>
-  <data name="PreprocessLinearize" xml:space="preserve"><value>Линеаризация (sRGB → linear) перед производными</value></data>
+  <data name="PreprocessLinearize" xml:space="preserve"><value>Линеаризация (sRGB → Linear) перед производными</value></data>
   <data name="PreprocessDenoiseRadius" xml:space="preserve"><value>Радиус шумоподавления</value></data>
   <data name="PreprocessDenoiseBlend" xml:space="preserve"><value>Смешивание шумоподавления</value></data>
   <data name="PreprocessFrequencySplit" xml:space="preserve"><value>Разделение частот (макро + детали)</value></data>
@@ -204,10 +204,13 @@
   <data name="Particles" xml:space="preserve"><value>Частицы</value></data>
   <data name="ParticlesTooltip" xml:space="preserve"><value>Текстуры частиц. Генерируются только карты specular.</value></data>
   <data name="FilterWatermark" xml:space="preserve"><value>Фильтр (напр. \block\stone)</value></data>
+  <data name="ExploreTagFilter" xml:space="preserve"><value>Показать тег:</value></data>
+  <data name="ExploreTagFilterAll" xml:space="preserve"><value>Все</value></data>
   <data name="Output" xml:space="preserve"><value>Выход</value></data>
   <data name="OutputFolderWatermark" xml:space="preserve"><value>Папка вывода</value></data>
   <data name="OutputPathWatermark" xml:space="preserve"><value>Путь вывода</value></data>
   <data name="Engine" xml:space="preserve"><value>Движок</value></data>
+  <data name="DebugMode" xml:space="preserve"><value>Отладка</value></data>
   <data name="MaxThreads" xml:space="preserve"><value>Макс. потоков</value></data>
   <data name="MaxThreadsTooltip" xml:space="preserve"><value>Рабочие потоки. 0 = авто.</value></data>
   <data name="OnnxPreferTensorRt" xml:space="preserve"><value>Предпочитать TensorRT для ONNX GPU (запас CUDA)</value></data>

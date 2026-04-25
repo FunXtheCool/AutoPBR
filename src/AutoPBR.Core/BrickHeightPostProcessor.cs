@@ -68,9 +68,16 @@ internal static class BrickHeightPostProcessor
             return heightData.ToArray();
         }
 
-        var statsAny = BuildMaskStats(combined, hf, lum, width, height, brickFaceDilatePx);
-        var statsWhite = BuildMaskStats(combinedWhite, hf, lum, width, height, brickFaceDilatePx);
-        var statsBlack = BuildMaskStats(combinedBlack, hf, lum, width, height, brickFaceDilatePx);
+        float globalMeanLum = 0f;
+        foreach (var lumValue in lum)
+        {
+            globalMeanLum += lumValue;
+        }
+        globalMeanLum /= Math.Max(1, lum.Length);
+
+        var statsAny = BuildMaskStats(combined, hf, lum, width, height, brickFaceDilatePx, globalMeanLum);
+        var statsWhite = BuildMaskStats(combinedWhite, hf, lum, width, height, brickFaceDilatePx, globalMeanLum);
+        var statsBlack = BuildMaskStats(combinedBlack, hf, lum, width, height, brickFaceDilatePx, globalMeanLum);
         var (selected, maskLabel) = SelectBestMaskStats(statsAny, statsWhite, statsBlack);
 
         var meanS = selected.MeanS;
@@ -87,9 +94,34 @@ internal static class BrickHeightPostProcessor
         // Light-grout path: diffuse height puts mortar above brick (Δ>0) but mean S stays very low for thin joints,
         // so we must not gate on meanS here. If albedo is lighter on mortar than on brick faces, global-invert.
         var lumMin = options.BrickLightGroutDiffuseDeltaMin;
-        var invertLightGrout = delta > 0f && lumGap > lumMin;
+        var lightGroutMeanSMin = MathF.Max(options.BrickHeightMinStructuralConfidence * 0.5f, 0.004f);
+        var lumBeatMargin = MathF.Max(lumMin * 0.5f, 0.0015f);
+        var absoluteMortarLumFloor = 0.18f;
+        var relativeMortarLumFloor = MathF.Max(lumMin * 1.5f, 0.01f);
+
+        // Require polarity agreement across signed masks so white-top-hat cannot trigger on random bright brick flecks.
+        var polarityAgreement =
+            statsWhite.LumGap > lumMin &&
+            statsBlack.LumGap > MathF.Max(0.0008f, lumMin * 0.25f) &&
+            statsAny.LumGap > MathF.Max(0.0008f, lumMin * 0.5f) &&
+            statsWhite.LumGap > statsBlack.LumGap + lumBeatMargin;
+
+        // Absolute/relative brightness guard: light grout should be genuinely light, not just "less dark".
+        var isMortarBrightEnough =
+            statsWhite.MeanLumMortar > absoluteMortarLumFloor &&
+            (statsWhite.MeanLumMortar - statsWhite.GlobalMeanLum) > relativeMortarLumFloor;
+
+        // Keep light-grout path permissive for thin joints, but not fully ungated.
+        var hasLightGroutStructure =
+            statsWhite.MeanS >= lightGroutMeanSMin &&
+            statsWhite.SumMortarWeight > 2f;
+
+        var invertLightGrout = delta > 0f && polarityAgreement && isMortarBrightEnough && hasLightGroutStructure;
 
         var invert = invertStrong || invertLightGrout;
+        string FormatStatsLine(string label, ProbeMaskStats s)
+            => $"{label}: meanS={s.MeanS:F5} sumS={s.SumMortarWeight:F3} mMortarH={s.MeanMortarHeight:F1} mBrickH={s.MeanBrickHeight:F1} delta={s.Delta:F2} lumGap={s.LumGap:F5} lumMortar={s.MeanLumMortar:F5} lumBrick={s.MeanLumBrick:F5}";
+
         string? FormatDebug(bool applied, string reasonTag)
         {
             if (!options.BrickProbePreviewDebug)
@@ -101,9 +133,13 @@ internal static class BrickHeightPostProcessor
             return string.Join(Environment.NewLine,
                 $"mask={maskLabel}  minDim={minDim}  brickFaceDilatePx={brickFaceDilatePx}",
                 $"topHatRadii=[{rList}]  userTopHatMax={options.BrickMortarTopHatMaxRadius}",
-                $"meanS={meanS:F5}  mMortarH={mM:F1}  mBrickH={mB:F1}  delta={delta:F2}  lumGap={lumGap:F5}",
-                $"strongFloor={strongFloor:F5}  lumMin={lumMin:F5}",
-                $"path: strong={invertStrong}  lightGrout={invertLightGrout}",
+                FormatStatsLine("combined", statsAny),
+                FormatStatsLine("white", statsWhite),
+                FormatStatsLine("black", statsBlack),
+                $"selected: meanS={meanS:F5} delta={delta:F2} lumGap={lumGap:F5}",
+                $"strongFloor={strongFloor:F5}  lumMin={lumMin:F5}  lightGroutMeanSMin={lightGroutMeanSMin:F5}",
+                $"lightGroutChecks: polarity={polarityAgreement}  bright={isMortarBrightEnough}  structure={hasLightGroutStructure}",
+                $"path: strong={invertStrong}  lightGrout={invertLightGrout}  globalMeanLum={globalMeanLum:F5}",
                 $"invert={applied}  ({reasonTag})");
         }
 
@@ -187,7 +223,14 @@ internal static class BrickHeightPostProcessor
         return true;
     }
 
-    private static ProbeMaskStats BuildMaskStats(float[] mortarWeight, float[] hf, float[] lum, int width, int height, int brickFaceDilatePx)
+    private static ProbeMaskStats BuildMaskStats(
+        float[] mortarWeight,
+        float[] hf,
+        float[] lum,
+        int width,
+        int height,
+        int brickFaceDilatePx,
+        float globalMeanLum)
     {
         var n = width * height;
         var dilateR = brickFaceDilatePx;
@@ -223,10 +266,14 @@ internal static class BrickHeightPostProcessor
         return new ProbeMaskStats
         {
             MeanS = meanS,
+            SumMortarWeight = sumS,
             MeanMortarHeight = mM,
             MeanBrickHeight = mB,
             Delta = mM - mB,
-            LumGap = wMeanLumMortar - wMeanLumBrick
+            LumGap = wMeanLumMortar - wMeanLumBrick,
+            MeanLumMortar = wMeanLumMortar,
+            MeanLumBrick = wMeanLumBrick,
+            GlobalMeanLum = globalMeanLum
         };
     }
 
@@ -301,10 +348,14 @@ internal static class BrickHeightPostProcessor
     private sealed class ProbeMaskStats
     {
         public required float MeanS { get; init; }
+        public required float SumMortarWeight { get; init; }
         public required float MeanMortarHeight { get; init; }
         public required float MeanBrickHeight { get; init; }
         public required float Delta { get; init; }
         public required float LumGap { get; init; }
+        public required float MeanLumMortar { get; init; }
+        public required float MeanLumBrick { get; init; }
+        public required float GlobalMeanLum { get; init; }
     }
 
     private static void InvertHeightRangeInPlace(float[] hf)
