@@ -240,6 +240,8 @@
   <data name="Status_TagWorkDrainProgress" xml:space="preserve"><value>Finalisation du traitement des tags... ({0}/{1})</value></data>
   <data name="Status_SpecularCurrent" xml:space="preserve"><value>Specular : {0}</value></data>
   <data name="Status_NormalsCurrent" xml:space="preserve"><value>Normales : {0}</value></data>
+  <data name="Status_StageGeneratingSpecular" xml:space="preserve"><value>Génération des cartes spéculaires...</value></data>
+  <data name="Status_StageGeneratingNormals" xml:space="preserve"><value>Génération des cartes de normales...</value></data>
   <data name="Status_PackingOutput" xml:space="preserve"><value>Création du zip de sortie...</value></data>
   <data name="Status_PackingOutputProgress" xml:space="preserve"><value>Création du zip de sortie... ({0}/{1})</value></data>
   <data name="Status_Done" xml:space="preserve"><value>Terminé.</value></data>

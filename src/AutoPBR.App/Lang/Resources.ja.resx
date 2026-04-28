@@ -240,6 +240,8 @@
   <data name="Status_TagWorkDrainProgress" xml:space="preserve"><value>タグ処理を最終化しています... ({0}/{1})</value></data>
   <data name="Status_SpecularCurrent" xml:space="preserve"><value>スペキュラ: {0}</value></data>
   <data name="Status_NormalsCurrent" xml:space="preserve"><value>法線: {0}</value></data>
+  <data name="Status_StageGeneratingSpecular" xml:space="preserve"><value>スペキュラマップを生成中...</value></data>
+  <data name="Status_StageGeneratingNormals" xml:space="preserve"><value>法線マップを生成中...</value></data>
   <data name="Status_PackingOutput" xml:space="preserve"><value>出力 zip を作成中...</value></data>
   <data name="Status_PackingOutputProgress" xml:space="preserve"><value>出力 zip を作成中... ({0}/{1})</value></data>
   <data name="Status_Done" xml:space="preserve"><value>完了。</value></data>

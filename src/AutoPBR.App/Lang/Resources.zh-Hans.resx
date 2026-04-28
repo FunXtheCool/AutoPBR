@@ -240,6 +240,8 @@
   <data name="Status_TagWorkDrainProgress" xml:space="preserve"><value>正在完成标签处理… ({0}/{1})</value></data>
   <data name="Status_SpecularCurrent" xml:space="preserve"><value>高光：{0}</value></data>
   <data name="Status_NormalsCurrent" xml:space="preserve"><value>法线：{0}</value></data>
+  <data name="Status_StageGeneratingSpecular" xml:space="preserve"><value>正在生成镜面贴图…</value></data>
+  <data name="Status_StageGeneratingNormals" xml:space="preserve"><value>正在生成法线贴图…</value></data>
   <data name="Status_PackingOutput" xml:space="preserve"><value>正在打包输出 zip…</value></data>
   <data name="Status_PackingOutputProgress" xml:space="preserve"><value>正在打包输出 zip…（{0}/{1}）</value></data>
   <data name="Status_Done" xml:space="preserve"><value>完成。</value></data>

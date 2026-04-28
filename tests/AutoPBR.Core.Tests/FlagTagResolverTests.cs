@@ -54,4 +54,19 @@ public sealed class FlagTagResolverTests
 
         Assert.DoesNotContain(FlagTagResolver.UvWrapId, ids, StringComparer.OrdinalIgnoreCase);
     }
+
+    [Fact]
+    public void Resolve_DoesNotInferUvWrapFromSquareGeometry()
+    {
+        var ids = FlagTagResolver.Resolve(
+            textureName: "stone",
+            relativeKey: @"\minecraft\textures\block\stone",
+            flagRules: [],
+            context: new FlagTagResolver.ResolveContext(
+                ExplicitUvWrap: null,
+                TextureWidth: 32,
+                TextureHeight: 32));
+
+        Assert.DoesNotContain(FlagTagResolver.UvWrapId, ids, StringComparer.OrdinalIgnoreCase);
+    }
 }

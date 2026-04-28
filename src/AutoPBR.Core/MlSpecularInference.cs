@@ -25,13 +25,14 @@ internal static class MlSpecularInference
 {
     private static readonly object CacheLock = new();
 
-    /// <summary>Cache key: model path + TensorRT preference.</summary>
-    private static readonly Dictionary<(string Path, bool PreferTrt), CachedRunner> RunnerCache = new();
+    /// <summary>Cache key: model path + TensorRT preference + desired CPU runner pool size.</summary>
+    private static readonly Dictionary<(string Path, bool PreferTrt, int DesiredPoolSize), CachedRunner> RunnerCache = new();
 
     private sealed class CachedRunner
     {
-        public Runner? Runner { get; init; }
+        public required Runner[] Runners { get; init; }
         public string? LoadDiagnostic { get; init; }
+        public int NextRunnerIndex;
     }
 
     public static bool TryPredictSpecular(
@@ -65,16 +66,17 @@ internal static class MlSpecularInference
             return false;
         }
 
-        Runner? runner;
+        Runner? runner = null;
         string? loadDiag;
         lock (CacheLock)
         {
             var preferTrt = options.PreferOnnxTensorRtExecutionProvider;
-            var key = (path, preferTrt);
+            var desiredPoolSize = ResolveCpuRunnerPoolSize(options);
+            var key = (path, preferTrt, desiredPoolSize);
             if (!RunnerCache.TryGetValue(key, out var cached))
             {
-                var created = Runner.TryCreate(path, preferTrt, out loadDiag);
-                cached = new CachedRunner { Runner = created, LoadDiagnostic = loadDiag };
+                var created = CreateRunnerPool(path, preferTrt, desiredPoolSize, out loadDiag);
+                cached = new CachedRunner { Runners = created, LoadDiagnostic = loadDiag };
                 RunnerCache[key] = cached;
             }
             else
@@ -82,7 +84,12 @@ internal static class MlSpecularInference
                 loadDiag = cached.LoadDiagnostic;
             }
 
-            runner = cached.Runner;
+            if (cached.Runners.Length > 0)
+            {
+                var next = Interlocked.Increment(ref cached.NextRunnerIndex);
+                var idx = (next & int.MaxValue) % cached.Runners.Length;
+                runner = cached.Runners[idx];
+            }
         }
 
         if (runner is null)
@@ -121,6 +128,43 @@ internal static class MlSpecularInference
         }
     }
 
+    private static Runner[] CreateRunnerPool(
+        string modelPath,
+        bool preferTensorRtExecutionProvider,
+        int desiredCpuPoolSize,
+        out string? diagnostic)
+    {
+        diagnostic = null;
+        var first = Runner.TryCreate(modelPath, preferTensorRtExecutionProvider, out diagnostic);
+        if (first is null)
+        {
+            return [];
+        }
+
+        var runners = new List<Runner> { first };
+        var targetCount = first.IsUsingGpu ? 1 : Math.Max(1, desiredCpuPoolSize);
+        for (var i = 1; i < targetCount; i++)
+        {
+            var extra = Runner.TryCreate(modelPath, preferTensorRtExecutionProvider, out _);
+            if (extra is null)
+            {
+                break;
+            }
+
+            runners.Add(extra);
+        }
+
+        return runners.ToArray();
+    }
+
+    private static int ResolveCpuRunnerPoolSize(AutoPbrOptions options)
+    {
+        // Multiple CPU sessions remove the single-runner lock bottleneck.
+        // Cap pool size to avoid excessive model memory duplication.
+        var conversionParallelism = ThreadingUtil.GetConversionParallelism(options);
+        return Math.Clamp(conversionParallelism, 1, 4);
+    }
+
     private sealed class Runner : IDisposable
     {
         private readonly InferenceSession _session;
@@ -132,6 +176,7 @@ internal static class MlSpecularInference
         /// <summary>Declared input channel count (3 = RGB, 4 = RGB+edge).</summary>
         public int InputChannelCount => _inputChannels;
         public string ExecutionProvider { get; }
+        public bool IsUsingGpu => ExecutionProvider is "CUDA" or "TensorRT";
 
         private Runner(
             InferenceSession session,
@@ -252,14 +297,12 @@ internal static class MlSpecularInference
             var inputTensor = CreateInputTensor(image, edgeMagnitude, includeEdge);
             var inputs = new List<NamedOnnxValue> { NamedOnnxValue.CreateFromTensor(_inputName, inputTensor) };
 
-            Tensor<float> outputTensor;
             lock (_runLock)
             {
                 using IDisposableReadOnlyCollection<DisposableNamedOnnxValue> results = _session.Run(inputs);
-                outputTensor = results[0].AsTensor<float>();
+                var outputTensor = results[0].AsTensor<float>();
+                return Postprocess(outputTensor, w, h, r, g, b, a, out postprocessError);
             }
-
-            return Postprocess(outputTensor, w, h, r, g, b, a, out postprocessError);
         }
 
         private DenseTensor<float> CreateInputTensor(Image<Rgba32> img, float[] edgeMagnitude, bool includeEdge)

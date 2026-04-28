@@ -15,7 +15,8 @@ public static class AtlasTiling
         int width,
         int height,
         bool? explicitAtlasEnabled = null,
-        int minTileSize = DefaultMinTileSize)
+        int minTileSize = DefaultMinTileSize,
+        int? preferredTileSize = null)
     {
         if (width <= 0 || height <= 0)
         {
@@ -25,6 +26,27 @@ public static class AtlasTiling
         if (explicitAtlasEnabled == false)
         {
             return new AtlasPlan(false, 0, 0, 0, AtlasDecisionReason.ExplicitDisabled, 1f);
+        }
+
+        if (preferredTileSize is > 0)
+        {
+            var preferred = preferredTileSize.Value;
+            if (width == preferred && height == preferred)
+            {
+                return None;
+            }
+
+            if (width % preferred == 0 && height % preferred == 0)
+            {
+                var cols = width / preferred;
+                var rows = height / preferred;
+                if (cols * rows > 1)
+                {
+                    return new AtlasPlan(true, preferred, cols, rows, AtlasDecisionReason.GeometryInferred, 0.97f);
+                }
+            }
+
+            minTileSize = Math.Max(minTileSize, preferred);
         }
 
         var inferred = TryInferPlan(width, height, minTileSize);

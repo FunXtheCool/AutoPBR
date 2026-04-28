@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using System.IO.Compression;
 using System.IO.Hashing;
 using AutoPBR.Core.Models;
@@ -36,7 +37,8 @@ internal static class ParallelZipWriter
             var fullPath = files[i];
             var relativePath = Path.GetRelativePath(basePath, fullPath).Replace('\\', '/');
             var data = File.ReadAllBytes(fullPath);
-            var crc32 = BitConverter.ToUInt32(Crc32.Hash(data), 0);
+            // Crc32.Hash returns four bytes in little-endian order (same uint layout as ZIP's LE CRC field).
+            var crc32 = BinaryPrimitives.ReadUInt32LittleEndian(Crc32.Hash(data));
             var compressed = Compress(data);
             entries[i] = (relativePath, crc32, data.Length, compressed);
             var n = Interlocked.Increment(ref completed);
@@ -63,6 +65,7 @@ internal static class ParallelZipWriter
 
         var centralDirSize = (int)(fs.Position - centralDirOffset);
         WriteEndOfCentralDirectory(fs, centralDirEntries.Count, centralDirSize, centralDirOffset);
+        fs.Flush(flushToDisk: true);
     }
 
     private static byte[] Compress(byte[] data)
@@ -80,17 +83,17 @@ internal static class ParallelZipWriter
     {
         var nameBytes = System.Text.Encoding.UTF8.GetBytes(fileName);
         var (time, date) = GetDosDateTime(DateTimeOffset.Now);
-        s.Write(BitConverter.GetBytes(LocalFileHeaderSignature), 0, 4);
-        WriteLe(s, VersionNeeded);
-        WriteLe(s, 0); // flags
-        WriteLe(s, CompressionMethodDeflate);
-        WriteLe(s, time);
-        WriteLe(s, date);
-        WriteLe(s, crc32);
-        WriteLe(s, (uint)compressedSize);
-        WriteLe(s, (uint)uncompressedSize);
-        WriteLe(s, (ushort)nameBytes.Length);
-        WriteLe(s, 0); // extra field length
+        WriteU32(s, LocalFileHeaderSignature);
+        WriteU16(s, VersionNeeded);
+        WriteU16(s, 0); // general purpose bit flags
+        WriteU16(s, CompressionMethodDeflate);
+        WriteU16(s, time);
+        WriteU16(s, date);
+        WriteU32(s, crc32);
+        WriteU32(s, (uint)compressedSize);
+        WriteU32(s, (uint)uncompressedSize);
+        WriteU16(s, (ushort)nameBytes.Length);
+        WriteU16(s, 0); // extra field length
         s.Write(nameBytes, 0, nameBytes.Length);
     }
 
@@ -98,36 +101,36 @@ internal static class ParallelZipWriter
     {
         var nameBytes = System.Text.Encoding.UTF8.GetBytes(fileName);
         var (time, date) = GetDosDateTime(DateTimeOffset.Now);
-        s.Write(BitConverter.GetBytes(CentralFileHeaderSignature), 0, 4);
-        WriteLe(s, 0); // version made by
-        WriteLe(s, VersionNeeded);
-        WriteLe(s, 0); // flags
-        WriteLe(s, CompressionMethodDeflate);
-        WriteLe(s, time);
-        WriteLe(s, date);
-        WriteLe(s, crc32);
-        WriteLe(s, (uint)compressedSize);
-        WriteLe(s, (uint)uncompressedSize);
-        WriteLe(s, (ushort)nameBytes.Length);
-        WriteLe(s, 0); // extra field length
-        WriteLe(s, 0); // comment length
-        WriteLe(s, 0); // disk number
-        WriteLe(s, 0); // internal attrs
-        WriteLe(s, 0); // external attrs
-        WriteLe(s, (uint)localHeaderOffset);
+        WriteU32(s, CentralFileHeaderSignature);
+        WriteU16(s, 0); // version made by
+        WriteU16(s, VersionNeeded);
+        WriteU16(s, 0); // general purpose bit flags
+        WriteU16(s, CompressionMethodDeflate);
+        WriteU16(s, time);
+        WriteU16(s, date);
+        WriteU32(s, crc32);
+        WriteU32(s, (uint)compressedSize);
+        WriteU32(s, (uint)uncompressedSize);
+        WriteU16(s, (ushort)nameBytes.Length);
+        WriteU16(s, 0); // extra field length
+        WriteU16(s, 0); // file comment length
+        WriteU16(s, 0); // disk number start
+        WriteU16(s, 0); // internal file attributes
+        WriteU32(s, 0u); // external file attributes (always 4 bytes; never a 2-byte field)
+        WriteU32(s, (uint)localHeaderOffset);
         s.Write(nameBytes, 0, nameBytes.Length);
     }
 
     private static void WriteEndOfCentralDirectory(Stream s, int entryCount, int centralDirSize, long centralDirOffset)
     {
-        s.Write(BitConverter.GetBytes(EndOfCentralDirSignature), 0, 4);
-        WriteLe(s, 0); // disk number
-        WriteLe(s, 0); // disk with central dir
-        WriteLe(s, (ushort)entryCount);
-        WriteLe(s, (ushort)entryCount);
-        WriteLe(s, (uint)centralDirSize);
-        WriteLe(s, (uint)centralDirOffset);
-        WriteLe(s, 0); // comment length
+        WriteU32(s, EndOfCentralDirSignature);
+        WriteU16(s, 0); // number of this disk
+        WriteU16(s, 0); // number of the disk with the start of the central directory
+        WriteU16(s, (ushort)entryCount); // total number of entries on this disk
+        WriteU16(s, (ushort)entryCount);
+        WriteU32(s, (uint)centralDirSize);
+        WriteU32(s, (uint)centralDirOffset);
+        WriteU16(s, 0); // .zip file comment length
     }
 
     private static (ushort time, ushort date) GetDosDateTime(DateTimeOffset dt)
@@ -137,25 +140,17 @@ internal static class ParallelZipWriter
         return (time, date);
     }
 
-    private static void WriteLe(Stream s, ushort value)
+    private static void WriteU16(Stream s, ushort value)
     {
-        var b = BitConverter.GetBytes(value);
-        if (!BitConverter.IsLittleEndian)
-        {
-            Array.Reverse(b);
-        }
-
-        s.Write(b, 0, 2);
+        Span<byte> b = stackalloc byte[2];
+        BinaryPrimitives.WriteUInt16LittleEndian(b, value);
+        s.Write(b);
     }
 
-    private static void WriteLe(Stream s, uint value)
+    private static void WriteU32(Stream s, uint value)
     {
-        var b = BitConverter.GetBytes(value);
-        if (!BitConverter.IsLittleEndian)
-        {
-            Array.Reverse(b);
-        }
-
-        s.Write(b, 0, 4);
+        Span<byte> b = stackalloc byte[4];
+        BinaryPrimitives.WriteUInt32LittleEndian(b, value);
+        s.Write(b);
     }
 }

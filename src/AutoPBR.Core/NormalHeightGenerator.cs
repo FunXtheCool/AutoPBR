@@ -1,6 +1,7 @@
 using AutoPBR.Core.HeightFromNormals;
 using AutoPBR.Core.Models;
 using AutoPBR.Core.Atlas;
+using Microsoft.ML.OnnxRuntime;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -12,6 +13,10 @@ namespace AutoPBR.Core;
 /// </summary>
 internal static class NormalHeightGenerator
 {
+    private const int VcOrientationCount = 12;
+    private static readonly float[] VcCos = BuildVcCos();
+    private static readonly float[] VcSin = BuildVcSin();
+
     public static Task GenerateAsync(
         IReadOnlyList<TextureWorkItem> textures,
         AutoPbrOptions options,
@@ -27,6 +32,9 @@ internal static class NormalHeightGenerator
                 .ToList();
             var total = toProcess.Count;
             var completed = 0;
+            var deepBumpFallbackActivated = 0;
+            var deepBumpFallbackTextureCount = 0;
+            string? deepBumpFirstFailureReason = null;
             DeepBumpNormalsGenerator? deepBumpGenerator = null;
             try
             {
@@ -45,6 +53,23 @@ internal static class NormalHeightGenerator
                 }
 
                 var generatorForLoop = deepBumpGenerator;
+                void ActivateDeepBumpFallback(string reason)
+                {
+                    if (Interlocked.CompareExchange(ref deepBumpFallbackActivated, 1, 0) != 0)
+                    {
+                        return;
+                    }
+
+                    var normalized = NormalizeFirstDeepBumpFailureReason(reason);
+                    Interlocked.CompareExchange(ref deepBumpFirstFailureReason, normalized, null);
+                    progress?.Report(new ConversionProgress(
+                        ConversionStage.GeneratingNormals,
+                        0,
+                        total,
+                        null,
+                        "DeepBump failed during inference. Falling back to classic normal generation."));
+                }
+
                 Parallel.ForEach(
                     toProcess,
                     new ParallelOptions
@@ -53,6 +78,7 @@ internal static class NormalHeightGenerator
                     {
                         ThreadingUtil.SetThreadName("AutoPBR.Normals");
                         ct.ThrowIfCancellationRequested();
+                        var textureUsedDeepBumpFallback = 0;
 
                         if (!options.BrickProbePreviewDebug)
                         {
@@ -60,17 +86,120 @@ internal static class NormalHeightGenerator
                         }
 
                         using var diffuseImg = Image.Load<Rgba32>(t.DiffusePath);
-                        var atlasPlan = AtlasTiling.Decide(diffuseImg.Width, diffuseImg.Height);
+                        var atlasPlan = t.HasUvWrap
+                            ? AtlasTiling.Decide(
+                                diffuseImg.Width,
+                                diffuseImg.Height,
+                                preferredTileSize: t.PackBaseTileSize)
+                            : AtlasTiling.None;
                         string? brickInfo = null;
                         if (atlasPlan.IsAtlas)
                         {
+                            var tiles = AtlasTiling.EnumerateTiles(atlasPlan).ToList();
                             using var atlasNormal = new Image<Rgba32>(diffuseImg.Width, diffuseImg.Height);
-                            foreach (var tile in AtlasTiling.EnumerateTiles(atlasPlan))
+                            var tileWorkerCount = total <= 1
+                                ? Math.Min(Math.Max(1, ThreadingUtil.GetConversionParallelism(options)), Math.Max(1, tiles.Count))
+                                : 1;
+                            if (tileWorkerCount <= 1)
                             {
-                                using var tileDiffuse = AtlasTiling.ExtractTile(diffuseImg, tile);
-                                using var tileNormal = GenerateNormalForDiffuse(tileDiffuse, t, options, generatorForLoop, out var tileBrickInfo);
-                                AtlasTiling.PasteTile(atlasNormal, tile, tileNormal);
-                                brickInfo ??= tileBrickInfo;
+                                foreach (var tile in tiles)
+                                {
+                                    ct.ThrowIfCancellationRequested();
+                                    using var tileDiffuse = AtlasTiling.ExtractTile(diffuseImg, tile);
+                                    var deepBumpFaulted = Volatile.Read(ref deepBumpFallbackActivated) != 0;
+                                    var generatorForTile = !deepBumpFaulted
+                                        ? generatorForLoop
+                                        : null;
+                                    if (deepBumpFaulted && generatorForLoop != null)
+                                    {
+                                        Interlocked.Exchange(ref textureUsedDeepBumpFallback, 1);
+                                    }
+
+                                    using var tileNormal = GenerateNormalForDiffuse(
+                                        tileDiffuse,
+                                        t,
+                                        options,
+                                        generatorForTile,
+                                        out var tileBrickInfo,
+                                        out var tileUsedFallback,
+                                        ActivateDeepBumpFallback);
+                                    if (tileUsedFallback)
+                                    {
+                                        Interlocked.Exchange(ref textureUsedDeepBumpFallback, 1);
+                                    }
+
+                                    AtlasTiling.PasteTile(atlasNormal, tile, tileNormal);
+                                    brickInfo ??= tileBrickInfo;
+                                }
+                            }
+                            else
+                            {
+                                var tileDiffuses = new Image<Rgba32>?[tiles.Count];
+                                var tileNormals = new Image<Rgba32>?[tiles.Count];
+                                var tileBrickInfos = new string?[tiles.Count];
+                                try
+                                {
+                                    for (var i = 0; i < tiles.Count; i++)
+                                    {
+                                        tileDiffuses[i] = AtlasTiling.ExtractTile(diffuseImg, tiles[i]);
+                                    }
+
+                                    Parallel.For(
+                                        0,
+                                        tiles.Count,
+                                        new ParallelOptions
+                                        {
+                                            MaxDegreeOfParallelism = tileWorkerCount,
+                                            CancellationToken = ct
+                                        },
+                                        i =>
+                                        {
+                                            var tileDiffuse = tileDiffuses[i] ?? throw new InvalidOperationException("Atlas tile extraction failed.");
+                                            var deepBumpFaulted = Volatile.Read(ref deepBumpFallbackActivated) != 0;
+                                            var generatorForTile = !deepBumpFaulted
+                                                ? generatorForLoop
+                                                : null;
+                                            if (deepBumpFaulted && generatorForLoop != null)
+                                            {
+                                                Interlocked.Exchange(ref textureUsedDeepBumpFallback, 1);
+                                            }
+
+                                            tileNormals[i] = GenerateNormalForDiffuse(
+                                                tileDiffuse,
+                                                t,
+                                                options,
+                                                generatorForTile,
+                                                out var tileBrickInfo,
+                                                out var tileUsedFallback,
+                                                ActivateDeepBumpFallback);
+                                            if (tileUsedFallback)
+                                            {
+                                                Interlocked.Exchange(ref textureUsedDeepBumpFallback, 1);
+                                            }
+
+                                            tileBrickInfos[i] = tileBrickInfo;
+                                        });
+
+                                    for (var i = 0; i < tiles.Count; i++)
+                                    {
+                                        var tileNormal = tileNormals[i];
+                                        if (tileNormal is null)
+                                        {
+                                            continue;
+                                        }
+
+                                        AtlasTiling.PasteTile(atlasNormal, tiles[i], tileNormal);
+                                        brickInfo ??= tileBrickInfos[i];
+                                    }
+                                }
+                                finally
+                                {
+                                    for (var i = 0; i < tileNormals.Length; i++)
+                                    {
+                                        tileNormals[i]?.Dispose();
+                                        tileDiffuses[i]?.Dispose();
+                                    }
+                                }
                             }
 
                             atlasNormal.Save(t.NormalPath);
@@ -78,13 +207,60 @@ internal static class NormalHeightGenerator
                         else
                         {
                             using var croppedDiffuse = CropToSquare(diffuseImg);
-                            using var normal = GenerateNormalForDiffuse(croppedDiffuse, t, options, generatorForLoop, out brickInfo);
+                            var deepBumpFaulted = Volatile.Read(ref deepBumpFallbackActivated) != 0;
+                            var generatorForTexture = !deepBumpFaulted
+                                ? generatorForLoop
+                                : null;
+                            if (deepBumpFaulted && generatorForLoop != null)
+                            {
+                                Interlocked.Exchange(ref textureUsedDeepBumpFallback, 1);
+                            }
+
+                            using var normal = GenerateNormalForDiffuse(
+                                croppedDiffuse,
+                                t,
+                                options,
+                                generatorForTexture,
+                                out brickInfo,
+                                out var textureUsedFallback,
+                                ActivateDeepBumpFallback);
+                            if (textureUsedFallback)
+                            {
+                                Interlocked.Exchange(ref textureUsedDeepBumpFallback, 1);
+                            }
+
                             normal.Save(t.NormalPath);
+                        }
+
+                        if (Volatile.Read(ref textureUsedDeepBumpFallback) != 0)
+                        {
+                            Interlocked.Increment(ref deepBumpFallbackTextureCount);
                         }
 
                         var n = Interlocked.Increment(ref completed);
                         progress?.Report(new ConversionProgress(stage, n, total, t.Name, brickInfo));
                     });
+
+                if (Volatile.Read(ref deepBumpFallbackTextureCount) > 0)
+                {
+                    var firstReason = Volatile.Read(ref deepBumpFirstFailureReason);
+                    if (!string.IsNullOrWhiteSpace(firstReason))
+                    {
+                        progress?.Report(new ConversionProgress(
+                            stage,
+                            total,
+                            total,
+                            null,
+                            $"DeepBump first failure: {firstReason}"));
+                    }
+
+                    progress?.Report(new ConversionProgress(
+                        stage,
+                        total,
+                        total,
+                        null,
+                        $"DeepBump fallback used on {Volatile.Read(ref deepBumpFallbackTextureCount)} texture(s)."));
+                }
             }
             finally
             {
@@ -98,44 +274,64 @@ internal static class NormalHeightGenerator
         TextureWorkItem t,
         AutoPbrOptions options,
         DeepBumpNormalsGenerator? generatorForLoop,
-        out string? brickInfo)
+        out string? brickInfo,
+        out bool usedClassicFallback,
+        Action<string>? onDeepBumpFailure = null)
     {
         var width = diffuse.Width;
         var height = diffuse.Height;
         brickInfo = null;
+        usedClassicFallback = false;
 
         Image<Rgba32> normal;
         if (generatorForLoop != null)
         {
-            var overlap = options.DeepBumpOverlap switch
+            try
             {
-                "Small" => DeepBumpNormalsGenerator.Overlap.Small,
-                "Medium" => DeepBumpNormalsGenerator.Overlap.Medium,
-                _ => DeepBumpNormalsGenerator.Overlap.Large
-            };
+                var overlap = options.DeepBumpOverlap switch
+                {
+                    "Small" => DeepBumpNormalsGenerator.Overlap.Small,
+                    "Medium" => DeepBumpNormalsGenerator.Overlap.Medium,
+                    _ => DeepBumpNormalsGenerator.Overlap.Large
+                };
 
-            normal = generatorForLoop.Generate(
-                diffuse,
-                overlap,
-                options.DeepBumpInputMode,
-                options.DeepBumpForceBlue255);
-            var deepBumpIntensity = t.Overrides.NormalIntensity ?? options.DeepBumpNormalIntensity;
-            DeepBumpEdgeGuidance? edgeGuidance = null;
-            if (options.DeepBumpEdgeGuidedEnhance)
-            {
-                edgeGuidance = BuildDeepBumpEdgeGuidance(diffuse, width, height, options);
+                normal = generatorForLoop.Generate(
+                    diffuse,
+                    overlap,
+                    options.DeepBumpInputMode,
+                    options.DeepBumpForceBlue255);
+                var deepBumpIntensity = t.Overrides.NormalIntensity ?? options.DeepBumpNormalIntensity;
+                DeepBumpEdgeGuidance? edgeGuidance = null;
+                if (options.DeepBumpEdgeGuidedEnhance)
+                {
+                    edgeGuidance = BuildDeepBumpEdgeGuidance(diffuse, width, height, options);
+                }
+
+                ApplyDeepBumpNormalIntensity(
+                    normal,
+                    deepBumpIntensity,
+                    options.DeepBumpNormalSoftClamp,
+                    t.Overrides.InvertNormalRed,
+                    t.Overrides.InvertNormalGreen,
+                    edgeGuidance,
+                    options.DeepBumpEdgeGuidedStrength,
+                    options.DeepBumpEdgeGuidedGamma,
+                    options.DeepBumpEdgeGuidedDirectionMix);
             }
-
-            ApplyDeepBumpNormalIntensity(
-                normal,
-                deepBumpIntensity,
-                options.DeepBumpNormalSoftClamp,
-                t.Overrides.InvertNormalRed,
-                t.Overrides.InvertNormalGreen,
-                edgeGuidance,
-                options.DeepBumpEdgeGuidedStrength,
-                options.DeepBumpEdgeGuidedGamma,
-                options.DeepBumpEdgeGuidedDirectionMix);
+            catch (OnnxRuntimeException ex)
+            {
+                usedClassicFallback = true;
+                onDeepBumpFailure?.Invoke(ex.Message);
+                normal = GenerateNormalMap(
+                    diffuse,
+                    width,
+                    height,
+                    t.Overrides.NormalIntensity ?? options.NormalIntensity,
+                    t.Overrides.InvertNormalRed,
+                    t.Overrides.InvertNormalGreen,
+                    options);
+                brickInfo = "DeepBump inference failed; used classic normal generation fallback.";
+            }
         }
         else
         {
@@ -449,18 +645,15 @@ internal static class NormalHeightGenerator
                 }
         }
 
-        const int vcOrientationCount = 12;
-        const float vcAngleStep = MathF.PI / vcOrientationCount;
         var vcMag = new float[width * height];
         for (var i = 0; i < gx.Length; i++)
         {
             var gxv = gx[i];
             var gyv = gy[i];
             float sum = 0;
-            for (var k = 0; k < vcOrientationCount; k++)
+            for (var k = 0; k < VcOrientationCount; k++)
             {
-                var a = k * vcAngleStep;
-                sum += MathF.Abs(gxv * MathF.Cos(a) + gyv * MathF.Sin(a));
+                sum += MathF.Abs(gxv * VcCos[k] + gyv * VcSin[k]);
             }
 
             vcMag[i] = sum;
@@ -474,8 +667,20 @@ internal static class NormalHeightGenerator
             gradMag[i] = MathF.Sqrt(gxv * gxv + gyv * gyv);
         }
 
-        var maxGradMag = gradMag.Max();
-        var maxVcMag = vcMag.Max();
+        var maxGradMag = 0f;
+        var maxVcMag = 0f;
+        for (var i = 0; i < gradMag.Length; i++)
+        {
+            if (gradMag[i] > maxGradMag)
+            {
+                maxGradMag = gradMag[i];
+            }
+
+            if (vcMag[i] > maxVcMag)
+            {
+                maxVcMag = vcMag[i];
+            }
+        }
         const float eps = 1e-6f;
         if (maxGradMag < eps)
         {
@@ -865,53 +1070,112 @@ internal static class NormalHeightGenerator
         float[] gxOut,
         float[] gyOut)
     {
-        var n = width * height;
-        var r = new float[n];
-        var g = new float[n];
-        var b = new float[n];
-        img.ProcessPixelRows(acc =>
+        if (!img.DangerousTryGetSinglePixelMemory(out var mem))
         {
-            for (var y = 0; y < height; y++)
+            var nFallback = width * height;
+            var r = new float[nFallback];
+            var g = new float[nFallback];
+            var b = new float[nFallback];
+            img.ProcessPixelRows(acc =>
             {
-                var row = acc.GetRowSpan(y);
-                for (var x = 0; x < width; x++)
+                for (var y = 0; y < height; y++)
                 {
-                    var p = row[x];
-                    var i = y * width + x;
-                    r[i] = p.R / 255f;
-                    g[i] = p.G / 255f;
-                    b[i] = p.B / 255f;
+                    var row = acc.GetRowSpan(y);
+                    for (var x = 0; x < width; x++)
+                    {
+                        var p = row[x];
+                        var i = y * width + x;
+                        r[i] = p.R / 255f;
+                        g[i] = p.G / 255f;
+                        b[i] = p.B / 255f;
+                    }
+                }
+            });
+            var gxR = new float[nFallback];
+            var gyR = new float[nFallback];
+            var gxG = new float[nFallback];
+            var gyG = new float[nFallback];
+            var gxB = new float[nFallback];
+            var gyB = new float[nFallback];
+            ComputeGradients(r, width, height, kx, ky, radius, gxR, gyR);
+            ComputeGradients(g, width, height, kx, ky, radius, gxG, gyG);
+            ComputeGradients(b, width, height, kx, ky, radius, gxB, gyB);
+            for (var i = 0; i < nFallback; i++)
+            {
+                var magR = MathF.Sqrt(gxR[i] * gxR[i] + gyR[i] * gyR[i]);
+                var magG = MathF.Sqrt(gxG[i] * gxG[i] + gyG[i] * gyG[i]);
+                var magB = MathF.Sqrt(gxB[i] * gxB[i] + gyB[i] * gyB[i]);
+                if (magR >= magG && magR >= magB)
+                {
+                    gxOut[i] = gxR[i];
+                    gyOut[i] = gyR[i];
+                }
+                else if (magG >= magB)
+                {
+                    gxOut[i] = gxG[i];
+                    gyOut[i] = gyG[i];
+                }
+                else
+                {
+                    gxOut[i] = gxB[i];
+                    gyOut[i] = gyB[i];
                 }
             }
-        });
-        var gxR = new float[n];
-        var gyR = new float[n];
-        var gxG = new float[n];
-        var gyG = new float[n];
-        var gxB = new float[n];
-        var gyB = new float[n];
-        ComputeGradients(r, width, height, kx, ky, radius, gxR, gyR);
-        ComputeGradients(g, width, height, kx, ky, radius, gxG, gyG);
-        ComputeGradients(b, width, height, kx, ky, radius, gxB, gyB);
-        for (var i = 0; i < n; i++)
+
+            return;
+        }
+
+        var span = mem.Span;
+        const float inv255 = 1f / 255f;
+        for (var y = 0; y < height; y++)
         {
-            var magR = MathF.Sqrt(gxR[i] * gxR[i] + gyR[i] * gyR[i]);
-            var magG = MathF.Sqrt(gxG[i] * gxG[i] + gyG[i] * gyG[i]);
-            var magB = MathF.Sqrt(gxB[i] * gxB[i] + gyB[i] * gyB[i]);
-            if (magR >= magG && magR >= magB)
+            for (var x = 0; x < width; x++)
             {
-                gxOut[i] = gxR[i];
-                gyOut[i] = gyR[i];
-            }
-            else if (magG >= magB)
-            {
-                gxOut[i] = gxG[i];
-                gyOut[i] = gyG[i];
-            }
-            else
-            {
-                gxOut[i] = gxB[i];
-                gyOut[i] = gyB[i];
+                float sxR = 0, syR = 0;
+                float sxG = 0, syG = 0;
+                float sxB = 0, syB = 0;
+                for (var oy = -radius; oy <= radius; oy++)
+                {
+                    for (var ox = -radius; ox <= radius; ox++)
+                    {
+                        var rx = Reflect(x + ox, width);
+                        var ry = Reflect(y + oy, height);
+                        var p = span[ry * width + rx];
+                        var kxv = kx[oy + radius, ox + radius];
+                        var kyv = ky[oy + radius, ox + radius];
+
+                        var rv = p.R * inv255;
+                        var gv = p.G * inv255;
+                        var bv = p.B * inv255;
+
+                        sxR += rv * kxv;
+                        syR += rv * kyv;
+                        sxG += gv * kxv;
+                        syG += gv * kyv;
+                        sxB += bv * kxv;
+                        syB += bv * kyv;
+                    }
+                }
+
+                var idx = y * width + x;
+                var magR = MathF.Sqrt(sxR * sxR + syR * syR);
+                var magG = MathF.Sqrt(sxG * sxG + syG * syG);
+                var magB = MathF.Sqrt(sxB * sxB + syB * syB);
+                if (magR >= magG && magR >= magB)
+                {
+                    gxOut[idx] = sxR;
+                    gyOut[idx] = syR;
+                }
+                else if (magG >= magB)
+                {
+                    gxOut[idx] = sxG;
+                    gyOut[idx] = syG;
+                }
+                else
+                {
+                    gxOut[idx] = sxB;
+                    gyOut[idx] = syB;
+                }
             }
         }
     }
@@ -1113,8 +1377,22 @@ internal static class NormalHeightGenerator
 
         if (invertHeight)
         {
-            var lowest = outData.Min();
-            var highest = outData.Max();
+            byte lowest = 255;
+            byte highest = 0;
+            for (var i = 0; i < outData.Length; i++)
+            {
+                var v = outData[i];
+                if (v < lowest)
+                {
+                    lowest = v;
+                }
+
+                if (v > highest)
+                {
+                    highest = v;
+                }
+            }
+
             for (var i = 0; i < outData.Length; i++)
             {
                 outData[i] = (byte)(highest - outData[i] + lowest);
@@ -1183,6 +1461,55 @@ internal static class NormalHeightGenerator
         var startX = (img.Width - s) / 2;
         var startY = (img.Height - s) / 2;
         return img.Clone(ctx => ctx.Crop(new Rectangle(startX, startY, s, s)));
+    }
+
+    private static float[] BuildVcCos()
+    {
+        var arr = new float[VcOrientationCount];
+        var step = MathF.PI / VcOrientationCount;
+        for (var i = 0; i < VcOrientationCount; i++)
+        {
+            arr[i] = MathF.Cos(i * step);
+        }
+
+        return arr;
+    }
+
+    private static float[] BuildVcSin()
+    {
+        var arr = new float[VcOrientationCount];
+        var step = MathF.PI / VcOrientationCount;
+        for (var i = 0; i < VcOrientationCount; i++)
+        {
+            arr[i] = MathF.Sin(i * step);
+        }
+
+        return arr;
+    }
+
+    private static string NormalizeFirstDeepBumpFailureReason(string? reason)
+    {
+        if (string.IsNullOrWhiteSpace(reason))
+        {
+            return "unknown ONNX Runtime error";
+        }
+
+        var cleaned = reason
+            .Replace("\r", " ", StringComparison.Ordinal)
+            .Replace("\n", " ", StringComparison.Ordinal);
+        while (cleaned.Contains("  ", StringComparison.Ordinal))
+        {
+            cleaned = cleaned.Replace("  ", " ", StringComparison.Ordinal);
+        }
+
+        cleaned = cleaned.Trim();
+        const int maxLen = 220;
+        if (cleaned.Length > maxLen)
+        {
+            cleaned = $"{cleaned[..maxLen]}...";
+        }
+
+        return cleaned;
     }
 }
 

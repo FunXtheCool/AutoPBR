@@ -39,19 +39,43 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
     private DateTime _lastLogWriteUtc = DateTime.MinValue;
     private const int LogWriteIntervalMs = 250;
     private const int MaxLogLines = 600;
+    private static readonly TimeSpan ScanDebugUpdateInterval = TimeSpan.FromMilliseconds(100);
+    private static readonly TimeSpan ConversionUiProgressUpdateInterval = TimeSpan.FromMilliseconds(50);
+    private static readonly TimeSpan ScanUiProgressUpdateInterval = TimeSpan.FromMilliseconds(50);
+    private DateTime _lastScanDebugUpdateUtc = DateTime.MinValue;
 
     /// <summary>Append a line to the log (e.g. from view code-behind).</summary>
     public void AppendUserLog(string line) => AddLogLine(line);
 
     private void AddLogLine(string line)
     {
-        LogLines.Add(line);
-        while (LogLines.Count > MaxLogLines)
+        void Core()
         {
-            LogLines.RemoveAt(0);
+            LogLines.Add(line);
+            var trimmed = false;
+            while (LogLines.Count > MaxLogLines)
+            {
+                LogLines.RemoveAt(0);
+                trimmed = true;
+            }
+
+            if (trimmed)
+            {
+                LogText = string.Join(Environment.NewLine, LogLines);
+                return;
+            }
+
+            LogText = string.IsNullOrEmpty(LogText) ? line : $"{LogText}{Environment.NewLine}{line}";
         }
 
-        LogText = string.Join(Environment.NewLine, LogLines);
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            Core();
+        }
+        else
+        {
+            Dispatcher.UIThread.Post(Core);
+        }
     }
 
     private static string ResolveBackgroundTaskLabel(string taskId) => taskId switch
@@ -88,7 +112,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
         }
         else
         {
-            Dispatcher.UIThread.Invoke(Core);
+            Dispatcher.UIThread.Post(Core);
         }
     }
 
@@ -119,7 +143,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
         }
         else
         {
-            Dispatcher.UIThread.Invoke(Core);
+            Dispatcher.UIThread.Post(Core);
         }
     }
 
@@ -142,7 +166,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
         }
         else
         {
-            Dispatcher.UIThread.Invoke(Core);
+            Dispatcher.UIThread.Post(Core);
         }
     }
 
@@ -280,6 +304,9 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
 
     [ObservableProperty] private double _progressValue;
     [ObservableProperty] private double _progressMax = 1;
+    [ObservableProperty] private string _conversionElapsedText = "";
+    [ObservableProperty] private string _conversionEtaText = "";
+    [ObservableProperty] private string _conversionTotalText = "";
 
     [ObservableProperty] private string? _outputZipPath;
 
@@ -1521,18 +1548,14 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
             return;
         }
 
-        var ext = Path.GetExtension(PackPath);
         var baseName = Path.GetFileNameWithoutExtension(PackPath);
         if (string.IsNullOrWhiteSpace(baseName))
         {
             baseName = "pack";
         }
 
-        // Always output .zip (separate PBR layer). JAR in → ZIP out; ZIP in → ZIP with _PBR suffix.
-
-        OutputZipPath = ext.Equals(".jar", StringComparison.OrdinalIgnoreCase)
-            ? Path.Combine(OutputDirectory, baseName + ".zip")
-            : Path.Combine(OutputDirectory, $"{baseName}_PBR.zip");
+        // Always output a .zip PBR layer; same _PBR suffix for .zip and .jar (matches batch convert).
+        OutputZipPath = Path.Combine(OutputDirectory, $"{baseName}_PBR.zip");
     }
 
     private void SaveSettings()
@@ -1576,6 +1599,17 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
          path.EndsWith(".jar", StringComparison.OrdinalIgnoreCase));
 
     private bool CanScanArchive() => !IsConverting && !IsBusy && IsPackPath(PackPath) && File.Exists(PackPath);
+
+    private static void RunOnUiThread(Action action)
+    {
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            action();
+            return;
+        }
+
+        Dispatcher.UIThread.Post(action);
+    }
 
     private void ClearScannedArchive()
     {
@@ -1845,7 +1879,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
         _scanCts = new CancellationTokenSource();
         var scanToken = _scanCts.Token;
 
-        var scanProgress = new Progress<(int completed, int total)>(p =>
+        var scanProgress = CreateScanProgressReporter(p =>
         {
             _ = Dispatcher.UIThread.InvokeAsync(() =>
             {
@@ -1954,7 +1988,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
         _scanCts = new CancellationTokenSource();
         var scanToken = _scanCts.Token;
 
-        var scanProgress = new Progress<(int completed, int total)>(p =>
+        var scanProgress = CreateScanProgressReporter(p =>
         {
             _ = Dispatcher.UIThread.InvokeAsync(() =>
             {
@@ -2071,6 +2105,9 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
         _lastLogWriteUtc = DateTime.MinValue;
         _conversionStartUtc = DateTime.UtcNow;
         _currentStage = null;
+        ConversionElapsedText = "Elapsed: 00:00";
+        ConversionEtaText = "ETA: --:--";
+        ConversionTotalText = "";
         CancelCommand.NotifyCanExecuteChanged();
         _cts = new CancellationTokenSource();
         var token = _cts.Token;
@@ -2082,7 +2119,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
             _specularData ??=
                 SpecularData.LoadFromFile(Path.Combine(AppContext.BaseDirectory, "Data", "textures_data.json"));
 
-            var prog = CreateConversionProgressReporter();
+            using var prog = CreateConversionProgressReporter();
             await WaitForPendingTagWorkWithProgressAsync(token).ConfigureAwait(false);
             _exploreController.FlushTagOverridesToDisk();
             var packIndex = 0;
@@ -2112,39 +2149,64 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
         }
         catch (OperationCanceledException)
         {
-            SetStatus("Status_Cancelled");
-            AddLogLine(Resources.GetString("Log_Cancelled"));
+            RunOnUiThread(() =>
+            {
+                SetStatus("Status_Cancelled");
+                AddLogLine(Resources.GetString("Log_Cancelled"));
+            });
         }
         catch (Exception ex)
         {
-            SetStatus("Status_ConversionFailed");
-            AddLogLine(ex.ToString());
+            RunOnUiThread(() =>
+            {
+                SetStatus("Status_ConversionFailed");
+                AddLogLine(ex.ToString());
+            });
         }
         finally
         {
             SaveLogToFile();
+            RunOnUiThread(() =>
+            {
+                if (string.IsNullOrWhiteSpace(ConversionTotalText))
+                {
+                    var total = DateTime.UtcNow - _conversionStartUtc;
+                    if (total < TimeSpan.Zero)
+                    {
+                        total = TimeSpan.Zero;
+                    }
+
+                    ConversionTotalText = $"Total: {FormatDuration(total)}";
+                }
+            });
             _cts?.Dispose();
             _cts = null;
-            IsConverting = false;
-            IsBusy = false;
-            CancelCommand.NotifyCanExecuteChanged();
-            ConvertCommand.NotifyCanExecuteChanged();
-            ScanCurrentInputCommand.NotifyCanExecuteChanged();
+            RunOnUiThread(() =>
+            {
+                IsConverting = false;
+                IsBusy = false;
+                CancelCommand.NotifyCanExecuteChanged();
+                ConvertCommand.NotifyCanExecuteChanged();
+                ScanCurrentInputCommand.NotifyCanExecuteChanged();
+            });
         }
     }
 
     partial void OnScannedArchiveRootChanged(ArchiveNode? value)
     {
         _ = value; // Partial method signature is generated; parameter not needed for this handler.
-        ClearExploreSelection();
-        OnPropertyChanged(nameof(HasScannedArchive));
-        OnPropertyChanged(nameof(ShowExploreEmptyMessage));
-        OnPropertyChanged(nameof(ScannedArchiveTopLevel));
-        OnPropertyChanged(nameof(ExploreViewItems));
-        OnPropertyChanged(nameof(IsBatchScanActive));
-        ScanCurrentInputCommand.NotifyCanExecuteChanged();
-        ConvertCommand.NotifyCanExecuteChanged();
-        ClearTagOverridesCommand.NotifyCanExecuteChanged();
+        RunOnUiThread(() =>
+        {
+            ClearExploreSelection();
+            OnPropertyChanged(nameof(HasScannedArchive));
+            OnPropertyChanged(nameof(ShowExploreEmptyMessage));
+            OnPropertyChanged(nameof(ScannedArchiveTopLevel));
+            OnPropertyChanged(nameof(ExploreViewItems));
+            OnPropertyChanged(nameof(IsBatchScanActive));
+            ScanCurrentInputCommand.NotifyCanExecuteChanged();
+            ConvertCommand.NotifyCanExecuteChanged();
+            ClearTagOverridesCommand.NotifyCanExecuteChanged();
+        });
     }
 
     partial void OnFocusedArchiveNodeChanged(ArchiveNode? value)
@@ -2348,6 +2410,9 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
         _lastLogWriteUtc = DateTime.MinValue;
         _conversionStartUtc = DateTime.UtcNow;
         _currentStage = null;
+        ConversionElapsedText = "Elapsed: 00:00";
+        ConversionEtaText = "ETA: --:--";
+        ConversionTotalText = "";
         CancelCommand.NotifyCanExecuteChanged();
 
         _cts = new CancellationTokenSource();
@@ -2365,7 +2430,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
             if (!HaveScanForCurrentPack())
             {
                 AddLogLine(Resources.GetString("Log_ScanningPackForExtraction"));
-                var scanProg = new Progress<(int completed, int total)>(p =>
+                var scanProg = CreateScanProgressReporter(p =>
                     Dispatcher.UIThread.Post(() =>
                     {
                         ProgressMax = Math.Max(1, p.total);
@@ -2394,7 +2459,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
             _exploreController.FlushTagOverridesToDisk();
 
             var options = BuildConversionOptions(ignore, entriesToExtractOnly);
-            var prog = CreateConversionProgressReporter();
+            using var prog = CreateConversionProgressReporter();
 
             AddLogLine(Resources.GetStatusString("Log_Converting", OutputZipPath ?? ""));
             await ConversionCoordinator.ConvertAsync(PackPath!, OutputZipPath!, options, prog, _cts.Token);
@@ -2402,32 +2467,54 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
         }
         catch (OperationCanceledException)
         {
-            SetStatus("Status_Cancelled");
-            AddLogLine(Resources.GetString("Log_Cancelled"));
-            var totalSec = (DateTime.UtcNow - _conversionStartUtc).TotalSeconds;
-            AddLogLine(Resources.GetStatusString("Log_TotalTime", totalSec));
+            RunOnUiThread(() =>
+            {
+                SetStatus("Status_Cancelled");
+                AddLogLine(Resources.GetString("Log_Cancelled"));
+                var totalSec = (DateTime.UtcNow - _conversionStartUtc).TotalSeconds;
+                AddLogLine(Resources.GetStatusString("Log_TotalTime", totalSec));
+            });
         }
         catch (Exception ex)
         {
-            SetStatus("Status_ConversionFailed");
-            AddLogLine(ex.ToString());
-            var totalSec = (DateTime.UtcNow - _conversionStartUtc).TotalSeconds;
-            AddLogLine(Resources.GetStatusString("Log_TotalTime", totalSec));
+            RunOnUiThread(() =>
+            {
+                SetStatus("Status_ConversionFailed");
+                AddLogLine(ex.ToString());
+                var totalSec = (DateTime.UtcNow - _conversionStartUtc).TotalSeconds;
+                AddLogLine(Resources.GetStatusString("Log_TotalTime", totalSec));
+            });
         }
         finally
         {
             // Persist the log for this conversion run.
             SaveLogToFile();
+            RunOnUiThread(() =>
+            {
+                if (string.IsNullOrWhiteSpace(ConversionTotalText))
+                {
+                    var total = DateTime.UtcNow - _conversionStartUtc;
+                    if (total < TimeSpan.Zero)
+                    {
+                        total = TimeSpan.Zero;
+                    }
+
+                    ConversionTotalText = $"Total: {FormatDuration(total)}";
+                }
+            });
 
             _cts?.Dispose();
             _cts = null;
-            IsConverting = false;
-            IsBusy = false;
-            ClearScannedArchive();
-            ConvertCommand.NotifyCanExecuteChanged();
-            CancelCommand.NotifyCanExecuteChanged();
-            ScanArchiveCommand.NotifyCanExecuteChanged();
-            ScanCurrentInputCommand.NotifyCanExecuteChanged();
+            RunOnUiThread(() =>
+            {
+                IsConverting = false;
+                IsBusy = false;
+                ClearScannedArchive();
+                ConvertCommand.NotifyCanExecuteChanged();
+                CancelCommand.NotifyCanExecuteChanged();
+                ScanArchiveCommand.NotifyCanExecuteChanged();
+                ScanCurrentInputCommand.NotifyCanExecuteChanged();
+            });
         }
     }
 
@@ -2554,13 +2641,20 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
             BuildMaterialTagSemanticOptions());
     }
 
-    /// <summary>Progress reporter that marshals conversion progress to the UI thread and updates status/log.</summary>
-    private Progress<ConversionProgress> CreateConversionProgressReporter() =>
-        new Progress<ConversionProgress>(OnConversionProgress);
+    /// <summary>Progress reporter that coalesces high-frequency updates before they hit the UI thread.</summary>
+    private CoalescingConversionProgressReporter CreateConversionProgressReporter() =>
+        new(OnConversionProgress, ConversionUiProgressUpdateInterval);
+
+    private static CoalescingProgressReporter<(int completed, int total)> CreateScanProgressReporter(
+        Action<(int completed, int total)> sink) =>
+        new(
+            sink,
+            ScanUiProgressUpdateInterval,
+            p => p.completed >= p.total);
 
     private void OnConversionProgress(ConversionProgress p)
     {
-        Dispatcher.UIThread.Post(() =>
+        void ApplyProgress()
         {
             var now = DateTime.UtcNow;
             if (_currentStage.HasValue && _currentStage.Value != p.Stage)
@@ -2583,6 +2677,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
 
             ProgressMax = Math.Max(1, p.Total);
             ProgressValue = p.Completed;
+            UpdateConversionTiming(now, p);
             if (!string.IsNullOrEmpty(p.InfoMessage))
             {
                 AddLogLine(p.InfoMessage);
@@ -2590,12 +2685,21 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
 
             if (p.Stage == ConversionStage.ScanningTextures)
             {
-                ConversionScanDebugText = p.Total > 0
-                    ? $"Scanning debug: {p.Completed}/{p.Total} {(string.IsNullOrWhiteSpace(p.CurrentTextureName) ? "" : p.CurrentTextureName)}"
-                    : "Scanning debug: phase started";
-                if (!string.IsNullOrWhiteSpace(p.InfoMessage))
+                var shouldUpdateScanDebug =
+                    !string.IsNullOrWhiteSpace(p.InfoMessage) ||
+                    now - _lastScanDebugUpdateUtc >= ScanDebugUpdateInterval ||
+                    p.Completed == p.Total;
+                if (shouldUpdateScanDebug)
                 {
-                    ConversionScanDebugText = $"{ConversionScanDebugText} | {p.InfoMessage}";
+                    ConversionScanDebugText = p.Total > 0
+                        ? $"Scanning debug: {p.Completed}/{p.Total} {(string.IsNullOrWhiteSpace(p.CurrentTextureName) ? "" : p.CurrentTextureName)}"
+                        : "Scanning debug: phase started";
+                    if (!string.IsNullOrWhiteSpace(p.InfoMessage))
+                    {
+                        ConversionScanDebugText = $"{ConversionScanDebugText} | {p.InfoMessage}";
+                    }
+
+                    _lastScanDebugUpdateUtc = now;
                 }
             }
 
@@ -2624,24 +2728,65 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
 
             (_statusKey, _statusFormatArgs) = p.Stage switch
             {
-                ConversionStage.Extracting => p.Total > 0
-                    ? ("Status_ExtractingPackProgress", [p.Completed, p.Total])
-                    : ("Status_ExtractingPack", null),
-                ConversionStage.ScanningTextures => p.Total > 0
-                    ? ("Status_ScanningPackProgress", [p.Completed, p.Total])
-                    : ("Status_ScanningTextures", null),
-                ConversionStage.GeneratingSpecular => ("Status_SpecularCurrent",
-                    [p.CurrentTextureName ?? ""]),
-                ConversionStage.GeneratingNormals => ("Status_NormalsCurrent",
-                    [p.CurrentTextureName ?? ""]),
-                ConversionStage.Packing => p.Total > 0
-                    ? ("Status_PackingOutputProgress", [p.Completed, p.Total])
-                    : ("Status_PackingOutput", null),
+                ConversionStage.Extracting => ("Status_ExtractingPack", null),
+                ConversionStage.ScanningTextures => ("Status_ScanningTextures", null),
+                ConversionStage.GeneratingSpecular => ("Status_StageGeneratingSpecular", null),
+                ConversionStage.GeneratingNormals => ("Status_StageGeneratingNormals", null),
+                ConversionStage.Packing => ("Status_PackingOutput", null),
                 ConversionStage.Done => ("Status_Done", null),
                 _ => (_statusKey, _statusFormatArgs)
             };
             UpdateStatusText();
-        });
+        }
+
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            ApplyProgress();
+        }
+        else
+        {
+            Dispatcher.UIThread.Post(ApplyProgress);
+        }
+    }
+
+    private void UpdateConversionTiming(DateTime now, ConversionProgress p)
+    {
+        var elapsed = now - _conversionStartUtc;
+        if (elapsed < TimeSpan.Zero)
+        {
+            elapsed = TimeSpan.Zero;
+        }
+
+        ConversionElapsedText = $"Elapsed: {FormatDuration(elapsed)}";
+        if (p.Stage == ConversionStage.Done)
+        {
+            ConversionEtaText = "ETA: 00:00";
+            ConversionTotalText = $"Total: {FormatDuration(elapsed)}";
+            return;
+        }
+
+        ConversionTotalText = "";
+        if (p.Total > 0 && p.Completed > 0 && p.Completed < p.Total)
+        {
+            var remaining = p.Total - p.Completed;
+            var etaSeconds = elapsed.TotalSeconds * (remaining / (double)p.Completed);
+            etaSeconds = Math.Max(0, Math.Min(etaSeconds, 365 * 24 * 3600));
+            ConversionEtaText = $"ETA: {FormatDuration(TimeSpan.FromSeconds(etaSeconds))}";
+        }
+        else
+        {
+            ConversionEtaText = "ETA: --:--";
+        }
+    }
+
+    private static string FormatDuration(TimeSpan duration)
+    {
+        if (duration.TotalHours >= 1)
+        {
+            return duration.ToString(@"h\:mm\:ss", CultureInfo.InvariantCulture);
+        }
+
+        return duration.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
     }
 
     private static string GetStageDisplayName(ConversionStage stage)
@@ -2656,6 +2801,258 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
             _ => null
         };
         return key != null ? Resources.GetString(key) : stage.ToString();
+    }
+
+    private sealed class CoalescingConversionProgressReporter : IProgress<ConversionProgress>, IDisposable
+    {
+        private readonly Action<ConversionProgress> _sink;
+        private readonly TimeSpan _minInterval;
+        private readonly object _gate = new();
+        private ConversionProgress? _pending;
+        private DateTime _lastDispatchUtc = DateTime.MinValue;
+        private ConversionStage? _lastDispatchedStage;
+        private bool _drainScheduled;
+        private bool _disposed;
+
+        public CoalescingConversionProgressReporter(Action<ConversionProgress> sink, TimeSpan minInterval)
+        {
+            _sink = sink;
+            _minInterval = minInterval;
+        }
+
+        public void Report(ConversionProgress value)
+        {
+            ConversionProgress? dispatchNow = null;
+            TimeSpan delay = default;
+            var scheduleDrain = false;
+
+            lock (_gate)
+            {
+                if (_disposed)
+                {
+                    return;
+                }
+
+                var now = DateTime.UtcNow;
+                var forceImmediate = value.Stage == ConversionStage.Done ||
+                                     (_lastDispatchedStage.HasValue && value.Stage != _lastDispatchedStage.Value);
+                var elapsed = _lastDispatchUtc == DateTime.MinValue
+                    ? _minInterval
+                    : now - _lastDispatchUtc;
+                if (forceImmediate || elapsed >= _minInterval)
+                {
+                    dispatchNow = value;
+                    _lastDispatchUtc = now;
+                    _lastDispatchedStage = value.Stage;
+                    _pending = null;
+                }
+                else
+                {
+                    _pending = value;
+                    if (!_drainScheduled)
+                    {
+                        _drainScheduled = true;
+                        delay = _minInterval - elapsed;
+                        scheduleDrain = true;
+                    }
+                }
+            }
+
+            if (dispatchNow is not null)
+            {
+                _sink(dispatchNow);
+            }
+
+            if (scheduleDrain)
+            {
+                ScheduleDrain(delay);
+            }
+        }
+
+        private void ScheduleDrain(TimeSpan delay)
+        {
+            _ = Task.Delay(delay).ContinueWith(_ => DrainPending(), TaskScheduler.Default);
+        }
+
+        private void DrainPending()
+        {
+            ConversionProgress? dispatch = null;
+            TimeSpan delay = default;
+            var scheduleAgain = false;
+
+            lock (_gate)
+            {
+                _drainScheduled = false;
+                if (_disposed || _pending is null)
+                {
+                    return;
+                }
+
+                var now = DateTime.UtcNow;
+                var elapsed = _lastDispatchUtc == DateTime.MinValue
+                    ? _minInterval
+                    : now - _lastDispatchUtc;
+                if (elapsed < _minInterval)
+                {
+                    _drainScheduled = true;
+                    delay = _minInterval - elapsed;
+                    scheduleAgain = true;
+                }
+                else
+                {
+                    dispatch = _pending;
+                    _pending = null;
+                    _lastDispatchUtc = now;
+                    _lastDispatchedStage = dispatch.Stage;
+                }
+            }
+
+            if (dispatch is not null)
+            {
+                _sink(dispatch);
+            }
+
+            if (scheduleAgain)
+            {
+                ScheduleDrain(delay);
+            }
+        }
+
+        public void Dispose()
+        {
+            ConversionProgress? lastPending;
+            lock (_gate)
+            {
+                if (_disposed)
+                {
+                    return;
+                }
+
+                _disposed = true;
+                lastPending = _pending;
+                _pending = null;
+            }
+
+            if (lastPending is not null)
+            {
+                _sink(lastPending);
+            }
+        }
+    }
+
+    private sealed class CoalescingProgressReporter<T> : IProgress<T>
+    {
+        private readonly Action<T> _sink;
+        private readonly TimeSpan _minInterval;
+        private readonly Func<T, bool> _shouldFlushImmediately;
+        private readonly object _gate = new();
+        private T _pending = default!;
+        private bool _hasPending;
+        private DateTime _lastDispatchUtc = DateTime.MinValue;
+        private bool _drainScheduled;
+
+        public CoalescingProgressReporter(Action<T> sink, TimeSpan minInterval, Func<T, bool>? shouldFlushImmediately = null)
+        {
+            _sink = sink;
+            _minInterval = minInterval;
+            _shouldFlushImmediately = shouldFlushImmediately ?? (_ => false);
+        }
+
+        public void Report(T value)
+        {
+            T dispatchNow = default!;
+            var hasDispatchNow = false;
+            TimeSpan delay = default;
+            var scheduleDrain = false;
+
+            lock (_gate)
+            {
+                var now = DateTime.UtcNow;
+                var forceImmediate = _shouldFlushImmediately(value);
+                var elapsed = _lastDispatchUtc == DateTime.MinValue
+                    ? _minInterval
+                    : now - _lastDispatchUtc;
+                if (forceImmediate || elapsed >= _minInterval)
+                {
+                    dispatchNow = value;
+                    hasDispatchNow = true;
+                    _lastDispatchUtc = now;
+                    _hasPending = false;
+                }
+                else
+                {
+                    _pending = value;
+                    _hasPending = true;
+                    if (!_drainScheduled)
+                    {
+                        _drainScheduled = true;
+                        delay = _minInterval - elapsed;
+                        scheduleDrain = true;
+                    }
+                }
+            }
+
+            if (hasDispatchNow)
+            {
+                _sink(dispatchNow);
+            }
+
+            if (scheduleDrain)
+            {
+                ScheduleDrain(delay);
+            }
+        }
+
+        private void ScheduleDrain(TimeSpan delay)
+        {
+            _ = Task.Delay(delay).ContinueWith(_ => DrainPending(), TaskScheduler.Default);
+        }
+
+        private void DrainPending()
+        {
+            T dispatch = default!;
+            var hasDispatch = false;
+            TimeSpan delay = default;
+            var scheduleAgain = false;
+
+            lock (_gate)
+            {
+                _drainScheduled = false;
+                if (!_hasPending)
+                {
+                    return;
+                }
+
+                var now = DateTime.UtcNow;
+                var elapsed = _lastDispatchUtc == DateTime.MinValue
+                    ? _minInterval
+                    : now - _lastDispatchUtc;
+                if (elapsed < _minInterval)
+                {
+                    _drainScheduled = true;
+                    delay = _minInterval - elapsed;
+                    scheduleAgain = true;
+                }
+                else
+                {
+                    dispatch = _pending;
+                    _hasPending = false;
+                    hasDispatch = true;
+                    _lastDispatchUtc = now;
+                }
+            }
+
+            if (hasDispatch)
+            {
+                _sink(dispatch);
+            }
+
+            if (scheduleAgain)
+            {
+                ScheduleDrain(delay);
+            }
+        }
+
     }
 
     public void Dispose()

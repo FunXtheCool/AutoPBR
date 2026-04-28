@@ -406,6 +406,8 @@
   <data name="Status_TagWorkDrainProgress" xml:space="preserve"><value>Tag-Verarbeitung wird abgeschlossen... ({0}/{1})</value></data>
   <data name="Status_SpecularCurrent" xml:space="preserve"><value>Specular: {0}</value></data>
   <data name="Status_NormalsCurrent" xml:space="preserve"><value>Normalen: {0}</value></data>
+  <data name="Status_StageGeneratingSpecular" xml:space="preserve"><value>Specular-Maps werden erstellt...</value></data>
+  <data name="Status_StageGeneratingNormals" xml:space="preserve"><value>Normal-Maps werden erstellt...</value></data>
   <data name="Status_PackingOutput" xml:space="preserve"><value>Erstelle Ausgabe-Zip...</value></data>
   <data name="Status_PackingOutputProgress" xml:space="preserve"><value>Erstelle Ausgabe-Zip... ({0}/{1})</value></data>
   <data name="Status_Done" xml:space="preserve"><value>Fertig.</value></data>

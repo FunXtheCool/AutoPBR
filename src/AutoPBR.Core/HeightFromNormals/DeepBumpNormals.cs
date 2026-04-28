@@ -27,6 +27,7 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
     private readonly object _poolLock = new();
     private readonly Queue<InferenceSession> _sessionPool = new();
     private readonly int _maxConcurrentRuns;
+    private readonly SemaphoreSlim _sessionSlots;
 
     public enum Overlap
     {
@@ -61,6 +62,12 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
                               out _) ??
                           new InferenceSession(modelPath);
             var useGpu = provider is "CUDA" or "TensorRT";
+            if (useGpu)
+            {
+                // ORT CUDA EP can become unstable when multiple sessions run concurrently.
+                // Keep GPU inference single-flight unless/ until a dedicated tuning option is introduced.
+                maxConcurrentRuns = 1;
+            }
 
             var inputName = session.InputMetadata.Keys.FirstOrDefault() ?? "input";
             var inputIsNhwc = false;
@@ -126,6 +133,7 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
         _preferGpu = isUsingGpu;
         _preferOnnxTensorRt = preferOnnxTensorRtExecutionProvider;
         _maxConcurrentRuns = maxConcurrentRuns;
+        _sessionSlots = new SemaphoreSlim(_maxConcurrentRuns, _maxConcurrentRuns);
         _sessionPool.Enqueue(firstSession);
         for (var i = 1; i < _maxConcurrentRuns; i++)
         {
@@ -350,10 +358,17 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
 
     private InferenceSession RentSession()
     {
+        _sessionSlots.Wait();
         lock (_poolLock)
         {
-            return _sessionPool.Count > 0 ? _sessionPool.Dequeue() : CreateSession();
+            if (_sessionPool.Count > 0)
+            {
+                return _sessionPool.Dequeue();
+            }
         }
+
+        // Should be rare (e.g., if session pre-creation failed); keep behavior resilient.
+        return CreateSession();
     }
 
     private void ReturnSession(InferenceSession session)
@@ -363,11 +378,14 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
             if (_sessionPool.Count < _maxConcurrentRuns)
             {
                 _sessionPool.Enqueue(session);
-                return;
+            }
+            else
+            {
+                session.Dispose();
             }
         }
 
-        session.Dispose();
+        _sessionSlots.Release();
     }
 
     private InferenceSession CreateSession()
@@ -651,6 +669,7 @@ public sealed class DeepBumpNormalsGenerator : IDisposable
 
     public void Dispose()
     {
+        _sessionSlots.Dispose();
         lock (_poolLock)
         {
             while (_sessionPool.Count > 0)

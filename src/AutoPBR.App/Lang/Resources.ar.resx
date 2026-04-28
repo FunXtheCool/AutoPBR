@@ -240,6 +240,8 @@
   <data name="Status_TagWorkDrainProgress" xml:space="preserve"><value>جارٍ إنهاء معالجة الوسوم... ({0}/{1})</value></data>
   <data name="Status_SpecularCurrent" xml:space="preserve"><value>اللمعان: {0}</value></data>
   <data name="Status_NormalsCurrent" xml:space="preserve"><value>الطبيعيات: {0}</value></data>
+  <data name="Status_StageGeneratingSpecular" xml:space="preserve"><value>جارٍ إنشاء خرائط العاكسية...</value></data>
+  <data name="Status_StageGeneratingNormals" xml:space="preserve"><value>جارٍ إنشاء خرائط النورمال...</value></data>
   <data name="Status_PackingOutput" xml:space="preserve"><value>جاري إنشاء zip المخرجات...</value></data>
   <data name="Status_PackingOutputProgress" xml:space="preserve"><value>جاري إنشاء zip المخرجات... ({0}/{1})</value></data>
   <data name="Status_Done" xml:space="preserve"><value>تم.</value></data>

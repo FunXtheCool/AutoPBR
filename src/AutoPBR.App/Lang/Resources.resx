@@ -973,6 +973,12 @@
   <data name="Status_NormalsCurrent" xml:space="preserve">
     <value>Normals: {0}</value>
   </data>
+  <data name="Status_StageGeneratingSpecular" xml:space="preserve">
+    <value>Generating specular maps...</value>
+  </data>
+  <data name="Status_StageGeneratingNormals" xml:space="preserve">
+    <value>Generating normal maps...</value>
+  </data>
   <data name="Status_PackingOutput" xml:space="preserve">
     <value>Packing output zip...</value>
   </data>

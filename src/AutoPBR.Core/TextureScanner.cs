@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using AutoPBR.Core.Models;
+using SixLabors.ImageSharp;
 
 namespace AutoPBR.Core;
 
@@ -20,6 +21,7 @@ internal static class TextureScanner
         bool Sprite2DFoliageTarget,
         bool HasPlantMaterialTag,
         bool HasBrickMaterialTag,
+        bool HasUvWrap,
         bool InvertSpecular,
         bool InvertHeight,
         IReadOnlyList<string> EffectiveTagIds);
@@ -195,6 +197,7 @@ internal static class TextureScanner
             effective.Contains("plant") ||
             AutoPbrDefaults.PlantTextureKeys.Contains(candidate.RelativePathNoExt),
             effective.Contains("brick"),
+            effective.Contains(FlagTagResolver.UvWrapId),
             invertSpecular,
             invertHeight,
             effective.ToList());
@@ -329,7 +332,8 @@ internal static class TextureScanner
     private static TextureWorkItem BuildWorkItem(
         ScanCandidate candidate,
         TagComputationResult tags,
-        AutoPbrOptions options)
+        AutoPbrOptions options,
+        int? packBaseTileSize)
     {
         return new TextureWorkItem
         {
@@ -343,6 +347,8 @@ internal static class TextureScanner
             Sprite2DFoliageTarget = tags.Sprite2DFoliageTarget,
             HasPlantMaterialTag = tags.HasPlantMaterialTag,
             HasBrickMaterialTag = tags.HasBrickMaterialTag,
+            HasUvWrap = tags.HasUvWrap,
+            PackBaseTileSize = packBaseTileSize,
             Overrides =
             {
                 InvertSpecular = tags.InvertSpecular,
@@ -377,6 +383,51 @@ internal static class TextureScanner
 
     private static bool IsIgnoredByKey(ScanCandidate candidate, AutoPbrOptions options) =>
         options.IgnoreTextureKeys.Contains(candidate.RelativePathNoExt);
+
+    private static int? EstimatePackBaseTileSize(IEnumerable<ScanCandidate> candidates)
+    {
+        var histogram = new Dictionary<int, int>();
+        foreach (var candidate in candidates)
+        {
+            if (candidate.SpecularOnly)
+            {
+                continue;
+            }
+
+            try
+            {
+                var info = Image.Identify(candidate.File);
+                if (info.Width <= 0 || info.Height <= 0 || info.Width != info.Height)
+                {
+                    continue;
+                }
+
+                var edge = info.Width;
+                if ((edge & (edge - 1)) != 0)
+                {
+                    continue;
+                }
+
+                histogram.TryGetValue(edge, out var count);
+                histogram[edge] = count + 1;
+            }
+            catch
+            {
+                // Ignore unreadable textures while estimating baseline tile size.
+            }
+        }
+
+        if (histogram.Count == 0)
+        {
+            return null;
+        }
+
+        return histogram
+            .OrderByDescending(kv => kv.Value)
+            .ThenBy(kv => kv.Key)
+            .First()
+            .Key;
+    }
 
     private static IEnumerable<ScanCandidate> EnumerateScanCandidates(string extractedPackRoot, AutoPbrOptions options)
     {
@@ -586,6 +637,8 @@ internal static class TextureScanner
                 Path.GetFileName(candidate.File)));
         }
 
+        var packBaseTileSize = EstimatePackBaseTileSize(includedCandidates);
+
         foreach (var candidate in includedCandidates)
         {
             if (!tagCache.TryGetValue(candidate.RelativePathNoExt, out var tags))
@@ -598,7 +651,7 @@ internal static class TextureScanner
                 continue;
             }
 
-            results.Add(BuildWorkItem(candidate, tags, options));
+            results.Add(BuildWorkItem(candidate, tags, options, packBaseTileSize));
         }
 
         var persistMap = tagCache.ToDictionary(

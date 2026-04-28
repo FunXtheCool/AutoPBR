@@ -240,6 +240,8 @@
   <data name="Status_TagWorkDrainProgress" xml:space="preserve"><value>टैग प्रोसेसिंग पूरी की जा रही है... ({0}/{1})</value></data>
   <data name="Status_SpecularCurrent" xml:space="preserve"><value>स्पेक्युलर: {0}</value></data>
   <data name="Status_NormalsCurrent" xml:space="preserve"><value>नॉर्मल: {0}</value></data>
+  <data name="Status_StageGeneratingSpecular" xml:space="preserve"><value>स्पेक्युलर मैप बन रहा है...</value></data>
+  <data name="Status_StageGeneratingNormals" xml:space="preserve"><value>नॉर्मल मैप बन रहा है...</value></data>
   <data name="Status_PackingOutput" xml:space="preserve"><value>आउटपुट zip बन रहा है...</value></data>
   <data name="Status_PackingOutputProgress" xml:space="preserve"><value>आउटपुट zip बन रहा है... ({0}/{1})</value></data>
   <data name="Status_Done" xml:space="preserve"><value>हो गया।</value></data>

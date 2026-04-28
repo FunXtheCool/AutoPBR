@@ -14,6 +14,9 @@ internal static class SpecularGenerator
 {
     /// <summary>LabPBR: G channel &lt;= this value is F0 (dielectric); 230+ = metal.</summary>
     private const byte LabPbrF0CapDielectric = 229;
+    private const int VcOrientationCount = 12;
+    private static readonly float[] VcCos = BuildVcCos();
+    private static readonly float[] VcSin = BuildVcSin();
 
     private static string? BuildSpecularModelLogLine(
         string textureName,
@@ -141,18 +144,15 @@ internal static class SpecularGenerator
             }
         }
 
-        const int vcOrientationCount = 12;
-        const float vcAngleStep = MathF.PI / vcOrientationCount;
         var edge = new float[width * height];
         for (var i = 0; i < gx.Length; i++)
         {
             var gxv = gx[i];
             var gyv = gy[i];
             float sum = 0;
-            for (var k = 0; k < vcOrientationCount; k++)
+            for (var k = 0; k < VcOrientationCount; k++)
             {
-                var a = k * vcAngleStep;
-                var r = gxv * MathF.Cos(a) + gyv * MathF.Sin(a);
+                var r = gxv * VcCos[k] + gyv * VcSin[k];
                 sum += MathF.Abs(r);
             }
 
@@ -255,12 +255,12 @@ internal static class SpecularGenerator
             var stage = ConversionStage.GeneratingSpecular;
             var total = textures.Count;
 
-            var rgbToLab = new ConverterBuilder()
-                .FromRGB(RGBWorkingSpaces.sRGB)
-                .ToLab(Illuminants.D65)
-                .Build();
-
-            var de2000 = new CIEDE2000ColorDifference();
+            var rgbToLabByThread = new ThreadLocal<IColorConverter<RGBColor, LabColor>>(
+                () => new ConverterBuilder()
+                    .FromRGB(RGBWorkingSpaces.sRGB)
+                    .ToLab(Illuminants.D65)
+                    .Build());
+            var de2000ByThread = new ThreadLocal<CIEDE2000ColorDifference>(() => new CIEDE2000ColorDifference());
             var completed = 0;
 
             Parallel.ForEach(
@@ -278,29 +278,115 @@ internal static class SpecularGenerator
                         return;
                     }
 
+                    var rgbToLab = rgbToLabByThread.Value ?? throw new InvalidOperationException("Thread-local Lab converter not available.");
+                    var de2000 = de2000ByThread.Value ?? throw new InvalidOperationException("Thread-local CIEDE2000 not available.");
                     using var img = Image.Load<Rgba32>(t.DiffusePath);
-                    var atlasPlan = AtlasTiling.Decide(img.Width, img.Height);
+                    var atlasPlan = t.HasUvWrap
+                        ? AtlasTiling.Decide(
+                            img.Width,
+                            img.Height,
+                            preferredTileSize: t.PackBaseTileSize)
+                        : AtlasTiling.None;
                     string? mlDiagnostic = null;
                     var anyUseMlSpec = false;
                     var hasData = false;
 
                     if (atlasPlan.IsAtlas)
                     {
+                        var tiles = AtlasTiling.EnumerateTiles(atlasPlan).ToList();
                         using var atlasOut = new Image<Rgba32>(img.Width, img.Height);
-                        foreach (var tile in AtlasTiling.EnumerateTiles(atlasPlan))
+                        var tileWorkerCount = total <= 1
+                            ? Math.Min(Math.Max(1, ThreadingUtil.GetConversionParallelism(options)), Math.Max(1, tiles.Count))
+                            : 1;
+                        if (tileWorkerCount <= 1)
                         {
-                            using var tileDiffuse = AtlasTiling.ExtractTile(img, tile);
-                            var tileResult = GenerateSpecularForDiffuseTile(tileDiffuse, t, options, rgbToLab, de2000);
-                            anyUseMlSpec |= tileResult.UseMlSpec;
-                            mlDiagnostic ??= tileResult.MlDiagnostic;
-                            if (!tileResult.HasData || tileResult.Image is null)
+                            foreach (var tile in tiles)
                             {
-                                continue;
-                            }
+                                ct.ThrowIfCancellationRequested();
+                                var tileRgbToLab = rgbToLabByThread.Value ??
+                                                   throw new InvalidOperationException("Thread-local Lab converter not available.");
+                                var tileDe2000 = de2000ByThread.Value ??
+                                                 throw new InvalidOperationException("Thread-local CIEDE2000 not available.");
+                                using var tileDiffuse = AtlasTiling.ExtractTile(img, tile);
+                                var tileResult = GenerateSpecularForDiffuseTile(
+                                    tileDiffuse,
+                                    t,
+                                    options,
+                                    tileRgbToLab,
+                                    tileDe2000);
+                                anyUseMlSpec |= tileResult.UseMlSpec;
+                                mlDiagnostic ??= tileResult.MlDiagnostic;
+                                if (!tileResult.HasData || tileResult.Image is null)
+                                {
+                                    continue;
+                                }
 
-                            hasData = true;
-                            using var tileImage = tileResult.Image;
-                            AtlasTiling.PasteTile(atlasOut, tile, tileImage);
+                                hasData = true;
+                                using var tileImage = tileResult.Image;
+                                AtlasTiling.PasteTile(atlasOut, tile, tileImage);
+                            }
+                        }
+                        else
+                        {
+                            var tileDiffuses = new Image<Rgba32>?[tiles.Count];
+                            var tileResults = new SpecularTileResult?[tiles.Count];
+                            try
+                            {
+                                for (var i = 0; i < tiles.Count; i++)
+                                {
+                                    tileDiffuses[i] = AtlasTiling.ExtractTile(img, tiles[i]);
+                                }
+
+                                Parallel.For(
+                                    0,
+                                    tiles.Count,
+                                    new ParallelOptions
+                                    {
+                                        MaxDegreeOfParallelism = tileWorkerCount,
+                                        CancellationToken = ct
+                                    },
+                                    i =>
+                                    {
+                                        var tileRgbToLab = rgbToLabByThread.Value ??
+                                                           throw new InvalidOperationException("Thread-local Lab converter not available.");
+                                        var tileDe2000 = de2000ByThread.Value ??
+                                                         throw new InvalidOperationException("Thread-local CIEDE2000 not available.");
+                                        var tileDiffuse = tileDiffuses[i] ?? throw new InvalidOperationException("Atlas tile extraction failed.");
+                                        tileResults[i] = GenerateSpecularForDiffuseTile(
+                                            tileDiffuse,
+                                            t,
+                                            options,
+                                            tileRgbToLab,
+                                            tileDe2000);
+                                    });
+
+                                for (var i = 0; i < tiles.Count; i++)
+                                {
+                                    var tileResult = tileResults[i];
+                                    if (tileResult is null)
+                                    {
+                                        continue;
+                                    }
+
+                                    anyUseMlSpec |= tileResult.UseMlSpec;
+                                    mlDiagnostic ??= tileResult.MlDiagnostic;
+                                    if (!tileResult.HasData || tileResult.Image is null)
+                                    {
+                                        continue;
+                                    }
+
+                                    hasData = true;
+                                    AtlasTiling.PasteTile(atlasOut, tiles[i], tileResult.Image);
+                                }
+                            }
+                            finally
+                            {
+                                for (var i = 0; i < tileResults.Length; i++)
+                                {
+                                    tileResults[i]?.Image?.Dispose();
+                                    tileDiffuses[i]?.Dispose();
+                                }
+                            }
                         }
 
                         if (hasData)
@@ -693,6 +779,30 @@ internal static class SpecularGenerator
         var startX = (img.Width - s) / 2;
         var startY = (img.Height - s) / 2;
         return img.Clone(ctx => ctx.Crop(new Rectangle(startX, startY, s, s)));
+    }
+
+    private static float[] BuildVcCos()
+    {
+        var arr = new float[VcOrientationCount];
+        var step = MathF.PI / VcOrientationCount;
+        for (var i = 0; i < VcOrientationCount; i++)
+        {
+            arr[i] = MathF.Cos(i * step);
+        }
+
+        return arr;
+    }
+
+    private static float[] BuildVcSin()
+    {
+        var arr = new float[VcOrientationCount];
+        var step = MathF.PI / VcOrientationCount;
+        for (var i = 0; i < VcOrientationCount; i++)
+        {
+            arr[i] = MathF.Sin(i * step);
+        }
+
+        return arr;
     }
 }
 

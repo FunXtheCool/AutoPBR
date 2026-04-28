@@ -1,5 +1,6 @@
 using System.Runtime.Loader;
 using Avalonia;
+using Avalonia.Win32;
 
 namespace AutoPBR.App;
 
@@ -41,6 +42,12 @@ sealed class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
+            // Avoid intermittent WinUI compositor commit timeouts on some Windows setups.
+            // RedirectionSurface takes a more stable composition path than direct WinUI composition.
+            .With(new Win32PlatformOptions
+            {
+                CompositionMode = new[] { Win32CompositionMode.RedirectionSurface },
+            })
             .WithInterFont()
             .LogToTrace();
 }

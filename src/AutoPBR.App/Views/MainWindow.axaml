@@ -1643,14 +1643,24 @@
 
         <Border Grid.Row="2" Background="{Binding WindowBackground}" Padding="12" MinWidth="0">
             <DockPanel LastChildFill="True" MinWidth="0">
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                     <Button Content="{Binding Strings.Cancel}" Command="{Binding CancelCommand}" IsEnabled="{Binding IsConverting}" />
                     <Button Content="{Binding Strings.Convert}" Command="{Binding ConvertCommand}" />
                 </StackPanel>
 
                 <StackPanel Orientation="Vertical" Margin="0,0,8,0" MinWidth="0">
-                    <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" Margin="0,0,0,4" />
-                    <ProgressBar Minimum="0" Maximum="{Binding ProgressMax}" Value="{Binding ProgressValue}" Height="16" Foreground="{Binding AccentBrush}" />
+                    <Grid MinWidth="0" ColumnSpacing="8" RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding StatusText}" TextWrapping="Wrap" Margin="0,0,0,4" />
+                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="10"
+                                    VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,0,4">
+                            <TextBlock Text="{Binding ConversionElapsedText}" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding ConversionTotalText}" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding ConversionEtaText}" VerticalAlignment="Center"
+                                       Foreground="{Binding ForegroundBrush}" TextAlignment="Right" />
+                        </StackPanel>
+                        <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" Minimum="0" Maximum="{Binding ProgressMax}" Value="{Binding ProgressValue}"
+                                     Height="16" Foreground="{Binding AccentBrush}" MinHeight="16" VerticalAlignment="Center" />
+                    </Grid>
                 </StackPanel>
             </DockPanel>
         </Border>

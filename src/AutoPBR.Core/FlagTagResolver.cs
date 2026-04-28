@@ -114,6 +114,7 @@ public static class FlagTagResolver
         var hasAtlasGeometryEvidence =
             context.TextureWidth is > 0 &&
             context.TextureHeight is > 0 &&
+            context.TextureWidth.Value != context.TextureHeight.Value &&
             AtlasTiling.TryInferPlan(context.TextureWidth.Value, context.TextureHeight.Value).IsAtlas;
 
         var shouldApplyUv = explicitUvDecision ?? (hasLegacyUvEvidence || hasAtlasGeometryEvidence);

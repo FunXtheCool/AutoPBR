@@ -240,6 +240,8 @@
   <data name="Status_TagWorkDrainProgress" xml:space="preserve"><value>Завершение обработки тегов... ({0}/{1})</value></data>
   <data name="Status_SpecularCurrent" xml:space="preserve"><value>Specular: {0}</value></data>
   <data name="Status_NormalsCurrent" xml:space="preserve"><value>Нормали: {0}</value></data>
+  <data name="Status_StageGeneratingSpecular" xml:space="preserve"><value>Создаём specular-карты...</value></data>
+  <data name="Status_StageGeneratingNormals" xml:space="preserve"><value>Создаём карты нормалей...</value></data>
   <data name="Status_PackingOutput" xml:space="preserve"><value>Создание выходного zip...</value></data>
   <data name="Status_PackingOutputProgress" xml:space="preserve"><value>Создание выходного zip... ({0}/{1})</value></data>
   <data name="Status_Done" xml:space="preserve"><value>Готово.</value></data>
