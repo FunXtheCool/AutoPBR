@@ -19,7 +19,7 @@ net.minecraft.client.model.animal.fish.CodModel
 net.minecraft.client.model.animal.fish.SalmonModel
 net.minecraft.client.model.animal.chicken.AdultChickenModel
 net.minecraft.client.model.animal.chicken.ChickenModel
-# CowModel / PigModel / CreeperModel: 56-pilot assembly-parity — omit until assemblyGatePass + viewport T1 (see assembly-pilot-explore-checklist.md)
+# CowModel / PigModel / CreeperModel / WolfModel: 56-pilot canaries — omit until assemblyGatePass + viewport T1 (regen script still reports their gate status)
 net.minecraft.client.model.ambient.BatModel
 net.minecraft.client.model.animal.feline.AdultCatModel
 net.minecraft.client.model.animal.feline.AdultFelineModel
