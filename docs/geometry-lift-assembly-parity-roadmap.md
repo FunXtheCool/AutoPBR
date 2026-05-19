@@ -2,9 +2,24 @@
 
 **Status:** Planning (multitask-ready)  
 **Pinned version:** 26.1.2 (`minecraft-26.1.2-client.jar`)  
-**Trigger:** Models like `CreeperModel` report `ok` with all three `reference*Match: true` in [`geometry-lift-quality-26.1.2.json`](generated/geometry-lift-quality-26.1.2.json), yet Explore 3D preview shows wrong assembly (e.g. legs above head).
+**Trigger:** Models in the [pilot JVM set](generated/geometry-assembly-parity-pilots-26.1.2.txt) (e.g. `CreeperModel` as canary) report `ok` with all three `reference*Match: true` in [`geometry-lift-quality-26.1.2.json`](generated/geometry-lift-quality-26.1.2.json), yet Explore 3D preview shows wrong assembly (e.g. legs above head).
 
-**Related docs:** [`generated/geometry-ir-conventions.md`](generated/geometry-ir-conventions.md), [`test-guidance-geometry-animation-ir.md`](test-guidance-geometry-animation-ir.md), [`vanilla-preview-parity.md`](vanilla-preview-parity.md)
+**Related docs:** [`generated/geometry-ir-conventions.md`](generated/geometry-ir-conventions.md), [`test-guidance-geometry-animation-ir.md`](test-guidance-geometry-animation-ir.md), [`vanilla-preview-parity.md`](vanilla-preview-parity.md), [`generated/geometry-assembly-parity-pilots-26.1.2.txt`](generated/geometry-assembly-parity-pilots-26.1.2.txt)
+
+---
+
+## Program scope
+
+This program targets **all affected entity models** on 26.1.2, not a creeper-only fix.
+
+| Scope layer | What it covers |
+|-------------|----------------|
+| **Pilot JVM set** | [`geometry-assembly-parity-pilots-26.1.2.txt`](generated/geometry-assembly-parity-pilots-26.1.2.txt) — **56 JVMs** (union of `prioritizedBacklogJvmNames` + must-fix quadruped/monster pilots) |
+| **Backlog driver** | `prioritizedBacklogJvmNames` in [`geometry-lift-quality-26.1.2.json`](generated/geometry-lift-quality-26.1.2.json): models with `suspectedFlatNestedPartCount > 0` while `reference*Match` stay true |
+| **Family fixes** | Quadruped / humanoid-adjacent rigs per [Appendix B](#appendix-b--models-likely-affected-non-exhaustive) — lifter and gate changes apply by **pattern**, not per-model hacks |
+| **Regression canary** | `CreeperModel` — smallest documented false-green; use for T0 tests and manual Explore checks, not as the only promotion target |
+
+**Creeper is the canonical *example*** in tables and agent briefs below. Phase deliverables and exit criteria refer to the **pilot JVM set** or **all `ok` shards matching pattern X** unless a brief explicitly names the canary.
 
 ---
 
@@ -17,7 +32,7 @@ The creeper failure mode is representative of a **class** of quadruped / humanoi
 | Gap | Symptom | Example (creeper) |
 |-----|---------|---------------------|
 | Flat part tree (no `addOrReplaceChild` edges) | Parts composed from `root` only; body rotation does not affect legs | `suspectedFlatNestedPartCount: 4` when report is fresh |
-| Missing / wrong `PartPose.offsetAndRotation` | Body has zero rotation; wrong leg/head pivots | Body `T(0,6,0)` vs parity `T(0,5,2)+Rx(π/2)` |
+| Wrong `PartPose` kind or values vs factory | Flat tree + wrong locals; preview applies clean-room rotation creeper jar lacks | Body `T(0,6,0)` offset-only in jar vs template `T(0,5,2)+Rx(π/2)` |
 | Preview repair without pose rebase | `GeometryIrPartTreeRepair` reparents legs under `body` without changing child translation | Can worsen world Y (18+6) |
 | Circular reference | `reference_java` bake matches wrong IR | All three reference flags green |
 
@@ -50,7 +65,12 @@ Quality mesh path applies `GeometryIrPartTreeRepair` + `GeometryIrReferencePoseS
 | `body` | `T(0, 6, 0)`, no rotation | `T(0, 5, 2)` + `Rx(π/2)` |
 | legs | `T(±2, 18, ±4)` | `T(±3, 12, ±7)` / `±5` |
 
-CowModel shows the lifter **can** lift body rotation when bytecode parses (`rotationEulerRad: [1.570796371, …]`). Creeper’s factory pattern is the gap.
+CowModel shows the lifter **can** lift body rotation when bytecode uses `PartPose.offsetAndRotation` (`rotationEulerRad: [1.570796371, …]`). **Phase 1D (26.1.2 jar):** `CreeperModel.createBodyLayer` uses **`PartPose.offset` only** for body, head, and legs — there is **no** body `Rx(π/2)` in factory bytecode. Clean-room `BuildCreeper` body rotation is a **preview parity template**, not something to paste onto creeper from cow. The lifter must emit the factory’s actual pose kind per bind (`offset` vs `offsetAndRotation`) and recover hierarchy for flat trees across pilots; wrong rotation on creeper would be a lifter bug, not the fix.
+
+### Phase 1D finding (26.1.2 creeper bytecode)
+
+- Factory: six parts under `root`; binds use `PartPose.offset` (3-float), not `offsetAndRotation` (6-float).
+- Implication for Phase 1: do **not** frame work as “add cow body rotation to creeper.” Frame as **lifter correctness** — parse the invoke that is present, lift parent→child edges when `addOrReplaceChild` exists, and apply composed layout for flat sibling trees on all pilots sharing the pattern.
 
 ### Stale quality report warning
 
@@ -96,10 +116,11 @@ Copy each **Agent task** block into a separate multitask agent. Set `subagent_ty
 ### Conventions for all agents
 
 - **Repo root:** `z:\Cursor Projects\AutoPBR`
+- **Pilot scope:** [`geometry-assembly-parity-pilots-26.1.2.txt`](generated/geometry-assembly-parity-pilots-26.1.2.txt) (56 JVMs) — default target for regen, gates, and T1 tests; `CreeperModel` = regression canary only
 - **Jar:** `tools/minecraft-parity/26.1.2/client.jar` (skip jar tests if missing; document skip)
 - **Test tiers:** Follow [`test-guidance-geometry-animation-ir.md`](test-guidance-geometry-animation-ir.md) — no new default-CI goldens on unpromoted shards
 - **Allowlists:** `src/AutoPBR.Core/Data/minecraft-native/*.txt` — promotion in same PR as shard
-- **kluster:** Run after code changes per workspace rules
+- **kluster:** Run after code changes per workspace rules (markdown-only doc edits may skip)
 
 ---
 
@@ -123,18 +144,18 @@ DELIVERABLE: Updated geometry-lift-quality-26.1.2.json + summary of models with 
 subagent_type: shell
 ```
 
-### Agent 0B — Creeper / quadruped pilot manifest
+### Agent 0B — Assembly-parity pilot manifest (done)
 
 ```text
-TASK: Define pilot JVM list for assembly-parity work (T1 promotion targets).
+TASK: Maintain pilot JVM list for assembly-parity work (T1 promotion targets).
 
 STEPS:
 1. Start from prioritizedBacklogJvmNames in fresh quality report
-2. Add must-fix pilots: CreeperModel, QuadrupedModel, CowModel, SheepModel, PigModel
-3. Create docs/generated/geometry-assembly-parity-pilots-26.1.2.txt (one JVM per line)
-4. Cross-link in this roadmap
+2. Union must-fix pilots: CreeperModel, QuadrupedModel, CowModel, SheepModel, PigModel
+3. Keep docs/generated/geometry-assembly-parity-pilots-26.1.2.txt (one JVM per line; currently 56 JVMs)
+4. Cross-link in this roadmap Program scope section
 
-DELIVERABLE: Pilot list file + table in roadmap appendix.
+DELIVERABLE: Pilot list file current with quality report; count noted in roadmap.
 
 subagent_type: explore
 ```
@@ -142,14 +163,14 @@ subagent_type: explore
 ### Agent 0C — Javap oracle capture for pilots
 
 ```text
-TASK: Capture creeper + cow createBodyLayer javap excerpts for pose/hierarchy oracle tests.
+TASK: Capture createBodyLayer javap excerpts for pilot JVMs (canary + offsetAndRotation exemplar).
 
 STEPS:
-1. Extract CreeperModel.class and CowModel.class from client.jar (ZipFile single entry)
-2. javap -c -constants → save under tools/minecraft-parity/26.1.2/javap-snapshots/ (gitignore or committed per repo policy)
-3. Document PartPose.offsetAndRotation lines for body, head, legs in roadmap appendix
+1. Extract classes from client.jar for CreeperModel (offset-only canary), CowModel (offsetAndRotation exemplar), and sample from geometry-assembly-parity-pilots-26.1.2.txt
+2. javap -c -constants → save under tools/minecraft-parity/26.1.2/javap-snapshots/
+3. Document per-model: PartPose.offset vs offsetAndRotation vs addOrReplaceChild patterns in roadmap appendix
 
-DELIVERABLE: Snapshot files or inline appendix table; list of invoke patterns the lifter must handle.
+DELIVERABLE: Snapshot files or appendix table; invoke-pattern checklist used by Phase 1 and 2C.
 
 subagent_type: shell
 ```
@@ -157,51 +178,53 @@ subagent_type: shell
 **Phase 0 exit criteria**
 
 - [ ] Fresh `geometry-lift-quality-26.1.2.json` committed or regeneration command documented
-- [x] `geometry-assembly-parity-pilots-26.1.2.txt` exists (56 JVMs; see [Appendix D](#appendix-d--pilot-list-generated))
-- [ ] Creeper vs cow javap pose table documented
+- [x] `geometry-assembly-parity-pilots-26.1.2.txt` exists (56 JVMs; see [Program scope](#program-scope))
+- [ ] Javap pose/hierarchy table for pilot sample (creeper offset-only + cow offsetAndRotation documented)
 
 ---
 
 ## Phase 1 — Lifter: topology and poses (parallel workstreams)
 
-**Objective:** Lift `PartDefinition.addOrReplaceChild` graph and full `PartPose` (including `offsetAndRotation`) into IR shards.
+**Objective:** Lift `PartDefinition.addOrReplaceChild` graph and the **correct** `PartPose` factory per bind (`offset` vs `offsetAndRotation`) into IR shards for all pilot JVMs. Apply hierarchy recovery for flat part trees across the pilot set — not “copy cow rotation onto creeper.”
 
 **Primary code:** `src/AutoPBR.Tools.GeometryCompiler/JavapFloatGeometryMeshLift.cs`, `BytecodeGeometryMeshLift.cs`, `BytecodeMeshResolution.cs`
 
 ### Agent 1A — addOrReplaceChild binding recovery
 
 ```text
-TASK: Fix "No PartDefinition addChild binding lines found" for creeper-like factories.
+TASK: Fix "No PartDefinition addChild binding lines found" for factories across the pilot JVM set.
 
 FOCUS:
-- CreeperModel.createBodyLayer (26.1.2 named jar)
+- Pattern: flat root siblings + missing edges (creeper canary; QuadrupedModel, RavagerModel, etc. on pilot list)
 - Split-line javap comments, fluent chains, ldc ordering vs aload receiver
 - Reuse QuadrupedMeshLiftTests / PartialModelLiftDiagnosticsTests patterns
 
 TESTS (T0):
-- New: CreeperModel_lift_recovers_part_hierarchy (jar-gated)
-- Assert maxTreeDepth >= 2 OR legs nested under body in lifted roots
+- Jar-gated tests on pilot sample: hierarchy recovered OR honest flat-tree + composed-pose path documented per JVM
+- CreeperModel_lift_recovers_part_hierarchy as regression canary
 
-DELIVERABLE: Lifter PR; creeper shard shows body.children containing legs OR documented why vanilla is flat with composed poses only.
+DELIVERABLE: Lifter PR; all affected ok shards in pilot list show lifted edges or documented flat-tree semantics matching javap.
 
 subagent_type: generalPurpose
 ```
 
-### Agent 1B — offsetAndRotation and shared leg builder
+### Agent 1B — PartPose kind correctness (offset vs offsetAndRotation)
 
 ```text
-TASK: Ensure offsetAndRotation(6-float) and shared CubeListBuilder leg segments lift correctly.
+TASK: Lift the PartPose invoke actually used in each factory — offset (3-float) OR offsetAndRotation (6-float) — not the wrong overload.
 
 FOCUS:
-- PartPose.offsetAndRotation before addOrReplaceChild
-- Reused builder: ldc legName, aload builder, PartPose, bind (Quadruped createLegs pattern)
-- Compare lifted creeper body pose to CleanRoomEntityMonsters.BuildCreeper comments
+- CowModel / QuadrupedModel: offsetAndRotation before addOrReplaceChild (exemplar)
+- CreeperModel (Phase 1D): offset only in 26.1.2 jar — lifter must not invent π/2 on body
+- Shared CubeListBuilder leg binds (ldc legName, aload builder, PartPose, bind)
+- Compare lifted poses to javap oracle per part id, not to clean-room template when factory differs
 
 TESTS (T0):
-- Creeper body rotationEulerRad[0] ≈ π/2 within tolerance
-- Leg translations closer to (±3, 12, ±7) than (±2, 18, ±4)
+- Cow (or pilot with offsetAndRotation): body rotationEulerRad[0] ≈ π/2 within tolerance
+- Creeper canary: lifted body/head/leg translations match javap offset constants; rotation only if bytecode has offsetAndRotation
+- Spot-check N pilots from geometry-assembly-parity-pilots-26.1.2.txt
 
-DELIVERABLE: Lifter changes + failing→passing unit tests on jar.
+DELIVERABLE: Lifter changes + jar-gated tests; pilot shards’ local poses match factory bytecode kind per part.
 
 subagent_type: generalPurpose
 ```
@@ -212,10 +235,10 @@ subagent_type: generalPurpose
 TASK: Lift CubeDeformation / inflate where it affects cuboid corners; surface liftWarnings in shard.
 
 FOCUS:
-- Creeper head/body deformation constants from javap
+- Pilot models with deformation in javap (creeper inflate, quadruped overlays, etc.)
 - liftWarnings in geometry-lift-quality liftWarningCounts
 
-DELIVERABLE: Optional v2 cuboid metadata; not blocking creeper pose fix.
+DELIVERABLE: Optional v2 cuboid metadata; not blocking Phase 1B pose-kind fixes.
 
 subagent_type: generalPurpose
 ```
@@ -223,28 +246,32 @@ subagent_type: generalPurpose
 ### Agent 1D — Delegation / mesh host resolution
 
 ```text
-TASK: Verify CreeperModel mesh host resolution and deep concat (no wrong island merge).
+TASK: Verify mesh host resolution and deep concat for pilot JVMs (no wrong island merge).
 
 FOCUS:
 - BytecodeMeshResolution, DualLiftRegressionTests
+- CreeperModel (canary): confirm 26.1.2 factory uses PartPose.offset only — document in extractionNotes
 - If createBodyLayer delegates, ensure poses come from correct island
 
-DELIVERABLE: Test or note in extractionNotes when host != model class.
+DELIVERABLE: Test or extractionNotes when host != model class; Phase 1D offset-only finding recorded for creeper.
 
 subagent_type: explore
 ```
 
 **Phase 1 exit criteria**
 
-- [ ] Creeper IR: body `rotationEulerRad[0] ≈ π/2` OR hierarchy nests legs under rotated body
-- [ ] `extractionNotes` no longer claim missing addChild for creeper (or status → `partial` with honest notes)
-- [ ] T0 tests green on jar; no false T1 promotion yet
+- [ ] All pilot JVM shards: local poses match javap (`offset` vs `offsetAndRotation` per bind); no invented rotation on offset-only factories
+- [ ] Flat-tree pilots: hierarchy lifted OR flat layout + composed world layout documented and tested
+- [ ] `extractionNotes` honest for pilot sample (no false “missing addChild” when bindings exist)
+- [ ] T0 tests green on jar for pilot sample; creeper canary included; no false T1 promotion yet
 
 ---
 
 ## Phase 2 — Quality report v2 (parallel)
 
 **Objective:** Non-circular gates so `ok` + `reference*Match` cannot imply correct assembly.
+
+**Gate scope:** New fields and promotion policy run **index-wide** on every shard in `geometry-index-26.1.2.json`, with **pilot-list reporting** (highlight failures for JVMs in [`geometry-assembly-parity-pilots-26.1.2.txt`](generated/geometry-assembly-parity-pilots-26.1.2.txt)) and **pattern-based backlog** (`prioritizedBacklogJvmNames`). Gates are **not** creeper-only — creeper is the first regression assertion in tests.
 
 **Primary code:** `src/AutoPBR.Core/Preview/GeometryIrLiftQualityReport.cs`, `GeometryIrReferenceComparer.cs`
 
@@ -262,7 +289,7 @@ INTEGRATION:
 - GeometryIrLiftQualityReport.AnalyzeShard new fields
 - WriteJson schemaVersion bump or document new fields
 
-DELIVERABLE: Report entries fail for creeper when world origins diverge.
+DELIVERABLE: Index-wide report entries; all pilot JVMs with divergent world origins fail the gate (creeper canary in T3 tests).
 
 subagent_type: generalPurpose
 ```
@@ -270,17 +297,18 @@ subagent_type: generalPurpose
 ### Agent 2B — Policy gates on flat nested + warnings
 
 ```text
-TASK: Gate promotion on suspectedFlatNestedPartCount and lift binding failures.
+TASK: Gate promotion on suspectedFlatNestedPartCount and lift binding failures (index-wide).
 
 STEPS:
 1. If suspectedFlatNestedPartCount > 0 and hierarchy not lifted → flag referenceHierarchyMatch: false
 2. Parse extractionNotes for "addChild binding" → extractionBindingGap: true
 3. Add to prioritizedBacklog sort before referenceCuboidsMatch
+4. Apply to full geometry index; surface pilot-list subset in summary stats
 
 TESTS (T3):
-- GeometryIrLiftQualityReportTests assert creeper fails new gate when shard still flat
+- GeometryIrLiftQualityReportTests: creeper canary fails when flat; optional pilot-list batch assert
 
-DELIVERABLE: Quality report fields + tests (opt-in env ok).
+DELIVERABLE: Quality report fields + tests (opt-in env ok); prioritizedBacklog reflects new gates across pilots.
 
 subagent_type: generalPurpose
 ```
@@ -302,7 +330,8 @@ subagent_type: generalPurpose
 
 **Phase 2 exit criteria**
 
-- [ ] Creeper fails at least one new gate in regenerated quality JSON
+- [ ] Regenerated quality JSON: all pilot JVMs with known assembly gaps fail at least one new gate (creeper canary included)
+- [ ] Index-wide gate fields populated for full 26.1.2 geometry index, not creeper row only
 - [ ] Documented field list in `geometry-ir-conventions.md` or generated README
 
 ---
@@ -323,7 +352,7 @@ STEPS:
 2. Add optional "worldPose" or separate reference-world JSON alongside reference-output
 3. Use for Phase 2 comparer (not only IR circular compare)
 
-DELIVERABLE: net.minecraft.client.model.monster.creeper.CreeperModel-world.json or embedded worldPose on nodes.
+DELIVERABLE: World-pose reference export for pilot JVM sample (creeper canary first); pattern reusable for full pilot list.
 
 subagent_type: generalPurpose
 ```
@@ -331,21 +360,21 @@ subagent_type: generalPurpose
 ### Agent 3B — MeshDefinition / pre-bake pose probe
 
 ```text
-TASK: Investigate if getInitialPose() loses offsetAndRotation for creeper body; document or fix bake source.
+TASK: Investigate if getInitialPose() loses pose data for pilot factories; document or fix bake source.
 
 STEPS:
-1. Compare LayerDefinition bake vs PartDefinition builder poses for creeper
+1. Compare LayerDefinition bake vs PartDefinition builder poses for pilot sample (creeper offset-only, cow offsetAndRotation)
 2. If bake is lossy, export poses from builder path for reference
 
-DELIVERABLE: ADR paragraph in this roadmap or vanilla-preview-parity.md.
+DELIVERABLE: ADR paragraph in this roadmap or vanilla-preview-parity.md; applies to models sharing bake-loss pattern.
 
 subagent_type: explore
 ```
 
 **Phase 3 exit criteria**
 
-- [ ] Non-circular reference signal for creeper assembly (world poses or builder poses)
-- [ ] Export-GeometryReference.ps1 updated for pilot models
+- [ ] Non-circular reference signal for pilot JVM assembly (world poses or builder poses), index-wide export path documented
+- [ ] Export-GeometryReference.ps1 updated for geometry-assembly-parity-pilots-26.1.2.txt (batched)
 
 ---
 
@@ -353,10 +382,10 @@ subagent_type: explore
 
 **Objective:** Regenerate shards for pilot JVMs; promote via allowlists only when new gates pass.
 
-### Agent 4A — Regenerate creeper + quadruped cluster shards
+### Agent 4A — Regenerate pilot batch 1 (monsters + base quadruped)
 
 ```text
-TASK: Regenerate geometry shards for geometry-assembly-parity-pilots-26.1.2.txt (batch 1: monsters + QuadrupedModel).
+TASK: Regenerate geometry shards for geometry-assembly-parity-pilots-26.1.2.txt batch 1 (monsters + QuadrupedModel + creeper canary).
 
 STEPS:
 1. GeometryCompiler lift for each JVM
@@ -394,8 +423,8 @@ subagent_type: generalPurpose
 
 **Phase 4 exit criteria**
 
-- [ ] Creeper passes `javapPoseOracleMatch` + `referenceWorldPoseMatch` (or equivalent)
-- [ ] Explore 3D creeper visually correct (manual checklist)
+- [ ] Every JVM in geometry-assembly-parity-pilots-26.1.2.txt passes `javapPoseOracleMatch` + `referenceWorldPoseMatch` (or equivalent) before `ok` promotion
+- [ ] Explore 3D manual checklist on canary set (creeper, cow, one monster, one baby variant)
 - [ ] Allowlists updated in same PR as shards
 
 ---
@@ -409,13 +438,13 @@ subagent_type: generalPurpose
 ### Agent 5A — Reparent with pose rebase
 
 ```text
-TASK: When ReparentFlatPart moves leg under body, rebase child pose into parent space (or skip reparent if poses are root-absolute).
+TASK: When ReparentFlatPart moves parts, rebase child pose into parent space (or skip reparent if poses are root-absolute).
 
 STEPS:
-1. Document vanilla: flat siblings vs nested in baked ModelPart for creeper
-2. If Java bake is flat, disable leg→body reparent for creeper JVM allowlist OR rebase translations
+1. Document vanilla bake: flat siblings vs nested per pilot family (creeper canary)
+2. Policy: disable harmful reparent for JVMs on pilot list where Java bake is flat OR rebase translations
 
-DELIVERABLE: Creeper preview correct even before full hierarchy lift OR explicit "no reparent" policy.
+DELIVERABLE: Preview correct for pilot sample; explicit no-reparent policy per pattern, not creeper-only hack.
 
 subagent_type: generalPurpose
 ```
@@ -423,21 +452,21 @@ subagent_type: generalPurpose
 ### Agent 5B — Viewport sanity tests (T2/T1)
 
 ```text
-TASK: Add viewport AABB tests after ApplyLivingEntityRendererPreviewBasis for pilot mobs.
+TASK: Add viewport AABB tests after ApplyLivingEntityRendererPreviewBasis for geometry-assembly-parity-pilots-26.1.2.txt.
 
 PATTERN: EntityTextureParityAssemblyCohesionTests, MinecraftJavaModelPreviewTests world AABB helpers
 
-ASSERT: Leg elements centroid Y below head centroid Y in preview space (creeper, cow pilots).
+ASSERT: Leg elements centroid Y below head centroid Y in preview space (pilot quadrupeds; creeper + cow as canaries).
 
-DELIVERABLE: Tests on allowlist only; jar + shard required.
+DELIVERABLE: Tests on pilot allowlist only; jar + shard required.
 
 subagent_type: generalPurpose
 ```
 
 **Phase 5 exit criteria**
 
-- [ ] Creeper Explore preview matches vanilla screenshot expectation
-- [ ] T1 viewport test for creeper on strict allowlist
+- [ ] Explore preview sane for pilot JVM sample (creeper canary + representative quadrupeds)
+- [ ] T1 viewport tests on strict allowlist for promoted pilots, not creeper alone
 
 ---
 
@@ -454,28 +483,30 @@ Use this table to launch **independent** agents in one multitask batch. Wait for
 | **3** | 3A, 3B | Yes | Before 4 (helps 2A) |
 | **4** | 4A, 4B | Yes (different JVM batches) | After 1+2 |
 | **4** | 4C | After 4A+4B | After 4A+4B |
-| **5** | 5A, 5B | Yes | After 4 for creeper OR parallel if preview-only hotfix |
+| **5** | 5A, 5B | Yes | After 4 for pilot list OR parallel if preview-only hotfix |
 
 **Suggested multitask prompt (paste into Multitask Mode):**
 
 ```text
-Execute Phase 0 of docs/geometry-lift-assembly-parity-roadmap.md:
-- Agent 0A: regenerate geometry-lift-quality-26.1.2.json
-- Agent 0B: create geometry-assembly-parity-pilots-26.1.2.txt
-- Agent 0C: javap snapshots for CreeperModel and CowModel
+Execute docs/geometry-lift-assembly-parity-roadmap.md (full pilot program, 56 JVMs):
+- Phase 0: quality JSON + geometry-assembly-parity-pilots-26.1.2.txt + javap oracles (creeper offset-only, cow offsetAndRotation)
+- Phase 1: lifter topology + PartPose kind correctness across pilot list (1A+1B parallel)
+- Phase 2: index-wide quality gates (not creeper-only)
+- Phase 4: shard regen for full pilot list only when gates pass
 
-Then Phase 1 agents 1A+1B in parallel. Report blockers before Phase 4.
+CreeperModel is regression canary only. Report blockers before Phase 4.
 ```
 
 ---
 
 ## Acceptance criteria (program level)
 
-1. **No false green:** A model with `suspectedFlatNestedPartCount > 0` and missing body `offsetAndRotation` cannot have all assembly gates pass.
-2. **Creeper pilot:** Head, body, legs in plausible relative positions in Explore 3D (legs below torso/head).
-3. **Non-circular validation:** At least one quality field compares against javap oracle or world-composed poses, not only `reference_java` locals.
-4. **Tier discipline:** New strict tests only on `geometry-assembly-parity-pilots-26.1.2.txt` allowlist.
-5. **Regenerated artifacts:** `geometry-lift-quality-26.1.2.json` reflects current shard metrics (creeper `rootChildCount: 6`, `suspectedFlatNestedPartCount: 4` until fixed).
+1. **No false green:** Any shard with `suspectedFlatNestedPartCount > 0` and assembly gaps (wrong pose kind, flat tree without composed layout) cannot have all assembly gates pass — evaluated index-wide, enforced on [pilot JVM set](generated/geometry-assembly-parity-pilots-26.1.2.txt).
+2. **Pilot set:** All 56 JVMs in `geometry-assembly-parity-pilots-26.1.2.txt` pass Phase 2 gates before T1 promotion; Explore 3D sane on canary subset (creeper, cow, +2 families).
+3. **Non-circular validation:** At least one quality field compares against javap oracle or world-composed poses, not only `reference_java` locals — for every promoted pilot.
+4. **Tier discipline:** New strict tests only on pilot allowlist derived from `geometry-assembly-parity-pilots-26.1.2.txt`.
+5. **Regenerated artifacts:** `geometry-lift-quality-26.1.2.json` reflects current metrics for full index; pilot backlog matches `prioritizedBacklogJvmNames` pattern until fixed.
+6. **Lifter correctness:** Factories using `PartPose.offset` only (26.1.2 creeper) are not “fixed” by injecting cow-style `offsetAndRotation`; offsetAndRotation pilots lift 6-float binds correctly.
 
 ---
 
@@ -493,7 +524,7 @@ Then Phase 1 agents 1A+1B in parallel. Report blockers before Phase 4.
 | Creeper IR shard | `docs/generated/geometry/26.1.2/net.minecraft.client.model.monster.creeper.CreeperModel.json` |
 | Reference bake | `tools/MinecraftGeometryReference/reference-output/...CreeperModel.json` |
 | Quality JSON | `docs/generated/geometry-lift-quality-26.1.2.json` |
-| Assembly-parity pilots (T1) | `docs/generated/geometry-assembly-parity-pilots-26.1.2.txt` |
+| Pilot JVM list (56) | `docs/generated/geometry-assembly-parity-pilots-26.1.2.txt` |
 
 ---
 
@@ -503,7 +534,7 @@ From fresh quality backlog pattern (`suspectedFlatNestedPartCount > 0` + referen
 
 - `QuadrupedModel`, `CowModel`, `SheepModel`, `PigModel`, `FoxModel`, `CamelModel`, `GoatModel`, `LlamaModel`, `PandaModel`, `PolarBearModel`, `RabbitModel`, `WolfModel`, `ArmadilloModel`, `AxolotlModel`, `SnifferModel`, `TurtleModel`, `HorseModel` / equine family, `CreeperModel`, `RavagerModel`, `EnderDragonModel` (verify per shard)
 
-Treat as **family fixes** in the lifter, not one-off creeper hacks.
+Treat as **family fixes** in the lifter, not one-off creeper hacks. Authoritative promotion list: [`geometry-assembly-parity-pilots-26.1.2.txt`](generated/geometry-assembly-parity-pilots-26.1.2.txt) (56 JVMs, aligned with `prioritizedBacklogJvmNames` + must-fix pilots).
 
 ---
 
@@ -513,7 +544,7 @@ Treat as **family fixes** in the lifter, not one-off creeper hacks.
 |------|--------------|------------|
 | `PartDefinition` parent→child edges | Often missing (flat root) | **Yes** |
 | `PartPose.offset` | Partial | **Yes** |
-| `PartPose.offsetAndRotation` | Missing on creeper body | **Yes** |
+| `PartPose.offsetAndRotation` | Required where factory uses 6-float bind; creeper 26.1.2 uses `offset` only | **Yes** (per factory bytecode) |
 | Shared leg `CubeListBuilder` binds | Partial | **Yes** |
 | `CubeDeformation` | Often omitted | Nice-to-have |
 | `setupAnim` default pose | Separate animation IR | Only if rest pose incomplete |
@@ -521,18 +552,4 @@ Treat as **family fixes** in the lifter, not one-off creeper hacks.
 
 ---
 
-## Appendix D — Pilot list (generated)
-
-Agent **0B** output: [`geometry-assembly-parity-pilots-26.1.2.txt`](generated/geometry-assembly-parity-pilots-26.1.2.txt).
-
-| Field | Value |
-|-------|-------|
-| **Pilot JVM count** | 56 |
-| **Source** | `prioritizedBacklogJvmNames` in [`geometry-lift-quality-26.1.2.json`](generated/geometry-lift-quality-26.1.2.json) (`generatedUtc` 2026-05-19T07:40:20Z), union **must-fix** assembly pilots: `CreeperModel`, `QuadrupedModel`, `CowModel`, `SheepModel`, `PigModel` (all five already present in backlog after refresh) |
-| **Format** | One `officialJvmName` per line; `#` section comments |
-
-Regenerate quality JSON before refreshing pilots: `AUTOPBR_WRITE_GEOMETRY_LIFT_QUALITY=docs/generated/geometry-lift-quality-26.1.2.json` + `Write_quality_report_when_env_set` (see [test guidance](test-guidance-geometry-animation-ir.md)).
-
----
-
-*Generated from assembly-parity analysis (creeper false-positive `reference*Match` investigation). Update this doc when phases complete.*
+*Assembly-parity program for 26.1.2 pilot JVM set (56 models); creeper is the canonical example / regression canary. Update when phases complete.*
