@@ -1,0 +1,63 @@
+# geometry-assembly-parity-pilots-26.1.2.txt
+# T1 promotion targets for assembly-parity (Phase 0B).
+# Source: geometry-lift-quality-26.1.2.json generatedUtc=2026-05-19T07:40:20.2604474Z
+# Union: prioritizedBacklogJvmNames + must-fix (CreeperModel, QuadrupedModel, CowModel, SheepModel, PigModel)
+
+# Prioritized backlog (flat-nested suspects with reference*Match true)
+
+net.minecraft.client.model.QuadrupedModel
+net.minecraft.client.model.animal.armadillo.AdultArmadilloModel
+net.minecraft.client.model.animal.armadillo.ArmadilloModel
+net.minecraft.client.model.animal.armadillo.BabyArmadilloModel
+net.minecraft.client.model.animal.axolotl.AdultAxolotlModel
+net.minecraft.client.model.animal.axolotl.BabyAxolotlModel
+net.minecraft.client.model.animal.camel.AdultCamelModel
+net.minecraft.client.model.animal.camel.BabyCamelModel
+net.minecraft.client.model.animal.camel.CamelModel
+net.minecraft.client.model.animal.camel.CamelSaddleModel
+net.minecraft.client.model.animal.cow.BabyCowModel
+net.minecraft.client.model.animal.cow.CowModel
+net.minecraft.client.model.animal.equine.AbstractEquineModel
+net.minecraft.client.model.animal.equine.BabyDonkeyModel
+net.minecraft.client.model.animal.equine.BabyHorseModel
+net.minecraft.client.model.animal.equine.DonkeyModel
+net.minecraft.client.model.animal.equine.EquineSaddleModel
+net.minecraft.client.model.animal.equine.HorseModel
+net.minecraft.client.model.animal.feline.AbstractFelineModel
+net.minecraft.client.model.animal.feline.AdultCatModel
+net.minecraft.client.model.animal.feline.AdultFelineModel
+net.minecraft.client.model.animal.feline.AdultOcelotModel
+net.minecraft.client.model.animal.feline.BabyCatModel
+net.minecraft.client.model.animal.feline.BabyFelineModel
+net.minecraft.client.model.animal.feline.BabyOcelotModel
+net.minecraft.client.model.animal.fox.AdultFoxModel
+net.minecraft.client.model.animal.fox.BabyFoxModel
+net.minecraft.client.model.animal.fox.FoxModel
+net.minecraft.client.model.animal.goat.BabyGoatModel
+net.minecraft.client.model.animal.goat.GoatModel
+net.minecraft.client.model.animal.llama.BabyLlamaModel
+net.minecraft.client.model.animal.llama.LlamaModel
+net.minecraft.client.model.animal.panda.BabyPandaModel
+net.minecraft.client.model.animal.panda.PandaModel
+net.minecraft.client.model.animal.pig.PigModel
+net.minecraft.client.model.animal.polarbear.BabyPolarBearModel
+net.minecraft.client.model.animal.polarbear.PolarBearModel
+net.minecraft.client.model.animal.rabbit.AdultRabbitModel
+net.minecraft.client.model.animal.rabbit.BabyRabbitModel
+net.minecraft.client.model.animal.rabbit.RabbitModel
+net.minecraft.client.model.animal.sheep.BabySheepModel
+net.minecraft.client.model.animal.sheep.SheepFurModel
+net.minecraft.client.model.animal.sheep.SheepModel
+net.minecraft.client.model.animal.sniffer.SnifferModel
+net.minecraft.client.model.animal.sniffer.SniffletModel
+net.minecraft.client.model.animal.turtle.AdultTurtleModel
+net.minecraft.client.model.animal.turtle.BabyTurtleModel
+net.minecraft.client.model.animal.turtle.TurtleModel
+net.minecraft.client.model.animal.wolf.AdultWolfModel
+net.minecraft.client.model.animal.wolf.BabyWolfModel
+net.minecraft.client.model.animal.wolf.WolfModel
+net.minecraft.client.model.monster.creeper.CreeperModel
+net.minecraft.client.model.monster.dragon.EnderDragonModel
+net.minecraft.client.model.monster.hoglin.BabyHoglinModel
+net.minecraft.client.model.monster.hoglin.HoglinModel
+net.minecraft.client.model.monster.ravager.RavagerModel
