@@ -1,0 +1,470 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.llama.LlamaModel",
+  "profile": "named_jar_26.1.2",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.llama.LlamaModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0.000000000,
+          0.000000000,
+          0.000000000
+        ],
+        "rotationEulerRad": [
+          0.000000000,
+          0.000000000,
+          0.000000000
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "head",
+          "pose": {
+            "translation": [
+              0.000000000,
+              7.000000000,
+              -6.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -2,
+                -14,
+                -10
+              ],
+              "to": [
+                2,
+                -10,
+                -1
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            },
+            {
+              "from": [
+                -4,
+                -16,
+                -6
+              ],
+              "to": [
+                4,
+                2,
+                0
+              ],
+              "uvOrigin": [
+                0,
+                14
+              ],
+              "textureKey": "#neck",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            },
+            {
+              "from": [
+                -4,
+                -19,
+                -4
+              ],
+              "to": [
+                -1,
+                -16,
+                -2
+              ],
+              "uvOrigin": [
+                17,
+                0
+              ],
+              "textureKey": "#ear",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            },
+            {
+              "from": [
+                1,
+                -19,
+                -4
+              ],
+              "to": [
+                4,
+                -16,
+                -2
+              ],
+              "uvOrigin": [
+                17,
+                0
+              ],
+              "textureKey": "#ear",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "body",
+          "pose": {
+            "translation": [
+              0.000000000,
+              5.000000000,
+              2.000000000
+            ],
+            "rotationEulerRad": [
+              1.570796371,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -6,
+                -10,
+                -7
+              ],
+              "to": [
+                6,
+                8,
+                3
+              ],
+              "uvOrigin": [
+                29,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": [
+            {
+              "id": "right_chest",
+              "pose": {
+                "translation": [
+                  -8.500000000,
+                  3.000000000,
+                  3.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  1.570796371,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -3,
+                    0,
+                    0
+                  ],
+                  "to": [
+                    5,
+                    8,
+                    3
+                  ],
+                  "uvOrigin": [
+                    45,
+                    28
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "left_chest",
+              "pose": {
+                "translation": [
+                  5.500000000,
+                  3.000000000,
+                  3.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  1.570796371,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -3,
+                    0,
+                    0
+                  ],
+                  "to": [
+                    5,
+                    8,
+                    3
+                  ],
+                  "uvOrigin": [
+                    45,
+                    41
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
+              ],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "right_hind_leg",
+          "pose": {
+            "translation": [
+              -3.500000000,
+              10.00000000,
+              6.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -2,
+                0,
+                -2
+              ],
+              "to": [
+                2,
+                14,
+                2
+              ],
+              "uvOrigin": [
+                29,
+                29
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left_hind_leg",
+          "pose": {
+            "translation": [
+              3.500000000,
+              10.00000000,
+              6.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -2,
+                0,
+                -2
+              ],
+              "to": [
+                2,
+                14,
+                2
+              ],
+              "uvOrigin": [
+                29,
+                29
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right_front_leg",
+          "pose": {
+            "translation": [
+              -3.500000000,
+              10.00000000,
+              -5.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -2,
+                0,
+                -2
+              ],
+              "to": [
+                2,
+                14,
+                2
+              ],
+              "uvOrigin": [
+                29,
+                29
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left_front_leg",
+          "pose": {
+            "translation": [
+              3.500000000,
+              10.00000000,
+              -5.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -2,
+                0,
+                -2
+              ],
+              "to": [
+                2,
+                14,
+                2
+              ],
+              "uvOrigin": [
+                29,
+                29
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "net/minecraft/client/model/animal/llama/LlamaModel.class",
+  "classSha256Hex": "98b0510ed7df4a3e815489037a2012e3540c90f0f7646855660c4dc5cdd8d986",
+  "bytecodeFloatProbe": [
+    -2,
+    -14,
+    -10,
+    4,
+    4,
+    9,
+    -4,
+    -16,
+    -6,
+    8,
+    18,
+    6,
+    -4,
+    -19,
+    -4,
+    3,
+    3,
+    -19,
+    -4,
+    3,
+    3,
+    7,
+    -6,
+    -6,
+    -10,
+    -7,
+    12,
+    18,
+    10,
+    5,
+    1.5707964,
+    -3,
+    8,
+    8,
+    3,
+    -8.5,
+    3,
+    3,
+    1.5707964,
+    -3,
+    8,
+    8,
+    3,
+    5.5,
+    3,
+    3,
+    1.5707964,
+    -2,
+    -2,
+    4,
+    14,
+    4,
+    -3.5,
+    10,
+    6,
+    3.5,
+    10,
+    6,
+    -3.5,
+    10,
+    -5,
+    3.5,
+    10,
+    -5
+  ],
+  "textureWidth": 128,
+  "textureHeight": 64,
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

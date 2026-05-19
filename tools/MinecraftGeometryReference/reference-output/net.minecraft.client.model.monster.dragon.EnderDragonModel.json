@@ -1,0 +1,991 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.dragon.EnderDragonModel",
+  "extractionStatus": "reference_java",
+  "factoryMethod": "createBodyLayer",
+  "meshHostJvmName": "net.minecraft.client.model.monster.dragon.EnderDragonModel",
+  "roots": [{
+  "id": "root",
+  "pose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [],
+  "children": [{
+  "id": "neck4",
+  "pose": {
+  "translation": [0.000000000, 20.00000000, -52.00000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 20.00000000, -52.00000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-5.000000000, -5.000000000, -5.000000000],
+  "to": [5.000000000, 5.000000000, 5.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -9.000000000, -3.000000000],
+  "to": [1.000000000, -5.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "neck3",
+  "pose": {
+  "translation": [0.000000000, 20.00000000, -42.00000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 20.00000000, -42.00000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-5.000000000, -5.000000000, -5.000000000],
+  "to": [5.000000000, 5.000000000, 5.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -9.000000000, -3.000000000],
+  "to": [1.000000000, -5.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "tail11",
+  "pose": {
+  "translation": [0.000000000, 10.00000000, 170.0000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 10.00000000, 170.0000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-5.000000000, -5.000000000, -5.000000000],
+  "to": [5.000000000, 5.000000000, 5.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -9.000000000, -3.000000000],
+  "to": [1.000000000, -5.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "neck0",
+  "pose": {
+  "translation": [0.000000000, 20.00000000, -12.00000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 20.00000000, -12.00000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-5.000000000, -5.000000000, -5.000000000],
+  "to": [5.000000000, 5.000000000, 5.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -9.000000000, -3.000000000],
+  "to": [1.000000000, -5.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "body",
+  "pose": {
+  "translation": [0.000000000, 3.000000000, 8.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 3.000000000, 8.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-12.00000000, 1.000000000, -16.00000000],
+  "to": [12.00000000, 25.00000000, 48.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -5.000000000, -10.00000000],
+  "to": [1.000000000, 1.000000000, 2.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -5.000000000, 10.00000000],
+  "to": [1.000000000, 1.000000000, 22.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -5.000000000, 30.00000000],
+  "to": [1.000000000, 1.000000000, 42.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": [{
+  "id": "right_front_leg",
+  "pose": {
+  "translation": [-12.00000000, 17.00000000, -6.000000000],
+  "rotationEulerRad": [1.299999952, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [-12.00000000, 3.422862053, 19.80615997],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-4.000000000, -4.000000000, -4.000000000],
+  "to": [4.000000000, 20.00000000, 4.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": [{
+  "id": "right_front_leg_tip",
+  "pose": {
+  "translation": [0.000000000, 20.00000000, -1.000000000],
+  "rotationEulerRad": [-0.5000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [-12.00000000, 29.57164764, 5.274439812],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-3.000000000, -1.000000000, -3.000000000],
+  "to": [3.000000000, 23.00000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": [{
+  "id": "right_front_foot",
+  "pose": {
+  "translation": [0.000000000, 23.00000000, 0.000000000],
+  "rotationEulerRad": [0.7500000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [-12.00000000, 34.87082672, 39.69412231],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-4.000000000, 0.000000000, -12.00000000],
+  "to": [4.000000000, 4.000000000, 4.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+]
+}
+]
+}
+,{
+  "id": "right_hind_leg",
+  "pose": {
+  "translation": [-16.00000000, 13.00000000, 34.00000000],
+  "rotationEulerRad": [1.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [-16.00000000, -26.69694328, 36.15623093],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-8.000000000, -4.000000000, -8.000000000],
+  "to": [8.000000000, 28.00000000, 8.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": [{
+  "id": "right_hind_leg_tip",
+  "pose": {
+  "translation": [0.000000000, 32.00000000, -4.000000000],
+  "rotationEulerRad": [0.5000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [-16.00000000, -10.76264954, 30.76216888],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-6.000000000, -2.000000000, 0.000000000],
+  "to": [6.000000000, 30.00000000, 12.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": [{
+  "id": "right_hind_foot",
+  "pose": {
+  "translation": [0.000000000, 31.00000000, 4.000000000],
+  "rotationEulerRad": [0.7500000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [-16.00000000, -8.887798309, 39.22965622],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-9.000000000, 0.000000000, -20.00000000],
+  "to": [9.000000000, 6.000000000, 4.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+]
+}
+]
+}
+,{
+  "id": "right_wing",
+  "pose": {
+  "translation": [-12.00000000, 2.000000000, -6.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [-12.00000000, 5.000000000, 2.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-56.00000000, -4.000000000, -4.000000000],
+  "to": [0.000000000, 4.000000000, 4.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-56.00000000, 0.000000000, 2.000000000],
+  "to": [0.000000000, 0.000000000, 58.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": [{
+  "id": "right_wing_tip",
+  "pose": {
+  "translation": [-56.00000000, 0.000000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [-68.00000000, 5.000000000, 2.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-56.00000000, -2.000000000, -2.000000000],
+  "to": [0.000000000, 2.000000000, 2.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-56.00000000, 0.000000000, 2.000000000],
+  "to": [0.000000000, 0.000000000, 58.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+]
+}
+,{
+  "id": "left_wing",
+  "pose": {
+  "translation": [12.00000000, 2.000000000, -6.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [12.00000000, 5.000000000, 2.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [0.000000000, -4.000000000, -4.000000000],
+  "to": [56.00000000, 4.000000000, 4.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [0.000000000, 0.000000000, 2.000000000],
+  "to": [56.00000000, 0.000000000, 58.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": [{
+  "id": "left_wing_tip",
+  "pose": {
+  "translation": [56.00000000, 0.000000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [68.00000000, 5.000000000, 2.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [0.000000000, -2.000000000, -2.000000000],
+  "to": [56.00000000, 2.000000000, 2.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [0.000000000, 0.000000000, 2.000000000],
+  "to": [56.00000000, 0.000000000, 58.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+]
+}
+,{
+  "id": "left_hind_leg",
+  "pose": {
+  "translation": [16.00000000, 13.00000000, 34.00000000],
+  "rotationEulerRad": [1.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [16.00000000, -26.69694328, 36.15623093],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-8.000000000, -4.000000000, -8.000000000],
+  "to": [8.000000000, 28.00000000, 8.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": [{
+  "id": "left_hind_leg_tip",
+  "pose": {
+  "translation": [0.000000000, 32.00000000, -4.000000000],
+  "rotationEulerRad": [0.5000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [16.00000000, -10.76264954, 30.76216888],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-6.000000000, -2.000000000, 0.000000000],
+  "to": [6.000000000, 30.00000000, 12.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": [{
+  "id": "left_hind_foot",
+  "pose": {
+  "translation": [0.000000000, 31.00000000, 4.000000000],
+  "rotationEulerRad": [0.7500000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [16.00000000, -8.887798309, 39.22965622],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-9.000000000, 0.000000000, -20.00000000],
+  "to": [9.000000000, 6.000000000, 4.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+]
+}
+]
+}
+,{
+  "id": "left_front_leg",
+  "pose": {
+  "translation": [12.00000000, 17.00000000, -6.000000000],
+  "rotationEulerRad": [1.299999952, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [12.00000000, 3.422862053, 19.80615997],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-4.000000000, -4.000000000, -4.000000000],
+  "to": [4.000000000, 20.00000000, 4.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": [{
+  "id": "left_front_leg_tip",
+  "pose": {
+  "translation": [0.000000000, 20.00000000, -1.000000000],
+  "rotationEulerRad": [-0.5000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [12.00000000, 29.57164764, 5.274439812],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-3.000000000, -1.000000000, -3.000000000],
+  "to": [3.000000000, 23.00000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": [{
+  "id": "left_front_foot",
+  "pose": {
+  "translation": [0.000000000, 23.00000000, 0.000000000],
+  "rotationEulerRad": [0.7500000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [12.00000000, 34.87082672, 39.69412231],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-4.000000000, 0.000000000, -12.00000000],
+  "to": [4.000000000, 4.000000000, 4.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+]
+}
+]
+}
+]
+}
+,{
+  "id": "neck2",
+  "pose": {
+  "translation": [0.000000000, 20.00000000, -32.00000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 20.00000000, -32.00000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-5.000000000, -5.000000000, -5.000000000],
+  "to": [5.000000000, 5.000000000, 5.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -9.000000000, -3.000000000],
+  "to": [1.000000000, -5.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "neck1",
+  "pose": {
+  "translation": [0.000000000, 20.00000000, -22.00000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 20.00000000, -22.00000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-5.000000000, -5.000000000, -5.000000000],
+  "to": [5.000000000, 5.000000000, 5.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -9.000000000, -3.000000000],
+  "to": [1.000000000, -5.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "head",
+  "pose": {
+  "translation": [0.000000000, 20.00000000, -62.00000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 20.00000000, -62.00000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-6.000000000, -1.000000000, -24.00000000],
+  "to": [6.000000000, 4.000000000, -8.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-8.000000000, -8.000000000, -10.00000000],
+  "to": [8.000000000, 8.000000000, 6.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-5.000000000, -12.00000000, -4.000000000],
+  "to": [-3.000000000, -8.000000000, 2.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-5.000000000, -3.000000000, -22.00000000],
+  "to": [-3.000000000, -1.000000000, -18.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [3.000000000, -12.00000000, -4.000000000],
+  "to": [5.000000000, -8.000000000, 2.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [3.000000000, -3.000000000, -22.00000000],
+  "to": [5.000000000, -1.000000000, -18.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": [{
+  "id": "jaw",
+  "pose": {
+  "translation": [0.000000000, 4.000000000, -8.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 24.00000000, -70.00000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-6.000000000, 0.000000000, -16.00000000],
+  "to": [6.000000000, 4.000000000, 0.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+]
+}
+,{
+  "id": "tail0",
+  "pose": {
+  "translation": [0.000000000, 10.00000000, 60.00000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 10.00000000, 60.00000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-5.000000000, -5.000000000, -5.000000000],
+  "to": [5.000000000, 5.000000000, 5.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -9.000000000, -3.000000000],
+  "to": [1.000000000, -5.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "tail1",
+  "pose": {
+  "translation": [0.000000000, 10.00000000, 70.00000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 10.00000000, 70.00000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-5.000000000, -5.000000000, -5.000000000],
+  "to": [5.000000000, 5.000000000, 5.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -9.000000000, -3.000000000],
+  "to": [1.000000000, -5.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "tail2",
+  "pose": {
+  "translation": [0.000000000, 10.00000000, 80.00000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 10.00000000, 80.00000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-5.000000000, -5.000000000, -5.000000000],
+  "to": [5.000000000, 5.000000000, 5.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -9.000000000, -3.000000000],
+  "to": [1.000000000, -5.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "tail3",
+  "pose": {
+  "translation": [0.000000000, 10.00000000, 90.00000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 10.00000000, 90.00000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-5.000000000, -5.000000000, -5.000000000],
+  "to": [5.000000000, 5.000000000, 5.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -9.000000000, -3.000000000],
+  "to": [1.000000000, -5.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "tail4",
+  "pose": {
+  "translation": [0.000000000, 10.00000000, 100.0000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 10.00000000, 100.0000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-5.000000000, -5.000000000, -5.000000000],
+  "to": [5.000000000, 5.000000000, 5.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -9.000000000, -3.000000000],
+  "to": [1.000000000, -5.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "tail5",
+  "pose": {
+  "translation": [0.000000000, 10.00000000, 110.0000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 10.00000000, 110.0000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-5.000000000, -5.000000000, -5.000000000],
+  "to": [5.000000000, 5.000000000, 5.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -9.000000000, -3.000000000],
+  "to": [1.000000000, -5.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "tail10",
+  "pose": {
+  "translation": [0.000000000, 10.00000000, 160.0000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 10.00000000, 160.0000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-5.000000000, -5.000000000, -5.000000000],
+  "to": [5.000000000, 5.000000000, 5.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -9.000000000, -3.000000000],
+  "to": [1.000000000, -5.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "tail6",
+  "pose": {
+  "translation": [0.000000000, 10.00000000, 120.0000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 10.00000000, 120.0000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-5.000000000, -5.000000000, -5.000000000],
+  "to": [5.000000000, 5.000000000, 5.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -9.000000000, -3.000000000],
+  "to": [1.000000000, -5.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "tail7",
+  "pose": {
+  "translation": [0.000000000, 10.00000000, 130.0000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 10.00000000, 130.0000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-5.000000000, -5.000000000, -5.000000000],
+  "to": [5.000000000, 5.000000000, 5.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -9.000000000, -3.000000000],
+  "to": [1.000000000, -5.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "tail8",
+  "pose": {
+  "translation": [0.000000000, 10.00000000, 140.0000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 10.00000000, 140.0000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-5.000000000, -5.000000000, -5.000000000],
+  "to": [5.000000000, 5.000000000, 5.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -9.000000000, -3.000000000],
+  "to": [1.000000000, -5.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "tail9",
+  "pose": {
+  "translation": [0.000000000, 10.00000000, 150.0000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 10.00000000, 150.0000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-5.000000000, -5.000000000, -5.000000000],
+  "to": [5.000000000, 5.000000000, 5.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.000000000, -9.000000000, -3.000000000],
+  "to": [1.000000000, -5.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+]
+}
+]
+}
