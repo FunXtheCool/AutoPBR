@@ -1,0 +1,120 @@
+# javap snapshot - Minecraft 26.1.2 client.jar
+# Class: net.minecraft.client.model.animal.equine.DonkeyModel
+# Pilot entry: net.minecraft.client.model.animal.equine.DonkeyModel
+# Factory method: createBodyLayer
+# Command: javap -c -constants
+# Content: full class disassembly
+# Generated: 2026-05-19T05:02:17.2794870-04:00
+Compiled from "DonkeyModel.java"
+public class net.minecraft.client.model.animal.equine.DonkeyModel extends net.minecraft.client.model.animal.equine.AbstractEquineModel<net.minecraft.client.renderer.entity.state.DonkeyRenderState> {
+  public static final float DONKEY_SCALE;
+
+  public static final float MULE_SCALE;
+
+  public net.minecraft.client.model.animal.equine.DonkeyModel(net.minecraft.client.model.geom.ModelPart);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokespecial #1                  // Method net/minecraft/client/model/animal/equine/AbstractEquineModel."<init>":(Lnet/minecraft/client/model/geom/ModelPart;)V
+       5: aload_0
+       6: aload_0
+       7: getfield      #7                  // Field body:Lnet/minecraft/client/model/geom/ModelPart;
+      10: ldc           #15                 // String left_chest
+      12: invokevirtual #17                 // Method net/minecraft/client/model/geom/ModelPart.getChild:(Ljava/lang/String;)Lnet/minecraft/client/model/geom/ModelPart;
+      15: putfield      #23                 // Field leftChest:Lnet/minecraft/client/model/geom/ModelPart;
+      18: aload_0
+      19: aload_0
+      20: getfield      #7                  // Field body:Lnet/minecraft/client/model/geom/ModelPart;
+      23: ldc           #26                 // String right_chest
+      25: invokevirtual #17                 // Method net/minecraft/client/model/geom/ModelPart.getChild:(Ljava/lang/String;)Lnet/minecraft/client/model/geom/ModelPart;
+      28: putfield      #28                 // Field rightChest:Lnet/minecraft/client/model/geom/ModelPart;
+      31: return
+
+  public net.minecraft.client.model.animal.equine.DonkeyModel(net.minecraft.client.model.geom.ModelPart, net.minecraft.client.model.geom.ModelPart, net.minecraft.client.model.geom.ModelPart, net.minecraft.client.model.geom.ModelPart, net.minecraft.client.model.geom.ModelPart, net.minecraft.client.model.geom.ModelPart, net.minecraft.client.model.geom.ModelPart);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: aload_2
+       3: aload_3
+       4: aload         4
+       6: aload         5
+       8: aload         6
+      10: aload         7
+      12: invokespecial #31                 // Method net/minecraft/client/model/animal/equine/AbstractEquineModel."<init>":(Lnet/minecraft/client/model/geom/ModelPart;Lnet/minecraft/client/model/geom/ModelPart;Lnet/minecraft/client/model/geom/ModelPart;Lnet/minecraft/client/model/geom/ModelPart;Lnet/minecraft/client/model/geom/ModelPart;Lnet/minecraft/client/model/geom/ModelPart;Lnet/minecraft/client/model/geom/ModelPart;)V
+      15: aload_0
+      16: aload_0
+      17: getfield      #7                  // Field body:Lnet/minecraft/client/model/geom/ModelPart;
+      20: ldc           #15                 // String left_chest
+      22: invokevirtual #17                 // Method net/minecraft/client/model/geom/ModelPart.getChild:(Ljava/lang/String;)Lnet/minecraft/client/model/geom/ModelPart;
+      25: putfield      #23                 // Field leftChest:Lnet/minecraft/client/model/geom/ModelPart;
+      28: aload_0
+      29: aload_0
+      30: getfield      #7                  // Field body:Lnet/minecraft/client/model/geom/ModelPart;
+      33: ldc           #26                 // String right_chest
+      35: invokevirtual #17                 // Method net/minecraft/client/model/geom/ModelPart.getChild:(Ljava/lang/String;)Lnet/minecraft/client/model/geom/ModelPart;
+      38: putfield      #28                 // Field rightChest:Lnet/minecraft/client/model/geom/ModelPart;
+      41: return
+
+  public static net.minecraft.client.model.geom.builders.LayerDefinition createBodyLayer(float);
+    Code:
+       0: getstatic     #34                 // Field net/minecraft/client/model/geom/builders/CubeDeformation.NONE:Lnet/minecraft/client/model/geom/builders/CubeDeformation;
+       3: invokestatic  #40                 // Method net/minecraft/client/model/animal/equine/AbstractEquineModel.createBodyMesh:(Lnet/minecraft/client/model/geom/builders/CubeDeformation;)Lnet/minecraft/client/model/geom/builders/MeshDefinition;
+       6: bipush        64
+       8: bipush        64
+      10: invokestatic  #44                 // Method net/minecraft/client/model/geom/builders/LayerDefinition.create:(Lnet/minecraft/client/model/geom/builders/MeshDefinition;II)Lnet/minecraft/client/model/geom/builders/LayerDefinition;
+      13: getstatic     #50                 // Field DONKEY_TRANSFORMER:Lnet/minecraft/client/model/geom/builders/MeshTransformer;
+      16: invokevirtual #54                 // Method net/minecraft/client/model/geom/builders/LayerDefinition.apply:(Lnet/minecraft/client/model/geom/builders/MeshTransformer;)Lnet/minecraft/client/model/geom/builders/LayerDefinition;
+      19: fload_0
+      20: invokestatic  #58                 // InterfaceMethod net/minecraft/client/model/geom/builders/MeshTransformer.scaling:(F)Lnet/minecraft/client/model/geom/builders/MeshTransformer;
+      23: invokevirtual #54                 // Method net/minecraft/client/model/geom/builders/LayerDefinition.apply:(Lnet/minecraft/client/model/geom/builders/MeshTransformer;)Lnet/minecraft/client/model/geom/builders/LayerDefinition;
+      26: areturn
+
+  public static net.minecraft.client.model.geom.builders.LayerDefinition createSaddleLayer(float);
+    Code:
+       0: invokestatic  #64                 // Method net/minecraft/client/model/animal/equine/EquineSaddleModel.createSaddleLayer:()Lnet/minecraft/client/model/geom/builders/LayerDefinition;
+       3: getstatic     #50                 // Field DONKEY_TRANSFORMER:Lnet/minecraft/client/model/geom/builders/MeshTransformer;
+       6: invokevirtual #54                 // Method net/minecraft/client/model/geom/builders/LayerDefinition.apply:(Lnet/minecraft/client/model/geom/builders/MeshTransformer;)Lnet/minecraft/client/model/geom/builders/LayerDefinition;
+       9: fload_0
+      10: invokestatic  #58                 // InterfaceMethod net/minecraft/client/model/geom/builders/MeshTransformer.scaling:(F)Lnet/minecraft/client/model/geom/builders/MeshTransformer;
+      13: invokevirtual #54                 // Method net/minecraft/client/model/geom/builders/LayerDefinition.apply:(Lnet/minecraft/client/model/geom/builders/MeshTransformer;)Lnet/minecraft/client/model/geom/builders/LayerDefinition;
+      16: areturn
+
+  public void setupAnim(net.minecraft.client.renderer.entity.state.DonkeyRenderState);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokespecial #127                // Method net/minecraft/client/model/animal/equine/AbstractEquineModel.setupAnim:(Lnet/minecraft/client/renderer/entity/state/EquineRenderState;)V
+       5: aload_0
+       6: getfield      #23                 // Field leftChest:Lnet/minecraft/client/model/geom/ModelPart;
+       9: aload_1
+      10: getfield      #131                // Field net/minecraft/client/renderer/entity/state/DonkeyRenderState.hasChest:Z
+      13: putfield      #137                // Field net/minecraft/client/model/geom/ModelPart.visible:Z
+      16: aload_0
+      17: getfield      #28                 // Field rightChest:Lnet/minecraft/client/model/geom/ModelPart;
+      20: aload_1
+      21: getfield      #131                // Field net/minecraft/client/renderer/entity/state/DonkeyRenderState.hasChest:Z
+      24: putfield      #137                // Field net/minecraft/client/model/geom/ModelPart.visible:Z
+      27: return
+
+  public void setupAnim(net.minecraft.client.renderer.entity.state.EquineRenderState);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: checkcast     #132                // class net/minecraft/client/renderer/entity/state/DonkeyRenderState
+       5: invokevirtual #140                // Method setupAnim:(Lnet/minecraft/client/renderer/entity/state/DonkeyRenderState;)V
+       8: return
+
+  public void setupAnim(java.lang.Object);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: checkcast     #132                // class net/minecraft/client/renderer/entity/state/DonkeyRenderState
+       5: invokevirtual #140                // Method setupAnim:(Lnet/minecraft/client/renderer/entity/state/DonkeyRenderState;)V
+       8: return
+
+  static {};
+    Code:
+       0: invokedynamic #153,  0            // InvokeDynamic #0:apply:()Lnet/minecraft/client/model/geom/builders/MeshTransformer;
+       5: putstatic     #50                 // Field DONKEY_TRANSFORMER:Lnet/minecraft/client/model/geom/builders/MeshTransformer;
+       8: return
+}

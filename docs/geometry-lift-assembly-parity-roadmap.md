@@ -179,7 +179,7 @@ subagent_type: shell
 
 - [x] Fresh `geometry-lift-quality-26.1.2.json` committed or regeneration command documented (see `docs/generated/README.md`; batch regen with 4A)
 - [x] `geometry-assembly-parity-pilots-26.1.2.txt` exists (56 JVMs; see [Program scope](#program-scope))
-- [x] Javap pose/hierarchy table for pilot sample (creeper offset-only + cow offsetAndRotation documented in Phase 1D + canary notes; full 0C snapshot table deferred)
+- [x] Javap pose/hierarchy table for all 56 pilots ([Appendix G](#appendix-g--phase-0c-pilot-javap-snapshots-2612); snapshots under tools/minecraft-parity/26.1.2/javap-snapshots/)
 
 ---
 
@@ -642,7 +642,7 @@ Synthesis of multitask agent work through Phases **0–5**, shard regen commits 
 - **Batch-2 index rows:** `0addf5d` did not refresh `geometry-index-26.1.2.json` for all batch-2 JVMs; align index `extractionStatus` with kept shards.
 - **Reference export (3A batch):** `.tmpbuild/batch1-export.log` — `Export-GeometryReference.ps1` failed (**JDK 25+** required for 26.1.2 class file 69); pilot `reference-output` stale/incomplete until Temurin 25 or `-JavaHome` is set.
 - **Lift decisions audit:** `.tmpbuild/batch2-lift-decisions.csv` (keep/revert per JVM; all rows `assemblyGate=false` at regen time).
-- **Phase 0C full table:** Javap snapshots for remaining **54** pilot JVMs (invoke-pattern checklist for 2C/1A).
+- [x] **Phase 0C full table:** 56/56 pilot javap snapshots + [Appendix G](#appendix-g--phase-0c-pilot-javap-snapshots-2612) (2026-05-19).
 - **Phase 1C:** `CubeDeformation` / inflate lift (optional; not blocking pose-kind work).
 - **Preview-deltas:** Only a **small** committed set under `docs/generated/preview-deltas/26.1.2/` (cow, pig, creeper, fish, etc.) — no pilot-wide overlay pass yet.
 
@@ -665,6 +665,74 @@ Synthesis of multitask agent work through Phases **0–5**, shard regen commits 
 7. **Re-run 4C:** Regenerate quality JSON → confirm pilot `assemblyGatePass` > 0 → update allowlists + viewport strict in **same PR** as shards.
 
 **Commits (shard regen):** `c7717a5` (4A), `0addf5d` (4B). **Quality snapshot:** `geometry-lift-quality-26.1.2.json` `generatedUtc=2026-05-19T08:47:45Z`, `okEntryCount=143`, entity-wide `assemblyGatePass` **3** (`HumanoidModel`, `VillagerModel`, `SkullModel`).
+
+
+## Appendix G - Phase 0C pilot javap snapshots (26.1.2)
+
+**Coverage:** 56/56 pilot JVM rows in [geometry-assembly-parity-pilots-26.1.2.txt](generated/geometry-assembly-parity-pilots-26.1.2.txt). **44** unique snapshot files under [tools/minecraft-parity/26.1.2/javap-snapshots/](../tools/minecraft-parity/26.1.2/javap-snapshots/) (shared mesh hosts); each file <=100KB.
+
+**Regenerate:** dotnet run --project src/AutoPBR.Tools.GeometryCompiler -- export-javap-pilot-snapshots --client-jar tools/minecraft-parity/26.1.2/client.jar --pilot-list docs/generated/geometry-assembly-parity-pilots-26.1.2.txt --summary-csv docs/generated/geometry-assembly-pilot-javap-snapshots-26.1.2.csv
+
+Factory method resolution matches MeshFactoryMethodResolver + BytecodeMeshResolution. **Flat root** uses suspectedFlatNestedPartCount >= 4 from geometry-lift-quality-26.1.2.json. Bind counts count PartPose.offset vs PartPose.offsetAndRotation in captured bytecode.
+
+| JVM | factory method | offset-only binds | offsetAndRotation binds | flat root Y/N |
+| --- | --- | ---: | ---: | --- |
+| net.minecraft.client.model.QuadrupedModel | createBodyMesh | 5 | 1 | Y |
+| net.minecraft.client.model.animal.armadillo.AdultArmadilloModel | createBodyLayer | 9 | 4 | Y |
+| net.minecraft.client.model.animal.armadillo.ArmadilloModel | createBodyLayer | 9 | 4 | Y |
+| net.minecraft.client.model.animal.armadillo.BabyArmadilloModel | createBodyLayer | 8 | 4 | Y |
+| net.minecraft.client.model.animal.axolotl.AdultAxolotlModel | createBodyLayer | 10 | 0 | Y |
+| net.minecraft.client.model.animal.axolotl.BabyAxolotlModel | createBodyLayer | 10 | 2 | Y |
+| net.minecraft.client.model.animal.camel.AdultCamelModel | createBodyLayer | 10 | 0 | Y |
+| net.minecraft.client.model.animal.camel.BabyCamelModel | createBodyLayer | 9 | 0 | Y |
+| net.minecraft.client.model.animal.camel.CamelModel | createBodyLayer | 10 | 0 | Y |
+| net.minecraft.client.model.animal.camel.CamelSaddleModel | createSaddleLayer | 3 | 0 | Y |
+| net.minecraft.client.model.animal.cow.BabyCowModel | createBodyLayer | 6 | 0 | Y |
+| net.minecraft.client.model.animal.cow.CowModel | createBodyLayer | 5 | 1 | Y |
+| net.minecraft.client.model.animal.equine.AbstractEquineModel | createBodyMesh | 5 | 2 | Y |
+| net.minecraft.client.model.animal.equine.BabyDonkeyModel | createBabyLayer | 10 | 5 | Y |
+| net.minecraft.client.model.animal.equine.BabyHorseModel | createBabyMesh | 6 | 4 | Y |
+| net.minecraft.client.model.animal.equine.DonkeyModel | createBodyLayer | 0 | 0 | Y |
+| net.minecraft.client.model.animal.equine.EquineSaddleModel | createSaddleLayer | 0 | 0 | Y |
+| net.minecraft.client.model.animal.equine.HorseModel | createBabyMesh | 6 | 4 | Y |
+| net.minecraft.client.model.animal.feline.AbstractFelineModel | createBodyMesh | 6 | 2 | Y |
+| net.minecraft.client.model.animal.feline.AdultCatModel | createBodyMesh | 6 | 2 | Y |
+| net.minecraft.client.model.animal.feline.AdultFelineModel | createBodyMesh | 6 | 2 | Y |
+| net.minecraft.client.model.animal.feline.AdultOcelotModel | createBodyMesh | 6 | 2 | Y |
+| net.minecraft.client.model.animal.feline.BabyCatModel | createBodyMesh | 6 | 2 | Y |
+| net.minecraft.client.model.animal.feline.BabyFelineModel | createBabyLayer | 6 | 1 | Y |
+| net.minecraft.client.model.animal.feline.BabyOcelotModel | createBodyMesh | 6 | 2 | Y |
+| net.minecraft.client.model.animal.fox.AdultFoxModel | createBodyLayer | 5 | 2 | Y |
+| net.minecraft.client.model.animal.fox.BabyFoxModel | createBodyLayer | 7 | 0 | Y |
+| net.minecraft.client.model.animal.fox.FoxModel | createBodyLayer | 5 | 2 | Y |
+| net.minecraft.client.model.animal.goat.BabyGoatModel | createBodyLayer | 6 | 5 | Y |
+| net.minecraft.client.model.animal.goat.GoatModel | createBodyLayer | 8 | 1 | Y |
+| net.minecraft.client.model.animal.llama.BabyLlamaModel | createBodyLayer | 6 | 2 | Y |
+| net.minecraft.client.model.animal.llama.LlamaModel | createBodyLayer | 5 | 3 | Y |
+| net.minecraft.client.model.animal.panda.BabyPandaModel | createBodyLayer | 6 | 0 | Y |
+| net.minecraft.client.model.animal.panda.PandaModel | createBodyLayer | 5 | 1 | Y |
+| net.minecraft.client.model.animal.pig.PigModel | createBodyLayer | 1 | 0 | Y |
+| net.minecraft.client.model.animal.polarbear.BabyPolarBearModel | createBodyLayer | 6 | 0 | Y |
+| net.minecraft.client.model.animal.polarbear.PolarBearModel | createBodyLayer | 5 | 1 | Y |
+| net.minecraft.client.model.animal.rabbit.AdultRabbitModel | createBodyLayer | 7 | 6 | Y |
+| net.minecraft.client.model.animal.rabbit.BabyRabbitModel | createBodyLayer | 7 | 10 | Y |
+| net.minecraft.client.model.animal.rabbit.RabbitModel | createBodyLayer | 7 | 6 | Y |
+| net.minecraft.client.model.animal.sheep.BabySheepModel | createBodyLayer | 6 | 0 | Y |
+| net.minecraft.client.model.animal.sheep.SheepFurModel | createFurLayer | 5 | 1 | Y |
+| net.minecraft.client.model.animal.sheep.SheepModel | createBodyLayer | 1 | 1 | Y |
+| net.minecraft.client.model.animal.sniffer.SnifferModel | createBodyLayer | 13 | 0 | Y |
+| net.minecraft.client.model.animal.sniffer.SniffletModel | createBodyLayer | 13 | 0 | Y |
+| net.minecraft.client.model.animal.turtle.AdultTurtleModel | createBodyLayer | 5 | 2 | Y |
+| net.minecraft.client.model.animal.turtle.BabyTurtleModel | createBodyLayer | 6 | 0 | Y |
+| net.minecraft.client.model.animal.turtle.TurtleModel | createBodyLayer | 5 | 2 | Y |
+| net.minecraft.client.model.animal.wolf.AdultWolfModel | createBodyLayer | 5 | 3 | Y |
+| net.minecraft.client.model.animal.wolf.BabyWolfModel | createBodyLayer | 8 | 2 | Y |
+| net.minecraft.client.model.animal.wolf.WolfModel | createBodyLayer | 5 | 3 | Y |
+| net.minecraft.client.model.monster.creeper.CreeperModel | createBodyLayer | 6 | 0 | Y |
+| net.minecraft.client.model.monster.dragon.EnderDragonModel | createBodyLayer | 9 | 12 | Y |
+| net.minecraft.client.model.monster.hoglin.BabyHoglinModel | createBodyLayer | 5 | 3 | Y |
+| net.minecraft.client.model.monster.hoglin.HoglinModel | createBodyLayer | 8 | 3 | Y |
+| net.minecraft.client.model.monster.ravager.RavagerModel | createBodyLayer | 7 | 3 | Y |
 
 ---
 
