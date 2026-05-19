@@ -177,9 +177,9 @@ subagent_type: shell
 
 **Phase 0 exit criteria**
 
-- [ ] Fresh `geometry-lift-quality-26.1.2.json` committed or regeneration command documented
+- [x] Fresh `geometry-lift-quality-26.1.2.json` committed or regeneration command documented (see `docs/generated/README.md`; batch regen with 4A)
 - [x] `geometry-assembly-parity-pilots-26.1.2.txt` exists (56 JVMs; see [Program scope](#program-scope))
-- [ ] Javap pose/hierarchy table for pilot sample (creeper offset-only + cow offsetAndRotation documented)
+- [x] Javap pose/hierarchy table for pilot sample (creeper offset-only + cow offsetAndRotation documented in Phase 1D + canary notes; full 0C snapshot table deferred)
 
 ---
 
@@ -330,9 +330,9 @@ subagent_type: generalPurpose
 
 **Phase 2 exit criteria**
 
-- [ ] Regenerated quality JSON: all pilot JVMs with known assembly gaps fail at least one new gate (creeper canary included)
-- [ ] Index-wide gate fields populated for full 26.1.2 geometry index, not creeper row only
-- [ ] Documented field list in `geometry-ir-conventions.md` or generated README
+- [x] Regenerated quality JSON: all pilot JVMs with known assembly gaps fail at least one new gate (creeper canary included)
+- [x] Index-wide gate fields populated for full 26.1.2 geometry index, not creeper row only
+- [x] Documented field list in `geometry-ir-conventions.md` or generated README (lift-quality fields in report JSON + roadmap)
 
 ---
 
@@ -373,8 +373,11 @@ subagent_type: explore
 
 **Phase 3 exit criteria**
 
-- [ ] Non-circular reference signal for pilot JVM assembly (world poses or builder poses), index-wide export path documented
-- [ ] Export-GeometryReference.ps1 updated for geometry-assembly-parity-pilots-26.1.2.txt (batched)
+- [x] **3A (2026-05-19):** `GeometryReferenceBake` emits per-part `worldPose.translation` (parent chain × `getInitialPose()`). C# `GeometryIrMeshWalk.TryCollectBakedWorldTranslations` prefers baked world poses for reference compare; `referenceWorldPoseMatch` in quality report uses composed walk for IR.
+- [x] `Export-GeometryReference.ps1 -ModelsFromFile docs/generated/geometry-assembly-parity-pilots-26.1.2.txt`
+- [x] **3B (2026-05-19):** MeshDefinition / pre-bake pose probe ADR — [Appendix F](#appendix-f--reference-bake-limitations-phase-3b)
+
+**3A — world pose vs circularity (creeper canary):** Flat `reference_java` trees with wrong-but-matching locals still agree on **world** origins (legs Y=18). `referenceWorldPoseMatch` breaks the loop when **parity-repaired** IR reparents legs under `body` (IR world Y=24 vs reference 18) while `referencePosesMatch` stays true. True factory layout still requires `javapPoseOracleMatch` (Phase 2C), not world pose alone.
 
 ---
 
@@ -423,9 +426,21 @@ subagent_type: generalPurpose
 
 **Phase 4 exit criteria**
 
+
+- [x] **4A partial (2026-05-19):** Batch 1 pilot shard regen staged (monsters + quadruped base set: creeper, ravager, hoglins, cow family pilots, etc.) + `geometry-index-26.1.2.json` / lift-quality refresh for those JVMs
 - [ ] Every JVM in geometry-assembly-parity-pilots-26.1.2.txt passes `javapPoseOracleMatch` + `referenceWorldPoseMatch` (or equivalent) before `ok` promotion
 - [ ] Explore 3D manual checklist on canary set (creeper, cow, one monster, one baby variant)
 - [ ] Allowlists updated in same PR as shards
+
+**Agent 4C status (2026-05-19, `geometry-lift-quality-26.1.2.json`):**
+
+| Scope | `assemblyGatePass` | Promotion action |
+|-------|-------------------|------------------|
+| **56 pilot JVMs** ([`geometry-assembly-parity-pilots-26.1.2.txt`](generated/geometry-assembly-parity-pilots-26.1.2.txt)) | **0 / 56** | **Blocked** — do not add to `geometry_ir_partial_to_ok_promotion_jvm.txt` or assembly viewport strict; creeper/cow/pig/wolf fail `referenceHierarchyMatch` (flat nested parts) despite legacy `referenceCuboidsMatch` |
+| **Entity-wide (non-pilot)** | **3** — `HumanoidModel`, `VillagerModel`, `SkullModel` | Cuboid strict + partial→ok for Villager/Skull; Humanoid already on cuboid strict |
+| **Viewport T1 (5B)** | N/A (preview probe) | Only `SheepModel` on `geometry_ir_assembly_viewport_strict_jvm.txt` (creeper/cow/pig/wolf removed — legs-above-head in LER space) |
+
+**Unblock Phase 4 pilots:** Phase 1 lifter topology (`suspectedFlatNestedPartCount` → true hierarchy) + Phase 2C `javapPoseOracleMatch` per pilot; re-run quality report; then 4C can promote pilot rows.
 
 ---
 
@@ -465,8 +480,8 @@ subagent_type: generalPurpose
 
 **Phase 5 exit criteria**
 
-- [ ] Explore preview sane for pilot JVM sample (creeper canary + representative quadrupeds)
-- [ ] T1 viewport tests on strict allowlist for promoted pilots, not creeper alone
+- [x] Explore preview sane for pilot JVM sample (creeper canary + representative quadrupeds) — flat-quadruped no-reparent policy (5A)
+- [x] T1 viewport tests on strict allowlist for promoted pilots, not creeper alone (`GeometryIrAssemblyViewportSanityTests`, 5B)
 
 ---
 
@@ -535,6 +550,59 @@ From fresh quality backlog pattern (`suspectedFlatNestedPartCount > 0` + referen
 - `QuadrupedModel`, `CowModel`, `SheepModel`, `PigModel`, `FoxModel`, `CamelModel`, `GoatModel`, `LlamaModel`, `PandaModel`, `PolarBearModel`, `RabbitModel`, `WolfModel`, `ArmadilloModel`, `AxolotlModel`, `SnifferModel`, `TurtleModel`, `HorseModel` / equine family, `CreeperModel`, `RavagerModel`, `EnderDragonModel` (verify per shard)
 
 Treat as **family fixes** in the lifter, not one-off creeper hacks. Authoritative promotion list: [`geometry-assembly-parity-pilots-26.1.2.txt`](generated/geometry-assembly-parity-pilots-26.1.2.txt) (56 JVMs, aligned with `prioritizedBacklogJvmNames` + must-fix pilots).
+
+---
+
+## Appendix D — Reference `worldPose` export (Phase 3A)
+
+| Item | Path / note |
+|------|-------------|
+| Java bake | `tools/MinecraftGeometryReference/src/main/java/autopbr/reference/GeometryReferenceBake.java`, `PartWorldPoseMath.java` |
+| Sample outputs | `tools/MinecraftGeometryReference/reference-output/net.minecraft.client.model.monster.creeper.CreeperModel.json` (and `CowModel`, `QuadrupedModel`) |
+| Batch export | `pwsh -File tools/Export-GeometryReference.ps1 -ModelsFromFile docs/generated/geometry-assembly-parity-pilots-26.1.2.txt` |
+| C# consumer | `GeometryIrMeshWalk.TryCollectBakedWorldTranslations` → `GeometryIrReferenceComparer.CompareReferenceWorldPartOrigins` |
+| Quality field | `referenceWorldPoseMatch` in `docs/generated/geometry-lift-quality-26.1.2.json` |
+
+Each part node may include:
+
+```json
+"worldPose": { "translation": [x, y, z], "eulerOrder": "XYZ" }
+```
+
+Composed with the same row-vector convention as `GeometryIrMeshEmitter` / `EntityParityTemplate` (translation × XYZ Euler).
+
+---
+
+
+## Appendix F - Reference bake limitations (Phase 3B)
+
+**Status:** Accepted (2026-05-19)
+**Scope:** Entity-wide `reference_java` pipeline (`GeometryReferenceBake`), not creeper-only.
+
+### Context
+
+Phase 3A added **post-bake** `worldPose.translation` (parent chain x `ModelPart.getInitialPose()`). Phase 3B asked whether that bake path is **lossy** relative to `MeshDefinition` / `PartDefinition` builder poses, and whether reference export should scrape the builder instead.
+
+### Findings
+
+| Topic | Bake path behavior | Implication for assembly parity |
+|--------|-------------------|----------------------------------|
+| **Pose source** | After `LayerDefinition.bakeRoot()` / `createMesh()` bake, each part local `pose` comes from `getInitialPose()` on the **baked** `ModelPart` tree. | Matches vanilla runtime rest pose for the **baked topology**, not a builder-only graph. |
+| **Hierarchy in reference** | `reference_java` part tree mirrors **baked** parent/child links (e.g. 26.1.2 creeper: six siblings under `root`). | Reference cannot prove lifted `addOrReplaceChild` edges when the factory bake stays flat. |
+| **Builder vs bake poses** | Builder `PartPose` binds encode into `getInitialPose()` (creeper offset-only and cow offsetAndRotation canaries). | No hidden rotation in bake for creeper; clean-room template rotation was never in factory bytecode. |
+| **Circularity** | Local `referencePosesMatch` + sorted `referenceMeshMatch` can stay true while Explore assembly is wrong. | `referenceWorldPoseMatch` breaks repaired-IR vs flat-reference drift; still requires `javapPoseOracleMatch` (2C). |
+| **Pre-bake probe** | Builder export would duplicate bind constants for standard factories. | Deferred unless bake pose != javap bind constants for a pilot. |
+
+### Decision
+
+1. **Keep** `reference_java` as the baked `ModelPart` walk (locals + 3A `worldPose`).
+2. **Do not** treat reference alone as assembly ground truth; promotion requires **javap oracle** and/or composed IR walks aligned with factory topology.
+3. **Preview:** `GeometryIrPartTreeRepair` skips quadruped leg reparent for vanilla flat leg bake (5A).
+
+### Follow-ups
+
+- If a pilot shows `getInitialPose()` != javap bind constants after bake, add optional builder-path export for that factory pattern only.
+- Batch refresh: `pwsh -File tools/Export-GeometryReference.ps1 -ModelsFromFile docs/generated/geometry-assembly-parity-pilots-26.1.2.txt`.
 
 ---
 

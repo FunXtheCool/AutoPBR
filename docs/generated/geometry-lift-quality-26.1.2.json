@@ -1,65 +1,149 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "versionLabel": "26.1.2",
-  "generatedUtc": "2026-05-19T07:40:20.2604474Z",
+  "generatedUtc": "2026-05-19T08:25:39.0613863Z",
   "okEntryCount": 143,
   "prioritizedBacklogJvmNames": [
-    "net.minecraft.client.model.QuadrupedModel",
+    "net.minecraft.client.model.animal.axolotl.BabyAxolotlModel",
+    "net.minecraft.client.model.animal.camel.CamelSaddleModel",
+    "net.minecraft.client.model.animal.equine.EquineSaddleModel",
+    "net.minecraft.client.model.animal.feline.AdultFelineModel",
+    "net.minecraft.client.model.animal.llama.BabyLlamaModel",
+    "net.minecraft.client.model.animal.llama.LlamaModel",
+    "net.minecraft.client.model.monster.dragon.EnderDragonModel",
     "net.minecraft.client.model.animal.armadillo.AdultArmadilloModel",
     "net.minecraft.client.model.animal.armadillo.ArmadilloModel",
     "net.minecraft.client.model.animal.armadillo.BabyArmadilloModel",
     "net.minecraft.client.model.animal.axolotl.AdultAxolotlModel",
-    "net.minecraft.client.model.animal.axolotl.BabyAxolotlModel",
-    "net.minecraft.client.model.animal.camel.AdultCamelModel",
-    "net.minecraft.client.model.animal.camel.BabyCamelModel",
-    "net.minecraft.client.model.animal.camel.CamelModel",
-    "net.minecraft.client.model.animal.camel.CamelSaddleModel",
-    "net.minecraft.client.model.animal.cow.BabyCowModel",
-    "net.minecraft.client.model.animal.cow.CowModel",
-    "net.minecraft.client.model.animal.equine.AbstractEquineModel",
     "net.minecraft.client.model.animal.equine.BabyDonkeyModel",
     "net.minecraft.client.model.animal.equine.BabyHorseModel",
-    "net.minecraft.client.model.animal.equine.DonkeyModel",
-    "net.minecraft.client.model.animal.equine.EquineSaddleModel",
     "net.minecraft.client.model.animal.equine.HorseModel",
     "net.minecraft.client.model.animal.feline.AbstractFelineModel",
     "net.minecraft.client.model.animal.feline.AdultCatModel",
-    "net.minecraft.client.model.animal.feline.AdultFelineModel",
     "net.minecraft.client.model.animal.feline.AdultOcelotModel",
     "net.minecraft.client.model.animal.feline.BabyCatModel",
     "net.minecraft.client.model.animal.feline.BabyFelineModel",
     "net.minecraft.client.model.animal.feline.BabyOcelotModel",
-    "net.minecraft.client.model.animal.fox.AdultFoxModel",
-    "net.minecraft.client.model.animal.fox.BabyFoxModel",
-    "net.minecraft.client.model.animal.fox.FoxModel",
-    "net.minecraft.client.model.animal.goat.BabyGoatModel",
-    "net.minecraft.client.model.animal.goat.GoatModel",
-    "net.minecraft.client.model.animal.llama.BabyLlamaModel",
-    "net.minecraft.client.model.animal.llama.LlamaModel",
-    "net.minecraft.client.model.animal.panda.BabyPandaModel",
-    "net.minecraft.client.model.animal.panda.PandaModel",
-    "net.minecraft.client.model.animal.pig.PigModel",
-    "net.minecraft.client.model.animal.polarbear.BabyPolarBearModel",
-    "net.minecraft.client.model.animal.polarbear.PolarBearModel",
     "net.minecraft.client.model.animal.rabbit.AdultRabbitModel",
     "net.minecraft.client.model.animal.rabbit.BabyRabbitModel",
     "net.minecraft.client.model.animal.rabbit.RabbitModel",
-    "net.minecraft.client.model.animal.sheep.BabySheepModel",
-    "net.minecraft.client.model.animal.sheep.SheepFurModel",
-    "net.minecraft.client.model.animal.sheep.SheepModel",
     "net.minecraft.client.model.animal.sniffer.SnifferModel",
     "net.minecraft.client.model.animal.sniffer.SniffletModel",
+    "net.minecraft.client.model.animal.wolf.AdultWolfModel",
+    "net.minecraft.client.model.animal.wolf.WolfModel",
+    "net.minecraft.client.model.monster.ravager.RavagerModel",
+    "net.minecraft.client.model.QuadrupedModel",
+    "net.minecraft.client.model.animal.cow.BabyCowModel",
+    "net.minecraft.client.model.animal.cow.CowModel",
+    "net.minecraft.client.model.animal.equine.DonkeyModel",
+    "net.minecraft.client.model.animal.fox.BabyFoxModel",
+    "net.minecraft.client.model.animal.goat.GoatModel",
+    "net.minecraft.client.model.animal.panda.PandaModel",
+    "net.minecraft.client.model.animal.pig.PigModel",
+    "net.minecraft.client.model.animal.polarbear.PolarBearModel",
+    "net.minecraft.client.model.animal.sheep.SheepModel",
     "net.minecraft.client.model.animal.turtle.AdultTurtleModel",
+    "net.minecraft.client.model.animal.camel.AdultCamelModel",
+    "net.minecraft.client.model.animal.camel.BabyCamelModel",
+    "net.minecraft.client.model.animal.camel.CamelModel",
+    "net.minecraft.client.model.animal.equine.AbstractEquineModel",
+    "net.minecraft.client.model.animal.fox.AdultFoxModel",
+    "net.minecraft.client.model.animal.fox.FoxModel",
+    "net.minecraft.client.model.animal.goat.BabyGoatModel",
+    "net.minecraft.client.model.animal.panda.BabyPandaModel",
+    "net.minecraft.client.model.animal.polarbear.BabyPolarBearModel",
+    "net.minecraft.client.model.animal.sheep.BabySheepModel",
+    "net.minecraft.client.model.animal.sheep.SheepFurModel",
     "net.minecraft.client.model.animal.turtle.BabyTurtleModel",
     "net.minecraft.client.model.animal.turtle.TurtleModel",
-    "net.minecraft.client.model.animal.wolf.AdultWolfModel",
     "net.minecraft.client.model.animal.wolf.BabyWolfModel",
-    "net.minecraft.client.model.animal.wolf.WolfModel",
     "net.minecraft.client.model.monster.creeper.CreeperModel",
-    "net.minecraft.client.model.monster.dragon.EnderDragonModel",
     "net.minecraft.client.model.monster.hoglin.BabyHoglinModel",
     "net.minecraft.client.model.monster.hoglin.HoglinModel",
-    "net.minecraft.client.model.monster.ravager.RavagerModel"
+    "net.minecraft.client.model.ambient.BatModel",
+    "net.minecraft.client.model.animal.bee.AdultBeeModel",
+    "net.minecraft.client.model.animal.bee.BabyBeeModel",
+    "net.minecraft.client.model.animal.bee.BeeModel",
+    "net.minecraft.client.model.animal.dolphin.BabyDolphinModel",
+    "net.minecraft.client.model.animal.dolphin.DolphinModel",
+    "net.minecraft.client.model.animal.fish.CodModel",
+    "net.minecraft.client.model.animal.frog.FrogModel",
+    "net.minecraft.client.model.animal.ghast.HappyGhastModel",
+    "net.minecraft.client.model.animal.golem.CopperGolemModel",
+    "net.minecraft.client.model.monster.breeze.BreezeModel",
+    "net.minecraft.client.model.monster.creaking.CreakingModel",
+    "net.minecraft.client.model.monster.nautilus.ZombieNautilusCoralModel",
+    "net.minecraft.client.model.monster.phantom.PhantomModel",
+    "net.minecraft.client.model.monster.piglin.AbstractPiglinModel",
+    "net.minecraft.client.model.monster.piglin.AdultPiglinModel",
+    "net.minecraft.client.model.monster.piglin.AdultZombifiedPiglinModel",
+    "net.minecraft.client.model.monster.piglin.BabyPiglinModel",
+    "net.minecraft.client.model.monster.piglin.BabyZombifiedPiglinModel",
+    "net.minecraft.client.model.monster.piglin.PiglinModel",
+    "net.minecraft.client.model.monster.piglin.ZombifiedPiglinModel",
+    "net.minecraft.client.model.monster.warden.WardenModel",
+    "net.minecraft.client.model.monster.witch.WitchModel",
+    "net.minecraft.client.model.player.PlayerCapeModel",
+    "net.minecraft.client.model.player.PlayerEarsModel",
+    "net.minecraft.client.model.animal.allay.AllayModel",
+    "net.minecraft.client.model.animal.bee.BeeStingerModel",
+    "net.minecraft.client.model.animal.chicken.AdultChickenModel",
+    "net.minecraft.client.model.animal.chicken.BabyChickenModel",
+    "net.minecraft.client.model.animal.chicken.ChickenModel",
+    "net.minecraft.client.model.animal.fish.PufferfishBigModel",
+    "net.minecraft.client.model.animal.fish.PufferfishMidModel",
+    "net.minecraft.client.model.animal.fish.PufferfishSmallModel",
+    "net.minecraft.client.model.animal.fish.SalmonModel",
+    "net.minecraft.client.model.animal.fish.TropicalFishLargeModel",
+    "net.minecraft.client.model.animal.fish.TropicalFishSmallModel",
+    "net.minecraft.client.model.animal.frog.TadpoleModel",
+    "net.minecraft.client.model.animal.ghast.HappyGhastHarnessModel",
+    "net.minecraft.client.model.animal.golem.IronGolemModel",
+    "net.minecraft.client.model.animal.golem.SnowGolemModel",
+    "net.minecraft.client.model.animal.llama.LlamaSpitModel",
+    "net.minecraft.client.model.animal.nautilus.NautilusArmorModel",
+    "net.minecraft.client.model.animal.nautilus.NautilusModel",
+    "net.minecraft.client.model.animal.nautilus.NautilusSaddleModel",
+    "net.minecraft.client.model.animal.parrot.ParrotModel",
+    "net.minecraft.client.model.animal.squid.BabySquidModel",
+    "net.minecraft.client.model.animal.squid.SquidModel",
+    "net.minecraft.client.model.effects.EvokerFangsModel",
+    "net.minecraft.client.model.effects.SpinAttackEffectModel",
+    "net.minecraft.client.model.monster.blaze.BlazeModel",
+    "net.minecraft.client.model.monster.enderman.EndermanModel",
+    "net.minecraft.client.model.monster.endermite.EndermiteModel",
+    "net.minecraft.client.model.monster.ghast.GhastModel",
+    "net.minecraft.client.model.monster.guardian.GuardianModel",
+    "net.minecraft.client.model.monster.illager.IllagerModel",
+    "net.minecraft.client.model.monster.shulker.ShulkerModel",
+    "net.minecraft.client.model.monster.silverfish.SilverfishModel",
+    "net.minecraft.client.model.monster.skeleton.BoggedModel",
+    "net.minecraft.client.model.monster.skeleton.SkeletonModel",
+    "net.minecraft.client.model.monster.slime.MagmaCubeModel",
+    "net.minecraft.client.model.monster.slime.SlimeModel",
+    "net.minecraft.client.model.monster.spider.SpiderModel",
+    "net.minecraft.client.model.monster.strider.AdultStriderModel",
+    "net.minecraft.client.model.monster.strider.BabyStriderModel",
+    "net.minecraft.client.model.monster.strider.StriderModel",
+    "net.minecraft.client.model.monster.vex.VexModel",
+    "net.minecraft.client.model.monster.wither.WitherBossModel",
+    "net.minecraft.client.model.monster.zombie.BabyZombieVillagerModel",
+    "net.minecraft.client.model.monster.zombie.DrownedModel",
+    "net.minecraft.client.model.npc.BabyVillagerModel",
+    "net.minecraft.client.model.object.armorstand.ArmorStandModel",
+    "net.minecraft.client.model.object.banner.BannerFlagModel",
+    "net.minecraft.client.model.object.bell.BellModel",
+    "net.minecraft.client.model.object.book.BookModel",
+    "net.minecraft.client.model.object.cart.MinecartModel",
+    "net.minecraft.client.model.object.crystal.EndCrystalModel",
+    "net.minecraft.client.model.object.equipment.ElytraModel",
+    "net.minecraft.client.model.object.equipment.ShieldModel",
+    "net.minecraft.client.model.object.leash.LeashKnotModel",
+    "net.minecraft.client.model.object.projectile.ArrowModel",
+    "net.minecraft.client.model.object.projectile.ShulkerBulletModel",
+    "net.minecraft.client.model.object.projectile.TridentModel",
+    "net.minecraft.client.model.object.projectile.WindChargeModel",
+    "net.minecraft.client.model.object.skull.DragonHeadModel"
   ],
   "entries": [
     {
@@ -75,7 +159,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": false,
+      "assemblyGatePass": true,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.QuadrupedModel",
@@ -90,7 +182,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": false,
+      "javapPoseOracleMessage": "part \u0027head\u0027: oracle T=(8,0,-6) R=(0,0,0) ir T=(0,12,-6) R=(0,0,0)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.ambient.BatModel",
@@ -105,7 +205,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_wing_tip\u0027 world origin reference=(-3.5,17,0) ir=(-2,17,0)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.allay.AllayModel",
@@ -120,7 +228,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.armadillo.AdultArmadilloModel",
@@ -135,7 +251,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027head_cube\u0027 world origin reference=(0,14.874915,-13.738155) ir=(0,20.9322,-4.3408527)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.armadillo.ArmadilloModel",
@@ -150,7 +274,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027head_cube\u0027 world origin reference=(0,14.874915,-13.738155) ir=(0,20.9322,-4.3408527)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": "javap on-demand (no bindings)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.armadillo.BabyArmadilloModel",
@@ -165,7 +297,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027head_cube\u0027 world origin reference=(0,16.56964,11.521153) ir=(0,14.407751,13.880442)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.axolotl.AdultAxolotlModel",
@@ -180,7 +320,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_front_leg\u0027 world origin reference=(-3.5,20.5,-3) ir=(-3.5,1,-8)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.axolotl.BabyAxolotlModel",
@@ -195,7 +343,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_front_leg\u0027 world origin reference=(-2,23,0.5) ir=(-2,24.25,-1.25)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": false,
+      "javapPoseOracleMessage": "pose part count oracle=12 ir=11"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.bee.AdultBeeModel",
@@ -210,7 +366,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027front_legs\u0027 world origin reference=(1.5,22,-2) ir=(1.5,3,-2)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.bee.BabyBeeModel",
@@ -225,7 +389,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027front_legs\u0027 world origin reference=(0,23,0) ir=(0,3.3333,1.8567)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.bee.BeeModel",
@@ -240,7 +412,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027front_legs\u0027 world origin reference=(1.5,22,-2) ir=(1.5,3,-2)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.bee.BeeStingerModel",
@@ -255,7 +435,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.camel.AdultCamelModel",
@@ -270,7 +458,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.camel.BabyCamelModel",
@@ -285,7 +481,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.camel.CamelModel",
@@ -300,7 +504,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": "javap on-demand (no bindings)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.camel.CamelSaddleModel",
@@ -315,7 +527,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027bridle\u0027 world origin reference=(0,1,-10) ir=(0,0,0)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": false,
+      "javapPoseOracleMessage": "pose part count oracle=2 ir=13"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.chicken.AdultChickenModel",
@@ -330,7 +550,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.chicken.BabyChickenModel",
@@ -345,7 +573,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.chicken.ChickenModel",
@@ -360,7 +596,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.cow.BabyCowModel",
@@ -375,7 +619,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": false,
+      "javapPoseOracleMessage": "pose part count oracle=5 ir=6"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.cow.CowModel",
@@ -390,7 +642,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": false,
+      "javapPoseOracleMessage": "missing IR pose for part \u0027left_horn\u0027"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.dolphin.BabyDolphinModel",
@@ -405,7 +665,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027tail_fin\u0027 world origin reference=(0,22.5,10) ir=(0,21.5,6)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.dolphin.DolphinModel",
@@ -420,7 +688,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027tail_fin\u0027 world origin reference=(0,20.020348,12.928826) ir=(0,22,4)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.equine.AbstractEquineModel",
@@ -435,7 +711,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.equine.BabyDonkeyModel",
@@ -450,7 +734,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_front_leg\u0027 world origin reference=(-1.4000001,17.5,-5.4) ir=(-2.4,3.5,-5.4)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.equine.BabyHorseModel",
@@ -465,7 +757,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_ear\u0027 world origin reference=(-1.5868578,1.8051691,2.1711562) ir=(-0.020584822,7.6505656,2.4662561)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.equine.DonkeyModel",
@@ -480,7 +780,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": false,
+      "javapPoseOracleMessage": "pose part count oracle=12 ir=14"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.equine.EquineSaddleModel",
@@ -495,7 +803,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027left_saddle_mouth\u0027 world origin reference=(0,9.464102,-8.392304) ir=(0,0,0)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": false,
+      "javapPoseOracleMessage": "pose part count oracle=7 ir=19"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.equine.HorseModel",
@@ -510,7 +826,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_ear\u0027 world origin reference=(-1.5868578,1.8051691,2.1711562) ir=(-0.020584822,7.6505656,2.4662561)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": "javap on-demand (no bindings)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.feline.AbstractFelineModel",
@@ -525,7 +849,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027tail2\u0027 world origin reference=(0,20,14) ir=(0,23.057535,30.722784)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": "javap on-demand (no bindings)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.feline.AdultCatModel",
@@ -540,7 +872,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027tail2\u0027 world origin reference=(0,20,14) ir=(0,23.057535,30.722784)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": "javap on-demand (no bindings)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.feline.AdultFelineModel",
@@ -555,7 +895,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027tail2\u0027 world origin reference=(0,20,14) ir=(0,23.057535,30.722784)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": false,
+      "javapPoseOracleMessage": "missing IR pose for part \u0027ear2\u0027"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.feline.AdultOcelotModel",
@@ -570,7 +918,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027tail2\u0027 world origin reference=(0,20,14) ir=(0,23.057535,30.722784)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": "javap on-demand (no bindings)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.feline.BabyCatModel",
@@ -585,7 +941,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027tail2\u0027 world origin reference=(0,20,14) ir=(0,23.057535,30.722784)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": "javap on-demand (no bindings)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.feline.BabyFelineModel",
@@ -600,7 +964,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027tail2\u0027 world origin reference=(0,0,0) ir=(0,18.218262,-6.964222)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.feline.BabyOcelotModel",
@@ -615,7 +987,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027tail2\u0027 world origin reference=(0,20,14) ir=(0,23.057535,30.722784)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": "javap on-demand (no bindings)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.fish.CodModel",
@@ -630,7 +1010,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027nose\u0027 world origin reference=(0,22,-3) ir=(0,44,-3)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.fish.PufferfishBigModel",
@@ -645,7 +1033,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.fish.PufferfishMidModel",
@@ -660,7 +1056,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.fish.PufferfishSmallModel",
@@ -675,7 +1079,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.fish.SalmonModel",
@@ -690,7 +1102,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.fish.TropicalFishLargeModel",
@@ -705,7 +1125,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.fish.TropicalFishSmallModel",
@@ -720,7 +1148,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.fox.AdultFoxModel",
@@ -735,7 +1171,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.fox.BabyFoxModel",
@@ -750,7 +1194,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": false,
+      "javapPoseOracleMessage": "pose part count oracle=6 ir=7"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.fox.FoxModel",
@@ -765,7 +1217,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": "javap on-demand (no bindings)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.frog.FrogModel",
@@ -780,7 +1240,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027eyes\u0027 world origin reference=(-0.5,20,5) ir=(-0.5,22,6)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.frog.TadpoleModel",
@@ -795,7 +1263,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.ghast.HappyGhastHarnessModel",
@@ -810,7 +1286,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.ghast.HappyGhastModel",
@@ -825,7 +1309,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027tentacle0\u0027 world origin reference=(-3.75,-49.048004,-5) ir=(-3.75,-65.048004,-5)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.goat.BabyGoatModel",
@@ -840,7 +1332,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.goat.GoatModel",
@@ -855,7 +1355,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": false,
+      "javapPoseOracleMessage": "missing IR pose for part \u0027goatee\u0027"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.golem.CopperGolemModel",
@@ -870,7 +1378,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027head\u0027 world origin reference=(0,13,0) ir=(0,18,0)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.golem.IronGolemModel",
@@ -885,7 +1401,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.golem.SnowGolemModel",
@@ -900,7 +1424,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.llama.BabyLlamaModel",
@@ -915,7 +1447,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_chest\u0027 world origin reference=(3.0000005,4,8.5) ir=(5.5000005,18,8.5)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": false,
+      "javapPoseOracleMessage": "pose part count oracle=7 ir=8"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.llama.LlamaModel",
@@ -930,7 +1470,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_chest\u0027 world origin reference=(3.0000005,3,8.5) ir=(8,0.99999976,8.5)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": false,
+      "javapPoseOracleMessage": "missing IR pose for part \u0027ear\u0027"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.llama.LlamaSpitModel",
@@ -945,7 +1493,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.nautilus.NautilusArmorModel",
@@ -960,7 +1516,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.nautilus.NautilusModel",
@@ -975,7 +1539,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.nautilus.NautilusSaddleModel",
@@ -990,7 +1562,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.panda.BabyPandaModel",
@@ -1005,7 +1585,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.panda.PandaModel",
@@ -1020,7 +1608,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": false,
+      "javapPoseOracleMessage": "missing IR pose for part \u0027right_ear\u0027"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.parrot.ParrotModel",
@@ -1035,7 +1631,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.pig.PigModel",
@@ -1050,7 +1654,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": false,
+      "javapPoseOracleMessage": "pose part count oracle=1 ir=6"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.polarbear.BabyPolarBearModel",
@@ -1065,7 +1677,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.polarbear.PolarBearModel",
@@ -1080,7 +1700,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": false,
+      "javapPoseOracleMessage": "missing IR pose for part \u0027left_ear\u0027"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.rabbit.AdultRabbitModel",
@@ -1095,7 +1723,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_hind_leg\u0027 world origin reference=(-3,23.5,4) ir=(-3,0.5,0)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.rabbit.BabyRabbitModel",
@@ -1110,7 +1746,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_hind_leg\u0027 world origin reference=(1.499982,23.5,-2.500011) ir=(1.4999964,0.5,-0.50001085)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.rabbit.RabbitModel",
@@ -1125,7 +1769,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_hind_leg\u0027 world origin reference=(-3,23.5,4) ir=(-3,0.5,0)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": "javap on-demand (no bindings)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.sheep.BabySheepModel",
@@ -1140,7 +1792,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.sheep.SheepFurModel",
@@ -1155,7 +1815,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.sheep.SheepModel",
@@ -1170,7 +1838,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": false,
+      "javapPoseOracleMessage": "pose part count oracle=2 ir=6"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.sniffer.SnifferModel",
@@ -1185,7 +1861,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_front_leg\u0027 world origin reference=(-7.5,15,-15) ir=(-7.5,10,-15)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.sniffer.SniffletModel",
@@ -1200,7 +1884,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_front_leg\u0027 world origin reference=(-4,20,-7) ir=(-4,-4,-7)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.squid.BabySquidModel",
@@ -1215,7 +1907,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.squid.SquidModel",
@@ -1230,7 +1930,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.turtle.AdultTurtleModel",
@@ -1245,7 +1953,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": false,
+      "javapPoseOracleMessage": "missing IR pose for part \u0027belly\u0027"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.turtle.BabyTurtleModel",
@@ -1260,7 +1976,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.turtle.TurtleModel",
@@ -1275,7 +1999,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": "javap on-demand (no bindings)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.wolf.AdultWolfModel",
@@ -1290,7 +2022,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027real_head\u0027 world origin reference=(-1,13.5,-7) ir=(0,0,0)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.wolf.BabyWolfModel",
@@ -1305,7 +2045,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.animal.wolf.WolfModel",
@@ -1320,7 +2068,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027real_head\u0027 world origin reference=(-1,13.5,-7) ir=(0,0,0)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": "javap on-demand (no bindings)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.effects.EvokerFangsModel",
@@ -1335,7 +2091,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.effects.SpinAttackEffectModel",
@@ -1350,7 +2114,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.blaze.BlazeModel",
@@ -1365,7 +2137,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.breeze.BreezeModel",
@@ -1380,7 +2160,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027eyes\u0027 world origin reference=(0,4,0) ir=(0,0,0)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.creaking.CreakingModel",
@@ -1395,7 +2183,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027head\u0027 world origin reference=(-4,-6,0) ir=(-3,13,0)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.creeper.CreeperModel",
@@ -1410,7 +2206,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap snapshot"
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.dragon.EnderDragonModel",
@@ -1425,7 +2229,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_front_leg\u0027 world origin reference=(-12,3.422862,19.80616) ir=(-12,10.328831,14.775496)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": false,
+      "javapPoseOracleMessage": "pose part count oracle=5 ir=36"
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.enderman.EndermanModel",
@@ -1440,7 +2252,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.endermite.EndermiteModel",
@@ -1455,7 +2275,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.ghast.GhastModel",
@@ -1470,7 +2298,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.guardian.GuardianModel",
@@ -1485,7 +2321,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.hoglin.BabyHoglinModel",
@@ -1500,7 +2344,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.hoglin.HoglinModel",
@@ -1515,7 +2367,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.illager.IllagerModel",
@@ -1530,7 +2390,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.nautilus.ZombieNautilusCoralModel",
@@ -1545,7 +2413,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027corals\u0027 world origin reference=(8,20.5,-9) ir=(8,33.5,-14)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.phantom.PhantomModel",
@@ -1560,7 +2436,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_wing_tip\u0027 world origin reference=(-9.307564,-0.76512474,-8) ir=(-5.970025,0.5990005,0)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.piglin.AbstractPiglinModel",
@@ -1575,7 +2459,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_sleeve\u0027 world origin reference=(-5,2,0) ir=(0,0,0)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.piglin.AdultPiglinModel",
@@ -1590,7 +2482,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_sleeve\u0027 world origin reference=(-5,2,0) ir=(0,0,0)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.piglin.AdultZombifiedPiglinModel",
@@ -1605,7 +2505,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_sleeve\u0027 world origin reference=(-5,2,0) ir=(0,0,0)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.piglin.BabyPiglinModel",
@@ -1620,7 +2528,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_ear_r1\u0027 world origin reference=(-11.572949,7.461189,0) ir=(-10.427014,13.146858,0)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.piglin.BabyZombifiedPiglinModel",
@@ -1635,7 +2551,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_ear_r1\u0027 world origin reference=(-11.572949,7.461189,0) ir=(-10.427014,13.146858,0)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.piglin.PiglinModel",
@@ -1650,7 +2574,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_sleeve\u0027 world origin reference=(-5,2,0) ir=(0,0,0)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.piglin.ZombifiedPiglinModel",
@@ -1665,7 +2597,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_sleeve\u0027 world origin reference=(-5,2,0) ir=(0,0,0)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.ravager.RavagerModel",
@@ -1680,7 +2620,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_horn\u0027 world origin reference=(-10,15.104675,-13.307848) ir=(-10,-7.3062854,-19.846115)",
+      "referenceHierarchyMatch": false,
+      "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
+      "extractionBindingGap": false,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": true,
+      "javapPoseOracleMessage": "javap on-demand (host class)"
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.shulker.ShulkerModel",
@@ -1695,7 +2643,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.silverfish.SilverfishModel",
@@ -1710,7 +2666,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.skeleton.BoggedModel",
@@ -1725,7 +2689,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.skeleton.SkeletonModel",
@@ -1740,7 +2712,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.slime.MagmaCubeModel",
@@ -1755,7 +2735,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.slime.SlimeModel",
@@ -1770,7 +2758,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.spider.SpiderModel",
@@ -1785,7 +2781,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.strider.AdultStriderModel",
@@ -1800,7 +2804,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.strider.BabyStriderModel",
@@ -1815,7 +2827,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.strider.StriderModel",
@@ -1830,7 +2850,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.vex.VexModel",
@@ -1845,7 +2873,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.warden.WardenModel",
@@ -1860,7 +2896,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027left_leg\u0027 world origin reference=(5.9,11,0) ir=(5.9,-13,0)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.witch.WitchModel",
@@ -1875,7 +2919,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027mole\u0027 world origin reference=(0,-4,0) ir=(-2.5112066,-16.418007,-1.5011313)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.wither.WitherBossModel",
@@ -1890,7 +2942,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.zombie.BabyZombieVillagerModel",
@@ -1905,7 +2965,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.monster.zombie.DrownedModel",
@@ -1920,7 +2988,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.npc.BabyVillagerModel",
@@ -1935,7 +3011,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.npc.VillagerModel",
@@ -1950,7 +3034,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": false,
+      "assemblyGatePass": true,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.object.armorstand.ArmorStandModel",
@@ -1965,7 +3057,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.object.banner.BannerFlagModel",
@@ -1980,7 +3080,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.object.bell.BellModel",
@@ -1995,7 +3103,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.object.book.BookModel",
@@ -2010,7 +3126,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.object.cart.MinecartModel",
@@ -2025,7 +3149,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.object.crystal.EndCrystalModel",
@@ -2040,7 +3172,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.object.equipment.ElytraModel",
@@ -2055,7 +3195,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.object.equipment.ShieldModel",
@@ -2070,7 +3218,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.object.leash.LeashKnotModel",
@@ -2085,7 +3241,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.object.projectile.ArrowModel",
@@ -2100,7 +3264,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.object.projectile.ShulkerBulletModel",
@@ -2115,7 +3287,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.object.projectile.TridentModel",
@@ -2130,7 +3310,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.object.projectile.WindChargeModel",
@@ -2145,7 +3333,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.object.skull.DragonHeadModel",
@@ -2160,7 +3356,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.object.skull.SkullModel",
@@ -2175,7 +3379,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": true,
+      "referenceWorldPoseCompareMessage": null,
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": false,
+      "assemblyGatePass": true,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.player.PlayerCapeModel",
@@ -2190,7 +3402,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_sleeve\u0027 world origin reference=(-5,2,0) ir=(0,0,0)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     },
     {
       "officialJvmName": "net.minecraft.client.model.player.PlayerEarsModel",
@@ -2205,7 +3425,15 @@
       "referencePosesMatch": true,
       "referencePoseCompareMessage": null,
       "referenceMeshMatch": true,
-      "referenceMeshCompareMessage": null
+      "referenceMeshCompareMessage": null,
+      "referenceWorldPoseMatch": false,
+      "referenceWorldPoseCompareMessage": "part \u0027right_sleeve\u0027 world origin reference=(-5,2,0) ir=(0,0,0)",
+      "referenceHierarchyMatch": true,
+      "referenceHierarchyMessage": null,
+      "extractionBindingGap": true,
+      "assemblyGatePass": false,
+      "javapPoseOracleMatch": null,
+      "javapPoseOracleMessage": null
     }
   ]
 }
