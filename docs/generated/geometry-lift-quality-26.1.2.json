@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "versionLabel": "26.1.2",
-  "generatedUtc": "2026-05-19T08:25:39.0613863Z",
+  "generatedUtc": "2026-05-19T08:47:45.7226762Z",
   "okEntryCount": 143,
   "prioritizedBacklogJvmNames": [
     "net.minecraft.client.model.animal.axolotl.BabyAxolotlModel",
@@ -256,7 +256,7 @@
       "referenceWorldPoseCompareMessage": "part \u0027head_cube\u0027 world origin reference=(0,14.874915,-13.738155) ir=(0,20.9322,-4.3408527)",
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": true,
       "javapPoseOracleMessage": "javap on-demand (host class)"
@@ -279,7 +279,7 @@
       "referenceWorldPoseCompareMessage": "part \u0027head_cube\u0027 world origin reference=(0,14.874915,-13.738155) ir=(0,20.9322,-4.3408527)",
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": null,
       "javapPoseOracleMessage": "javap on-demand (no bindings)"
@@ -302,7 +302,7 @@
       "referenceWorldPoseCompareMessage": "part \u0027head_cube\u0027 world origin reference=(0,16.56964,11.521153) ir=(0,14.407751,13.880442)",
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": true,
       "javapPoseOracleMessage": "javap on-demand (host class)"
@@ -311,7 +311,7 @@
       "officialJvmName": "net.minecraft.client.model.animal.axolotl.AdultAxolotlModel",
       "extractionStatus": "ok",
       "cuboidCount": 11,
-      "maxTreeDepth": 3,
+      "maxTreeDepth": 2,
       "rootChildCount": 5,
       "suspectedFlatNestedPartCount": 4,
       "liftWarningCounts": {},
@@ -322,10 +322,10 @@
       "referenceMeshMatch": true,
       "referenceMeshCompareMessage": null,
       "referenceWorldPoseMatch": false,
-      "referenceWorldPoseCompareMessage": "part \u0027right_front_leg\u0027 world origin reference=(-3.5,20.5,-3) ir=(-3.5,1,-8)",
+      "referenceWorldPoseCompareMessage": "part \u0027top_gills\u0027 world origin reference=(0,16.5,-5) ir=(0,16.5,4)",
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": true,
       "javapPoseOracleMessage": "javap on-demand (host class)"
@@ -334,7 +334,7 @@
       "officialJvmName": "net.minecraft.client.model.animal.axolotl.BabyAxolotlModel",
       "extractionStatus": "ok",
       "cuboidCount": 11,
-      "maxTreeDepth": 3,
+      "maxTreeDepth": 2,
       "rootChildCount": 5,
       "suspectedFlatNestedPartCount": 4,
       "liftWarningCounts": {},
@@ -345,10 +345,10 @@
       "referenceMeshMatch": true,
       "referenceMeshCompareMessage": null,
       "referenceWorldPoseMatch": false,
-      "referenceWorldPoseCompareMessage": "part \u0027right_front_leg\u0027 world origin reference=(-2,23,0.5) ir=(-2,24.25,-1.25)",
+      "referenceWorldPoseCompareMessage": "part \u0027top_gills\u0027 world origin reference=(0,21,-3) ir=(0,20.75,-0.25)",
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": false,
       "javapPoseOracleMessage": "pose part count oracle=12 ir=11"
@@ -463,7 +463,7 @@
       "referenceWorldPoseCompareMessage": null,
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": true,
       "javapPoseOracleMessage": "javap on-demand (host class)"
@@ -509,7 +509,7 @@
       "referenceWorldPoseCompareMessage": null,
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": null,
       "javapPoseOracleMessage": "javap on-demand (no bindings)"
@@ -532,7 +532,7 @@
       "referenceWorldPoseCompareMessage": "part \u0027bridle\u0027 world origin reference=(0,1,-10) ir=(0,0,0)",
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": false,
       "javapPoseOracleMessage": "pose part count oracle=2 ir=13"
@@ -739,7 +739,7 @@
       "referenceWorldPoseCompareMessage": "part \u0027right_front_leg\u0027 world origin reference=(-1.4000001,17.5,-5.4) ir=(-2.4,3.5,-5.4)",
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": true,
       "javapPoseOracleMessage": "javap on-demand (host class)"
@@ -785,7 +785,7 @@
       "referenceWorldPoseCompareMessage": null,
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": false,
       "javapPoseOracleMessage": "pose part count oracle=12 ir=14"
@@ -808,7 +808,7 @@
       "referenceWorldPoseCompareMessage": "part \u0027left_saddle_mouth\u0027 world origin reference=(0,9.464102,-8.392304) ir=(0,0,0)",
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": false,
       "javapPoseOracleMessage": "pose part count oracle=7 ir=19"
@@ -969,7 +969,7 @@
       "referenceWorldPoseCompareMessage": "part \u0027tail2\u0027 world origin reference=(0,0,0) ir=(0,18.218262,-6.964222)",
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": true,
       "javapPoseOracleMessage": "javap on-demand (host class)"
@@ -1176,7 +1176,7 @@
       "referenceWorldPoseCompareMessage": null,
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": true,
       "javapPoseOracleMessage": "javap on-demand (host class)"
@@ -1199,7 +1199,7 @@
       "referenceWorldPoseCompareMessage": null,
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": false,
       "javapPoseOracleMessage": "pose part count oracle=6 ir=7"
@@ -1222,7 +1222,7 @@
       "referenceWorldPoseCompareMessage": null,
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": null,
       "javapPoseOracleMessage": "javap on-demand (no bindings)"
@@ -1337,7 +1337,7 @@
       "referenceWorldPoseCompareMessage": null,
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": true,
       "javapPoseOracleMessage": "javap on-demand (host class)"
@@ -1452,7 +1452,7 @@
       "referenceWorldPoseCompareMessage": "part \u0027right_chest\u0027 world origin reference=(3.0000005,4,8.5) ir=(5.5000005,18,8.5)",
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": false,
       "javapPoseOracleMessage": "pose part count oracle=7 ir=8"
@@ -1590,7 +1590,7 @@
       "referenceWorldPoseCompareMessage": null,
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": true,
       "javapPoseOracleMessage": "javap on-demand (host class)"
@@ -1613,7 +1613,7 @@
       "referenceWorldPoseCompareMessage": null,
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": false,
       "javapPoseOracleMessage": "missing IR pose for part \u0027right_ear\u0027"
@@ -1682,7 +1682,7 @@
       "referenceWorldPoseCompareMessage": null,
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": true,
       "javapPoseOracleMessage": "javap on-demand (host class)"
@@ -1705,7 +1705,7 @@
       "referenceWorldPoseCompareMessage": null,
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": false,
       "javapPoseOracleMessage": "missing IR pose for part \u0027left_ear\u0027"
@@ -1714,7 +1714,7 @@
       "officialJvmName": "net.minecraft.client.model.animal.rabbit.AdultRabbitModel",
       "extractionStatus": "ok",
       "cuboidCount": 9,
-      "maxTreeDepth": 3,
+      "maxTreeDepth": 2,
       "rootChildCount": 7,
       "suspectedFlatNestedPartCount": 4,
       "liftWarningCounts": {},
@@ -1728,7 +1728,7 @@
       "referenceWorldPoseCompareMessage": "part \u0027right_hind_leg\u0027 world origin reference=(-3,23.5,4) ir=(-3,0.5,0)",
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": true,
       "javapPoseOracleMessage": "javap on-demand (host class)"
@@ -1737,7 +1737,7 @@
       "officialJvmName": "net.minecraft.client.model.animal.rabbit.BabyRabbitModel",
       "extractionStatus": "ok",
       "cuboidCount": 9,
-      "maxTreeDepth": 3,
+      "maxTreeDepth": 2,
       "rootChildCount": 9,
       "suspectedFlatNestedPartCount": 4,
       "liftWarningCounts": {},
@@ -1751,7 +1751,7 @@
       "referenceWorldPoseCompareMessage": "part \u0027right_hind_leg\u0027 world origin reference=(1.499982,23.5,-2.500011) ir=(1.4999964,0.5,-0.50001085)",
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": true,
       "javapPoseOracleMessage": "javap on-demand (host class)"
@@ -1760,7 +1760,7 @@
       "officialJvmName": "net.minecraft.client.model.animal.rabbit.RabbitModel",
       "extractionStatus": "ok",
       "cuboidCount": 9,
-      "maxTreeDepth": 3,
+      "maxTreeDepth": 2,
       "rootChildCount": 7,
       "suspectedFlatNestedPartCount": 4,
       "liftWarningCounts": {},
@@ -1774,7 +1774,7 @@
       "referenceWorldPoseCompareMessage": "part \u0027right_hind_leg\u0027 world origin reference=(-3,23.5,4) ir=(-3,0.5,0)",
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": null,
       "javapPoseOracleMessage": "javap on-demand (no bindings)"
@@ -1797,7 +1797,7 @@
       "referenceWorldPoseCompareMessage": null,
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": true,
       "javapPoseOracleMessage": "javap on-demand (host class)"
@@ -1820,7 +1820,7 @@
       "referenceWorldPoseCompareMessage": null,
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": true,
       "javapPoseOracleMessage": "javap on-demand (host class)"
@@ -1852,7 +1852,7 @@
       "officialJvmName": "net.minecraft.client.model.animal.sniffer.SnifferModel",
       "extractionStatus": "ok",
       "cuboidCount": 15,
-      "maxTreeDepth": 3,
+      "maxTreeDepth": 2,
       "rootChildCount": 8,
       "suspectedFlatNestedPartCount": 4,
       "liftWarningCounts": {},
@@ -1866,7 +1866,7 @@
       "referenceWorldPoseCompareMessage": "part \u0027right_front_leg\u0027 world origin reference=(-7.5,15,-15) ir=(-7.5,10,-15)",
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": true,
       "javapPoseOracleMessage": "javap on-demand (host class)"
@@ -1875,7 +1875,7 @@
       "officialJvmName": "net.minecraft.client.model.animal.sniffer.SniffletModel",
       "extractionStatus": "ok",
       "cuboidCount": 15,
-      "maxTreeDepth": 3,
+      "maxTreeDepth": 2,
       "rootChildCount": 8,
       "suspectedFlatNestedPartCount": 4,
       "liftWarningCounts": {},
@@ -1889,7 +1889,7 @@
       "referenceWorldPoseCompareMessage": "part \u0027right_front_leg\u0027 world origin reference=(-4,20,-7) ir=(-4,-4,-7)",
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": true,
       "javapPoseOracleMessage": "javap on-demand (host class)"
@@ -1958,7 +1958,7 @@
       "referenceWorldPoseCompareMessage": null,
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": false,
       "javapPoseOracleMessage": "missing IR pose for part \u0027belly\u0027"
@@ -1981,7 +1981,7 @@
       "referenceWorldPoseCompareMessage": null,
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": true,
       "javapPoseOracleMessage": "javap on-demand (host class)"
@@ -2004,7 +2004,7 @@
       "referenceWorldPoseCompareMessage": null,
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": null,
       "javapPoseOracleMessage": "javap on-demand (no bindings)"
@@ -2050,7 +2050,7 @@
       "referenceWorldPoseCompareMessage": null,
       "referenceHierarchyMatch": false,
       "referenceHierarchyMessage": "suspectedFlatNestedPartCount=4 with body/legs still root siblings",
-      "extractionBindingGap": true,
+      "extractionBindingGap": false,
       "assemblyGatePass": false,
       "javapPoseOracleMatch": true,
       "javapPoseOracleMessage": "javap on-demand (host class)"
