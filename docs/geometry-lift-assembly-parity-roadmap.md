@@ -427,7 +427,8 @@ subagent_type: generalPurpose
 **Phase 4 exit criteria**
 
 
-- [x] **4A partial (2026-05-19):** Batch 1 pilot shard regen staged (monsters + quadruped base set: creeper, ravager, hoglins, cow family pilots, etc.) + `geometry-index-26.1.2.json` / lift-quality refresh for those JVMs
+- [x] **4A partial (2026-05-19, `c7717a5`):** Batch 1 pilot shard regen (12 JVMs: monsters + quadruped base — creeper, ravager, hoglins, cow/goat/pig/sheep, `QuadrupedModel`, equine abstract) + `geometry-index-26.1.2.json` / lift-quality refresh
+- [x] **4B partial (2026-05-19, `0addf5d`):** Batch 2 animal pilot lift (41 JVMs attempted; **32** shard diffs kept where lift score improved; **9** reverted per `.tmpbuild/batch2-lift-decisions.csv`); lift-quality JSON refreshed — **no** `geometry-index` row batch for batch-2-only JVMs yet
 - [ ] Every JVM in geometry-assembly-parity-pilots-26.1.2.txt passes `javapPoseOracleMatch` + `referenceWorldPoseMatch` (or equivalent) before `ok` promotion
 - [ ] Explore 3D manual checklist on canary set (creeper, cow, one monster, one baby variant)
 - [ ] Allowlists updated in same PR as shards
@@ -617,6 +618,53 @@ Phase 3A added **post-bake** `worldPose.translation` (parent chain x `ModelPart.
 | `CubeDeformation` | Often omitted | Nice-to-have |
 | `setupAnim` default pose | Separate animation IR | Only if rest pose incomplete |
 | LivingEntityRenderer basis | Preview-only | Already applied; not a lift field |
+
+---
+
+## Remaining work (as of 2026-05-19)
+
+Synthesis of multitask agent work through Phases **0–5**, shard regen commits **`c7717a5`** (4A) and **`0addf5d`** (4B), and **4C** promotion attempt (blocked). Committed artifacts: pilot manifest (`17dce7e`), roadmap program scope (`9500076`), generated shards/index/quality JSON. **Uncommitted WIP:** `src/AutoPBR.Core/Preview/` (quality gates, repair policy, javap oracle), `tools/MinecraftGeometryReference/` (3A world-pose bake), `tests/AutoPBR.Core.Tests/GeometryIr*.cs` — land in a follow-up PR before relying on CI.
+
+### DONE
+
+- **Phase 0 — baseline:** Fresh [`geometry-lift-quality-26.1.2.json`](generated/geometry-lift-quality-26.1.2.json) (`schemaVersion` 2, `generatedUtc` 2026-05-19); [`geometry-assembly-parity-pilots-26.1.2.txt`](generated/geometry-assembly-parity-pilots-26.1.2.txt) (**56** JVMs, `17dce7e`); regeneration command in [`docs/generated/README.md`](generated/README.md).
+- **Phase 0C (partial):** Creeper + cow `createBodyLayer` javap under `tools/minecraft-parity/26.1.2/javap-snapshots/`; Phase **1D** offset-only creeper finding recorded in roadmap.
+- **Phase 2 — quality gates (code + JSON):** `referenceWorldPoseMatch`, `referenceHierarchyMatch`, `extractionBindingGap`, `assemblyGatePass`, `javapPoseOracleMatch` on index-wide report; creeper and flat-quadruped pilots fail new gates while legacy `referenceCuboidsMatch` may stay true.
+- **Phase 3 — reference v2:** `GeometryReferenceBake` + `PartWorldPoseMath` world-pose export; C# consumer + [Appendix F](#appendix-f--reference-bake-limitations-phase-3b) ADR (bake not assembly ground truth).
+- **Phase 4A (`c7717a5`):** 12 batch-1 pilot geometry shards + `geometry-index-26.1.2.json` + quality refresh.
+- **Phase 4B (`0addf5d`):** 32 batch-2 animal pilot shards kept (41 lifted; score-based keep/revert).
+- **Phase 5 (preview, code WIP):** Flat-quadruped **no-reparent** policy in `GeometryIrPartTreeRepair`; `GeometryIrAssemblyViewportSanityTests` (5B); viewport strict allowlist trimmed to `SheepModel` only for pilots.
+- **Phase 4C (entity-wide only):** `HumanoidModel`, `VillagerModel`, `SkullModel` on cuboid strict + partial→ok allowlists — **not** pilot quadrupeds.
+
+### IN PROGRESS / optional
+
+- **Commit gate/oracle/repair code:** Entire `src/AutoPBR.Core/Preview/` tree and related tests still **untracked** — merge before CI enforces assembly gates.
+- **Batch-2 index rows:** `0addf5d` did not refresh `geometry-index-26.1.2.json` for all batch-2 JVMs; align index `extractionStatus` with kept shards.
+- **Reference export (3A batch):** `.tmpbuild/batch1-export.log` — `Export-GeometryReference.ps1` failed (**JDK 25+** required for 26.1.2 class file 69); pilot `reference-output` stale/incomplete until Temurin 25 or `-JavaHome` is set.
+- **Lift decisions audit:** `.tmpbuild/batch2-lift-decisions.csv` (keep/revert per JVM; all rows `assemblyGate=false` at regen time).
+- **Phase 0C full table:** Javap snapshots for remaining **54** pilot JVMs (invoke-pattern checklist for 2C/1A).
+- **Phase 1C:** `CubeDeformation` / inflate lift (optional; not blocking pose-kind work).
+- **Preview-deltas:** Only a **small** committed set under `docs/generated/preview-deltas/26.1.2/` (cow, pig, creeper, fish, etc.) — no pilot-wide overlay pass yet.
+
+### BLOCKED
+
+- **4C pilot promotion:** **`assemblyGatePass` 0 / 56** on [`geometry-assembly-parity-pilots-26.1.2.txt`](generated/geometry-assembly-parity-pilots-26.1.2.txt) — do **not** add creeper/cow/pig/wolf (and peers) to `geometry_ir_partial_to_ok_promotion_jvm.txt` until gates pass.
+- **Hierarchy gate:** Most pilots fail `referenceHierarchyMatch` (`suspectedFlatNestedPartCount > 0`, body/legs still root siblings) — requires **Phase 1A** lifter topology, not shard-only regen.
+- **Viewport T1:** Creeper, cow, pig, wolf **removed** from `geometry_ir_assembly_viewport_strict_jvm.txt` (legs-above-head in LER preview space); only `SheepModel` on strict viewport list.
+- **Phase 1 exit (open):** All four Phase 1 checkboxes unchecked — no pilot-wide `addOrReplaceChild` recovery, offset vs `offsetAndRotation` parity, or jar-gated T0 promotion path complete.
+- **Manual Explore:** Phase 4 “Explore 3D manual checklist” on canary set **not** signed off.
+
+### RECOMMENDED NEXT SPRINT (ordered)
+
+1. **Land hierarchy + gate policy (Phase 1A + 2B):** Commit lifter binding recovery and `referenceHierarchyMatch` enforcement; re-lift flat-tree pilots so `suspectedFlatNestedPartCount` → 0 or documented composed-flat semantics.
+2. **Preview-deltas 26.1.2:** Generate/commit overlays for pilot JVMs where preview interpretation still diverges from lifted IR (renderer basis, skipped inflates).
+3. **Phase 1B + 2C on pilots:** Per-bind `PartPose` kind + `javapPoseOracleMatch` for full pilot list (extend snapshots beyond creeper/cow).
+4. **Phase 1C (optional):** `CubeDeformation` where javap shows inflate affecting cuboid corners.
+5. **Phase 0C full snapshots:** `tools/minecraft-parity/26.1.2/javap-snapshots/` for all 56 pilots; appendix invoke-pattern table.
+6. **Manual Explore:** Creeper, cow, one monster, one baby variant — legs below head, body orientation sane after 5A policy.
+7. **Re-run 4C:** Regenerate quality JSON → confirm pilot `assemblyGatePass` > 0 → update allowlists + viewport strict in **same PR** as shards.
+
+**Commits (shard regen):** `c7717a5` (4A), `0addf5d` (4B). **Quality snapshot:** `geometry-lift-quality-26.1.2.json` `generatedUtc=2026-05-19T08:47:45Z`, `okEntryCount=143`, entity-wide `assemblyGatePass` **3** (`HumanoidModel`, `VillagerModel`, `SkullModel`).
 
 ---
 
