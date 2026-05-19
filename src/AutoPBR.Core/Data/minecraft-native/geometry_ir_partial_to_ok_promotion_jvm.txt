@@ -27,6 +27,7 @@ net.minecraft.client.model.animal.feline.AdultCatModel
 net.minecraft.client.model.animal.feline.AdultFelineModel
 net.minecraft.client.model.animal.feline.BabyCatModel
 net.minecraft.client.model.monster.breeze.BreezeModel
-# Agent 4C (2026-05-19): assemblyGatePass true (entity-wide)
+# Agent 4C (2026-05-19): assemblyGatePass true (entity-wide; not 56-pilot promotion)
+net.minecraft.client.model.HumanoidModel
 net.minecraft.client.model.npc.VillagerModel
 net.minecraft.client.model.object.skull.SkullModel

@@ -429,6 +429,7 @@ subagent_type: generalPurpose
 
 - [x] **4A partial (2026-05-19, `c7717a5`):** Batch 1 pilot shard regen (12 JVMs: monsters + quadruped base — creeper, ravager, hoglins, cow/goat/pig/sheep, `QuadrupedModel`, equine abstract) + `geometry-index-26.1.2.json` / lift-quality refresh
 - [x] **4B partial (2026-05-19, `0addf5d`):** Batch 2 animal pilot lift (41 JVMs attempted; **32** shard diffs kept where lift score improved; **9** reverted per `.tmpbuild/batch2-lift-decisions.csv`); lift-quality JSON refreshed — **no** `geometry-index` row batch for batch-2-only JVMs yet
+- [x] **Coordinated pilot regen (2026-05-19):** `tools/regen-assembly-pilots.ps1` — 56/56 lift + index rows + quality JSON + pilot `reference-output` (JDK 25); **17/56** `assemblyGatePass` unchanged
 - [ ] Every JVM in geometry-assembly-parity-pilots-26.1.2.txt passes `javapPoseOracleMatch` + `referenceWorldPoseMatch` (or equivalent) before `ok` promotion
 - [ ] Explore 3D manual checklist on canary set (creeper, cow, one monster, one baby variant)
 - [ ] Allowlists updated in same PR as shards
@@ -652,7 +653,7 @@ Synthesis of multitask agent work through Phases **0–5**, shard regen commits 
 - **Hierarchy gate (flat bakes):** `referenceHierarchyMatch` passes when IR + reference_java share intentional flat root (`UsesVanillaFlatQuadrupedLegBake`); nested topology lift remains **Phase 1A** optional.
 - **Viewport T1:** Creeper, cow, pig, wolf **removed** from `geometry_ir_assembly_viewport_strict_jvm.txt` (legs-above-head in LER preview space); only `SheepModel` on strict viewport list.
 - **Phase 1 exit (open):** All four Phase 1 checkboxes unchecked — no pilot-wide `addOrReplaceChild` recovery, offset vs `offsetAndRotation` parity, or jar-gated T0 promotion path complete.
-- **Manual Explore:** Phase 4 “Explore 3D manual checklist” on canary set **not** signed off.
+- **Manual Explore:** Checklist at [`assembly-pilot-explore-checklist.md`](generated/assembly-pilot-explore-checklist.md) — automated canary table filled; Explore 3D sign-off **pending**.
 
 ### RECOMMENDED NEXT SPRINT (ordered)
 
@@ -664,7 +665,7 @@ Synthesis of multitask agent work through Phases **0–5**, shard regen commits 
 6. **Manual Explore:** Creeper, cow, one monster, one baby variant — legs below head, body orientation sane after 5A policy.
 7. **Re-run 4C:** Regenerate quality JSON → confirm pilot `assemblyGatePass` > 0 → update allowlists + viewport strict in **same PR** as shards.
 
-**Commits (shard regen):** `c7717a5` (4A), `0addf5d` (4B). **Quality snapshot:** `geometry-lift-quality-26.1.2.json` `generatedUtc=2026-05-19T08:47:45Z`, `okEntryCount=143`, entity-wide `assemblyGatePass` **3** (`HumanoidModel`, `VillagerModel`, `SkullModel`).
+**Commits (shard regen):** `c7717a5` (4A), `0addf5d` (4B). **Quality snapshot:** `geometry-lift-quality-26.1.2.json` refreshed via `tools/regen-assembly-pilots.ps1` (pilot batch regen); **17/56** pilot `assemblyGatePass`; entity-wide gates include `HumanoidModel`, `VillagerModel`, `SkullModel`.
 
 
 ## Appendix G - Phase 0C pilot javap snapshots (26.1.2)
