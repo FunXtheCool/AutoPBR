@@ -1,0 +1,48 @@
+
+
+namespace AutoPBR.GeometryCompiler.Tests;
+
+public sealed class StaticIntMatrixExtractorTests
+{
+    [Fact]
+    public void SilverfishModel_clinit_exposes_body_tables()
+    {
+        var jar = ResolveClientJar();
+        var bytes = ReadClassBytes(jar, "net/minecraft/client/model/monster/silverfish/SilverfishModel");
+        var matrices = JvmStaticIntMatrixExtractor.ExtractFromClass(bytes);
+        Assert.True(matrices.TryGetValue("BODY_SIZES", out var sizes));
+        Assert.Equal(7, sizes.Length);
+        Assert.Equal(3, sizes[0].Length);
+        Assert.Equal(3, sizes[0][0]);
+        Assert.True(matrices.TryGetValue("BODY_TEXS", out var texs));
+        Assert.Equal(7, texs.Length);
+    }
+
+    private static byte[] ReadClassBytes(string jar, string officialJvmName)
+    {
+        Assert.True(ClientJarIO.TryResolveJarEntry(jar, officialJvmName, null, out _, out var bytes));
+        return bytes;
+    }
+
+    private static string ResolveClientJar()
+    {
+        var root = FindRepoRoot();
+        return Path.Combine(root, "tools", "minecraft-parity", "26.1.2", "client.jar");
+    }
+
+    private static string FindRepoRoot()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null)
+        {
+            if (File.Exists(Path.Combine(dir.FullName, "AutoPBR.sln")))
+            {
+                return dir.FullName;
+            }
+
+            dir = dir.Parent;
+        }
+
+        throw new InvalidOperationException("Could not find repo root.");
+    }
+}

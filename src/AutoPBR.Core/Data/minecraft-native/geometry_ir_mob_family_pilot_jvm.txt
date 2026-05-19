@@ -1,0 +1,11 @@
+# T1 mob-family pilots (26.1.2): officialJvmName,atlasWidth,atlasHeight,minCuboids
+# See docs/test-guidance-geometry-animation-ir.md
+net.minecraft.client.model.animal.fish.CodModel,32,32,6
+net.minecraft.client.model.animal.fish.SalmonModel,32,32,7
+net.minecraft.client.model.animal.chicken.ChickenModel,64,32,6
+net.minecraft.client.model.animal.cow.CowModel,64,64,4
+net.minecraft.client.model.animal.pig.PigModel,64,64,2
+net.minecraft.client.model.ambient.BatModel,64,64,2
+net.minecraft.client.model.monster.creeper.CreeperModel,64,32,3
+net.minecraft.client.model.animal.chicken.BabyChickenModel,64,32,4
+net.minecraft.client.model.animal.cow.ColdCowModel,64,64,4

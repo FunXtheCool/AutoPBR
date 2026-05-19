@@ -1,0 +1,307 @@
+using System.Globalization;
+using System.Text.Json.Nodes;
+
+namespace AutoPBR.Tools.GeometryCompiler;
+
+/// <summary>
+/// Merges lifted part JSON trees when multiple mesh islands or segments contribute to the same part id.
+/// Used after per-island lift and when composing delegated factory output.
+/// </summary>
+internal static class GeometryLiftJsonMerge
+{
+    /// <summary>
+    /// Later mesh islands replace earlier root parts with the same id for pose/cuboids, but nested child ids
+    /// absent from the newer island are retained from the earlier lift.
+    /// </summary>
+    public static void MergeRootChildLastWinsByPartId(JsonArray rootChildren, JsonNode? partNode)
+    {
+        if (partNode is not JsonObject co)
+        {
+            return;
+        }
+
+        var id = (string?)co["id"];
+        if (string.IsNullOrEmpty(id))
+        {
+            return;
+        }
+
+        for (var i = rootChildren.Count - 1; i >= 0; i--)
+        {
+            if (rootChildren[i] is JsonObject ex && string.Equals((string?)ex["id"], id, StringComparison.Ordinal))
+            {
+                rootChildren[i] = MergeLiftedPartNodes(ex, co);
+                return;
+            }
+        }
+
+        rootChildren.Add(JsonNode.Parse(co.ToJsonString())!);
+    }
+
+    /// <summary>
+    /// Deep-merges two lifted part nodes with the same id: incoming pose/shallow fields win;
+    /// cuboids are unioned or replaced per overlay and piglin-head rules; children are merged by id.
+    /// </summary>
+    public static JsonObject MergeLiftedPartNodes(JsonObject earlier, JsonObject incoming)
+    {
+        var merged = JsonNode.Parse(incoming.ToJsonString())!.AsObject();
+        var earlierCuboids = earlier["cuboids"] as JsonArray ?? new JsonArray();
+        var incomingCuboids = merged["cuboids"] as JsonArray ?? new JsonArray();
+        var preferIncomingCuboids = ShouldPreferIncomingCuboidsOverUnion(merged, incomingCuboids, earlierCuboids);
+        var dropHumanoidHatForPiglinEars = incoming["children"] is JsonArray incomingKidsForHat &&
+            (ContainsChildPartId(incomingKidsForHat, "left_ear") ||
+             ContainsChildPartId(incomingKidsForHat, "right_ear") ||
+             ContainsChildPartId(incomingKidsForHat, "left_ear_r1") ||
+             ContainsChildPartId(incomingKidsForHat, "right_ear_r1"));
+        var overlayPart = GeometryLiftForestMerge.IsMeshTransformerOverlayPartId((string?)incoming["id"]) ||
+            GeometryLiftForestMerge.IsMeshTransformerOverlayPartId((string?)earlier["id"]);
+        if (overlayPart && incomingCuboids.Count > 0)
+        {
+            merged["cuboids"] = JsonNode.Parse(incomingCuboids.ToJsonString())!.AsArray();
+        }
+        else
+        {
+            merged["cuboids"] = incomingCuboids.Count > 0
+                ? earlierCuboids.Count > 0 && incomingCuboids.Count > earlierCuboids.Count && !preferIncomingCuboids
+                    ? MergeCuboidArraysUnionByFingerprint(earlierCuboids, incomingCuboids)
+                    : JsonNode.Parse(incomingCuboids.ToJsonString())!.AsArray()
+                : JsonNode.Parse(earlierCuboids.ToJsonString())!.AsArray();
+        }
+
+        var earlierKids = earlier["children"] as JsonArray ?? new JsonArray();
+        var incomingKids = merged["children"] as JsonArray ?? new JsonArray();
+        merged["children"] = MergeNestedChildrenPreferIncoming(earlierKids, incomingKids, dropHumanoidHatForPiglinEars);
+        return merged;
+    }
+
+    /// <summary>
+    /// Delegated factories lift the same part id from multiple islands; union cuboids by geometry fingerprint
+    /// instead of last-wins replacement.
+    /// </summary>
+    public static JsonArray MergeCuboidArraysUnionByFingerprint(JsonArray earlier, JsonArray incoming)
+    {
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        var merged = new JsonArray();
+        foreach (var source in new[] { earlier, incoming })
+        {
+            foreach (var cNode in source)
+            {
+                if (cNode is not JsonObject c)
+                {
+                    continue;
+                }
+
+                var fp = LiftedCuboidFingerprint(c);
+                if (!seen.Add(fp))
+                {
+                    continue;
+                }
+
+                merged.Add(JsonNode.Parse(c.ToJsonString())!);
+            }
+        }
+
+        return merged;
+    }
+
+    /// <summary>
+    /// Stable fingerprint for deduplicating cuboids during union merge (from/to, uv, face mask).
+    /// </summary>
+    public static string LiftedCuboidFingerprint(JsonObject cuboid)
+    {
+        static string F(JsonObject? o, string key) =>
+            o?[key]?.GetValue<double>().ToString("R", CultureInfo.InvariantCulture) ?? "0";
+
+        static string Vec3(JsonNode? node)
+        {
+            if (node is JsonArray a && a.Count >= 3)
+            {
+                return string.Create(CultureInfo.InvariantCulture,
+                    $"{a[0]!.GetValue<double>().ToString("R", CultureInfo.InvariantCulture)},{a[1]!.GetValue<double>().ToString("R", CultureInfo.InvariantCulture)},{a[2]!.GetValue<double>().ToString("R", CultureInfo.InvariantCulture)}");
+            }
+
+            if (node is JsonObject o)
+            {
+                return string.Create(CultureInfo.InvariantCulture, $"{F(o, "x")},{F(o, "y")},{F(o, "z")}");
+            }
+
+            return "0,0,0";
+        }
+
+        static string Uv(JsonNode? node)
+        {
+            if (node is JsonArray a && a.Count >= 2)
+            {
+                return string.Create(CultureInfo.InvariantCulture,
+                    $"{a[0]!.GetValue<double>().ToString("R", CultureInfo.InvariantCulture)},{a[1]!.GetValue<double>().ToString("R", CultureInfo.InvariantCulture)}");
+            }
+
+            if (node is JsonObject o)
+            {
+                return string.Create(CultureInfo.InvariantCulture, $"{F(o, "u")},{F(o, "v")}");
+            }
+
+            return "0,0";
+        }
+
+        static string FaceMask(JsonNode? node)
+        {
+            if (node is not JsonArray a || a.Count == 0)
+            {
+                return "";
+            }
+
+            var faces = new List<string>(a.Count);
+            foreach (var f in a)
+            {
+                if (f is not null)
+                {
+                    faces.Add(f.GetValue<string>());
+                }
+            }
+
+            faces.Sort(StringComparer.Ordinal);
+            return string.Join(",", faces);
+        }
+
+        return string.Create(CultureInfo.InvariantCulture,
+            $"{Vec3(cuboid["from"])}|{Vec3(cuboid["to"])}|{Uv(cuboid["uv"] ?? cuboid["uvOrigin"])}|{FaceMask(cuboid["faceMask"])}");
+    }
+
+    /// <summary>
+    /// Incoming children win ordering and shallow fields per id; subtree ids only on the earlier island are appended after.
+    /// When <paramref name="incomingKids"/> is empty, earlier nested parts are copied verbatim (wrapper islands).
+    /// </summary>
+    public static JsonArray MergeNestedChildrenPreferIncoming(JsonArray earlierKids, JsonArray incomingKids,
+        bool dropHumanoidHatWhenIncomingHasPiglinEars = false)
+    {
+        if (incomingKids.Count == 0)
+        {
+            return JsonNode.Parse(earlierKids.ToJsonString())!.AsArray();
+        }
+
+        var incomingById = new Dictionary<string, JsonObject>(StringComparer.Ordinal);
+        foreach (var n in incomingKids)
+        {
+            if (n is not JsonObject io)
+            {
+                continue;
+            }
+
+            var kid = (string?)io["id"];
+            if (!string.IsNullOrEmpty(kid))
+            {
+                incomingById[kid] = io;
+            }
+        }
+
+        var merged = new JsonArray();
+        foreach (var n in incomingKids)
+        {
+            if (n is not JsonObject inc)
+            {
+                continue;
+            }
+
+            var cid = (string?)inc["id"];
+            if (string.IsNullOrEmpty(cid))
+            {
+                continue;
+            }
+
+            JsonObject mergedChild;
+            if (FindChildPartById(earlierKids, cid) is { } prev)
+            {
+                mergedChild = MergeLiftedPartNodes(prev, inc);
+                if (dropHumanoidHatWhenIncomingHasPiglinEars &&
+                    string.Equals(cid, "hat", StringComparison.Ordinal))
+                {
+                    mergedChild["cuboids"] = new JsonArray();
+                }
+            }
+            else
+            {
+                mergedChild = JsonNode.Parse(inc.ToJsonString())!.AsObject();
+            }
+
+            merged.Add(mergedChild);
+        }
+
+        foreach (var n in earlierKids)
+        {
+            if (n is not JsonObject eo)
+            {
+                continue;
+            }
+
+            var eid = (string?)eo["id"];
+            if (string.IsNullOrEmpty(eid) || incomingById.ContainsKey(eid))
+            {
+                continue;
+            }
+
+            if (dropHumanoidHatWhenIncomingHasPiglinEars &&
+                string.Equals(eid, "hat", StringComparison.Ordinal))
+            {
+                var emptyHat = JsonNode.Parse(eo.ToJsonString())!.AsObject();
+                emptyHat["cuboids"] = new JsonArray();
+                merged.Add(emptyHat);
+                continue;
+            }
+
+            merged.Add(JsonNode.Parse(eo.ToJsonString())!);
+        }
+
+        return merged;
+    }
+
+    private static bool ShouldPreferIncomingCuboidsOverUnion(
+        JsonObject incomingPart,
+        JsonArray incomingCuboids,
+        JsonArray earlierCuboids)
+    {
+        if (incomingCuboids.Count > 0 && earlierCuboids.Count > 0 &&
+            incomingCuboids.Count < MergeCuboidArraysUnionByFingerprint(earlierCuboids, incomingCuboids).Count)
+        {
+            return true;
+        }
+
+        if (incomingCuboids.Count < 3)
+        {
+            return false;
+        }
+
+        if (incomingPart["children"] is not JsonArray kids)
+        {
+            return false;
+        }
+
+        return ContainsChildPartId(kids, "left_ear") || ContainsChildPartId(kids, "right_ear");
+    }
+
+    private static bool ContainsChildPartId(JsonArray parts, string id)
+    {
+        foreach (var n in parts)
+        {
+            if (n is JsonObject j && string.Equals((string?)j["id"], id, StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static JsonObject? FindChildPartById(JsonArray parts, string id)
+    {
+        foreach (var n in parts)
+        {
+            if (n is JsonObject o && string.Equals((string?)o["id"], id, StringComparison.Ordinal))
+            {
+                return o;
+            }
+        }
+
+        return null;
+    }
+}

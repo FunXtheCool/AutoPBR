@@ -1,0 +1,173 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);CA1707</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="JsonSchema.Net" Version="7.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\docs\generated\schema\geometry-ir.schema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\schema\geometry-ir.schema.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\schema\preview-delta.schema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\schema\preview-delta.schema.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\schema\geometry-index.schema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\schema\geometry-index.schema.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\26.1.2\net.minecraft.client.model.animal.cow.CowModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\26.1.2\net.minecraft.client.model.animal.cow.CowModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\26.1.2\net.minecraft.client.model.BlazeModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\26.1.2\net.minecraft.client.model.BlazeModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.cow.CowModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.cow.CowModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\26.1.2\net.minecraft.client.model.animal.chicken.ChickenModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\26.1.2\net.minecraft.client.model.animal.chicken.ChickenModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.chicken.ChickenModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.chicken.ChickenModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\preview-deltas\26.1.2\net.minecraft.client.model.animal.cow.CowModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\preview-deltas\26.1.2\net.minecraft.client.model.animal.cow.CowModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\preview-deltas\26.1.2\net.minecraft.client.model.animal.chicken.ChickenModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\preview-deltas\26.1.2\net.minecraft.client.model.animal.chicken.ChickenModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\preview-deltas\26.1.2\net.minecraft.client.model.BlazeModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\preview-deltas\26.1.2\net.minecraft.client.model.BlazeModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\preview-deltas\26.1.2\net.minecraft.client.model.animal.fish.CodModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\preview-deltas\26.1.2\net.minecraft.client.model.animal.fish.CodModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\preview-deltas\26.1.2\net.minecraft.client.model.animal.fish.SalmonModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\preview-deltas\26.1.2\net.minecraft.client.model.animal.fish.SalmonModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\preview-deltas\26.1.2\net.minecraft.client.model.animal.pig.PigModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\preview-deltas\26.1.2\net.minecraft.client.model.animal.pig.PigModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\preview-deltas\26.1.2\net.minecraft.client.model.ambient.BatModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\preview-deltas\26.1.2\net.minecraft.client.model.ambient.BatModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\preview-deltas\26.1.2\net.minecraft.client.model.monster.creeper.CreeperModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\preview-deltas\26.1.2\net.minecraft.client.model.monster.creeper.CreeperModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry-index-26.1.2.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry-index-26.1.2.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry-index-1.21.11.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry-index-1.21.11.json</Link>
+    </Content>
+    <Content Include="..\..\tools\minecraft-parity\1.21.11\client_mappings.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>tools\minecraft-parity\1.21.11\client_mappings.txt</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\1.21.11\net.minecraft.client.model.ambient.BatModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\1.21.11\net.minecraft.client.model.ambient.BatModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.chicken.ColdChickenModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.chicken.ColdChickenModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.cow.WarmCowModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.cow.WarmCowModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.dolphin.DolphinModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.dolphin.DolphinModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.fish.CodModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.fish.CodModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.fish.SalmonModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.fish.SalmonModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\1.21.11\net.minecraft.client.model.monster.blaze.BlazeModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\1.21.11\net.minecraft.client.model.monster.blaze.BlazeModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\1.21.11\net.minecraft.client.model.monster.guardian.GuardianModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\1.21.11\net.minecraft.client.model.monster.guardian.GuardianModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\1.21.11\net.minecraft.client.model.monster.slime.MagmaCubeModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\1.21.11\net.minecraft.client.model.monster.slime.MagmaCubeModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.goat.GoatModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.goat.GoatModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.panda.PandaModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.panda.PandaModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.pig.PigModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\1.21.11\net.minecraft.client.model.animal.pig.PigModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\1.21.11\net.minecraft.client.model.monster.creeper.CreeperModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\1.21.11\net.minecraft.client.model.monster.creeper.CreeperModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\1.21.11\net.minecraft.client.model.HumanoidModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\1.21.11\net.minecraft.client.model.HumanoidModel.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\1.21.11\net.minecraft.client.model.player.PlayerModel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>docs\generated\geometry\1.21.11\net.minecraft.client.model.player.PlayerModel.json</Link>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\AutoPBR.Tools.GeometryCompiler\AutoPBR.Tools.GeometryCompiler.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Shared\GeometryIrTestTierSupport.cs" Link="Shared\GeometryIrTestTierSupport.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="AutoPBR.Tools.GeometryCompiler" />
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

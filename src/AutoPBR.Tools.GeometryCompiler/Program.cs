@@ -20,6 +20,11 @@ internal static class Program
             return ExportAssemblyPilotJavapSnapshotsCommand.Run(args.Skip(1).ToArray());
         }
 
+        if (string.Equals(args[0], "score-lift-shard", StringComparison.OrdinalIgnoreCase))
+        {
+            return ScoreLiftShardCommand.Run(args.Skip(1).ToArray());
+        }
+
         if (string.Equals(args[0], "codegen-entity-cuboids", StringComparison.OrdinalIgnoreCase))
         {
             return GeometryIrCodegenHost.RunCodegenEntityCuboids(args.Skip(1).ToArray());

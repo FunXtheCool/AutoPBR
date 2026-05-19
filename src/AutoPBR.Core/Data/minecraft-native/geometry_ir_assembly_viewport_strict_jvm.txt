@@ -1,0 +1,5 @@
+# T1 assembly viewport sanity (26.1.2): legs-below-head after LER preview basis on parity emit.
+# Promote JVMs here only when GeometryIrAssemblyViewportSanityTests strict cases pass.
+# See docs/test-guidance-geometry-animation-ir.md
+# Agent 4C (2026-05-19): pilot JVMs fail assemblyGatePass; only SheepModel passes T1 viewport (Phase 5B).
+net.minecraft.client.model.animal.sheep.SheepModel

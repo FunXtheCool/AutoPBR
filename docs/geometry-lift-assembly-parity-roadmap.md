@@ -437,7 +437,7 @@ subagent_type: generalPurpose
 
 | Scope | `assemblyGatePass` | Promotion action |
 |-------|-------------------|------------------|
-| **56 pilot JVMs** ([`geometry-assembly-parity-pilots-26.1.2.txt`](generated/geometry-assembly-parity-pilots-26.1.2.txt)) | **0 / 56** | **Blocked** — do not add to `geometry_ir_partial_to_ok_promotion_jvm.txt` or assembly viewport strict; creeper/cow/pig/wolf fail `referenceHierarchyMatch` (flat nested parts) despite legacy `referenceCuboidsMatch` |
+| **56 pilot JVMs** ([`geometry-assembly-parity-pilots-26.1.2.txt`](generated/geometry-assembly-parity-pilots-26.1.2.txt)) | **17 / 56** `assemblyGatePass` (flat-bake hierarchy policy) | **Blocked for viewport/promotion** — do not add creeper/cow/pig/wolf to assembly viewport strict until T1 passes (legs-above-head); `javapPoseOracleMatch` gaps on cow/sheep |
 | **Entity-wide (non-pilot)** | **3** — `HumanoidModel`, `VillagerModel`, `SkullModel` | Cuboid strict + partial→ok for Villager/Skull; Humanoid already on cuboid strict |
 | **Viewport T1 (5B)** | N/A (preview probe) | Only `SheepModel` on `geometry_ir_assembly_viewport_strict_jvm.txt` (creeper/cow/pig/wolf removed — legs-above-head in LER space) |
 
@@ -623,7 +623,7 @@ Phase 3A added **post-bake** `worldPose.translation` (parent chain x `ModelPart.
 
 ## Remaining work (as of 2026-05-19)
 
-Synthesis of multitask agent work through Phases **0–5**, shard regen commits **`c7717a5`** (4A) and **`0addf5d`** (4B), and **4C** promotion attempt (blocked). Committed artifacts: pilot manifest (`17dce7e`), roadmap program scope (`9500076`), generated shards/index/quality JSON. **Uncommitted WIP:** `src/AutoPBR.Core/Preview/` (quality gates, repair policy, javap oracle), `tools/MinecraftGeometryReference/` (3A world-pose bake), `tests/AutoPBR.Core.Tests/GeometryIr*.cs` — land in a follow-up PR before relying on CI.
+Synthesis of multitask agent work through Phases **0–5**, shard regen commits **`c7717a5`** (4A) and **`0addf5d`** (4B), and **4C** promotion attempt (blocked). Committed artifacts: pilot manifest (`17dce7e`), roadmap program scope (`9500076`), generated shards/index/quality JSON. **Toolchain landed (PR1):** `src/AutoPBR.Core/Preview/` (quality gates, repair policy, javap oracle), `tools/MinecraftGeometryReference/` (3A world-pose bake), GeometryCompiler lifter, `tests/AutoPBR.Core.Tests/GeometryIr*.cs`. **Pilot refresh:** `tools/regen-assembly-pilots.ps1` (56 JVMs; not full 761-class index).
 
 ### DONE
 
@@ -638,7 +638,7 @@ Synthesis of multitask agent work through Phases **0–5**, shard regen commits 
 
 ### IN PROGRESS / optional
 
-- **Commit gate/oracle/repair code:** Entire `src/AutoPBR.Core/Preview/` tree and related tests still **untracked** — merge before CI enforces assembly gates.
+- **Coordinated pilot regen:** Run `tools/regen-assembly-pilots.ps1` after PR1 merge; commit shards + quality + reference-output in PR2.
 - **Batch-2 index rows:** `0addf5d` did not refresh `geometry-index-26.1.2.json` for all batch-2 JVMs; align index `extractionStatus` with kept shards.
 - **Reference export (3A batch):** `.tmpbuild/batch1-export.log` — `Export-GeometryReference.ps1` failed (**JDK 25+** required for 26.1.2 class file 69); pilot `reference-output` stale/incomplete until Temurin 25 or `-JavaHome` is set.
 - **Lift decisions audit:** `.tmpbuild/batch2-lift-decisions.csv` (keep/revert per JVM; all rows `assemblyGate=false` at regen time).
@@ -648,8 +648,8 @@ Synthesis of multitask agent work through Phases **0–5**, shard regen commits 
 
 ### BLOCKED
 
-- **4C pilot promotion:** **`assemblyGatePass` 0 / 56** on [`geometry-assembly-parity-pilots-26.1.2.txt`](generated/geometry-assembly-parity-pilots-26.1.2.txt) — do **not** add creeper/cow/pig/wolf (and peers) to `geometry_ir_partial_to_ok_promotion_jvm.txt` until gates pass.
-- **Hierarchy gate:** Most pilots fail `referenceHierarchyMatch` (`suspectedFlatNestedPartCount > 0`, body/legs still root siblings) — requires **Phase 1A** lifter topology, not shard-only regen.
+- **4C pilot promotion:** **`assemblyGatePass` 17 / 56** on pilot list — promote only when **viewport T1** passes (`GeometryIrAssemblyViewportSanityTests`); creeper may pass assembly gate but still fails Explore T1.
+- **Hierarchy gate (flat bakes):** `referenceHierarchyMatch` passes when IR + reference_java share intentional flat root (`UsesVanillaFlatQuadrupedLegBake`); nested topology lift remains **Phase 1A** optional.
 - **Viewport T1:** Creeper, cow, pig, wolf **removed** from `geometry_ir_assembly_viewport_strict_jvm.txt` (legs-above-head in LER preview space); only `SheepModel` on strict viewport list.
 - **Phase 1 exit (open):** All four Phase 1 checkboxes unchecked — no pilot-wide `addOrReplaceChild` recovery, offset vs `offsetAndRotation` parity, or jar-gated T0 promotion path complete.
 - **Manual Explore:** Phase 4 “Explore 3D manual checklist” on canary set **not** signed off.
