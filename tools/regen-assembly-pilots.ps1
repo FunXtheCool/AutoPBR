@@ -128,7 +128,8 @@ elseif (-not $SkipIndex) {
 }
 
 if ($KeepRevert) {
-    Write-Host "=== Step 3: Keep/revert by lift score ==="
+    Write-Host "=== Step 3: Keep/revert by lift score (one dotnet process per score; omit -KeepRevert for speed) ==="
+    dotnet build $proj -v q | Out-Null
     $rows = @("officialJvmName,oldScore,newScore,decision,assemblyGatePass,referenceWorldPoseMatch,javapPoseOracleMatch")
     foreach ($jvm in $pilots) {
         $shard = Get-ShardPath $jvm
@@ -140,9 +141,14 @@ if ($KeepRevert) {
         }
         $new = if (Test-Path -LiteralPath $shard) { Get-LiftScore $jvm $shard } else { $null }
         $newScore = if ($new) { $new.Score } else { -1 }
-        $decision = if (-not (Test-Path -LiteralPath $backup)) { "keep" }
-            elseif ($newScore -ge $oldScore) { "keep" }
-            else { "revert" }
+        $decision = if ($null -eq $new -or $newScore -lt 0) {
+            if (Test-Path -LiteralPath $backup) { "revert" } else { "skip" }
+        }
+        elseif (-not (Test-Path -LiteralPath $backup)) { "keep" }
+        elseif ($oldScore -lt 0) { "keep" }
+        elseif ($newScore -gt $oldScore) { "keep" }
+        elseif ($newScore -eq $oldScore) { "keep" }
+        else { "revert" }
         if ($decision -eq "revert" -and (Test-Path -LiteralPath $backup)) {
             Copy-Item -LiteralPath $backup -Destination $shard -Force
         }
