@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.object.statue.CopperGolemStatueModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "skipped",
+  "extractionNotes": [
+    "No static mesh factory on net.minecraft.client.model.object.statue.CopperGolemStatueModel; structural lift skipped (interface, inner class, or non-mesh type)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": []
+    }
+  ],
+  "jarPath": "hho.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.object.statue.hho",
+  "classSha256Hex": "c2e906d1d07491706fb899729cf6dbc40a9eefacc4c2a75ca4e026642452f910",
+  "bytecodeFloatProbe": [],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

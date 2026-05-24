@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.object.book.BookModel$State",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "skipped",
+  "extractionNotes": [
+    "No static mesh factory on net.minecraft.client.model.object.book.BookModel$State; structural lift skipped (interface, inner class, or non-mesh type)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": []
+    }
+  ],
+  "jarPath": "hgr$a.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.object.book.hgr$a",
+  "classSha256Hex": "05f131fe173e0f5c7952406a3d63e1787a38a04342f2de7f571bba03c3c47099",
+  "bytecodeFloatProbe": [],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.camel.BabyCamelModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/camel/BabyCamelModel.class",
+  "classSha256Hex": "1d691769ef78c521c4bc3c8dec9c555f08107a90c2df7c553fff435d2d46b836",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.camel.CamelModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.animal.camel.CamelModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

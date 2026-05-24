@@ -1,0 +1,15 @@
+net/minecraft/client/model/animal/allay/AllayModel.class
+net/minecraft/client/model/animal/axolotl/BabyAxolotlModel.class
+net/minecraft/client/model/animal/bee/AdultBeeModel.class
+net/minecraft/client/model/animal/frog/FrogModel.class
+net/minecraft/client/model/animal/nautilus/NautilusArmorModel.class
+net/minecraft/client/model/animal/nautilus/NautilusModel.class
+net/minecraft/client/model/animal/nautilus/NautilusSaddleModel.class
+net/minecraft/client/model/animal/sniffer/SnifferModel.class
+net/minecraft/client/model/animal/sniffer/SniffletModel.class
+net/minecraft/client/model/monster/creaking/CreakingModel.class
+net/minecraft/client/model/monster/nautilus/ZombieNautilusCoralModel.class
+net/minecraft/client/model/monster/vex/VexModel.class
+net/minecraft/client/model/monster/warden/WardenModel.class
+net/minecraft/client/model/object/projectile/WindChargeModel.class
+net/minecraft/client/model/player.PlayerCapeModel.class

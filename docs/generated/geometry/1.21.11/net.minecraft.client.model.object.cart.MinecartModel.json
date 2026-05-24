@@ -1,0 +1,372 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.object.cart.MinecartModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.object.cart.MinecartModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "bottom",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -10,
+                -8,
+                -1
+              ],
+              "to": [
+                10,
+                8,
+                1
+              ],
+              "uvOrigin": [
+                0,
+                10
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            },
+            {
+              "from": [
+                0,
+                4,
+                0
+              ],
+              "to": [
+                1.57079637,
+                4,
+                0
+              ],
+              "uvOrigin": [
+                0,
+                10
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "front",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -8,
+                -9,
+                -1
+              ],
+              "to": [
+                8,
+                -1,
+                1
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            },
+            {
+              "from": [
+                -9,
+                4,
+                0
+              ],
+              "to": [
+                -9,
+                8.71238899,
+                0
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "back",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -8,
+                -9,
+                -1
+              ],
+              "to": [
+                8,
+                -1,
+                1
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            },
+            {
+              "from": [
+                9,
+                4,
+                0
+              ],
+              "to": [
+                9,
+                5.57079637,
+                0
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -8,
+                -9,
+                -1
+              ],
+              "to": [
+                8,
+                -1,
+                1
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            },
+            {
+              "from": [
+                0,
+                4,
+                -7
+              ],
+              "to": [
+                0,
+                7.14159274,
+                -7
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right",
+          "pose": {
+            "translation": [
+              0,
+              4,
+              7
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              4,
+              7
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -8,
+                -9,
+                -1
+              ],
+              "to": [
+                8,
+                -1,
+                1
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "hgt.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.object.cart.hgt",
+  "classSha256Hex": "17e500eca99dcc383c227f1c2090efe3ac14b7aee531eccb0de9e71c01f56f95",
+  "bytecodeFloatProbe": [
+    -10,
+    -8,
+    -1,
+    20,
+    16,
+    4,
+    1.5707964,
+    -8,
+    -9,
+    -1,
+    16,
+    8,
+    -9,
+    4,
+    4.712389,
+    -8,
+    -9,
+    -1,
+    16,
+    8,
+    9,
+    4,
+    1.5707964,
+    -8,
+    -9,
+    -1,
+    16,
+    8,
+    4,
+    -7,
+    3.1415927,
+    -8,
+    -9,
+    -1,
+    16,
+    8,
+    4,
+    7
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

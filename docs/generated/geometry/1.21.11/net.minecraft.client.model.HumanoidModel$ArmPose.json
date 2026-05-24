@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.HumanoidModel$ArmPose",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "skipped",
+  "extractionNotes": [
+    "No static mesh factory on net.minecraft.client.model.HumanoidModel$ArmPose; structural lift skipped (interface, inner class, or non-mesh type)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": []
+    }
+  ],
+  "jarPath": "gzo$a.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.gzo$a",
+  "classSha256Hex": "92cca66c7b130a01abc85f82621367c0b9ae258a83602c02ada0bfaabb6cdc8e",
+  "bytecodeFloatProbe": [],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

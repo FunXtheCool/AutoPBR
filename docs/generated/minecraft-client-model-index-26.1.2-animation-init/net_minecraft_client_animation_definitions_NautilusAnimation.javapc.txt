@@ -1,0 +1,427 @@
+Compiled from "NautilusAnimation.java"
+public class net.minecraft.client.animation.definitions.NautilusAnimation {
+  public static final net.minecraft.client.animation.AnimationDefinition SWIMMING;
+
+  public net.minecraft.client.animation.definitions.NautilusAnimation();
+    Code:
+       0: aload_0
+       1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+       4: return
+
+  static {};
+    Code:
+       0: fconst_1
+       1: invokestatic  #7                  // Method net/minecraft/client/animation/AnimationDefinition$Builder.withLength:(F)Lnet/minecraft/client/animation/AnimationDefinition$Builder;
+       4: invokevirtual #13                 // Method net/minecraft/client/animation/AnimationDefinition$Builder.looping:()Lnet/minecraft/client/animation/AnimationDefinition$Builder;
+       7: ldc           #19                 // String body
+       9: new           #21                 // class net/minecraft/client/animation/AnimationChannel
+      12: dup
+      13: getstatic     #23                 // Field net/minecraft/client/animation/AnimationChannel$Targets.SCALE:Lnet/minecraft/client/animation/AnimationChannel$Target;
+      16: iconst_5
+      17: anewarray     #29                 // class net/minecraft/client/animation/Keyframe
+      20: dup
+      21: iconst_0
+      22: new           #29                 // class net/minecraft/client/animation/Keyframe
+      25: dup
+      26: fconst_0
+      27: dconst_1
+      28: dconst_1
+      29: dconst_1
+      30: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+      33: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+      36: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+      39: aastore
+      40: dup
+      41: iconst_1
+      42: new           #29                 // class net/minecraft/client/animation/Keyframe
+      45: dup
+      46: ldc           #46                 // float 0.5f
+      48: dconst_1
+      49: dconst_1
+      50: ldc2_w        #47                 // double 1.2000000476837158d
+      53: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+      56: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+      59: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+      62: aastore
+      63: dup
+      64: iconst_2
+      65: new           #29                 // class net/minecraft/client/animation/Keyframe
+      68: dup
+      69: ldc           #49                 // float 0.75f
+      71: dconst_1
+      72: dconst_1
+      73: ldc2_w        #50                 // double 0.8999999761581421d
+      76: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+      79: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+      82: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+      85: aastore
+      86: dup
+      87: iconst_3
+      88: new           #29                 // class net/minecraft/client/animation/Keyframe
+      91: dup
+      92: ldc           #52                 // float 0.875f
+      94: dconst_1
+      95: dconst_1
+      96: dconst_1
+      97: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+     100: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     103: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     106: aastore
+     107: dup
+     108: iconst_4
+     109: new           #29                 // class net/minecraft/client/animation/Keyframe
+     112: dup
+     113: fconst_1
+     114: dconst_1
+     115: dconst_1
+     116: dconst_1
+     117: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+     120: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     123: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     126: aastore
+     127: invokespecial #53                 // Method net/minecraft/client/animation/AnimationChannel."<init>":(Lnet/minecraft/client/animation/AnimationChannel$Target;[Lnet/minecraft/client/animation/Keyframe;)V
+     130: invokevirtual #56                 // Method net/minecraft/client/animation/AnimationDefinition$Builder.addAnimation:(Ljava/lang/String;Lnet/minecraft/client/animation/AnimationChannel;)Lnet/minecraft/client/animation/AnimationDefinition$Builder;
+     133: ldc           #60                 // String upper_mouth
+     135: new           #21                 // class net/minecraft/client/animation/AnimationChannel
+     138: dup
+     139: getstatic     #62                 // Field net/minecraft/client/animation/AnimationChannel$Targets.ROTATION:Lnet/minecraft/client/animation/AnimationChannel$Target;
+     142: iconst_5
+     143: anewarray     #29                 // class net/minecraft/client/animation/Keyframe
+     146: dup
+     147: iconst_0
+     148: new           #29                 // class net/minecraft/client/animation/Keyframe
+     151: dup
+     152: fconst_0
+     153: fconst_0
+     154: fconst_0
+     155: fconst_0
+     156: invokestatic  #65                 // Method net/minecraft/client/animation/KeyframeAnimations.degreeVec:(FFF)Lorg/joml/Vector3f;
+     159: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     162: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     165: aastore
+     166: dup
+     167: iconst_1
+     168: new           #29                 // class net/minecraft/client/animation/Keyframe
+     171: dup
+     172: ldc           #46                 // float 0.5f
+     174: ldc           #69                 // float 30.0f
+     176: fconst_0
+     177: fconst_0
+     178: invokestatic  #65                 // Method net/minecraft/client/animation/KeyframeAnimations.degreeVec:(FFF)Lorg/joml/Vector3f;
+     181: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     184: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     187: aastore
+     188: dup
+     189: iconst_2
+     190: new           #29                 // class net/minecraft/client/animation/Keyframe
+     193: dup
+     194: ldc           #49                 // float 0.75f
+     196: fconst_0
+     197: fconst_0
+     198: fconst_0
+     199: invokestatic  #65                 // Method net/minecraft/client/animation/KeyframeAnimations.degreeVec:(FFF)Lorg/joml/Vector3f;
+     202: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     205: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     208: aastore
+     209: dup
+     210: iconst_3
+     211: new           #29                 // class net/minecraft/client/animation/Keyframe
+     214: dup
+     215: ldc           #52                 // float 0.875f
+     217: fconst_0
+     218: fconst_0
+     219: fconst_0
+     220: invokestatic  #65                 // Method net/minecraft/client/animation/KeyframeAnimations.degreeVec:(FFF)Lorg/joml/Vector3f;
+     223: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     226: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     229: aastore
+     230: dup
+     231: iconst_4
+     232: new           #29                 // class net/minecraft/client/animation/Keyframe
+     235: dup
+     236: fconst_1
+     237: fconst_0
+     238: fconst_0
+     239: fconst_0
+     240: invokestatic  #65                 // Method net/minecraft/client/animation/KeyframeAnimations.degreeVec:(FFF)Lorg/joml/Vector3f;
+     243: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     246: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     249: aastore
+     250: invokespecial #53                 // Method net/minecraft/client/animation/AnimationChannel."<init>":(Lnet/minecraft/client/animation/AnimationChannel$Target;[Lnet/minecraft/client/animation/Keyframe;)V
+     253: invokevirtual #56                 // Method net/minecraft/client/animation/AnimationDefinition$Builder.addAnimation:(Ljava/lang/String;Lnet/minecraft/client/animation/AnimationChannel;)Lnet/minecraft/client/animation/AnimationDefinition$Builder;
+     256: ldc           #60                 // String upper_mouth
+     258: new           #21                 // class net/minecraft/client/animation/AnimationChannel
+     261: dup
+     262: getstatic     #23                 // Field net/minecraft/client/animation/AnimationChannel$Targets.SCALE:Lnet/minecraft/client/animation/AnimationChannel$Target;
+     265: iconst_5
+     266: anewarray     #29                 // class net/minecraft/client/animation/Keyframe
+     269: dup
+     270: iconst_0
+     271: new           #29                 // class net/minecraft/client/animation/Keyframe
+     274: dup
+     275: fconst_0
+     276: dconst_1
+     277: dconst_1
+     278: dconst_1
+     279: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+     282: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     285: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     288: aastore
+     289: dup
+     290: iconst_1
+     291: new           #29                 // class net/minecraft/client/animation/Keyframe
+     294: dup
+     295: ldc           #46                 // float 0.5f
+     297: dconst_1
+     298: dconst_1
+     299: ldc2_w        #70                 // double 1.399999976158142d
+     302: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+     305: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     308: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     311: aastore
+     312: dup
+     313: iconst_2
+     314: new           #29                 // class net/minecraft/client/animation/Keyframe
+     317: dup
+     318: ldc           #49                 // float 0.75f
+     320: dconst_1
+     321: dconst_1
+     322: ldc2_w        #50                 // double 0.8999999761581421d
+     325: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+     328: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     331: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     334: aastore
+     335: dup
+     336: iconst_3
+     337: new           #29                 // class net/minecraft/client/animation/Keyframe
+     340: dup
+     341: ldc           #52                 // float 0.875f
+     343: dconst_1
+     344: dconst_1
+     345: dconst_1
+     346: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+     349: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     352: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     355: aastore
+     356: dup
+     357: iconst_4
+     358: new           #29                 // class net/minecraft/client/animation/Keyframe
+     361: dup
+     362: fconst_1
+     363: dconst_1
+     364: dconst_1
+     365: dconst_1
+     366: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+     369: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     372: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     375: aastore
+     376: invokespecial #53                 // Method net/minecraft/client/animation/AnimationChannel."<init>":(Lnet/minecraft/client/animation/AnimationChannel$Target;[Lnet/minecraft/client/animation/Keyframe;)V
+     379: invokevirtual #56                 // Method net/minecraft/client/animation/AnimationDefinition$Builder.addAnimation:(Ljava/lang/String;Lnet/minecraft/client/animation/AnimationChannel;)Lnet/minecraft/client/animation/AnimationDefinition$Builder;
+     382: ldc           #72                 // String inner_mouth
+     384: new           #21                 // class net/minecraft/client/animation/AnimationChannel
+     387: dup
+     388: getstatic     #23                 // Field net/minecraft/client/animation/AnimationChannel$Targets.SCALE:Lnet/minecraft/client/animation/AnimationChannel$Target;
+     391: iconst_5
+     392: anewarray     #29                 // class net/minecraft/client/animation/Keyframe
+     395: dup
+     396: iconst_0
+     397: new           #29                 // class net/minecraft/client/animation/Keyframe
+     400: dup
+     401: fconst_0
+     402: dconst_1
+     403: dconst_1
+     404: dconst_1
+     405: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+     408: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     411: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     414: aastore
+     415: dup
+     416: iconst_1
+     417: new           #29                 // class net/minecraft/client/animation/Keyframe
+     420: dup
+     421: ldc           #46                 // float 0.5f
+     423: ldc2_w        #74                 // double 0.800000011920929d
+     426: ldc2_w        #74                 // double 0.800000011920929d
+     429: dconst_1
+     430: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+     433: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     436: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     439: aastore
+     440: dup
+     441: iconst_2
+     442: new           #29                 // class net/minecraft/client/animation/Keyframe
+     445: dup
+     446: ldc           #49                 // float 0.75f
+     448: dconst_1
+     449: dconst_1
+     450: ldc2_w        #50                 // double 0.8999999761581421d
+     453: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+     456: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     459: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     462: aastore
+     463: dup
+     464: iconst_3
+     465: new           #29                 // class net/minecraft/client/animation/Keyframe
+     468: dup
+     469: ldc           #52                 // float 0.875f
+     471: dconst_1
+     472: dconst_1
+     473: dconst_1
+     474: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+     477: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     480: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     483: aastore
+     484: dup
+     485: iconst_4
+     486: new           #29                 // class net/minecraft/client/animation/Keyframe
+     489: dup
+     490: fconst_1
+     491: dconst_1
+     492: dconst_1
+     493: dconst_1
+     494: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+     497: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     500: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     503: aastore
+     504: invokespecial #53                 // Method net/minecraft/client/animation/AnimationChannel."<init>":(Lnet/minecraft/client/animation/AnimationChannel$Target;[Lnet/minecraft/client/animation/Keyframe;)V
+     507: invokevirtual #56                 // Method net/minecraft/client/animation/AnimationDefinition$Builder.addAnimation:(Ljava/lang/String;Lnet/minecraft/client/animation/AnimationChannel;)Lnet/minecraft/client/animation/AnimationDefinition$Builder;
+     510: ldc           #76                 // String lower_mouth
+     512: new           #21                 // class net/minecraft/client/animation/AnimationChannel
+     515: dup
+     516: getstatic     #62                 // Field net/minecraft/client/animation/AnimationChannel$Targets.ROTATION:Lnet/minecraft/client/animation/AnimationChannel$Target;
+     519: iconst_5
+     520: anewarray     #29                 // class net/minecraft/client/animation/Keyframe
+     523: dup
+     524: iconst_0
+     525: new           #29                 // class net/minecraft/client/animation/Keyframe
+     528: dup
+     529: fconst_0
+     530: fconst_0
+     531: fconst_0
+     532: fconst_0
+     533: invokestatic  #65                 // Method net/minecraft/client/animation/KeyframeAnimations.degreeVec:(FFF)Lorg/joml/Vector3f;
+     536: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     539: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     542: aastore
+     543: dup
+     544: iconst_1
+     545: new           #29                 // class net/minecraft/client/animation/Keyframe
+     548: dup
+     549: ldc           #46                 // float 0.5f
+     551: ldc           #78                 // float -30.0f
+     553: fconst_0
+     554: fconst_0
+     555: invokestatic  #65                 // Method net/minecraft/client/animation/KeyframeAnimations.degreeVec:(FFF)Lorg/joml/Vector3f;
+     558: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     561: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     564: aastore
+     565: dup
+     566: iconst_2
+     567: new           #29                 // class net/minecraft/client/animation/Keyframe
+     570: dup
+     571: ldc           #49                 // float 0.75f
+     573: fconst_0
+     574: fconst_0
+     575: fconst_0
+     576: invokestatic  #65                 // Method net/minecraft/client/animation/KeyframeAnimations.degreeVec:(FFF)Lorg/joml/Vector3f;
+     579: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     582: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     585: aastore
+     586: dup
+     587: iconst_3
+     588: new           #29                 // class net/minecraft/client/animation/Keyframe
+     591: dup
+     592: ldc           #52                 // float 0.875f
+     594: fconst_0
+     595: fconst_0
+     596: fconst_0
+     597: invokestatic  #65                 // Method net/minecraft/client/animation/KeyframeAnimations.degreeVec:(FFF)Lorg/joml/Vector3f;
+     600: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     603: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     606: aastore
+     607: dup
+     608: iconst_4
+     609: new           #29                 // class net/minecraft/client/animation/Keyframe
+     612: dup
+     613: fconst_1
+     614: fconst_0
+     615: fconst_0
+     616: fconst_0
+     617: invokestatic  #65                 // Method net/minecraft/client/animation/KeyframeAnimations.degreeVec:(FFF)Lorg/joml/Vector3f;
+     620: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     623: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     626: aastore
+     627: invokespecial #53                 // Method net/minecraft/client/animation/AnimationChannel."<init>":(Lnet/minecraft/client/animation/AnimationChannel$Target;[Lnet/minecraft/client/animation/Keyframe;)V
+     630: invokevirtual #56                 // Method net/minecraft/client/animation/AnimationDefinition$Builder.addAnimation:(Ljava/lang/String;Lnet/minecraft/client/animation/AnimationChannel;)Lnet/minecraft/client/animation/AnimationDefinition$Builder;
+     633: ldc           #76                 // String lower_mouth
+     635: new           #21                 // class net/minecraft/client/animation/AnimationChannel
+     638: dup
+     639: getstatic     #23                 // Field net/minecraft/client/animation/AnimationChannel$Targets.SCALE:Lnet/minecraft/client/animation/AnimationChannel$Target;
+     642: iconst_5
+     643: anewarray     #29                 // class net/minecraft/client/animation/Keyframe
+     646: dup
+     647: iconst_0
+     648: new           #29                 // class net/minecraft/client/animation/Keyframe
+     651: dup
+     652: fconst_0
+     653: dconst_1
+     654: dconst_1
+     655: dconst_1
+     656: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+     659: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     662: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     665: aastore
+     666: dup
+     667: iconst_1
+     668: new           #29                 // class net/minecraft/client/animation/Keyframe
+     671: dup
+     672: ldc           #46                 // float 0.5f
+     674: dconst_1
+     675: dconst_1
+     676: ldc2_w        #70                 // double 1.399999976158142d
+     679: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+     682: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     685: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     688: aastore
+     689: dup
+     690: iconst_2
+     691: new           #29                 // class net/minecraft/client/animation/Keyframe
+     694: dup
+     695: ldc           #49                 // float 0.75f
+     697: dconst_1
+     698: dconst_1
+     699: ldc2_w        #50                 // double 0.8999999761581421d
+     702: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+     705: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     708: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     711: aastore
+     712: dup
+     713: iconst_3
+     714: new           #29                 // class net/minecraft/client/animation/Keyframe
+     717: dup
+     718: ldc           #52                 // float 0.875f
+     720: dconst_1
+     721: dconst_1
+     722: dconst_1
+     723: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+     726: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     729: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     732: aastore
+     733: dup
+     734: iconst_4
+     735: new           #29                 // class net/minecraft/client/animation/Keyframe
+     738: dup
+     739: fconst_1
+     740: dconst_1
+     741: dconst_1
+     742: dconst_1
+     743: invokestatic  #31                 // Method net/minecraft/client/animation/KeyframeAnimations.scaleVec:(DDD)Lorg/joml/Vector3f;
+     746: getstatic     #37                 // Field net/minecraft/client/animation/AnimationChannel$Interpolations.LINEAR:Lnet/minecraft/client/animation/AnimationChannel$Interpolation;
+     749: invokespecial #43                 // Method net/minecraft/client/animation/Keyframe."<init>":(FLorg/joml/Vector3fc;Lnet/minecraft/client/animation/AnimationChannel$Interpolation;)V
+     752: aastore
+     753: invokespecial #53                 // Method net/minecraft/client/animation/AnimationChannel."<init>":(Lnet/minecraft/client/animation/AnimationChannel$Target;[Lnet/minecraft/client/animation/Keyframe;)V
+     756: invokevirtual #56                 // Method net/minecraft/client/animation/AnimationDefinition$Builder.addAnimation:(Ljava/lang/String;Lnet/minecraft/client/animation/AnimationChannel;)Lnet/minecraft/client/animation/AnimationDefinition$Builder;
+     759: invokevirtual #79                 // Method net/minecraft/client/animation/AnimationDefinition$Builder.build:()Lnet/minecraft/client/animation/AnimationDefinition;
+     762: putstatic     #83                 // Field SWIMMING:Lnet/minecraft/client/animation/AnimationDefinition;
+     765: return
+}

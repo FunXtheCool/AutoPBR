@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://autopbr.local/schema/animation-ir.json",
+  "title": "AutoPBR vanilla animation IR (AnimationDefinition <clinit> lift)",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "versionLabel",
+    "officialJvmName",
+    "profile",
+    "jarPath",
+    "classSha256Hex",
+    "extractionStatus",
+    "definitions"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "versionLabel": { "type": "string" },
+    "officialJvmName": { "type": "string" },
+    "profile": { "type": "string" },
+    "jarPath": { "type": "string" },
+    "classSha256Hex": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{64}$"
+    },
+    "extractionStatus": {
+      "type": "string",
+      "enum": ["ok", "partial"]
+    },
+    "extractionNotes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "definitions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/animationDefinition" }
+    }
+  },
+  "$defs": {
+    "keyframe": {
+      "type": "object",
+      "required": ["timeSeconds", "x", "y", "z", "vectorKind", "interpolation"],
+      "properties": {
+        "timeSeconds": { "type": "number" },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "z": { "type": "number" },
+        "vectorKind": {
+          "type": "string",
+          "enum": ["degrees", "position", "scale"]
+        },
+        "interpolation": { "type": "string" }
+      }
+    },
+    "channel": {
+      "type": "object",
+      "required": ["partName", "target", "interpolation", "keyframes"],
+      "properties": {
+        "partName": { "type": "string" },
+        "target": { "type": "string" },
+        "interpolation": { "type": "string" },
+        "keyframes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/keyframe" }
+        }
+      }
+    },
+    "animationDefinition": {
+      "type": "object",
+      "required": ["fieldName", "channels"],
+      "properties": {
+        "fieldName": { "type": "string" },
+        "lengthSeconds": { "type": "number" },
+        "channels": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/channel" }
+        }
+      }
+    }
+  }
+}

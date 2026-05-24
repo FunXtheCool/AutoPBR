@@ -1,0 +1,408 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.golem.CopperGolemModel",
+  "profile": "named_jar_26.1.2",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.golem.CopperGolemModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0.000000000,
+          24.00000000,
+          0.000000000
+        ],
+        "rotationEulerRad": [
+          0.000000000,
+          0.000000000,
+          0.000000000
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "body",
+          "pose": {
+            "translation": [
+              0.000000000,
+              -5.000000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -4,
+                -6,
+                -3
+              ],
+              "to": [
+                4,
+                0,
+                3
+              ],
+              "uvOrigin": [
+                0,
+                15
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "textureWidth": 64,
+              "textureHeight": 64
+            }
+          ],
+          "children": [
+            {
+              "id": "right_arm",
+              "pose": {
+                "translation": [
+                  -4.000000000,
+                  -6.000000000,
+                  0.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -3,
+                    -1,
+                    -2
+                  ],
+                  "to": [
+                    0,
+                    9,
+                    2
+                  ],
+                  "uvOrigin": [
+                    36,
+                    16
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                  "textureWidth": 64,
+                  "textureHeight": 64
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "left_arm",
+              "pose": {
+                "translation": [
+                  4.000000000,
+                  -6.000000000,
+                  0.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    0,
+                    -1,
+                    -2
+                  ],
+                  "to": [
+                    3,
+                    9,
+                    2
+                  ],
+                  "uvOrigin": [
+                    50,
+                    16
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                  "textureWidth": 64,
+                  "textureHeight": 64
+                }
+              ],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "head",
+          "pose": {
+            "translation": [
+              0.000000000,
+              -6.000000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -4,
+                -5,
+                -5
+              ],
+              "to": [
+                4,
+                0,
+                5
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "inflate": 0.0149999997,
+              "textureWidth": 64,
+              "textureHeight": 64
+            },
+            {
+              "from": [
+                -1,
+                -2,
+                -6
+              ],
+              "to": [
+                1,
+                1,
+                -4
+              ],
+              "uvOrigin": [
+                56,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "textureWidth": 64,
+              "textureHeight": 64
+            },
+            {
+              "from": [
+                -1,
+                -9,
+                -1
+              ],
+              "to": [
+                1,
+                -5,
+                1
+              ],
+              "uvOrigin": [
+                37,
+                8
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "inflate": -0.0149999997,
+              "textureWidth": 64,
+              "textureHeight": 64
+            },
+            {
+              "from": [
+                -2,
+                -13,
+                -2
+              ],
+              "to": [
+                2,
+                -9,
+                2
+              ],
+              "uvOrigin": [
+                37,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "inflate": -0.0149999997,
+              "textureWidth": 64,
+              "textureHeight": 64
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right_leg",
+          "pose": {
+            "translation": [
+              0.000000000,
+              -5.000000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -4,
+                0,
+                -2
+              ],
+              "to": [
+                0,
+                5,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                27
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "textureWidth": 64,
+              "textureHeight": 64
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left_leg",
+          "pose": {
+            "translation": [
+              0.000000000,
+              -5.000000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                -2
+              ],
+              "to": [
+                4,
+                5,
+                2
+              ],
+              "uvOrigin": [
+                16,
+                27
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "textureWidth": 64,
+              "textureHeight": 64
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "net/minecraft/client/model/animal/golem/CopperGolemModel.class",
+  "classSha256Hex": "72213f54f64c78a16560309c618944a78e654668f4e6338900c9ea0cdc0a984b",
+  "bytecodeFloatProbe": [
+    -4,
+    -6,
+    -3,
+    8,
+    6,
+    6,
+    -5,
+    -4,
+    -5,
+    -5,
+    8,
+    5,
+    10,
+    0.015,
+    -1,
+    -2,
+    -6,
+    3,
+    -1,
+    -9,
+    -1,
+    4,
+    -0.015,
+    -2,
+    -13,
+    -2,
+    4,
+    4,
+    4,
+    -0.015,
+    -6,
+    -3,
+    -1,
+    -2,
+    3,
+    10,
+    4,
+    -4,
+    -6,
+    -1,
+    -2,
+    3,
+    10,
+    4,
+    4,
+    -6,
+    -4,
+    -2,
+    4,
+    5,
+    4,
+    -5,
+    -2,
+    4,
+    5,
+    4,
+    -5
+  ],
+  "textureWidth": 64,
+  "textureHeight": 64,
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

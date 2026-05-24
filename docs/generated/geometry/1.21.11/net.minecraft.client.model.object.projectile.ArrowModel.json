@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.object.projectile.ArrowModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.object.projectile.ArrowModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "back",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                -2.5,
+                -2.5
+              ],
+              "to": [
+                0,
+                2.5,
+                2.5
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            },
+            {
+              "from": [
+                -11,
+                0,
+                0
+              ],
+              "to": [
+                -10.214601815,
+                0,
+                0
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "cross_1",
+          "pose": {
+            "translation": [
+              0.785398185,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0.785398185,
+              0,
+              0
+            ]
+          },
+          "cuboids": [],
+          "children": []
+        },
+        {
+          "id": "cross_2",
+          "pose": {
+            "translation": [
+              0.785398185,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0.785398185,
+              0,
+              0
+            ]
+          },
+          "cuboids": [],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "hhe.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.object.projectile.hhe",
+  "classSha256Hex": "12181ec9e873fce0cbee971a9bf421cbed4a0e7ce06162969ef2c9acf22d9415",
+  "bytecodeFloatProbe": [
+    -2.5,
+    -2.5,
+    5,
+    5,
+    -11,
+    0.7853982,
+    0.8,
+    -12,
+    -2,
+    16,
+    4,
+    0.8,
+    0.7853982,
+    2.3561945
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

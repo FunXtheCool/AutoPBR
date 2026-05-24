@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.chicken.BabyChickenModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/chicken/BabyChickenModel.class",
+  "classSha256Hex": "f508404d85073e53784674cb88ae6a3df15fa87c7b15be4f3b89f2071441dc87",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.chicken.ChickenModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.animal.chicken.ChickenModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

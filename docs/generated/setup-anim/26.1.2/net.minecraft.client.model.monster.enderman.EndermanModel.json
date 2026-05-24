@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.enderman.EndermanModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/enderman/EndermanModel.class",
+  "classSha256Hex": "861b07f3a2d8a4c8bfe3b5fe0f5dd31687d07c261c8522e40ac40de306606c85",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.HumanoidModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.HumanoidModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

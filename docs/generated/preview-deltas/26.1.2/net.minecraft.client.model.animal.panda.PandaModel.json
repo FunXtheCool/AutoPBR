@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.panda.PandaModel",
+  "deltas": [
+    {
+      "kind": "previewBasis",
+      "description": "Cow-class LER right-compose (LocalToParent × worldRoot with scale -1,-1,1) for flat quadruped root siblings; not hoglin/ravager default (worldRoot × LocalToParent). Parity emit passes officialJvmName into ApplyGeometryIrParityLivingEntityRendererPreviewBasis.",
+      "partId": "_all"
+    },
+    {
+      "kind": "other",
+      "description": "Composed-flat factory: body Rx(π/2)+T(0,10,0) with head/legs as root siblings (suspectedFlatNestedPartCount:4). Shards referenceWorldPoseMatch ok; manual Explore § A.4 after LER policy (quadruped regression section)."
+    }
+  ]
+}

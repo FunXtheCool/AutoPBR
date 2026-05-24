@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.effects.SpearAnimations$UseParams",
+  "profile": "named_jar_26.1.2",
+  "extractionStatus": "skipped",
+  "extractionNotes": [
+    "No static mesh factory on net.minecraft.client.model.effects.SpearAnimations$UseParams; structural lift skipped (interface, inner class, or non-mesh type)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": []
+    }
+  ],
+  "jarPath": "net/minecraft/client/model/effects/SpearAnimations$UseParams.class",
+  "classSha256Hex": "8c0dd9ad8a5750fb154014292b05522c6461f2fbdcecd7558e6431515b719cad",
+  "bytecodeFloatProbe": [],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

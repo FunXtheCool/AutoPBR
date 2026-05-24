@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.armorstand.ArmorStandArmorModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/object/armorstand/ArmorStandArmorModel.class",
+  "classSha256Hex": "8ab1f868df918ab6820fe09c5ae495350c4c8fbc563fc2e6952f601eb6d37ca3",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.HumanoidModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.HumanoidModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

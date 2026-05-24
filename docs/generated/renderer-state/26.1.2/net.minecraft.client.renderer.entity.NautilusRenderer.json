@@ -1,0 +1,54 @@
+{
+
+  "schemaVersion": 1,
+
+  "versionLabel": "26.1.2",
+
+  "officialJvmName": "net.minecraft.client.renderer.entity.NautilusRenderer",
+
+  "renderStateType": "net.minecraft.client.renderer.entity.state.NautilusRenderState",
+
+  "modelJvmNames": [
+
+    "net.minecraft.client.model.animal.nautilus.NautilusModel"
+
+  ],
+
+  "extractionStatus": "partial",
+
+  "extractionNotes": [
+
+    "extractRenderState: LivingEntityRenderer super; no AnimationState mood fields on NautilusRenderState (javap 26.1.2).",
+
+    "NautilusModel.setupAnim: head look (xRot/yRot), swimAnimation.applyWalk(walkAnimationPos, walkAnimationSpeed, speedScale 0.2, posScale 3).",
+
+    "Preview driver nautilus_swim_walk maps catalog timing to walk fields for honest SWIMMING clip playback via setupAnim IR."
+
+  ],
+
+  "animationStateFields": [],
+
+  "livingEntityFields": [
+
+    "ageInTicks",
+
+    "walkAnimationPos",
+
+    "walkAnimationSpeed",
+
+    "xRot",
+
+    "yRot"
+
+  ],
+
+  "previewDriver": "nautilus_swim_walk",
+
+  "clipLengthsSeconds": {
+
+    "swimWalk": 4
+
+  }
+
+}
+

@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.hoglin.HoglinModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/hoglin/HoglinModel.class",
+  "classSha256Hex": "13644b2259cb8e7d410856b2b4e403e78c3d72c69b9a3229dc057d0553ef2629",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.HoglinRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "rightEar",
+      "property": "zRot",
+      "expr": {
+        "op": "sub",
+        "args": [
+          {
+            "const": -0.6981317
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "state": "walkAnimationSpeed"
+              },
+              {
+                "op": "sin",
+                "args": [
+                  {
+                    "state": "walkAnimationPos"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftEar",
+      "property": "zRot",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "const": 0.6981317
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "state": "walkAnimationSpeed"
+              },
+              {
+                "op": "sin",
+                "args": [
+                  {
+                    "state": "walkAnimationPos"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "yRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightFrontLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "cos",
+                "args": [
+                  {
+                    "state": "walkAnimationPos"
+                  }
+                ]
+              },
+              {
+                "const": 1.2
+              }
+            ]
+          },
+          {
+            "state": "walkAnimationSpeed"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftFrontLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "cos",
+                "args": [
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "state": "walkAnimationPos"
+                      },
+                      {
+                        "const": 3.1415927
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "const": 1.2
+              }
+            ]
+          },
+          {
+            "state": "walkAnimationSpeed"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightHindLeg",
+      "property": "xRot",
+      "expr": {
+        "partPeer": "leftFrontLeg",
+        "peerProperty": "xRot"
+      }
+    },
+    {
+      "partField": "leftHindLeg",
+      "property": "xRot",
+      "expr": {
+        "partPeer": "rightFrontLeg",
+        "peerProperty": "xRot"
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

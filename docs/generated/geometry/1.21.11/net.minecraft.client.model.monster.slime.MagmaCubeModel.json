@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.monster.slime.MagmaCubeModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree lifted from javap_mesh_proguard_obf (mesh host net.minecraft.client.model.monster.slime.MagmaCubeModel).",
+    "Mesh lift parser notes (9): Lifted from javap deep concat after bytecode path produced no cuboids.; Mesh segment skipped: could not resolve part id (no ldc String before addOrReplaceChild and none before CubeListBuilder.create).; Mesh segment skipped: could not resolve part id (no ldc String before addOrReplaceChild and none before CubeListBuilder.create).; Mesh segment skipped: could not resolve part id (no ldc String before addOrReplaceChild and none before CubeListBuilder.create)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "inside_cube",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -2,
+                18,
+                -2
+              ],
+              "to": [
+                2,
+                22,
+                2
+              ],
+              "uvOrigin": [
+                24,
+                40
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "hfi.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.monster.slime.hfi",
+  "classSha256Hex": "807f819ae80d4b48fd54526b3fdb1783e8d794cdf237f0da3dac7b99542d44e2",
+  "bytecodeFloatProbe": [
+    -4,
+    -4,
+    8,
+    8,
+    -2,
+    18,
+    -2,
+    4,
+    4,
+    4
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

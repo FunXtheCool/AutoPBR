@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.hoglin.HoglinModel",
+  "deltas": [
+    {
+      "kind": "previewBasis",
+      "description": "Hoglin uses composed offset+rotation LER default (not cow-class LocalToParent * S); parity emit applies GeometryIrParityLivingEntityRendererPreviewBasis per JVM resolver.",
+      "partId": "_all"
+    },
+    {
+      "kind": "other",
+      "description": "Ear/leg setupAnim and attack lean are procedural (HoglinModel setupAnim IR + render state); static createBodyLayer IR is rest pose only."
+    }
+  ]
+}

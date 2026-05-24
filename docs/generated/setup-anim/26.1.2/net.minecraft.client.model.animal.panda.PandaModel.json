@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.panda.PandaModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/panda/PandaModel.class",
+  "classSha256Hex": "5f4c0863ad9a7f534f859a3ce121a1280eeb3a76fd4500be0f08a3a8347f1409",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.QuadrupedModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.QuadrupedModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

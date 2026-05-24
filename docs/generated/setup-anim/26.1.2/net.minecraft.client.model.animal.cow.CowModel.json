@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.cow.CowModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/cow/CowModel.class",
+  "classSha256Hex": "00239827a104b7d098b65b12c67e1a6affd499288e942f1b3c4f07fa486c6c9e",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.QuadrupedModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.QuadrupedModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

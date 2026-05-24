@@ -1,0 +1,17 @@
+# Phase 8: pinned 1.21.11 geometry IR shards with extractionStatus ok (obfuscated jar + ProGuard mappings).
+# Jar-reconciliation CI covers these; ColdChicken/WarmCow omitted (committed shards retain template merge).
+net/minecraft/client/model/ambient/BatModel.class
+net/minecraft/client/model/animal/chicken/ChickenModel.class
+net/minecraft/client/model/animal/cow/CowModel.class
+net/minecraft/client/model/animal/dolphin/DolphinModel.class
+net/minecraft/client/model/animal/fish/CodModel.class
+net/minecraft/client/model/animal/fish/SalmonModel.class
+net/minecraft/client/model/monster/blaze/BlazeModel.class
+net/minecraft/client/model/monster/guardian/GuardianModel.class
+net/minecraft/client/model/monster/slime/MagmaCubeModel.class
+net/minecraft/client/model/animal/goat/GoatModel.class
+net/minecraft/client/model/animal/panda/PandaModel.class
+net/minecraft/client/model/animal/pig/PigModel.class
+net/minecraft/client/model/monster/creeper/CreeperModel.class
+net/minecraft/client/model/HumanoidModel.class
+net/minecraft/client/model/player/PlayerModel.class

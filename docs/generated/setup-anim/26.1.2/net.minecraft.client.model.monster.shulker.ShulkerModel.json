@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.shulker.ShulkerModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/shulker/ShulkerModel.class",
+  "classSha256Hex": "31b24b6a427ec1fdc996e28e24f2e0934bb6cd45fc7487f91b2ab07da50887f9",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.ShulkerRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "lid",
+      "property": "yRot",
+      "expr": {
+        "const": 0
+      }
+    },
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "xRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "sub",
+            "args": [
+              {
+                "op": "sub",
+                "args": [
+                  {
+                    "state": "yHeadRot"
+                  },
+                  {
+                    "const": 180
+                  }
+                ]
+              },
+              {
+                "state": "yBodyRot"
+              }
+            ]
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

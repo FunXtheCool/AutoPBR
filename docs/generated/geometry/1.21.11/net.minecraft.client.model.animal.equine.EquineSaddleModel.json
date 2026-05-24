@@ -1,0 +1,394 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.animal.equine.EquineSaddleModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "partial",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.equine.EquineSaddleModel).",
+    "Strict structural validation failed (3): cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027; cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027; cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "saddle",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -8,
+                -9,
+                10
+              ],
+              "to": [
+                1,
+                0,
+                10.5
+              ],
+              "uvOrigin": [
+                26,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "liftWarnings": [
+                "cube_deformation_obf_inferred"
+              ],
+              "inflate": 0.5
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left_saddle_mouth",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                2,
+                -9,
+                -6
+              ],
+              "to": [
+                3,
+                -7,
+                -4
+              ],
+              "uvOrigin": [
+                29,
+                5
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right_saddle_mouth",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -3,
+                -9,
+                -6
+              ],
+              "to": [
+                -2,
+                -7,
+                -4
+              ],
+              "uvOrigin": [
+                29,
+                5
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left_saddle_line",
+          "pose": {
+            "translation": [
+              -0.52359879,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              -0.52359879,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                3.0999999,
+                -6,
+                -8
+              ],
+              "to": [
+                3.0999999,
+                -3,
+                8
+              ],
+              "uvOrigin": [
+                32,
+                2
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right_saddle_line",
+          "pose": {
+            "translation": [
+              -0.52359879,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              -0.52359879,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -3.0999999,
+                -6,
+                -8
+              ],
+              "to": [
+                -3.0999999,
+                -3,
+                8
+              ],
+              "uvOrigin": [
+                32,
+                2
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "head_saddle",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -11,
+                -1.89999998,
+                6
+              ],
+              "to": [
+                -6,
+                4.10000002,
+                6.219999999
+              ],
+              "uvOrigin": [
+                1,
+                1
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "liftWarnings": [
+                "cube_deformation_obf_inferred"
+              ],
+              "inflate": 0.219999999
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "mouth_saddle_wrap",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -11,
+                -4,
+                4
+              ],
+              "to": [
+                -6,
+                -2,
+                4.200000003
+              ],
+              "uvOrigin": [
+                19,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "liftWarnings": [
+                "cube_deformation_obf_inferred"
+              ],
+              "inflate": 0.200000003
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "har.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.animal.equine.har",
+  "classSha256Hex": "8a678df635e10eb2f73f7f8bcc1f51c83b729535615a6f650c6a5eb5013ffeeb",
+  "bytecodeFloatProbe": [
+    -5,
+    -8,
+    -9,
+    10,
+    9,
+    9,
+    0.5,
+    -9,
+    -6,
+    -3,
+    -9,
+    -6,
+    3.1,
+    -6,
+    -8,
+    3,
+    16,
+    -0.5235988,
+    -3.1,
+    -6,
+    -8,
+    3,
+    16,
+    -0.5235988,
+    -3,
+    -11,
+    -1.9,
+    6,
+    5,
+    6,
+    0.22,
+    -2,
+    -11,
+    -4,
+    4,
+    5,
+    0.2
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

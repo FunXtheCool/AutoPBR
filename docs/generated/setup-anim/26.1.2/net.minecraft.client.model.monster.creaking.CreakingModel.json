@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.creaking.CreakingModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/creaking/CreakingModel.class",
+  "classSha256Hex": "1ab11bb1a910631d132d863bd300bfecd2a08846710c88e897871b1b16b468a9",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.CreakingRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "xRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "yRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    }
+  ],
+  "bakedAnimations": [
+    {
+      "field": "walkAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.CreakingAnimation",
+      "definitionField": "CREAKING_WALK",
+      "rootPartField": "root"
+    },
+    {
+      "field": "attackAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.CreakingAnimation",
+      "definitionField": "CREAKING_ATTACK",
+      "rootPartField": "root"
+    },
+    {
+      "field": "invulnerableAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.CreakingAnimation",
+      "definitionField": "CREAKING_INVULNERABLE",
+      "rootPartField": "root"
+    },
+    {
+      "field": "deathAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.CreakingAnimation",
+      "definitionField": "CREAKING_DEATH",
+      "rootPartField": "root"
+    }
+  ],
+  "playbackSteps": [
+    {
+      "mode": "applyWalk",
+      "animationField": "walkAnimation",
+      "walkPosField": "walkAnimationPos",
+      "walkSpeedField": "walkAnimationSpeed",
+      "speedScale": 0.017453292
+    },
+    {
+      "mode": "apply",
+      "animationField": "attackAnimation",
+      "stateField": "attackAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "invulnerableAnimation",
+      "stateField": "invulnerabilityAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "deathAnimation",
+      "stateField": "deathAnimationState",
+      "ageField": "ageInTicks"
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

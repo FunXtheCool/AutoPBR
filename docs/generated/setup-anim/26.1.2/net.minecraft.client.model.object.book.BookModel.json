@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.book.BookModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/object/book/BookModel.class",
+  "classSha256Hex": "2a9abd08d35e9187aa1a12c10b35344f765da62a4665f49bfe900c103d9ee20d",
+  "renderStateType": "net.minecraft.client.model.object.book.BookModel$State",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.Model",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "leftLid",
+      "property": "yRot",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "const": 3.1415927
+          },
+          {
+            "state": "openness"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightLid",
+      "property": "yRot",
+      "expr": {
+        "state": "openness"
+      }
+    },
+    {
+      "partField": "leftPages",
+      "property": "yRot",
+      "expr": {
+        "state": "openness"
+      }
+    },
+    {
+      "partField": "rightPages",
+      "property": "yRot",
+      "expr": {
+        "state": "openness"
+      }
+    },
+    {
+      "partField": "flipPage1",
+      "property": "yRot",
+      "expr": {
+        "op": "sub",
+        "args": [
+          {
+            "state": "openness"
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "state": "openness"
+                  },
+                  {
+                    "const": 2
+                  }
+                ]
+              },
+              {
+                "state": "pageFlip1"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "flipPage2",
+      "property": "yRot",
+      "expr": {
+        "op": "sub",
+        "args": [
+          {
+            "state": "openness"
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "state": "openness"
+                  },
+                  {
+                    "const": 2
+                  }
+                ]
+              },
+              {
+                "state": "pageFlip2"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftPages",
+      "property": "x",
+      "expr": {
+        "op": "sin",
+        "args": [
+          {
+            "state": "openness"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightPages",
+      "property": "x",
+      "expr": {
+        "op": "sin",
+        "args": [
+          {
+            "state": "openness"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "flipPage1",
+      "property": "x",
+      "expr": {
+        "op": "sin",
+        "args": [
+          {
+            "state": "openness"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "flipPage2",
+      "property": "x",
+      "expr": {
+        "op": "sin",
+        "args": [
+          {
+            "state": "openness"
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

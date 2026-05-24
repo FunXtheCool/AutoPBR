@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.object.skull.SkullModelBase$State",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "skipped",
+  "extractionNotes": [
+    "No static mesh factory on net.minecraft.client.model.object.skull.SkullModelBase$State; structural lift skipped (interface, inner class, or non-mesh type)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": []
+    }
+  ],
+  "jarPath": "hhm$a.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.object.skull.hhm$a",
+  "classSha256Hex": "7f4e3c4c170b9f643f6b06cc4247f64be9f78a04c1df1b1901560397fd68819c",
+  "bytecodeFloatProbe": [],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

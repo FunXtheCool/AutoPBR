@@ -21,6 +21,84 @@
     <Content Include="Data\textures_data.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Data\minecraft-native\minecraft_26.1.2_entity_textures.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\minecraft-native\minecraft_26.1.2_entity_texture_model_manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\minecraft-native\minecraft_26.1.2_geometry_ir_parity_policy.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\minecraft-native\minecraft_26.1.2_geometry_emit_policy.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\minecraft-native\minecraft_26.1.2_cleanroom_entity_animation_map.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\minecraft-native\*.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\docs\generated\animation-index-26.1.2.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Data\minecraft-native\animation-index-26.1.2.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\animation-index-1.21.11.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Data\minecraft-native\animation-index-1.21.11.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry-index-26.1.2.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Data\minecraft-native\geometry-index-26.1.2.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry-index-1.21.11.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Data\minecraft-native\geometry-index-1.21.11.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\setup-anim-index-26.1.2.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Data\minecraft-native\setup-anim-index-26.1.2.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\setup-anim-index-1.21.11.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Data\minecraft-native\setup-anim-index-1.21.11.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\minecraft-client-model-index-26.1.2.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Data\minecraft-native\minecraft-client-model-index-26.1.2.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\minecraft-client-model-index-1.21.11.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Data\minecraft-native\minecraft-client-model-index-1.21.11.json</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\animation\26.1.2\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Data\minecraft-native\animation\26.1.2\%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\animation\1.21.11\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Data\minecraft-native\animation\1.21.11\%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\26.1.2\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Data\minecraft-native\geometry\26.1.2\%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\preview-deltas\26.1.2\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Data\minecraft-native\preview-deltas\26.1.2\%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\setup-anim\26.1.2\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Data\minecraft-native\setup-anim\26.1.2\%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\renderer-state\26.1.2\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Data\minecraft-native\renderer-state\26.1.2\%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\..\docs\generated\geometry\1.21.11\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Data\minecraft-native\geometry\1.21.11\%(Filename)%(Extension)</Link>
+    </Content>
     <Content Include="Data\ONNX-AI\DeepBump\*.onnx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

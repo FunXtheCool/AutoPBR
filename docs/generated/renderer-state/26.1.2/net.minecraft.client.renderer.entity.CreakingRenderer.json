@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.renderer.entity.CreakingRenderer",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.CreakingRenderState",
+  "modelJvmNames": [
+    "net.minecraft.client.model.monster.creaking.CreakingModel"
+  ],
+  "extractionStatus": "partial",
+  "extractionNotes": [
+    "extractRenderState: LivingEntityRenderer super then AnimationState.copyFrom for attack, invulnerability, death (javap 26.1.2).",
+    "CreakingModel.setupAnim: applyWalk(walkAnimation) then KeyframeAnimation.apply on attack/invulnerable/death AnimationState fields with ageInTicks.",
+    "Preview driver creaking_clip_cycle advances one mood clip per segment; inactive AnimationState fields use -1 (skip apply)."
+  ],
+  "animationStateFields": [
+    { "renderStateField": "attackAnimationState", "setupAnimStateField": "attackAnimationState", "entityAnimationState": "Creaking.attack" },
+    { "renderStateField": "invulnerabilityAnimationState", "setupAnimStateField": "invulnerabilityAnimationState", "entityAnimationState": "Creaking.invulnerability" },
+    { "renderStateField": "deathAnimationState", "setupAnimStateField": "deathAnimationState", "entityAnimationState": "Creaking.death" }
+  ],
+  "livingEntityFields": [
+    "ageInTicks",
+    "walkAnimationPos",
+    "walkAnimationSpeed",
+    "xRot",
+    "yRot"
+  ],
+  "previewDriver": "creaking_clip_cycle",
+  "clipLengthsSeconds": {
+    "walkOnly": 2,
+    "attackAnimationState": 0.7083,
+    "invulnerabilityAnimationState": 0.2917,
+    "deathAnimationState": 2.25
+  }
+}

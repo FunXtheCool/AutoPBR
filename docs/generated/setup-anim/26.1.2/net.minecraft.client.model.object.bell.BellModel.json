@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.bell.BellModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/object/bell/BellModel.class",
+  "classSha256Hex": "03df2da44f1221d4040bd70d30bad3fd2536f1a782d1a0eafb0d0feb437e8f82",
+  "renderStateType": "net.minecraft.client.model.object.bell.BellModel$State",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.Model",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "bellBody",
+      "property": "xRot",
+      "expr": {
+        "const": 0
+      }
+    },
+    {
+      "partField": "bellBody",
+      "property": "zRot",
+      "expr": {
+        "const": 0
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

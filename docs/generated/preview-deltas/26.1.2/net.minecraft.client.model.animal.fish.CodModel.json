@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.fish.CodModel",
+  "deltas": [
+    {
+      "kind": "zeroThicknessSheet",
+      "description": "Viewport fidelity thickens IR zero-extent axes (e.g. side fins) via PreviewDegenerateAxisThickness; parity emit keeps true zero depth.",
+      "partId": "right_fin"
+    },
+    {
+      "kind": "previewBasis",
+      "description": "AutoPBR applies LivingEntityRenderer preview basis after mesh build.",
+      "partId": "_all"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.fish.CodModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/fish/CodModel.class",
+  "classSha256Hex": "5b0463ef5e3309f31ed3a385ac97719e6d2ea7d8f3f4c735a6788194c1d52e3b",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.LivingEntityRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "tailFin",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "when": {
+                  "state": "isInWater",
+                  "cmp": "eq",
+                  "value": true
+                },
+                "then": {
+                  "const": 1.5
+                },
+                "else": {
+                  "const": 1
+                }
+              },
+              {
+                "const": 0.45
+              }
+            ]
+          },
+          {
+            "op": "sin",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "const": 0.6
+                  },
+                  {
+                    "state": "ageInTicks"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

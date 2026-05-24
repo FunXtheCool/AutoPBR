@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.skull.SkullModel",
+  "profile": "named_jar_26.1.2",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.object.skull.SkullModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createHeadModel",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0.000000000,
+          0.000000000,
+          0.000000000
+        ],
+        "rotationEulerRad": [
+          0.000000000,
+          0.000000000,
+          0.000000000
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "head",
+          "pose": {
+            "translation": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -4,
+                -8,
+                -4
+              ],
+              "to": [
+                4,
+                0,
+                4
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "net/minecraft/client/model/object/skull/SkullModel.class",
+  "classSha256Hex": "a980171a1627eaeaa0c63d5803a7dd27d7dfffb35a69d48377f2a607dc714989",
+  "bytecodeFloatProbe": [
+    -4,
+    -8,
+    -4,
+    8,
+    8,
+    8
+  ],
+  "textureWidth": 64,
+  "textureHeight": 64,
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

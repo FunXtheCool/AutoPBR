@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "1.21.11",
+  "profile": "proguard_1.21.11",
+  "mappingKind": "proguard",
+  "clientJarNote": "One row per AnimationDefinition holder class in the batch list. Shards under animation/\u003CversionLabel\u003E/: class SHA-256 and javap-lifted \u003Cclinit\u003E channel/keyframe data.",
+  "entries": [
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.ArmadilloAnimation",
+      "shardRelPath": "animation/1.21.11/net.minecraft.client.animation.definitions.ArmadilloAnimation.json",
+      "profile": "proguard_1.21.11",
+      "extractionStatus": "ok",
+      "classSha256Hex": "928d790dd7cdcbafb27214af102e34084ff5a8e6d80f607e155192980a5ca2c6",
+      "jarPath": "ggd.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.BatAnimation",
+      "shardRelPath": "animation/1.21.11/net.minecraft.client.animation.definitions.BatAnimation.json",
+      "profile": "proguard_1.21.11",
+      "extractionStatus": "ok",
+      "classSha256Hex": "caa2ffdd3d6a36f36dab67f9768cbd7a8f6c34eaca46bd53778e2926bff12c3c",
+      "jarPath": "gge.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.BreezeAnimation",
+      "shardRelPath": "animation/1.21.11/net.minecraft.client.animation.definitions.BreezeAnimation.json",
+      "profile": "proguard_1.21.11",
+      "extractionStatus": "ok",
+      "classSha256Hex": "9add8962ca304d0871797ba9fb14448b7df8454e3bdc6813190a50ba4ba24229",
+      "jarPath": "ggf.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.CamelAnimation",
+      "shardRelPath": "animation/1.21.11/net.minecraft.client.animation.definitions.CamelAnimation.json",
+      "profile": "proguard_1.21.11",
+      "extractionStatus": "ok",
+      "classSha256Hex": "dba2aac2810cf716cc5489692c36d3371d59d3365b6b3bc1e134c1c48da19886",
+      "jarPath": "ggg.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.CopperGolemAnimation",
+      "shardRelPath": "animation/1.21.11/net.minecraft.client.animation.definitions.CopperGolemAnimation.json",
+      "profile": "proguard_1.21.11",
+      "extractionStatus": "ok",
+      "classSha256Hex": "98ac7d4206652a76ba0e14fd751f6f195785eba6ac012e976d219f245edfbef7",
+      "jarPath": "ggh.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.CreakingAnimation",
+      "shardRelPath": "animation/1.21.11/net.minecraft.client.animation.definitions.CreakingAnimation.json",
+      "profile": "proguard_1.21.11",
+      "extractionStatus": "ok",
+      "classSha256Hex": "55f353ece5909a33be759a97368a7fc1798e8e3f1d25cd5703fedeceb873cb15",
+      "jarPath": "ggi.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.FrogAnimation",
+      "shardRelPath": "animation/1.21.11/net.minecraft.client.animation.definitions.FrogAnimation.json",
+      "profile": "proguard_1.21.11",
+      "extractionStatus": "ok",
+      "classSha256Hex": "4fd51f18c233764ab7d99289656273ea511dfd56817eac99666c932dd5617dcd",
+      "jarPath": "ggj.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.NautilusAnimation",
+      "shardRelPath": "animation/1.21.11/net.minecraft.client.animation.definitions.NautilusAnimation.json",
+      "profile": "proguard_1.21.11",
+      "extractionStatus": "ok",
+      "classSha256Hex": "58dd52ed0ad30e486392485194f7adc7b01cd5334afb7eeb7d90c944af485b4f",
+      "jarPath": "ggk.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.SnifferAnimation",
+      "shardRelPath": "animation/1.21.11/net.minecraft.client.animation.definitions.SnifferAnimation.json",
+      "profile": "proguard_1.21.11",
+      "extractionStatus": "ok",
+      "classSha256Hex": "dac36e55e41804e534c0834f11c7decda1a9661516f24e82867d579a531b368d",
+      "jarPath": "ggl.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.WardenAnimation",
+      "shardRelPath": "animation/1.21.11/net.minecraft.client.animation.definitions.WardenAnimation.json",
+      "profile": "proguard_1.21.11",
+      "extractionStatus": "ok",
+      "classSha256Hex": "ba145399c54525ffb52a4e370bd4cad8d4cdaa23b0236e97ffd67074ad2d174b",
+      "jarPath": "ggm.class"
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.object.skull.PiglinHeadModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "partial",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.object.skull.SkullModel).",
+    "Strict structural validation failed (1): cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "head",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -4,
+                -8,
+                -4
+              ],
+              "to": [
+                4,
+                0,
+                4
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": [
+            {
+              "id": "hat",
+              "pose": {
+                "translation": [
+                  0,
+                  0,
+                  0
+                ],
+                "rotationEulerRad": [
+                  0,
+                  0,
+                  0
+                ],
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -8,
+                    -4,
+                    8
+                  ],
+                  "to": [
+                    0,
+                    4,
+                    8.25
+                  ],
+                  "uvOrigin": [
+                    32,
+                    0
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift fluent addBox profile_proguard_obf",
+                  "liftWarnings": [
+                    "cube_deformation_obf_inferred"
+                  ],
+                  "inflate": 0.25
+                }
+              ],
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "jarPath": "hhk.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.object.skull.hhk",
+  "classSha256Hex": "00266e80f6d1bb0f37515b77c3f2be60fa4118d20963eebf165265899672ab83",
+  "bytecodeFloatProbe": [
+    -4,
+    -8,
+    -4,
+    8,
+    8,
+    8,
+    -4,
+    -8,
+    -4,
+    8,
+    8,
+    8,
+    0.25
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

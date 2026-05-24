@@ -1,0 +1,6 @@
+net/minecraft/client/model/animal/squid/SquidModel.class
+net/minecraft/client/model/monster/silverfish/SilverfishModel.class
+net/minecraft/client/model/monster/endermite/EndermiteModel.class
+net/minecraft/client/model/monster/slime/MagmaCubeModel.class
+net/minecraft/client/model/monster/dragon/EnderDragonModel.class
+net/minecraft/client/model/effects/SpinAttackEffectModel.class

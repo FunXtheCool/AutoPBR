@@ -1,0 +1,303 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.animation.definitions.NautilusAnimation",
+  "profile": "proguard_1.21.11",
+  "jarPath": "ggk.class",
+  "classSha256Hex": "58dd52ed0ad30e486392485194f7adc7b01cd5334afb7eeb7d90c944af485b4f",
+  "definitions": [
+    {
+      "fieldName": "SWIMMING",
+      "channels": [
+        {
+          "partName": "body",
+          "target": "SCALE",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 1,
+              "y": 1,
+              "z": 1,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 0.5,
+              "x": 1,
+              "y": 1,
+              "z": 1.2,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 0.75,
+              "x": 1,
+              "y": 1,
+              "z": 0.9,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 0.875,
+              "x": 1,
+              "y": 1,
+              "z": 1,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 1,
+              "x": 1,
+              "y": 1,
+              "z": 1,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            }
+          ],
+          "interpolation": "LINEAR"
+        },
+        {
+          "partName": "upper_mouth",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 0.5,
+              "x": 30,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 0.75,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 0.875,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 1,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "LINEAR"
+            }
+          ],
+          "interpolation": "LINEAR"
+        },
+        {
+          "partName": "upper_mouth",
+          "target": "SCALE",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 1,
+              "y": 1,
+              "z": 1,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 0.5,
+              "x": 1,
+              "y": 1,
+              "z": 1.4,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 0.75,
+              "x": 1,
+              "y": 1,
+              "z": 0.9,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 0.875,
+              "x": 1,
+              "y": 1,
+              "z": 1,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 1,
+              "x": 1,
+              "y": 1,
+              "z": 1,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            }
+          ],
+          "interpolation": "LINEAR"
+        },
+        {
+          "partName": "inner_mouth",
+          "target": "SCALE",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 1,
+              "y": 1,
+              "z": 1,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 0.5,
+              "x": 0.8,
+              "y": 0.8,
+              "z": 1,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 0.75,
+              "x": 1,
+              "y": 1,
+              "z": 0.9,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 0.875,
+              "x": 1,
+              "y": 1,
+              "z": 1,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 1,
+              "x": 1,
+              "y": 1,
+              "z": 1,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            }
+          ],
+          "interpolation": "LINEAR"
+        },
+        {
+          "partName": "lower_mouth",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 0.5,
+              "x": -30,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 0.75,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 0.875,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 1,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "LINEAR"
+            }
+          ],
+          "interpolation": "LINEAR"
+        },
+        {
+          "partName": "lower_mouth",
+          "target": "SCALE",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 1,
+              "y": 1,
+              "z": 1,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 0.5,
+              "x": 1,
+              "y": 1,
+              "z": 1.4,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 0.75,
+              "x": 1,
+              "y": 1,
+              "z": 0.9,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 0.875,
+              "x": 1,
+              "y": 1,
+              "z": 1,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            },
+            {
+              "timeSeconds": 1,
+              "x": 1,
+              "y": 1,
+              "z": 1,
+              "vectorKind": "scale",
+              "interpolation": "LINEAR"
+            }
+          ],
+          "interpolation": "LINEAR"
+        }
+      ],
+      "lengthSeconds": 1
+    }
+  ],
+  "obfuscatedJvmName": "net.minecraft.client.animation.definitions.ggk",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Animation IR lifted from javap \u003Cclinit\u003E (proguard_1.21.11; KeyframeAnimations.degreeVec|posVec|scaleVec FFF/DDD)."
+  ]
+}

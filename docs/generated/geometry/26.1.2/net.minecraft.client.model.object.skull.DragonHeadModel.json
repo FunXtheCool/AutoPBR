@@ -1,0 +1,269 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.skull.DragonHeadModel",
+  "profile": "named_jar_26.1.2",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.object.skull.DragonHeadModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createHeadLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0.000000000,
+          0.000000000,
+          0.000000000
+        ],
+        "rotationEulerRad": [
+          0.000000000,
+          0.000000000,
+          0.000000000
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "head",
+          "pose": {
+            "translation": [
+              0.000000000,
+              -5.989999771,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -6,
+                -1,
+                -24
+              ],
+              "to": [
+                6,
+                4,
+                -8
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#upper_lip",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "uvSpan": [
+                176,
+                44
+              ]
+            },
+            {
+              "from": [
+                -8,
+                -8,
+                -10
+              ],
+              "to": [
+                8,
+                8,
+                6
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#upper_head",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "uvSpan": [
+                112,
+                30
+              ]
+            },
+            {
+              "from": [
+                -5,
+                -12,
+                -4
+              ],
+              "to": [
+                -3,
+                -8,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#scale",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "mirrorU": true,
+              "uvSpan": [
+                0,
+                0
+              ]
+            },
+            {
+              "from": [
+                -5,
+                -3,
+                -22
+              ],
+              "to": [
+                -3,
+                -1,
+                -18
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#nostril",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "uvSpan": [
+                112,
+                0
+              ]
+            },
+            {
+              "from": [
+                3,
+                -12,
+                -4
+              ],
+              "to": [
+                5,
+                -8,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#scale",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "uvSpan": [
+                0,
+                0
+              ]
+            },
+            {
+              "from": [
+                3,
+                -3,
+                -22
+              ],
+              "to": [
+                5,
+                -1,
+                -18
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#nostril",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "uvSpan": [
+                112,
+                0
+              ]
+            }
+          ],
+          "children": [
+            {
+              "id": "jaw",
+              "pose": {
+                "translation": [
+                  0.000000000,
+                  4.000000000,
+                  -8.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -6,
+                    0,
+                    -16
+                  ],
+                  "to": [
+                    6,
+                    4,
+                    0
+                  ],
+                  "uvOrigin": [
+                    176,
+                    65
+                  ],
+                  "textureKey": "#jaw",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
+              ],
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "jarPath": "net/minecraft/client/model/object/skull/DragonHeadModel.class",
+  "classSha256Hex": "c7f62a960e7c753bc9d00f42998372b03ba32eb0449ab8a03e639d3ce4b6b679",
+  "bytecodeFloatProbe": [
+    -16,
+    -6,
+    -1,
+    -24,
+    -8,
+    -8,
+    -10,
+    -5,
+    -12,
+    -4,
+    -5,
+    -3,
+    -22,
+    3,
+    -12,
+    -4,
+    3,
+    -3,
+    -22,
+    -7.986666,
+    0.75,
+    -6,
+    -16,
+    12,
+    4,
+    16,
+    4,
+    -8
+  ],
+  "textureWidth": 256,
+  "textureHeight": 256,
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

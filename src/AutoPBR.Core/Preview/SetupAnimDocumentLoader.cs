@@ -26,8 +26,17 @@ internal static class SetupAnimDocumentLoader
         return true;
     }
 
-    public static bool IsEffectivelyOk(JsonObject doc)
+    public static bool IsEffectivelyOk(JsonObject doc) =>
+        IsEffectivelyOk(doc, new HashSet<string>(StringComparer.Ordinal));
+
+    private static bool IsEffectivelyOk(JsonObject doc, HashSet<string> visited)
     {
+        var self = (string?)doc["officialJvmName"];
+        if (!string.IsNullOrEmpty(self) && !visited.Add(self))
+        {
+            return false;
+        }
+
         if (string.Equals((string?)doc["extractionStatus"], "ok", StringComparison.OrdinalIgnoreCase))
         {
             return true;
@@ -39,9 +48,14 @@ internal static class SetupAnimDocumentLoader
         }
 
         var parent = inh.GetValue<string>();
-        return !string.IsNullOrEmpty(parent) &&
-               TryLoad(parent, out var parentDoc) &&
-               IsEffectivelyOk(parentDoc);
+        if (string.IsNullOrEmpty(parent) ||
+            string.Equals(parent, self, StringComparison.Ordinal) ||
+            visited.Contains(parent))
+        {
+            return false;
+        }
+
+        return TryLoad(parent, out var parentDoc) && IsEffectivelyOk(parentDoc, visited);
     }
 
     public static bool TryLoad(string officialJvmName, out JsonObject root)

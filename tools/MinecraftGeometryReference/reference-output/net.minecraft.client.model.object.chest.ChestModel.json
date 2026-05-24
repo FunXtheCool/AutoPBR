@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.chest.ChestModel",
+  "extractionStatus": "reference_java",
+  "factoryMethod": "createSingleBodyLayer",
+  "meshHostJvmName": "net.minecraft.client.model.object.chest.ChestModel",
+  "roots": [{
+  "id": "root",
+  "pose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [],
+  "children": [{
+  "id": "bottom",
+  "pose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [1.000000000, 0.000000000, 1.000000000],
+  "to": [15.00000000, 10.00000000, 15.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "lid",
+  "pose": {
+  "translation": [0.000000000, 9.000000000, 1.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [1.000000000, 0.000000000, 0.000000000],
+  "to": [15.00000000, 5.000000000, 14.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "lock",
+  "pose": {
+  "translation": [0.000000000, 9.000000000, 1.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [7.000000000, -2.000000000, 14.00000000],
+  "to": [9.000000000, 2.000000000, 15.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+]
+}
+]
+}

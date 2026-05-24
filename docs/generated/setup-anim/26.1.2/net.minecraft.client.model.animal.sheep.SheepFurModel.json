@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.sheep.SheepFurModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/sheep/SheepFurModel.class",
+  "classSha256Hex": "18e76fb1dd9238b6174f2a1876bf73669e566185c12b2f4bcfd803798385d23e",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.QuadrupedModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.QuadrupedModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

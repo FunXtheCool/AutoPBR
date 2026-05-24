@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.cow.CowModel",
+  "deltas": [
+    {
+      "kind": "previewBasis",
+      "description": "AutoPBR applies LivingEntityRenderer preview basis (scale -1,-1,1 per element) after mesh build; vanilla defers to renderer.",
+      "partId": "_all"
+    },
+    {
+      "kind": "other",
+      "description": "Idle animation channels (head pitch, leg swing) are driven in CleanRoomEntityModelRuntime, not static createBodyLayer IR."
+    }
+  ]
+}

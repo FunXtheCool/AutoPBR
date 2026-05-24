@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.bee.BabyBeeModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/bee/BabyBeeModel.class",
+  "classSha256Hex": "111448c9d00a790ba555f73a5c21a1097bd68ffe60f62f266b4e4f2af0cb34dd",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.bee.BeeModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.animal.bee.BeeModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

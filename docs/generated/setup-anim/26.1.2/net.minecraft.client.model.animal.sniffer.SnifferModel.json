@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.sniffer.SnifferModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/sniffer/SnifferModel.class",
+  "classSha256Hex": "ba25c98a5ce717cdc77228d7ad854cb3d35b4e9ea5de95c611bed7b0bcf48052",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.SnifferRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "xRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "yRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    }
+  ],
+  "bakedAnimations": [
+    {
+      "field": "sniffSearchAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.SnifferAnimation",
+      "definitionField": "SNIFFER_SNIFF_SEARCH",
+      "rootPartField": "root"
+    },
+    {
+      "field": "walkAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.SnifferAnimation",
+      "definitionField": "SNIFFER_WALK",
+      "rootPartField": "root"
+    },
+    {
+      "field": "digAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.SnifferAnimation",
+      "definitionField": "SNIFFER_DIG",
+      "rootPartField": "root"
+    },
+    {
+      "field": "longSniffAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.SnifferAnimation",
+      "definitionField": "SNIFFER_LONGSNIFF",
+      "rootPartField": "root"
+    },
+    {
+      "field": "standUpAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.SnifferAnimation",
+      "definitionField": "SNIFFER_STAND_UP",
+      "rootPartField": "root"
+    },
+    {
+      "field": "happyAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.SnifferAnimation",
+      "definitionField": "SNIFFER_HAPPY",
+      "rootPartField": "root"
+    },
+    {
+      "field": "sniffSniffAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.SnifferAnimation",
+      "definitionField": "SNIFFER_SNIFFSNIFF",
+      "rootPartField": "root"
+    }
+  ],
+  "playbackSteps": [
+    {
+      "mode": "applyWalk",
+      "animationField": "sniffSearchAnimation",
+      "walkPosField": "walkAnimationPos",
+      "walkSpeedField": "walkAnimationSpeed",
+      "speedScale": 9,
+      "posScale": 100
+    },
+    {
+      "mode": "applyWalk",
+      "animationField": "walkAnimation",
+      "walkPosField": "walkAnimationPos",
+      "walkSpeedField": "walkAnimationSpeed",
+      "speedScale": 9,
+      "posScale": 100
+    },
+    {
+      "mode": "apply",
+      "animationField": "digAnimation",
+      "stateField": "diggingAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "longSniffAnimation",
+      "stateField": "sniffingAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "standUpAnimation",
+      "stateField": "risingAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "happyAnimation",
+      "stateField": "feelingHappyAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "sniffSniffAnimation",
+      "stateField": "scentingAnimationState",
+      "ageField": "ageInTicks"
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.piglin.PiglinModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/piglin/PiglinModel.class",
+  "classSha256Hex": "12ae0a03e9faf5ba7c1d046b25d598db75d3a9ebf5898e38518f6930c2ce6ca8",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.monster.piglin.AbstractPiglinModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.monster.piglin.AbstractPiglinModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

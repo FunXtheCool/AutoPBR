@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.pig.PigModel",
+  "deltas": [
+    {
+      "kind": "previewBasis",
+      "description": "LivingEntityRenderer preview basis after static body-layer IR emit.",
+      "partId": "_all"
+    },
+    {
+      "kind": "other",
+      "description": "Pig snout cuboids merge with quadruped head via multi-island IR composition; leg scale flows from createBodyMesh bipush into createLegs iload+i2f."
+    }
+  ]
+}

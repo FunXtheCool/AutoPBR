@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.animal.nautilus.NautilusArmorModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "partial",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.nautilus.NautilusArmorModel).",
+    "Strict structural validation failed (3): cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027; cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027; duplicate_part_id: duplicate part id \u0027root\u0027 in tree",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "root",
+          "pose": {
+            "translation": [
+              0,
+              29,
+              -6
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              29,
+              -6
+            ]
+          },
+          "cuboids": [],
+          "children": []
+        },
+        {
+          "id": "shell",
+          "pose": {
+            "translation": [
+              0,
+              -13,
+              5
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              -13,
+              5
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -10,
+                -7,
+                14
+              ],
+              "to": [
+                0,
+                9,
+                14.0099999998
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "liftWarnings": [
+                "cube_deformation_obf_inferred"
+              ],
+              "inflate": 0.0099999998
+            },
+            {
+              "from": [
+                0,
+                -7,
+                14
+              ],
+              "to": [
+                8,
+                13,
+                14.0099999998
+              ],
+              "uvOrigin": [
+                0,
+                26
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "liftWarnings": [
+                "cube_deformation_obf_inferred"
+              ],
+              "inflate": 0.0099999998
+            },
+            {
+              "from": [
+                0,
+                6,
+                14
+              ],
+              "to": [
+                8,
+                6,
+                14
+              ],
+              "uvOrigin": [
+                48,
+                26
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "hbx.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.animal.nautilus.hbx",
+  "classSha256Hex": "1b98376765011c9e4773618b68c95295f3820023366941af50925f9826ab31dd",
+  "bytecodeFloatProbe": [
+    29,
+    -6,
+    -7,
+    -10,
+    -7,
+    14,
+    10,
+    16,
+    0.01,
+    -7,
+    -7,
+    14,
+    8,
+    20,
+    0.01,
+    -7,
+    6,
+    14,
+    8,
+    -13,
+    5
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

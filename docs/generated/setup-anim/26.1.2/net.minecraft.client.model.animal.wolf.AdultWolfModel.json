@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.wolf.AdultWolfModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/wolf/AdultWolfModel.class",
+  "classSha256Hex": "a77ac01866820190633546f0484590ce4c722c1740a106142c9c1733c600fe08",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.wolf.WolfModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.animal.wolf.WolfModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

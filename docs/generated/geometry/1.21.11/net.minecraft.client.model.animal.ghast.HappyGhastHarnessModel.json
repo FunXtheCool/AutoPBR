@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.animal.ghast.HappyGhastHarnessModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "partial",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.ghast.HappyGhastHarnessModel).",
+    "Strict structural validation failed (1): cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "harness",
+          "pose": {
+            "translation": [
+              0,
+              24,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              24,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -8,
+                -16,
+                -8
+              ],
+              "to": [
+                8,
+                0,
+                8
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "goggles",
+          "pose": {
+            "translation": [
+              0,
+              14,
+              -5.5
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              14,
+              -5.5
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -2.5,
+                -2.5,
+                16
+              ],
+              "to": [
+                2.5,
+                2.5,
+                16.150000006
+              ],
+              "uvOrigin": [
+                0,
+                32
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "liftWarnings": [
+                "cube_deformation_obf_inferred"
+              ],
+              "inflate": 0.150000006
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "hbl.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.animal.ghast.hbl",
+  "classSha256Hex": "8b3364fa17f55574690cab59b447b72e83ee75f40554c8141bdb3e681e994551",
+  "bytecodeFloatProbe": [
+    -8,
+    -16,
+    -8,
+    16,
+    16,
+    16,
+    24,
+    -8,
+    -2.5,
+    -2.5,
+    16,
+    5,
+    5,
+    0.15,
+    14,
+    -5.5,
+    4
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

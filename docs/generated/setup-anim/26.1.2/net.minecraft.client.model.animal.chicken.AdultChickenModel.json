@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.chicken.AdultChickenModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/chicken/AdultChickenModel.class",
+  "classSha256Hex": "b82673d40f01b9621eef2a415769cd4e6c12752717ce14a15103fa0428c6275f",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.ChickenRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.chicken.ChickenModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "xRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "yRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

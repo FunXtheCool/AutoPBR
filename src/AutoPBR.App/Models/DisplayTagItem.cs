@@ -1,5 +1,6 @@
-using Avalonia.Media.Imaging;
 using AutoPBR.Core.Models;
+
+using Avalonia.Media.Imaging;
 
 namespace AutoPBR.App.Models;
 

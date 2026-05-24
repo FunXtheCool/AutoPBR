@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.leash.LeashKnotModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/object/leash/LeashKnotModel.class",
+  "classSha256Hex": "897abcd5291e84a4781fa16b29fb0669b63014d05fd32964b57ba0175464262e",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "setupAnimEffectOnly": true,
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No setupAnim bytecode; effect model uses parent pose only.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

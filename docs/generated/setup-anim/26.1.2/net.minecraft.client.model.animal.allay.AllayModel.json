@@ -1,0 +1,928 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.allay.AllayModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/allay/AllayModel.class",
+  "classSha256Hex": "5bc96af5a5a541a74046b9faf8f5dc576bf77d6a083e7f630b2e802c00e5abd3",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.AllayRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "when": {
+          "state": "isDancing",
+          "cmp": "eq",
+          "value": true
+        },
+        "then": {
+          "partSelf": "xRot"
+        },
+        "else": {
+          "op": "mul",
+          "args": [
+            {
+              "state": "xRot"
+            },
+            {
+              "const": 0.017453292
+            }
+          ]
+        }
+      }
+    },
+    {
+      "partField": "head",
+      "property": "yRot",
+      "expr": {
+        "when": {
+          "state": "isDancing",
+          "cmp": "eq",
+          "value": true
+        },
+        "then": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "cos",
+                      "args": [
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "mul",
+                              "args": [
+                                {
+                                  "state": "ageInTicks"
+                                },
+                                {
+                                  "const": 0.13962634
+                                }
+                              ]
+                            },
+                            {
+                              "state": "walkAnimationSpeed"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "const": 30
+                    }
+                  ]
+                },
+                {
+                  "const": 0.017453292
+                }
+              ]
+            },
+            {
+              "op": "sub",
+              "args": [
+                {
+                  "const": 1
+                },
+                {
+                  "state": "spinningProgress"
+                }
+              ]
+            }
+          ]
+        },
+        "else": {
+          "op": "mul",
+          "args": [
+            {
+              "state": "yRot"
+            },
+            {
+              "const": 0.017453292
+            }
+          ]
+        }
+      }
+    },
+    {
+      "partField": "head",
+      "property": "zRot",
+      "expr": {
+        "when": {
+          "state": "isDancing",
+          "cmp": "eq",
+          "value": true
+        },
+        "then": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "cos",
+                      "args": [
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "mul",
+                              "args": [
+                                {
+                                  "state": "ageInTicks"
+                                },
+                                {
+                                  "const": 0.13962634
+                                }
+                              ]
+                            },
+                            {
+                              "state": "walkAnimationSpeed"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "const": 14
+                    }
+                  ]
+                },
+                {
+                  "const": 0.017453292
+                }
+              ]
+            },
+            {
+              "op": "sub",
+              "args": [
+                {
+                  "const": 1
+                },
+                {
+                  "state": "spinningProgress"
+                }
+              ]
+            }
+          ]
+        },
+        "else": {
+          "const": 0
+        }
+      }
+    },
+    {
+      "partField": "root",
+      "property": "yRot",
+      "expr": {
+        "when": {
+          "state": "isDancing",
+          "cmp": "eq",
+          "value": true
+        },
+        "then": {
+          "when": {
+            "state": "isSpinning",
+            "cmp": "eq",
+            "value": true
+          },
+          "then": {
+            "op": "mul",
+            "args": [
+              {
+                "const": 12.566371
+              },
+              {
+                "state": "spinningProgress"
+              }
+            ]
+          },
+          "else": {
+            "partSelf": "yRot"
+          }
+        },
+        "else": {
+          "partSelf": "yRot"
+        }
+      }
+    },
+    {
+      "partField": "root",
+      "property": "zRot",
+      "expr": {
+        "when": {
+          "state": "isDancing",
+          "cmp": "eq",
+          "value": true
+        },
+        "then": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "cos",
+                      "args": [
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "mul",
+                              "args": [
+                                {
+                                  "state": "ageInTicks"
+                                },
+                                {
+                                  "const": 0.13962634
+                                }
+                              ]
+                            },
+                            {
+                              "state": "walkAnimationSpeed"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "const": 16
+                    }
+                  ]
+                },
+                {
+                  "const": 0.017453292
+                }
+              ]
+            },
+            {
+              "op": "sub",
+              "args": [
+                {
+                  "const": 1
+                },
+                {
+                  "state": "spinningProgress"
+                }
+              ]
+            }
+          ]
+        },
+        "else": {
+          "const": 0
+        }
+      }
+    },
+    {
+      "partField": "root",
+      "property": "y",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "y"
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "cos",
+                    "args": [
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "state": "ageInTicks"
+                          },
+                          {
+                            "const": 0.15707964
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "const": 0.25
+                  }
+                ]
+              },
+              {
+                "op": "sub",
+                "args": [
+                  {
+                    "const": 1
+                  },
+                  {
+                    "op": "min",
+                    "args": [
+                      {
+                        "op": "div",
+                        "args": [
+                          {
+                            "state": "walkAnimationSpeed"
+                          },
+                          {
+                            "const": 0.3
+                          }
+                        ]
+                      },
+                      {
+                        "const": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "right_wing",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "const": 0.43633232
+          },
+          {
+            "op": "sub",
+            "args": [
+              {
+                "const": 1
+              },
+              {
+                "op": "min",
+                "args": [
+                  {
+                    "op": "div",
+                    "args": [
+                      {
+                        "state": "walkAnimationSpeed"
+                      },
+                      {
+                        "const": 0.3
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "left_wing",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "const": 0.43633232
+          },
+          {
+            "op": "sub",
+            "args": [
+              {
+                "const": 1
+              },
+              {
+                "op": "min",
+                "args": [
+                  {
+                    "op": "div",
+                    "args": [
+                      {
+                        "state": "walkAnimationSpeed"
+                      },
+                      {
+                        "const": 0.3
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "right_wing",
+      "property": "yRot",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "const": -0.7853982
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "cos",
+                        "args": [
+                          {
+                            "op": "mul",
+                            "args": [
+                              {
+                                "op": "add",
+                                "args": [
+                                  {
+                                    "op": "mul",
+                                    "args": [
+                                      {
+                                        "state": "ageInTicks"
+                                      },
+                                      {
+                                        "const": 20
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "state": "walkAnimationPos"
+                                  }
+                                ]
+                              },
+                              {
+                                "const": 0.017453292
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "const": 3.1415927
+                      }
+                    ]
+                  },
+                  {
+                    "const": 0.15
+                  }
+                ]
+              },
+              {
+                "state": "walkAnimationSpeed"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "left_wing",
+      "property": "yRot",
+      "expr": {
+        "op": "sub",
+        "args": [
+          {
+            "const": 0.7853982
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "cos",
+                        "args": [
+                          {
+                            "op": "mul",
+                            "args": [
+                              {
+                                "op": "add",
+                                "args": [
+                                  {
+                                    "op": "mul",
+                                    "args": [
+                                      {
+                                        "state": "ageInTicks"
+                                      },
+                                      {
+                                        "const": 20
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "state": "walkAnimationPos"
+                                  }
+                                ]
+                              },
+                              {
+                                "const": 0.017453292
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "const": 3.1415927
+                      }
+                    ]
+                  },
+                  {
+                    "const": 0.15
+                  }
+                ]
+              },
+              {
+                "state": "walkAnimationSpeed"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "body",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "min",
+            "args": [
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "state": "walkAnimationSpeed"
+                  },
+                  {
+                    "const": 0.3
+                  }
+                ]
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": 0.7853982
+          }
+        ]
+      }
+    },
+    {
+      "partField": "right_arm",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "lerp",
+            "args": [
+              {
+                "const": -1.0471976
+              },
+              {
+                "const": -1.134464
+              },
+              {
+                "state": "holdingAnimationProgress"
+              }
+            ]
+          },
+          {
+            "op": "min",
+            "args": [
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "state": "walkAnimationSpeed"
+                  },
+                  {
+                    "const": 0.3
+                  }
+                ]
+              },
+              {
+                "const": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "left_arm",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "lerp",
+            "args": [
+              {
+                "const": -1.0471976
+              },
+              {
+                "const": -1.134464
+              },
+              {
+                "state": "holdingAnimationProgress"
+              }
+            ]
+          },
+          {
+            "op": "min",
+            "args": [
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "state": "walkAnimationSpeed"
+                  },
+                  {
+                    "const": 0.3
+                  }
+                ]
+              },
+              {
+                "const": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "right_arm",
+      "property": "zRot",
+      "expr": {
+        "op": "sub",
+        "args": [
+          {
+            "const": 0.43633232
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "cos",
+                    "args": [
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "mul",
+                            "args": [
+                              {
+                                "state": "ageInTicks"
+                              },
+                              {
+                                "const": 0.15707964
+                              }
+                            ]
+                          },
+                          {
+                            "const": 4.712389
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "const": 3.1415927
+                  }
+                ]
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "const": 0.075
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "sub",
+                        "args": [
+                          {
+                            "const": 1
+                          },
+                          {
+                            "op": "min",
+                            "args": [
+                              {
+                                "op": "div",
+                                "args": [
+                                  {
+                                    "state": "walkAnimationSpeed"
+                                  },
+                                  {
+                                    "const": 0.3
+                                  }
+                                ]
+                              },
+                              {
+                                "const": 1
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "op": "sub",
+                        "args": [
+                          {
+                            "const": 1
+                          },
+                          {
+                            "state": "holdingAnimationProgress"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "left_arm",
+      "property": "zRot",
+      "expr": {
+        "op": "neg",
+        "args": [
+          {
+            "op": "sub",
+            "args": [
+              {
+                "const": 0.43633232
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "cos",
+                        "args": [
+                          {
+                            "op": "add",
+                            "args": [
+                              {
+                                "op": "mul",
+                                "args": [
+                                  {
+                                    "state": "ageInTicks"
+                                  },
+                                  {
+                                    "const": 0.15707964
+                                  }
+                                ]
+                              },
+                              {
+                                "const": 4.712389
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "const": 3.1415927
+                      }
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "const": 0.075
+                      },
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "sub",
+                            "args": [
+                              {
+                                "const": 1
+                              },
+                              {
+                                "op": "min",
+                                "args": [
+                                  {
+                                    "op": "div",
+                                    "args": [
+                                      {
+                                        "state": "walkAnimationSpeed"
+                                      },
+                                      {
+                                        "const": 0.3
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "const": 1
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "op": "sub",
+                            "args": [
+                              {
+                                "const": 1
+                              },
+                              {
+                                "state": "holdingAnimationProgress"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "right_arm",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "const": 0.27925268
+          },
+          {
+            "state": "holdingAnimationProgress"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "left_arm",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "const": -0.27925268
+          },
+          {
+            "state": "holdingAnimationProgress"
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

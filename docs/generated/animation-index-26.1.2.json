@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "profile": "named_jar_26.1.2",
+  "mappingKind": "named_jar",
+  "clientJarNote": "One row per AnimationDefinition holder class in the batch list. Shards under animation/\u003CversionLabel\u003E/: class SHA-256 and javap-lifted \u003Cclinit\u003E channel/keyframe data.",
+  "entries": [
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.ArmadilloAnimation",
+      "shardRelPath": "animation/26.1.2/net.minecraft.client.animation.definitions.ArmadilloAnimation.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "ok",
+      "classSha256Hex": "a6698a0ca66928d198c89e0b5e5ac50c4b2b621594b3173c1cae1ba2fd813d1f",
+      "jarPath": "net/minecraft/client/animation/definitions/ArmadilloAnimation.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.BabyArmadilloAnimation",
+      "shardRelPath": "animation/26.1.2/net.minecraft.client.animation.definitions.BabyArmadilloAnimation.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "ok",
+      "classSha256Hex": "441c51ec7c2ae8fc03634e3b84837c8f9ff2c632abc91235ef4f95744d6482cb",
+      "jarPath": "net/minecraft/client/animation/definitions/BabyArmadilloAnimation.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.BabyAxolotlAnimation",
+      "shardRelPath": "animation/26.1.2/net.minecraft.client.animation.definitions.BabyAxolotlAnimation.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "ok",
+      "classSha256Hex": "4483d99a91189a1f330ac8ef66bdc76b1a52232dc1e041193fe7638d26f47bdf",
+      "jarPath": "net/minecraft/client/animation/definitions/BabyAxolotlAnimation.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.BabyRabbitAnimation",
+      "shardRelPath": "animation/26.1.2/net.minecraft.client.animation.definitions.BabyRabbitAnimation.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "ok",
+      "classSha256Hex": "16201d8fded449eb585ba6ab395f867f0704812e6172cf767885d468a095a34c",
+      "jarPath": "net/minecraft/client/animation/definitions/BabyRabbitAnimation.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.BatAnimation",
+      "shardRelPath": "animation/26.1.2/net.minecraft.client.animation.definitions.BatAnimation.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "ok",
+      "classSha256Hex": "606f0ca93999cf3f2781cf6534a24a722809893ca410ba7c54fac06fb43bfa64",
+      "jarPath": "net/minecraft/client/animation/definitions/BatAnimation.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.BreezeAnimation",
+      "shardRelPath": "animation/26.1.2/net.minecraft.client.animation.definitions.BreezeAnimation.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "ok",
+      "classSha256Hex": "2aa22d7094b262d42ed43aad6c7bc798a0a781d9a960832b0e50040330d77bba",
+      "jarPath": "net/minecraft/client/animation/definitions/BreezeAnimation.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.CamelAnimation",
+      "shardRelPath": "animation/26.1.2/net.minecraft.client.animation.definitions.CamelAnimation.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "ok",
+      "classSha256Hex": "315f9cd727250ffd48d9148b935cabefa08db5aa4f0d6c3afd16ff614bf8ad12",
+      "jarPath": "net/minecraft/client/animation/definitions/CamelAnimation.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.CamelBabyAnimation",
+      "shardRelPath": "animation/26.1.2/net.minecraft.client.animation.definitions.CamelBabyAnimation.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "ok",
+      "classSha256Hex": "2205fb8355e8443810e38c7345049c48d47df37e65c1d40c99614b8c20a89632",
+      "jarPath": "net/minecraft/client/animation/definitions/CamelBabyAnimation.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.CopperGolemAnimation",
+      "shardRelPath": "animation/26.1.2/net.minecraft.client.animation.definitions.CopperGolemAnimation.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "ok",
+      "classSha256Hex": "219ed167de7db8a964c1bb36aa9fb03eadbc49f71952e84a1a55ddb29658fecc",
+      "jarPath": "net/minecraft/client/animation/definitions/CopperGolemAnimation.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.CreakingAnimation",
+      "shardRelPath": "animation/26.1.2/net.minecraft.client.animation.definitions.CreakingAnimation.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "ok",
+      "classSha256Hex": "cabaf62898281358532eff8089e1758c1d2830a0ed15d4c3d5038c921a78c2ca",
+      "jarPath": "net/minecraft/client/animation/definitions/CreakingAnimation.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.FoxBabyAnimation",
+      "shardRelPath": "animation/26.1.2/net.minecraft.client.animation.definitions.FoxBabyAnimation.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "ok",
+      "classSha256Hex": "77bc937add3d1d2f5505bce047cc5432358027a4d31859e0447737d7438494d0",
+      "jarPath": "net/minecraft/client/animation/definitions/FoxBabyAnimation.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.FrogAnimation",
+      "shardRelPath": "animation/26.1.2/net.minecraft.client.animation.definitions.FrogAnimation.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "ok",
+      "classSha256Hex": "15175c2a0ea250e38605e399fceb8fab48b57b856f23e5edb5bc5a0f369c3c54",
+      "jarPath": "net/minecraft/client/animation/definitions/FrogAnimation.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.NautilusAnimation",
+      "shardRelPath": "animation/26.1.2/net.minecraft.client.animation.definitions.NautilusAnimation.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "ok",
+      "classSha256Hex": "31d95f599659e1c7761b28911015a0f224f7bf927e8c66aad615353ce8146e22",
+      "jarPath": "net/minecraft/client/animation/definitions/NautilusAnimation.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.RabbitAnimation",
+      "shardRelPath": "animation/26.1.2/net.minecraft.client.animation.definitions.RabbitAnimation.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "ok",
+      "classSha256Hex": "ed604c8e90bfe135fea08dfde5cccd88fa5a86f801f02b849a6c188329651349",
+      "jarPath": "net/minecraft/client/animation/definitions/RabbitAnimation.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.SnifferAnimation",
+      "shardRelPath": "animation/26.1.2/net.minecraft.client.animation.definitions.SnifferAnimation.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "ok",
+      "classSha256Hex": "78f98091622132f22d3a8e1d14377f9c4e510cef0a204d6e861bd830d6f8168e",
+      "jarPath": "net/minecraft/client/animation/definitions/SnifferAnimation.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.WardenAnimation",
+      "shardRelPath": "animation/26.1.2/net.minecraft.client.animation.definitions.WardenAnimation.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "ok",
+      "classSha256Hex": "f177adb0579fcf3aa5f0becd055bef594721277557d6eded872a8465d4da84be",
+      "jarPath": "net/minecraft/client/animation/definitions/WardenAnimation.class"
+    }
+  ]
+}

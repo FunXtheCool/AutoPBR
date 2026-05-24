@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://autopbr.local/schema/setup-anim-ir.json",
+  "title": "AutoPBR vanilla setupAnim IR (model pose + definition playback)",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "versionLabel",
+    "officialJvmName",
+    "profile",
+    "jarPath",
+    "classSha256Hex",
+    "extractionStatus"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "versionLabel": { "type": "string" },
+    "officialJvmName": { "type": "string" },
+    "profile": { "type": "string" },
+    "jarPath": { "type": "string" },
+    "classSha256Hex": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{64}$"
+    },
+    "extractionStatus": {
+      "type": "string",
+      "enum": ["ok", "partial"]
+    },
+    "extractionNotes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "renderStateType": { "type": "string" },
+    "setupAnimMethod": { "type": "string" },
+    "inheritsSetupAnimFrom": { "type": "string" },
+    "superSetupAnimCall": { "type": "boolean" },
+    "assignments": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/assignment" }
+    },
+    "bakedAnimations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/bakedAnimation" }
+    },
+    "playbackSteps": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/playbackStep" }
+    }
+  },
+  "$defs": {
+    "expr": {
+      "oneOf": [
+        { "type": "object", "required": ["const"], "properties": { "const": { "type": "number" } } },
+        { "type": "object", "required": ["state"], "properties": { "state": { "type": "string" } } },
+        {
+          "type": "object",
+          "required": ["op", "args"],
+          "properties": {
+            "op": {
+              "type": "string",
+              "enum": ["add", "sub", "mul", "div", "neg", "sin", "cos"]
+            },
+            "args": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/expr" }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["when", "then", "else"],
+          "properties": {
+            "when": { "$ref": "#/$defs/condition" },
+            "then": { "$ref": "#/$defs/expr" },
+            "else": { "$ref": "#/$defs/expr" }
+          }
+        }
+      ]
+    },
+    "condition": {
+      "type": "object",
+      "required": ["state", "cmp"],
+      "properties": {
+        "state": { "type": "string" },
+        "cmp": { "type": "string", "enum": ["eq", "ne", "gt", "ge", "lt", "le"] },
+        "value": { "type": ["number", "boolean"] }
+      }
+    },
+    "assignment": {
+      "type": "object",
+      "required": ["partField", "property", "expr"],
+      "properties": {
+        "partField": { "type": "string" },
+        "property": {
+          "type": "string",
+          "enum": ["xRot", "yRot", "zRot", "x", "y", "z", "visible"]
+        },
+        "expr": { "$ref": "#/$defs/expr" }
+      }
+    },
+    "bakedAnimation": {
+      "type": "object",
+      "required": ["field", "definitionClass", "definitionField", "rootPartField"],
+      "properties": {
+        "field": { "type": "string" },
+        "definitionClass": { "type": "string" },
+        "definitionField": { "type": "string" },
+        "rootPartField": { "type": "string" }
+      }
+    },
+    "playbackStep": {
+      "type": "object",
+      "required": ["mode", "animationField"],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["apply", "applyWalk", "setVisible"]
+        },
+        "animationField": { "type": "string" },
+        "stateField": { "type": "string" },
+        "ageField": { "type": "string" },
+        "walkPosField": { "type": "string" },
+        "walkSpeedField": { "type": "string" },
+        "speedScale": { "type": "number" },
+        "posScale": { "type": "number" },
+        "partField": { "type": "string" },
+        "whenStateField": { "type": "string" },
+        "whenEquals": { "type": ["boolean", "number"] },
+        "whenNot": { "type": "boolean" }
+      }
+    }
+  }
+}

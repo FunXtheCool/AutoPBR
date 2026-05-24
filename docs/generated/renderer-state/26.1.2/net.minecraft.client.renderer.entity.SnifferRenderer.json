@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.renderer.entity.SnifferRenderer",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.SnifferRenderState",
+  "modelJvmNames": [
+    "net.minecraft.client.model.animal.sniffer.SnifferModel",
+    "net.minecraft.client.model.animal.sniffer.SniffletModel"
+  ],
+  "extractionStatus": "partial",
+  "extractionNotes": [
+    "extractRenderState: LivingEntityRenderer super then entity AnimationState.copyFrom into render state (javap 26.1.2 SnifferRenderer lines 30–37).",
+    "SnifferModel.setupAnim: head look (xRot/yRot), isSearching → sniffSearch applyWalk, walk applyWalk, KeyframeAnimation.apply on digging/sniffing/rising/feelingHappy/scenting AnimationState fields with ageInTicks.",
+    "Preview driver sniffer_clip_cycle advances one non-walk clip at a time; inactive AnimationState fields use -1 (skip apply). Dig/scent segment lengths shortened for preview cadence (vanilla clips 8s)."
+  ],
+  "animationStateFields": [
+    { "renderStateField": "diggingAnimationState", "setupAnimStateField": "diggingAnimationState", "entityAnimationState": "Sniffer.digging" },
+    { "renderStateField": "sniffingAnimationState", "setupAnimStateField": "sniffingAnimationState", "entityAnimationState": "Sniffer.sniffing" },
+    { "renderStateField": "risingAnimationState", "setupAnimStateField": "risingAnimationState", "entityAnimationState": "Sniffer.rising" },
+    { "renderStateField": "feelingHappyAnimationState", "setupAnimStateField": "feelingHappyAnimationState", "entityAnimationState": "Sniffer.feelingHappy" },
+    { "renderStateField": "scentingAnimationState", "setupAnimStateField": "scentingAnimationState", "entityAnimationState": "Sniffer.scenting" }
+  ],
+  "livingEntityFields": [
+    "ageInTicks",
+    "walkAnimationPos",
+    "walkAnimationSpeed",
+    "xRot",
+    "yRot",
+    "isSearching"
+  ],
+  "previewDriver": "sniffer_clip_cycle",
+  "clipLengthsSeconds": {
+    "walkOnly": 2,
+    "sniffingAnimationState": 1,
+    "diggingAnimationState": 2,
+    "feelingHappyAnimationState": 2,
+    "scentingAnimationState": 2,
+    "risingAnimationState": 3
+  }
+}

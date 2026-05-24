@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.golem.CopperGolemModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/golem/CopperGolemModel.class",
+  "classSha256Hex": "72213f54f64c78a16560309c618944a78e654668f4e6338900c9ea0cdc0a984b",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.CopperGolemRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "xRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "yRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    }
+  ],
+  "bakedAnimations": [
+    {
+      "field": "walkAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.CopperGolemAnimation",
+      "definitionField": "COPPER_GOLEM_WALK",
+      "rootPartField": "root"
+    },
+    {
+      "field": "walkWithItemAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.CopperGolemAnimation",
+      "definitionField": "COPPER_GOLEM_WALK_ITEM",
+      "rootPartField": "root"
+    },
+    {
+      "field": "idleAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.CopperGolemAnimation",
+      "definitionField": "COPPER_GOLEM_IDLE",
+      "rootPartField": "root"
+    },
+    {
+      "field": "interactionGetItem",
+      "definitionClass": "net.minecraft.client.animation.definitions.CopperGolemAnimation",
+      "definitionField": "COPPER_GOLEM_CHEST_INTERACTION_NOITEM_GET",
+      "rootPartField": "root"
+    },
+    {
+      "field": "interactionGetNoItem",
+      "definitionClass": "net.minecraft.client.animation.definitions.CopperGolemAnimation",
+      "definitionField": "COPPER_GOLEM_CHEST_INTERACTION_NOITEM_NOGET",
+      "rootPartField": "root"
+    },
+    {
+      "field": "interactionDropItem",
+      "definitionClass": "net.minecraft.client.animation.definitions.CopperGolemAnimation",
+      "definitionField": "COPPER_GOLEM_CHEST_INTERACTION_ITEM_DROP",
+      "rootPartField": "root"
+    },
+    {
+      "field": "interactionDropNoItem",
+      "definitionClass": "net.minecraft.client.animation.definitions.CopperGolemAnimation",
+      "definitionField": "COPPER_GOLEM_CHEST_INTERACTION_ITEM_NODROP",
+      "rootPartField": "root"
+    }
+  ],
+  "playbackSteps": [
+    {
+      "mode": "applyWalk",
+      "animationField": "walkAnimation",
+      "walkPosField": "walkAnimationPos",
+      "walkSpeedField": "walkAnimationSpeed",
+      "speedScale": 2.5,
+      "posScale": 2.5
+    },
+    {
+      "mode": "applyWalk",
+      "animationField": "walkWithItemAnimation",
+      "walkPosField": "walkAnimationPos",
+      "walkSpeedField": "walkAnimationSpeed",
+      "speedScale": 2.5,
+      "posScale": 2.5
+    },
+    {
+      "mode": "apply",
+      "animationField": "idleAnimation",
+      "stateField": "idleAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "interactionGetItem",
+      "stateField": "interactionGetItem",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "interactionGetNoItem",
+      "stateField": "interactionGetNoItem",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "interactionDropItem",
+      "stateField": "interactionDropItem",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "interactionDropNoItem",
+      "stateField": "interactionDropNoItem",
+      "ageField": "ageInTicks"
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

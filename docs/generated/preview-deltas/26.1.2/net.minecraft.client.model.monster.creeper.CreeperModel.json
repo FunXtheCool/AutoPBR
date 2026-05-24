@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.creeper.CreeperModel",
+  "deltas": [
+    {
+      "kind": "skipCubeDeformation",
+      "description": "Some lifted cuboids may omit CubeDeformation inflate until bytecode lift fully resolves deformation slots.",
+      "partId": "head"
+    },
+    {
+      "kind": "previewBasis",
+      "description": "LivingEntityRenderer preview basis.",
+      "partId": "_all"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.renderer.entity.WardenRenderer",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.WardenRenderState",
+  "modelJvmNames": [
+    "net.minecraft.client.model.monster.warden.WardenModel"
+  ],
+  "extractionStatus": "partial",
+  "extractionNotes": [
+    "extractRenderState: MobRenderer super then tendrilAnimation/heartAnimation from entity getters; AnimationState.copyFrom for roar/sniff/emerge/digging/attack/sonicBoom (javap 26.1.2).",
+    "WardenRenderer ctor bakes four extra WardenModel layers (bioluminescent, pulsating, tendrils, heart) — preview uses main WARDEN layer mesh only.",
+    "Preview driver warden_clip_cycle advances one mood clip per segment; inactive AnimationState fields use -1 (skip apply).",
+    "Full RendererStateLift compiler blocked: multi-model renderer + entity float probes — see docs/archive/p6-renderer-state-lift-blockers.md."
+  ],
+  "animationStateFields": [
+    { "renderStateField": "roarAnimationState", "setupAnimStateField": "roarAnimationState", "entityAnimationState": "Warden.roar" },
+    { "renderStateField": "sniffAnimationState", "setupAnimStateField": "sniffAnimationState", "entityAnimationState": "Warden.sniff" },
+    { "renderStateField": "emergeAnimationState", "setupAnimStateField": "emergeAnimationState", "entityAnimationState": "Warden.emerge" },
+    { "renderStateField": "diggingAnimationState", "setupAnimStateField": "diggingAnimationState", "entityAnimationState": "Warden.digging" },
+    { "renderStateField": "attackAnimationState", "setupAnimStateField": "attackAnimationState", "entityAnimationState": "Warden.attack" },
+    { "renderStateField": "sonicBoomAnimationState", "setupAnimStateField": "sonicBoomAnimationState", "entityAnimationState": "Warden.sonicBoom" }
+  ],
+  "livingEntityFields": [
+    "ageInTicks",
+    "walkAnimationPos",
+    "walkAnimationSpeed",
+    "xRot",
+    "yRot",
+    "tendrilAnimation",
+    "heartAnimation"
+  ],
+  "previewDriver": "warden_clip_cycle",
+  "clipLengthsSeconds": {
+    "walkOnly": 2,
+    "sniffAnimationState": 2,
+    "emergeAnimationState": 3,
+    "roarAnimationState": 2,
+    "diggingAnimationState": 2,
+    "attackAnimationState": 1.5,
+    "sonicBoomAnimationState": 2
+  }
+}

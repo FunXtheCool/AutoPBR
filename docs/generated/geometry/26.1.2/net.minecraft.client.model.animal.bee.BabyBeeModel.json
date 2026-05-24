@@ -1,0 +1,413 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.bee.BabyBeeModel",
+  "profile": "named_jar_26.1.2",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.bee.BabyBeeModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0.000000000,
+          0.000000000,
+          0.000000000
+        ],
+        "rotationEulerRad": [
+          0.000000000,
+          0.000000000,
+          0.000000000
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "bone",
+          "pose": {
+            "translation": [
+              0.000000000,
+              19.66670036,
+              -1.856699944
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                1,
+                -1.66670001,
+                -2.16330004
+              ],
+              "to": [
+                2,
+                0.33329999,
+                -0.16330004
+              ],
+              "uvOrigin": [
+                6,
+                12
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            },
+            {
+              "from": [
+                -2,
+                -1.66670001,
+                -2.19330001
+              ],
+              "to": [
+                -1,
+                0.33329999,
+                -0.19330001
+              ],
+              "uvOrigin": [
+                0,
+                12
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": [
+            {
+              "id": "body",
+              "pose": {
+                "translation": [
+                  0.000000000,
+                  1.333299994,
+                  2.356699944
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -2,
+                    -2,
+                    -2.5
+                  ],
+                  "to": [
+                    2,
+                    2,
+                    2.5
+                  ],
+                  "uvOrigin": [
+                    0,
+                    0
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "stinger",
+              "pose": {
+                "translation": [
+                  0.000000000,
+                  0.5000000000,
+                  2.500000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    0,
+                    -0.5,
+                    0
+                  ],
+                  "to": [
+                    0,
+                    0.5,
+                    1
+                  ],
+                  "uvOrigin": [
+                    13,
+                    2
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "right_wing",
+              "pose": {
+                "translation": [
+                  -1.000000000,
+                  -0.6667000055,
+                  0.8567000031
+                ],
+                "rotationEulerRad": [
+                  0.2181999981,
+                  0.3490999937,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -3,
+                    0,
+                    0
+                  ],
+                  "to": [
+                    0,
+                    0,
+                    3
+                  ],
+                  "uvOrigin": [
+                    3,
+                    9
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "left_wing",
+              "pose": {
+                "translation": [
+                  1.000000000,
+                  -0.6667000055,
+                  0.8567000031
+                ],
+                "rotationEulerRad": [
+                  0.2181999981,
+                  -0.3490999937,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "to": [
+                    3,
+                    0,
+                    3
+                  ],
+                  "uvOrigin": [
+                    -3,
+                    9
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                  "mirrorU": true
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "front_legs",
+              "pose": {
+                "translation": [
+                  0.000000000,
+                  3.333300114,
+                  1.856699944
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -1.5,
+                    0,
+                    0
+                  ],
+                  "to": [
+                    1.5,
+                    1,
+                    0
+                  ],
+                  "uvOrigin": [
+                    13,
+                    0
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "middle_legs",
+              "pose": {
+                "translation": [
+                  0.000000000,
+                  3.333300114,
+                  2.856699944
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -1.5,
+                    0,
+                    0
+                  ],
+                  "to": [
+                    1.5,
+                    1,
+                    0
+                  ],
+                  "uvOrigin": [
+                    13,
+                    1
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "back_legs",
+              "pose": {
+                "translation": [
+                  0.000000000,
+                  3.333300114,
+                  3.856699944
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -1.5,
+                    0,
+                    0
+                  ],
+                  "to": [
+                    1.5,
+                    1,
+                    0
+                  ],
+                  "uvOrigin": [
+                    13,
+                    2
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
+              ],
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "jarPath": "net/minecraft/client/model/animal/bee/BabyBeeModel.class",
+  "classSha256Hex": "111448c9d00a790ba555f73a5c21a1097bd68ffe60f62f266b4e4f2af0cb34dd",
+  "bytecodeFloatProbe": [
+    -1.6667,
+    -2.1633,
+    -2,
+    -1.6667,
+    -2.1933,
+    19.6667,
+    -1.8567,
+    -2,
+    -2,
+    -2.5,
+    4,
+    4,
+    5,
+    1.3333,
+    2.3567,
+    -0.5,
+    0.5,
+    2.5,
+    -3,
+    3,
+    3,
+    -1,
+    -0.6667,
+    0.8567,
+    0.2182,
+    0.3491,
+    3,
+    3,
+    -0.6667,
+    0.8567,
+    0.2182,
+    -0.3491,
+    -1.5,
+    3,
+    3.3333,
+    1.8567,
+    -1.5,
+    3,
+    3.3333,
+    2.8567,
+    -1.5,
+    3,
+    3.3333,
+    3.8567
+  ],
+  "textureWidth": 32,
+  "textureHeight": 32,
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

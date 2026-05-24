@@ -1,0 +1,194 @@
+using System.Numerics;
+using System.Text.Json;
+using AutoPBR.Core.Preview;
+using AutoPBR.Tests.Shared;
+
+namespace AutoPBR.Core.Tests;
+
+/// <summary>
+/// Hoglin body uses <c>PartPose.offsetAndRotation</c>; default LER fold (<c>S * LocalToParent</c>) matches T2 viewport.
+/// Baby hoglin shares the same policy (see <c>BabyHoglinModel</c> assembly pilot).
+/// </summary>
+public sealed class GeometryIrHoglinViewportLerTests
+{
+    private const string HoglinJvm = "net.minecraft.client.model.monster.hoglin.HoglinModel";
+    private const string BabyHoglinJvm = "net.minecraft.client.model.monster.hoglin.BabyHoglinModel";
+
+    [Theory]
+    [InlineData(HoglinJvm)]
+    [InlineData(BabyHoglinJvm)]
+    public void Hoglin_family_does_not_use_flat_offset_quadruped_ler_right_compose(string officialJvm)
+    {
+        Assert.False(CleanRoomEntityModelRuntime.UsesFlatPartPoseOffsetQuadrupedJvm(officialJvm));
+        Assert.False(
+            CleanRoomEntityModelRuntime.ResolveGeometryIrLerMirrorRightComposeLocalChain(
+                officialJvm,
+                "hoglinmodel",
+                "assets/minecraft/textures/entity/hoglin/hoglin.png"));
+    }
+
+    [Fact]
+    public void HoglinModel_creeper_flat_ler_inverts_head_leg_centroids()
+    {
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{HoglinJvm}.json");
+        using var doc = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(HoglinJvm, doc.RootElement.Clone());
+
+        var defaultMesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTestsWithLerCompose(
+            "entity/test", HoglinJvm, 128, 64, repaired, lerMirrorRightComposeLocalChain: false, out var err0);
+        var flatMesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTestsWithLerCompose(
+            "entity/test", HoglinJvm, 128, 64, repaired, lerMirrorRightComposeLocalChain: true, out var err1);
+        Assert.NotNull(defaultMesh);
+        Assert.NotNull(flatMesh);
+        Assert.Null(err0);
+        Assert.Null(err1);
+
+        var (defaultHead, defaultLeg) = MeasureHeadLegCentroidY(defaultMesh!, repaired, 128, 64, HoglinJvm);
+        var (flatHead, flatLeg) = MeasureHeadLegCentroidY(flatMesh!, repaired, 128, 64, HoglinJvm);
+
+        Assert.True(defaultLeg < defaultHead, $"default LER: legY={defaultLeg:F3} headY={defaultHead:F3}");
+        Assert.False(flatLeg < flatHead, $"flat LER must invert ordering: legY={flatLeg:F3} headY={flatHead:F3}");
+    }
+
+    [Theory]
+    [InlineData("net.minecraft.client.model.animal.polarbear.PolarBearModel", true)]
+    [InlineData("net.minecraft.client.model.animal.panda.PandaModel", true)]
+    [InlineData("net.minecraft.client.model.animal.polarbear.BabyPolarBearModel", true)]
+    [InlineData("net.minecraft.client.model.animal.panda.BabyPandaModel", true)]
+    public void Panda_polar_bear_family_ler_compose_matches_viewport(string officialJvm, bool expectRightCompose)
+    {
+        Assert.Equal(
+            expectRightCompose,
+            CleanRoomEntityModelRuntime.ResolveGeometryIrLerMirrorRightComposeLocalChain(
+                officialJvm,
+                stemLower: null,
+                normalizedAssetPath: null));
+
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{officialJvm}.json");
+        using var doc = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(officialJvm, doc.RootElement.Clone());
+
+        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTestsWithLerCompose(
+            "entity/test",
+            officialJvm,
+            128,
+            64,
+            repaired,
+            lerMirrorRightComposeLocalChain: expectRightCompose,
+            out var err);
+        Assert.NotNull(mesh);
+        Assert.Null(err);
+
+        var (headY, legY) = MeasureHeadLegCentroidY(mesh!, repaired, 128, 64, officialJvm);
+        Assert.True(legY < headY, $"{officialJvm}: legY={legY:F3} headY={headY:F3}");
+    }
+
+    [Theory]
+    [InlineData(HoglinJvm, 128, 64)]
+    [InlineData(BabyHoglinJvm, 128, 64)]
+    public void Hoglin_family_geometry_ir_viewport_legs_below_head(string officialJvm, int atlasW, int atlasH)
+    {
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        if (!GeometryIrTestTierSupport.IsClientJarPresent(repo))
+        {
+            return;
+        }
+
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{officialJvm}.json");
+        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
+            !string.Equals(status, "ok", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        using var doc = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var shardRoot = doc.RootElement.Clone();
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(officialJvm, shardRoot);
+
+        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+            "entity/test",
+            new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2)),
+            officialJvm,
+            atlasW,
+            atlasH,
+            out var failure,
+            geometryRootOverride: repaired);
+        Assert.NotNull(mesh);
+        Assert.Null(failure);
+
+        var (headY, legY) = MeasureHeadLegCentroidY(mesh!, repaired, atlasW, atlasH, officialJvm);
+        Assert.True(legY < headY, $"{officialJvm}: expected legs below head; legY={legY:F4} headY={headY:F4}");
+    }
+
+    private static (float HeadY, float LegY) MeasureHeadLegCentroidY(
+        MergedJavaBlockModel mesh,
+        JsonElement geometryRoot,
+        int atlasW,
+        int atlasH,
+        string officialJvm)
+    {
+        var options = new GeometryIrMeshEmitOptions
+        {
+            RootTransform = Matrix4x4.Identity,
+            DefaultPartScale = 1f,
+            AtlasWidth = atlasW,
+            AtlasHeight = atlasH,
+            Fidelity = GeometryIrEmitFidelity.Parity,
+            PreviewDegenerateAxisThickness = 0f,
+            OfficialJvmName = officialJvm,
+        };
+        var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(geometryRoot, options);
+
+        float headSum = 0f;
+        var headCount = 0;
+        float legSum = 0f;
+        var legCount = 0;
+
+        for (var i = 0; i < mesh.Elements.Count; i++)
+        {
+            var partId = partIds[i];
+            TransformWorldCorners(mesh.Elements[i], out var wMin, out var wMax);
+            var cy = (wMin.Y + wMax.Y) * 0.5f;
+            if (partId.Contains("head", StringComparison.OrdinalIgnoreCase) &&
+                !partId.Contains("leg", StringComparison.OrdinalIgnoreCase))
+            {
+                headSum += cy;
+                headCount++;
+            }
+
+            if (partId.Contains("leg", StringComparison.OrdinalIgnoreCase))
+            {
+                legSum += cy;
+                legCount++;
+            }
+        }
+
+        Assert.True(headCount > 0 && legCount > 0);
+        return (headSum / headCount, legSum / legCount);
+    }
+
+    private static void TransformWorldCorners(ModelElement el, out Vector3 wMin, out Vector3 wMax)
+    {
+        wMin = new Vector3(float.PositiveInfinity);
+        wMax = new Vector3(float.NegativeInfinity);
+        ReadOnlySpan<(float x, float y, float z)> corners =
+        [
+            (el.From[0], el.From[1], el.From[2]),
+            (el.To[0], el.From[1], el.From[2]),
+            (el.From[0], el.To[1], el.From[2]),
+            (el.To[0], el.To[1], el.From[2]),
+            (el.From[0], el.From[1], el.To[2]),
+            (el.To[0], el.From[1], el.To[2]),
+            (el.From[0], el.To[1], el.To[2]),
+            (el.To[0], el.To[1], el.To[2]),
+        ];
+        foreach (var (x, y, z) in corners)
+        {
+            var w = Vector3.Transform(new Vector3(x, y, z), el.LocalToParent);
+            wMin = Vector3.Min(wMin, w);
+            wMax = Vector3.Max(wMax, w);
+        }
+    }
+}

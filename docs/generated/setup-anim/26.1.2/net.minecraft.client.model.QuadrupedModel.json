@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.QuadrupedModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/QuadrupedModel.class",
+  "classSha256Hex": "955f9a580dd02d73cbe719a30dfad25774be8146a591d7ba8742b747bb92c01a",
+  "renderStateType": "T",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "xRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "yRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightHindLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "cos",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "walkAnimationPos"
+                      },
+                      {
+                        "const": 0.6662
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "const": 1.4
+              }
+            ]
+          },
+          {
+            "state": "walkAnimationSpeed"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftHindLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "cos",
+                "args": [
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "state": "walkAnimationPos"
+                          },
+                          {
+                            "const": 0.6662
+                          }
+                        ]
+                      },
+                      {
+                        "const": 3.1415927
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "const": 1.4
+              }
+            ]
+          },
+          {
+            "state": "walkAnimationSpeed"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightFrontLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "cos",
+                "args": [
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "state": "walkAnimationPos"
+                          },
+                          {
+                            "const": 0.6662
+                          }
+                        ]
+                      },
+                      {
+                        "const": 3.1415927
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "const": 1.4
+              }
+            ]
+          },
+          {
+            "state": "walkAnimationSpeed"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftFrontLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "cos",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "walkAnimationPos"
+                      },
+                      {
+                        "const": 0.6662
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "const": 1.4
+              }
+            ]
+          },
+          {
+            "state": "walkAnimationSpeed"
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

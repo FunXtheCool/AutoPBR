@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.npc.VillagerModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/npc/VillagerModel.class",
+  "classSha256Hex": "5b60dc5c1eb8b4b8ae6ce15b40d04fea295a557a69b98cc239cb55078762ee70",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.VillagerRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "head",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "yRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "xRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "zRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "const": 0.3
+          },
+          {
+            "op": "sin",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "const": 0.45
+                  },
+                  {
+                    "state": "ageInTicks"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "const": 0.4
+      }
+    },
+    {
+      "partField": "head",
+      "property": "zRot",
+      "expr": {
+        "const": 0
+      }
+    },
+    {
+      "partField": "rightLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "cos",
+                    "args": [
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "state": "walkAnimationPos"
+                          },
+                          {
+                            "const": 0.6662
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1.4
+                  }
+                ]
+              },
+              {
+                "state": "walkAnimationSpeed"
+              }
+            ]
+          },
+          {
+            "const": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "cos",
+                    "args": [
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "mul",
+                            "args": [
+                              {
+                                "state": "walkAnimationPos"
+                              },
+                              {
+                                "const": 0.6662
+                              }
+                            ]
+                          },
+                          {
+                            "const": 3.1415927
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1.4
+                  }
+                ]
+              },
+              {
+                "state": "walkAnimationSpeed"
+              }
+            ]
+          },
+          {
+            "const": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightLeg",
+      "property": "yRot",
+      "expr": {
+        "const": 0
+      }
+    },
+    {
+      "partField": "leftLeg",
+      "property": "yRot",
+      "expr": {
+        "const": 0
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

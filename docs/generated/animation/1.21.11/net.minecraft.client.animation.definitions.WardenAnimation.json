@@ -1,0 +1,4285 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.animation.definitions.WardenAnimation",
+  "profile": "proguard_1.21.11",
+  "jarPath": "ggm.class",
+  "classSha256Hex": "ba145399c54525ffb52a4e370bd4cad8d4cdaa23b0236e97ffd67074ad2d174b",
+  "definitions": [
+    {
+      "fieldName": "WARDEN_EMERGE",
+      "channels": [
+        {
+          "partName": "body",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.52,
+              "x": 0,
+              "y": 0,
+              "z": -22.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.2,
+              "x": 0,
+              "y": 0,
+              "z": -7.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.68,
+              "x": 0,
+              "y": 0,
+              "z": 10,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.8,
+              "x": 0,
+              "y": 0,
+              "z": 10,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.28,
+              "x": 0,
+              "y": 0,
+              "z": 10,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.88,
+              "x": 0,
+              "y": 0,
+              "z": 10,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.76,
+              "x": 25,
+              "y": 0,
+              "z": -7.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.92,
+              "x": 35,
+              "y": 0,
+              "z": -7.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.08,
+              "x": 25,
+              "y": 0,
+              "z": -7.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.44,
+              "x": 47.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.56,
+              "x": 47.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.68,
+              "x": 47.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5,
+              "x": 70,
+              "y": 0,
+              "z": 2.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5.8,
+              "x": 70,
+              "y": 0,
+              "z": 2.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 6.64,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "body",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": -63,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.52,
+              "x": 0,
+              "y": -56,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.2,
+              "x": 0,
+              "y": -32,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.68,
+              "x": 0,
+              "y": -32,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.8,
+              "x": 0,
+              "y": -32,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.28,
+              "x": 0,
+              "y": -32,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.88,
+              "x": 0,
+              "y": -32,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.16,
+              "x": 0,
+              "y": -27,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.76,
+              "x": 0,
+              "y": -14,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.92,
+              "x": 0,
+              "y": -11,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.08,
+              "x": 0,
+              "y": -14,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.44,
+              "x": 0,
+              "y": -6,
+              "z": -3,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.56,
+              "x": 0,
+              "y": -4,
+              "z": -3,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.68,
+              "x": 0,
+              "y": -6,
+              "z": -3,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5,
+              "x": 0,
+              "y": -3,
+              "z": -4,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5.8,
+              "x": 0,
+              "y": -3,
+              "z": -4,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 6.64,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "head",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.52,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.92,
+              "x": 0.74,
+              "y": 0,
+              "z": -40.380001,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.16,
+              "x": -67.5,
+              "y": 0,
+              "z": -2.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.24,
+              "x": -67.5,
+              "y": 0,
+              "z": -2.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.32,
+              "x": -47.5,
+              "y": 0,
+              "z": -2.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.4,
+              "x": -67.5,
+              "y": 0,
+              "z": -2.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.68,
+              "x": -67.5,
+              "y": 0,
+              "z": 15,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.76,
+              "x": -67.5,
+              "y": 0,
+              "z": -5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.84,
+              "x": -52.5,
+              "y": 0,
+              "z": -5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.92,
+              "x": -67.5,
+              "y": 0,
+              "z": -5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.64,
+              "x": -17.5,
+              "y": 0,
+              "z": -10,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.76,
+              "x": 70,
+              "y": 0,
+              "z": 12.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.04,
+              "x": 70,
+              "y": 0,
+              "z": 12.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.12,
+              "x": 80,
+              "y": 0,
+              "z": 12.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.24,
+              "x": 70,
+              "y": 0,
+              "z": 12.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5,
+              "x": 77.5,
+              "y": 0,
+              "z": -2.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 6.64,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "head",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.52,
+              "x": -8,
+              "y": -11,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.92,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.24,
+              "x": 0,
+              "y": 0.47,
+              "z": -0.95,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.32,
+              "x": 0,
+              "y": 0.47,
+              "z": -0.95,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.4,
+              "x": 0,
+              "y": 0.47,
+              "z": -0.95,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.68,
+              "x": 0,
+              "y": 1,
+              "z": -2,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.76,
+              "x": 0,
+              "y": 1,
+              "z": -2,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.84,
+              "x": 0,
+              "y": 1,
+              "z": -2,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.92,
+              "x": 0,
+              "y": 1,
+              "z": -2,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.64,
+              "x": 0,
+              "y": -2,
+              "z": -2,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.76,
+              "x": 0,
+              "y": -4,
+              "z": 1,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.04,
+              "x": 0,
+              "y": -1,
+              "z": 1,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.12,
+              "x": 0,
+              "y": -1,
+              "z": 1,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.24,
+              "x": 0,
+              "y": -1,
+              "z": 1,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5,
+              "x": 0,
+              "y": -1,
+              "z": 1,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 6.64,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "right_arm",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.52,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.2,
+              "x": -152.5,
+              "y": 2.5,
+              "z": 7.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.68,
+              "x": -180,
+              "y": 12.5,
+              "z": -10,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.8,
+              "x": -90,
+              "y": 12.5,
+              "z": -10,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.28,
+              "x": -90,
+              "y": 12.5,
+              "z": -10,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.88,
+              "x": -90,
+              "y": 12.5,
+              "z": -10,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.08,
+              "x": -95,
+              "y": 12.5,
+              "z": -10,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.24,
+              "x": -83.93,
+              "y": 3.93,
+              "z": 5.71,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.36,
+              "x": -80,
+              "y": 7.5,
+              "z": 17.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.76,
+              "x": -67.5,
+              "y": 2.5,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.08,
+              "x": -67.5,
+              "y": 2.5,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.44,
+              "x": -55,
+              "y": 2.5,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.56,
+              "x": -60,
+              "y": 2.5,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.68,
+              "x": -55,
+              "y": 2.5,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5,
+              "x": -67.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5.56,
+              "x": -50.450001,
+              "y": 0,
+              "z": 2.69,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 6.08,
+              "x": -62.720001,
+              "y": 0,
+              "z": 4.3,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 6.64,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "right_arm",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.52,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.2,
+              "x": 0,
+              "y": -21,
+              "z": 9,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.68,
+              "x": 2,
+              "y": -2,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.8,
+              "x": 2,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.28,
+              "x": 2,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.88,
+              "x": 2,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.08,
+              "x": 2,
+              "y": -2,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.24,
+              "x": 2,
+              "y": 2.71,
+              "z": 3.86,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.36,
+              "x": 2,
+              "y": 1,
+              "z": 5,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.76,
+              "x": 2,
+              "y": 3,
+              "z": 3,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.08,
+              "x": 2,
+              "y": 3,
+              "z": 3,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.44,
+              "x": 2.67,
+              "y": 4,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.56,
+              "x": 2.67,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.68,
+              "x": 2.67,
+              "y": 4,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5,
+              "x": 0.67,
+              "y": 3,
+              "z": 4,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 6.64,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "left_arm",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.12,
+              "x": -167.5,
+              "y": -17.5,
+              "z": -7.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.6,
+              "x": -167.5,
+              "y": -17.5,
+              "z": -7.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.88,
+              "x": -175,
+              "y": -17.5,
+              "z": 15,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.16,
+              "x": -190,
+              "y": -17.5,
+              "z": 5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.28,
+              "x": -90,
+              "y": -5,
+              "z": 5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.68,
+              "x": -90,
+              "y": -17.5,
+              "z": -12.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.8,
+              "x": -90,
+              "y": -17.5,
+              "z": -12.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.28,
+              "x": -90,
+              "y": -17.5,
+              "z": -12.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.88,
+              "x": -90,
+              "y": -17.5,
+              "z": -12.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.04,
+              "x": -81.290001,
+              "y": -10.64,
+              "z": -14.21,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.16,
+              "x": -83.5,
+              "y": -5.5,
+              "z": -15.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.76,
+              "x": -62.5,
+              "y": -7.5,
+              "z": 5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.92,
+              "x": -58.75,
+              "y": -3.75,
+              "z": 5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.08,
+              "x": -55,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.44,
+              "x": -52.5,
+              "y": 0,
+              "z": 5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.56,
+              "x": -50,
+              "y": 0,
+              "z": 5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.68,
+              "x": -52.5,
+              "y": 0,
+              "z": 5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5,
+              "x": -72.5,
+              "y": -2.5,
+              "z": 5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5.56,
+              "x": -57.5,
+              "y": -4.54,
+              "z": 2.99,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 6.08,
+              "x": -70.989998,
+              "y": -5.77,
+              "z": 1.78,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 6.64,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "left_arm",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.12,
+              "x": 0,
+              "y": -8,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.6,
+              "x": 0,
+              "y": -8,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.88,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.2,
+              "x": -2,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.68,
+              "x": -4,
+              "y": 3,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.8,
+              "x": -4,
+              "y": 3,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.28,
+              "x": -4,
+              "y": 3,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.88,
+              "x": -4,
+              "y": 3,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.04,
+              "x": -3.23,
+              "y": 5.7,
+              "z": 4.97,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.16,
+              "x": -1.49,
+              "y": 2.22,
+              "z": 5.25,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.76,
+              "x": -1.14,
+              "y": 1.71,
+              "z": 1.86,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.92,
+              "x": -1.14,
+              "y": 1.21,
+              "z": 3.86,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.08,
+              "x": -1.14,
+              "y": 2.71,
+              "z": 4.86,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.44,
+              "x": -1,
+              "y": 1,
+              "z": 3,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.56,
+              "x": 0,
+              "y": 1,
+              "z": 1,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.68,
+              "x": 0,
+              "y": 1,
+              "z": 3,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5,
+              "x": -2,
+              "y": 0,
+              "z": 4,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 6.64,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "right_leg",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.52,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.28,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.88,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.36,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.32,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.48,
+              "x": 55,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.6,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5.8,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 6.64,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "right_leg",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": -63,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.52,
+              "x": 0,
+              "y": -56,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.2,
+              "x": 0,
+              "y": -32,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.68,
+              "x": 0,
+              "y": -32,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.8,
+              "x": 0,
+              "y": -32,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.28,
+              "x": 0,
+              "y": -32,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.88,
+              "x": 0,
+              "y": -32,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.36,
+              "x": 0,
+              "y": -22,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.76,
+              "x": 0,
+              "y": -12.28,
+              "z": 2.48,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.92,
+              "x": 0,
+              "y": -9.28,
+              "z": 2.48,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.08,
+              "x": 0,
+              "y": -12.28,
+              "z": 2.48,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.32,
+              "x": 0,
+              "y": -4.14,
+              "z": 4.14,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.48,
+              "x": 0,
+              "y": -0.57,
+              "z": -8.43,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.6,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5.8,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 6.64,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "left_leg",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.52,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.28,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.88,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.36,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.84,
+              "x": 20,
+              "y": 0,
+              "z": -17.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.68,
+              "x": 20,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.84,
+              "x": 10,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5.8,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 6.64,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "left_leg",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": -63,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.52,
+              "x": 0,
+              "y": -56,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.2,
+              "x": 0,
+              "y": -32,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.68,
+              "x": 0,
+              "y": -32,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.8,
+              "x": 0,
+              "y": -32,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.28,
+              "x": 0,
+              "y": -32,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.88,
+              "x": 0,
+              "y": -32,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.36,
+              "x": 0,
+              "y": -22,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.84,
+              "x": -4,
+              "y": 2,
+              "z": -7,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4,
+              "x": -4,
+              "y": 0,
+              "z": -5,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.68,
+              "x": -4,
+              "y": 0,
+              "z": -9,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.84,
+              "x": -2,
+              "y": 2,
+              "z": -3.5,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 5.8,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 6.64,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        }
+      ],
+      "lengthSeconds": 6.68
+    },
+    {
+      "fieldName": "WARDEN_DIG",
+      "channels": [
+        {
+          "partName": "body",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.25,
+              "x": 4.13441,
+              "y": 0.94736,
+              "z": 1.2694,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.5,
+              "x": 50,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.7083,
+              "x": 54.454071,
+              "y": -13.53935,
+              "z": -18.14183,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.0417,
+              "x": 59.46442,
+              "y": -10.8885,
+              "z": 35.795399,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.3333,
+              "x": 82.282608,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.625,
+              "x": 53.236061,
+              "y": 10.04715,
+              "z": -29.729321,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.2083,
+              "x": -17.71739,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.5417,
+              "x": 112.282608,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.6667,
+              "x": 116.068893,
+              "y": 5.11581,
+              "z": -24.501169,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.8333,
+              "x": 121.562439,
+              "y": -4.17248,
+              "z": 19.57737,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.0417,
+              "x": 138.568893,
+              "y": 5.11581,
+              "z": -24.501169,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.25,
+              "x": 144.062439,
+              "y": -4.17248,
+              "z": 19.57737,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.375,
+              "x": 147.282608,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.625,
+              "x": 147.282608,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.875,
+              "x": 134.362213,
+              "y": 8.81113,
+              "z": -8.90172,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.0417,
+              "x": 132.059662,
+              "y": -8.35927,
+              "z": 9.70506,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.25,
+              "x": 134.362213,
+              "y": 8.81113,
+              "z": -8.90172,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.5,
+              "x": 147.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "LINEAR"
+            }
+          ],
+          "interpolation": "MIXED"
+        },
+        {
+          "partName": "body",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.5,
+              "x": 0,
+              "y": -16.484541,
+              "z": -6.5784,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.7083,
+              "x": 0,
+              "y": -16.484541,
+              "z": -6.5784,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.0417,
+              "x": 0,
+              "y": -16.969999,
+              "z": -7.11,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.625,
+              "x": 0,
+              "y": -13.97,
+              "z": -7.11,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.2083,
+              "x": 0,
+              "y": -11.48454,
+              "z": -0.5784,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.5417,
+              "x": 0,
+              "y": -16.484541,
+              "z": -6.5784,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.6667,
+              "x": 0,
+              "y": -20.27,
+              "z": -5.42,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.375,
+              "x": 0,
+              "y": -21.484541,
+              "z": -5.5784,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.0417,
+              "x": 0,
+              "y": -22.484541,
+              "z": -5.5784,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.5,
+              "x": 0,
+              "y": -40,
+              "z": -8,
+              "vectorKind": "position",
+              "interpolation": "LINEAR"
+            }
+          ],
+          "interpolation": "MIXED"
+        },
+        {
+          "partName": "head",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.6667,
+              "x": 12.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.2083,
+              "x": 12.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.75,
+              "x": 45,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.375,
+              "x": -22.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.5417,
+              "x": 67.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.375,
+              "x": 67.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "head",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.375,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "LINEAR"
+            }
+          ],
+          "interpolation": "MIXED"
+        },
+        {
+          "partName": "right_arm",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.5,
+              "x": -101.803596,
+              "y": -21.29587,
+              "z": 30.61478,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.7083,
+              "x": -101.803596,
+              "y": -21.29587,
+              "z": 30.61478,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1,
+              "x": 48.758499,
+              "y": -17.61941,
+              "z": 9.9865,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.1667,
+              "x": 48.758499,
+              "y": -17.61941,
+              "z": 9.9865,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.4583,
+              "x": -101.803596,
+              "y": -21.29587,
+              "z": 30.61478,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.75,
+              "x": -89.049942,
+              "y": -4.19657,
+              "z": -1.47845,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.2083,
+              "x": -158.307281,
+              "y": 3.7152,
+              "z": -1.52352,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.5417,
+              "x": -89.049942,
+              "y": -4.19657,
+              "z": -1.47845,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.375,
+              "x": -120,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "right_arm",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.7083,
+              "x": 2.22,
+              "y": 0,
+              "z": 0.86,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1,
+              "x": 3.12,
+              "y": 0,
+              "z": 4.29,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.2083,
+              "x": 1,
+              "y": 0,
+              "z": 4,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.375,
+              "x": 0,
+              "y": 0,
+              "z": 4,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "left_arm",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.2917,
+              "x": -63.892879,
+              "y": -0.52011,
+              "z": 2.09491,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.5,
+              "x": -63.892879,
+              "y": -0.52011,
+              "z": 2.09491,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.7083,
+              "x": -62.878571,
+              "y": 15.15061,
+              "z": 9.97445,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.9167,
+              "x": -86.936417,
+              "y": 17.45026,
+              "z": 4.05284,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.1667,
+              "x": -86.936417,
+              "y": 17.45026,
+              "z": 4.05284,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.4583,
+              "x": -86.936417,
+              "y": 17.45026,
+              "z": 4.05284,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.6667,
+              "x": 63.0984,
+              "y": 8.83573,
+              "z": -8.71284,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.8333,
+              "x": 35.5984,
+              "y": 8.83573,
+              "z": -8.71284,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.2083,
+              "x": -153.274734,
+              "y": -0.02953,
+              "z": 3.5235,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.5417,
+              "x": -87.077538,
+              "y": -0.02625,
+              "z": 3.132,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.375,
+              "x": -120,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "LINEAR"
+            }
+          ],
+          "interpolation": "MIXED"
+        },
+        {
+          "partName": "left_arm",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.5,
+              "x": -0.28,
+              "y": 5,
+              "z": 10,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.7083,
+              "x": -1.51,
+              "y": 4.35,
+              "z": 4.33,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.9167,
+              "x": -0.6,
+              "y": 3.61,
+              "z": 4.63,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.1667,
+              "x": -0.6,
+              "y": 3.61,
+              "z": 0.63,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.6667,
+              "x": -2.85,
+              "y": -0.1,
+              "z": 3.33,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.2083,
+              "x": -1,
+              "y": 0,
+              "z": 4,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.375,
+              "x": 0,
+              "y": 0,
+              "z": 4,
+              "vectorKind": "position",
+              "interpolation": "LINEAR"
+            }
+          ],
+          "interpolation": "MIXED"
+        },
+        {
+          "partName": "right_leg",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.5,
+              "x": 113.269997,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.7083,
+              "x": 113.269997,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.3333,
+              "x": 113.269997,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.5833,
+              "x": 182.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.8333,
+              "x": 120,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.0833,
+              "x": 182.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.2917,
+              "x": 120,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.5,
+              "x": 90,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "LINEAR"
+            }
+          ],
+          "interpolation": "MIXED"
+        },
+        {
+          "partName": "right_leg",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.5,
+              "x": 0,
+              "y": -13.98,
+              "z": -2.37,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.7083,
+              "x": 0,
+              "y": -13.98,
+              "z": -2.37,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.3333,
+              "x": 0,
+              "y": -13.98,
+              "z": -2.37,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.5833,
+              "x": 0,
+              "y": -7,
+              "z": -3,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.8333,
+              "x": 0,
+              "y": -9,
+              "z": -3,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.0833,
+              "x": 0,
+              "y": -16.709999,
+              "z": -3.69,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.2917,
+              "x": 0,
+              "y": -28,
+              "z": -5,
+              "vectorKind": "position",
+              "interpolation": "LINEAR"
+            }
+          ],
+          "interpolation": "MIXED"
+        },
+        {
+          "partName": "left_leg",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.5,
+              "x": 114.980003,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.7083,
+              "x": 114.980003,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.3333,
+              "x": 114.980003,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.5833,
+              "x": 90,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.8333,
+              "x": 172.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.0833,
+              "x": 90,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.2917,
+              "x": 197.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.5,
+              "x": 90,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "LINEAR"
+            }
+          ],
+          "interpolation": "MIXED"
+        },
+        {
+          "partName": "left_leg",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.5,
+              "x": 0,
+              "y": -14.01,
+              "z": -2.35,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.7083,
+              "x": 0,
+              "y": -14.01,
+              "z": -2.35,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.3333,
+              "x": 0,
+              "y": -14.01,
+              "z": -2.35,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.5833,
+              "x": 0,
+              "y": -5,
+              "z": -4,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.8333,
+              "x": 0,
+              "y": -7,
+              "z": -4,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.0833,
+              "x": 0,
+              "y": -15.5,
+              "z": -3.76,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.2917,
+              "x": 0,
+              "y": -28,
+              "z": -5,
+              "vectorKind": "position",
+              "interpolation": "LINEAR"
+            }
+          ],
+          "interpolation": "MIXED"
+        }
+      ],
+      "lengthSeconds": 5
+    },
+    {
+      "fieldName": "WARDEN_ROAR",
+      "channels": [
+        {
+          "partName": "body",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.24,
+              "x": -25,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.6,
+              "x": 32.5,
+              "y": 0,
+              "z": -7.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.84,
+              "x": 38.330002,
+              "y": 0,
+              "z": 2.99,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.08,
+              "x": 40.970001,
+              "y": 0,
+              "z": -4.3,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.36,
+              "x": 44.41,
+              "y": 0,
+              "z": 6.29,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3,
+              "x": 47.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.2,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "body",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.24,
+              "x": 0,
+              "y": -1,
+              "z": 3,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.6,
+              "x": 0,
+              "y": -3,
+              "z": -6,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3,
+              "x": 0,
+              "y": -3,
+              "z": -6,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.2,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "head",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.24,
+              "x": -32.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.6,
+              "x": -32.5,
+              "y": 0,
+              "z": -27.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.8,
+              "x": -32.5,
+              "y": 0,
+              "z": 26,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.04,
+              "x": -32.5,
+              "y": 0,
+              "z": -27.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.44,
+              "x": -32.5,
+              "y": 0,
+              "z": 26,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.84,
+              "x": -5,
+              "y": 0,
+              "z": -12.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.2,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "head",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.24,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.6,
+              "x": 0,
+              "y": -2,
+              "z": -6,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.2,
+              "x": 0,
+              "y": -2,
+              "z": -6,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.48,
+              "x": 0,
+              "y": -2,
+              "z": -6,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.2,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "right_arm",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.72,
+              "x": -120,
+              "y": 0,
+              "z": -20,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.24,
+              "x": -77.5,
+              "y": 3.75,
+              "z": 15,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.48,
+              "x": 67.5,
+              "y": -32.5,
+              "z": 20,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.48,
+              "x": 37.5,
+              "y": -32.5,
+              "z": 25,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.88,
+              "x": 27.6,
+              "y": -17.1,
+              "z": 32.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.2,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "right_arm",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.72,
+              "x": 3,
+              "y": -2,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.48,
+              "x": 4,
+              "y": -2,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.48,
+              "x": 4,
+              "y": -2,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.2,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "left_arm",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.72,
+              "x": -125,
+              "y": 0,
+              "z": 20,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.24,
+              "x": -76.25,
+              "y": -17.5,
+              "z": -7.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.48,
+              "x": 62.5,
+              "y": 42.5,
+              "z": -12.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.48,
+              "x": 37.5,
+              "y": 27.5,
+              "z": -27.5,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.88,
+              "x": 25,
+              "y": 18.4,
+              "z": -30,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.2,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "left_arm",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.72,
+              "x": -3,
+              "y": -2,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.48,
+              "x": -4,
+              "y": -2,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.48,
+              "x": -4,
+              "y": -2,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 4.2,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        }
+      ],
+      "lengthSeconds": 4.2
+    },
+    {
+      "fieldName": "WARDEN_SNIFF",
+      "channels": [
+        {
+          "partName": "body",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.56,
+              "x": 17.5,
+              "y": 32.5,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.96,
+              "x": 0,
+              "y": 32.5,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.2,
+              "x": 10,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.8,
+              "x": 10,
+              "y": -30,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.32,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "head",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.68,
+              "x": 0,
+              "y": 40,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.96,
+              "x": -22.5,
+              "y": 40,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.24,
+              "x": 0,
+              "y": 20,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.52,
+              "x": -35,
+              "y": 20,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.76,
+              "x": 0,
+              "y": 20,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.28,
+              "x": 0,
+              "y": -20,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.88,
+              "x": 0,
+              "y": -20,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.32,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "right_arm",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.96,
+              "x": 17.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.2,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.76,
+              "x": -15,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.32,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "left_arm",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.96,
+              "x": -15,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.2,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.76,
+              "x": 17.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3.32,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        }
+      ],
+      "lengthSeconds": 4.16
+    },
+    {
+      "fieldName": "WARDEN_ATTACK",
+      "channels": [
+        {
+          "partName": "body",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.0417,
+              "x": -22.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.2083,
+              "x": 22.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.3333,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "body",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.0417,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.2083,
+              "x": 0,
+              "y": -1,
+              "z": -2,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.3333,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "head",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.0417,
+              "x": 22.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.25,
+              "x": -30.174931,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.3333,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "head",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.0417,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.25,
+              "x": 0,
+              "y": -2,
+              "z": -2,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.3333,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "right_arm",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.0417,
+              "x": -120.361191,
+              "y": 40.789471,
+              "z": -20.941019,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.1667,
+              "x": -90,
+              "y": -45,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.3333,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "right_arm",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.0417,
+              "x": 4,
+              "y": 0,
+              "z": 5,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.1667,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.3333,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "left_arm",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.0417,
+              "x": -120.361191,
+              "y": -40.789471,
+              "z": 20.941019,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.1667,
+              "x": -61.1632,
+              "y": 42.858822,
+              "z": 11.52421,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.3333,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "left_arm",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.0417,
+              "x": -4,
+              "y": 0,
+              "z": 5,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.1667,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.3333,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        }
+      ],
+      "lengthSeconds": 0.33333
+    },
+    {
+      "fieldName": "WARDEN_SONIC_BOOM",
+      "channels": [
+        {
+          "partName": "body",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.0833,
+              "x": 47.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.625,
+              "x": 55,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.9167,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2,
+              "x": -32.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.4583,
+              "x": -32.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.7083,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.875,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "body",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.0833,
+              "x": 0,
+              "y": -3,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.625,
+              "x": 0,
+              "y": -4,
+              "z": -1,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.9167,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.7083,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.875,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "right_ribcage",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.5417,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.7917,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.875,
+              "x": 0,
+              "y": 125,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.5,
+              "x": 0,
+              "y": 125,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.6667,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "left_ribcage",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.5417,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.7917,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.875,
+              "x": 0,
+              "y": -125,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.5,
+              "x": 0,
+              "y": -125,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.6667,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "head",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1,
+              "x": 67.5,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.75,
+              "x": 80,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.9167,
+              "x": -45,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.5,
+              "x": -45,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.7083,
+              "x": -45,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.875,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "head",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.9167,
+              "x": 0,
+              "y": 0,
+              "z": -3,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.5,
+              "x": 0,
+              "y": 0,
+              "z": -3,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.7083,
+              "x": 0,
+              "y": 0,
+              "z": -3,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.875,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "right_arm",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.875,
+              "x": -42.286591,
+              "y": -32.698132,
+              "z": -5.00825,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.1667,
+              "x": -29.83757,
+              "y": -35.396259,
+              "z": -45.280891,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.3333,
+              "x": -29.83757,
+              "y": -35.396259,
+              "z": -45.280891,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.6667,
+              "x": -72.286591,
+              "y": -32.698132,
+              "z": -5.00825,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.8333,
+              "x": 35.264389,
+              "y": -30,
+              "z": 35.264389,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.9167,
+              "x": 73.754837,
+              "y": -13.0931,
+              "z": 19.205179,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.5,
+              "x": 73.754837,
+              "y": -13.0931,
+              "z": 19.205179,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.75,
+              "x": 58.20713,
+              "y": -21.1064,
+              "z": 28.726101,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "right_arm",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.8333,
+              "x": 3,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.75,
+              "x": 3,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "left_arm",
+          "target": "ROTATION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 0.875,
+              "x": -33.806938,
+              "y": 32.310581,
+              "z": 6.87997,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.1667,
+              "x": -17.878269,
+              "y": 34.621151,
+              "z": 49.02433,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.3333,
+              "x": -17.878269,
+              "y": 34.621151,
+              "z": 49.02433,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.6667,
+              "x": -51.306938,
+              "y": 32.310581,
+              "z": 6.87997,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.8333,
+              "x": 35.264389,
+              "y": 30,
+              "z": -35.264389,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.9167,
+              "x": 73.754837,
+              "y": 13.0931,
+              "z": -19.205179,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.5,
+              "x": 73.754837,
+              "y": 13.0931,
+              "z": -19.205179,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.75,
+              "x": 58.20713,
+              "y": 21.1064,
+              "z": -28.726101,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "degrees",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        },
+        {
+          "partName": "left_arm",
+          "target": "POSITION",
+          "keyframes": [
+            {
+              "timeSeconds": 0,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 1.8333,
+              "x": -3,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 2.75,
+              "x": -3,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            },
+            {
+              "timeSeconds": 3,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "vectorKind": "position",
+              "interpolation": "CATMULLROM"
+            }
+          ],
+          "interpolation": "CATMULLROM"
+        }
+      ],
+      "lengthSeconds": 3
+    }
+  ],
+  "obfuscatedJvmName": "net.minecraft.client.animation.definitions.ggm",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Animation IR lifted from javap \u003Cclinit\u003E (proguard_1.21.11; KeyframeAnimations.degreeVec|posVec|scaleVec FFF/DDD)."
+  ]
+}

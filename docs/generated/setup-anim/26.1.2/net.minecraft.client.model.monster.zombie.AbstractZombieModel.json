@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.zombie.AbstractZombieModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/zombie/AbstractZombieModel.class",
+  "classSha256Hex": "d3b462f785f618b811727a0cd8fa39f285e39f472dca938694a4010cf4fa0d27",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.HumanoidModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.HumanoidModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

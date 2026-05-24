@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.player.PlayerModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/player/PlayerModel.class",
+  "classSha256Hex": "2b079f3f2f1ec200bfd080b5eac968c057f67b955374ec5c567a8765fed83981",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.HumanoidModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.HumanoidModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

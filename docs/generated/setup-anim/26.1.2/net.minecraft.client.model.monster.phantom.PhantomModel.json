@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.phantom.PhantomModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/phantom/PhantomModel.class",
+  "classSha256Hex": "02f311f5d01587b48c3131cff9fdb6f9dd3384e8eef1a7c5f1972a36dd09d978",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.PhantomRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "leftWingBase",
+      "property": "zRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "cos",
+                "args": [
+                  {
+                    "state": "flapTime"
+                  }
+                ]
+              },
+              {
+                "const": 16
+              }
+            ]
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftWingTip",
+      "property": "zRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "cos",
+                "args": [
+                  {
+                    "state": "flapTime"
+                  }
+                ]
+              },
+              {
+                "const": 16
+              }
+            ]
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightWingBase",
+      "property": "zRot",
+      "expr": {
+        "partPeer": "leftWingBase",
+        "peerProperty": "zRot"
+      }
+    },
+    {
+      "partField": "rightWingTip",
+      "property": "zRot",
+      "expr": {
+        "partPeer": "leftWingTip",
+        "peerProperty": "zRot"
+      }
+    },
+    {
+      "partField": "tailBase",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "add",
+            "args": [
+              {
+                "const": 5
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "cos",
+                    "args": [
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "state": "flapTime"
+                          },
+                          {
+                            "const": 2
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "const": 5
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tailTip",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "add",
+            "args": [
+              {
+                "const": 5
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "cos",
+                    "args": [
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "state": "flapTime"
+                          },
+                          {
+                            "const": 2
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "const": 5
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

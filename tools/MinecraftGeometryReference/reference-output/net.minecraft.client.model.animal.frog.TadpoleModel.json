@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.frog.TadpoleModel",
+  "extractionStatus": "reference_java",
+  "factoryMethod": "createBodyLayer",
+  "meshHostJvmName": "net.minecraft.client.model.animal.frog.TadpoleModel",
+  "roots": [{
+  "id": "root",
+  "pose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [],
+  "children": [{
+  "id": "tail",
+  "pose": {
+  "translation": [0.000000000, 22.00000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [0.000000000, -1.000000000, 0.000000000],
+  "to": [0.000000000, 1.000000000, 7.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "body",
+  "pose": {
+  "translation": [0.000000000, 22.00000000, -3.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-1.500000000, -1.000000000, 0.000000000],
+  "to": [1.500000000, 1.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+]
+}
+]
+}

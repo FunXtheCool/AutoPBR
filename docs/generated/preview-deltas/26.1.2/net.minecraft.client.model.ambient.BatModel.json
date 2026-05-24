@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.ambient.BatModel",
+  "deltas": [
+    {
+      "kind": "previewBasis",
+      "description": "Preview basis transform; wing flap animation is runtime setupAnim, not static IR.",
+      "partId": "_all"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://autopbr.local/schema/preview-delta.json",
+  "title": "AutoPBR preview interpretation overlay (non-vanilla)",
+  "type": "object",
+  "required": ["schemaVersion", "versionLabel", "officialJvmName", "deltas"],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "versionLabel": { "type": "string" },
+    "officialJvmName": { "type": "string" },
+    "deltas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["kind", "description"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "zeroThicknessSheet",
+              "skipCubeDeformation",
+              "rendererOnlyScale",
+              "previewBasis",
+              "textureKeyRemap",
+              "other"
+            ]
+          },
+          "description": { "type": "string" },
+          "partId": { "type": "string" },
+          "cuboidIndex": { "type": "integer", "minimum": 0 }
+        }
+      }
+    }
+  }
+}

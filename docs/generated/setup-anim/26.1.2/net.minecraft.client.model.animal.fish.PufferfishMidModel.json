@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.fish.PufferfishMidModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/fish/PufferfishMidModel.class",
+  "classSha256Hex": "5eef4ef0835c1a0209bbd6e890343a9654b8b49f6cdbc4198104b240a9757674",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.EntityRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "rightBlueFin",
+      "property": "zRot",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "const": -0.2
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "const": 0.4
+              },
+              {
+                "op": "sin",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "ageInTicks"
+                      },
+                      {
+                        "const": 0.2
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftBlueFin",
+      "property": "zRot",
+      "expr": {
+        "op": "sub",
+        "args": [
+          {
+            "const": 0.2
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "const": 0.4
+              },
+              {
+                "op": "sin",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "ageInTicks"
+                      },
+                      {
+                        "const": 0.2
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

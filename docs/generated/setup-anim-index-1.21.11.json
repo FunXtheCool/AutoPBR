@@ -1,0 +1,1133 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "1.21.11",
+  "profile": "named_jar_1.21.11",
+  "clientJarNote": "One row per *Model class with setupAnim lift. Shards under setup-anim/\u003CversionLabel\u003E/.",
+  "entries": [
+    {
+      "officialJvmName": "net.minecraft.client.model.ArmedModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.ArmedModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.EntityModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.EntityModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.HeadedModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.HeadedModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.HumanoidModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.HumanoidModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.Model",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.Model.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.QuadrupedModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.QuadrupedModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.VillagerLikeModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.VillagerLikeModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.ambient.BatModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.ambient.BatModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.allay.AllayModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.allay.AllayModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.armadillo.ArmadilloModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.armadillo.ArmadilloModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.axolotl.AxolotlModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.axolotl.AxolotlModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.bee.BeeModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.bee.BeeModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.bee.BeeStingerModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.bee.BeeStingerModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.camel.CamelModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.camel.CamelModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.camel.CamelSaddleModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.camel.CamelSaddleModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.chicken.ChickenModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.chicken.ChickenModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.chicken.ColdChickenModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.chicken.ColdChickenModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.cow.ColdCowModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.cow.ColdCowModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.cow.CowModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.cow.CowModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.cow.WarmCowModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.cow.WarmCowModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.dolphin.DolphinModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.dolphin.DolphinModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.equine.AbstractEquineModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.equine.AbstractEquineModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.equine.DonkeyModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.equine.DonkeyModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.equine.EquineSaddleModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.equine.EquineSaddleModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.equine.HorseModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.equine.HorseModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.feline.CatModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.feline.CatModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.feline.FelineModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.feline.FelineModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.feline.OcelotModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.feline.OcelotModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.fish.CodModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.fish.CodModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.fish.PufferfishBigModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.fish.PufferfishBigModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.fish.PufferfishMidModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.fish.PufferfishMidModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.fish.PufferfishSmallModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.fish.PufferfishSmallModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.fish.SalmonModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.fish.SalmonModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.fish.TropicalFishLargeModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.fish.TropicalFishLargeModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.fish.TropicalFishSmallModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.fish.TropicalFishSmallModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.fox.FoxModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.fox.FoxModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.frog.FrogModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.frog.FrogModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.frog.TadpoleModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.frog.TadpoleModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.ghast.HappyGhastHarnessModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.ghast.HappyGhastHarnessModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.ghast.HappyGhastModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.ghast.HappyGhastModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.goat.GoatModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.goat.GoatModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.golem.CopperGolemModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.golem.CopperGolemModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.golem.IronGolemModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.golem.IronGolemModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.golem.SnowGolemModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.golem.SnowGolemModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.llama.LlamaModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.llama.LlamaModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.llama.LlamaSpitModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.llama.LlamaSpitModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.nautilus.NautilusArmorModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.nautilus.NautilusArmorModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.nautilus.NautilusModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.nautilus.NautilusModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.nautilus.NautilusSaddleModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.nautilus.NautilusSaddleModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.panda.PandaModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.panda.PandaModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.parrot.ParrotModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.parrot.ParrotModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.pig.ColdPigModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.pig.ColdPigModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.pig.PigModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.pig.PigModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.polarbear.PolarBearModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.polarbear.PolarBearModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.rabbit.RabbitModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.rabbit.RabbitModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.sheep.SheepFurModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.sheep.SheepFurModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.sheep.SheepModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.sheep.SheepModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.sniffer.SnifferModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.sniffer.SnifferModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.squid.SquidModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.squid.SquidModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.turtle.TurtleModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.turtle.TurtleModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.wolf.WolfModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.animal.wolf.WolfModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.effects.EvokerFangsModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.effects.EvokerFangsModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.effects.SpinAttackEffectModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.effects.SpinAttackEffectModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.blaze.BlazeModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.blaze.BlazeModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.breeze.BreezeModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.breeze.BreezeModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.creaking.CreakingModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.creaking.CreakingModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.creeper.CreeperModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.creeper.CreeperModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.dragon.EnderDragonModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.dragon.EnderDragonModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.enderman.EndermanModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.enderman.EndermanModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.endermite.EndermiteModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.endermite.EndermiteModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.ghast.GhastModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.ghast.GhastModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.guardian.GuardianModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.guardian.GuardianModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.guardian.GuardianParticleModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.guardian.GuardianParticleModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.hoglin.HoglinModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.hoglin.HoglinModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.illager.IllagerModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.illager.IllagerModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.nautilus.ZombieNautilusCoralModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.nautilus.ZombieNautilusCoralModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.phantom.PhantomModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.phantom.PhantomModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.piglin.AbstractPiglinModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.piglin.AbstractPiglinModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.piglin.PiglinModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.piglin.PiglinModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.piglin.ZombifiedPiglinModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.piglin.ZombifiedPiglinModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.ravager.RavagerModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.ravager.RavagerModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.shulker.ShulkerModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.shulker.ShulkerModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.silverfish.SilverfishModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.silverfish.SilverfishModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.skeleton.BoggedModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.skeleton.BoggedModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.skeleton.SkeletonModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.skeleton.SkeletonModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.slime.MagmaCubeModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.slime.MagmaCubeModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.slime.SlimeModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.slime.SlimeModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.spider.SpiderModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.spider.SpiderModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.strider.StriderModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.strider.StriderModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.vex.VexModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.vex.VexModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.warden.WardenModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.warden.WardenModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.witch.WitchModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.witch.WitchModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.wither.WitherBossModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.wither.WitherBossModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.zombie.AbstractZombieModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.zombie.AbstractZombieModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.zombie.DrownedModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.zombie.DrownedModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.zombie.GiantZombieModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.zombie.GiantZombieModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.zombie.ZombieModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.zombie.ZombieModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.zombie.ZombieVillagerModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.monster.zombie.ZombieVillagerModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.npc.VillagerModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.npc.VillagerModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.armorstand.ArmorStandArmorModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.armorstand.ArmorStandArmorModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.armorstand.ArmorStandModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.armorstand.ArmorStandModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.banner.BannerFlagModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.banner.BannerFlagModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.banner.BannerModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.banner.BannerModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.bell.BellModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.bell.BellModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.boat.AbstractBoatModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.boat.AbstractBoatModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.boat.BoatModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.boat.BoatModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.boat.RaftModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.boat.RaftModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.book.BookModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.book.BookModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.cart.MinecartModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.cart.MinecartModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.chest.ChestModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.chest.ChestModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.crystal.EndCrystalModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.crystal.EndCrystalModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.equipment.ElytraModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.equipment.ElytraModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.equipment.ShieldModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.equipment.ShieldModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.leash.LeashKnotModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.leash.LeashKnotModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.projectile.ArrowModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.projectile.ArrowModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.projectile.ShulkerBulletModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.projectile.ShulkerBulletModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.projectile.TridentModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.projectile.TridentModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.projectile.WindChargeModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.projectile.WindChargeModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.skull.DragonHeadModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.skull.DragonHeadModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.skull.PiglinHeadModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.skull.PiglinHeadModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.skull.SkullModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.skull.SkullModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.statue.CopperGolemStatueModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.object.statue.CopperGolemStatueModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.player.PlayerCapeModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.player.PlayerCapeModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.player.PlayerEarsModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.player.PlayerEarsModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.player.PlayerModel",
+      "shardRelPath": "setup-anim/1.21.11/net.minecraft.client.model.player.PlayerModel.json",
+      "profile": "named_jar_1.21.11",
+      "extractionStatus": "partial",
+      "extractionNotes": [
+        "Could not disassemble or lift setupAnim."
+      ]
+    }
+  ]
+}

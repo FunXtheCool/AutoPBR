@@ -649,6 +649,11 @@ internal static class SpecularGenerator
             }
         }
 
+        if (options.SpecularForceNoEmissive)
+        {
+            Array.Fill(aBuf, (byte)255);
+        }
+
         var outImg = new Image<Rgba32>(width, height);
         var hasData = false;
         outImg.ProcessPixelRows(acc =>

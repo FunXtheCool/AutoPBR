@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.turtle.BabyTurtleModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/turtle/BabyTurtleModel.class",
+  "classSha256Hex": "373b01f6f01c7e9c95d2824e3c3ac9e239632d621c6c5346210d725fac3f922d",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.QuadrupedModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.QuadrupedModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

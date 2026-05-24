@@ -1,0 +1,124 @@
+Mob IR / baby parity — handoff backlog
+Date: 2026-05-21
+
+DONE (2026-05-21 — parity-catalog preview IR at 100%):
+  All 761 minecraft_26.1.2_entity_texture_model_manifest diffuse paths use RuntimeGeometryIrJson (ParityCatalogMeshDriverKindSurveyTests strict gate; 0 cleanRoom). Boat/chest/chest-boat: ParityCatalogHandLiftGeometryIrCatalog (BoatModel hull, ChestBoatModel synthetic, ChestModel); GeometryIrParityHandLiftJvmMap routes Boat/ChestBoat/ChestEntity builders. Adult HumanoidZombieVillager: geometry_ir_official_jvm -> ZombieVillagerModel (ok shard).
+  Equipment overlays: GeometryIrParityEquipmentJvmMap + hand-lift EquipmentHumanoidLeggingsModel; other block-entity via ParityCatalogHandLiftGeometryIrCatalog (bed, sign, conduit, …).
+  Atlas: GeometryIrParityAtlasDefaults + optional manifest backfill (tools/backfill-manifest-geometry-ir-atlas.ps1).
+
+Purpose: Coordinate subagents wiring 26.1.2 Baby*Model geometry IR into CleanRoomEntityModelRuntime (BuildBaby* helpers + retiring UsesPostBabyModelUpdate baby branches where IR replaces heuristic BabyProfile scales). Read-only inventory from repo scan; only this file was added/replaced.
+
+DONE (2026-05-14 follow-up — javap on tools/minecraft-parity/26.1.2/client.jar):
+  BabyZombifiedPiglinModel.json stub removed: full roots match BabyPiglinModel.json; extractionNotes cite javap (createBodyLayer → BabyPiglinModel.createBodyLayer).
+  BabyDrownedModel.json completed to full BabyZombieModel-equivalent IR; extractionNotes cite javap (createBodyLayer(CubeDeformation) → BabyZombieModel.createBodyLayer).
+  Tests: BabyDelegateGeometryIrLockTests roots equality; ParityCatalogBeeZombieFox… asserts baby zombie-family torso vs IR.
+
+DONE (baby IR builders present):
+  BuildBabyLlama
+  BuildBabyEquineHorseLike
+  BuildBabyChicken
+  BuildBabyRabbit (BabyRabbitModel IR + codegen cuboid table)
+  BuildBabyWolf (BabyWolfModel IR + codegen cuboid table)
+  BuildBabyCow (BabyCowModel IR + codegen cuboid table)
+  BuildBabySheep (BabySheepModel IR + codegen cuboid table)
+  BuildBabyPig (BabyPigModel IR + codegen cuboid table)
+  BuildBabyGoat (BabyGoatModel IR + codegen cuboid table)
+  BuildBabyFox (BabyFoxModel IR + codegen cuboid table)
+  BuildBabyLlama (BabyLlamaModel IR + codegen cuboid table; uvWithinAtlas gate pass 2026-05-21)
+  BuildBabyCamel
+  BuildBabyTurtle
+  BuildBabyDolphin
+  BuildBabySquid
+  BuildBabyAxolotl
+  BuildBabyBee
+  BuildBabyArmadillo
+  BuildBabyZombie
+  BuildBabyDrowned (delegates to BuildBabyZombie; catalog drowned baby skins)
+  BuildBabyZombieVillager
+  BuildBabyVillager
+  BuildBabyCat (BabyCatModel + BabyOcelotModel IR — shared AppendFelineModelQuadrupedMesh + BabyProfile.Adult)
+  BuildBabyFeline (BabyFelineModel IR — javap baby host mesh; ParityCatalog builder_method BabyFeline when manifest wires it)
+  BuildBabyPiglin (BabyPiglinModel IR; ears parented to head stack)
+  BuildBabyZombifiedPiglin (delegates to BuildBabyPiglin — in-repo BabyZombifiedPiglinModel.json is stub; vanilla shares baby piglin mesh)
+  BuildBabyHoglin (BabyHoglinModel IR; ears parented to head; quadruped leg preview when isBaby)
+  BuildBabyStrider (BabyStriderModel IR; bristles under body pose; same stride drivers as adult)
+  BuildBabyPolarBear (BabyPolarBearModel IR + codegen cuboid table; invoked from BuildPolarBear when UsesPostBabyModelUpdate + isBaby)
+  BuildBabyCamel (BabyCamelModel IR + codegen cuboid table; invoked from BuildCamel when isBaby)
+  BuildBabyPanda (BabyPandaModel IR + codegen cuboid table; invoked from BuildPanda when UsesPostBabyModelUpdate + isBaby)
+
+ADULT_ENTITY_CUBOID_CODEGEN (A.9 — temperate / fish / climate pilots, 2026-05-21):
+  BuildCod / BuildSalmon — full geometry IR + codegen cuboid tables
+  BuildChicken (adult temperate) — ChickenModel IR + codegen cuboid table
+  BuildColdChicken — ColdChickenModel IR + codegen cuboid table (cold hood/crest overlays)
+  BuildCow (temperate adult) — CowModel lifted IR via TryBuildCowMeshFromGeometryIr (2026-05-22; shard ok; codegen table deferred)
+  BuildColdCow / BuildWarmCow — ColdCowModel / WarmCowModel IR + codegen cuboid tables (26.1.2 ok shards)
+  BuildPanda (adult) — PandaModel IR + codegen cuboid table; BuildBabyPanda IR unchanged; preview-delta LER overlay stays
+  BuildPolarBear (adult) — PolarBearModel IR + codegen cuboid table (128×64); BuildBabyPolarBear IR unchanged; preview-delta LER overlay stays (2026-05-22)
+
+ADULT_HAND_CUBOID_REMAINING (ok pilot shards — catalog uses lifted IR or JVM emit; clean-room still hand EntityCuboid):
+  BuildQuadruped (legacy temperate stub) — AppendQuadrupedFamilyCowModelBodyHeadLegs hand path; prefer BuildCow for catalog cow.png
+
+Notes:
+  Glob also matched non-entity helper JSON: net.minecraft.client.model.BabyModelTransform.json, net.minecraft.client.model.AdultAndBabyModelPair.json (not mob stems).
+
+IR_AVAILABLE_NOT_WIRED (Baby*Model JSON class stems under docs/generated/geometry/26.1.2 with no matching BuildBaby* helper name — best-effort; BabyHorseModel + BabyDonkeyModel map to BuildBabyEquineHorseLike):
+  (none — last batch cleared BabyBeeModel + BabyArmadilloModel)
+
+Official geometry JSON stems (full relative paths, 26.1.2 Baby*Model entity layers):
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.armadillo.BabyArmadilloModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.axolotl.BabyAxolotlModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.bee.BabyBeeModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.camel.BabyCamelModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.chicken.BabyChickenModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.cow.BabyCowModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.dolphin.BabyDolphinModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.equine.BabyDonkeyModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.equine.BabyHorseModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.feline.BabyCatModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.feline.BabyFelineModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.feline.BabyOcelotModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.fox.BabyFoxModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.goat.BabyGoatModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.llama.BabyLlamaModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.panda.BabyPandaModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.pig.BabyPigModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.polarbear.BabyPolarBearModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.rabbit.BabyRabbitModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.sheep.BabySheepModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.squid.BabySquidModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.turtle.BabyTurtleModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.animal.wolf.BabyWolfModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.monster.hoglin.BabyHoglinModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.monster.piglin.BabyPiglinModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.monster.piglin.BabyZombifiedPiglinModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.monster.strider.BabyStriderModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.monster.zombie.BabyDrownedModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.monster.zombie.BabyZombieModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.monster.zombie.BabyZombieVillagerModel.json
+  docs/generated/geometry/26.1.2/net.minecraft.client.model.npc.BabyVillagerModel.json
+
+TESTS_STILL_HEAD_SPLIT (AssertBabyHeadSplit helper removed 2026-05-14; no remaining call sites in tests):
+  (none — use explicit dual-profile or legacy-vs-IR tests per mob.)
+
+Legacy-vs-IR style baby head tests still in MinecraftJavaModelPreviewTests (HasElementSize pre/post, not AssertBabyHeadSplit):
+  assets/minecraft/textures/entity/panda/baby_panda.png (body test nearby)
+  assets/minecraft/textures/entity/bear/baby_polarbear.png (+ canonical polarbear_baby.png parity catalog path)
+  assets/minecraft/textures/entity/zombie/zombie_baby.png (BabyZombieModel torso pre vs post)
+
+UsesPostBabyModelUpdate (CleanRoomEntityModelRuntime.cs):
+  Still referenced on many code paths (dozens of call sites) to pick BabyProfile tuples for pre- vs post-26.1 scaling.
+  Sample call sites with explicit isBaby branches (not exhaustive):
+    BuildHumanoid: tuned BabyProfile when isBaby
+    BuildPolarBear: legacy baby = tuned <c>BabyProfile</c> on adult <c>PolarBearModel</c> mesh; post–26.1 baby routes only to <c>BuildBabyPolarBear</c> IR (<c>BabyProfile.Adult</c> inside helper)
+    BuildEquineHorseLike: if (isBaby) return BuildBabyEquineHorseLike(...); (baby path already IR; adult still uses other logic).
+
+SUGGESTED_PARALLEL_BATCHES (disjoint mob families / regions; each agent: add BuildBaby*, dispatch from existing Build* when isBaby, tighten tests toward IR-stable head sizes, reduce UsesPostBabyModelUpdate on that path):
+  Batch 1 — DONE (2026-05-14): Nether — BabyPiglinModel, BabyZombifiedPiglinModel (full JSON mirrors BabyPiglin per javap forward; runtime delegates to BuildBabyPiglin), BabyHoglinModel, BabyStriderModel wired (BuildPiglin / BuildZombifiedPiglin / BuildHoglinFamily / BuildStrider isBaby → IR helpers; adult hoglin/zoglin preview stays static at headPitch=0 and leg pitches=0).
+  Batch 2 — DONE (2026-05-14): BabyZombieModel, BabyZombieVillagerModel, BabyDrownedModel (full JSON = BabyZombie per javap forward), BabyVillagerModel wired via BuildBabyZombie / BuildBabyDrowned / BuildBabyZombieVillager / BuildBabyVillager; BuildZombieHumanoid + BuildZombieVillager + BuildVillager isBaby branches on UsesPostBabyModelUpdate; catalog Zombie / HumanoidZombieVillager / HumanoidVillager paths unchanged.
+  Batch 3 — DONE: BabyCamelModel + BuildCamel baby IR; cow_cold/cow_warm paths (babies still BabyCowModel IR).
+  ADULT_PARITY_2026_05_14: ColdCow — BuildColdCow horn + fleece + nose now match 26.1.2 javap (geometry shard ColdCowModel.json corrected; temperate texOffs(22,0) horns removed on cold path).
+  ADULT_PARITY_2026_05_14: Sniffer — BuildSniffer adult legs parented under bone T(0,5,0) per javap; SnifferModel.json IR cuboids still axis-lift-noisy (runtime is javap source of truth until geometry compiler lift is fixed).
+  Batch 4 — DONE: Felines (BabyCatModel, BabyOcelotModel → BuildBabyCat; BabyFelineModel → BuildBabyFeline + catalog BabyFeline).
+  Batch 5 — DONE (2026-05-21): Panda — BuildPanda post–26.1 baby → BuildBabyPanda IR + codegen cuboid table; legacy 1.x/26.0 baby BabyProfile unchanged; tests cover head/body/leg IR vs legacy + 26.0 head parity + GeometryIrCodegenEmitTests.
+  Batch 6 — DONE (2026-05-14): Aquatic — BabyTurtleModel, BabyDolphinModel, BabySquidModel, BabyAxolotlModel wired (BuildTurtle / BuildDolphin / BuildSquid / BuildAxolotl early-return on UsesPostBabyModelUpdate + isBaby; BabySquid full mesh mantle + 8 tentacles per javap — geometry IR lift was mantle-only).
+  Batch 7 — DONE (2026-05-14): Bee + Armadillo — BabyBeeModel + BabyArmadilloModel wired (BuildBee / BuildArmadillo early-return on UsesPostBabyModelUpdate + isBaby; baby armadillo head/ears parented under body with adult neck anchor because IR lists head parts at model root).

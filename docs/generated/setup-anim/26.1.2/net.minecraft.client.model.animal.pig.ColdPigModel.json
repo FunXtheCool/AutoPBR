@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.pig.ColdPigModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/pig/ColdPigModel.class",
+  "classSha256Hex": "323d5708e2c5996a0676ab882af7d75a7cc2f12ca65d7d02515c6b05ae21bad7",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.QuadrupedModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.QuadrupedModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

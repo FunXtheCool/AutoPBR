@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.object.equipment.ElytraModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "partial",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.object.equipment.ElytraModel).",
+    "Strict structural validation failed (2): cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027; cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "left_wing",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -10,
+                0,
+                0
+              ],
+              "to": [
+                0,
+                20,
+                2
+              ],
+              "uvOrigin": [
+                22,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "liftWarnings": [
+                "cube_deformation_obf_inferred"
+              ],
+              "inflate": 1
+            },
+            {
+              "from": [
+                5,
+                0,
+                0
+              ],
+              "to": [
+                5.261799395,
+                0,
+                -0.261799395
+              ],
+              "uvOrigin": [
+                22,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right_wing",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                0
+              ],
+              "to": [
+                10,
+                20,
+                2
+              ],
+              "uvOrigin": [
+                22,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "liftWarnings": [
+                "cube_deformation_obf_inferred"
+              ],
+              "inflate": 1
+            },
+            {
+              "from": [
+                -5,
+                0,
+                0
+              ],
+              "to": [
+                -4.738200605,
+                0,
+                0.261799395
+              ],
+              "uvOrigin": [
+                22,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "hgz.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.object.equipment.hgz",
+  "classSha256Hex": "eb5eeb0eef4232fcac6172c961b036929b8d6a23ca79e0924cbe182f10b6a182",
+  "bytecodeFloatProbe": [
+    -10,
+    10,
+    20,
+    5,
+    0.2617994,
+    -0.2617994,
+    10,
+    20,
+    -5,
+    0.2617994,
+    0.2617994
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

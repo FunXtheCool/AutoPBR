@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.strider.BabyStriderModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/strider/BabyStriderModel.class",
+  "classSha256Hex": "db211d82690c6bdc7abfbca610599b8349d20164fdb3c02586a689aef23d3105",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.monster.strider.StriderModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.monster.strider.StriderModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

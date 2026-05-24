@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.golem.SnowGolemModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/golem/SnowGolemModel.class",
+  "classSha256Hex": "ee1ab716f340d157294a9c48eec592cf314d98340ba858e13ca64bafa8dd18f7",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.LivingEntityRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "head",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "yRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "xRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "upperBody",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "state": "yRot"
+              },
+              {
+                "const": 0.017453292
+              }
+            ]
+          },
+          {
+            "const": 0.25
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftArm",
+      "property": "yRot",
+      "expr": {
+        "partPeer": "upperBody",
+        "peerProperty": "yRot"
+      }
+    },
+    {
+      "partField": "rightArm",
+      "property": "yRot",
+      "expr": {
+        "partPeer": "upperBody",
+        "peerProperty": "yRot"
+      }
+    },
+    {
+      "partField": "leftArm",
+      "property": "x",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "partSelf": "yRot"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightArm",
+      "property": "x",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "partSelf": "yRot"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

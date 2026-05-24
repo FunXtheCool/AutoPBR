@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.effects.EvokerFangsModel",
+  "extractionStatus": "reference_java",
+  "factoryMethod": "createBodyLayer",
+  "meshHostJvmName": "net.minecraft.client.model.effects.EvokerFangsModel",
+  "roots": [{
+  "id": "root",
+  "pose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [],
+  "children": [{
+  "id": "base",
+  "pose": {
+  "translation": [-5.000000000, 24.00000000, -5.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [0.000000000, 0.000000000, 0.000000000],
+  "to": [10.00000000, 12.00000000, 10.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": [{
+  "id": "lower_jaw",
+  "pose": {
+  "translation": [3.500000000, 0.000000000, 9.000000000],
+  "rotationEulerRad": [0.000000000, 3.141592741, 4.241150379],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [0.000000000, 0.000000000, 0.000000000],
+  "to": [4.000000000, 14.00000000, 8.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "upper_jaw",
+  "pose": {
+  "translation": [6.500000000, 0.000000000, 1.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 2.042035103],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [0.000000000, 0.000000000, 0.000000000],
+  "to": [4.000000000, 14.00000000, 8.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+]
+}
+]
+}
+]
+}

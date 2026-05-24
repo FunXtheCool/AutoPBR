@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.endermite.EndermiteModel",
+  "profile": "named_jar_26.1.2",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.monster.endermite.EndermiteModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0.000000000,
+          0.000000000,
+          0.000000000
+        ],
+        "rotationEulerRad": [
+          0.000000000,
+          0.000000000,
+          0.000000000
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "segment0",
+          "pose": {
+            "translation": [
+              0.000000000,
+              21.00000000,
+              -3.500000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -2,
+                0,
+                -1
+              ],
+              "to": [
+                2,
+                3,
+                1
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "segment1",
+          "pose": {
+            "translation": [
+              0.000000000,
+              20.00000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -3,
+                0,
+                -2.5
+              ],
+              "to": [
+                3,
+                4,
+                2.5
+              ],
+              "uvOrigin": [
+                0,
+                5
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "segment2",
+          "pose": {
+            "translation": [
+              0.000000000,
+              21.00000000,
+              3.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1.5,
+                0,
+                -0.5
+              ],
+              "to": [
+                1.5,
+                3,
+                0.5
+              ],
+              "uvOrigin": [
+                0,
+                14
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "segment3",
+          "pose": {
+            "translation": [
+              0.000000000,
+              22.00000000,
+              4.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -0.5,
+                0,
+                -0.5
+              ],
+              "to": [
+                0.5,
+                2,
+                0.5
+              ],
+              "uvOrigin": [
+                0,
+                18
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "net/minecraft/client/model/monster/endermite/EndermiteModel.class",
+  "classSha256Hex": "bb73e8eba415280e4aa378e64481cd82e348f93d0eb0fef4b362a845846dfb11",
+  "bytecodeFloatProbe": [
+    -3.5,
+    -0.5,
+    -0.5,
+    0.5
+  ],
+  "textureWidth": 64,
+  "textureHeight": 32,
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

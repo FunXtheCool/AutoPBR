@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.fish.SalmonModel",
+  "deltas": [
+    {
+      "kind": "zeroThicknessSheet",
+      "description": "Viewport emit thickens zero-extent fin axes for GL visibility; parity fidelity matches lifted IR corners.",
+      "partId": "right_fin"
+    },
+    {
+      "kind": "previewBasis",
+      "description": "LivingEntityRenderer preview basis applied post-build.",
+      "partId": "_all"
+    }
+  ]
+}

@@ -1,0 +1,562 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.blaze.BlazeModel",
+  "profile": "named_jar_26.1.2",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.monster.blaze.BlazeModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0.000000000,
+          0.000000000,
+          0.000000000
+        ],
+        "rotationEulerRad": [
+          0.000000000,
+          0.000000000,
+          0.000000000
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "head",
+          "pose": {
+            "translation": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -4,
+                -4,
+                -4
+              ],
+              "to": [
+                4,
+                4,
+                4
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "part0",
+          "pose": {
+            "translation": [
+              9.000000000,
+              -1.000000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                0
+              ],
+              "to": [
+                2,
+                8,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "part1",
+          "pose": {
+            "translation": [
+              1.102182141e-15,
+              -1.122408748,
+              9.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                0
+              ],
+              "to": [
+                2,
+                8,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "part2",
+          "pose": {
+            "translation": [
+              -9.000000000,
+              -1.459667206,
+              1.102182141e-15
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                0
+              ],
+              "to": [
+                2,
+                8,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "part3",
+          "pose": {
+            "translation": [
+              0.000000000,
+              -1.929208517,
+              -9.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                0
+              ],
+              "to": [
+                2,
+                8,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "part4",
+          "pose": {
+            "translation": [
+              4.949747562,
+              1.583919168,
+              4.949747562
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                0
+              ],
+              "to": [
+                2,
+                8,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "part5",
+          "pose": {
+            "translation": [
+              -4.949747562,
+              1.198910713,
+              4.949747562
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                0
+              ],
+              "to": [
+                2,
+                8,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "part6",
+          "pose": {
+            "translation": [
+              -4.949747562,
+              1.010009289,
+              -4.949747562
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                0
+              ],
+              "to": [
+                2,
+                8,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "part7",
+          "pose": {
+            "translation": [
+              4.949747562,
+              1.063532352,
+              -4.949747562
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                0
+              ],
+              "to": [
+                2,
+                8,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "part8",
+          "pose": {
+            "translation": [
+              4.455076218,
+              11.96016312,
+              2.269866943
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                0
+              ],
+              "to": [
+                2,
+                8,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "part9",
+          "pose": {
+            "translation": [
+              -2.269866943,
+              11.89300823,
+              4.455076218
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                0
+              ],
+              "to": [
+                2,
+                8,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "part10",
+          "pose": {
+            "translation": [
+              -4.455076218,
+              11.34671021,
+              -2.269866943
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                0
+              ],
+              "to": [
+                2,
+                8,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "part11",
+          "pose": {
+            "translation": [
+              2.269866943,
+              10.61430740,
+              -4.455076218
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                0
+              ],
+              "to": [
+                2,
+                8,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "net/minecraft/client/model/monster/blaze/BlazeModel.class",
+  "classSha256Hex": "85090b4cdbed0796674bc0c4fa876117fbe24f40874b7268c60c7fec27e76c6a",
+  "bytecodeFloatProbe": [
+    -4,
+    -4,
+    -4,
+    8,
+    8,
+    8,
+    8,
+    9,
+    -2,
+    0.25,
+    9,
+    1.5707964,
+    0.7853982,
+    7,
+    0.25,
+    7,
+    1.5707964,
+    0.47123894,
+    5,
+    11,
+    1.5,
+    0.5,
+    5,
+    1.5707964
+  ],
+  "textureWidth": 64,
+  "textureHeight": 32,
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

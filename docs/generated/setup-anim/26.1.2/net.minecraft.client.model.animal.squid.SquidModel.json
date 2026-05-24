@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.squid.SquidModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/squid/SquidModel.class",
+  "classSha256Hex": "7f70285b26068d607250a81b829ed3c39162e4e2fbf6655d777499101e46dc90",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.SquidRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "tentacle0",
+      "property": "xRot",
+      "expr": {
+        "state": "tentacleAngle"
+      }
+    },
+    {
+      "partField": "tentacle1",
+      "property": "xRot",
+      "expr": {
+        "state": "tentacleAngle"
+      }
+    },
+    {
+      "partField": "tentacle2",
+      "property": "xRot",
+      "expr": {
+        "state": "tentacleAngle"
+      }
+    },
+    {
+      "partField": "tentacle3",
+      "property": "xRot",
+      "expr": {
+        "state": "tentacleAngle"
+      }
+    },
+    {
+      "partField": "tentacle4",
+      "property": "xRot",
+      "expr": {
+        "state": "tentacleAngle"
+      }
+    },
+    {
+      "partField": "tentacle5",
+      "property": "xRot",
+      "expr": {
+        "state": "tentacleAngle"
+      }
+    },
+    {
+      "partField": "tentacle6",
+      "property": "xRot",
+      "expr": {
+        "state": "tentacleAngle"
+      }
+    },
+    {
+      "partField": "tentacle7",
+      "property": "xRot",
+      "expr": {
+        "state": "tentacleAngle"
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

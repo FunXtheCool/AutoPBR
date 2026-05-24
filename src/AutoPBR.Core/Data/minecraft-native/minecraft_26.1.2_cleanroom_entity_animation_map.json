@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "animationIndexFileName": "animation-index-26.1.2.json",
+  "animationShardRootRelPath": "animation/26.1.2",
+  "setupAnimIndexFileName": "setup-anim-index-26.1.2.json",
+  "setupAnimShardRootRelPath": "setup-anim/26.1.2",
+  "bindings": [
+    {
+      "animationOfficialJvmName": "net.minecraft.client.animation.definitions.ArmadilloAnimation",
+      "parityBuilderMethods": ["Armadillo"],
+      "restrictToBabyTextures": false,
+      "notes": "Adult armadillo mob; CleanRoom idle uses heuristic head pitch unless retargeted to vanilla definitions (roll/walk/peek)."
+    },
+    {
+      "animationOfficialJvmName": "net.minecraft.client.animation.definitions.BabyArmadilloAnimation",
+      "parityBuilderMethods": ["Armadillo"],
+      "restrictToBabyTextures": true,
+      "notes": "Same parity builder as adult; baby diffuse stems route with isBaby."
+    },
+    {
+      "animationOfficialJvmName": "net.minecraft.client.animation.definitions.BabyAxolotlAnimation",
+      "parityBuilderMethods": ["Axolotl"],
+      "restrictToBabyTextures": true,
+      "notes": "26.1.2 batch lists baby axolotl definitions only; adult axolotl may use additional vanilla classes not in this index."
+    },
+    {
+      "animationOfficialJvmName": "net.minecraft.client.animation.definitions.BabyRabbitAnimation",
+      "parityBuilderMethods": ["Rabbit"],
+      "restrictToBabyTextures": true,
+      "notes": "Baby rabbit textures use Rabbit builder with isBaby."
+    },
+    {
+      "animationOfficialJvmName": "net.minecraft.client.animation.definitions.BatAnimation",
+      "parityBuilderMethods": ["Bat"],
+      "notes": "Catalogued bat entity diffuse."
+    },
+    {
+      "animationOfficialJvmName": "net.minecraft.client.animation.definitions.BreezeAnimation",
+      "parityBuilderMethods": ["Breeze"],
+      "notes": "Wind rods sample BreezeAnimation.IDLE via DefinitionAnimationPreviewSampling; setupAnim on BreezeModel uses playbackSteps."
+    },
+    {
+      "animationOfficialJvmName": "net.minecraft.client.animation.definitions.CamelAnimation",
+      "parityBuilderMethods": ["Camel"],
+      "restrictToBabyTextures": false,
+      "notes": "Adult camel mob."
+    },
+    {
+      "animationOfficialJvmName": "net.minecraft.client.animation.definitions.CamelBabyAnimation",
+      "parityBuilderMethods": ["Camel"],
+      "restrictToBabyTextures": true,
+      "notes": "Baby camel uses Camel builder with isBaby."
+    },
+    {
+      "animationOfficialJvmName": "net.minecraft.client.animation.definitions.CopperGolemAnimation",
+      "parityBuilderMethods": ["CopperGolem"],
+      "notes": "Copper golem entity + related catalogued paths."
+    },
+    {
+      "animationOfficialJvmName": "net.minecraft.client.animation.definitions.CreakingAnimation",
+      "parityBuilderMethods": ["Creaking"],
+      "notes": "Pale garden hostile."
+    },
+    {
+      "animationOfficialJvmName": "net.minecraft.client.animation.definitions.FoxBabyAnimation",
+      "parityBuilderMethods": ["Fox"],
+      "restrictToBabyTextures": true,
+      "notes": "Adult fox uses heuristic quadruped idle; only baby fox has a dedicated vanilla definition class in this batch list."
+    },
+    {
+      "animationOfficialJvmName": "net.minecraft.client.animation.definitions.FrogAnimation",
+      "parityBuilderMethods": ["Frog"],
+      "notes": "Frog cold/warm/temperate variants share Frog builder."
+    },
+    {
+      "animationOfficialJvmName": "net.minecraft.client.animation.definitions.NautilusAnimation",
+      "parityBuilderMethods": ["NautilusMob"],
+      "notes": "Mob body swimming uses NautilusAnimation.SWIMMING IR; setupAnim on NautilusModel wires applyWalk playback."
+    },
+    {
+      "animationOfficialJvmName": "net.minecraft.client.animation.definitions.RabbitAnimation",
+      "parityBuilderMethods": ["Rabbit"],
+      "restrictToBabyTextures": false,
+      "notes": "Adult rabbit / non-baby rabbit catalogued paths."
+    },
+    {
+      "animationOfficialJvmName": "net.minecraft.client.animation.definitions.SnifferAnimation",
+      "parityBuilderMethods": ["Sniffer"],
+      "notes": "Sniffer mob parity."
+    },
+    {
+      "animationOfficialJvmName": "net.minecraft.client.animation.definitions.WardenAnimation",
+      "parityBuilderMethods": ["Warden"],
+      "notes": "Warden body; warden heart/sonic textures use other builders without dedicated animation shards in this list."
+    }
+  ]
+}

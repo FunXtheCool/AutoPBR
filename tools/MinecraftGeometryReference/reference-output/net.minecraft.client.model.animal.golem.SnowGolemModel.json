@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.golem.SnowGolemModel",
+  "extractionStatus": "reference_java",
+  "factoryMethod": "createBodyLayer",
+  "meshHostJvmName": "net.minecraft.client.model.animal.golem.SnowGolemModel",
+  "roots": [{
+  "id": "root",
+  "pose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [],
+  "children": [{
+  "id": "head",
+  "pose": {
+  "translation": [0.000000000, 4.000000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-4.000000000, -8.000000000, -4.000000000],
+  "to": [4.000000000, 0.000000000, 4.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "right_arm",
+  "pose": {
+  "translation": [-5.000000000, 6.000000000, -1.000000000],
+  "rotationEulerRad": [0.000000000, 3.141592741, -1.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-1.000000000, 0.000000000, -1.000000000],
+  "to": [11.00000000, 2.000000000, 1.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "upper_body",
+  "pose": {
+  "translation": [0.000000000, 13.00000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-5.000000000, -10.00000000, -5.000000000],
+  "to": [5.000000000, 0.000000000, 5.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "left_arm",
+  "pose": {
+  "translation": [5.000000000, 6.000000000, 1.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 1.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-1.000000000, 0.000000000, -1.000000000],
+  "to": [11.00000000, 2.000000000, 1.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "lower_body",
+  "pose": {
+  "translation": [0.000000000, 24.00000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-6.000000000, -12.00000000, -6.000000000],
+  "to": [6.000000000, 0.000000000, 6.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+]
+}
+]
+}

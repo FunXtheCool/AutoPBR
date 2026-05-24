@@ -1,0 +1,910 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.equine.AbstractEquineModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/equine/AbstractEquineModel.class",
+  "classSha256Hex": "56b437491e7772057c57bd7ae638d0ac239382271a24010702ab6bffe89dd412",
+  "renderStateType": "T",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "headParts",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "yRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "headParts",
+      "property": "yRot",
+      "expr": {
+        "partSelf": "yRot"
+      }
+    },
+    {
+      "partField": "leftFrontLeg",
+      "property": "y",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "partSelf": "y"
+          },
+          {
+            "state": "standAnimation"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftFrontLeg",
+      "property": "z",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "partSelf": "z"
+          },
+          {
+            "state": "standAnimation"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightFrontLeg",
+      "property": "y",
+      "expr": {
+        "partPeer": "leftFrontLeg",
+        "peerProperty": "y"
+      }
+    },
+    {
+      "partField": "rightFrontLeg",
+      "property": "z",
+      "expr": {
+        "partPeer": "leftFrontLeg",
+        "peerProperty": "z"
+      }
+    },
+    {
+      "partField": "tail",
+      "property": "y",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "y"
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "state": "walkAnimationSpeed"
+              },
+              {
+                "state": "ageScale"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tail",
+      "property": "z",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "z"
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "state": "walkAnimationSpeed"
+                  },
+                  {
+                    "const": 2
+                  }
+                ]
+              },
+              {
+                "state": "ageScale"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tail",
+      "property": "yRot",
+      "expr": {
+        "op": "cos",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "state": "ageInTicks"
+              },
+              {
+                "const": 0.7
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tail",
+      "property": "yRot",
+      "expr": {
+        "const": 0
+      }
+    },
+    {
+      "partField": "leftHindLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "sub",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "const": 0.2617994
+              },
+              {
+                "state": "standAnimation"
+              }
+            ]
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "cos",
+                        "args": [
+                          {
+                            "op": "add",
+                            "args": [
+                              {
+                                "op": "mul",
+                                "args": [
+                                  {
+                                    "op": "mul",
+                                    "args": [
+                                      {
+                                        "when": {
+                                          "state": "isInWater",
+                                          "cmp": "eq",
+                                          "value": true
+                                        },
+                                        "then": {
+                                          "const": 0.2
+                                        },
+                                        "else": {
+                                          "const": 1
+                                        }
+                                      },
+                                      {
+                                        "state": "walkAnimationPos"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "const": 0.6662
+                                  }
+                                ]
+                              },
+                              {
+                                "const": 3.1415927
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "const": 0.5
+                      }
+                    ]
+                  },
+                  {
+                    "state": "walkAnimationSpeed"
+                  }
+                ]
+              },
+              {
+                "op": "sub",
+                "args": [
+                  {
+                    "const": 1
+                  },
+                  {
+                    "state": "standAnimation"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightHindLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "const": 0.2617994
+              },
+              {
+                "state": "standAnimation"
+              }
+            ]
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "cos",
+                        "args": [
+                          {
+                            "op": "add",
+                            "args": [
+                              {
+                                "op": "mul",
+                                "args": [
+                                  {
+                                    "op": "mul",
+                                    "args": [
+                                      {
+                                        "when": {
+                                          "state": "isInWater",
+                                          "cmp": "eq",
+                                          "value": true
+                                        },
+                                        "then": {
+                                          "const": 0.2
+                                        },
+                                        "else": {
+                                          "const": 1
+                                        }
+                                      },
+                                      {
+                                        "state": "walkAnimationPos"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "const": 0.6662
+                                  }
+                                ]
+                              },
+                              {
+                                "const": 3.1415927
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "const": 0.5
+                      }
+                    ]
+                  },
+                  {
+                    "state": "walkAnimationSpeed"
+                  }
+                ]
+              },
+              {
+                "op": "sub",
+                "args": [
+                  {
+                    "const": 1
+                  },
+                  {
+                    "state": "standAnimation"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftFrontLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "const": -1.0471976
+                  },
+                  {
+                    "op": "cos",
+                    "args": [
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "mul",
+                            "args": [
+                              {
+                                "state": "ageInTicks"
+                              },
+                              {
+                                "const": 0.6
+                              }
+                            ]
+                          },
+                          {
+                            "const": 3.1415927
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "state": "standAnimation"
+              }
+            ]
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "cos",
+                        "args": [
+                          {
+                            "op": "add",
+                            "args": [
+                              {
+                                "op": "mul",
+                                "args": [
+                                  {
+                                    "op": "mul",
+                                    "args": [
+                                      {
+                                        "when": {
+                                          "state": "isInWater",
+                                          "cmp": "eq",
+                                          "value": true
+                                        },
+                                        "then": {
+                                          "const": 0.2
+                                        },
+                                        "else": {
+                                          "const": 1
+                                        }
+                                      },
+                                      {
+                                        "state": "walkAnimationPos"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "const": 0.6662
+                                  }
+                                ]
+                              },
+                              {
+                                "const": 3.1415927
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "const": 0.8
+                      }
+                    ]
+                  },
+                  {
+                    "state": "walkAnimationSpeed"
+                  }
+                ]
+              },
+              {
+                "op": "sub",
+                "args": [
+                  {
+                    "const": 1
+                  },
+                  {
+                    "state": "standAnimation"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightFrontLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "sub",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "const": -1.0471976
+                  },
+                  {
+                    "op": "cos",
+                    "args": [
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "mul",
+                            "args": [
+                              {
+                                "state": "ageInTicks"
+                              },
+                              {
+                                "const": 0.6
+                              }
+                            ]
+                          },
+                          {
+                            "const": 3.1415927
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "state": "standAnimation"
+              }
+            ]
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "cos",
+                        "args": [
+                          {
+                            "op": "add",
+                            "args": [
+                              {
+                                "op": "mul",
+                                "args": [
+                                  {
+                                    "op": "mul",
+                                    "args": [
+                                      {
+                                        "when": {
+                                          "state": "isInWater",
+                                          "cmp": "eq",
+                                          "value": true
+                                        },
+                                        "then": {
+                                          "const": 0.2
+                                        },
+                                        "else": {
+                                          "const": 1
+                                        }
+                                      },
+                                      {
+                                        "state": "walkAnimationPos"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "const": 0.6662
+                                  }
+                                ]
+                              },
+                              {
+                                "const": 3.1415927
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "const": 0.8
+                      }
+                    ]
+                  },
+                  {
+                    "state": "walkAnimationSpeed"
+                  }
+                ]
+              },
+              {
+                "op": "sub",
+                "args": [
+                  {
+                    "const": 1
+                  },
+                  {
+                    "state": "standAnimation"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "headParts",
+      "property": "xRot",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "op": "add",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "state": "standAnimation"
+                  },
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "const": 0.2617994
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "mul",
+                            "args": [
+                              {
+                                "state": "xRot"
+                              },
+                              {
+                                "const": 0.017453292
+                              }
+                            ]
+                          },
+                          {
+                            "when": {
+                              "state": "walkAnimationSpeed",
+                              "cmp": "gt",
+                              "value": 0.2
+                            },
+                            "then": {
+                              "op": "mul",
+                              "args": [
+                                {
+                                  "op": "mul",
+                                  "args": [
+                                    {
+                                      "op": "cos",
+                                      "args": [
+                                        {
+                                          "op": "mul",
+                                          "args": [
+                                            {
+                                              "state": "walkAnimationPos"
+                                            },
+                                            {
+                                              "const": 0.8
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "const": 0.15
+                                    }
+                                  ]
+                                },
+                                {
+                                  "state": "walkAnimationSpeed"
+                                }
+                              ]
+                            },
+                            "else": {
+                              "const": 0
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "state": "eatAnimation"
+                  },
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "const": 2.1816616
+                      },
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "sin",
+                            "args": [
+                              {
+                                "state": "ageInTicks"
+                              }
+                            ]
+                          },
+                          {
+                            "const": 0.05
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "sub",
+                "args": [
+                  {
+                    "const": 1
+                  },
+                  {
+                    "op": "max",
+                    "args": [
+                      {
+                        "state": "standAnimation"
+                      },
+                      {
+                        "state": "eatAnimation"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "const": 0.5235988
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "mul",
+                            "args": [
+                              {
+                                "state": "xRot"
+                              },
+                              {
+                                "const": 0.017453292
+                              }
+                            ]
+                          },
+                          {
+                            "when": {
+                              "state": "walkAnimationSpeed",
+                              "cmp": "gt",
+                              "value": 0.2
+                            },
+                            "then": {
+                              "op": "mul",
+                              "args": [
+                                {
+                                  "op": "mul",
+                                  "args": [
+                                    {
+                                      "op": "cos",
+                                      "args": [
+                                        {
+                                          "op": "mul",
+                                          "args": [
+                                            {
+                                              "state": "walkAnimationPos"
+                                            },
+                                            {
+                                              "const": 0.8
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "const": 0.15
+                                    }
+                                  ]
+                                },
+                                {
+                                  "state": "walkAnimationSpeed"
+                                }
+                              ]
+                            },
+                            "else": {
+                              "const": 0
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "feedingAnimation"
+                      },
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "sin",
+                            "args": [
+                              {
+                                "state": "ageInTicks"
+                              }
+                            ]
+                          },
+                          {
+                            "const": 0.05
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "body",
+      "property": "xRot",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "state": "standAnimation"
+              },
+              {
+                "const": -0.7853982
+              }
+            ]
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "sub",
+                "args": [
+                  {
+                    "const": 1
+                  },
+                  {
+                    "state": "standAnimation"
+                  }
+                ]
+              },
+              {
+                "partSelf": "xRot"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tail",
+      "property": "xRot",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "op": "add",
+            "args": [
+              {
+                "const": 0
+              },
+              {
+                "const": 0.5235988
+              }
+            ]
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "state": "walkAnimationSpeed"
+              },
+              {
+                "const": 0.75
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

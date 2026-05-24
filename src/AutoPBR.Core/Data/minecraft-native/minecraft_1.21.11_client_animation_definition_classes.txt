@@ -1,0 +1,11 @@
+# 1.21.11 AnimationDefinition holders (from minecraft-client-model-index-1.21.11.json).
+net/minecraft/client/animation/definitions/ArmadilloAnimation.class
+net/minecraft/client/animation/definitions/BatAnimation.class
+net/minecraft/client/animation/definitions/BreezeAnimation.class
+net/minecraft/client/animation/definitions/CamelAnimation.class
+net/minecraft/client/animation/definitions/CopperGolemAnimation.class
+net/minecraft/client/animation/definitions/CreakingAnimation.class
+net/minecraft/client/animation/definitions/FrogAnimation.class
+net/minecraft/client/animation/definitions/NautilusAnimation.class
+net/minecraft/client/animation/definitions/SnifferAnimation.class
+net/minecraft/client/animation/definitions/WardenAnimation.class

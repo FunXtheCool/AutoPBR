@@ -1,0 +1,151 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AutoPBR.App.ViewModels"
+        x:Class="AutoPBR.App.Views.UvDebugWindow"
+        x:DataType="vm:UvDebugWindowViewModel"
+        Width="760"
+        Height="680"
+        MinWidth="560"
+        MinHeight="420"
+        WindowStartupLocation="CenterOwner"
+        Background="Transparent"
+        SystemDecorations="None"
+        ExtendClientAreaToDecorationsHint="True"
+        TransparencyLevelHint="None">
+    <Border Background="{Binding WindowBackground}"
+            BorderBrush="{Binding CardBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="8"
+            Padding="1">
+        <Grid RowDefinitions="Auto,*">
+            <Border Grid.Row="0"
+                    Height="40"
+                    Background="{Binding WindowBackground}"
+                    BorderBrush="{Binding CardBorderBrush}"
+                    BorderThickness="0,0,0,1"
+                    PointerPressed="TitleBarDragRegion_PointerPressed">
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="{Binding HeaderTitle}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Foreground="{Binding ForegroundBrush}" />
+                    <Button Grid.Column="1"
+                            Width="36"
+                            Height="28"
+                            Margin="0,6,6,6"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Foreground="{Binding ForegroundBrush}"
+                            Content="✕"
+                            Click="CloseWindow_Click" />
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="1"
+                    Margin="12"
+                    Padding="0"
+                    Background="{Binding CardBackground}"
+                    BorderBrush="{Binding CardBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="6">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled"
+                              MinHeight="220">
+                    <StackPanel Spacing="10" Margin="12">
+                    <TextBlock Text="Global UV Debug Controls"
+                               Foreground="{Binding ForegroundBrush}"
+                               FontWeight="SemiBold" />
+                    <TextBlock Text="These apply to all baked previews (blocks/items/entities)."
+                               Foreground="{Binding ForegroundBrush}"
+                               Opacity="0.8"
+                               FontSize="12" />
+
+                    <CheckBox Content="Flip U (swap u0/u1)"
+                              IsChecked="{Binding FlipU, Mode=TwoWay}" />
+                    <CheckBox Content="Flip V (swap v0/v1)"
+                              IsChecked="{Binding FlipV, Mode=TwoWay}" />
+
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <TextBlock Text="U offset (px)"
+                                   VerticalAlignment="Center"
+                                   Foreground="{Binding ForegroundBrush}" />
+                        <NumericUpDown Width="120"
+                                       Increment="1"
+                                       Minimum="-128"
+                                       Maximum="128"
+                                       Value="{Binding OffsetUPixels, Mode=TwoWay}" />
+
+                        <TextBlock Text="V offset (px)"
+                                   VerticalAlignment="Center"
+                                   Margin="10,0,0,0"
+                                   Foreground="{Binding ForegroundBrush}" />
+                        <NumericUpDown Width="120"
+                                       Increment="1"
+                                       Minimum="-128"
+                                       Maximum="128"
+                                       Value="{Binding OffsetVPixels, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <TextBlock Text="Face semantic routing (post-transform face semantics)"
+                               Foreground="{Binding ForegroundBrush}"
+                               FontWeight="SemiBold"
+                               Margin="0,8,0,0" />
+                    <CheckBox Content="Swap face routing North / South"
+                              IsChecked="{Binding SwapFaceNorthSouth, Mode=TwoWay}" />
+                    <CheckBox Content="Swap face routing East / West"
+                              IsChecked="{Binding SwapFaceEastWest, Mode=TwoWay}" />
+                    <CheckBox Content="Swap face routing Up / Down"
+                              IsChecked="{Binding SwapFaceUpDown, Mode=TwoWay}" />
+
+                    <TextBlock Text="Baker UV conversion"
+                               Foreground="{Binding ForegroundBrush}"
+                               FontWeight="SemiBold"
+                               Margin="0,8,0,0" />
+                    <CheckBox Content="Preserve directional UV bounds (disable min/max normalization)"
+                              IsChecked="{Binding PreserveDirectionalBounds, Mode=TwoWay}" />
+                    <CheckBox Content="Use bottom-left UV origin conversion (GL style)"
+                              IsChecked="{Binding UseBottomLeftUvOrigin, Mode=TwoWay}" />
+
+                    <TextBlock Text="Face corner ordering / winding"
+                               Foreground="{Binding ForegroundBrush}"
+                               FontWeight="SemiBold"
+                               Margin="0,8,0,0" />
+                    <WrapPanel ItemSpacing="8" LineSpacing="6">
+                        <RadioButton Content="Default" IsChecked="{Binding CornerOrderDefault, Mode=TwoWay}" GroupName="UvCornerOrder" />
+                        <RadioButton Content="Rotate 90" IsChecked="{Binding CornerOrderRotate90, Mode=TwoWay}" GroupName="UvCornerOrder" />
+                        <RadioButton Content="Rotate 180" IsChecked="{Binding CornerOrderRotate180, Mode=TwoWay}" GroupName="UvCornerOrder" />
+                        <RadioButton Content="Rotate 270" IsChecked="{Binding CornerOrderRotate270, Mode=TwoWay}" GroupName="UvCornerOrder" />
+                        <RadioButton Content="Reverse winding" IsChecked="{Binding CornerOrderReverseWinding, Mode=TwoWay}" GroupName="UvCornerOrder" />
+                    </WrapPanel>
+
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <TextBlock Text="Global face rotation"
+                                   VerticalAlignment="Center"
+                                   Foreground="{Binding ForegroundBrush}" />
+                        <RadioButton Content="0°" IsChecked="{Binding Rotation0, Mode=TwoWay}" GroupName="UvRotation" />
+                        <RadioButton Content="90°" IsChecked="{Binding Rotation90, Mode=TwoWay}" GroupName="UvRotation" />
+                        <RadioButton Content="180°" IsChecked="{Binding Rotation180, Mode=TwoWay}" GroupName="UvRotation" />
+                        <RadioButton Content="270°" IsChecked="{Binding Rotation270, Mode=TwoWay}" GroupName="UvRotation" />
+                    </StackPanel>
+
+                    <Border Margin="0,8,0,0"
+                            Padding="8"
+                            CornerRadius="4"
+                            BorderBrush="{Binding CardBorderBrush}"
+                            BorderThickness="1">
+                        <TextBlock Text="Changes apply live and trigger preview refresh. Use these to isolate texOffs vs baker conversion vs corner-order issues."
+                                   Foreground="{Binding ForegroundBrush}"
+                                   Opacity="0.8"
+                                   FontSize="12" />
+                    </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </Border>
+</Window>
+

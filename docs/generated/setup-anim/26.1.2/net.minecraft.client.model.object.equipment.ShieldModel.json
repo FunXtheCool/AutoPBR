@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.equipment.ShieldModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/object/equipment/ShieldModel.class",
+  "classSha256Hex": "ae8e9ad4b1bb6a7aa4b9b524fe7eaa71e8ef9a3323d89ad0fefeabec7cfd7471",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.Model",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "setupAnimEffectOnly": true,
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No setupAnim bytecode; effect model uses parent pose only.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.rabbit.RabbitModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/rabbit/RabbitModel.class",
+  "classSha256Hex": "81d5fec794f6fecda865907e4d9f33469981dd9b8d34213968363e8e381d61eb",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.RabbitRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "head",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "yRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "xRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    }
+  ],
+  "playbackSteps": [
+    {
+      "mode": "apply",
+      "animationField": "hopAnimation",
+      "stateField": "hopAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "idleHeadTiltAnimation",
+      "stateField": "idleHeadTiltAnimationState",
+      "ageField": "ageInTicks"
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

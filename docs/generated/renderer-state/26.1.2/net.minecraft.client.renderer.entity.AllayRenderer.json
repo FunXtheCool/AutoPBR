@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.renderer.entity.AllayRenderer",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.AllayRenderState",
+  "modelJvmNames": [
+    "net.minecraft.client.model.animal.allay.AllayModel"
+  ],
+  "extractionStatus": "partial",
+  "extractionNotes": [
+    "extractRenderState: MobRenderer.extractRenderState super, ArmedEntityRenderState.extractArmedEntityRenderState, then isDancing/isSpinning/spinningProgress/holdingAnimationProgress from Allay entity (javap 26.1.2 lines 34–51).",
+    "AllayModel.setupAnim is lifted ok: wing idle uses walk fields; arms use holdingAnimationProgress; dance branch uses isDancing, spinningProgress, isSpinning (no KeyframeAnimation.apply).",
+    "Preview driver allay_hold_dance_cycle ramps holdingAnimationProgress then toggles dance/spin flags for viewport motion."
+  ],
+  "scalarRenderStateFields": [
+    { "renderStateField": "holdingAnimationProgress", "setupAnimStateField": "holdingAnimationProgress" },
+    { "renderStateField": "isDancing", "setupAnimStateField": "isDancing" },
+    { "renderStateField": "isSpinning", "setupAnimStateField": "isSpinning" },
+    { "renderStateField": "spinningProgress", "setupAnimStateField": "spinningProgress" }
+  ],
+  "livingEntityFields": [
+    "ageInTicks",
+    "walkAnimationPos",
+    "walkAnimationSpeed",
+    "xRot",
+    "yRot"
+  ],
+  "previewDriver": "allay_hold_dance_cycle",
+  "phaseLengthsSeconds": {
+    "holding": 3,
+    "dance": 4,
+    "spinRamp": 1.5
+  }
+}

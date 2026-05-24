@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.cart.MinecartModel",
+  "extractionStatus": "reference_java",
+  "factoryMethod": "createBodyLayer",
+  "meshHostJvmName": "net.minecraft.client.model.object.cart.MinecartModel",
+  "roots": [{
+  "id": "root",
+  "pose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [],
+  "children": [{
+  "id": "left",
+  "pose": {
+  "translation": [0.000000000, 4.000000000, -7.000000000],
+  "rotationEulerRad": [0.000000000, 3.141592741, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-8.000000000, -9.000000000, -1.000000000],
+  "to": [8.000000000, -1.000000000, 1.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "bottom",
+  "pose": {
+  "translation": [0.000000000, 4.000000000, 0.000000000],
+  "rotationEulerRad": [1.570796371, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-10.00000000, -8.000000000, -1.000000000],
+  "to": [10.00000000, 8.000000000, 1.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "back",
+  "pose": {
+  "translation": [9.000000000, 4.000000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 1.570796371, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-8.000000000, -9.000000000, -1.000000000],
+  "to": [8.000000000, -1.000000000, 1.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "front",
+  "pose": {
+  "translation": [-9.000000000, 4.000000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 4.712388992, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-8.000000000, -9.000000000, -1.000000000],
+  "to": [8.000000000, -1.000000000, 1.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "right",
+  "pose": {
+  "translation": [0.000000000, 4.000000000, 7.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-8.000000000, -9.000000000, -1.000000000],
+  "to": [8.000000000, -1.000000000, 1.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+]
+}
+]
+}

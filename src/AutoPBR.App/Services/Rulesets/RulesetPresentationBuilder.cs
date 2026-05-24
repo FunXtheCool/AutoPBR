@@ -1,5 +1,5 @@
-using AutoPBR.App.ViewModels.Rulesets;
 using AutoPBR.App.Lang;
+using AutoPBR.App.ViewModels.Rulesets;
 using AutoPBR.Core;
 using AutoPBR.Core.Models;
 using AutoPBR.Core.Models.RuleExpressions;
@@ -18,19 +18,19 @@ public static class RulesetPresentationBuilder
                 var rowKey = $"tag:{r.Id}";
                 return new RuleDisplayItemViewModel
                 {
-                Id = r.Id,
-                DisplayName = r.DisplayName,
-                Kind = r.Kind.ToString(),
-                Keywords = string.Join(", ", r.Keywords),
-                SemanticHints = string.Join(", ", r.SemanticHints),
-                KeywordTokens = r.Keywords.ToList(),
-                VisibleKeywordTokens = BuildVisibleKeywordTokens(rowKey, r.Keywords, isExpanded),
-                KeywordsExpanded = IsExpanded(rowKey, isExpanded),
-                HiddenKeywordCount = CountHiddenKeywords(rowKey, r.Keywords, isExpanded),
-                MoreKeywordsLabel = string.Format(LocalizedStrings.RulesetsMoreCount, CountHiddenKeywords(rowKey, r.Keywords, isExpanded)),
-                SemanticHintTokens = r.SemanticHints.ToList(),
-                Source = RuleDisplaySource.BuiltInTag,
-                IsEditable = false
+                    Id = r.Id,
+                    DisplayName = r.DisplayName,
+                    Kind = r.Kind.ToString(),
+                    Keywords = string.Join(", ", r.Keywords),
+                    SemanticHints = string.Join(", ", r.SemanticHints),
+                    KeywordTokens = r.Keywords.ToList(),
+                    VisibleKeywordTokens = BuildVisibleKeywordTokens(rowKey, r.Keywords, isExpanded),
+                    KeywordsExpanded = IsExpanded(rowKey, isExpanded),
+                    HiddenKeywordCount = CountHiddenKeywords(rowKey, r.Keywords, isExpanded),
+                    MoreKeywordsLabel = string.Format(LocalizedStrings.RulesetsMoreCount, CountHiddenKeywords(rowKey, r.Keywords, isExpanded)),
+                    SemanticHintTokens = r.SemanticHints.ToList(),
+                    Source = RuleDisplaySource.BuiltInTag,
+                    IsEditable = false
                 };
             })
             .ToList();
@@ -45,19 +45,19 @@ public static class RulesetPresentationBuilder
                 var rowKey = $"flag:{r.Id}";
                 return new RuleDisplayItemViewModel
                 {
-                Id = r.Id,
-                DisplayName = r.DisplayName,
-                Kind = r.Kind.ToString(),
-                Keywords = string.Join(", ", r.Keywords),
-                SemanticHints = string.Join(", ", r.SemanticHints),
-                KeywordTokens = r.Keywords.ToList(),
-                VisibleKeywordTokens = BuildVisibleKeywordTokens(rowKey, r.Keywords, isExpanded),
-                KeywordsExpanded = IsExpanded(rowKey, isExpanded),
-                HiddenKeywordCount = CountHiddenKeywords(rowKey, r.Keywords, isExpanded),
-                MoreKeywordsLabel = string.Format(LocalizedStrings.RulesetsMoreCount, CountHiddenKeywords(rowKey, r.Keywords, isExpanded)),
-                SemanticHintTokens = r.SemanticHints.ToList(),
-                Source = RuleDisplaySource.BuiltInTag,
-                IsEditable = false
+                    Id = r.Id,
+                    DisplayName = r.DisplayName,
+                    Kind = r.Kind.ToString(),
+                    Keywords = string.Join(", ", r.Keywords),
+                    SemanticHints = string.Join(", ", r.SemanticHints),
+                    KeywordTokens = r.Keywords.ToList(),
+                    VisibleKeywordTokens = BuildVisibleKeywordTokens(rowKey, r.Keywords, isExpanded),
+                    KeywordsExpanded = IsExpanded(rowKey, isExpanded),
+                    HiddenKeywordCount = CountHiddenKeywords(rowKey, r.Keywords, isExpanded),
+                    MoreKeywordsLabel = string.Format(LocalizedStrings.RulesetsMoreCount, CountHiddenKeywords(rowKey, r.Keywords, isExpanded)),
+                    SemanticHintTokens = r.SemanticHints.ToList(),
+                    Source = RuleDisplaySource.BuiltInTag,
+                    IsEditable = false
                 };
             })
             .ToList();

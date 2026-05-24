@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.equine.BabyHorseModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/equine/BabyHorseModel.class",
+  "classSha256Hex": "fcd1fd84173022f085824fe164c78df90e7937435fbf551d265ce2cae886fa3a",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.equine.AbstractEquineModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.animal.equine.AbstractEquineModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

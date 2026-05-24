@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.boat.RaftModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/object/boat/RaftModel.class",
+  "classSha256Hex": "43db0e1bb2f3d1b722ea92fac0bfeff6f231415b79b9a5e099b16cfdb6c01359",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.object.boat.AbstractBoatModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.object.boat.AbstractBoatModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

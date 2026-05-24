@@ -1,6 +1,6 @@
-using Avalonia.Data.Converters;
-
 using AutoPBR.Core.Models.RuleExpressions;
+
+using Avalonia.Data.Converters;
 
 namespace AutoPBR.App.Converters;
 

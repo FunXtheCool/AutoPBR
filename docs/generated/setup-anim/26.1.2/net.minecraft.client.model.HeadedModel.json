@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.HeadedModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/HeadedModel.class",
+  "classSha256Hex": "097303c2c562191e2dbeb64102d0dd9b511eccdf130dd4ea35f44e7be39f3139",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "setupAnimEffectOnly": true,
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Interface host net.minecraft.client.model.HeadedModel; setupAnim lifted on concrete implementors.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

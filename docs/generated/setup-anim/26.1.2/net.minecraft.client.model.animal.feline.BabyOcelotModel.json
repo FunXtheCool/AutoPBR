@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.feline.BabyOcelotModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/feline/BabyOcelotModel.class",
+  "classSha256Hex": "ca3f2aa1c9e551110631dc56fae03b61b2da5285bb471b4e05a61ff0967bdf29",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.feline.BabyFelineModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.animal.feline.BabyFelineModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

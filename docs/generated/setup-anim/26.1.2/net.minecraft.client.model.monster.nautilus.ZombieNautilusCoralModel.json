@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.nautilus.ZombieNautilusCoralModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/nautilus/ZombieNautilusCoralModel.class",
+  "classSha256Hex": "853934f17c4c353504ea52836b5a11ed1e238e9272cd6785a1cb9cb6eb8c4808",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.NautilusRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.nautilus.NautilusModel",
+  "superSetupAnimCall": true,
+  "assignments": [],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Visible assignment at line 9 not lifted.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

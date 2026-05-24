@@ -1,0 +1,258 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.fish.TropicalFishSmallModel",
+  "profile": "named_jar_26.1.2",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.fish.TropicalFishSmallModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0.000000000,
+          0.000000000,
+          0.000000000
+        ],
+        "rotationEulerRad": [
+          0.000000000,
+          0.000000000,
+          0.000000000
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "body",
+          "pose": {
+            "translation": [
+              0.000000000,
+              22.00000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1,
+                -1.5,
+                -3
+              ],
+              "to": [
+                1,
+                1.5,
+                3
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "tail",
+          "pose": {
+            "translation": [
+              0.000000000,
+              22.00000000,
+              3.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                -1.5,
+                0
+              ],
+              "to": [
+                0,
+                1.5,
+                6
+              ],
+              "uvOrigin": [
+                22,
+                -6
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right_fin",
+          "pose": {
+            "translation": [
+              -1.000000000,
+              22.50000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.7853981853,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -2,
+                -1,
+                0
+              ],
+              "to": [
+                0,
+                1,
+                0
+              ],
+              "uvOrigin": [
+                2,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left_fin",
+          "pose": {
+            "translation": [
+              1.000000000,
+              22.50000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              -0.7853981853,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                -1,
+                0
+              ],
+              "to": [
+                2,
+                1,
+                0
+              ],
+              "uvOrigin": [
+                2,
+                12
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "top_fin",
+          "pose": {
+            "translation": [
+              0.000000000,
+              20.50000000,
+              -3.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                -3,
+                0
+              ],
+              "to": [
+                0,
+                0,
+                6
+              ],
+              "uvOrigin": [
+                10,
+                -5
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "net/minecraft/client/model/animal/fish/TropicalFishSmallModel.class",
+  "classSha256Hex": "4b922087b506ed45a5d969a7b9462af60c8866777a86610a9eb7d5fa60761715",
+  "bytecodeFloatProbe": [
+    -1,
+    -1.5,
+    -3,
+    3,
+    6,
+    22,
+    -1.5,
+    3,
+    6,
+    22,
+    3,
+    -2,
+    -1,
+    -1,
+    22.5,
+    0.7853982,
+    -1,
+    22.5,
+    -0.7853982,
+    -3,
+    3,
+    6,
+    20.5,
+    -3
+  ],
+  "textureWidth": 32,
+  "textureHeight": 32,
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

@@ -1,0 +1,62 @@
+{
+
+  "schemaVersion": 1,
+
+  "versionLabel": "26.1.2",
+
+  "officialJvmName": "net.minecraft.client.renderer.entity.CopperGolemRenderer",
+
+  "renderStateType": "net.minecraft.client.renderer.entity.state.CopperGolemRenderState",
+
+  "modelJvmNames": [
+
+    "net.minecraft.client.model.animal.golem.CopperGolemModel"
+
+  ],
+
+  "extractionStatus": "partial",
+
+  "extractionNotes": [
+
+    "extractRenderState: LivingEntityRenderer super then AnimationState.copyFrom for idle + chest-interaction clips (javap 26.1.2).",
+
+    "CopperGolemModel.setupAnim: head look, applyWalk on walk/walkWithItem, KeyframeAnimation.apply on idle + interaction AnimationState fields.",
+
+    "Preview driver copper_golem_clip_cycle: walk segment then idle; chest-interaction clips omitted (geometry IR has no chest part — see B.3).",
+
+    "Inactive AnimationState fields use -1 (skip apply)."
+
+  ],
+
+  "animationStateFields": [
+
+    { "renderStateField": "idleAnimationState", "setupAnimStateField": "idleAnimationState", "entityAnimationState": "CopperGolem.idle" }
+
+  ],
+
+  "livingEntityFields": [
+
+    "ageInTicks",
+
+    "walkAnimationPos",
+
+    "walkAnimationSpeed",
+
+    "xRot",
+
+    "yRot"
+
+  ],
+
+  "previewDriver": "copper_golem_clip_cycle",
+
+  "clipLengthsSeconds": {
+
+    "walkOnly": 2,
+
+    "idleAnimationState": 3
+
+  }
+
+}
+

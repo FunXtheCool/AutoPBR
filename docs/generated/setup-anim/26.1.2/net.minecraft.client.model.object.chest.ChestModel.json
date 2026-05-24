@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.chest.ChestModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/object/chest/ChestModel.class",
+  "classSha256Hex": "4bdd6f6dfc2e147fd01857dee36b944a98f5c541918f50a82c60103946839471",
+  "renderStateType": "java.lang.Float",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.Model",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "lid",
+      "property": "xRot",
+      "expr": {
+        "const": 1.5707964
+      }
+    },
+    {
+      "partField": "lock",
+      "property": "xRot",
+      "expr": {
+        "partPeer": "lid",
+        "peerProperty": "xRot"
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

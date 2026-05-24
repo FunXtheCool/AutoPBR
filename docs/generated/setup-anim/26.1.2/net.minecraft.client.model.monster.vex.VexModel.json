@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.vex.VexModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/vex/VexModel.class",
+  "classSha256Hex": "b495612411603f33d90d083019be2cda9288b28570d537afef5d8c3eeba42b92",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.VexRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "head",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "yRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "xRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "body",
+      "property": "xRot",
+      "expr": {
+        "const": 0
+      }
+    },
+    {
+      "partField": "body",
+      "property": "xRot",
+      "expr": {
+        "const": 0.15707964
+      }
+    },
+    {
+      "partField": "leftWing",
+      "property": "yRot",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "const": 1.0995574
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "cos",
+                    "args": [
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "mul",
+                            "args": [
+                              {
+                                "state": "ageInTicks"
+                              },
+                              {
+                                "const": 45.836624
+                              }
+                            ]
+                          },
+                          {
+                            "const": 0.017453292
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "const": 0.017453292
+                  }
+                ]
+              },
+              {
+                "const": 16.2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightWing",
+      "property": "yRot",
+      "expr": {
+        "partPeer": "leftWing",
+        "peerProperty": "yRot"
+      }
+    },
+    {
+      "partField": "leftWing",
+      "property": "xRot",
+      "expr": {
+        "const": 0.47123888
+      }
+    },
+    {
+      "partField": "leftWing",
+      "property": "zRot",
+      "expr": {
+        "const": -0.47123888
+      }
+    },
+    {
+      "partField": "rightWing",
+      "property": "xRot",
+      "expr": {
+        "const": 0.47123888
+      }
+    },
+    {
+      "partField": "rightWing",
+      "property": "zRot",
+      "expr": {
+        "const": 0.47123888
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

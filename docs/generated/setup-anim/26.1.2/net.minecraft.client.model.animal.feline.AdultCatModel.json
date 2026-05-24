@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.feline.AdultCatModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/feline/AdultCatModel.class",
+  "classSha256Hex": "7350637fd64bc97a34bb3130cb8a1a9f451bf1ec8a9b86523fef1346bc3b8dfd",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.feline.AdultFelineModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.animal.feline.AdultFelineModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

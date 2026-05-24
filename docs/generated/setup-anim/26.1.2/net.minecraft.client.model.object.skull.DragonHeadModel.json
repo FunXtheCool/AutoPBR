@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.skull.DragonHeadModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/object/skull/DragonHeadModel.class",
+  "classSha256Hex": "c7f62a960e7c753bc9d00f42998372b03ba32eb0449ab8a03e639d3ce4b6b679",
+  "renderStateType": "net.minecraft.client.model.object.skull.SkullModelBase$State",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.object.skull.SkullModelBase",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "jaw",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "sin",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "animationPos"
+                      },
+                      {
+                        "const": 3.1415927
+                      }
+                    ]
+                  },
+                  {
+                    "const": 0.2
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0.2
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "yRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "xRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

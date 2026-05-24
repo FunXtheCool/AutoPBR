@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.animal.pig.ColdPigModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.pig.ColdPigModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "body",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -5,
+                -10,
+                -7
+              ],
+              "to": [
+                5,
+                6,
+                1
+              ],
+              "uvOrigin": [
+                28,
+                8
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "hcg.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.animal.pig.hcg",
+  "classSha256Hex": "62807b3ecd41f319135d8a841b76b8d43cfdea4a9479f7cdb43abf7657f9e87c",
+  "bytecodeFloatProbe": [
+    -5,
+    -10,
+    -7,
+    10,
+    16,
+    8,
+    -5,
+    -10,
+    -7,
+    10,
+    16,
+    8,
+    0.5,
+    11,
+    1.5707964
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

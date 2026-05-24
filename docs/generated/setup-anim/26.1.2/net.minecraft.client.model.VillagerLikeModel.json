@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.VillagerLikeModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/VillagerLikeModel.class",
+  "classSha256Hex": "bb2cc462d08290df150ed11ded87d34afac5ffee35e06b4839b93e3b284071ca",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "setupAnimEffectOnly": true,
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Interface host net.minecraft.client.model.VillagerLikeModel; setupAnim lifted on concrete implementors.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.renderer.entity.BreezeRenderer",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.BreezeRenderState",
+  "modelJvmNames": [
+    "net.minecraft.client.model.monster.breeze.BreezeModel"
+  ],
+  "extractionStatus": "partial",
+  "extractionNotes": [
+    "extractRenderState: MobRenderer.extractRenderState then AnimationState.copyFrom for idle, shoot, slide, slideBack, inhale, longJump (javap 26.1.2).",
+    "setupAnim uses KeyframeAnimation.apply(stateField, ageInTicks) per BreezeModel.setupAnim; lifted setup-anim playbackSteps map stateField names to those AnimationState fields.",
+    "Preview driver breeze_clip_cycle supplies per-clip local times; inactive clips use -1 (skip apply) in PreviewRenderStateSynthesis."
+  ],
+  "animationStateFields": [
+    { "renderStateField": "idle", "setupAnimStateField": "idle", "entityAnimationState": "Breeze.idle" },
+    { "renderStateField": "shoot", "setupAnimStateField": "shoot", "entityAnimationState": "Breeze.shoot" },
+    { "renderStateField": "slide", "setupAnimStateField": "slide", "entityAnimationState": "Breeze.slide" },
+    { "renderStateField": "slideBack", "setupAnimStateField": "slideBack", "entityAnimationState": "Breeze.slideBack" },
+    { "renderStateField": "inhale", "setupAnimStateField": "inhale", "entityAnimationState": "Breeze.inhale" },
+    { "renderStateField": "longJump", "setupAnimStateField": "longJump", "entityAnimationState": "Breeze.longJump" }
+  ],
+  "livingEntityFields": [
+    "ageInTicks",
+    "walkAnimationPos",
+    "walkAnimationSpeed",
+    "xRot",
+    "yRot"
+  ],
+  "previewDriver": "breeze_clip_cycle",
+  "clipLengthsSeconds": {
+    "idle": 2,
+    "shoot": 1.125,
+    "slide": 0.2,
+    "slideBack": 0.1,
+    "inhale": 2,
+    "longJump": 0.5
+  }
+}

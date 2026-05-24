@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.warden.WardenModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/warden/WardenModel.class",
+  "classSha256Hex": "365664c0ef2e5cc9ee342e93d6b53041f7a491e125141b1d3351f8fa1f78e0de",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.WardenRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [],
+  "bakedAnimations": [
+    {
+      "field": "attackAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.WardenAnimation",
+      "definitionField": "WARDEN_ATTACK",
+      "rootPartField": "root"
+    },
+    {
+      "field": "sonicBoomAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.WardenAnimation",
+      "definitionField": "WARDEN_SONIC_BOOM",
+      "rootPartField": "root"
+    },
+    {
+      "field": "diggingAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.WardenAnimation",
+      "definitionField": "WARDEN_DIG",
+      "rootPartField": "root"
+    },
+    {
+      "field": "emergeAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.WardenAnimation",
+      "definitionField": "WARDEN_EMERGE",
+      "rootPartField": "root"
+    },
+    {
+      "field": "roarAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.WardenAnimation",
+      "definitionField": "WARDEN_ROAR",
+      "rootPartField": "root"
+    },
+    {
+      "field": "sniffAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.WardenAnimation",
+      "definitionField": "WARDEN_SNIFF",
+      "rootPartField": "root"
+    }
+  ],
+  "playbackSteps": [
+    {
+      "mode": "apply",
+      "animationField": "attackAnimation",
+      "stateField": "attackAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "sonicBoomAnimation",
+      "stateField": "sonicBoomAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "diggingAnimation",
+      "stateField": "diggingAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "emergeAnimation",
+      "stateField": "emergeAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "roarAnimation",
+      "stateField": "roarAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "sniffAnimation",
+      "stateField": "sniffAnimationState",
+      "ageField": "ageInTicks"
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

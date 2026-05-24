@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.boat.BoatModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/object/boat/BoatModel.class",
+  "classSha256Hex": "44746e7008a7148507df1d5675fc4c574b5b9edcb7f6a48d04cd714a37f09425",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.object.boat.AbstractBoatModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.object.boat.AbstractBoatModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

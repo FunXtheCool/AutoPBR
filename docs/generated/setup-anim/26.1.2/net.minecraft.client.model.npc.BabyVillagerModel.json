@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.npc.BabyVillagerModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/npc/BabyVillagerModel.class",
+  "classSha256Hex": "7ec15084cbd25b59a5d23e4dd596c0008f09a7599837c5ad3d24ac95b41d5280",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.npc.VillagerModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.npc.VillagerModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

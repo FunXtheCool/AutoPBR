@@ -1,0 +1,486 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.silverfish.SilverfishModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/silverfish/SilverfishModel.class",
+  "classSha256Hex": "1c2f1062462231729ccd1a5fcb334d7fbc8e44dbdf92eacbb5d131542ddd8467",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.EntityRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "segment0",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "ageInTicks"
+                      },
+                      {
+                        "const": 0.9
+                      }
+                    ]
+                  },
+                  {
+                    "const": 0
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0.12566371
+          }
+        ]
+      }
+    },
+    {
+      "partField": "segment0",
+      "property": "x",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "sin",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "ageInTicks"
+                      },
+                      {
+                        "const": 0.9
+                      }
+                    ]
+                  },
+                  {
+                    "const": 0
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0.62831855
+          }
+        ]
+      }
+    },
+    {
+      "partField": "segment1",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "ageInTicks"
+                      },
+                      {
+                        "const": 0.9
+                      }
+                    ]
+                  },
+                  {
+                    "const": 0.47123894
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0.09424779
+          }
+        ]
+      }
+    },
+    {
+      "partField": "segment1",
+      "property": "x",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "sin",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "ageInTicks"
+                      },
+                      {
+                        "const": 0.9
+                      }
+                    ]
+                  },
+                  {
+                    "const": 0.47123894
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0.31415927
+          }
+        ]
+      }
+    },
+    {
+      "partField": "segment2",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "ageInTicks"
+                      },
+                      {
+                        "const": 0.9
+                      }
+                    ]
+                  },
+                  {
+                    "const": 0.9424779
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0.06283186
+          }
+        ]
+      }
+    },
+    {
+      "partField": "segment3",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "ageInTicks"
+                      },
+                      {
+                        "const": 0.9
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1.4137168
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0.09424779
+          }
+        ]
+      }
+    },
+    {
+      "partField": "segment3",
+      "property": "x",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "sin",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "ageInTicks"
+                      },
+                      {
+                        "const": 0.9
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1.4137168
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0.31415927
+          }
+        ]
+      }
+    },
+    {
+      "partField": "segment4",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "ageInTicks"
+                      },
+                      {
+                        "const": 0.9
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1.8849558
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0.12566371
+          }
+        ]
+      }
+    },
+    {
+      "partField": "segment4",
+      "property": "x",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "sin",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "ageInTicks"
+                      },
+                      {
+                        "const": 0.9
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1.8849558
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0.62831855
+          }
+        ]
+      }
+    },
+    {
+      "partField": "segment5",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "ageInTicks"
+                      },
+                      {
+                        "const": 0.9
+                      }
+                    ]
+                  },
+                  {
+                    "const": 2.3561945
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0.15707964
+          }
+        ]
+      }
+    },
+    {
+      "partField": "segment5",
+      "property": "x",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "sin",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "ageInTicks"
+                      },
+                      {
+                        "const": 0.9
+                      }
+                    ]
+                  },
+                  {
+                    "const": 2.3561945
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0.9424778
+          }
+        ]
+      }
+    },
+    {
+      "partField": "segment6",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "ageInTicks"
+                      },
+                      {
+                        "const": 0.9
+                      }
+                    ]
+                  },
+                  {
+                    "const": 2.8274336
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0.18849558
+          }
+        ]
+      }
+    },
+    {
+      "partField": "segment6",
+      "property": "x",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "sin",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "ageInTicks"
+                      },
+                      {
+                        "const": 0.9
+                      }
+                    ]
+                  },
+                  {
+                    "const": 2.8274336
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 1.2566371
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

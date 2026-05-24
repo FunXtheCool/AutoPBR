@@ -354,14 +354,28 @@ internal static class VanillaSetupAnimRuntime
         return true;
     }
 
-    private static void CollectInheritanceChain(string modelOfficialJvmName, JsonObject doc, List<string> chain)
+    private static void CollectInheritanceChain(string modelOfficialJvmName, JsonObject doc, List<string> chain) =>
+        CollectInheritanceChain(modelOfficialJvmName, doc, chain, new HashSet<string>(StringComparer.Ordinal));
+
+    private static void CollectInheritanceChain(
+        string modelOfficialJvmName,
+        JsonObject doc,
+        List<string> chain,
+        HashSet<string> visiting)
     {
+        if (!visiting.Add(modelOfficialJvmName))
+        {
+            return;
+        }
+
         if (doc["inheritsSetupAnimFrom"] is JsonValue inh)
         {
             var parent = inh.GetValue<string>();
-            if (!string.IsNullOrEmpty(parent) && SetupAnimDocumentLoader.TryLoad(parent, out var parentDoc))
+            if (!string.IsNullOrEmpty(parent) &&
+                !string.Equals(parent, modelOfficialJvmName, StringComparison.Ordinal) &&
+                SetupAnimDocumentLoader.TryLoad(parent, out var parentDoc))
             {
-                CollectInheritanceChain(parent, parentDoc, chain);
+                CollectInheritanceChain(parent, parentDoc, chain, visiting);
             }
         }
 

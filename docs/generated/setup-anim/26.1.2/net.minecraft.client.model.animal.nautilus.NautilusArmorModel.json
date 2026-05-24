@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.nautilus.NautilusArmorModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/nautilus/NautilusArmorModel.class",
+  "classSha256Hex": "08ac91e3a9c97b6c3f3ea6786c9f23da848c087732fc73ab0536bd1183ab1c2d",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.nautilus.NautilusModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.animal.nautilus.NautilusModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

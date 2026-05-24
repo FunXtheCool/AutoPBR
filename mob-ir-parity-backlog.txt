@@ -1,0 +1,23 @@
+Mob / humanoid IR parity backlog (CleanRoomEntityModelRuntime, UsesPostBabyModelUpdate)
+=======================================================================================
+
+Done in this pass (26.1.2 + uniform LivingEntity.DEFAULT_BABY_SCALE on shared adult mesh):
+- Skeleton / stray / bogged / wither_skeleton rig (BuildSkeletonHumanoid) — SkeletonModel.json
+- Player wide + slim (BuildPlayerWide / BuildPlayerSlim) — PlayerModel.json
+- Illager family pillager + generic illager stems (BuildIllager); evoker/vindicator delegate here — IllagerModel.json
+
+Already on dedicated baby geometry or correct branch (not anisotropic BabyProfile for post-baby):
+- Zombie / husk / drowned (BuildZombieHumanoid → BuildBabyZombie / BuildBabyDrowned), zombie villager baby, villagers (BabyVillagerModel IR), etc.
+
+Still using anisotropic BabyProfile heuristics under UsesPostBabyModelUpdate (audit + javap / IR as needed):
+- BuildHumanoid (giant, generic fallbacks) — vanilla baby giants N/A; heuristic is legacy placeholder
+- BuildEnderman — confirm whether baby enderman uses uniform age scale only (likely same as skeleton if ever baby)
+- BuildWitch — IllagerModel-shaped mesh; same renderer pattern as other illagers → likely VanillaUniformBaby candidate
+- BuildIgniter, BuildPillager-only variants if any separate paths still tuple-scale
+- Abstract piglin / piglin / zombified piglin adult paths that still branch BabyProfile tuples (several use BabyProfile with post-baby; some already use BuildBabyPiglin)
+- Polar bear, goat, sheep, dolphin, bee, sniffer, armadillo, etc. where UsesPostBabyModelUpdate && isBaby still uses tuple scales without a dedicated Baby*Model IR helper
+- Equipment / armor overlay preview builders that tuple-scale on post-baby profiles
+
+Notes:
+- Index: docs/generated/geometry-index-26.1.2.json
+- JAR: tools/minecraft-parity/26.1.2/client.jar

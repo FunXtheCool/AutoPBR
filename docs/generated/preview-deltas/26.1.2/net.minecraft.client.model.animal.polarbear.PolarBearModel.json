@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.polarbear.PolarBearModel",
+  "deltas": [
+    {
+      "kind": "previewBasis",
+      "description": "Cow-class LER right-compose (LocalToParent × worldRoot with scale -1,-1,1) for flat quadruped root siblings; same policy as Cow/Panda adults. Baby polar uses JVM+stem gate; catalog manifest geometry_ir_official_jvm_baby → BabyPolarBearModel.",
+      "partId": "_all"
+    },
+    {
+      "kind": "other",
+      "description": "Composed-flat quadruped host (flatCount:4). Shards ok; Explore sign-off § A.4 — compare adult+baby silhouettes to quadruped regression screenshots."
+    }
+  ]
+}

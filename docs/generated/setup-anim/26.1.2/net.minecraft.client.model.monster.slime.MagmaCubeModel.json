@@ -1,0 +1,202 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.slime.MagmaCubeModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/slime/MagmaCubeModel.class",
+  "classSha256Hex": "68d16f46f986d9af010d72c28f33271df784c5f948003da9fd22d58f83986134",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.SlimeRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "segment0",
+      "property": "y",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "const": -4
+              },
+              {
+                "state": "squish"
+              }
+            ]
+          },
+          {
+            "const": 1.7
+          }
+        ]
+      }
+    },
+    {
+      "partField": "segment1",
+      "property": "y",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "const": -3
+              },
+              {
+                "state": "squish"
+              }
+            ]
+          },
+          {
+            "const": 1.7
+          }
+        ]
+      }
+    },
+    {
+      "partField": "segment2",
+      "property": "y",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "const": -2
+              },
+              {
+                "state": "squish"
+              }
+            ]
+          },
+          {
+            "const": 1.7
+          }
+        ]
+      }
+    },
+    {
+      "partField": "segment3",
+      "property": "y",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "const": -1
+              },
+              {
+                "state": "squish"
+              }
+            ]
+          },
+          {
+            "const": 1.7
+          }
+        ]
+      }
+    },
+    {
+      "partField": "segment4",
+      "property": "y",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "const": 0
+              },
+              {
+                "state": "squish"
+              }
+            ]
+          },
+          {
+            "const": 1.7
+          }
+        ]
+      }
+    },
+    {
+      "partField": "segment5",
+      "property": "y",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "const": 1
+              },
+              {
+                "state": "squish"
+              }
+            ]
+          },
+          {
+            "const": 1.7
+          }
+        ]
+      }
+    },
+    {
+      "partField": "segment6",
+      "property": "y",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "const": 2
+              },
+              {
+                "state": "squish"
+              }
+            ]
+          },
+          {
+            "const": 1.7
+          }
+        ]
+      }
+    },
+    {
+      "partField": "segment7",
+      "property": "y",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "const": 3
+              },
+              {
+                "state": "squish"
+              }
+            ]
+          },
+          {
+            "const": 1.7
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

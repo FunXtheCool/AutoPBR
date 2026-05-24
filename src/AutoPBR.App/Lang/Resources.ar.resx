@@ -78,7 +78,7 @@
     <value>المظهر</value>
   </data>
   <data name="UiScaling" xml:space="preserve">
-    <value>التحجيم</value>
+    <value>توسيع واجهة المستخدم</value>
   </data>
   <data name="UiScalingTooltip" xml:space="preserve">
     <value>يغيّر مقياس الواجهة بالكامل (النص والعناصر والمسافات). استخدم قيمة أعلى من 100٪ لسهولة القراءة.</value>
@@ -103,6 +103,7 @@
   <data name="ExploreBack" xml:space="preserve"><value>رجوع</value></data>
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
   <data name="TabNormals" xml:space="preserve"><value>المعتدلات</value></data>
+  <data name="TabShader" xml:space="preserve"><value>العرض</value></data>
   <data name="TabSettings" xml:space="preserve"><value>الإعدادات</value></data>
   <data name="Input" xml:space="preserve"><value>الإدخال</value></data>
   <data name="InputSourceModeTooltip" xml:space="preserve"><value>إيقاف: حزمة موارد واحدة (.zip / .jar). تشغيل: مجلد يحتوي عدة حزم للمسح والتحويل المُجَمَّع.</value></data>
@@ -213,7 +214,7 @@
   <data name="DebugMode" xml:space="preserve"><value>تصحيح</value></data>
   <data name="MaxThreads" xml:space="preserve"><value>الحد الأقصى للخيوط</value></data>
   <data name="MaxThreadsTooltip" xml:space="preserve"><value>خيوط العمل للتحويل. 0 = تلقائي.</value></data>
-  <data name="OnnxPreferTensorRt" xml:space="preserve"><value>تفضيل TensorRT لـ ONNX GPU (احتياطي CUDA)</value></data>
+  <data name="OnnxPreferTensorRt" xml:space="preserve"><value>تفضيل TensorRT لـ ONNX GPU (مسار احتياطي CUDA)</value></data>
   <data name="OnnxPreferTensorRtTooltip" xml:space="preserve"><value>عند التفعيل: TensorRT مع CUDA للعمليات غير المدعومة. عند الإلغاء: CUDA فقط—بدء أسرع؛ قد يُجمّع TensorRT المحركات في المرة الأولى.</value></data>
   <data name="TempFolder" xml:space="preserve"><value>مجلد مؤقت</value></data>
   <data name="TempFolderTooltip" xml:space="preserve"><value>مجلد الاستخراج المؤقت. فارغ = مؤقت النظام.</value></data>
@@ -250,4 +251,59 @@
   <data name="OpenLogFolder" xml:space="preserve"><value>فتح مجلد السجلات</value></data>
   <data name="NormalOperatorLabel" xml:space="preserve"><value>المعامل</value></data>
   <data name="NormalKernelSizeLabel" xml:space="preserve"><value>حجم النواة</value></data>
+  <data name="MaterialTagSemanticMl" xml:space="preserve"><value>اقتراحات الوسوم الدلالية (MiniLM)</value></data>
+  <data name="UseSemanticMaterialTags" xml:space="preserve"><value>تفعيل الاقتراحات الدلالية</value></data>
+  <data name="MaterialTagMinSimilarity" xml:space="preserve"><value>أدنى تشابه</value></data>
+  <data name="MaterialTagMaxCount" xml:space="preserve"><value>أقصى وسوم ML</value></data>
+  <data name="MaterialTagCertaintyThreshold" xml:space="preserve"><value>أدنى ثقة</value></data>
+  <data name="DictionaryEvidenceEnabled" xml:space="preserve"><value>إثراء بأدلة القاموس (FreeDictionaryAPI)</value></data>
+  <data name="DictionaryEvidenceWeight" xml:space="preserve"><value>وزن دمج القاموس</value></data>
+  <data name="DictionaryMinEvidenceScore" xml:space="preserve"><value>أدنى دليل للقاموس</value></data>
+  <data name="DictionaryRequestTimeoutMs" xml:space="preserve"><value>مهلة القاموس (مللي ثانية)</value></data>
+  <data name="Preview3DCameraSection" xml:space="preserve"><value>كاميرا المعاينة ثلاثية الأبعاد</value></data>
+  <data name="Preview3DCameraBindings" xml:space="preserve"><value>Alt + زر الماوس الأوسط: الدوران. زر الماوس الأوسط: الإزاحة. العجلة: التكبير. مرّر فوق المعاينة واضغط مفتاح إعادة التعيين لاستعادة الإطار الافتراضي.</value></data>
+  <data name="Preview3DCameraOrbitSensitivity" xml:space="preserve"><value>حساسية الدوران</value></data>
+  <data name="Preview3DCameraPanSensitivity" xml:space="preserve"><value>حساسية الإزاحة</value></data>
+  <data name="Preview3DCameraZoomSensitivity" xml:space="preserve"><value>حساسية التكبير</value></data>
+  <data name="Preview3DCameraResetKey" xml:space="preserve"><value>مفتاح إعادة ضبط الكاميرا</value></data>
+  <data name="PreviewPanelTitle" xml:space="preserve"><value>المعاينة</value></data>
+  <data name="PreviewModeLabel" xml:space="preserve"><value>وضع المعاينة</value></data>
+  <data name="PreviewMode2D" xml:space="preserve"><value>2D</value></data>
+  <data name="PreviewMode3D" xml:space="preserve"><value>3D</value></data>
+  <data name="Preview3DCameraOrbitBoomDistance" xml:space="preserve"><value>مسافة ذراع المدار</value></data>
+  <data name="Preview3DCameraOrbitBoomDistanceTooltip" xml:space="preserve"><value>المسافة الافتراضية بين المحور والكاميرا في وضع المدار (بوحدات العالم). تغييرها يعيد خط أساس التكبير مع الحفاظ على yaw/pitch.</value></data>
+  <data name="ShaderPreviewLabPbrSection" xml:space="preserve"><value>معاينة LabPBR ‏(OpenGL)</value></data>
+  <data name="ShaderPreviewLabPbrDescription" xml:space="preserve"><value>تُطبّق هذه الخيارات عندما تكون المعاينة اليمنى في وضع 3D. القوامات ذات علم 2D Sprite تُعرض تلقائيًا على مستويات متقاطعة شبيهة بالأوراق، والباقي على مكعب. يتبع المظلّل قنوات LabPBR: الارتفاع من _h، والنورمال من _n، والنعومة/المعدن من _s.</value></data>
+  <data name="Preview3DEnableParallax" xml:space="preserve"><value>Parallax occlusion mapping ‏(POM)</value></data>
+  <data name="Preview3DEnableParallaxTooltip" xml:space="preserve"><value>يستخدم خريطة ارتفاع LabPBR مع إزاحة محدودة للحفاظ على الثبات عند الزوايا الحادة.</value></data>
+  <data name="Preview3DEnableNormalMap" xml:space="preserve"><value>تخطيط النورمال (_n)</value></data>
+  <data name="Preview3DEnableNormalMapTooltip" xml:space="preserve"><value>عند الإيقاف: تُستخدم نورمالات المجسم فقط في الإضاءة.</value></data>
+  <data name="Preview3DEnableSpecularMap" xml:space="preserve"><value>انعكاس / LabPBR _s</value></data>
+  <data name="Preview3DEnableSpecularMapTooltip" xml:space="preserve"><value>عند الإيقاف: معاينة منتشرة فقط بدون لمعات النعومة/المعدن.</value></data>
+  <data name="Preview3DEnableParallaxShadow" xml:space="preserve"><value>ظل ذاتي للبارالاكس</value></data>
+  <data name="Preview3DEnableParallaxShadowTooltip" xml:space="preserve"><value>يتتبع شعاع ظل ذاتي قصير عبر حقل ارتفاع البارالاكس.</value></data>
+  <data name="Preview3DEnableSss" xml:space="preserve"><value>تشتت تحت السطح (SSS)</value></data>
+  <data name="Preview3DEnableSssTooltip" xml:space="preserve"><value>يُمكّن تقريبًا خفيفًا لتشتت تحت السطح من قناة المسامية/SSS في LabPBR.</value></data>
+  <data name="Preview3DEnableIbl" xml:space="preserve"><value>IBL بيئي (محيطي/انعكاسي)</value></data>
+  <data name="Preview3DEnableIblTooltip" xml:space="preserve"><value>إضاءة محيطية وانعكاس غير مباشر من البيئة. مع السماء الغلافية: يعيّن LUT السماء والشمس المنعكسة؛ وإلا نصف كرة إجرائية للسماء/الأرض.</value></data>
+  <data name="Preview3DLightingSection" xml:space="preserve"><value>الإضاءة</value></data>
+  <data name="Preview3DEnableShadows" xml:space="preserve"><value>ظلال اتجاهية</value></data>
+  <data name="Preview3DEnableShadowsTooltip" xml:space="preserve"><value>يعرض خريطة ظلال اتجاهية مع تصفية PCF لإضاءة المعاينة.</value></data>
+  <data name="Preview3DLightYawDegrees" xml:space="preserve"><value>انعراج الضوء</value></data>
+  <data name="Preview3DLightYawDegreesTooltip" xml:space="preserve"><value>انعراج الشمس بالدرجات (-180..180)؛ يدوّر الضوء حول محور العالم العمودي.</value></data>
+  <data name="Preview3DLightPitchDegrees" xml:space="preserve"><value>ميلان الضوء</value></data>
+  <data name="Preview3DLightPitchDegreesTooltip" xml:space="preserve"><value>ميلان الشمس بالدرجات (-89..89)؛ القيم السالبة تضع الشمس فوق الأفق.</value></data>
+  <data name="Preview3DParallaxHeightStrength" xml:space="preserve"><value>إزاحة POM</value></data>
+  <data name="Preview3DParallaxHeightStrengthTooltip" xml:space="preserve"><value>قوة إزاحة البارالاكس داخل الشيدر (uHeightStrength).</value></data>
+  <data name="Preview3DShowGrid" xml:space="preserve"><value>شبكة أرضية (3D)</value></data>
+  <data name="Preview3DShowGridTooltip" xml:space="preserve"><value>إظهار شبكة XZ مرجعية أسفل العنصر في المعاينة ثلاثية الأبعاد.</value></data>
+  <data name="Preview3DAutoRotate" xml:space="preserve"><value>تدوير تلقائي 3D</value></data>
+  <data name="Preview3DShowAxes" xml:space="preserve"><value>محاور XYZ ثلاثية الأبعاد</value></data>
+  <data name="Preview3DItemUseAlphaBlend" xml:space="preserve"><value>مزج ألفا للعناصر</value></data>
+  <data name="Preview3DSpritePlaneCount" xml:space="preserve"><value>عدد مستويات السبرايت</value></data>
+  <data name="Preview3DSpritePlaneCountTooltip" xml:space="preserve"><value>عدد المستويات المتقاطعة المستخدمة للقوامات ذات علم 2D Sprite في معاينة 3D.</value></data>
+  <data name="Preview3DCameraDebugFlyHint" xml:space="preserve"><value>سحب بزر الفأرة الأيمن: نظر · WASD مع الضغط على الأيمن: طيران · R: إعادة ضبط المدار والإزاحة</value></data>
 </root>
+
+
+

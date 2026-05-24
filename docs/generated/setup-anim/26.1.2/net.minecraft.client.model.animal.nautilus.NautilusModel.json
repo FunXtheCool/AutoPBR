@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.nautilus.NautilusModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/nautilus/NautilusModel.class",
+  "classSha256Hex": "97324a695f00f735b1b01c8afff52f9e086ad45b0799b8f6d64364953a56aa90",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.NautilusRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [],
+  "bakedAnimations": [
+    {
+      "field": "swimAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.NautilusAnimation",
+      "definitionField": "SWIMMING",
+      "rootPartField": "root"
+    }
+  ],
+  "playbackSteps": [
+    {
+      "mode": "applyWalk",
+      "animationField": "swimAnimation",
+      "walkPosField": "walkAnimationPos",
+      "walkSpeedField": "walkAnimationSpeed",
+      "speedScale": 0.2,
+      "posScale": 3
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

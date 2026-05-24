@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.sniffer.SniffletModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/sniffer/SniffletModel.class",
+  "classSha256Hex": "cbd641029c8a33946affc00cc9727ddbcc7fda8bae5e6474d9985b659ea88298",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.SnifferRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.sniffer.SnifferModel",
+  "superSetupAnimCall": true,
+  "assignments": [],
+  "bakedAnimations": [
+    {
+      "field": "babyTransform",
+      "definitionClass": "net.minecraft.client.animation.definitions.SnifferAnimation",
+      "definitionField": "BABY_TRANSFORM",
+      "rootPartField": "root"
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

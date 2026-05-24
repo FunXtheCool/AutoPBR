@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.banner.BannerFlagModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/object/banner/BannerFlagModel.class",
+  "classSha256Hex": "f88cb11694dfffa301c23c4de5823067dea8129512d060db8aef7b12592a2511",
+  "renderStateType": "java.lang.Float",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.Model",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "flag",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "const": -0.0125
+              },
+              {
+                "op": "cos",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "const": 0.01
+                      },
+                      {
+                        "const": 6.2831855
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 3.1415927
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

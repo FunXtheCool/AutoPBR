@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.strider.StriderModel",
+  "extractionStatus": "reference_java",
+  "factoryMethod": "createBodyLayer",
+  "meshHostJvmName": "net.minecraft.client.model.monster.strider.AdultStriderModel",
+  "roots": [{
+  "id": "root",
+  "pose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [],
+  "children": [{
+  "id": "left_leg",
+  "pose": {
+  "translation": [4.000000000, 8.000000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-2.000000000, 0.000000000, -2.000000000],
+  "to": [2.000000000, 16.00000000, 2.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "right_leg",
+  "pose": {
+  "translation": [-4.000000000, 8.000000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-2.000000000, 0.000000000, -2.000000000],
+  "to": [2.000000000, 16.00000000, 2.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "body",
+  "pose": {
+  "translation": [0.000000000, 1.000000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-8.000000000, -6.000000000, -8.000000000],
+  "to": [8.000000000, 8.000000000, 8.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": [{
+  "id": "right_top_bristle",
+  "pose": {
+  "translation": [-8.000000000, -5.000000000, -8.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, -0.8726646304],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-12.00000000, 0.000000000, 0.000000000],
+  "to": [0.000000000, 0.000000000, 16.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "right_bottom_bristle",
+  "pose": {
+  "translation": [-8.000000000, 4.000000000, -8.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, -1.221730471],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-12.00000000, 0.000000000, 0.000000000],
+  "to": [0.000000000, 0.000000000, 16.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "left_top_bristle",
+  "pose": {
+  "translation": [8.000000000, -6.000000000, -8.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.8726646304],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [0.000000000, 0.000000000, 0.000000000],
+  "to": [12.00000000, 0.000000000, 16.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "left_bottom_bristle",
+  "pose": {
+  "translation": [8.000000000, 3.000000000, -8.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 1.221730471],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [0.000000000, 0.000000000, 0.000000000],
+  "to": [12.00000000, 0.000000000, 16.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "right_middle_bristle",
+  "pose": {
+  "translation": [-8.000000000, -1.000000000, -8.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, -1.134464025],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-12.00000000, 0.000000000, 0.000000000],
+  "to": [0.000000000, 0.000000000, 16.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "left_middle_bristle",
+  "pose": {
+  "translation": [8.000000000, -2.000000000, -8.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 1.134464025],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [0.000000000, 0.000000000, 0.000000000],
+  "to": [12.00000000, 0.000000000, 16.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+]
+}
+]
+}
+]
+}

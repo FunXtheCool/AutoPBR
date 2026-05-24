@@ -1,0 +1,489 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.monster.skeleton.BoggedModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.monster.skeleton.BoggedModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "mushrooms",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [],
+          "children": [
+            {
+              "id": "red_mushroom_1",
+              "pose": {
+                "translation": [
+                  0,
+                  0,
+                  0
+                ],
+                "rotationEulerRad": [
+                  0,
+                  0,
+                  0
+                ],
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -3,
+                    -3,
+                    0
+                  ],
+                  "to": [
+                    3,
+                    1,
+                    0
+                  ],
+                  "uvOrigin": [
+                    50,
+                    16
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift fluent addBox profile_proguard_obf"
+                },
+                {
+                  "from": [
+                    3,
+                    -8,
+                    3
+                  ],
+                  "to": [
+                    3,
+                    -7.214601815,
+                    3
+                  ],
+                  "uvOrigin": [
+                    50,
+                    16
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift fluent addBox profile_proguard_obf"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "red_mushroom_2",
+              "pose": {
+                "translation": [
+                  0,
+                  0,
+                  0
+                ],
+                "rotationEulerRad": [
+                  0,
+                  0,
+                  0
+                ],
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -3,
+                    -3,
+                    0
+                  ],
+                  "to": [
+                    3,
+                    1,
+                    0
+                  ],
+                  "uvOrigin": [
+                    50,
+                    16
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift fluent addBox profile_proguard_obf"
+                },
+                {
+                  "from": [
+                    3,
+                    -8,
+                    3
+                  ],
+                  "to": [
+                    3,
+                    -5.6438055,
+                    3
+                  ],
+                  "uvOrigin": [
+                    50,
+                    16
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift fluent addBox profile_proguard_obf"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "brown_mushroom_1",
+              "pose": {
+                "translation": [
+                  0,
+                  0,
+                  0
+                ],
+                "rotationEulerRad": [
+                  0,
+                  0,
+                  0
+                ],
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -3,
+                    -3,
+                    0
+                  ],
+                  "to": [
+                    3,
+                    1,
+                    0
+                  ],
+                  "uvOrigin": [
+                    50,
+                    22
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift fluent addBox profile_proguard_obf"
+                },
+                {
+                  "from": [
+                    -3,
+                    -8,
+                    -3
+                  ],
+                  "to": [
+                    -3,
+                    -7.214601815,
+                    -3
+                  ],
+                  "uvOrigin": [
+                    50,
+                    22
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift fluent addBox profile_proguard_obf"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "brown_mushroom_2",
+              "pose": {
+                "translation": [
+                  0,
+                  0,
+                  0
+                ],
+                "rotationEulerRad": [
+                  0,
+                  0,
+                  0
+                ],
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -3,
+                    -3,
+                    0
+                  ],
+                  "to": [
+                    3,
+                    1,
+                    0
+                  ],
+                  "uvOrigin": [
+                    50,
+                    22
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift fluent addBox profile_proguard_obf"
+                },
+                {
+                  "from": [
+                    -3,
+                    -8,
+                    -3
+                  ],
+                  "to": [
+                    -3,
+                    -5.6438055,
+                    -3
+                  ],
+                  "uvOrigin": [
+                    50,
+                    22
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift fluent addBox profile_proguard_obf"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "brown_mushroom_3",
+              "pose": {
+                "translation": [
+                  0,
+                  0,
+                  0
+                ],
+                "rotationEulerRad": [
+                  0,
+                  0,
+                  0
+                ],
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -3,
+                    -4,
+                    0
+                  ],
+                  "to": [
+                    3,
+                    0,
+                    0
+                  ],
+                  "uvOrigin": [
+                    50,
+                    28
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift fluent addBox profile_proguard_obf"
+                },
+                {
+                  "from": [
+                    -2,
+                    -1,
+                    4
+                  ],
+                  "to": [
+                    -3.57079637,
+                    -1,
+                    4.785398185
+                  ],
+                  "uvOrigin": [
+                    50,
+                    28
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift fluent addBox profile_proguard_obf"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "brown_mushroom_4",
+              "pose": {
+                "translation": [
+                  0,
+                  0,
+                  0
+                ],
+                "rotationEulerRad": [
+                  0,
+                  0,
+                  0
+                ],
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -3,
+                    -4,
+                    0
+                  ],
+                  "to": [
+                    3,
+                    0,
+                    0
+                  ],
+                  "uvOrigin": [
+                    50,
+                    28
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift fluent addBox profile_proguard_obf"
+                },
+                {
+                  "from": [
+                    -2,
+                    -1,
+                    4
+                  ],
+                  "to": [
+                    -3.57079637,
+                    -1,
+                    6.3561945
+                  ],
+                  "uvOrigin": [
+                    50,
+                    28
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift fluent addBox profile_proguard_obf"
+                }
+              ],
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "jarPath": "hff.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.monster.skeleton.hff",
+  "classSha256Hex": "9879580db6ad41d220ce8d60f42074ca0b30c406807a05722a8dde5c6a01bda4",
+  "bytecodeFloatProbe": [
+    -3,
+    -3,
+    6,
+    4,
+    3,
+    -8,
+    3,
+    0.7853982,
+    -3,
+    -3,
+    6,
+    4,
+    3,
+    -8,
+    3,
+    2.3561945,
+    -3,
+    -3,
+    6,
+    4,
+    -3,
+    -8,
+    -3,
+    0.7853982,
+    -3,
+    -3,
+    6,
+    4,
+    -3,
+    -8,
+    -3,
+    2.3561945,
+    -3,
+    -4,
+    6,
+    4,
+    -2,
+    -1,
+    4,
+    -1.5707964,
+    0.7853982,
+    -3,
+    -4,
+    6,
+    4,
+    -2,
+    -1,
+    4,
+    -1.5707964,
+    2.3561945
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

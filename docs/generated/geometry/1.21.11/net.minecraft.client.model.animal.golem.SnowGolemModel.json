@@ -1,0 +1,327 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.animal.golem.SnowGolemModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "partial",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.golem.SnowGolemModel).",
+    "Strict structural validation failed (4): cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027; cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027; cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027; cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027",
+    "Mesh lift parser notes (2): Lifted via bytecode disassembly \u002B segment parser (exact pool constants).; addBox at line 10: could not parse texOffs (defaulting to 0,0)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "head",
+          "pose": {
+            "translation": [
+              0,
+              4,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              4,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -4,
+                -8,
+                -4
+              ],
+              "to": [
+                4,
+                0,
+                4
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "liftWarnings": [
+                "cube_deformation_obf_inferred"
+              ],
+              "inflate": -0.5
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left_arm",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1,
+                0,
+                -1
+              ],
+              "to": [
+                11,
+                2,
+                1
+              ],
+              "uvOrigin": [
+                32,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "liftWarnings": [
+                "cube_deformation_obf_inferred"
+              ],
+              "inflate": -0.5
+            },
+            {
+              "from": [
+                5,
+                6,
+                1
+              ],
+              "to": [
+                5,
+                6,
+                2
+              ],
+              "uvOrigin": [
+                32,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right_arm",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -5,
+                6,
+                -1
+              ],
+              "to": [
+                -5,
+                9.14159274,
+                -2
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "upper_body",
+          "pose": {
+            "translation": [
+              0,
+              13,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              13,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -5,
+                -10,
+                -5
+              ],
+              "to": [
+                5,
+                0,
+                5
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "liftWarnings": [
+                "cube_deformation_obf_inferred"
+              ],
+              "inflate": -0.5
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "lower_body",
+          "pose": {
+            "translation": [
+              0,
+              24,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              24,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -6,
+                -12,
+                -6
+              ],
+              "to": [
+                6,
+                0,
+                6
+              ],
+              "uvOrigin": [
+                0,
+                36
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "liftWarnings": [
+                "cube_deformation_obf_inferred"
+              ],
+              "inflate": -0.5
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "hbs.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.animal.golem.hbs",
+  "classSha256Hex": "cc589e73a7ebecf1d29646f80b6a3eacba5adafd3a1200114971ef92181c03cf",
+  "bytecodeFloatProbe": [
+    4,
+    -0.5,
+    -4,
+    -8,
+    -4,
+    8,
+    8,
+    8,
+    4,
+    -1,
+    -1,
+    12,
+    5,
+    6,
+    -5,
+    6,
+    -1,
+    3.1415927,
+    -1,
+    -5,
+    -10,
+    -5,
+    10,
+    10,
+    10,
+    13,
+    -6,
+    -12,
+    -6,
+    12,
+    12,
+    12,
+    24
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

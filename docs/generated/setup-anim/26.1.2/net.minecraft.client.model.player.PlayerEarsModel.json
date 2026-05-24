@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.player.PlayerEarsModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/player/PlayerEarsModel.class",
+  "classSha256Hex": "5708acf381d0edea75fb0de00906e0076a5dbb5527706dd5bbd4ebf0451412d8",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.HumanoidModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.HumanoidModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

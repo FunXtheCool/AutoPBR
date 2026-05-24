@@ -1,0 +1,272 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.golem.SnowGolemModel",
+  "profile": "named_jar_26.1.2",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.golem.SnowGolemModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0.000000000,
+          0.000000000,
+          0.000000000
+        ],
+        "rotationEulerRad": [
+          0.000000000,
+          0.000000000,
+          0.000000000
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "head",
+          "pose": {
+            "translation": [
+              0.000000000,
+              4.000000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -4,
+                -8,
+                -4
+              ],
+              "to": [
+                4,
+                0,
+                4
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "inflate": -0.5
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left_arm",
+          "pose": {
+            "translation": [
+              5.000000000,
+              6.000000000,
+              1.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              1.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1,
+                0,
+                -1
+              ],
+              "to": [
+                11,
+                2,
+                1
+              ],
+              "uvOrigin": [
+                32,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "inflate": -0.5
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right_arm",
+          "pose": {
+            "translation": [
+              -5.000000000,
+              6.000000000,
+              -1.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              3.141592741,
+              -1.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1,
+                0,
+                -1
+              ],
+              "to": [
+                11,
+                2,
+                1
+              ],
+              "uvOrigin": [
+                32,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "inflate": -0.5
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "upper_body",
+          "pose": {
+            "translation": [
+              0.000000000,
+              13.00000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -5,
+                -10,
+                -5
+              ],
+              "to": [
+                5,
+                0,
+                5
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "inflate": -0.5
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "lower_body",
+          "pose": {
+            "translation": [
+              0.000000000,
+              24.00000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -6,
+                -12,
+                -6
+              ],
+              "to": [
+                6,
+                0,
+                6
+              ],
+              "uvOrigin": [
+                0,
+                36
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "inflate": -0.5
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "net/minecraft/client/model/animal/golem/SnowGolemModel.class",
+  "classSha256Hex": "ee1ab716f340d157294a9c48eec592cf314d98340ba858e13ca64bafa8dd18f7",
+  "bytecodeFloatProbe": [
+    4,
+    -0.5,
+    -4,
+    -8,
+    -4,
+    8,
+    8,
+    8,
+    4,
+    -1,
+    -1,
+    12,
+    5,
+    6,
+    -5,
+    6,
+    -1,
+    3.1415927,
+    -1,
+    -5,
+    -10,
+    -5,
+    10,
+    10,
+    10,
+    13,
+    -6,
+    -12,
+    -6,
+    12,
+    12,
+    12,
+    24
+  ],
+  "textureWidth": 64,
+  "textureHeight": 64,
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

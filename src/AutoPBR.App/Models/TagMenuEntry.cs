@@ -1,5 +1,7 @@
-using Avalonia.Media.Imaging;
 using AutoPBR.Core.Models;
+
+using Avalonia.Media.Imaging;
+
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace AutoPBR.App.Models;

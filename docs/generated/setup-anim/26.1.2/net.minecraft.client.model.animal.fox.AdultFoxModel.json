@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.fox.AdultFoxModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/fox/AdultFoxModel.class",
+  "classSha256Hex": "9991676c1bcb805a707a400b8b4381b41465df2f088299f021637f0c08ec8927",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.fox.FoxModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.animal.fox.FoxModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

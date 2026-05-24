@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.renderer.entity.CamelRenderer",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.CamelRenderState",
+  "modelJvmNames": [
+    "net.minecraft.client.model.animal.camel.CamelModel",
+    "net.minecraft.client.model.animal.camel.AdultCamelModel",
+    "net.minecraft.client.model.animal.camel.BabyCamelModel"
+  ],
+  "extractionStatus": "partial",
+  "extractionNotes": [
+    "extractRenderState: LivingEntityRenderer super then AnimationState.copyFrom for sit, sitPose, sitUp, idle, dash (javap 26.1.2).",
+    "CamelModel.setupAnim: applyWalk(walkAnimation) then KeyframeAnimation.apply on sit/sitPose/standup/idle/dash AnimationState fields with ageInTicks.",
+    "Preview driver camel_clip_cycle advances one mood clip per segment; inactive AnimationState fields use -1 (skip apply)."
+  ],
+  "animationStateFields": [
+    { "renderStateField": "sitAnimationState", "setupAnimStateField": "sitAnimationState", "entityAnimationState": "Camel.sit" },
+    { "renderStateField": "sitPoseAnimationState", "setupAnimStateField": "sitPoseAnimationState", "entityAnimationState": "Camel.sitPose" },
+    { "renderStateField": "sitUpAnimationState", "setupAnimStateField": "sitUpAnimationState", "entityAnimationState": "Camel.sitUp" },
+    { "renderStateField": "idleAnimationState", "setupAnimStateField": "idleAnimationState", "entityAnimationState": "Camel.idle" },
+    { "renderStateField": "dashAnimationState", "setupAnimStateField": "dashAnimationState", "entityAnimationState": "Camel.dash" }
+  ],
+  "livingEntityFields": [
+    "ageInTicks",
+    "walkAnimationPos",
+    "walkAnimationSpeed",
+    "xRot",
+    "yRot"
+  ],
+  "previewDriver": "camel_clip_cycle",
+  "clipLengthsSeconds": {
+    "walkOnly": 2,
+    "sitAnimationState": 2,
+    "sitPoseAnimationState": 1,
+    "sitUpAnimationState": 2.6,
+    "dashAnimationState": 0.5,
+    "idleAnimationState": 4
+  }
+}

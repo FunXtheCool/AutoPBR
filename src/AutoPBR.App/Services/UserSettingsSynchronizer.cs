@@ -29,6 +29,69 @@ internal static class UserSettingsSynchronizer
         vm.BrickHeightInvertDeltaThreshold = settings.BrickHeightInvertDeltaThreshold;
         vm.BrickLightGroutDiffuseDeltaMin = settings.BrickLightGroutDiffuseDeltaMin;
         vm.PreviewBrickProbeDebug = settings.PreviewBrickProbeDebug;
+        vm.PreviewDisplayMode = Math.Clamp(settings.PreviewDisplayMode, 0, 1);
+        vm.Preview3DAutoRotate = settings.Preview3DAutoRotate;
+        vm.Preview3DEntityAnimationSpeed = settings.Preview3DEntityAnimationSpeed <= 0
+            ? 1.0
+            : Math.Clamp(settings.Preview3DEntityAnimationSpeed, 0.0, 4.0);
+        vm.Preview3DEntityAnimationAmplitude = settings.Preview3DEntityAnimationAmplitude < 0
+            ? 1.0
+            : Math.Clamp(settings.Preview3DEntityAnimationAmplitude, 0.0, 2.0);
+        vm.Preview3DEnableEntityAnimation = settings.Preview3DEnableEntityAnimation;
+        vm.Preview3DEnableLegacyEntityWobble = settings.Preview3DEnableLegacyEntityWobble;
+        vm.Preview3DPauseEntityIdleAnimation = settings.Preview3DPauseEntityIdleAnimation;
+        vm.Preview3DShowGrid = settings.Preview3DShowGrid;
+        vm.Preview3DShowAxes = settings.Preview3DShowAxes;
+        vm.Preview3DEnableParallax = settings.Preview3DEnableParallax;
+        vm.Preview3DEnableNormalMap = settings.Preview3DEnableNormalMap;
+        vm.Preview3DEnableSpecularMap = settings.Preview3DEnableSpecularMap;
+        vm.Preview3DParallaxHeightStrength = settings.Preview3DParallaxHeightStrength <= 0
+            ? 0.05
+            : Math.Clamp(settings.Preview3DParallaxHeightStrength, 0.0, 0.35);
+        vm.Preview3DEnableSss = settings.Preview3DEnableSss;
+        vm.Preview3DEnableParallaxShadow = settings.Preview3DEnableParallaxShadow;
+        vm.Preview3DEnableParallaxAo = settings.Preview3DEnableParallaxAo;
+        vm.Preview3DParallaxAoStrength = settings.Preview3DParallaxAoStrength <= 0
+            ? 1.0
+            : Math.Clamp(settings.Preview3DParallaxAoStrength, 0.0, 2.0);
+        vm.Preview3DEnableIbl = settings.Preview3DEnableIbl;
+        vm.Preview3DEnableAtmosphericSky = settings.Preview3DEnableAtmosphericSky;
+        vm.Preview3DAtmosphereTurbidity = settings.Preview3DAtmosphereTurbidity <= 0
+            ? 2.6
+            : Math.Clamp(settings.Preview3DAtmosphereTurbidity, 1.2, 10.0);
+        vm.Preview3DAtmosphereSunIntensity = settings.Preview3DAtmosphereSunIntensity <= 0
+            ? 16.0
+            : Math.Clamp(settings.Preview3DAtmosphereSunIntensity, 0.2, 64.0);
+        vm.Preview3DAtmosphereHorizonFalloff = settings.Preview3DAtmosphereHorizonFalloff <= 0
+            ? 1.35
+            : Math.Clamp(settings.Preview3DAtmosphereHorizonFalloff, 0.25, 4.0);
+        vm.Preview3DEnableShadows = settings.Preview3DEnableShadows;
+        vm.Preview3DLightYawDegrees = Math.Clamp(settings.Preview3DLightYawDegrees, -180.0, 180.0);
+        vm.Preview3DLightPitchDegrees = Math.Clamp(settings.Preview3DLightPitchDegrees, -89.0, 89.0);
+        vm.Preview3DEnableShadowCascades = settings.Preview3DEnableShadowCascades;
+        vm.Preview3DSpritePlaneCount = settings.Preview3DSpritePlaneCount <= 0
+            ? 2
+            : Math.Clamp(settings.Preview3DSpritePlaneCount, 1, 8);
+        vm.Preview3DCameraOrbitSensitivity = settings.Preview3DCameraOrbitSensitivity <= 0
+            ? 0.006
+            : Math.Clamp(settings.Preview3DCameraOrbitSensitivity, 0.0008, 0.04);
+        vm.Preview3DCameraPanSensitivity = settings.Preview3DCameraPanSensitivity <= 0
+            ? 0.0022
+            : Math.Clamp(settings.Preview3DCameraPanSensitivity, 0.0003, 0.02);
+        vm.Preview3DCameraZoomSensitivity = settings.Preview3DCameraZoomSensitivity <= 0
+            ? 0.12
+            : Math.Clamp(settings.Preview3DCameraZoomSensitivity, 0.02, 0.5);
+        var boomDefault = Math.Sqrt(3.6 * 3.6 + 2.6 * 2.6 + 3.6 * 3.6);
+        vm.Preview3DCameraOrbitBoomDistance = settings.Preview3DCameraOrbitBoomDistance <= 0
+            ? boomDefault
+            : Math.Clamp(settings.Preview3DCameraOrbitBoomDistance, 1.05, 120.0);
+        vm.Preview3DCameraResetKey = string.IsNullOrWhiteSpace(settings.Preview3DCameraResetKey)
+            ? "R"
+            : settings.Preview3DCameraResetKey.Trim();
+        vm.Preview3DItemUseAlphaBlend = settings.Preview3DItemUseAlphaBlend;
+        vm.Preview3DEntityAlphaMode = Math.Clamp(settings.Preview3DEntityAlphaMode, 0, 2);
+        vm.Preview3DEnableEntityLabPbrShading = settings.Preview3DEnableEntityLabPbrShading;
+        vm.Preview3DEnableEntityParallax = settings.Preview3DEnableEntityParallax;
         vm.FastSpecular = settings.FastSpecular;
         vm.FoliageMode = string.IsNullOrWhiteSpace(settings.FoliageMode) ? "No Height" : settings.FoliageMode;
         vm.UseLegacyExtractor = settings.UseLegacyExtractor;
@@ -84,6 +147,7 @@ internal static class UserSettingsSynchronizer
         vm.SpecularUsePercentileRemap = settings.SpecularUsePercentileRemap;
         vm.SpecularRemapLowPercentile = settings.SpecularRemapLowPercentile;
         vm.SpecularRemapHighPercentile = settings.SpecularRemapHighPercentile;
+        vm.SpecularForceNoEmissive = settings.SpecularForceNoEmissive;
         vm.UseMlSpecularPredictor = settings.UseMlSpecularPredictor;
         vm.MlSpecularModelPath = settings.MlSpecularModelPath;
         vm.MlSpecularModelPath16 = settings.MlSpecularModelPath16;
@@ -160,6 +224,44 @@ internal static class UserSettingsSynchronizer
         settings.BrickHeightInvertDeltaThreshold = vm.BrickHeightInvertDeltaThreshold;
         settings.BrickLightGroutDiffuseDeltaMin = vm.BrickLightGroutDiffuseDeltaMin;
         settings.PreviewBrickProbeDebug = vm.PreviewBrickProbeDebug;
+        settings.PreviewDisplayMode = Math.Clamp(vm.PreviewDisplayMode, 0, 1);
+        settings.Preview3DAutoRotate = vm.Preview3DAutoRotate;
+        settings.Preview3DEntityAnimationSpeed = Math.Clamp(vm.Preview3DEntityAnimationSpeed, 0.0, 4.0);
+        settings.Preview3DEntityAnimationAmplitude = Math.Clamp(vm.Preview3DEntityAnimationAmplitude, 0.0, 2.0);
+        settings.Preview3DEnableEntityAnimation = vm.Preview3DEnableEntityAnimation;
+        settings.Preview3DEnableLegacyEntityWobble = vm.Preview3DEnableLegacyEntityWobble;
+        settings.Preview3DPauseEntityIdleAnimation = vm.Preview3DPauseEntityIdleAnimation;
+        settings.Preview3DShowGrid = vm.Preview3DShowGrid;
+        settings.Preview3DShowAxes = vm.Preview3DShowAxes;
+        settings.Preview3DEnableParallax = vm.Preview3DEnableParallax;
+        settings.Preview3DEnableNormalMap = vm.Preview3DEnableNormalMap;
+        settings.Preview3DEnableSpecularMap = vm.Preview3DEnableSpecularMap;
+        settings.Preview3DParallaxHeightStrength = Math.Clamp(vm.Preview3DParallaxHeightStrength, 0.0, 0.35);
+        settings.Preview3DEnableSss = vm.Preview3DEnableSss;
+        settings.Preview3DEnableParallaxShadow = vm.Preview3DEnableParallaxShadow;
+        settings.Preview3DEnableParallaxAo = vm.Preview3DEnableParallaxAo;
+        settings.Preview3DParallaxAoStrength = Math.Clamp(vm.Preview3DParallaxAoStrength, 0.0, 2.0);
+        settings.Preview3DEnableIbl = vm.Preview3DEnableIbl;
+        settings.Preview3DEnableAtmosphericSky = vm.Preview3DEnableAtmosphericSky;
+        settings.Preview3DAtmosphereTurbidity = Math.Clamp(vm.Preview3DAtmosphereTurbidity, 1.2, 10.0);
+        settings.Preview3DAtmosphereSunIntensity = Math.Clamp(vm.Preview3DAtmosphereSunIntensity, 0.2, 64.0);
+        settings.Preview3DAtmosphereHorizonFalloff = Math.Clamp(vm.Preview3DAtmosphereHorizonFalloff, 0.25, 4.0);
+        settings.Preview3DEnableShadows = vm.Preview3DEnableShadows;
+        settings.Preview3DLightYawDegrees = Math.Clamp(vm.Preview3DLightYawDegrees, -180.0, 180.0);
+        settings.Preview3DLightPitchDegrees = Math.Clamp(vm.Preview3DLightPitchDegrees, -89.0, 89.0);
+        settings.Preview3DEnableShadowCascades = vm.Preview3DEnableShadowCascades;
+        settings.Preview3DSpritePlaneCount = Math.Clamp(vm.Preview3DSpritePlaneCount, 1, 8);
+        settings.Preview3DCameraOrbitSensitivity = Math.Clamp(vm.Preview3DCameraOrbitSensitivity, 0.0008, 0.04);
+        settings.Preview3DCameraPanSensitivity = Math.Clamp(vm.Preview3DCameraPanSensitivity, 0.0003, 0.02);
+        settings.Preview3DCameraZoomSensitivity = Math.Clamp(vm.Preview3DCameraZoomSensitivity, 0.02, 0.5);
+        settings.Preview3DCameraOrbitBoomDistance = Math.Clamp(vm.Preview3DCameraOrbitBoomDistance, 1.05, 120.0);
+        settings.Preview3DCameraResetKey = string.IsNullOrWhiteSpace(vm.Preview3DCameraResetKey)
+            ? "R"
+            : vm.Preview3DCameraResetKey.Trim();
+        settings.Preview3DItemUseAlphaBlend = vm.Preview3DItemUseAlphaBlend;
+        settings.Preview3DEntityAlphaMode = Math.Clamp(vm.Preview3DEntityAlphaMode, 0, 2);
+        settings.Preview3DEnableEntityLabPbrShading = vm.Preview3DEnableEntityLabPbrShading;
+        settings.Preview3DEnableEntityParallax = vm.Preview3DEnableEntityParallax;
         settings.FastSpecular = vm.FastSpecular;
         settings.FoliageMode = vm.FoliageMode;
         settings.UseLegacyExtractor = vm.UseLegacyExtractor;
@@ -203,6 +305,7 @@ internal static class UserSettingsSynchronizer
         settings.SpecularUsePercentileRemap = vm.SpecularUsePercentileRemap;
         settings.SpecularRemapLowPercentile = vm.SpecularRemapLowPercentile;
         settings.SpecularRemapHighPercentile = vm.SpecularRemapHighPercentile;
+        settings.SpecularForceNoEmissive = vm.SpecularForceNoEmissive;
         settings.UseMlSpecularPredictor = vm.UseMlSpecularPredictor;
         settings.MlSpecularModelPath = vm.MlSpecularModelPath;
         settings.MlSpecularModelPath16 = vm.MlSpecularModelPath16;

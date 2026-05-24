@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.guardian.GuardianModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/guardian/GuardianModel.class",
+  "classSha256Hex": "4e7f6d39cd124d40d1cdcc764dc34168836f75e44eec6dacc53cbbdaacc6b4ed",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.GuardianRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "head",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "yRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "xRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "eye",
+      "property": "y",
+      "expr": {
+        "const": 0
+      }
+    },
+    {
+      "partField": "eye",
+      "property": "y",
+      "expr": {
+        "const": 1
+      }
+    },
+    {
+      "partField": "eye",
+      "property": "x",
+      "expr": {
+        "const": 2
+      }
+    },
+    {
+      "partField": "eye",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "sin",
+                "args": [
+                  {
+                    "state": "tailAnimation"
+                  }
+                ]
+              },
+              {
+                "const": 3.1415927
+              }
+            ]
+          },
+          {
+            "const": 0.05
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Visible assignment at line 111 not lifted.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

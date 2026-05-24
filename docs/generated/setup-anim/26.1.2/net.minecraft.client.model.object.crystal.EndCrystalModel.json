@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.crystal.EndCrystalModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/object/crystal/EndCrystalModel.class",
+  "classSha256Hex": "c8faea1f206655290c9269a030120642e173299de3eece72d01ff5182a352f78",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.EndCrystalRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "outerGlass",
+      "property": "y",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "y"
+          },
+          {
+            "op": "div",
+            "args": [
+              {
+                "state": "ageInTicks"
+              },
+              {
+                "const": 2
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Visible assignment at line 8 not lifted.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

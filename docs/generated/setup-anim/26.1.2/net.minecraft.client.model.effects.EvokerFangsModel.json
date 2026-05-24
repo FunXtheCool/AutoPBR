@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.effects.EvokerFangsModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/effects/EvokerFangsModel.class",
+  "classSha256Hex": "2c5afe475afc823ff0f163c91af131ee9c072aff7ff5ebcce8243497b572e332",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.EvokerFangsRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "upperJaw",
+      "property": "zRot",
+      "expr": {
+        "op": "sub",
+        "args": [
+          {
+            "const": 3.1415927
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "state": "biteProgress"
+                  },
+                  {
+                    "const": 0.35
+                  }
+                ]
+              },
+              {
+                "const": 3.1415927
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "lowerJaw",
+      "property": "zRot",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "const": 3.1415927
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "state": "biteProgress"
+                  },
+                  {
+                    "const": 0.35
+                  }
+                ]
+              },
+              {
+                "const": 3.1415927
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "base",
+      "property": "y",
+      "expr": {
+        "op": "sub",
+        "args": [
+          {
+            "partSelf": "y"
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "state": "biteProgress"
+                  },
+                  {
+                    "op": "sin",
+                    "args": [
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "state": "biteProgress"
+                          },
+                          {
+                            "const": 2.7
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "const": 7.2
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

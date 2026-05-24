@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.armadillo.BabyArmadilloModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/armadillo/BabyArmadilloModel.class",
+  "classSha256Hex": "e91a9545cd212069454924a26c3b9656d149d3a485abb27ba46091ff1e2cd211",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.armadillo.ArmadilloModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.animal.armadillo.ArmadilloModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

@@ -1,0 +1,307 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.ravager.RavagerModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/ravager/RavagerModel.class",
+  "classSha256Hex": "0cd4ad1d3e0e57cc852e10c95ccb5f43d6c055809c8de555964534bd961aa247",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.RavagerRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "neck",
+      "property": "z",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "const": -6.5
+          },
+          {
+            "const": 12
+          }
+        ]
+      }
+    },
+    {
+      "partField": "mouth",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "sin",
+                "args": [
+                  {
+                    "op": "div",
+                    "args": [
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "const": -4
+                          },
+                          {
+                            "state": "attackTicksRemaining"
+                          }
+                        ]
+                      },
+                      {
+                        "const": 4
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "const": 3.1415927
+              }
+            ]
+          },
+          {
+            "const": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "partField": "mouth",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "const": 0.15707964
+          },
+          {
+            "op": "sin",
+            "args": [
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "const": 3.1415927
+                      },
+                      {
+                        "state": "attackTicksRemaining"
+                      }
+                    ]
+                  },
+                  {
+                    "const": 10
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "neck",
+      "property": "x",
+      "expr": {
+        "const": 0
+      }
+    },
+    {
+      "partField": "neck",
+      "property": "z",
+      "expr": {
+        "const": 5.5
+      }
+    },
+    {
+      "partField": "neck",
+      "property": "x",
+      "expr": {
+        "const": 3
+      }
+    },
+    {
+      "partField": "mouth",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "const": 1.5707964
+          },
+          {
+            "state": "roarAnimation"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "xRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "yRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightHindLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "state": "walkAnimationPos"
+                  },
+                  {
+                    "const": 0.6662
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "state": "walkAnimationSpeed"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftHindLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "walkAnimationPos"
+                      },
+                      {
+                        "const": 0.6662
+                      }
+                    ]
+                  },
+                  {
+                    "const": 3.1415927
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "state": "walkAnimationSpeed"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightFrontLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "walkAnimationPos"
+                      },
+                      {
+                        "const": 0.6662
+                      }
+                    ]
+                  },
+                  {
+                    "const": 3.1415927
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "state": "walkAnimationSpeed"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftFrontLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "state": "walkAnimationPos"
+                  },
+                  {
+                    "const": 0.6662
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "state": "walkAnimationSpeed"
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

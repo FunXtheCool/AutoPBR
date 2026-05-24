@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.projectile.TridentModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/object/projectile/TridentModel.class",
+  "classSha256Hex": "f453b1567918eda7f24dcbb29e7a49e267265fe323d16dc92ebf4cd2dca2a412",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.Model",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "setupAnimEffectOnly": true,
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No setupAnim bytecode; effect model uses parent pose only.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

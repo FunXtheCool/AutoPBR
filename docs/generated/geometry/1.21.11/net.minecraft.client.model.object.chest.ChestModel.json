@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.object.chest.ChestModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.object.chest.ChestModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "bottom",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                1
+              ],
+              "to": [
+                15,
+                10,
+                15
+              ],
+              "uvOrigin": [
+                0,
+                19
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "lid",
+          "pose": {
+            "translation": [
+              0,
+              9,
+              1
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              9,
+              1
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                0
+              ],
+              "to": [
+                15,
+                5,
+                14
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "lock",
+          "pose": {
+            "translation": [
+              0,
+              9,
+              1
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              9,
+              1
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                -2,
+                14
+              ],
+              "to": [
+                1,
+                2,
+                15
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "hgv.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.object.chest.hgv",
+  "classSha256Hex": "5435da10e1c1cf7461139cc3f155bd0655c48107c01b3e4d46b53e3989d6d896",
+  "bytecodeFloatProbe": [
+    14,
+    10,
+    14,
+    14,
+    5,
+    14,
+    9,
+    7,
+    -2,
+    14,
+    4,
+    9,
+    15,
+    10,
+    14,
+    15,
+    5,
+    14,
+    9,
+    15,
+    -2,
+    14,
+    4,
+    9,
+    15,
+    10,
+    14,
+    15,
+    5,
+    14,
+    9,
+    -2,
+    14,
+    4,
+    9
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

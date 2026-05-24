@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.llama.BabyLlamaModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/llama/BabyLlamaModel.class",
+  "classSha256Hex": "d79a33ce9d347bdba8a9e2502449ccc0bf23ac2457c5511b532620ef2408e9de",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.llama.LlamaModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.animal.llama.LlamaModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

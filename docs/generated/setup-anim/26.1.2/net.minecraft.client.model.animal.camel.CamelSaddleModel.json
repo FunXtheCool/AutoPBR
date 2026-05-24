@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.camel.CamelSaddleModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/camel/CamelSaddleModel.class",
+  "classSha256Hex": "4a4325482beed30c8334f1ea09de4f93374f252069fed60d6d7d63e9efbf6b5c",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.CamelRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.camel.AdultCamelModel",
+  "superSetupAnimCall": true,
+  "assignments": [],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Visible assignment at line 8 not lifted.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.hoglin.BabyHoglinModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/hoglin/BabyHoglinModel.class",
+  "classSha256Hex": "c6935c951cb56945c5d49d017010d6528a0a4cca9b20ea53f8778df037e40998",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.monster.hoglin.HoglinModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.monster.hoglin.HoglinModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

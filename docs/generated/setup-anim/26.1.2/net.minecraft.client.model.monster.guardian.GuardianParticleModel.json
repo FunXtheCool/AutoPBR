@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.guardian.GuardianParticleModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/guardian/GuardianParticleModel.class",
+  "classSha256Hex": "b91064f752d166b406b57a5f69520be5e68d6f66b5704d93d0676de05d9049aa",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.Model",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "setupAnimEffectOnly": true,
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No setupAnim bytecode; effect model uses parent pose only.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.projectile.ArrowModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/object/projectile/ArrowModel.class",
+  "classSha256Hex": "248e310c5f5c6bc5e8aae25288e17816ad6217cc9d12b4ed78721a0ca99416f2",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.ArrowRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "root",
+      "property": "zRot",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "zRot"
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "state": "shake"
+              },
+              {
+                "const": 0.017453292
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

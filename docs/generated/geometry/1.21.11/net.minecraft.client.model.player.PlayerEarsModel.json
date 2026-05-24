@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.player.PlayerEarsModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "partial",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.player.PlayerEarsModel).",
+    "Strict structural validation failed (2): cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027; cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "left_ear",
+          "pose": {
+            "translation": [
+              -6,
+              -6,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              -6,
+              -6,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -6,
+                -1,
+                6
+              ],
+              "to": [
+                0,
+                0,
+                7
+              ],
+              "uvOrigin": [
+                24,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "liftWarnings": [
+                "cube_deformation_obf_inferred"
+              ],
+              "inflate": 1
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right_ear",
+          "pose": {
+            "translation": [
+              -6,
+              -6,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              -6,
+              -6,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -6,
+                -1,
+                6
+              ],
+              "to": [
+                0,
+                0,
+                7
+              ],
+              "uvOrigin": [
+                24,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "liftWarnings": [
+                "cube_deformation_obf_inferred"
+              ],
+              "inflate": 1
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "hhs.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.player.hhs",
+  "classSha256Hex": "9677b6560152829ff52b6713462a70c87bdf9e1a430be27e100b855529d2ccb4",
+  "bytecodeFloatProbe": [
+    -3,
+    -6,
+    -1,
+    6,
+    6,
+    -6,
+    -6,
+    6,
+    -6
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

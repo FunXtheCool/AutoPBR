@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.rabbit.BabyRabbitModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/rabbit/BabyRabbitModel.class",
+  "classSha256Hex": "c93d016b183254e8de75342e5b06b625b4ec6145dafbfd2527d64800089f154d",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.rabbit.RabbitModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.animal.rabbit.RabbitModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

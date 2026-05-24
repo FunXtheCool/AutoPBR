@@ -78,7 +78,7 @@
     <value>Darstellung</value>
   </data>
   <data name="UiScaling" xml:space="preserve">
-    <value>Skalierung</value>
+    <value>UI-Skalierung</value>
   </data>
   <data name="UiScalingTooltip" xml:space="preserve">
     <value>Skaliert die gesamte Benutzeroberfläche (Text, Steuerelemente und Abstände). Werte über 100 % verbessern die Lesbarkeit.</value>
@@ -110,6 +110,9 @@
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
   <data name="TabNormals" xml:space="preserve">
     <value>Normalen</value>
+  </data>
+  <data name="TabShader" xml:space="preserve">
+    <value>Rendern</value>
   </data>
   <data name="TabSettings" xml:space="preserve">
     <value>Einstellungen</value>
@@ -416,4 +419,59 @@
   <data name="OpenLogFolder" xml:space="preserve"><value>Protokollordner öffnen</value></data>
   <data name="NormalOperatorLabel" xml:space="preserve"><value>Operator</value></data>
   <data name="NormalKernelSizeLabel" xml:space="preserve"><value>Kernelgröße</value></data>
+  <data name="MaterialTagSemanticMl" xml:space="preserve"><value>Semantische Tag-Vorschläge (MiniLM)</value></data>
+  <data name="UseSemanticMaterialTags" xml:space="preserve"><value>Semantische Vorschläge aktivieren</value></data>
+  <data name="MaterialTagMinSimilarity" xml:space="preserve"><value>Min. Ähnlichkeit</value></data>
+  <data name="MaterialTagMaxCount" xml:space="preserve"><value>Max. ML-Tags</value></data>
+  <data name="MaterialTagCertaintyThreshold" xml:space="preserve"><value>Min. Sicherheit</value></data>
+  <data name="DictionaryEvidenceEnabled" xml:space="preserve"><value>Mit Wörterbuchbelegen anreichern (FreeDictionaryAPI)</value></data>
+  <data name="DictionaryEvidenceWeight" xml:space="preserve"><value>Wörterbuch-Mischungsgewicht</value></data>
+  <data name="DictionaryMinEvidenceScore" xml:space="preserve"><value>Wörterbuch min. Beleg</value></data>
+  <data name="DictionaryRequestTimeoutMs" xml:space="preserve"><value>Wörterbuch-Timeout (ms)</value></data>
+  <data name="Preview3DCameraSection" xml:space="preserve"><value>3D-Vorschaukamera</value></data>
+  <data name="Preview3DCameraBindings" xml:space="preserve"><value>Alt + mittlere Maustaste: Orbit. Mittlere Maustaste: Schwenken. Rad: Zoomen. Vorschau anzeigen und Rückstelltaste drücken, um die Standardansicht wiederherzustellen.</value></data>
+  <data name="Preview3DCameraOrbitSensitivity" xml:space="preserve"><value>Orbit-Empfindlichkeit</value></data>
+  <data name="Preview3DCameraPanSensitivity" xml:space="preserve"><value>Schwenk-Empfindlichkeit</value></data>
+  <data name="Preview3DCameraZoomSensitivity" xml:space="preserve"><value>Zoom-Empfindlichkeit</value></data>
+  <data name="Preview3DCameraResetKey" xml:space="preserve"><value>Taste Kamera zurücksetzen</value></data>
+  <data name="PreviewPanelTitle" xml:space="preserve"><value>Vorschau</value></data>
+  <data name="PreviewModeLabel" xml:space="preserve"><value>Vorschaumodus</value></data>
+  <data name="PreviewMode2D" xml:space="preserve"><value>2D</value></data>
+  <data name="PreviewMode3D" xml:space="preserve"><value>3D</value></data>
+  <data name="Preview3DCameraOrbitBoomDistance" xml:space="preserve"><value>Orbit-Boom-Distanz</value></data>
+  <data name="Preview3DCameraOrbitBoomDistanceTooltip" xml:space="preserve"><value>Standardabstand zwischen Pivot und Kamera im Orbit-Modus (Welteinheiten). Eine Änderung setzt die Orbit-Zoom-Basis zurück und behält Yaw/Pitch.</value></data>
+  <data name="ShaderPreviewLabPbrSection" xml:space="preserve"><value>LabPBR-Vorschau (OpenGL)</value></data>
+  <data name="ShaderPreviewLabPbrDescription" xml:space="preserve"><value>Diese Optionen gelten, wenn die rechte Vorschau im 3D-Modus ist. Mit 2D-Sprite markierte Texturen werden automatisch als gekreuzte Foliage-Ebenen dargestellt, alle anderen als Würfel. Der Vorschau-Shader folgt den LabPBR-Kanälen: Höhe aus _h (Rot), Normalen aus _n, Glätte/Metall aus _s.</value></data>
+  <data name="Preview3DEnableParallax" xml:space="preserve"><value>Parallax Occlusion Mapping (POM)</value></data>
+  <data name="Preview3DEnableParallaxTooltip" xml:space="preserve"><value>Verwendet die LabPBR-Heightmap für begrenztes Relief; UV-Versatz bleibt bei flachen Blickwinkeln stabil.</value></data>
+  <data name="Preview3DEnableNormalMap" xml:space="preserve"><value>Normal Mapping (_n)</value></data>
+  <data name="Preview3DEnableNormalMapTooltip" xml:space="preserve"><value>Aus: Beleuchtung nutzt nur Mesh-Normalen.</value></data>
+  <data name="Preview3DEnableSpecularMap" xml:space="preserve"><value>Specular / LabPBR _s</value></data>
+  <data name="Preview3DEnableSpecularMapTooltip" xml:space="preserve"><value>Aus: nur diffuse Vorschau, ohne Glätte-/Metall-Highlights.</value></data>
+  <data name="Preview3DEnableParallaxShadow" xml:space="preserve"><value>Parallax-Selbstschatten</value></data>
+  <data name="Preview3DEnableParallaxShadowTooltip" xml:space="preserve"><value>Verfolgt einen kurzen Selbstschattenstrahl über das Parallax-Höhenfeld.</value></data>
+  <data name="Preview3DEnableSss" xml:space="preserve"><value>Subsurface Scattering (SSS)</value></data>
+  <data name="Preview3DEnableSssTooltip" xml:space="preserve"><value>Aktiviert eine einfache SSS-Approximation aus dem LabPBR-Porosität/SSS-Kanal.</value></data>
+  <data name="Preview3DEnableIbl" xml:space="preserve"><value>Umgebungs-IBL (Ambient/Spiegelung)</value></data>
+  <data name="Preview3DEnableIblTooltip" xml:space="preserve"><value>Indirektes Ambient und Spiegelung aus der Umgebung. Mit atmosphärischem Himmel: Sampling der Himmel-LUT und reflektierte Sonne; sonst prozedurales Himmel-/Boden-Hemisphärenmodell.</value></data>
+  <data name="Preview3DLightingSection" xml:space="preserve"><value>Beleuchtung</value></data>
+  <data name="Preview3DEnableShadows" xml:space="preserve"><value>Direktionale Schatten</value></data>
+  <data name="Preview3DEnableShadowsTooltip" xml:space="preserve"><value>Rendert eine direktionale Schattenkarte mit PCF-Filterung für das Vorschaulicht.</value></data>
+  <data name="Preview3DLightYawDegrees" xml:space="preserve"><value>Licht-Gierwinkel</value></data>
+  <data name="Preview3DLightYawDegreesTooltip" xml:space="preserve"><value>Sonnen-Gierwinkel in Grad (-180..180); rotiert das Licht um die Welt-Hochachse.</value></data>
+  <data name="Preview3DLightPitchDegrees" xml:space="preserve"><value>Licht-Neigung</value></data>
+  <data name="Preview3DLightPitchDegreesTooltip" xml:space="preserve"><value>Sonnen-Neigung in Grad (-89..89); negativ platziert die Sonne über dem Horizont.</value></data>
+  <data name="Preview3DParallaxHeightStrength" xml:space="preserve"><value>POM-Verschiebung</value></data>
+  <data name="Preview3DParallaxHeightStrengthTooltip" xml:space="preserve"><value>Shader-seitige Parallax-Verschiebungsstärke (uHeightStrength).</value></data>
+  <data name="Preview3DShowGrid" xml:space="preserve"><value>Bodengitter (3D)</value></data>
+  <data name="Preview3DShowGridTooltip" xml:space="preserve"><value>Zeigt ein XZ-Referenzgitter unter dem Objekt in der 3D-Vorschau.</value></data>
+  <data name="Preview3DAutoRotate" xml:space="preserve"><value>3D automatisch drehen</value></data>
+  <data name="Preview3DShowAxes" xml:space="preserve"><value>3D-XYZ-Achsen</value></data>
+  <data name="Preview3DItemUseAlphaBlend" xml:space="preserve"><value>Item-Alpha-Blending</value></data>
+  <data name="Preview3DSpritePlaneCount" xml:space="preserve"><value>Sprite-Ebenenanzahl</value></data>
+  <data name="Preview3DSpritePlaneCountTooltip" xml:space="preserve"><value>Anzahl gekreuzter Ebenen für 2D-Sprite-markierte Texturen in der 3D-Vorschau.</value></data>
+  <data name="Preview3DCameraDebugFlyHint" xml:space="preserve"><value>Rechts ziehen: schauen · WASD bei gedrückter rechter Taste: fliegen · R: Orbit + Flug-Offset zurücksetzen</value></data>
 </root>
+
+
+

@@ -1,9 +1,10 @@
+using AutoPBR.App.ViewModels;
+using AutoPBR.App.Views;
+
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
-using AutoPBR.App.ViewModels;
-using AutoPBR.App.Views;
 
 namespace AutoPBR.App;
 

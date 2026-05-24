@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.effects.SpinAttackEffectModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "partial",
+  "extractionNotes": [
+    "Synthetic placeholder shard: client.jar metadata (SHA-256, javap float probe) only. Extend GeometryCompiler extraction profiles or re-run with a matching jar so javap mesh lift can emit cuboids.",
+    "ldc float constants found in createBodyLayer bytecode; part-tree IR is still incomplete or placeholder-only."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "_placeholder",
+      "cuboids": [],
+      "children": []
+    }
+  ],
+  "jarPath": "hda.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.effects.hda",
+  "classSha256Hex": "e89a5ebf97966066952920a62f9fa4af7808b8ee0914ace9049bcf17193eee64",
+  "bytecodeFloatProbe": [
+    -3.2,
+    9.6,
+    0.75,
+    -8,
+    -16,
+    -8,
+    16,
+    32,
+    16
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

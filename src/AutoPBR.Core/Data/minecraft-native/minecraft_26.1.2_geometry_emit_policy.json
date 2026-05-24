@@ -1,0 +1,17 @@
+{
+  "default_inflate_uv_footprint": "pre_inflate_integer_extents",
+  "by_official_jvm": {
+    "net.minecraft.client.model.monster.creeper.CreeperModel": {
+      "inflate_uv_footprint": "pre_inflate_integer_extents",
+      "notes": "Head/body CubeDeformation inflate; UV stays on 6³ / 8×16×6 logical sizes."
+    },
+    "net.minecraft.client.model.animal.golem.SnowGolemModel": {
+      "inflate_uv_footprint": "pre_inflate_integer_extents",
+      "notes": "CubeDeformation(-0.5) on 8/10/12 logical UV with smaller mesh corners."
+    },
+    "net.minecraft.client.model.animal.pig.PigModel": {
+      "inflate_uv_footprint": "pre_inflate_integer_extents",
+      "notes": "Quadruped leg height via iload+i2f; UV on logical leg box before inflate."
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.dolphin.BabyDolphinModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/dolphin/BabyDolphinModel.class",
+  "classSha256Hex": "b72a0c95f76292ac5f084dae6fd2ac77ecbe3ffe43dbad981df884923068eeea",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.dolphin.DolphinModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.animal.dolphin.DolphinModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

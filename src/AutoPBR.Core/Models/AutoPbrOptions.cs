@@ -104,6 +104,11 @@ public sealed class AutoPbrOptions
     public float SpecularRemapHighPercentile { get; init; } = 0.98f;
 
     /// <summary>
+    /// When true, LabPBR specular alpha is forced to 255 (no emission) for every pixel, overriding heuristic rules and ML output.
+    /// </summary>
+    public bool SpecularForceNoEmissive { get; init; }
+
+    /// <summary>
     /// When true, process block/textures (block, blocks folders).
     /// </summary>
     public bool ProcessBlocks { get; init; } = true;

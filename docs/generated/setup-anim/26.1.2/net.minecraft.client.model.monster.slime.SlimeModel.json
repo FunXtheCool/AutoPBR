@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.slime.SlimeModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/slime/SlimeModel.class",
+  "classSha256Hex": "875d2fb6a22a64733f8cd639a3304c668d997f85a9b94ba31780773f69a9d35a",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "setupAnimEffectOnly": true,
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No setupAnim bytecode; effect model uses parent pose only.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

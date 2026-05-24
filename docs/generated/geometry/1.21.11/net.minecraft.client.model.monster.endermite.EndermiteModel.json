@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.monster.endermite.EndermiteModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "partial",
+  "extractionNotes": [
+    "Synthetic placeholder shard: client.jar metadata (SHA-256, javap float probe) only. Extend GeometryCompiler extraction profiles or re-run with a matching jar so javap mesh lift can emit cuboids.",
+    "ldc float constants found in createBodyLayer bytecode; part-tree IR is still incomplete or placeholder-only."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "_placeholder",
+      "cuboids": [],
+      "children": []
+    }
+  ],
+  "jarPath": "heg.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.monster.endermite.heg",
+  "classSha256Hex": "4d6e5a6ffed824896e30608ea995b6bef027df7ea81041f634a65f7f6b248b20",
+  "bytecodeFloatProbe": [
+    -3.5,
+    -0.5,
+    -0.5,
+    0.5
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

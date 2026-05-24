@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://autopbr.local/schema/geometry-ir.json",
+  "title": "AutoPBR vanilla geometry IR (createBodyLayer-style)",
+  "type": "object",
+  "required": ["schemaVersion", "versionLabel", "officialJvmName", "profile", "extractionStatus", "factoryMethod", "roots"],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 2 },
+    "versionLabel": { "type": "string", "description": "Pinned client label, e.g. 26.1.2 or 1.21.11" },
+    "officialJvmName": { "type": "string" },
+    "obfuscatedJvmName": { "type": "string", "description": "Present when mappingKind is proguard" },
+    "jarPath": { "type": "string", "description": "Zip entry path for the .class inside client.jar" },
+    "classSha256Hex": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{64}$",
+      "description": "SHA-256 of raw .class bytes when known"
+    },
+    "profile": { "type": "string", "description": "Extractor profile id, e.g. named_jar_26_1_2" },
+    "extractionStatus": {
+      "type": "string",
+      "enum": ["ok", "partial", "skipped", "heuristic"]
+    },
+    "extractionNotes": { "type": "array", "items": { "type": "string" } },
+    "factoryMethod": { "type": "string", "description": "Target factory, usually createBodyLayer" },
+    "animationClinitRelPath": {
+      "type": "string",
+      "description": "Optional relative path to javap -c sidecar for *Animation <clinit> prototype"
+    },
+    "liftSummary": {
+      "type": "object",
+      "properties": {
+        "cuboidApproxCount": { "type": "integer", "minimum": 0 },
+        "poseApproxCount": { "type": "integer", "minimum": 0 },
+        "delegationDepth": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "roots": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/partNode" }
+    },
+    "bytecodeFloatProbe": {
+      "type": "array",
+      "items": { "type": "number" },
+      "description": "Optional ldc/ldc_w float scan from createBodyLayer for drift debugging"
+    }
+  },
+  "$defs": {
+    "vec3": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "type": "number" }
+    },
+    "vec2i": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "type": "integer" }
+    },
+    "faceName": {
+      "type": "string",
+      "enum": ["north", "south", "east", "west", "up", "down"]
+    },
+    "liftKind": {
+      "type": "string",
+      "enum": ["exact", "direction_mask_full_box", "tex_crop_static", "unknown"]
+    },
+    "pose": {
+      "type": "object",
+      "required": ["translation", "rotationEulerRad", "eulerOrder"],
+      "properties": {
+        "translation": { "$ref": "#/$defs/vec3" },
+        "rotationEulerRad": { "$ref": "#/$defs/vec3" },
+        "eulerOrder": { "type": "string", "enum": ["XYZ", "XZY", "YXZ", "YZX", "ZXY", "ZYX"] },
+        "uniformScale": {
+          "type": "number",
+          "description": "Optional uniform PartPose.withScale factor when lifted from a constant ldc/fconst before withScale."
+        },
+        "setupAnimPivot": {
+          "$ref": "#/$defs/vec3",
+          "description": "Part-local hinge for setupAnim rotations (lifted from PartPose.offset / offsetAndRotation translation at bind site)."
+        },
+        "liftWarnings": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "cuboid": {
+      "type": "object",
+      "required": ["from", "to", "uvOrigin", "liftKind"],
+      "properties": {
+        "from": { "$ref": "#/$defs/vec3" },
+        "to": { "$ref": "#/$defs/vec3" },
+        "uvOrigin": { "$ref": "#/$defs/vec2i" },
+        "textureKey": { "type": "string" },
+        "textureWidth": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 512,
+          "description": "LayerDefinition atlas width for this cuboid when merged from a supplementary factory island (e.g. createWindLayer 128×128 on Breeze)."
+        },
+        "textureHeight": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 512,
+          "description": "LayerDefinition atlas height for this cuboid when merged from a supplementary factory island."
+        },
+        "mirrorU": { "type": "boolean" },
+        "inflate": { "type": "number" },
+        "uvSpan": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 3,
+          "items": { "type": "integer" },
+          "description": "Optional UV footprint [w,h] or [w,h,d] texels when lifted from texCrop-style CubeListBuilder.addBox overloads."
+        },
+        "liftKind": { "$ref": "#/$defs/liftKind" },
+        "faceMask": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/faceName" },
+          "description": "Included cube faces when direction-mask addBox was parsed; empty array means no faces."
+        },
+        "liftWarnings": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "provenance": { "type": "string", "description": "Debug trace from javap lift; not used for preview policy." }
+      }
+    },
+    "partNode": {
+      "type": "object",
+      "required": ["id", "cuboids", "children"],
+      "properties": {
+        "id": { "type": "string" },
+        "pose": { "$ref": "#/$defs/pose" },
+        "cuboids": { "type": "array", "items": { "$ref": "#/$defs/cuboid" } },
+        "children": { "type": "array", "items": { "$ref": "#/$defs/partNode" } }
+      }
+    }
+  }
+}

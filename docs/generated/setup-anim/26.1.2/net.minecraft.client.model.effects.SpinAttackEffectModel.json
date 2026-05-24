@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.effects.SpinAttackEffectModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/effects/SpinAttackEffectModel.class",
+  "classSha256Hex": "91816c4c28f290dc517d495e20097145c59eb958aa4ef9f0511bafab6c2217c9",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.AvatarRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "box0",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "state": "ageInTicks"
+              },
+              {
+                "const": -50
+              }
+            ]
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "box1",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "state": "ageInTicks"
+              },
+              {
+                "const": -55
+              }
+            ]
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

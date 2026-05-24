@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.feline.BabyCatModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/feline/BabyCatModel.class",
+  "classSha256Hex": "b1ca8a71647ff89d4dd51d36e4599c1d171ed452afb180a85436570945e2e939",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.feline.BabyFelineModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.animal.feline.BabyFelineModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

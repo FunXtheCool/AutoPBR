@@ -1,12 +1,12 @@
 using System.Collections.ObjectModel;
 
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-
 using AutoPBR.App.Services.Rulesets;
 using AutoPBR.Core.Models;
 using AutoPBR.Core.Models.RuleExpressions;
 using AutoPBR.Core.RuleAssembly;
+
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace AutoPBR.App.ViewModels.Rulesets;
 

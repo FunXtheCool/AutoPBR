@@ -1,0 +1,3 @@
+net.minecraft.client.model.animal.squid.BabySquidModel
+net.minecraft.client.model.monster.blaze.BlazeModel
+net.minecraft.client.model.monster.guardian.GuardianModel

@@ -890,6 +890,9 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
         _ = UpdatePreviewAsync();
     }
 
+    /// <summary>UV debug window: coalesced preview refresh without the default debounce delay.</summary>
+    internal void TriggerPreviewRefreshForDebug() => ScheduleRefreshPreviewIfActive(0);
+
     /// <summary>
     /// Coalesces rapid slider-driven setting changes (same idea as <see cref="ExploreTreeController.ScheduleRefreshAllDisplayTags"/>):
     /// waits <paramref name="delayMilliseconds"/> after the last call, then runs <see cref="RefreshPreviewIfActive"/>.
@@ -1822,7 +1825,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
                 null,
                 manualPreview,
                 PreviewBrickProbeDebug);
-            var previewResult = await PreviewService.RenderPreviewAsync(diskPack, entryPath, options, ct)
+            var previewResult = await PreviewService.RenderPreviewDetailedAsync(diskPack, entryPath, options, ct)
                 .ConfigureAwait(false);
 
             if (ct.IsCancellationRequested)
@@ -1836,6 +1839,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
                 using var ms = new MemoryStream(previewResult.PngBytes);
                 PreviewImage = new Bitmap(ms);
                 PreviewBrickProbeDebugText = PreviewBrickProbeDebug ? previewResult.BrickProbeDebugText : null;
+                ApplyPreviewDetailedResult(previewResult);
             });
         }
         catch (OperationCanceledException)
@@ -2592,6 +2596,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
             SpecularUsePercentileRemap = SpecularUsePercentileRemap,
             SpecularRemapLowPercentile = SpecularRemapLowPercentile,
             SpecularRemapHighPercentile = SpecularRemapHighPercentile,
+            SpecularForceNoEmissive = SpecularForceNoEmissive,
             UseMlSpecularPredictor = UseMlSpecularPredictor,
             MlSpecularModelPath = MlSpecularModelPath,
             MlSpecularModelPathsByResolution = BuildMergedSpecularResolutionMap(),
@@ -3065,6 +3070,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
         _scanCts?.Dispose();
         _previewCts?.Dispose();
         _previewRefreshDebounceCts?.Dispose();
+        DisposePreviewResources();
         _materialTagSemanticMatcher?.Dispose();
         _exploreController.Dispose();
         GC.SuppressFinalize(this);

@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://autopbr.local/schema/geometry-index.json",
+  "title": "Geometry compiler manifest",
+  "type": "object",
+  "required": ["schemaVersion", "versionLabel", "mappingKind", "entries"],
+  "properties": {
+    "schemaVersion": { "type": "integer", "enum": [1, 2] },
+    "versionLabel": { "type": "string" },
+    "mappingKind": { "type": "string", "enum": ["named_jar", "proguard"] },
+    "clientJarNote": { "type": "string", "description": "Optional human note; do not commit Mojang client.jar" },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["officialJvmName", "shardRelPath", "extractionStatus"],
+        "properties": {
+          "officialJvmName": { "type": "string" },
+          "obfuscatedJvmName": { "type": "string" },
+          "jarPath": { "type": "string" },
+          "classSha256Hex": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+          "shardRelPath": { "type": "string", "description": "Relative to docs/generated/" },
+          "profile": { "type": "string" },
+          "extractionStatus": {
+            "type": "string",
+            "enum": ["ok", "partial", "skipped", "heuristic"]
+          },
+          "extractionNotes": { "type": "array", "items": { "type": "string" } },
+          "modelIndexJvmName": { "type": "string", "description": "Cross-ref officialJvmName in minecraft-client-model-index JSON" }
+        }
+      }
+    }
+  }
+}

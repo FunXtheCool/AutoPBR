@@ -1,0 +1,552 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.player.PlayerEarsModel",
+  "profile": "named_jar_26.1.2",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.player.PlayerEarsModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createEarsLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0.000000000,
+          0.000000000,
+          0.000000000
+        ],
+        "rotationEulerRad": [
+          0.000000000,
+          0.000000000,
+          0.000000000
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "right_leg",
+          "pose": {
+            "translation": [
+              -1.899999976,
+              12.00000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [],
+          "children": [
+            {
+              "id": "right_pants",
+              "pose": {
+                "translation": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [],
+              "children": [
+                {
+                  "id": "jacket",
+                  "pose": {
+                    "translation": [
+                      0.000000000,
+                      0.000000000,
+                      0.000000000
+                    ],
+                    "rotationEulerRad": [
+                      0.000000000,
+                      0.000000000,
+                      0.000000000
+                    ],
+                    "eulerOrder": "XYZ"
+                  },
+                  "cuboids": [],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "left_leg",
+          "pose": {
+            "translation": [
+              1.899999976,
+              12.00000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [],
+          "children": [
+            {
+              "id": "left_pants",
+              "pose": {
+                "translation": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "head",
+          "pose": {
+            "translation": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [],
+          "children": [
+            {
+              "id": "hat",
+              "pose": {
+                "translation": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [],
+              "children": []
+            },
+            {
+              "id": "right_ear",
+              "pose": {
+                "translation": [
+                  6.000000000,
+                  -6.000000000,
+                  0.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -3,
+                    -6,
+                    -1
+                  ],
+                  "to": [
+                    3,
+                    0,
+                    0
+                  ],
+                  "uvOrigin": [
+                    24,
+                    0
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                  "inflate": 1
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "left_ear",
+              "pose": {
+                "translation": [
+                  -6.000000000,
+                  -6.000000000,
+                  0.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -3,
+                    -6,
+                    -1
+                  ],
+                  "to": [
+                    3,
+                    0,
+                    0
+                  ],
+                  "uvOrigin": [
+                    24,
+                    0
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                  "inflate": 1
+                }
+              ],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "body",
+          "pose": {
+            "translation": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [],
+          "children": []
+        },
+        {
+          "id": "right_arm",
+          "pose": {
+            "translation": [
+              -5.000000000,
+              2.000000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [],
+          "children": [
+            {
+              "id": "right_sleeve",
+              "pose": {
+                "translation": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "left_arm",
+          "pose": {
+            "translation": [
+              5.000000000,
+              2.000000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [],
+          "children": [
+            {
+              "id": "left_sleeve",
+              "pose": {
+                "translation": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [],
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "jarPath": "net/minecraft/client/model/player/PlayerEarsModel.class",
+  "classSha256Hex": "5708acf381d0edea75fb0de00906e0076a5dbb5527706dd5bbd4ebf0451412d8",
+  "bytecodeFloatProbe": [
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -0.1,
+    -1.9,
+    12,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -0.1,
+    1.9,
+    12,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -0.1,
+    -1.9,
+    12,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -0.1,
+    1.9,
+    12,
+    -4,
+    -8,
+    -4,
+    8,
+    8,
+    8,
+    -4,
+    -8,
+    -4,
+    8,
+    8,
+    8,
+    0.5,
+    -4,
+    -2,
+    8,
+    12,
+    4,
+    -3,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -5,
+    -1,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    5,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -1.9,
+    12,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    1.9,
+    12,
+    0.25,
+    -1,
+    -2,
+    -2,
+    3,
+    12,
+    4,
+    5,
+    -2,
+    -2,
+    -2,
+    3,
+    12,
+    4,
+    -5,
+    -1,
+    -2,
+    -2,
+    3,
+    12,
+    4,
+    0.25,
+    -2,
+    -2,
+    -2,
+    3,
+    12,
+    4,
+    0.25,
+    -1,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    5,
+    -1,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    0.25,
+    -3,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    0.25,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    1.9,
+    12,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    0.25,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    0.25,
+    -4,
+    -2,
+    8,
+    12,
+    4,
+    0.25,
+    -4,
+    -8,
+    -4,
+    8,
+    8,
+    8,
+    -4,
+    -8,
+    -4,
+    8,
+    8,
+    8,
+    0.5,
+    -4,
+    -2,
+    8,
+    12,
+    4,
+    -3,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -5,
+    -1,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    5,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -1.9,
+    12,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    1.9,
+    12,
+    -3,
+    -6,
+    -1,
+    6,
+    6,
+    -6,
+    -6,
+    6,
+    -6
+  ],
+  "textureWidth": 64,
+  "textureHeight": 64,
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.boat.RaftModel",
+  "extractionStatus": "reference_java",
+  "factoryMethod": "createRaftModel",
+  "meshHostJvmName": "net.minecraft.client.model.object.boat.RaftModel",
+  "roots": [{
+  "id": "root",
+  "pose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [],
+  "children": [{
+  "id": "right_paddle",
+  "pose": {
+  "translation": [3.000000000, -4.000000000, -9.000000000],
+  "rotationEulerRad": [0.000000000, 3.141592741, 0.1963495463],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-1.000000000, 0.000000000, -5.000000000],
+  "to": [1.000000000, 2.000000000, 13.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [0.001000000047, -3.000000000, 8.000000000],
+  "to": [1.001000047, 3.000000000, 15.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "left_paddle",
+  "pose": {
+  "translation": [3.000000000, -4.000000000, 9.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.1963495463],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-1.000000000, 0.000000000, -5.000000000],
+  "to": [1.000000000, 2.000000000, 13.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-1.001000047, -3.000000000, 8.000000000],
+  "to": [-0.001000046730, 3.000000000, 15.00000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "bottom",
+  "pose": {
+  "translation": [0.000000000, -2.099999905, 1.000000000],
+  "rotationEulerRad": [1.570799947, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-14.00000000, -11.00000000, -4.000000000],
+  "to": [14.00000000, 9.000000000, 0.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-14.00000000, -9.000000000, -8.000000000],
+  "to": [14.00000000, 7.000000000, -4.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+]
+}
+]
+}

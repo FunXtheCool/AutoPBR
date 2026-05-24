@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.monster.silverfish.SilverfishModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "partial",
+  "extractionNotes": [
+    "Synthetic placeholder shard: client.jar metadata (SHA-256, javap float probe) only. Extend GeometryCompiler extraction profiles or re-run with a matching jar so javap mesh lift can emit cuboids.",
+    "ldc float constants found in createBodyLayer bytecode; part-tree IR is still incomplete or placeholder-only."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "_placeholder",
+      "cuboids": [],
+      "children": []
+    }
+  ],
+  "jarPath": "hfd.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.monster.silverfish.hfd",
+  "classSha256Hex": "e2633a2a55475e33b4b1a033fa77e277f27c1bcc2c0a8b2256edeca7d996da76",
+  "bytecodeFloatProbe": [
+    -3.5,
+    -0.5,
+    -0.5,
+    0.5,
+    -5,
+    -0.5,
+    10,
+    8,
+    16,
+    -3,
+    -0.5,
+    6,
+    4,
+    20,
+    -3,
+    -0.5,
+    6,
+    5,
+    19
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

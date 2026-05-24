@@ -1,0 +1,23 @@
+{
+  "default_tier": "prefer_ir",
+  "default_emit_fidelity": "parity",
+  "by_builder_method": {
+    "Chicken": "ir_geometry_preview_anim",
+    "Axolotl": "ir_geometry_preview_anim",
+    "Cod": "prefer_ir",
+    "Salmon": "prefer_ir",
+    "Pig": "ir_geometry_preview_anim",
+    "Cow": "ir_geometry_preview_anim",
+    "Cat": "ir_geometry_preview_anim",
+    "Fox": "ir_geometry_preview_anim",
+    "Wolf": "ir_geometry_preview_anim",
+    "Goat": "ir_geometry_preview_anim",
+    "Sheep": "ir_geometry_preview_anim",
+    "Ocelot": "ir_geometry_preview_anim",
+    "Rabbit": "ir_geometry_preview_anim",
+    "Panda": "ir_geometry_preview_anim",
+    "Camel": "ir_geometry_preview_anim",
+    "Armadillo": "ir_geometry_preview_anim",
+    "Breeze": "ir_geometry_preview_anim"
+  }
+}

@@ -1,0 +1,37 @@
+name: Build and test
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore "AutoPBR.sln"
+
+      - name: Build
+        run: dotnet build "AutoPBR.sln" -c Release --no-restore -v minimal
+
+      - name: Test
+        run: dotnet test "AutoPBR.sln" -c Release --no-build -v minimal
+
+      - name: Validate geometry IR (26.1.2 strict)
+        run: dotnet run --project src/AutoPBR.Tools.GeometryCompiler --no-build -c Release -- validate-geometry --strict 26.1.2
+
+      - name: Dual-lift regression (bytecode vs javap, when client.jar present)
+        run: dotnet test tests/AutoPBR.GeometryCompiler.Tests/AutoPBR.GeometryCompiler.Tests.csproj -c Release --no-build --filter "FullyQualifiedName~DualLiftRegression" -v minimal
+        continue-on-error: false
+
+      - name: Geometry IR reference alignment (strict pilots, when reference JSON committed)
+        run: dotnet test tests/AutoPBR.Core.Tests/AutoPBR.Core.Tests.csproj -c Release --no-build --filter "FullyQualifiedName~GeometryIrReferenceBakeTests" -v minimal

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.ArmedModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/ArmedModel.class",
+  "classSha256Hex": "9c5cd8a84fd30eede56e2e6423d1ffc9410b6c5c87f089ee705ac5f94ce4447e",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "setupAnimEffectOnly": true,
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Interface host net.minecraft.client.model.ArmedModel; setupAnim lifted on concrete implementors.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

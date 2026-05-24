@@ -1,7 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
+
+using AutoPBR.App.ViewModels;
+
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using AutoPBR.App.ViewModels;
 
 namespace AutoPBR.App;
 

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.Model",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/Model.class",
+  "classSha256Hex": "bfa138beb9e110746e6717f7c5172fd8cd476332482d933d4045001155389118",
+  "renderStateType": "S",
+  "setupAnimMethod": "setupAnim",
+  "assignments": [],
+  "setupAnimEffectOnly": true,
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "setupAnim delegates to resetPose only (Model base).",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

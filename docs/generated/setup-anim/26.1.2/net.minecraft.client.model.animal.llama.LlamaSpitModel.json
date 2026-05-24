@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.llama.LlamaSpitModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/llama/LlamaSpitModel.class",
+  "classSha256Hex": "e804fc46504fc47e9f6ce4654baeeb3e4317fda94fa302803e0a5f80c3c79401",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "setupAnimEffectOnly": true,
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No setupAnim bytecode; effect model uses parent pose only.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

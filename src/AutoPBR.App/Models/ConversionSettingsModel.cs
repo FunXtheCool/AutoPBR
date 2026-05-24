@@ -1,12 +1,13 @@
 using AutoPBR.Core;
 using AutoPBR.Core.Embeddings;
 using AutoPBR.Core.Models;
-using NormalOperatorEnum = AutoPBR.Core.Models.NormalOperator;
-using NormalKernelSizeEnum = AutoPBR.Core.Models.NormalKernelSize;
-using NormalDerivativeEnum = AutoPBR.Core.Models.NormalDerivative;
+
 using DeepBumpInputModeEnum = AutoPBR.Core.Models.DeepBumpInputMode;
-using MlSpecularBlendModeEnum = AutoPBR.Core.Models.MlSpecularHeuristicBlendMode;
 using MlSpecularBlendMathEnum = AutoPBR.Core.Models.MlSpecularBlendMath;
+using MlSpecularBlendModeEnum = AutoPBR.Core.Models.MlSpecularHeuristicBlendMode;
+using NormalDerivativeEnum = AutoPBR.Core.Models.NormalDerivative;
+using NormalKernelSizeEnum = AutoPBR.Core.Models.NormalKernelSize;
+using NormalOperatorEnum = AutoPBR.Core.Models.NormalOperator;
 
 namespace AutoPBR.App.Models;
 
@@ -65,6 +66,8 @@ internal sealed class ConversionSettingsModel
     public bool SpecularUsePercentileRemap { get; set; } = true;
     public double SpecularRemapLowPercentile { get; set; } = 0.02;
     public double SpecularRemapHighPercentile { get; set; } = 0.98;
+    /// <summary>When true, specular map alpha is forced to LabPBR &quot;no emission&quot; (255).</summary>
+    public bool SpecularForceNoEmissive { get; set; }
     public bool UseMlSpecularPredictor { get; set; }
     public string? MlSpecularModelPath { get; set; }
 
@@ -147,6 +150,7 @@ internal sealed class ConversionSettingsModel
             SpecularUsePercentileRemap = SpecularUsePercentileRemap,
             SpecularRemapLowPercentile = (float)SpecularRemapLowPercentile,
             SpecularRemapHighPercentile = (float)SpecularRemapHighPercentile,
+            SpecularForceNoEmissive = SpecularForceNoEmissive,
             UseMlSpecularPredictor = UseMlSpecularPredictor,
             MlSpecularModelPath = string.IsNullOrWhiteSpace(MlSpecularModelPath) ? null : MlSpecularModelPath.Trim(),
             MlSpecularModelPathsByResolution = MlSpecularModelPathsByResolution is { Count: > 0 }

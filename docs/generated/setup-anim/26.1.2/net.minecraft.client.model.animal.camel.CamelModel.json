@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.camel.CamelModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/camel/CamelModel.class",
+  "classSha256Hex": "96fb696e0a90921c03e9b4435ec6585b1272ff4bbb5cf309a8e23ea97df2b440",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.CamelRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [],
+  "playbackSteps": [
+    {
+      "mode": "applyWalk",
+      "animationField": "walkAnimation",
+      "walkPosField": "walkAnimationPos",
+      "walkSpeedField": "walkAnimationSpeed",
+      "speedScale": 2.5
+    },
+    {
+      "mode": "apply",
+      "animationField": "sitAnimation",
+      "stateField": "sitAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "sitPoseAnimation",
+      "stateField": "sitPoseAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "standupAnimation",
+      "stateField": "sitUpAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "idleAnimation",
+      "stateField": "idleAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "dashAnimation",
+      "stateField": "dashAnimationState",
+      "ageField": "ageInTicks"
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

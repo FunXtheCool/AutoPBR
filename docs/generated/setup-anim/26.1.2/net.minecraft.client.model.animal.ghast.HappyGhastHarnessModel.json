@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.ghast.HappyGhastHarnessModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/ghast/HappyGhastHarnessModel.class",
+  "classSha256Hex": "ddfefb80b1753f3895ccce3b1463ce487427c5eb98d9c5f63f22aaedda02bc39",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.HappyGhastRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "goggles",
+      "property": "xRot",
+      "expr": {
+        "const": 0
+      }
+    },
+    {
+      "partField": "goggles",
+      "property": "y",
+      "expr": {
+        "const": 14
+      }
+    },
+    {
+      "partField": "goggles",
+      "property": "xRot",
+      "expr": {
+        "const": -0.7854
+      }
+    },
+    {
+      "partField": "goggles",
+      "property": "y",
+      "expr": {
+        "const": 9
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

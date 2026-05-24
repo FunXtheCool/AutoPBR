@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.renderer.entity.FrogRenderer",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.FrogRenderState",
+  "modelJvmNames": [
+    "net.minecraft.client.model.animal.frog.FrogModel"
+  ],
+  "extractionStatus": "partial",
+  "extractionNotes": [
+    "extractRenderState: LivingEntityRenderer super then AnimationState.copyFrom for jump, croak, tongue, swimIdle (javap 26.1.2).",
+    "FrogModel.setupAnim: apply on jump/croak/tongue/swimIdle; applyWalk on swim and walk with speedScale/posScale 1.5/2.5.",
+    "Preview driver frog_clip_cycle advances one mood clip per segment; inactive AnimationState fields use -1 (skip apply)."
+  ],
+  "animationStateFields": [
+    { "renderStateField": "jumpAnimationState", "setupAnimStateField": "jumpAnimationState", "entityAnimationState": "Frog.jump" },
+    { "renderStateField": "croakAnimationState", "setupAnimStateField": "croakAnimationState", "entityAnimationState": "Frog.croak" },
+    { "renderStateField": "tongueAnimationState", "setupAnimStateField": "tongueAnimationState", "entityAnimationState": "Frog.tongue" },
+    { "renderStateField": "swimIdleAnimationState", "setupAnimStateField": "swimIdleAnimationState", "entityAnimationState": "Frog.swimIdle" }
+  ],
+  "livingEntityFields": [
+    "ageInTicks",
+    "walkAnimationPos",
+    "walkAnimationSpeed",
+    "xRot",
+    "yRot"
+  ],
+  "previewDriver": "frog_clip_cycle",
+  "clipLengthsSeconds": {
+    "walkOnly": 2,
+    "jumpAnimationState": 0.5,
+    "croakAnimationState": 3,
+    "tongueAnimationState": 0.5,
+    "swimIdleAnimationState": 3
+  }
+}

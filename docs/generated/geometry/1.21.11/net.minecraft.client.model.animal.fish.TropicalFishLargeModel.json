@@ -1,0 +1,365 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.animal.fish.TropicalFishLargeModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.fish.TropicalFishLargeModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "body",
+          "pose": {
+            "translation": [
+              0,
+              19,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              19,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1,
+                -3,
+                -3
+              ],
+              "to": [
+                1,
+                3,
+                3
+              ],
+              "uvOrigin": [
+                0,
+                20
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "tail",
+          "pose": {
+            "translation": [
+              0,
+              19,
+              3
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              19,
+              3
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                -3,
+                0
+              ],
+              "to": [
+                0,
+                3,
+                5
+              ],
+              "uvOrigin": [
+                21,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right_fin",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -2,
+                0,
+                0
+              ],
+              "to": [
+                0,
+                2,
+                0
+              ],
+              "uvOrigin": [
+                2,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            },
+            {
+              "from": [
+                -1,
+                20,
+                0
+              ],
+              "to": [
+                -1,
+                20.785398185,
+                0
+              ],
+              "uvOrigin": [
+                2,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left_fin",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                0
+              ],
+              "to": [
+                2,
+                2,
+                0
+              ],
+              "uvOrigin": [
+                2,
+                12
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            },
+            {
+              "from": [
+                1,
+                20,
+                0
+              ],
+              "to": [
+                1,
+                19.214601815,
+                0
+              ],
+              "uvOrigin": [
+                2,
+                12
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "top_fin",
+          "pose": {
+            "translation": [
+              0,
+              16,
+              -3
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              16,
+              -3
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                -4,
+                0
+              ],
+              "to": [
+                0,
+                0,
+                6
+              ],
+              "uvOrigin": [
+                20,
+                11
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "bottom_fin",
+          "pose": {
+            "translation": [
+              0,
+              22,
+              -3
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              22,
+              -3
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                0
+              ],
+              "to": [
+                0,
+                4,
+                6
+              ],
+              "uvOrigin": [
+                20,
+                21
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "hbd.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.animal.fish.hbd",
+  "classSha256Hex": "fb3a5eb371148b94138d50bbf56312b5a8c6d2a219a02f7d0fe1e1be2e383a8d",
+  "bytecodeFloatProbe": [
+    -1,
+    -3,
+    -3,
+    6,
+    6,
+    19,
+    -3,
+    6,
+    5,
+    19,
+    3,
+    -2,
+    -1,
+    20,
+    0.7853982,
+    20,
+    -0.7853982,
+    -4,
+    4,
+    6,
+    16,
+    -3,
+    4,
+    6,
+    22,
+    -3
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://autopbr.local/schema/setup-anim-index.json",
+  "title": "AutoPBR setupAnim compiler index",
+  "type": "object",
+  "required": ["schemaVersion", "versionLabel", "profile", "entries"],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "versionLabel": { "type": "string" },
+    "profile": { "type": "string" },
+    "clientJarNote": { "type": "string" },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "officialJvmName",
+          "shardRelPath",
+          "extractionStatus",
+          "classSha256Hex",
+          "jarPath",
+          "profile"
+        ],
+        "properties": {
+          "officialJvmName": { "type": "string" },
+          "shardRelPath": { "type": "string" },
+          "extractionStatus": { "type": "string" },
+          "classSha256Hex": { "type": "string" },
+          "jarPath": { "type": "string" },
+          "profile": { "type": "string" },
+          "renderStateType": { "type": "string" },
+          "inheritsSetupAnimFrom": { "type": "string" },
+          "extractionNotes": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

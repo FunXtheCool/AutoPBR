@@ -78,7 +78,7 @@
     <value>Apariencia</value>
   </data>
   <data name="UiScaling" xml:space="preserve">
-    <value>Escala</value>
+    <value>Escala de la interfaz</value>
   </data>
   <data name="UiScalingTooltip" xml:space="preserve">
     <value>Escala toda la interfaz (texto, controles y espacio). Use un valor superior al 100 % para legibilidad.</value>
@@ -103,6 +103,7 @@
   <data name="ExploreBack" xml:space="preserve"><value>Atrás</value></data>
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
   <data name="TabNormals" xml:space="preserve"><value>Normales</value></data>
+  <data name="TabShader" xml:space="preserve"><value>Render</value></data>
   <data name="TabSettings" xml:space="preserve"><value>Configuración</value></data>
   <data name="Input" xml:space="preserve"><value>Entrada</value></data>
   <data name="InputSourceModeTooltip" xml:space="preserve"><value>Desactivado: paquete de recursos único (.zip / .jar). Activado: carpeta de paquetes para escaneo y conversión por lotes.</value></data>
@@ -213,7 +214,7 @@
   <data name="DebugMode" xml:space="preserve"><value>Depuración</value></data>
   <data name="MaxThreads" xml:space="preserve"><value>Máx. hilos</value></data>
   <data name="MaxThreadsTooltip" xml:space="preserve"><value>Hilos de trabajo. 0 = automático.</value></data>
-  <data name="OnnxPreferTensorRt" xml:space="preserve"><value>Preferir TensorRT para ONNX GPU (reserva CUDA)</value></data>
+  <data name="OnnxPreferTensorRt" xml:space="preserve"><value>Preferir TensorRT para ONNX GPU (Reserva CUDA)</value></data>
   <data name="OnnxPreferTensorRtTooltip" xml:space="preserve"><value>Si está activado, los modelos ONNX usan TensorRT con CUDA para ops no soportadas. Si no, solo CUDA—inicio de sesión más rápido; TensorRT puede compilar motores la primera vez.</value></data>
   <data name="TempFolder" xml:space="preserve"><value>Carpeta temporal</value></data>
   <data name="TempFolderTooltip" xml:space="preserve"><value>Carpeta para extracción temporal. Vacío = temp del sistema.</value></data>
@@ -250,4 +251,59 @@
   <data name="OpenLogFolder" xml:space="preserve"><value>Abrir carpeta de registros</value></data>
   <data name="NormalOperatorLabel" xml:space="preserve"><value>Operador</value></data>
   <data name="NormalKernelSizeLabel" xml:space="preserve"><value>Tamaño del kernel</value></data>
+  <data name="MaterialTagSemanticMl" xml:space="preserve"><value>Sugerencias de etiquetas semánticas (MiniLM)</value></data>
+  <data name="UseSemanticMaterialTags" xml:space="preserve"><value>Activar sugerencias semánticas</value></data>
+  <data name="MaterialTagMinSimilarity" xml:space="preserve"><value>Simil. mín.</value></data>
+  <data name="MaterialTagMaxCount" xml:space="preserve"><value>Etiquetas ML máx.</value></data>
+  <data name="MaterialTagCertaintyThreshold" xml:space="preserve"><value>Certeza mín.</value></data>
+  <data name="DictionaryEvidenceEnabled" xml:space="preserve"><value>Complementar con evidencia del diccionario (FreeDictionaryAPI)</value></data>
+  <data name="DictionaryEvidenceWeight" xml:space="preserve"><value>Ponderación de fusión del diccionario</value></data>
+  <data name="DictionaryMinEvidenceScore" xml:space="preserve"><value>Evidencia mín. del diccionario</value></data>
+  <data name="DictionaryRequestTimeoutMs" xml:space="preserve"><value>Tiempo de espera del diccionario (ms)</value></data>
+  <data name="Preview3DCameraSection" xml:space="preserve"><value>Cámara de vista previa 3D</value></data>
+  <data name="Preview3DCameraBindings" xml:space="preserve"><value>Alt + botón central: órbita. Botón central: panorámica. Rueda: zoom. Sitúe el puntero sobre la vista previa y pulse la tecla de restablecimiento para volver al encuadre predeterminado.</value></data>
+  <data name="Preview3DCameraOrbitSensitivity" xml:space="preserve"><value>Sensibilidad de órbita</value></data>
+  <data name="Preview3DCameraPanSensitivity" xml:space="preserve"><value>Sensibilidad de panorámica</value></data>
+  <data name="Preview3DCameraZoomSensitivity" xml:space="preserve"><value>Sensibilidad del zoom</value></data>
+  <data name="Preview3DCameraResetKey" xml:space="preserve"><value>Tecla para reiniciar la cámara</value></data>
+  <data name="PreviewPanelTitle" xml:space="preserve"><value>Vista previa</value></data>
+  <data name="PreviewModeLabel" xml:space="preserve"><value>Modo de vista previa</value></data>
+  <data name="PreviewMode2D" xml:space="preserve"><value>2D</value></data>
+  <data name="PreviewMode3D" xml:space="preserve"><value>3D</value></data>
+  <data name="Preview3DCameraOrbitBoomDistance" xml:space="preserve"><value>Distancia del brazo de órbita</value></data>
+  <data name="Preview3DCameraOrbitBoomDistanceTooltip" xml:space="preserve"><value>Distancia predeterminada pivote-cámara en modo órbita (unidades del mundo). Cambiarla reinicia la base del zoom conservando yaw/pitch.</value></data>
+  <data name="ShaderPreviewLabPbrSection" xml:space="preserve"><value>Vista previa LabPBR (OpenGL)</value></data>
+  <data name="ShaderPreviewLabPbrDescription" xml:space="preserve"><value>Estas opciones se aplican cuando la vista previa derecha está en modo 3D. Las texturas con la marca Sprite 2D usan automáticamente planos cruzados tipo follaje; las demás usan el cubo. El shader sigue las convenciones LabPBR: altura desde _h, normales desde _n y suavidad/metal desde _s.</value></data>
+  <data name="Preview3DEnableParallax" xml:space="preserve"><value>Parallax occlusion mapping (POM)</value></data>
+  <data name="Preview3DEnableParallaxTooltip" xml:space="preserve"><value>Usa el mapa de altura LabPBR con relieve limitado para mantener estabilidad en ángulos rasantes.</value></data>
+  <data name="Preview3DEnableNormalMap" xml:space="preserve"><value>Mapeado normal (_n)</value></data>
+  <data name="Preview3DEnableNormalMapTooltip" xml:space="preserve"><value>Si está desactivado, la iluminación usa solo normales de la malla.</value></data>
+  <data name="Preview3DEnableSpecularMap" xml:space="preserve"><value>Especular / LabPBR _s</value></data>
+  <data name="Preview3DEnableSpecularMapTooltip" xml:space="preserve"><value>Si está desactivado, vista difusa sin brillos de suavidad/metal.</value></data>
+  <data name="Preview3DEnableParallaxShadow" xml:space="preserve"><value>Autosombra de parallax</value></data>
+  <data name="Preview3DEnableParallaxShadowTooltip" xml:space="preserve"><value>Traza un rayo corto de autosombra sobre el campo de altura de parallax.</value></data>
+  <data name="Preview3DEnableSss" xml:space="preserve"><value>Subsurface scattering (SSS)</value></data>
+  <data name="Preview3DEnableSssTooltip" xml:space="preserve"><value>Activa una aproximación barata de SSS desde el canal de porosidad/SSS de LabPBR.</value></data>
+  <data name="Preview3DEnableIbl" xml:space="preserve"><value>IBL de entorno (ambiente/especular)</value></data>
+  <data name="Preview3DEnableIblTooltip" xml:space="preserve"><value>Iluminación ambiente y especular indirectas del entorno. Con cielo atmosférico: muestrea la LUT del cielo y el sol reflejado; si no, hemisferio procedural cielo/suelo.</value></data>
+  <data name="Preview3DLightingSection" xml:space="preserve"><value>Iluminación</value></data>
+  <data name="Preview3DEnableShadows" xml:space="preserve"><value>Sombras direccionales</value></data>
+  <data name="Preview3DEnableShadowsTooltip" xml:space="preserve"><value>Renderiza un mapa de sombras direccional con filtrado PCF para la luz de vista previa.</value></data>
+  <data name="Preview3DLightYawDegrees" xml:space="preserve"><value>Yaw de la luz</value></data>
+  <data name="Preview3DLightYawDegreesTooltip" xml:space="preserve"><value>Yaw del sol en grados (-180..180); rota la luz alrededor del eje vertical del mundo.</value></data>
+  <data name="Preview3DLightPitchDegrees" xml:space="preserve"><value>Pitch de la luz</value></data>
+  <data name="Preview3DLightPitchDegreesTooltip" xml:space="preserve"><value>Pitch del sol en grados (-89..89); valores negativos sitúan el sol sobre el horizonte.</value></data>
+  <data name="Preview3DParallaxHeightStrength" xml:space="preserve"><value>Desplazamiento POM</value></data>
+  <data name="Preview3DParallaxHeightStrengthTooltip" xml:space="preserve"><value>Fuerza de desplazamiento de parallax en shader (uHeightStrength).</value></data>
+  <data name="Preview3DShowGrid" xml:space="preserve"><value>Cuadrícula de suelo (3D)</value></data>
+  <data name="Preview3DShowGridTooltip" xml:space="preserve"><value>Muestra una cuadrícula XZ bajo el objeto en vista 3D.</value></data>
+  <data name="Preview3DAutoRotate" xml:space="preserve"><value>Auto-rotación 3D</value></data>
+  <data name="Preview3DShowAxes" xml:space="preserve"><value>Ejes XYZ 3D</value></data>
+  <data name="Preview3DItemUseAlphaBlend" xml:space="preserve"><value>Mezcla alfa de ítems</value></data>
+  <data name="Preview3DSpritePlaneCount" xml:space="preserve"><value>Cantidad de planos sprite</value></data>
+  <data name="Preview3DSpritePlaneCountTooltip" xml:space="preserve"><value>Número de planos cruzados para texturas marcadas como Sprite 2D en vista 3D.</value></data>
+  <data name="Preview3DCameraDebugFlyHint" xml:space="preserve"><value>Arrastrar con clic derecho: mirar · WASD con clic derecho: volar · R: restablecer órbita y desplazamiento</value></data>
 </root>
+
+
+

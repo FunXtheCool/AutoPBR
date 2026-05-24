@@ -78,7 +78,7 @@
     <value>Внешний вид</value>
   </data>
   <data name="UiScaling" xml:space="preserve">
-    <value>Масштаб</value>
+    <value>Масштаб интерфейса</value>
   </data>
   <data name="UiScalingTooltip" xml:space="preserve">
     <value>Масштабирует весь интерфейс (текст, элементы и отступы). Значения выше 100% улучшают читаемость.</value>
@@ -103,6 +103,7 @@
   <data name="ExploreBack" xml:space="preserve"><value>Назад</value></data>
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
   <data name="TabNormals" xml:space="preserve"><value>Нормали</value></data>
+  <data name="TabShader" xml:space="preserve"><value>Рендер</value></data>
   <data name="TabSettings" xml:space="preserve"><value>Параметры</value></data>
   <data name="Input" xml:space="preserve"><value>Ввод</value></data>
   <data name="InputSourceModeTooltip" xml:space="preserve"><value>Выкл.: один ресурс-пак (.zip / .jar). Вкл.: папка с пакетами для пакетного сканирования и конвертации.</value></data>
@@ -213,7 +214,7 @@
   <data name="DebugMode" xml:space="preserve"><value>Отладка</value></data>
   <data name="MaxThreads" xml:space="preserve"><value>Макс. потоков</value></data>
   <data name="MaxThreadsTooltip" xml:space="preserve"><value>Рабочие потоки. 0 = авто.</value></data>
-  <data name="OnnxPreferTensorRt" xml:space="preserve"><value>Предпочитать TensorRT для ONNX GPU (запас CUDA)</value></data>
+  <data name="OnnxPreferTensorRt" xml:space="preserve"><value>Предпочитать TensorRT для ONNX GPU (Резерв CUDA)</value></data>
   <data name="OnnxPreferTensorRtTooltip" xml:space="preserve"><value>Вкл.: TensorRT с CUDA для неподдерживаемых операций. Выкл.: только CUDA — быстрее старт сессии; при первом запуске TensorRT может собирать движки.</value></data>
   <data name="TempFolder" xml:space="preserve"><value>Временная папка</value></data>
   <data name="TempFolderTooltip" xml:space="preserve"><value>Папка для временной распаковки. Пусто = системный temp.</value></data>
@@ -250,4 +251,59 @@
   <data name="OpenLogFolder" xml:space="preserve"><value>Открыть папку логов</value></data>
   <data name="NormalOperatorLabel" xml:space="preserve"><value>Оператор</value></data>
   <data name="NormalKernelSizeLabel" xml:space="preserve"><value>Размер ядра</value></data>
+  <data name="MaterialTagSemanticMl" xml:space="preserve"><value>Семантические подсказки тегов (MiniLM)</value></data>
+  <data name="UseSemanticMaterialTags" xml:space="preserve"><value>Включить семантические подсказки</value></data>
+  <data name="MaterialTagMinSimilarity" xml:space="preserve"><value>Мин. сходство</value></data>
+  <data name="MaterialTagMaxCount" xml:space="preserve"><value>Макс. ML-тегов</value></data>
+  <data name="MaterialTagCertaintyThreshold" xml:space="preserve"><value>Мин. уверенность</value></data>
+  <data name="DictionaryEvidenceEnabled" xml:space="preserve"><value>Дополнять данными словаря (FreeDictionaryAPI)</value></data>
+  <data name="DictionaryEvidenceWeight" xml:space="preserve"><value>Вес смешивания со словарём</value></data>
+  <data name="DictionaryMinEvidenceScore" xml:space="preserve"><value>Мин. вес доказательства словаря</value></data>
+  <data name="DictionaryRequestTimeoutMs" xml:space="preserve"><value>Тайм-аут словаря (мс)</value></data>
+  <data name="Preview3DCameraSection" xml:space="preserve"><value>Камера 3D-предпросмотра</value></data>
+  <data name="Preview3DCameraBindings" xml:space="preserve"><value>Alt + средняя кнопка мыши: вращение. Средняя кнопка: панорама. Колёсико: масштаб. Наведите курсор на предпросмотр и нажмите клавишу сброса, чтобы вернуть кадрирование по умолчанию.</value></data>
+  <data name="Preview3DCameraOrbitSensitivity" xml:space="preserve"><value>Чувствительность вращения</value></data>
+  <data name="Preview3DCameraPanSensitivity" xml:space="preserve"><value>Чувствительность панорамы</value></data>
+  <data name="Preview3DCameraZoomSensitivity" xml:space="preserve"><value>Чувствительность масштаба</value></data>
+  <data name="Preview3DCameraResetKey" xml:space="preserve"><value>Клавиша сброса камеры</value></data>
+  <data name="PreviewPanelTitle" xml:space="preserve"><value>Предпросмотр</value></data>
+  <data name="PreviewModeLabel" xml:space="preserve"><value>Режим предпросмотра</value></data>
+  <data name="PreviewMode2D" xml:space="preserve"><value>2D</value></data>
+  <data name="PreviewMode3D" xml:space="preserve"><value>3D</value></data>
+  <data name="Preview3DCameraOrbitBoomDistance" xml:space="preserve"><value>Длина орбитального плеча</value></data>
+  <data name="Preview3DCameraOrbitBoomDistanceTooltip" xml:space="preserve"><value>Расстояние по умолчанию между pivot и камерой в режиме орбиты (мировые единицы). Изменение сбрасывает базу зума, сохраняя yaw/pitch.</value></data>
+  <data name="ShaderPreviewLabPbrSection" xml:space="preserve"><value>Предпросмотр LabPBR (OpenGL)</value></data>
+  <data name="ShaderPreviewLabPbrDescription" xml:space="preserve"><value>Эти параметры действуют, когда правый предпросмотр в режиме 3D. Текстуры с флагом 2D Sprite автоматически показываются как перекрещенные плоскости (листва), остальные — как куб. Шейдер использует каналы LabPBR: высота из _h, нормали из _n, гладкость/металл из _s.</value></data>
+  <data name="Preview3DEnableParallax" xml:space="preserve"><value>Parallax occlusion mapping (POM)</value></data>
+  <data name="Preview3DEnableParallaxTooltip" xml:space="preserve"><value>Использует карту высот LabPBR с ограниченным рельефом для стабильности на скользящих углах.</value></data>
+  <data name="Preview3DEnableNormalMap" xml:space="preserve"><value>Карта нормалей (_n)</value></data>
+  <data name="Preview3DEnableNormalMapTooltip" xml:space="preserve"><value>Если выключено, освещение использует только нормали меша.</value></data>
+  <data name="Preview3DEnableSpecularMap" xml:space="preserve"><value>Specular / LabPBR _s</value></data>
+  <data name="Preview3DEnableSpecularMapTooltip" xml:space="preserve"><value>Если выключено, только диффузный предпросмотр без бликов гладкости/металла.</value></data>
+  <data name="Preview3DEnableParallaxShadow" xml:space="preserve"><value>Самозатенение параллакса</value></data>
+  <data name="Preview3DEnableParallaxShadowTooltip" xml:space="preserve"><value>Выполняет короткий луч самозатенения по высотному полю параллакса.</value></data>
+  <data name="Preview3DEnableSss" xml:space="preserve"><value>Подповерхностное рассеивание (SSS)</value></data>
+  <data name="Preview3DEnableSssTooltip" xml:space="preserve"><value>Включает упрощенную аппроксимацию SSS из канала пористости/SSS LabPBR.</value></data>
+  <data name="Preview3DEnableIbl" xml:space="preserve"><value>IBL окружения (фон/спекуляр)</value></data>
+  <data name="Preview3DEnableIblTooltip" xml:space="preserve"><value>Косвенный фон и спекуляр из окружения. При атмосферном небе — выборка LUT неба и отражённое солнце; иначе процедурное полушарие небо/земля.</value></data>
+  <data name="Preview3DLightingSection" xml:space="preserve"><value>Освещение</value></data>
+  <data name="Preview3DEnableShadows" xml:space="preserve"><value>Направленные тени</value></data>
+  <data name="Preview3DEnableShadowsTooltip" xml:space="preserve"><value>Рендерит карту направленных теней с PCF-фильтрацией для предпросмотра.</value></data>
+  <data name="Preview3DLightYawDegrees" xml:space="preserve"><value>Рысканье света</value></data>
+  <data name="Preview3DLightYawDegreesTooltip" xml:space="preserve"><value>Рысканье солнца в градусах (-180..180); вращает свет вокруг мировой оси Y.</value></data>
+  <data name="Preview3DLightPitchDegrees" xml:space="preserve"><value>Тангаж света</value></data>
+  <data name="Preview3DLightPitchDegreesTooltip" xml:space="preserve"><value>Тангаж солнца в градусах (-89..89); отрицательные значения помещают солнце над горизонтом.</value></data>
+  <data name="Preview3DParallaxHeightStrength" xml:space="preserve"><value>Смещение POM</value></data>
+  <data name="Preview3DParallaxHeightStrengthTooltip" xml:space="preserve"><value>Сила параллакс-смещения в шейдере (uHeightStrength).</value></data>
+  <data name="Preview3DShowGrid" xml:space="preserve"><value>Сетка пола (3D)</value></data>
+  <data name="Preview3DShowGridTooltip" xml:space="preserve"><value>Показывает XZ-сетку под объектом в 3D предпросмотре.</value></data>
+  <data name="Preview3DAutoRotate" xml:space="preserve"><value>Автовращение 3D</value></data>
+  <data name="Preview3DShowAxes" xml:space="preserve"><value>Оси XYZ 3D</value></data>
+  <data name="Preview3DItemUseAlphaBlend" xml:space="preserve"><value>Альфа-смешивание предмета</value></data>
+  <data name="Preview3DSpritePlaneCount" xml:space="preserve"><value>Число спрайт-плоскостей</value></data>
+  <data name="Preview3DSpritePlaneCountTooltip" xml:space="preserve"><value>Количество перекрещенных плоскостей для текстур с флагом 2D Sprite в 3D предпросмотре.</value></data>
+  <data name="Preview3DCameraDebugFlyHint" xml:space="preserve"><value>ПКМ+движение: обзор · WASD при зажатой ПКМ: полёт · R: сброс орбиты и смещения</value></data>
 </root>
+
+
+

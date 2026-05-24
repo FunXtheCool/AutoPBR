@@ -78,7 +78,7 @@
     <value>外观</value>
   </data>
   <data name="UiScaling" xml:space="preserve">
-    <value>缩放</value>
+    <value>界面缩放</value>
   </data>
   <data name="UiScalingTooltip" xml:space="preserve">
     <value>缩放整个界面（文字、控件和间距）。高于 100% 便于阅读。</value>
@@ -103,6 +103,7 @@
   <data name="ExploreBack" xml:space="preserve"><value>返回</value></data>
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
   <data name="TabNormals" xml:space="preserve"><value>法线</value></data>
+  <data name="TabShader" xml:space="preserve"><value>渲染</value></data>
   <data name="TabSettings" xml:space="preserve"><value>设置</value></data>
   <data name="Input" xml:space="preserve"><value>输入</value></data>
   <data name="InputSourceModeTooltip" xml:space="preserve"><value>关闭：单个资源包（.zip / .jar）。开启：包含多个资源包的文件夹，用于批量扫描与转换。</value></data>
@@ -213,7 +214,7 @@
   <data name="DebugMode" xml:space="preserve"><value>调试</value></data>
   <data name="MaxThreads" xml:space="preserve"><value>最大线程数</value></data>
   <data name="MaxThreadsTooltip" xml:space="preserve"><value>转换工作线程。0 = 自动。</value></data>
-  <data name="OnnxPreferTensorRt" xml:space="preserve"><value>ONNX GPU 优先使用 TensorRT（CUDA 回退）</value></data>
+  <data name="OnnxPreferTensorRt" xml:space="preserve"><value>ONNX GPU 优先使用 TensorRT（CUDA 回退选项）</value></data>
   <data name="OnnxPreferTensorRtTooltip" xml:space="preserve"><value>勾选：TensorRT 执行提供程序，不支持的操作用 CUDA。不勾选：仅 CUDA—会话启动更快；首次运行 TensorRT 可能编译引擎。</value></data>
   <data name="TempFolder" xml:space="preserve"><value>临时文件夹</value></data>
   <data name="TempFolderTooltip" xml:space="preserve"><value>转换时临时解压目录。空 = 系统临时目录。</value></data>
@@ -250,4 +251,59 @@
   <data name="OpenLogFolder" xml:space="preserve"><value>打开日志文件夹</value></data>
   <data name="NormalOperatorLabel" xml:space="preserve"><value>算子</value></data>
   <data name="NormalKernelSizeLabel" xml:space="preserve"><value>核大小</value></data>
+  <data name="MaterialTagSemanticMl" xml:space="preserve"><value>语义标签建议（MiniLM）</value></data>
+  <data name="UseSemanticMaterialTags" xml:space="preserve"><value>启用语义建议</value></data>
+  <data name="MaterialTagMinSimilarity" xml:space="preserve"><value>最低相似度</value></data>
+  <data name="MaterialTagMaxCount" xml:space="preserve"><value>最多 ML 标签数</value></data>
+  <data name="MaterialTagCertaintyThreshold" xml:space="preserve"><value>最低置信度</value></data>
+  <data name="DictionaryEvidenceEnabled" xml:space="preserve"><value>使用词典证据增强（FreeDictionaryAPI）</value></data>
+  <data name="DictionaryEvidenceWeight" xml:space="preserve"><value>词典混合权重</value></data>
+  <data name="DictionaryMinEvidenceScore" xml:space="preserve"><value>词典最低证据分</value></data>
+  <data name="DictionaryRequestTimeoutMs" xml:space="preserve"><value>词典请求超时（毫秒）</value></data>
+  <data name="Preview3DCameraSection" xml:space="preserve"><value>3D 预览相机</value></data>
+  <data name="Preview3DCameraBindings" xml:space="preserve"><value>Alt + 中键：环绕。中键：平移。滚轮：缩放。将指针悬停在预览上并按重置键可恢复默认取景。</value></data>
+  <data name="Preview3DCameraOrbitSensitivity" xml:space="preserve"><value>环绕灵敏度</value></data>
+  <data name="Preview3DCameraPanSensitivity" xml:space="preserve"><value>平移灵敏度</value></data>
+  <data name="Preview3DCameraZoomSensitivity" xml:space="preserve"><value>缩放灵敏度</value></data>
+  <data name="Preview3DCameraResetKey" xml:space="preserve"><value>重置相机按键</value></data>
+  <data name="PreviewPanelTitle" xml:space="preserve"><value>预览</value></data>
+  <data name="PreviewModeLabel" xml:space="preserve"><value>预览模式</value></data>
+  <data name="PreviewMode2D" xml:space="preserve"><value>2D</value></data>
+  <data name="PreviewMode3D" xml:space="preserve"><value>3D</value></data>
+  <data name="Preview3DCameraOrbitBoomDistance" xml:space="preserve"><value>轨道臂距离</value></data>
+  <data name="Preview3DCameraOrbitBoomDistanceTooltip" xml:space="preserve"><value>轨道模式下默认枢轴到相机距离（世界单位）。修改后会重置轨道缩放基线，同时保留偏航/俯仰。</value></data>
+  <data name="ShaderPreviewLabPbrSection" xml:space="preserve"><value>LabPBR 预览（OpenGL）</value></data>
+  <data name="ShaderPreviewLabPbrDescription" xml:space="preserve"><value>这些选项在右侧预览处于 3D 模式时生效。带有 2D Sprite 标记的纹理会自动使用类似树叶的交叉平面，其它纹理使用立方体。预览着色器遵循 LabPBR 通道约定：_h 高度、_n 法线、_s 平滑度/金属。</value></data>
+  <data name="Preview3DEnableParallax" xml:space="preserve"><value>视差遮蔽映射（POM）</value></data>
+  <data name="Preview3DEnableParallaxTooltip" xml:space="preserve"><value>使用 LabPBR 高度图进行受限位移，掠射角下更稳定。</value></data>
+  <data name="Preview3DEnableNormalMap" xml:space="preserve"><value>法线贴图（_n）</value></data>
+  <data name="Preview3DEnableNormalMapTooltip" xml:space="preserve"><value>关闭时仅使用网格法线进行光照。</value></data>
+  <data name="Preview3DEnableSpecularMap" xml:space="preserve"><value>高光 / LabPBR _s</value></data>
+  <data name="Preview3DEnableSpecularMapTooltip" xml:space="preserve"><value>关闭时仅显示漫反射，不显示平滑度/金属高光。</value></data>
+  <data name="Preview3DEnableParallaxShadow" xml:space="preserve"><value>视差自阴影</value></data>
+  <data name="Preview3DEnableParallaxShadowTooltip" xml:space="preserve"><value>在视差高度场上追踪一条短自阴影射线。</value></data>
+  <data name="Preview3DEnableSss" xml:space="preserve"><value>次表面散射 (SSS)</value></data>
+  <data name="Preview3DEnableSssTooltip" xml:space="preserve"><value>启用基于 LabPBR 孔隙/SSS 通道的轻量次表面散射近似。</value></data>
+  <data name="Preview3DEnableIbl" xml:space="preserve"><value>环境 IBL（环境光/高光）</value></data>
+  <data name="Preview3DEnableIblTooltip" xml:space="preserve"><value>来自场景环境的间接环境光与高光。启用大气天空时采样天空 LUT 与反射太阳；否则使用程序化天空/地面半球近似。</value></data>
+  <data name="Preview3DLightingSection" xml:space="preserve"><value>光照</value></data>
+  <data name="Preview3DEnableShadows" xml:space="preserve"><value>方向阴影</value></data>
+  <data name="Preview3DEnableShadowsTooltip" xml:space="preserve"><value>为预览光源渲染带 PCF 过滤的方向阴影贴图。</value></data>
+  <data name="Preview3DLightYawDegrees" xml:space="preserve"><value>光源偏航</value></data>
+  <data name="Preview3DLightYawDegreesTooltip" xml:space="preserve"><value>太阳偏航角(度,-180..180);围绕世界纵轴旋转光源。</value></data>
+  <data name="Preview3DLightPitchDegrees" xml:space="preserve"><value>光源俯仰</value></data>
+  <data name="Preview3DLightPitchDegreesTooltip" xml:space="preserve"><value>太阳俯仰角(度,-89..89);负值将太阳置于地平线之上。</value></data>
+  <data name="Preview3DParallaxHeightStrength" xml:space="preserve"><value>POM 位移</value></data>
+  <data name="Preview3DParallaxHeightStrengthTooltip" xml:space="preserve"><value>着色器侧视差位移强度（uHeightStrength）。</value></data>
+  <data name="Preview3DShowGrid" xml:space="preserve"><value>地面网格（3D）</value></data>
+  <data name="Preview3DShowGridTooltip" xml:space="preserve"><value>在 3D 预览中显示对象下方的 XZ 参考网格。</value></data>
+  <data name="Preview3DAutoRotate" xml:space="preserve"><value>3D 自动旋转</value></data>
+  <data name="Preview3DShowAxes" xml:space="preserve"><value>3D XYZ 坐标轴</value></data>
+  <data name="Preview3DItemUseAlphaBlend" xml:space="preserve"><value>物品 Alpha 混合</value></data>
+  <data name="Preview3DSpritePlaneCount" xml:space="preserve"><value>精灵平面数量</value></data>
+  <data name="Preview3DSpritePlaneCountTooltip" xml:space="preserve"><value>3D 预览中用于 2D Sprite 标记纹理的交叉平面数量。</value></data>
+  <data name="Preview3DCameraDebugFlyHint" xml:space="preserve"><value>右键拖动：观察 · 右键按住 + WASD：飞行 · R：重置轨道与偏移</value></data>
 </root>
+
+
+

@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.witch.WitchModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/witch/WitchModel.class",
+  "classSha256Hex": "1a70888486ad0260db8f05101f2d0bb2e80f71df3232a7b3fe08cfb954247d92",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.WitchRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "head",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "yRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "xRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "cos",
+                    "args": [
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "state": "walkAnimationPos"
+                          },
+                          {
+                            "const": 0.6662
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1.4
+                  }
+                ]
+              },
+              {
+                "state": "walkAnimationSpeed"
+              }
+            ]
+          },
+          {
+            "const": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "cos",
+                    "args": [
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "mul",
+                            "args": [
+                              {
+                                "state": "walkAnimationPos"
+                              },
+                              {
+                                "const": 0.6662
+                              }
+                            ]
+                          },
+                          {
+                            "const": 3.1415927
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1.4
+                  }
+                ]
+              },
+              {
+                "state": "walkAnimationSpeed"
+              }
+            ]
+          },
+          {
+            "const": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "partField": "nose",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "sin",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "ageInTicks"
+                      },
+                      {
+                        "state": "entityId"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "const": 4.5
+              }
+            ]
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "nose",
+      "property": "zRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "cos",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "ageInTicks"
+                      },
+                      {
+                        "state": "entityId"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "const": 2.5
+              }
+            ]
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "nose",
+      "property": "xRot",
+      "expr": {
+        "const": -0.9
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

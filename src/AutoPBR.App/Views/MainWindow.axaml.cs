@@ -4,13 +4,16 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+
+using AutoPBR.App.Controls;
+using AutoPBR.App.Models;
+using AutoPBR.App.Services;
+using AutoPBR.App.ViewModels;
+
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
-using AutoPBR.App.Models;
-using AutoPBR.App.Services;
-using AutoPBR.App.ViewModels;
 
 namespace AutoPBR.App.Views;
 
@@ -24,6 +27,7 @@ public partial class MainWindow : Window
 
     private const int LogScrollThrottleMs = 200;
     private DateTime _lastLogScrollUtc = DateTime.MinValue;
+    private UvDebugWindow? _uvDebugWindow;
 
     private const double RoundedCornerRadius = 8;
     private const double JumpToTopThresholdPx = 220;
@@ -470,6 +474,11 @@ public partial class MainWindow : Window
     {
         if (DataContext is MainWindowViewModel vm && LogScrollViewer is { } scroll)
         {
+            if (this.FindControl<GlPbrPreviewControl>("GlPbrPreview") is { } glPreview)
+            {
+                vm.RegisterGlPreview(glPreview);
+            }
+
             vm.LogLines.CollectionChanged += (_, _) =>
             {
                 var now = DateTime.UtcNow;
@@ -555,6 +564,28 @@ public partial class MainWindow : Window
         {
             // Opening the log folder should never crash the app.
         }
+    }
+
+    private void OpenUvDebugWindow_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm)
+        {
+            return;
+        }
+
+        if (_uvDebugWindow is { IsVisible: true })
+        {
+            _uvDebugWindow.Activate();
+            return;
+        }
+
+        var window = new UvDebugWindow
+        {
+            DataContext = new UvDebugWindowViewModel(vm)
+        };
+        window.Closed += (_, _) => _uvDebugWindow = null;
+        _uvDebugWindow = window;
+        window.Show(this);
     }
 
     private async void ExportTagRules_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

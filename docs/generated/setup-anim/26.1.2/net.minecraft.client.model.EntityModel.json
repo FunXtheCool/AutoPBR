@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.EntityModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/EntityModel.class",
+  "classSha256Hex": "201bf4c36eac0e75a2f47f3864769cd5224e24f59c9f29e6d517b8dd82a58401",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "setupAnimEffectOnly": true,
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No setupAnim bytecode; effect model uses parent pose only.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

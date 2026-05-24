@@ -1,12 +1,14 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Compression;
-using Avalonia.Media.Imaging;
-using Avalonia.Threading;
+
 using AutoPBR.App.Models;
 using AutoPBR.Core;
 using AutoPBR.Core.Embeddings;
 using AutoPBR.Core.Models;
+
+using Avalonia.Media.Imaging;
+using Avalonia.Threading;
 
 namespace AutoPBR.App.Services;
 

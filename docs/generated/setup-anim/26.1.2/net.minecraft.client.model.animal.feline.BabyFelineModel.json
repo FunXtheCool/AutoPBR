@@ -1,0 +1,1022 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.feline.BabyFelineModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/feline/BabyFelineModel.class",
+  "classSha256Hex": "cb0439a3136506f6f8b4af45915375dcfe01c64332094a69fab51ef2545a9b61",
+  "renderStateType": "S",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.feline.AbstractFelineModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "body",
+      "property": "y",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "y"
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "const": 1
+              },
+              {
+                "state": "ageScale"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "y",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "y"
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "const": 2
+              },
+              {
+                "state": "ageScale"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tail1",
+      "property": "y",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "y"
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "const": 1
+              },
+              {
+                "state": "ageScale"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tail2",
+      "property": "y",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "y"
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "const": -4
+              },
+              {
+                "state": "ageScale"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tail2",
+      "property": "z",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "z"
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "const": 2
+              },
+              {
+                "state": "ageScale"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tail1",
+      "property": "xRot",
+      "expr": {
+        "const": 1.5707964
+      }
+    },
+    {
+      "partField": "tail2",
+      "property": "xRot",
+      "expr": {
+        "const": 1.5707964
+      }
+    },
+    {
+      "partField": "tail2",
+      "property": "y",
+      "expr": {
+        "partPeer": "tail1",
+        "peerProperty": "y"
+      }
+    },
+    {
+      "partField": "tail1",
+      "property": "z",
+      "expr": {
+        "partPeer": "tail2",
+        "peerProperty": "z"
+      }
+    },
+    {
+      "partField": "tail1",
+      "property": "xRot",
+      "expr": {
+        "const": 1.5707964
+      }
+    },
+    {
+      "partField": "tail2",
+      "property": "xRot",
+      "expr": {
+        "const": 1.5707964
+      }
+    },
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "xRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "yRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftHindLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "state": "walkAnimationPos"
+                  },
+                  {
+                    "const": 0.6662
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "state": "walkAnimationSpeed"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightHindLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "walkAnimationPos"
+                      },
+                      {
+                        "const": 0.6662
+                      }
+                    ]
+                  },
+                  {
+                    "const": 0.3
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "state": "walkAnimationSpeed"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftFrontLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "state": "walkAnimationPos"
+                          },
+                          {
+                            "const": 0.6662
+                          }
+                        ]
+                      },
+                      {
+                        "const": 3.1415927
+                      }
+                    ]
+                  },
+                  {
+                    "const": 0.3
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "state": "walkAnimationSpeed"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightFrontLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "walkAnimationPos"
+                      },
+                      {
+                        "const": 0.6662
+                      }
+                    ]
+                  },
+                  {
+                    "const": 3.1415927
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "state": "walkAnimationSpeed"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tail2",
+      "property": "xRot",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "const": 1.7278761
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "const": 0.31415927
+                  },
+                  {
+                    "op": "cos",
+                    "args": [
+                      {
+                        "state": "walkAnimationPos"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "state": "walkAnimationSpeed"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftHindLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "state": "walkAnimationPos"
+                  },
+                  {
+                    "const": 0.6662
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "state": "walkAnimationSpeed"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightHindLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "walkAnimationPos"
+                      },
+                      {
+                        "const": 0.6662
+                      }
+                    ]
+                  },
+                  {
+                    "const": 3.1415927
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "state": "walkAnimationSpeed"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftFrontLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "walkAnimationPos"
+                      },
+                      {
+                        "const": 0.6662
+                      }
+                    ]
+                  },
+                  {
+                    "const": 3.1415927
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "state": "walkAnimationSpeed"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightFrontLeg",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "state": "walkAnimationPos"
+                  },
+                  {
+                    "const": 0.6662
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "state": "walkAnimationSpeed"
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tail2",
+      "property": "xRot",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "const": 1.7278761
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "const": 0.7853982
+                  },
+                  {
+                    "op": "cos",
+                    "args": [
+                      {
+                        "state": "walkAnimationPos"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "state": "walkAnimationSpeed"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tail2",
+      "property": "xRot",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "const": 1.7278761
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "const": 0.47123894
+                  },
+                  {
+                    "op": "cos",
+                    "args": [
+                      {
+                        "state": "walkAnimationPos"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "state": "walkAnimationSpeed"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "partField": "body",
+      "property": "xRot",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "xRot"
+          },
+          {
+            "const": -0.43633232
+          }
+        ]
+      }
+    },
+    {
+      "partField": "body",
+      "property": "y",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "y"
+          },
+          {
+            "const": 1.25
+          }
+        ]
+      }
+    },
+    {
+      "partField": "body",
+      "property": "z",
+      "expr": {
+        "partPeer": "head",
+        "peerProperty": "z"
+      }
+    },
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "partPeer": "tail1",
+        "peerProperty": "xRot"
+      }
+    },
+    {
+      "partField": "tail1",
+      "property": "y",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "y"
+          },
+          {
+            "const": 4
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tail1",
+      "property": "z",
+      "expr": {
+        "op": "sub",
+        "args": [
+          {
+            "partSelf": "z"
+          },
+          {
+            "const": 0.9
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tail1",
+      "property": "z",
+      "expr": {
+        "partPeer": "leftHindLeg",
+        "peerProperty": "z"
+      }
+    },
+    {
+      "partField": "leftHindLeg",
+      "property": "z",
+      "expr": {
+        "partPeer": "rightHindLeg",
+        "peerProperty": "z"
+      }
+    },
+    {
+      "partField": "body",
+      "property": "x",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "x"
+          },
+          {
+            "const": 1
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "x",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "x"
+          },
+          {
+            "const": 1.5
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "y",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "y"
+          },
+          {
+            "const": 0.75
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "z",
+      "expr": {
+        "op": "sub",
+        "args": [
+          {
+            "partSelf": "z"
+          },
+          {
+            "const": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightFrontLeg",
+      "property": "xRot",
+      "expr": {
+        "const": -0.7853982
+      }
+    },
+    {
+      "partField": "rightFrontLeg",
+      "property": "x",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "x"
+          },
+          {
+            "const": 3.5
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightFrontLeg",
+      "property": "y",
+      "expr": {
+        "op": "sub",
+        "args": [
+          {
+            "partSelf": "y"
+          },
+          {
+            "const": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightFrontLeg",
+      "property": "z",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "z"
+          },
+          {
+            "const": 0
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftFrontLeg",
+      "property": "xRot",
+      "expr": {
+        "const": -1.5707964
+      }
+    },
+    {
+      "partField": "leftFrontLeg",
+      "property": "x",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "x"
+          },
+          {
+            "const": 1.5
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftFrontLeg",
+      "property": "y",
+      "expr": {
+        "op": "sub",
+        "args": [
+          {
+            "partSelf": "y"
+          },
+          {
+            "const": 1
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftFrontLeg",
+      "property": "z",
+      "expr": {
+        "op": "sub",
+        "args": [
+          {
+            "partSelf": "z"
+          },
+          {
+            "const": 2
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightHindLeg",
+      "property": "xRot",
+      "expr": {
+        "const": 0.6981317
+      }
+    },
+    {
+      "partField": "rightHindLeg",
+      "property": "yRot",
+      "expr": {
+        "const": 0.34906584
+      }
+    },
+    {
+      "partField": "rightHindLeg",
+      "property": "zRot",
+      "expr": {
+        "const": -0.34906584
+      }
+    },
+    {
+      "partField": "rightHindLeg",
+      "property": "x",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "x"
+          },
+          {
+            "const": 2.5
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightHindLeg",
+      "property": "y",
+      "expr": {
+        "op": "sub",
+        "args": [
+          {
+            "partSelf": "y"
+          },
+          {
+            "const": 0.25
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightHindLeg",
+      "property": "z",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "z"
+          },
+          {
+            "const": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightHindLeg",
+      "property": "x",
+      "expr": {
+        "partPeer": "leftHindLeg",
+        "peerProperty": "x"
+      }
+    },
+    {
+      "partField": "leftHindLeg",
+      "property": "z",
+      "expr": {
+        "op": "sub",
+        "args": [
+          {
+            "partSelf": "z"
+          },
+          {
+            "const": 1
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tail1",
+      "property": "xRot",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "xRot"
+          },
+          {
+            "const": -0.5235988
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tail1",
+      "property": "yRot",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "yRot"
+          },
+          {
+            "const": 0
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tail1",
+      "property": "zRot",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "zRot"
+          },
+          {
+            "const": -0.17453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tail1",
+      "property": "x",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "x"
+          },
+          {
+            "const": 1
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tail1",
+      "property": "y",
+      "expr": {
+        "op": "add",
+        "args": [
+          {
+            "partSelf": "y"
+          },
+          {
+            "const": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "partField": "tail1",
+      "property": "z",
+      "expr": {
+        "op": "sub",
+        "args": [
+          {
+            "partSelf": "z"
+          },
+          {
+            "const": 0.25
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

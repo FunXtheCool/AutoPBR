@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.hoglin.BabyHoglinModel",
+  "deltas": [
+    {
+      "kind": "previewBasis",
+      "description": "Baby hoglin inherits Hoglin LER default (composed offset+rotation); catalog baby scale applied after mesh build.",
+      "partId": "_all"
+    }
+  ]
+}

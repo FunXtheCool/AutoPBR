@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.bee.BabyBeeModel",
+  "extractionStatus": "reference_java",
+  "factoryMethod": "createBodyLayer",
+  "meshHostJvmName": "net.minecraft.client.model.animal.bee.BabyBeeModel",
+  "roots": [{
+  "id": "root",
+  "pose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [],
+  "children": [{
+  "id": "bone",
+  "pose": {
+  "translation": [0.000000000, 19.66670036, -1.856699944],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [1.000000000, -1.666700006, -2.163300037],
+  "to": [2.000000000, 0.3332999945, -0.1633000374],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+,{
+  "from": [-2.000000000, -1.666700006, -2.193300009],
+  "to": [-1.000000000, 0.3332999945, -0.1933000088],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": [{
+  "id": "front_legs",
+  "pose": {
+  "translation": [0.000000000, 3.333300114, 1.856699944],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-1.500000000, 0.000000000, 0.000000000],
+  "to": [1.500000000, 1.000000000, 0.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "right_wing",
+  "pose": {
+  "translation": [-1.000000000, -0.6667000055, 0.8567000031],
+  "rotationEulerRad": [0.2181999981, 0.3490999937, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-3.000000000, 0.000000000, 0.000000000],
+  "to": [0.000000000, 0.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "left_wing",
+  "pose": {
+  "translation": [1.000000000, -0.6667000055, 0.8567000031],
+  "rotationEulerRad": [0.2181999981, -0.3490999937, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [0.000000000, 0.000000000, 0.000000000],
+  "to": [3.000000000, 0.000000000, 3.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "middle_legs",
+  "pose": {
+  "translation": [0.000000000, 3.333300114, 2.856699944],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-1.500000000, 0.000000000, 0.000000000],
+  "to": [1.500000000, 1.000000000, 0.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+,{
+  "id": "body",
+  "pose": {
+  "translation": [0.000000000, 1.333299994, 2.356699944],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-2.000000000, -2.000000000, -2.500000000],
+  "to": [2.000000000, 2.000000000, 2.500000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": [{
+  "id": "stinger",
+  "pose": {
+  "translation": [0.000000000, 0.5000000000, 2.500000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [0.000000000, -0.5000000000, 0.000000000],
+  "to": [0.000000000, 0.5000000000, 1.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+]
+}
+,{
+  "id": "back_legs",
+  "pose": {
+  "translation": [0.000000000, 3.333300114, 3.856699944],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-1.500000000, 0.000000000, 0.000000000],
+  "to": [1.500000000, 1.000000000, 0.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+]
+}
+]
+}
+]
+}

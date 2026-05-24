@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.banner.BannerFlagModel",
+  "extractionStatus": "reference_java",
+  "factoryMethod": "createFlagLayer",
+  "meshHostJvmName": "net.minecraft.client.model.object.banner.BannerFlagModel",
+  "roots": [{
+  "id": "root",
+  "pose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [],
+  "children": [{
+  "id": "flag",
+  "pose": {
+  "translation": [0.000000000, -20.50000000, 10.50000000],
+  "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "cuboids": [{
+  "from": [-10.00000000, 0.000000000, -2.000000000],
+  "to": [10.00000000, 40.00000000, -1.000000000],
+  "uvOrigin": [0, 0],
+  "liftKind": "reference_java"
+}
+],
+  "children": []
+}
+]
+}
+]
+}

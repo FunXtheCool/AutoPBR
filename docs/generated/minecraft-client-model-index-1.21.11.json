@@ -1,0 +1,2794 @@
+{
+  "officialNamedPrefixes": [
+    "net.minecraft.client.model.",
+    "net.minecraft.client.animation."
+  ],
+  "mappings": "tools/minecraft-parity/1.21.11/client_mappings.txt",
+  "classes": [
+    {
+      "officialJvmName": "net.minecraft.client.animation.AnimationChannel",
+      "groupKey": "net.minecraft.client.animation.AnimationChannel",
+      "jarPath": "gfy.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic final class gfy extends java.lang.Record {\r\n  public gfy(gfy$c, gga...);\r\n  public final java.lang.String toString();\r\n  public final int hashCode();\r\n  public final boolean equals(java.lang.Object);\r\n  public gfy$c a();\r\n  public gga[] b();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.gfy",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.AnimationChannel$Interpolation",
+      "groupKey": "net.minecraft.client.animation.AnimationChannel",
+      "jarPath": "gfy$a.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic interface gfy$a {\r\n  public abstract org.joml.Vector3f apply(org.joml.Vector3f, float, gga[], int, int, float);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.gfy$a",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.AnimationChannel$Interpolations",
+      "groupKey": "net.minecraft.client.animation.AnimationChannel",
+      "jarPath": "gfy$b.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class gfy$b {\r\n  public static final gfy$a a;\r\n  public static final gfy$a b;\r\n  public gfy$b();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.gfy$b",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.AnimationChannel$Target",
+      "groupKey": "net.minecraft.client.animation.AnimationChannel",
+      "jarPath": "gfy$c.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic interface gfy$c {\r\n  public abstract void apply(hdg, org.joml.Vector3f);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.gfy$c",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.AnimationChannel$Targets",
+      "groupKey": "net.minecraft.client.animation.AnimationChannel",
+      "jarPath": "gfy$d.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class gfy$d {\r\n  public static final gfy$c a;\r\n  public static final gfy$c b;\r\n  public static final gfy$c c;\r\n  public gfy$d();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.gfy$d",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.AnimationDefinition",
+      "groupKey": "net.minecraft.client.animation.AnimationDefinition",
+      "jarPath": "gfz.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic final class gfz extends java.lang.Record {\r\n  public gfz(float, boolean, java.util.Map<java.lang.String, java.util.List<gfy>>);\r\n  public ggb a(hdg);\r\n  public final java.lang.String toString();\r\n  public final int hashCode();\r\n  public final boolean equals(java.lang.Object);\r\n  public float a();\r\n  public boolean b();\r\n  public java.util.Map<java.lang.String, java.util.List<gfy>> c();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.gfz",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.AnimationDefinition$Builder",
+      "groupKey": "net.minecraft.client.animation.AnimationDefinition",
+      "jarPath": "gfz$a.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class gfz$a {\r\n  public static gfz$a a(float);\r\n  public gfz$a a();\r\n  public gfz$a a(java.lang.String, gfy);\r\n  public gfz b();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.gfz$a",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.ArmadilloAnimation",
+      "groupKey": "net.minecraft.client.animation.definitions",
+      "jarPath": "ggd.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class ggd {\r\n  public static final gfz a;\r\n  public static final gfz b;\r\n  public static final gfz c;\r\n  public static final gfz d;\r\n  public ggd();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.definitions.ggd",
+      "javapBytecodeCRelPath": "minecraft-client-model-index-1.21.11-animation-init/net_minecraft_client_animation_definitions_ArmadilloAnimation.javapc.txt",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.BatAnimation",
+      "groupKey": "net.minecraft.client.animation.definitions",
+      "jarPath": "gge.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class gge {\r\n  public static final gfz a;\r\n  public static final gfz b;\r\n  public gge();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.definitions.gge",
+      "javapBytecodeCRelPath": "minecraft-client-model-index-1.21.11-animation-init/net_minecraft_client_animation_definitions_BatAnimation.javapc.txt",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.BreezeAnimation",
+      "groupKey": "net.minecraft.client.animation.definitions",
+      "jarPath": "ggf.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class ggf {\r\n  public static final gfz a;\r\n  public static final gfz b;\r\n  public static final gfz c;\r\n  public static final gfz d;\r\n  public static final gfz e;\r\n  public static final gfz f;\r\n  public ggf();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.definitions.ggf",
+      "javapBytecodeCRelPath": "minecraft-client-model-index-1.21.11-animation-init/net_minecraft_client_animation_definitions_BreezeAnimation.javapc.txt",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.CamelAnimation",
+      "groupKey": "net.minecraft.client.animation.definitions",
+      "jarPath": "ggg.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class ggg {\r\n  public static final gfz a;\r\n  public static final gfz b;\r\n  public static final gfz c;\r\n  public static final gfz d;\r\n  public static final gfz e;\r\n  public static final gfz f;\r\n  public ggg();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.definitions.ggg",
+      "javapBytecodeCRelPath": "minecraft-client-model-index-1.21.11-animation-init/net_minecraft_client_animation_definitions_CamelAnimation.javapc.txt",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.CopperGolemAnimation",
+      "groupKey": "net.minecraft.client.animation.definitions",
+      "jarPath": "ggh.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class ggh {\r\n  public static final gfz a;\r\n  public static final gfz b;\r\n  public static final gfz c;\r\n  public static final gfz d;\r\n  public static final gfz e;\r\n  public static final gfz f;\r\n  public static final gfz g;\r\n  public ggh();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.definitions.ggh",
+      "javapBytecodeCRelPath": "minecraft-client-model-index-1.21.11-animation-init/net_minecraft_client_animation_definitions_CopperGolemAnimation.javapc.txt",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.CreakingAnimation",
+      "groupKey": "net.minecraft.client.animation.definitions",
+      "jarPath": "ggi.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class ggi {\r\n  public static final gfz a;\r\n  public static final gfz b;\r\n  public static final gfz c;\r\n  public static final gfz d;\r\n  public ggi();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.definitions.ggi",
+      "javapBytecodeCRelPath": "minecraft-client-model-index-1.21.11-animation-init/net_minecraft_client_animation_definitions_CreakingAnimation.javapc.txt",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.FrogAnimation",
+      "groupKey": "net.minecraft.client.animation.definitions",
+      "jarPath": "ggj.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class ggj {\r\n  public static final gfz a;\r\n  public static final gfz b;\r\n  public static final gfz c;\r\n  public static final gfz d;\r\n  public static final gfz e;\r\n  public static final gfz f;\r\n  public ggj();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.definitions.ggj",
+      "javapBytecodeCRelPath": "minecraft-client-model-index-1.21.11-animation-init/net_minecraft_client_animation_definitions_FrogAnimation.javapc.txt",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.NautilusAnimation",
+      "groupKey": "net.minecraft.client.animation.definitions",
+      "jarPath": "ggk.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class ggk {\r\n  public static final gfz a;\r\n  public ggk();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.definitions.ggk",
+      "javapBytecodeCRelPath": "minecraft-client-model-index-1.21.11-animation-init/net_minecraft_client_animation_definitions_NautilusAnimation.javapc.txt",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.package-info",
+      "groupKey": "net.minecraft.client.animation.definitions",
+      "jarPath": "ggn.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface ggn {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.definitions.ggn",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.SnifferAnimation",
+      "groupKey": "net.minecraft.client.animation.definitions",
+      "jarPath": "ggl.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class ggl {\r\n  public static final gfz a;\r\n  public static final gfz b;\r\n  public static final gfz c;\r\n  public static final gfz d;\r\n  public static final gfz e;\r\n  public static final gfz f;\r\n  public static final gfz g;\r\n  public static final gfz h;\r\n  public static final gfz i;\r\n  public ggl();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.definitions.ggl",
+      "javapBytecodeCRelPath": "minecraft-client-model-index-1.21.11-animation-init/net_minecraft_client_animation_definitions_SnifferAnimation.javapc.txt",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.definitions.WardenAnimation",
+      "groupKey": "net.minecraft.client.animation.definitions",
+      "jarPath": "ggm.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class ggm {\r\n  public static final gfz a;\r\n  public static final gfz b;\r\n  public static final gfz c;\r\n  public static final gfz d;\r\n  public static final gfz e;\r\n  public static final gfz f;\r\n  public ggm();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.definitions.ggm",
+      "javapBytecodeCRelPath": "minecraft-client-model-index-1.21.11-animation-init/net_minecraft_client_animation_definitions_WardenAnimation.javapc.txt",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.Keyframe",
+      "groupKey": "net.minecraft.client.animation.Keyframe",
+      "jarPath": "gga.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic final class gga extends java.lang.Record {\r\n  public gga(float, org.joml.Vector3fc, gfy$a);\r\n  public gga(float, org.joml.Vector3fc, org.joml.Vector3fc, gfy$a);\r\n  public final java.lang.String toString();\r\n  public final int hashCode();\r\n  public final boolean equals(java.lang.Object);\r\n  public float a();\r\n  public org.joml.Vector3fc b();\r\n  public org.joml.Vector3fc c();\r\n  public gfy$a d();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.gga",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.KeyframeAnimation",
+      "groupKey": "net.minecraft.client.animation.KeyframeAnimation",
+      "jarPath": "ggb.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class ggb {\r\n  public void a();\r\n  public void a(float, float, float, float);\r\n  public void a(cfz, float);\r\n  public void a(cfz, float, float);\r\n  public void a(long, float);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.ggb",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.KeyframeAnimation$Entry",
+      "groupKey": "net.minecraft.client.animation.KeyframeAnimation",
+      "jarPath": "ggb$a.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\nfinal class ggb$a extends java.lang.Record {\r\n  public void a(float, float, org.joml.Vector3f);\r\n  public final java.lang.String toString();\r\n  public final int hashCode();\r\n  public final boolean equals(java.lang.Object);\r\n  public hdg a();\r\n  public gfy$c b();\r\n  public gga[] c();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.ggb$a",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.KeyframeAnimations",
+      "groupKey": "net.minecraft.client.animation.KeyframeAnimations",
+      "jarPath": "ggc.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class ggc {\r\n  public ggc();\r\n  public static org.joml.Vector3f a(float, float, float);\r\n  public static org.joml.Vector3f b(float, float, float);\r\n  public static org.joml.Vector3f a(double, double, double);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.ggc",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.animation.package-info",
+      "groupKey": "net.minecraft.client.animation.package-info",
+      "jarPath": "ggo.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface ggo {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.animation.ggo",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.AdultAndBabyModelPair",
+      "groupKey": "net.minecraft.client.model.AdultAndBabyModelPair",
+      "jarPath": "gzi.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic final class gzi<T extends gzp> extends java.lang.Record {\r\n  public gzi(T, T);\r\n  public T a(boolean);\r\n  public final java.lang.String toString();\r\n  public final int hashCode();\r\n  public final boolean equals(java.lang.Object);\r\n  public T a();\r\n  public T b();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.gzi",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.ambient.BatModel",
+      "groupKey": "net.minecraft.client.model.ambient",
+      "jarPath": "gzs.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class gzs extends gzm<icm> {\r\n  public gzs(hdg);\r\n  public static hdm a();\r\n  public void a(icm);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.ambient.gzs",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/bat/bat"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.ambient.package-info",
+      "groupKey": "net.minecraft.client.model.ambient",
+      "jarPath": "gzt.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface gzt {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.ambient.gzt",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.allay.AllayModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "gzu.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class gzu extends gzm<icf> implements gzk<icf> {\r\n  public gzu(hdg);\r\n  public static hdm a();\r\n  public void a(icf);\r\n  public void a(icf, chb, fzm);\r\n  public void a(java.lang.Object);\r\n  public void a(idf, chb, fzm);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.allay.gzu",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/allay/allay"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.allay.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "gzv.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface gzv {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.allay.gzv",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.armadillo.ArmadilloModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "gzw.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class gzw extends gzm<icg> {\r\n  public static final hdp b;\r\n  public gzw(hdg);\r\n  public static hdm a();\r\n  public void a(icg);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.armadillo.gzw",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/armadillo/armadillo_baby",
+        "assets/minecraft/textures/entity/armadillo/armadillo"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.armadillo.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "gzx.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface gzx {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.armadillo.gzx",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.axolotl.AxolotlModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "gzy.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class gzy extends gzm<icl> {\r\n  public static final float b;\r\n  public static final hdp c;\r\n  public gzy(hdg);\r\n  public static hdm a();\r\n  public void a(icl);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.axolotl.gzy",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.axolotl.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "gzz.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface gzz {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.axolotl.gzz",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.bee.BeeModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "haa.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class haa extends gzm<icn> {\r\n  public static final hdp b;\r\n  public haa(hdg);\r\n  public static hdm a();\r\n  public void a(icn);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.bee.haa",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/bee/bee_angry_nectar_baby",
+        "assets/minecraft/textures/entity/bee/bee_angry_nectar",
+        "assets/minecraft/textures/entity/bee/bee_nectar_baby",
+        "assets/minecraft/textures/entity/bee/bee_angry_baby",
+        "assets/minecraft/textures/entity/bee/bee_nectar",
+        "assets/minecraft/textures/entity/bee/bee_angry",
+        "assets/minecraft/textures/entity/bee/bee_baby",
+        "assets/minecraft/textures/entity/bee/bee"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.bee.BeeStingerModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hab.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hab extends gzp<bhr> {\r\n  public hab(hdg);\r\n  public static hdm a();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.bee.hab",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/bee/bee_stinger"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.bee.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hac.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hac {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.bee.hac",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.camel.CamelModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "had.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class had extends gzm<ics> {\r\n  public static final hdp b;\r\n  public had(hdg);\r\n  public static hdm a();\r\n  public void a(ics);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.camel.had",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/camel/camel_husk",
+        "assets/minecraft/textures/entity/camel/camel_baby",
+        "assets/minecraft/textures/entity/camel/camel"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.camel.CamelSaddleModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hae.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hae extends had {\r\n  public hae(hdg);\r\n  public static hdm f();\r\n  public void a(ics);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.camel.hae",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/equipment/camel_husk_saddle/saddle",
+        "assets/minecraft/textures/entity/equipment/camel_saddle/saddle"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.camel.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "haf.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface haf {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.camel.haf",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.chicken.ChickenModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hag.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hag extends gzm<icu> {\r\n  public static final java.lang.String b;\r\n  public static final float c;\r\n  public static final hdp d;\r\n  public hag(hdg);\r\n  public static hdm a();\r\n  public void a(icu);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.chicken.hag",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/chicken/chicken_temperate_baby",
+        "assets/minecraft/textures/entity/chicken/chicken_temperate",
+        "assets/minecraft/textures/entity/chicken/chicken_cold_baby",
+        "assets/minecraft/textures/entity/chicken/chicken_warm_baby",
+        "assets/minecraft/textures/entity/chicken/chicken_warm",
+        "assets/minecraft/textures/entity/chicken/chicken_cold"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.chicken.ColdChickenModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hah.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hah extends hag {\r\n  public hah(hdg);\r\n  public static hdm f();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.chicken.hah",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.chicken.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hai.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hai {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.chicken.hai",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.cow.ColdCowModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "haj.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class haj extends hak {\r\n  public haj(hdg);\r\n  public static hdm a();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.cow.haj",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.cow.CowModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hak.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hak extends gzq<ieh> {\r\n  public static final hdp h;\r\n  public hak(hdg);\r\n  public static hdm e();\r\n  public hdg g();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.cow.hak",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/cow/mooshroom_brown_baby",
+        "assets/minecraft/textures/entity/cow/mooshroom_red_baby",
+        "assets/minecraft/textures/entity/cow/cow_temperate_baby",
+        "assets/minecraft/textures/entity/cow/mooshroom_brown",
+        "assets/minecraft/textures/entity/cow/cow_temperate",
+        "assets/minecraft/textures/entity/cow/cow_cold_baby",
+        "assets/minecraft/textures/entity/cow/cow_warm_baby",
+        "assets/minecraft/textures/entity/cow/mooshroom_red",
+        "assets/minecraft/textures/entity/cow/cow_warm",
+        "assets/minecraft/textures/entity/cow/cow_cold"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.cow.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "ham.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface ham {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.cow.ham",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.cow.WarmCowModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hal.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hal extends hak {\r\n  public hal(hdg);\r\n  public static hdm a();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.cow.hal",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.dolphin.DolphinModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "han.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class han extends gzm<ida> {\r\n  public static final hdp b;\r\n  public han(hdg);\r\n  public static hdm a();\r\n  public void a(ida);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.dolphin.han",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/dolphin/dolphin_baby",
+        "assets/minecraft/textures/entity/dolphin/dolphin"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.dolphin.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hao.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hao {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.dolphin.hao",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.equine.AbstractEquineModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hap.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic abstract class hap<T extends idg> extends gzm<T> {\r\n  public hap(hdg);\r\n  public static hdo a(hdk);\r\n  public static hdo b(hdk);\r\n  public void a(T);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.equine.hap",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.equine.DonkeyModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "haq.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class haq extends hap<idb> {\r\n  public static final float f;\r\n  public static final float g;\r\n  public haq(hdg);\r\n  public static hdm a(float);\r\n  public static hdm b(float);\r\n  public static hdm a(float, boolean);\r\n  public void a(idb);\r\n  public void a(idg);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.equine.haq",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/horse/donkey_baby",
+        "assets/minecraft/textures/entity/horse/mule_baby",
+        "assets/minecraft/textures/entity/horse/donkey",
+        "assets/minecraft/textures/entity/horse/mule"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.equine.EquineSaddleModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "har.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class har extends hap<idg> {\r\n  public har(hdg);\r\n  public static hdm a(boolean);\r\n  public static hdm b(boolean);\r\n  public void a(idg);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.equine.har",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.equine.HorseModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "has.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class has extends hap<idg> {\r\n  public has(hdg);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.equine.has",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/horse/horse_markings_whitefield_baby",
+        "assets/minecraft/textures/entity/horse/horse_markings_whitedots_baby",
+        "assets/minecraft/textures/entity/horse/horse_markings_blackdots_baby",
+        "assets/minecraft/textures/entity/horse/horse_markings_whitefield",
+        "assets/minecraft/textures/entity/horse/horse_markings_white_baby",
+        "assets/minecraft/textures/entity/horse/horse_markings_blackdots",
+        "assets/minecraft/textures/entity/horse/horse_markings_whitedots",
+        "assets/minecraft/textures/entity/horse/horse_markings_white",
+        "assets/minecraft/textures/entity/horse/horse_darkbrown_baby",
+        "assets/minecraft/textures/entity/horse/horse_chestnut_baby",
+        "assets/minecraft/textures/entity/horse/horse_skeleton_baby",
+        "assets/minecraft/textures/entity/horse/horse_zombie_baby",
+        "assets/minecraft/textures/entity/horse/horse_creamy_baby",
+        "assets/minecraft/textures/entity/horse/horse_black_baby",
+        "assets/minecraft/textures/entity/horse/horse_brown_baby",
+        "assets/minecraft/textures/entity/horse/horse_white_baby",
+        "assets/minecraft/textures/entity/horse/horse_darkbrown",
+        "assets/minecraft/textures/entity/horse/horse_gray_baby",
+        "assets/minecraft/textures/entity/horse/horse_chestnut",
+        "assets/minecraft/textures/entity/horse/horse_skeleton",
+        "assets/minecraft/textures/entity/horse/horse_zombie",
+        "assets/minecraft/textures/entity/horse/horse_creamy",
+        "assets/minecraft/textures/entity/horse/horse_white",
+        "assets/minecraft/textures/entity/horse/horse_brown",
+        "assets/minecraft/textures/entity/horse/horse_black",
+        "assets/minecraft/textures/entity/horse/horse_gray"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.equine.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hat.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hat {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.equine.hat",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.feline.CatModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hau.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hau extends hav<ict> {\r\n  public static final hdp b;\r\n  public hau(hdg);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.feline.hau",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.feline.FelineModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hav.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hav<T extends idl> extends gzm<T> {\r\n  public static final hdp c;\r\n  public hav(hdg);\r\n  public static hdo a(hdk);\r\n  public void a(T);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.feline.hav",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.feline.OcelotModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "haw.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class haw extends hav<idl> {\r\n  public haw(hdg);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.feline.haw",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.feline.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hax.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hax {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.feline.hax",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.fish.CodModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hay.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hay extends gzm<ieh> {\r\n  public hay(hdg);\r\n  public static hdm a();\r\n  public void a(ieh);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.fish.hay",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/fish/cod"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.fish.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbf.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hbf {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.fish.hbf",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.fish.PufferfishBigModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "haz.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class haz extends gzm<idf> {\r\n  public haz(hdg);\r\n  public static hdm a();\r\n  public void a(idf);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.fish.haz",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.fish.PufferfishMidModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hba.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hba extends gzm<idf> {\r\n  public hba(hdg);\r\n  public static hdm a();\r\n  public void a(idf);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.fish.hba",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.fish.PufferfishSmallModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbb.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hbb extends gzm<idf> {\r\n  public hbb(hdg);\r\n  public static hdm a();\r\n  public void a(idf);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.fish.hbb",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/fish/pufferfish"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.fish.SalmonModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbc.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hbc extends gzm<iey> {\r\n  public static final hdp b;\r\n  public static final hdp c;\r\n  public hbc(hdg);\r\n  public static hdm a();\r\n  public void a(iey);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.fish.hbc",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/fish/salmon"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.fish.TropicalFishLargeModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbd.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hbd extends gzm<ifn> {\r\n  public hbd(hdg);\r\n  public static hdm a(hdk);\r\n  public void a(ifn);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.fish.hbd",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/fish/tropical_b_pattern_5",
+        "assets/minecraft/textures/entity/fish/tropical_b_pattern_6",
+        "assets/minecraft/textures/entity/fish/tropical_b_pattern_4",
+        "assets/minecraft/textures/entity/fish/tropical_b_pattern_2",
+        "assets/minecraft/textures/entity/fish/tropical_b_pattern_3",
+        "assets/minecraft/textures/entity/fish/tropical_b_pattern_1",
+        "assets/minecraft/textures/entity/fish/tropical_b"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.fish.TropicalFishSmallModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbe.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hbe extends gzm<ifn> {\r\n  public hbe(hdg);\r\n  public static hdm a(hdk);\r\n  public void a(ifn);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.fish.hbe",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/fish/tropical_a_pattern_3",
+        "assets/minecraft/textures/entity/fish/tropical_a_pattern_6",
+        "assets/minecraft/textures/entity/fish/tropical_a_pattern_2",
+        "assets/minecraft/textures/entity/fish/tropical_a_pattern_4",
+        "assets/minecraft/textures/entity/fish/tropical_a_pattern_5",
+        "assets/minecraft/textures/entity/fish/tropical_a_pattern_1",
+        "assets/minecraft/textures/entity/fish/tropical_a"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.fox.FoxModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbg.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hbg extends gzm<ido> {\r\n  public static final hdp b;\r\n  public final hdg c;\r\n  public hbg(hdg);\r\n  public static hdm a();\r\n  public void a(ido);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.fox.hbg",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/fox/fox_snow_sleep_baby",
+        "assets/minecraft/textures/entity/fox/fox_sleep_baby",
+        "assets/minecraft/textures/entity/fox/fox_snow_sleep",
+        "assets/minecraft/textures/entity/fox/fox_snow_baby",
+        "assets/minecraft/textures/entity/fox/fox_sleep",
+        "assets/minecraft/textures/entity/fox/fox_baby",
+        "assets/minecraft/textures/entity/fox/fox_snow",
+        "assets/minecraft/textures/entity/fox/fox"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.fox.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbh.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hbh {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.fox.hbh",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.frog.FrogModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbi.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hbi extends gzm<idp> {\r\n  public hbi(hdg);\r\n  public static hdm a();\r\n  public void a(idp);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.frog.hbi",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/frog/frog_temperate",
+        "assets/minecraft/textures/entity/frog/frog_warm",
+        "assets/minecraft/textures/entity/frog/frog_cold"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.frog.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbk.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hbk {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.frog.hbk",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.frog.TadpoleModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbj.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hbj extends gzm<ieh> {\r\n  public hbj(hdg);\r\n  public static hdm a();\r\n  public void a(ieh);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.frog.hbj",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/tadpole/tadpole"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.ghast.HappyGhastHarnessModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbl.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hbl extends gzm<idt> {\r\n  public hbl(hdg);\r\n  public static hdm a(boolean);\r\n  public void a(idt);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.ghast.hbl",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/equipment/happy_ghast_body/light_blue_harness",
+        "assets/minecraft/textures/entity/equipment/happy_ghast_body/light_gray_harness",
+        "assets/minecraft/textures/entity/equipment/happy_ghast_body/magenta_harness",
+        "assets/minecraft/textures/entity/equipment/happy_ghast_body/purple_harness",
+        "assets/minecraft/textures/entity/equipment/happy_ghast_body/yellow_harness",
+        "assets/minecraft/textures/entity/equipment/happy_ghast_body/orange_harness",
+        "assets/minecraft/textures/entity/equipment/happy_ghast_body/brown_harness",
+        "assets/minecraft/textures/entity/equipment/happy_ghast_body/white_harness",
+        "assets/minecraft/textures/entity/equipment/happy_ghast_body/green_harness",
+        "assets/minecraft/textures/entity/equipment/happy_ghast_body/black_harness",
+        "assets/minecraft/textures/entity/equipment/happy_ghast_body/pink_harness",
+        "assets/minecraft/textures/entity/equipment/happy_ghast_body/blue_harness",
+        "assets/minecraft/textures/entity/equipment/happy_ghast_body/lime_harness",
+        "assets/minecraft/textures/entity/equipment/happy_ghast_body/gray_harness",
+        "assets/minecraft/textures/entity/equipment/happy_ghast_body/cyan_harness",
+        "assets/minecraft/textures/entity/equipment/happy_ghast_body/red_harness",
+        "assets/minecraft/textures/entity/ghast/happy_ghast_ropes"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.ghast.HappyGhastModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbm.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hbm extends gzm<idt> {\r\n  public static final hdp b;\r\n  public hbm(hdg);\r\n  public static hdm a(boolean, hdk);\r\n  public void a(idt);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.ghast.hbm",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/ghast/happy_ghast_baby",
+        "assets/minecraft/textures/entity/ghast/happy_ghast"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.ghast.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbn.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hbn {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.ghast.hbn",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.goat.GoatModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbo.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hbo extends gzq<idr> {\r\n  public static final hdp h;\r\n  public hbo(hdg);\r\n  public static hdm a();\r\n  public void a(idr);\r\n  public void a(ieh);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.goat.hbo",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/goat/goat_baby",
+        "assets/minecraft/textures/entity/goat/goat"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.goat.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbp.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hbp {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.goat.hbp",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.golem.CopperGolemModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbq.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hbq extends gzm<icv> implements gzk<icv>, gzn {\r\n  public hbq(hdg);\r\n  public static hdm e();\r\n  public static hdm f();\r\n  public static hdm g();\r\n  public static hdm h();\r\n  public static hdm i();\r\n  public void a(icv);\r\n  public void a(icv, chb, fzm);\r\n  public hdg a();\r\n  public void a(fzm);\r\n  public void b(fzm);\r\n  public void a(java.lang.Object);\r\n  public void a(idf, chb, fzm);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.golem.hbq",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/copper_golem/copper_golem_eyes_weathered",
+        "assets/minecraft/textures/entity/copper_golem/copper_golem_eyes_oxidized",
+        "assets/minecraft/textures/entity/copper_golem/copper_golem_eyes_exposed",
+        "assets/minecraft/textures/entity/copper_golem/copper_golem_weathered",
+        "assets/minecraft/textures/entity/copper_golem/copper_golem_oxidized",
+        "assets/minecraft/textures/entity/copper_golem/copper_golem_exposed",
+        "assets/minecraft/textures/entity/copper_golem/copper_golem_eyes",
+        "assets/minecraft/textures/entity/copper_golem/copper_golem"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.golem.IronGolemModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbr.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hbr extends gzm<ieb> {\r\n  public hbr(hdg);\r\n  public static hdm a();\r\n  public void a(ieb);\r\n  public hdg e();\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.golem.hbr",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/iron_golem/iron_golem_crackiness_medium",
+        "assets/minecraft/textures/entity/iron_golem/iron_golem_crackiness_high",
+        "assets/minecraft/textures/entity/iron_golem/iron_golem_crackiness_low",
+        "assets/minecraft/textures/entity/iron_golem/iron_golem"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.golem.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbt.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hbt {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.golem.hbt",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.golem.SnowGolemModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbs.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hbs extends gzm<ieh> {\r\n  public hbs(hdg);\r\n  public static hdm a();\r\n  public void a(ieh);\r\n  public hdg e();\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.golem.hbs",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/snow_golem/snow_golem"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.llama.LlamaModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbu.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hbu extends gzm<iei> {\r\n  public static final hdp b;\r\n  public hbu(hdg);\r\n  public static hdm a(hdk);\r\n  public void a(iei);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.llama.hbu",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/llama/llama_creamy_baby",
+        "assets/minecraft/textures/entity/llama/llama_white_baby",
+        "assets/minecraft/textures/entity/llama/llama_brown_baby",
+        "assets/minecraft/textures/entity/llama/llama_gray_baby",
+        "assets/minecraft/textures/entity/llama/llama_creamy",
+        "assets/minecraft/textures/entity/llama/llama_white",
+        "assets/minecraft/textures/entity/llama/llama_brown",
+        "assets/minecraft/textures/entity/llama/llama_gray"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.llama.LlamaSpitModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbv.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hbv extends gzm<idf> {\r\n  public hbv(hdg);\r\n  public static hdm a();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.llama.hbv",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/llama/llama_spit"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.llama.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbw.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hbw {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.llama.hbw",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.nautilus.NautilusArmorModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbx.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hbx extends hby {\r\n  public hbx(hdg);\r\n  public static hdm a();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.nautilus.hbx",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/equipment/nautilus_body/netherite",
+        "assets/minecraft/textures/entity/equipment/nautilus_body/diamond",
+        "assets/minecraft/textures/entity/equipment/nautilus_body/copper",
+        "assets/minecraft/textures/entity/equipment/nautilus_body/gold",
+        "assets/minecraft/textures/entity/equipment/nautilus_body/iron"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.nautilus.NautilusModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hby.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hby extends gzm<ien> {\r\n  public hby(hdg);\r\n  public static hdm e();\r\n  public static hdo f();\r\n  public static hdm g();\r\n  public void a(ien);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.nautilus.hby",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/nautilus/zombie_nautilus_coral",
+        "assets/minecraft/textures/entity/nautilus/zombie_nautilus",
+        "assets/minecraft/textures/entity/nautilus/nautilus_baby",
+        "assets/minecraft/textures/entity/nautilus/nautilus"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.nautilus.NautilusSaddleModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hbz.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hbz extends hby {\r\n  public hbz(hdg);\r\n  public static hdm a();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.nautilus.hbz",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/equipment/nautilus_saddle/saddle"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.nautilus.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hca.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hca {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.nautilus.hca",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hcb.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hcb {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.hcb",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.panda.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hcd.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hcd {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.panda.hcd",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.panda.PandaModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hcc.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hcc extends gzq<iep> {\r\n  public static final hdp h;\r\n  public hcc(hdg);\r\n  public static hdm a();\r\n  public void a(iep);\r\n  public void a(ieh);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.panda.hcc",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/panda/aggressive_panda_baby",
+        "assets/minecraft/textures/entity/panda/worried_panda_baby",
+        "assets/minecraft/textures/entity/panda/playful_panda_baby",
+        "assets/minecraft/textures/entity/panda/brown_panda_baby",
+        "assets/minecraft/textures/entity/panda/panda_aggressive",
+        "assets/minecraft/textures/entity/panda/weak_panda_baby",
+        "assets/minecraft/textures/entity/panda/lazy_panda_baby",
+        "assets/minecraft/textures/entity/panda/panda_worried",
+        "assets/minecraft/textures/entity/panda/panda_playful",
+        "assets/minecraft/textures/entity/panda/panda_brown",
+        "assets/minecraft/textures/entity/panda/panda_lazy",
+        "assets/minecraft/textures/entity/panda/panda_weak",
+        "assets/minecraft/textures/entity/panda/panda_baby",
+        "assets/minecraft/textures/entity/panda/panda"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.parrot.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hcf.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hcf {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.parrot.hcf",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.parrot.ParrotModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hce.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hce extends gzm<ieq> {\r\n  public hce(hdg);\r\n  public static hdm a();\r\n  public void a(ieq);\r\n  public static hce$a a(cwy);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.parrot.hce",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/parrot/parrot_yellow_blue",
+        "assets/minecraft/textures/entity/parrot/parrot_red_blue",
+        "assets/minecraft/textures/entity/parrot/parrot_green",
+        "assets/minecraft/textures/entity/parrot/parrot_grey",
+        "assets/minecraft/textures/entity/parrot/parrot_blue"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.parrot.ParrotModel$Pose",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hce$a.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic final class hce$a extends java.lang.Enum<hce$a> {\r\n  public static final hce$a a;\r\n  public static final hce$a b;\r\n  public static final hce$a c;\r\n  public static final hce$a d;\r\n  public static final hce$a e;\r\n  public static hce$a[] values();\r\n  public static hce$a valueOf(java.lang.String);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.parrot.hce$a",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.pig.ColdPigModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hcg.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hcg extends hch {\r\n  public hcg(hdg);\r\n  public static hdm a(hdk);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.pig.hcg",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/pig/pig_cold_baby",
+        "assets/minecraft/textures/entity/pig/pig_cold"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.pig.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hci.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hci {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.pig.hci",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.pig.PigModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hch.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hch extends gzq<ieh> {\r\n  public static final hdp h;\r\n  public hch(hdg);\r\n  public static hdm b(hdk);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.pig.hch",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/pig/pig_temperate_baby",
+        "assets/minecraft/textures/entity/pig/pig_warm_baby",
+        "assets/minecraft/textures/entity/pig/pig_temperate",
+        "assets/minecraft/textures/entity/pig/pig_warm"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.polarbear.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hck.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hck {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.polarbear.hck",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.polarbear.PolarBearModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hcj.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hcj extends gzq<ieu> {\r\n  public hcj(hdg);\r\n  public static hdm a(boolean);\r\n  public void a(ieu);\r\n  public void a(ieh);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.polarbear.hcj",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/bear/polarbear_baby",
+        "assets/minecraft/textures/entity/bear/polarbear"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.rabbit.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hcm.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hcm {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.rabbit.hcm",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.rabbit.RabbitModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hcl.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hcl extends gzm<iew> {\r\n  public hcl(hdg);\r\n  public static hdm a(boolean);\r\n  public void a(iew);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.rabbit.hcl",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/rabbit/rabbit_white_splotched_baby",
+        "assets/minecraft/textures/entity/rabbit/rabbit_caerbannog_baby",
+        "assets/minecraft/textures/entity/rabbit/rabbit_white_splotched",
+        "assets/minecraft/textures/entity/rabbit/rabbit_white_baby",
+        "assets/minecraft/textures/entity/rabbit/rabbit_toast_baby",
+        "assets/minecraft/textures/entity/rabbit/rabbit_caerbannog",
+        "assets/minecraft/textures/entity/rabbit/rabbit_brown_baby",
+        "assets/minecraft/textures/entity/rabbit/rabbit_black_baby",
+        "assets/minecraft/textures/entity/rabbit/rabbit_gold_baby",
+        "assets/minecraft/textures/entity/rabbit/rabbit_salt_baby",
+        "assets/minecraft/textures/entity/rabbit/rabbit_toast",
+        "assets/minecraft/textures/entity/rabbit/rabbit_white",
+        "assets/minecraft/textures/entity/rabbit/rabbit_brown",
+        "assets/minecraft/textures/entity/rabbit/rabbit_black",
+        "assets/minecraft/textures/entity/rabbit/rabbit_gold",
+        "assets/minecraft/textures/entity/rabbit/rabbit_salt"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.sheep.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hcp.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hcp {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.sheep.hcp",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.sheep.SheepFurModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hcn.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hcn extends gzq<iez> {\r\n  public hcn(hdg);\r\n  public static hdm a();\r\n  public void a(iez);\r\n  public void a(ieh);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.sheep.hcn",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.sheep.SheepModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hco.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hco extends gzq<iez> {\r\n  public static final hdp h;\r\n  public hco(hdg);\r\n  public static hdm a();\r\n  public void a(iez);\r\n  public void a(ieh);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.sheep.hco",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/sheep/sheep_wool_undercoat",
+        "assets/minecraft/textures/entity/sheep/sheep_wool_baby",
+        "assets/minecraft/textures/entity/sheep/sheep_wool",
+        "assets/minecraft/textures/entity/sheep/sheep_baby",
+        "assets/minecraft/textures/entity/sheep/sheep"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.sniffer.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hcr.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hcr {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.sniffer.hcr",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.sniffer.SnifferModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hcq.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hcq extends gzm<ife> {\r\n  public static final hdp b;\r\n  public hcq(hdg);\r\n  public static hdm a();\r\n  public void a(ife);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.sniffer.hcq",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/sniffer/snifflet",
+        "assets/minecraft/textures/entity/sniffer/sniffer"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.squid.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hct.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hct {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.squid.hct",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.squid.SquidModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hcs.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hcs extends gzm<ifg> {\r\n  public static final hdp b;\r\n  public hcs(hdg);\r\n  public static hdm a();\r\n  public void a(ifg);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.squid.hcs",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/squid/glow_squid_baby",
+        "assets/minecraft/textures/entity/squid/squid_baby",
+        "assets/minecraft/textures/entity/squid/glow_squid",
+        "assets/minecraft/textures/entity/squid/squid"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.turtle.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hcv.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hcv {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.turtle.hcv",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.turtle.TurtleModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hcu.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hcu extends gzq<ifo> {\r\n  public static final hdp h;\r\n  public hcu(hdg);\r\n  public static hdm a();\r\n  public void a(ifo);\r\n  public void a(ieh);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.turtle.hcu",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/turtle/turtle_baby",
+        "assets/minecraft/textures/entity/turtle/turtle"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.wolf.package-info",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hcx.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hcx {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.wolf.hcx",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.wolf.WolfModel",
+      "groupKey": "net.minecraft.client.model.animal",
+      "jarPath": "hcw.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hcw extends gzm<ifx> {\r\n  public static final hdp b;\r\n  public hcw(hdg);\r\n  public static hdo a(hdk);\r\n  public void a(ifx);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.animal.wolf.hcw",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/wolf/wolf_armor_crackiness_medium",
+        "assets/minecraft/textures/entity/wolf/wolf_armor_crackiness_high",
+        "assets/minecraft/textures/entity/wolf/wolf_armor_crackiness_low",
+        "assets/minecraft/textures/entity/wolf/wolf_chestnut_angry_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_chestnut_tame_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_spotted_angry_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_striped_angry_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_spotted_tame_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_striped_tame_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_black_angry_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_woods_angry_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_ashen_angry_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_rusty_angry_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_snowy_angry_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_woods_tame_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_ashen_tame_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_black_tame_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_snowy_tame_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_rusty_tame_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_chestnut_angry",
+        "assets/minecraft/textures/entity/wolf/wolf_spotted_angry",
+        "assets/minecraft/textures/entity/wolf/wolf_chestnut_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_striped_angry",
+        "assets/minecraft/textures/entity/wolf/wolf_chestnut_tame",
+        "assets/minecraft/textures/entity/wolf/wolf_spotted_tame",
+        "assets/minecraft/textures/entity/wolf/wolf_spotted_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_striped_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_striped_tame",
+        "assets/minecraft/textures/entity/wolf/wolf_snowy_angry",
+        "assets/minecraft/textures/entity/wolf/wolf_rusty_angry",
+        "assets/minecraft/textures/entity/wolf/wolf_woods_angry",
+        "assets/minecraft/textures/entity/wolf/wolf_collar_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_black_angry",
+        "assets/minecraft/textures/entity/wolf/wolf_ashen_angry",
+        "assets/minecraft/textures/entity/wolf/wolf_ashen_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_black_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_black_tame",
+        "assets/minecraft/textures/entity/wolf/wolf_ashen_tame",
+        "assets/minecraft/textures/entity/wolf/wolf_rusty_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_rusty_tame",
+        "assets/minecraft/textures/entity/wolf/wolf_angry_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_woods_tame",
+        "assets/minecraft/textures/entity/wolf/wolf_woods_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_snowy_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_snowy_tame",
+        "assets/minecraft/textures/entity/wolf/wolf_tame_baby",
+        "assets/minecraft/textures/entity/wolf/wolf_chestnut",
+        "assets/minecraft/textures/entity/wolf/wolf_striped",
+        "assets/minecraft/textures/entity/wolf/wolf_spotted",
+        "assets/minecraft/textures/entity/wolf/wolf_collar",
+        "assets/minecraft/textures/entity/wolf/wolf_angry",
+        "assets/minecraft/textures/entity/wolf/wolf_black",
+        "assets/minecraft/textures/entity/wolf/wolf_woods",
+        "assets/minecraft/textures/entity/wolf/wolf_ashen",
+        "assets/minecraft/textures/entity/wolf/wolf_snowy",
+        "assets/minecraft/textures/entity/wolf/wolf_rusty",
+        "assets/minecraft/textures/entity/wolf/wolf_tame",
+        "assets/minecraft/textures/entity/wolf/wolf_baby",
+        "assets/minecraft/textures/entity/wolf/wolf"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.AnimationUtils",
+      "groupKey": "net.minecraft.client.model.AnimationUtils",
+      "jarPath": "gzj.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class gzj {\r\n  public gzj();\r\n  public static void a(hdg, hdg, hdg, boolean);\r\n  public static void a(hdg, hdg, float, float, boolean);\r\n  public static void a(hdg, hdg, chb, float, float);\r\n  public static void a(hdg, float, float);\r\n  public static void a(hdg, hdg, float);\r\n  public static <T extends ifp> void a(hdg, hdg, boolean, T);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.gzj",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.ArmedModel",
+      "groupKey": "net.minecraft.client.model.ArmedModel",
+      "jarPath": "gzk.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic interface gzk<T extends idf> {\r\n  public abstract void a(T, chb, fzm);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.gzk",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.BabyModelTransform",
+      "groupKey": "net.minecraft.client.model.BabyModelTransform",
+      "jarPath": "gzl.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic final class gzl extends java.lang.Record implements hdp {\r\n  public gzl(java.util.Set<java.lang.String>);\r\n  public gzl(boolean, float, float, java.util.Set<java.lang.String>);\r\n  public gzl(boolean, float, float, float, float, float, java.util.Set<java.lang.String>);\r\n  public hdo apply(hdo);\r\n  public final java.lang.String toString();\r\n  public final int hashCode();\r\n  public final boolean equals(java.lang.Object);\r\n  public boolean a();\r\n  public float b();\r\n  public float c();\r\n  public float d();\r\n  public float e();\r\n  public float f();\r\n  public java.util.Set<java.lang.String> g();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.gzl",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.effects.EvokerFangsModel",
+      "groupKey": "net.minecraft.client.model.effects",
+      "jarPath": "hcy.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hcy extends gzm<idh> {\r\n  public hcy(hdg);\r\n  public static hdm a();\r\n  public void a(idh);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.effects.hcy",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/illager/evoker_fangs"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.effects.package-info",
+      "groupKey": "net.minecraft.client.model.effects",
+      "jarPath": "hdb.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hdb {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.effects.hdb",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.effects.SpearAnimations",
+      "groupKey": "net.minecraft.client.model.effects",
+      "jarPath": "hcz.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hcz {\r\n  public hcz();\r\n  public static <T extends idy> void a(hdg, hdg, boolean, dlt, T);\r\n  public static <S extends ich> void a(S, fzm, float, chb, dlt);\r\n  public static <T extends idy> void a(gzo<T>, T);\r\n  public static <S extends ich> void a(S, fzm);\r\n  public static void a(float, fzm, float, chb, dlt);\r\n  public static void a(float, fzm, int, chb);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.effects.hcz",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.effects.SpearAnimations$UseParams",
+      "groupKey": "net.minecraft.client.model.effects",
+      "jarPath": "hcz$a.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\nfinal class hcz$a extends java.lang.Record {\r\n  public static hcz$a a(doq, float);\r\n  public final java.lang.String toString();\r\n  public final int hashCode();\r\n  public final boolean equals(java.lang.Object);\r\n  public float a();\r\n  public float b();\r\n  public float c();\r\n  public float d();\r\n  public float e();\r\n  public float f();\r\n  public float g();\r\n  public float h();\r\n  public float i();\r\n  public float j();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.effects.hcz$a",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.effects.SpinAttackEffectModel",
+      "groupKey": "net.minecraft.client.model.effects",
+      "jarPath": "hda.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hda extends gzm<ick> {\r\n  public hda(hdg);\r\n  public static hdm a();\r\n  public void a(ick);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.effects.hda",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.EntityModel",
+      "groupKey": "net.minecraft.client.model.EntityModel",
+      "jarPath": "gzm.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic abstract class gzm<T extends idf> extends gzp<T> {\r\n  public static final float a;\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.gzm",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.builders.CubeDefinition",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdj.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic final class hdj {\r\n  public hdg$a a(int, int);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.builders.hdj",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.builders.CubeDeformation",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdk.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hdk {\r\n  public static final hdk a;\r\n  public hdk(float, float, float);\r\n  public hdk(float);\r\n  public hdk a(float);\r\n  public hdk a(float, float, float);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.builders.hdk",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.builders.CubeListBuilder",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdl.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hdl {\r\n  public hdl();\r\n  public hdl a(int, int);\r\n  public hdl a();\r\n  public hdl a(boolean);\r\n  public hdl a(java.lang.String, float, float, float, int, int, int, hdk, int, int);\r\n  public hdl a(java.lang.String, float, float, float, int, int, int, int, int);\r\n  public hdl a(float, float, float, float, float, float);\r\n  public hdl a(float, float, float, float, float, float, java.util.Set<iz>);\r\n  public hdl a(java.lang.String, float, float, float, float, float, float);\r\n  public hdl a(java.lang.String, float, float, float, float, float, float, hdk);\r\n  public hdl a(float, float, float, float, float, float, boolean);\r\n  public hdl a(float, float, float, float, float, float, hdk, float, float);\r\n  public hdl a(float, float, float, float, float, float, hdk);\r\n  public java.util.List<hdj> b();\r\n  public static hdl c();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.builders.hdl",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.builders.LayerDefinition",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdm.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hdm {\r\n  public hdm a(hdp);\r\n  public hdg a();\r\n  public static hdm a(hdo, int, int);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.builders.hdm",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.builders.MaterialDefinition",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdn.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hdn {\r\n  public hdn(int, int);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.builders.hdn",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.builders.MeshDefinition",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdo.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hdo {\r\n  public hdo();\r\n  public hdq a();\r\n  public hdo a(java.util.function.UnaryOperator<hdi>);\r\n  public hdo a(hdp);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.builders.hdo",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.builders.MeshTransformer",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdp.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic interface hdp {\r\n  public static final hdp a;\r\n  public static hdp scaling(float);\r\n  public abstract hdo apply(hdo);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.builders.hdp",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.builders.package-info",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hds.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hds {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.builders.hds",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.builders.PartDefinition",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdq.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hdq {\r\n  public hdq a(java.lang.String, hdl, hdi);\r\n  public hdq a(java.lang.String, hdq);\r\n  public hdq a();\r\n  public hdq a(java.lang.String);\r\n  public void a(java.util.Set<java.lang.String>);\r\n  public void b(java.util.Set<java.lang.String>);\r\n  public hdg a(int, int);\r\n  public hdq b(java.lang.String);\r\n  public java.util.Set<java.util.Map$Entry<java.lang.String, hdq>> b();\r\n  public hdq a(java.util.function.UnaryOperator<hdi>);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.builders.hdq",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.builders.UVPair",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdr.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic final class hdr extends java.lang.Record {\r\n  public hdr(float, float);\r\n  public java.lang.String toString();\r\n  public static long a(float, float);\r\n  public static float a(long);\r\n  public static float b(long);\r\n  public final int hashCode();\r\n  public final boolean equals(java.lang.Object);\r\n  public float a();\r\n  public float b();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.builders.hdr",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.EntityModelSet",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdc.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hdc {\r\n  public static final hdc a;\r\n  public hdc(java.util.Map<hde, hdm>);\r\n  public hdg a(hde);\r\n  public static hdc a();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.hdc",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.LayerDefinitions",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdd.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hdd {\r\n  public hdd();\r\n  public static java.util.Map<hde, hdm> a();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.hdd",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.ModelLayerLocation",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hde.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic final class hde extends java.lang.Record {\r\n  public hde(amo, java.lang.String);\r\n  public java.lang.String toString();\r\n  public final int hashCode();\r\n  public final boolean equals(java.lang.Object);\r\n  public amo a();\r\n  public java.lang.String b();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.hde",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.ModelLayers",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdf.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hdf {\r\n  public static final hde a;\r\n  public static final hde b;\r\n  public static final hde c;\r\n  public static final hde d;\r\n  public static final hde e;\r\n  public static final hde f;\r\n  public static final hvk<hde> g;\r\n  public static final hde h;\r\n  public static final hvk<hde> i;\r\n  public static final hde j;\r\n  public static final hde k;\r\n  public static final hde l;\r\n  public static final hde m;\r\n  public static final hde n;\r\n  public static final hde o;\r\n  public static final hde p;\r\n  public static final hde q;\r\n  public static final hde r;\r\n  public static final hde s;\r\n  public static final hde t;\r\n  public static final hde u;\r\n  public static final hde v;\r\n  public static final hde w;\r\n  public static final hde x;\r\n  public static final hde y;\r\n  public static final hde z;\r\n  public static final hde A;\r\n  public static final hde B;\r\n  public static final hde C;\r\n  public static final hde D;\r\n  public static final hvk<hde> E;\r\n  public static final hde F;\r\n  public static final hde G;\r\n  public static final hde H;\r\n  public static final hde I;\r\n  public static final hde J;\r\n  public static final hde K;\r\n  public static final hde L;\r\n  public static final hde M;\r\n  public static final hde N;\r\n  public static final hde O;\r\n  public static final hde P;\r\n  public static final hde Q;\r\n  public static final hde R;\r\n  public static final hde S;\r\n  public static final hde T;\r\n  public static final hde U;\r\n  public static final hde V;\r\n  public static final hde W;\r\n  public static final hde X;\r\n  public static final hde Y;\r\n  public static final hde Z;\r\n  public static final hde aa;\r\n  public static final hde ab;\r\n  public static final hde ac;\r\n  public static final hde ad;\r\n  public static final hde ae;\r\n  public static final hde af;\r\n  public static final hde ag;\r\n  public static final hde ah;\r\n  public static final hde ai;\r\n  public static final hde aj;\r\n  public static final hde ak;\r\n  public static final hde al;\r\n  public static final hde am;\r\n  public static final hde an;\r\n  public static final hde ao;\r\n  public static final hde ap;\r\n  public static final hde aq;\r\n  public static final hde ar;\r\n  public static final hde as;\r\n  public static final hde at;\r\n  public static final hde au;\r\n  public static final hde av;\r\n  public static final hde aw;\r\n  public static final hde ax;\r\n  public static final hde ay;\r\n  public static final hde az;\r\n  public static final hde aA;\r\n  public static final hde aB;\r\n  public static final hde aC;\r\n  public static final hde aD;\r\n  public static final hde aE;\r\n  public static final hde aF;\r\n  public static final hde aG;\r\n  public static final hde aH;\r\n  public static final hde aI;\r\n  public static final hde aJ;\r\n  public static final hde aK;\r\n  public static final hde aL;\r\n  public static final hde aM;\r\n  public static final hde aN;\r\n  public static final hde aO;\r\n  public static final hvk<hde> aP;\r\n  public static final hde aQ;\r\n  public static final hvk<hde> aR;\r\n  public static final hde aS;\r\n  public static final hde aT;\r\n  public static final hde aU;\r\n  public static final hde aV;\r\n  public static final hde aW;\r\n  public static final hde aX;\r\n  public static final hde aY;\r\n  public static final hde aZ;\r\n  public static final hde ba;\r\n  public static final hde bb;\r\n  public static final hde bc;\r\n  public static final hde bd;\r\n  public static final hde be;\r\n  public static final hde bf;\r\n  public static final hde bg;\r\n  public static final hde bh;\r\n  public static final hvk<hde> bi;\r\n  public static final hde bj;\r\n  public static final hde bk;\r\n  public static final hde bl;\r\n  public static final hde bm;\r\n  public static final hde bn;\r\n  public static final hde bo;\r\n  public static final hde bp;\r\n  public static final hde bq;\r\n  public static final hde br;\r\n  public static final hde bs;\r\n  public static final hde bt;\r\n  public static final hde bu;\r\n  public static final hde bv;\r\n  public static final hde bw;\r\n  public static final hde bx;\r\n  public static final hde by;\r\n  public static final hde bz;\r\n  public static final hde bA;\r\n  public static final hde bB;\r\n  public static final hde bC;\r\n  public static final hde bD;\r\n  public static final hde bE;\r\n  public static final hvk<hde> bF;\r\n  public static final hvk<hde> bG;\r\n  public static final hde bH;\r\n  public static final hde bI;\r\n  public static final hde bJ;\r\n  public static final hde bK;\r\n  public static final hde bL;\r\n  public static final hde bM;\r\n  public static final hde bN;\r\n  public static final hde bO;\r\n  public static final hde bP;\r\n  public static final hde bQ;\r\n  public static final hde bR;\r\n  public static final hde bS;\r\n  public static final hde bT;\r\n  public static final hde bU;\r\n  public static final hde bV;\r\n  public static final hde bW;\r\n  public static final hde bX;\r\n  public static final hde bY;\r\n  public static final hde bZ;\r\n  public static final hde ca;\r\n  public static final hde cb;\r\n  public static final hde cc;\r\n  public static final hde cd;\r\n  public static final hde ce;\r\n  public static final hde cf;\r\n  public static final hde cg;\r\n  public static final hde ch;\r\n  public static final hde ci;\r\n  public static final hde cj;\r\n  public static final hde ck;\r\n  public static final hde cl;\r\n  public static final hde cm;\r\n  public static final hde cn;\r\n  public static final hvk<hde> co;\r\n  public static final hde cp;\r\n  public static final hde cq;\r\n  public static final hde cr;\r\n  public static final hde cs;\r\n  public static final hde ct;\r\n  public static final hde cu;\r\n  public static final hvk<hde> cv;\r\n  public static final hde cw;\r\n  public static final hvk<hde> cx;\r\n  public static final hde cy;\r\n  public static final hvk<hde> cz;\r\n  public static final hde cA;\r\n  public static final hde cB;\r\n  public static final hde cC;\r\n  public static final hde cD;\r\n  public static final hde cE;\r\n  public static final hde cF;\r\n  public static final hde cG;\r\n  public static final hde cH;\r\n  public static final hvk<hde> cI;\r\n  public static final hde cJ;\r\n  public static final hvk<hde> cK;\r\n  public static final hde cL;\r\n  public static final hde cM;\r\n  public static final hde cN;\r\n  public static final hde cO;\r\n  public static final hde cP;\r\n  public static final hde cQ;\r\n  public static final hde cR;\r\n  public static final hde cS;\r\n  public static final hde cT;\r\n  public static final hde cU;\r\n  public static final hde cV;\r\n  public static final hde cW;\r\n  public static final hde cX;\r\n  public static final hde cY;\r\n  public static final hde cZ;\r\n  public static final hde da;\r\n  public static final hde db;\r\n  public static final hde dc;\r\n  public static final hde dd;\r\n  public static final hde de;\r\n  public static final hde df;\r\n  public static final hde dg;\r\n  public static final hde dh;\r\n  public static final hde di;\r\n  public static final hde dj;\r\n  public static final hde dk;\r\n  public static final hde dl;\r\n  public static final hde dm;\r\n  public static final hvk<hde> dn;\r\n  public static final hde do;\r\n  public static final hde dp;\r\n  public static final hde dq;\r\n  public static final hde dr;\r\n  public static final hde ds;\r\n  public static final hde dt;\r\n  public static final hde du;\r\n  public static final hde dv;\r\n  public static final hde dw;\r\n  public static final hde dx;\r\n  public static final hde dy;\r\n  public static final hde dz;\r\n  public static final hde dA;\r\n  public static final hvk<hde> dB;\r\n  public static final hde dC;\r\n  public static final hde dD;\r\n  public static final hde dE;\r\n  public static final hde dF;\r\n  public static final hde dG;\r\n  public static final hde dH;\r\n  public static final hde dI;\r\n  public static final hde dJ;\r\n  public static final hde dK;\r\n  public static final hde dL;\r\n  public static final hde dM;\r\n  public static final hde dN;\r\n  public static final hde dO;\r\n  public static final hde dP;\r\n  public static final hde dQ;\r\n  public static final hde dR;\r\n  public static final hde dS;\r\n  public static final hde dT;\r\n  public static final hde dU;\r\n  public static final hde dV;\r\n  public static final hde dW;\r\n  public static final hde dX;\r\n  public static final hde dY;\r\n  public static final hde dZ;\r\n  public static final hde ea;\r\n  public static final hde eb;\r\n  public static final hde ec;\r\n  public static final hde ed;\r\n  public static final hde ee;\r\n  public static final hde ef;\r\n  public static final hde eg;\r\n  public static final hde eh;\r\n  public static final hde ei;\r\n  public static final hde ej;\r\n  public static final hde ek;\r\n  public static final hde el;\r\n  public static final hde em;\r\n  public static final hvk<hde> en;\r\n  public static final hde eo;\r\n  public static final hde ep;\r\n  public static final hde eq;\r\n  public static final hde er;\r\n  public static final hde es;\r\n  public static final hde et;\r\n  public static final hde eu;\r\n  public static final hde ev;\r\n  public static final hde ew;\r\n  public static final hde ex;\r\n  public static final hvk<hde> ey;\r\n  public static final hde ez;\r\n  public static final hde eA;\r\n  public static final hde eB;\r\n  public static final hde eC;\r\n  public static final hde eD;\r\n  public static final hvk<hde> eE;\r\n  public static final hde eF;\r\n  public static final hde eG;\r\n  public static final hde eH;\r\n  public static final hde eI;\r\n  public static final hvk<hde> eJ;\r\n  public static final hvk<hde> eK;\r\n  public static final hde eL;\r\n  public static final hde eM;\r\n  public static final hvk<hde> eN;\r\n  public static final hvk<hde> eO;\r\n  public static final hde eP;\r\n  public hdf();\r\n  public static hde a(epw);\r\n  public static hde b(epw);\r\n  public static hde a(epw, hru$a);\r\n  public static java.util.stream.Stream<hde> a();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.hdf",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.ModelPart",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdg.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic final class hdg {\r\n  public static final float a;\r\n  public float b;\r\n  public float c;\r\n  public float d;\r\n  public float e;\r\n  public float f;\r\n  public float g;\r\n  public float h;\r\n  public float i;\r\n  public float j;\r\n  public boolean k;\r\n  public boolean l;\r\n  public hdg(java.util.List<hdg$a>, java.util.Map<java.lang.String, hdg>);\r\n  public hdi a();\r\n  public hdi b();\r\n  public void a(hdi);\r\n  public void c();\r\n  public void b(hdi);\r\n  public boolean a(java.lang.String);\r\n  public hdg b(java.lang.String);\r\n  public void a(float, float, float);\r\n  public void b(float, float, float);\r\n  public void a(fzm, fzp, int, int);\r\n  public void a(fzm, fzp, int, int, int);\r\n  public void a(org.joml.Quaternionf);\r\n  public void a(fzm, java.util.function.Consumer<org.joml.Vector3fc>);\r\n  public void a(fzm, hdg$d);\r\n  public void a(fzm);\r\n  public hdg$a a(bgr);\r\n  public boolean d();\r\n  public void a(org.joml.Vector3f);\r\n  public void b(org.joml.Vector3f);\r\n  public void c(org.joml.Vector3f);\r\n  public java.util.List<hdg> e();\r\n  public java.util.function.Function<java.lang.String, hdg> f();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.hdg",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.ModelPart$Cube",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdg$a.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hdg$a {\r\n  public final hdg$b[] a;\r\n  public final float b;\r\n  public final float c;\r\n  public final float d;\r\n  public final float e;\r\n  public final float f;\r\n  public final float g;\r\n  public hdg$a(int, int, float, float, float, float, float, float, float, float, float, boolean, float, float, java.util.Set<iz>);\r\n  public void a(fzm$a, fzp, int, int, int);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.hdg$a",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.ModelPart$Polygon",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdg$b.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic final class hdg$b extends java.lang.Record {\r\n  public hdg$b(hdg$c[], float, float, float, float, float, float, boolean, iz);\r\n  public hdg$b(hdg$c[], org.joml.Vector3fc);\r\n  public final java.lang.String toString();\r\n  public final int hashCode();\r\n  public final boolean equals(java.lang.Object);\r\n  public hdg$c[] a();\r\n  public org.joml.Vector3fc b();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.hdg$b",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.ModelPart$Vertex",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdg$c.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic final class hdg$c extends java.lang.Record {\r\n  public static final float a;\r\n  public hdg$c(float, float, float, float, float);\r\n  public hdg$c a(float, float);\r\n  public float a();\r\n  public float b();\r\n  public float c();\r\n  public final java.lang.String toString();\r\n  public final int hashCode();\r\n  public final boolean equals(java.lang.Object);\r\n  public float d();\r\n  public float e();\r\n  public float f();\r\n  public float g();\r\n  public float h();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.hdg$c",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.ModelPart$Visitor",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdg$d.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic interface hdg$d {\r\n  public abstract void visit(fzm$a, java.lang.String, int, hdg$a);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.hdg$d",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.package-info",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdt.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hdt {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.hdt",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.PartNames",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdh.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hdh {\r\n  public static final java.lang.String a;\r\n  public static final java.lang.String b;\r\n  public static final java.lang.String c;\r\n  public static final java.lang.String d;\r\n  public static final java.lang.String e;\r\n  public static final java.lang.String f;\r\n  public static final java.lang.String g;\r\n  public static final java.lang.String h;\r\n  public static final java.lang.String i;\r\n  public static final java.lang.String j;\r\n  public static final java.lang.String k;\r\n  public static final java.lang.String l;\r\n  public static final java.lang.String m;\r\n  public static final java.lang.String n;\r\n  public static final java.lang.String o;\r\n  public static final java.lang.String p;\r\n  public static final java.lang.String q;\r\n  public static final java.lang.String r;\r\n  public static final java.lang.String s;\r\n  public static final java.lang.String t;\r\n  public static final java.lang.String u;\r\n  public static final java.lang.String v;\r\n  public static final java.lang.String w;\r\n  public static final java.lang.String x;\r\n  public static final java.lang.String y;\r\n  public static final java.lang.String z;\r\n  public static final java.lang.String A;\r\n  public static final java.lang.String B;\r\n  public static final java.lang.String C;\r\n  public static final java.lang.String D;\r\n  public static final java.lang.String E;\r\n  public static final java.lang.String F;\r\n  public static final java.lang.String G;\r\n  public static final java.lang.String H;\r\n  public static final java.lang.String I;\r\n  public static final java.lang.String J;\r\n  public static final java.lang.String K;\r\n  public static final java.lang.String L;\r\n  public static final java.lang.String M;\r\n  public static final java.lang.String N;\r\n  public static final java.lang.String O;\r\n  public static final java.lang.String P;\r\n  public static final java.lang.String Q;\r\n  public static final java.lang.String R;\r\n  public static final java.lang.String S;\r\n  public static final java.lang.String T;\r\n  public static final java.lang.String U;\r\n  public static final java.lang.String V;\r\n  public static final java.lang.String W;\r\n  public static final java.lang.String X;\r\n  public static final java.lang.String Y;\r\n  public static final java.lang.String Z;\r\n  public static final java.lang.String aa;\r\n  public static final java.lang.String ab;\r\n  public static final java.lang.String ac;\r\n  public static final java.lang.String ad;\r\n  public static final java.lang.String ae;\r\n  public static final java.lang.String af;\r\n  public static final java.lang.String ag;\r\n  public static final java.lang.String ah;\r\n  public static final java.lang.String ai;\r\n  public static final java.lang.String aj;\r\n  public static final java.lang.String ak;\r\n  public static final java.lang.String al;\r\n  public static final java.lang.String am;\r\n  public static final java.lang.String an;\r\n  public static final java.lang.String ao;\r\n  public static final java.lang.String ap;\r\n  public static final java.lang.String aq;\r\n  public static final java.lang.String ar;\r\n  public static final java.lang.String as;\r\n  public static final java.lang.String at;\r\n  public static final java.lang.String au;\r\n  public static final java.lang.String av;\r\n  public static final java.lang.String aw;\r\n  public static final java.lang.String ax;\r\n  public static final java.lang.String ay;\r\n  public static final java.lang.String az;\r\n  public static final java.lang.String aA;\r\n  public static final java.lang.String aB;\r\n  public static final java.lang.String aC;\r\n  public static final java.lang.String aD;\r\n  public static final java.lang.String aE;\r\n  public static final java.lang.String aF;\r\n  public static final java.lang.String aG;\r\n  public static final java.lang.String aH;\r\n  public static final java.lang.String aI;\r\n  public static final java.lang.String aJ;\r\n  public static final java.lang.String aK;\r\n  public static final java.lang.String aL;\r\n  public static final java.lang.String aM;\r\n  public static final java.lang.String aN;\r\n  public static final java.lang.String aO;\r\n  public static final java.lang.String aP;\r\n  public static final java.lang.String aQ;\r\n  public static final java.lang.String aR;\r\n  public static final java.lang.String aS;\r\n  public static final java.lang.String aT;\r\n  public static final java.lang.String aU;\r\n  public static final java.lang.String aV;\r\n  public static final java.lang.String aW;\r\n  public static final java.lang.String aX;\r\n  public static final java.lang.String aY;\r\n  public static final java.lang.String aZ;\r\n  public static final java.lang.String ba;\r\n  public hdh();\r\n  public static java.lang.String a(int);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.hdh",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.geom.PartPose",
+      "groupKey": "net.minecraft.client.model.geom",
+      "jarPath": "hdi.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic final class hdi extends java.lang.Record {\r\n  public static final hdi a;\r\n  public hdi(float, float, float, float, float, float, float, float, float);\r\n  public static hdi a(float, float, float);\r\n  public static hdi b(float, float, float);\r\n  public static hdi a(float, float, float, float, float, float);\r\n  public hdi c(float, float, float);\r\n  public hdi a(float);\r\n  public hdi b(float);\r\n  public hdi d(float, float, float);\r\n  public final java.lang.String toString();\r\n  public final int hashCode();\r\n  public final boolean equals(java.lang.Object);\r\n  public float a();\r\n  public float b();\r\n  public float c();\r\n  public float d();\r\n  public float e();\r\n  public float f();\r\n  public float g();\r\n  public float h();\r\n  public float i();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.geom.hdi",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.HeadedModel",
+      "groupKey": "net.minecraft.client.model.HeadedModel",
+      "jarPath": "gzn.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic interface gzn {\r\n  public abstract hdg a();\r\n  public default void a(fzm);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.gzn",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.HumanoidModel",
+      "groupKey": "net.minecraft.client.model.HumanoidModel",
+      "jarPath": "gzo.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class gzo<T extends idy> extends gzm<T> implements gzk<T>, gzn {\r\n  public static final hdp b;\r\n  public static final float c;\r\n  public static final float d;\r\n  public static final float e;\r\n  public static final float f;\r\n  public static final float g;\r\n  public final hdg h;\r\n  public final hdg i;\r\n  public final hdg j;\r\n  public final hdg k;\r\n  public final hdg l;\r\n  public final hdg m;\r\n  public final hdg n;\r\n  public gzo(hdg);\r\n  public gzo(hdg, java.util.function.Function<amo, ijs>);\r\n  public static hdo a(hdk, float);\r\n  public static hvk<hdo> a(hdk, hdk);\r\n  public void a(T);\r\n  public void a(boolean);\r\n  public void a(idy, chb, fzm);\r\n  public hdg a(chb);\r\n  public hdg a();\r\n  public void a(java.lang.Object);\r\n  public void a(idf, chb, fzm);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.gzo",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/equipment/humanoid_leggings/leather_overlay",
+        "assets/minecraft/textures/entity/equipment/humanoid_baby/leather_overlay",
+        "assets/minecraft/textures/entity/equipment/humanoid_leggings/chainmail",
+        "assets/minecraft/textures/entity/equipment/humanoid_leggings/netherite",
+        "assets/minecraft/textures/entity/equipment/humanoid_baby/turtle_scute",
+        "assets/minecraft/textures/entity/equipment/humanoid_leggings/diamond",
+        "assets/minecraft/textures/entity/equipment/humanoid_leggings/leather",
+        "assets/minecraft/textures/entity/equipment/humanoid/leather_overlay",
+        "assets/minecraft/textures/entity/equipment/humanoid_leggings/copper",
+        "assets/minecraft/textures/entity/equipment/humanoid_baby/chainmail",
+        "assets/minecraft/textures/entity/equipment/humanoid_baby/netherite",
+        "assets/minecraft/textures/entity/equipment/humanoid_leggings/iron",
+        "assets/minecraft/textures/entity/equipment/humanoid_leggings/gold",
+        "assets/minecraft/textures/entity/equipment/humanoid_baby/leather",
+        "assets/minecraft/textures/entity/equipment/humanoid_baby/diamond",
+        "assets/minecraft/textures/entity/equipment/humanoid/turtle_scute",
+        "assets/minecraft/textures/entity/equipment/humanoid_baby/copper",
+        "assets/minecraft/textures/entity/equipment/humanoid/chainmail",
+        "assets/minecraft/textures/entity/equipment/humanoid/netherite",
+        "assets/minecraft/textures/entity/equipment/humanoid_baby/gold",
+        "assets/minecraft/textures/entity/equipment/humanoid_baby/iron",
+        "assets/minecraft/textures/entity/equipment/humanoid/diamond",
+        "assets/minecraft/textures/entity/equipment/humanoid/leather",
+        "assets/minecraft/textures/entity/equipment/humanoid/copper",
+        "assets/minecraft/textures/entity/equipment/humanoid/gold",
+        "assets/minecraft/textures/entity/equipment/humanoid/iron"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.HumanoidModel$1",
+      "groupKey": "net.minecraft.client.model.HumanoidModel",
+      "jarPath": "gzo$1.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\nclass gzo$1 {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.gzo$1",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.HumanoidModel$ArmPose",
+      "groupKey": "net.minecraft.client.model.HumanoidModel",
+      "jarPath": "gzo$a.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class gzo$a extends java.lang.Enum<gzo$a> {\r\n  public static final gzo$a a;\r\n  public static final gzo$a b;\r\n  public static final gzo$a c;\r\n  public static final gzo$a d;\r\n  public static final gzo$a e;\r\n  public static final gzo$a f;\r\n  public static final gzo$a g;\r\n  public static final gzo$a h;\r\n  public static final gzo$a i;\r\n  public static final gzo$a j;\r\n  public static final gzo$a k;\r\n  public static gzo$a[] values();\r\n  public static gzo$a valueOf(java.lang.String);\r\n  public boolean a();\r\n  public boolean b();\r\n  public <S extends ich> void a(S, fzm, float, chb, dlt);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.gzo$a",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.HumanoidModel$ArmPose$1",
+      "groupKey": "net.minecraft.client.model.HumanoidModel",
+      "jarPath": "gzo$a$1.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\nfinal class gzo$a$1 extends gzo$a {\r\n  public <S extends ich> void a(S, fzm, float, chb, dlt);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.gzo$a$1",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.Model",
+      "groupKey": "net.minecraft.client.model.Model",
+      "jarPath": "gzp.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic abstract class gzp<S> {\r\n  public gzp(hdg, java.util.function.Function<amo, ijs>);\r\n  public final ijs a(amo);\r\n  public final void a(fzm, fzp, int, int, int);\r\n  public final void a(fzm, fzp, int, int);\r\n  public final hdg b();\r\n  public final java.util.List<hdg> c();\r\n  public void a(S);\r\n  public final void d();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.gzp",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.Model$Simple",
+      "groupKey": "net.minecraft.client.model.Model",
+      "jarPath": "gzp$a.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class gzp$a extends gzp<bhr> {\r\n  public gzp$a(hdg, java.util.function.Function<amo, ijs>);\r\n  public void a(bhr);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.gzp$a",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.blaze.BlazeModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hdu.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hdu extends gzm<ieh> {\r\n  public hdu(hdg);\r\n  public static hdm a();\r\n  public void a(ieh);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.blaze.hdu",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/blaze/blaze"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.blaze.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hdv.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hdv {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.blaze.hdv",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.breeze.BreezeModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hdw.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hdw extends gzm<icr> {\r\n  public hdw(hdg);\r\n  public static hdm a();\r\n  public static hdm e();\r\n  public static hdm f();\r\n  public void a(icr);\r\n  public hdg g();\r\n  public hdg h();\r\n  public hdg i();\r\n  public hdg j();\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.breeze.hdw",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/breeze/breeze_wind",
+        "assets/minecraft/textures/entity/breeze/breeze_eyes",
+        "assets/minecraft/textures/entity/breeze/breeze"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.breeze.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hdx.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hdx {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.breeze.hdx",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.creaking.CreakingModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hdy.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hdy extends gzm<icx> {\r\n  public hdy(hdg);\r\n  public static hdm a();\r\n  public static hdm e();\r\n  public void a(icx);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.creaking.hdy",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/creaking/creaking_eyes",
+        "assets/minecraft/textures/entity/creaking/creaking"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.creaking.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hdz.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hdz {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.creaking.hdz",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.creeper.CreeperModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hea.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hea extends gzm<icy> {\r\n  public hea(hdg);\r\n  public static hdm a(hdk);\r\n  public void a(icy);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.creeper.hea",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/creeper/creeper_armor",
+        "assets/minecraft/textures/entity/creeper/creeper"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.creeper.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "heb.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface heb {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.creeper.heb",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.dragon.EnderDragonModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hec.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hec extends gzm<idd> {\r\n  public hec(hdg);\r\n  public static hdm a();\r\n  public void a(idd);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.dragon.hec",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/enderdragon/dragon_exploding",
+        "assets/minecraft/textures/entity/enderdragon/dragon_eyes",
+        "assets/minecraft/textures/entity/enderdragon/dragon"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.dragon.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hed.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hed {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.dragon.hed",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.enderman.EndermanModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hee.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hee<T extends ide> extends gzo<T> {\r\n  public hee(hdg);\r\n  public static hdm e();\r\n  public void a(T);\r\n  public void a(idy);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.enderman.hee",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/enderman/enderman_eyes",
+        "assets/minecraft/textures/entity/enderman/enderman"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.enderman.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hef.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hef {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.enderman.hef",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.endermite.EndermiteModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "heg.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class heg extends gzm<idf> {\r\n  public heg(hdg);\r\n  public static hdm a();\r\n  public void a(idf);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.endermite.heg",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/endermite/endermite"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.endermite.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "heh.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface heh {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.endermite.heh",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.ghast.GhastModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hei.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hei extends gzm<idq> {\r\n  public hei(hdg);\r\n  public static hdm a();\r\n  public void a(idq);\r\n  public static void a(idf, hdg[]);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.ghast.hei",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/ghast/ghast_shooting",
+        "assets/minecraft/textures/entity/ghast/ghast"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.ghast.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hej.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hej {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.ghast.hej",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.guardian.GuardianModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hek.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hek extends gzm<ids> {\r\n  public static final hdp b;\r\n  public hek(hdg);\r\n  public static hdm a();\r\n  public static hdm e();\r\n  public void a(ids);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.guardian.hek",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/guardian/guardian_elder",
+        "assets/minecraft/textures/entity/guardian/guardian"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.guardian.GuardianParticleModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hel.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hel extends gzp<bhr> {\r\n  public hel(hdg);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.guardian.hel",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.guardian.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hem.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hem {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.guardian.hem",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.hoglin.HoglinModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hen.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hen extends gzm<idv> {\r\n  public static final hdp b;\r\n  public hen(hdg);\r\n  public static hdm a();\r\n  public static hdm e();\r\n  public void a(idv);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.hoglin.hen",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/hoglin/hoglin_baby",
+        "assets/minecraft/textures/entity/hoglin/zoglin_baby",
+        "assets/minecraft/textures/entity/hoglin/hoglin",
+        "assets/minecraft/textures/entity/hoglin/zoglin"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.hoglin.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "heo.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface heo {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.hoglin.heo",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.illager.IllagerModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hep.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hep<S extends idz> extends gzm<S> implements gzk<S>, gzn {\r\n  public hep(hdg);\r\n  public static hdm e();\r\n  public void a(S);\r\n  public hdg f();\r\n  public hdg a();\r\n  public void a(idz, chb, fzm);\r\n  public void a(java.lang.Object);\r\n  public void a(idf, chb, fzm);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.illager.hep",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/illager/vindicator",
+        "assets/minecraft/textures/entity/illager/illusioner",
+        "assets/minecraft/textures/entity/illager/pillager",
+        "assets/minecraft/textures/entity/illager/evoker"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.illager.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "heq.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface heq {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.illager.heq",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.nautilus.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hes.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hes {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.nautilus.hes",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.nautilus.ZombieNautilusCoralModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "her.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class her extends hby {\r\n  public her(hdg);\r\n  public static hdm a();\r\n  public void a(ien);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.nautilus.her",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.phantom.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "heu.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface heu {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.phantom.heu",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.phantom.PhantomModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "het.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class het extends gzm<ier> {\r\n  public het(hdg);\r\n  public static hdm a();\r\n  public void a(ier);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.phantom.het",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/phantom/phantom_eyes",
+        "assets/minecraft/textures/entity/phantom/phantom"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.piglin.AbstractPiglinModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hev.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hev<S extends idy> extends gzo<S> {\r\n  public final hdg q;\r\n  public final hdg r;\r\n  public final hdg s;\r\n  public final hdg t;\r\n  public final hdg u;\r\n  public final hdg v;\r\n  public final hdg w;\r\n  public hev(hdg);\r\n  public static hdo a(hdk);\r\n  public static hvk<hdo> b(hdk, hdk);\r\n  public static hdq a(hdk, hdo);\r\n  public void a(S);\r\n  public void a(boolean);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.piglin.hev",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.piglin.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hey.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hey {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.piglin.hey",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.piglin.PiglinModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hew.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hew extends hev<iet> {\r\n  public hew(hdg);\r\n  public void a(iet);\r\n  public void a(boolean);\r\n  public void a(idy);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.piglin.hew",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/piglin/zombified_piglin_baby",
+        "assets/minecraft/textures/entity/piglin/zombified_piglin",
+        "assets/minecraft/textures/entity/piglin/piglin_brute",
+        "assets/minecraft/textures/entity/piglin/piglin_baby",
+        "assets/minecraft/textures/entity/piglin/piglin"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.piglin.ZombifiedPiglinModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hex.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hex extends hev<iga> {\r\n  public hex(hdg);\r\n  public void a(iga);\r\n  public void a(boolean);\r\n  public void a(idy);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.piglin.hex",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.ravager.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfa.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hfa {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.ravager.hfa",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.ravager.RavagerModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hez.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hez extends gzm<iex> {\r\n  public hez(hdg);\r\n  public static hdm a();\r\n  public void a(iex);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.ravager.hez",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/illager/ravager"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.shulker.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfc.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hfc {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.shulker.hfc",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.shulker.ShulkerModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfb.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hfb extends gzm<ifb> {\r\n  public static final java.lang.String b;\r\n  public hfb(hdg);\r\n  public static hdm a();\r\n  public static hdm e();\r\n  public void a(ifb);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.shulker.hfb",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/shulker/shulker_light_blue",
+        "assets/minecraft/textures/entity/shulker/shulker_light_gray",
+        "assets/minecraft/textures/entity/shulker/shulker_magenta",
+        "assets/minecraft/textures/entity/shulker/shulker_yellow",
+        "assets/minecraft/textures/entity/shulker/shulker_purple",
+        "assets/minecraft/textures/entity/shulker/shulker_orange",
+        "assets/minecraft/textures/entity/shulker/shulker_green",
+        "assets/minecraft/textures/entity/shulker/shulker_white",
+        "assets/minecraft/textures/entity/shulker/shulker_brown",
+        "assets/minecraft/textures/entity/shulker/shulker_black",
+        "assets/minecraft/textures/entity/shulker/shulker_blue",
+        "assets/minecraft/textures/entity/shulker/shulker_cyan",
+        "assets/minecraft/textures/entity/shulker/shulker_pink",
+        "assets/minecraft/textures/entity/shulker/shulker_gray",
+        "assets/minecraft/textures/entity/shulker/shulker_lime",
+        "assets/minecraft/textures/entity/shulker/shulker_red",
+        "assets/minecraft/textures/entity/shulker/shulker"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.silverfish.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfe.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hfe {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.silverfish.hfe",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.silverfish.SilverfishModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfd.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hfd extends gzm<idf> {\r\n  public hfd(hdg);\r\n  public static hdm a();\r\n  public void a(idf);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.silverfish.hfd",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/silverfish/silverfish"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.skeleton.BoggedModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hff.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hff extends hfg<icq> {\r\n  public hff(hdg);\r\n  public static hdm e();\r\n  public void a(icq);\r\n  public void a(ifc);\r\n  public void a(idy);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.skeleton.hff",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.skeleton.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfh.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hfh {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.skeleton.hfh",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.skeleton.SkeletonModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfg.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hfg<S extends ifc> extends gzo<S> {\r\n  public hfg(hdg);\r\n  public static hdm f();\r\n  public static hdm g();\r\n  public void a(S);\r\n  public void a(ifc, chb, fzm);\r\n  public void a(idy);\r\n  public void a(idf, chb, fzm);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.skeleton.hfg",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/skeleton/bogged_overlay",
+        "assets/minecraft/textures/entity/skeleton/stray_overlay",
+        "assets/minecraft/textures/entity/skeleton/skeleton",
+        "assets/minecraft/textures/entity/skeleton/parched",
+        "assets/minecraft/textures/entity/skeleton/bogged",
+        "assets/minecraft/textures/entity/skeleton/stray"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.slime.MagmaCubeModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfi.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hfi extends gzm<ifd> {\r\n  public hfi(hdg);\r\n  public static hdm a();\r\n  public void a(ifd);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.slime.hfi",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/slime/magmacube"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.slime.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfk.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hfk {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.slime.hfk",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.slime.SlimeModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfj.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hfj extends gzm<idf> {\r\n  public hfj(hdg);\r\n  public static hdm a();\r\n  public static hdm e();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.slime.hfj",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/slime/slime"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.spider.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfm.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hfm {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.spider.hfm",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.spider.SpiderModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfl.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hfl extends gzm<ieh> {\r\n  public hfl(hdg);\r\n  public static hdm a();\r\n  public void a(ieh);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.spider.hfl",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/spider/spider_eyes",
+        "assets/minecraft/textures/entity/spider/cave_spider",
+        "assets/minecraft/textures/entity/spider/spider"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.strider.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfo.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hfo {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.strider.hfo",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.strider.StriderModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfn.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hfn extends gzm<ifh> {\r\n  public static final hdp b;\r\n  public hfn(hdg);\r\n  public static hdm a();\r\n  public void a(ifh);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.strider.hfn",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/strider/strider_cold_baby",
+        "assets/minecraft/textures/entity/strider/strider_baby",
+        "assets/minecraft/textures/entity/strider/strider_cold",
+        "assets/minecraft/textures/entity/strider/strider"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.vex.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfq.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hfq {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.vex.hfq",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.vex.VexModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfp.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hfp extends gzm<ifq> implements gzk<ifq> {\r\n  public hfp(hdg);\r\n  public static hdm a();\r\n  public void a(ifq);\r\n  public void a(ifq, chb, fzm);\r\n  public void a(java.lang.Object);\r\n  public void a(idf, chb, fzm);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.vex.hfp",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/illager/vex_charging",
+        "assets/minecraft/textures/entity/illager/vex"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.warden.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfs.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hfs {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.warden.hfs",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.warden.WardenModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfr.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hfr extends gzm<ift> {\r\n  public hfr(hdg);\r\n  public static hdm a();\r\n  public static hdm e();\r\n  public static hdm f();\r\n  public static hdm g();\r\n  public static hdm h();\r\n  public void a(ift);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.warden.hfr",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/warden/warden_bioluminescent_layer",
+        "assets/minecraft/textures/entity/warden/warden_pulsating_spots_1",
+        "assets/minecraft/textures/entity/warden/warden_pulsating_spots_2",
+        "assets/minecraft/textures/entity/warden/warden_heart",
+        "assets/minecraft/textures/entity/warden/warden"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.witch.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfu.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hfu {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.witch.hfu",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.witch.WitchModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hft.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hft extends gzm<ifu> implements gzn, gzr<ifu> {\r\n  public hft(hdg);\r\n  public static hdm e();\r\n  public void a(ifu);\r\n  public hdg f();\r\n  public hdg a();\r\n  public void a(ifu, fzm);\r\n  public void a(java.lang.Object);\r\n  public void a(idf, fzm);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.witch.hft",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/witch/witch"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.wither.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfw.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hfw {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.wither.hfw",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.wither.WitherBossModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfv.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hfv extends gzm<ifv> {\r\n  public hfv(hdg);\r\n  public static hdm a(hdk);\r\n  public void a(ifv);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.wither.hfv",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/wither/wither_invulnerable",
+        "assets/minecraft/textures/entity/skeleton/wither_skeleton",
+        "assets/minecraft/textures/entity/wither/wither_armor",
+        "assets/minecraft/textures/entity/wither/wither"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.zombie.AbstractZombieModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfx.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic abstract class hfx<S extends ify> extends gzo<S> {\r\n  public void a(S);\r\n  public void a(idy);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.zombie.hfx",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.zombie.DrownedModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfy.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hfy extends hga<ify> {\r\n  public hfy(hdg);\r\n  public static hdm a(hdk);\r\n  public void a(ify);\r\n  public void a(idy);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.zombie.hfy",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.zombie.GiantZombieModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hfz.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hfz extends hfx<ify> {\r\n  public hfz(hdg);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.zombie.hfz",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.zombie.package-info",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hgc.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hgc {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.zombie.hgc",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.zombie.ZombieModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hga.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hga<S extends ify> extends hfx<S> {\r\n  public hga(hdg);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.zombie.hga",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/zombie/drowned_outer_layer_baby",
+        "assets/minecraft/textures/entity/zombie/drowned_outer_layer",
+        "assets/minecraft/textures/entity/zombie/drowned_baby",
+        "assets/minecraft/textures/entity/zombie/zombie_baby",
+        "assets/minecraft/textures/entity/zombie/husk_baby",
+        "assets/minecraft/textures/entity/zombie/drowned",
+        "assets/minecraft/textures/entity/zombie/zombie",
+        "assets/minecraft/textures/entity/zombie/husk"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.zombie.ZombieVillagerModel",
+      "groupKey": "net.minecraft.client.model.monster",
+      "jarPath": "hgb.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hgb<S extends ifz> extends gzo<S> implements gzr<S> {\r\n  public hgb(hdg);\r\n  public static hdm e();\r\n  public static hdm f();\r\n  public static hvk<hdm> b(hdk, hdk);\r\n  public void a(S);\r\n  public void a(ifz, fzm);\r\n  public void a(idy);\r\n  public void a(java.lang.Object);\r\n  public void a(idf, fzm);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.monster.zombie.hgb",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/zombie_villager/profession_level/emerald",
+        "assets/minecraft/textures/entity/zombie_villager/profession_level/diamond",
+        "assets/minecraft/textures/entity/zombie_villager/profession/leatherworker",
+        "assets/minecraft/textures/entity/zombie_villager/profession/cartographer",
+        "assets/minecraft/textures/entity/zombie_villager/profession/weaponsmith",
+        "assets/minecraft/textures/entity/zombie_villager/profession_level/stone",
+        "assets/minecraft/textures/entity/zombie_villager/profession_level/gold",
+        "assets/minecraft/textures/entity/zombie_villager/profession_level/iron",
+        "assets/minecraft/textures/entity/zombie_villager/profession/fisherman",
+        "assets/minecraft/textures/entity/zombie_villager/profession/librarian",
+        "assets/minecraft/textures/entity/zombie_villager/profession/toolsmith",
+        "assets/minecraft/textures/entity/zombie_villager/zombie_villager_baby",
+        "assets/minecraft/textures/entity/zombie_villager/profession/shepherd",
+        "assets/minecraft/textures/entity/zombie_villager/profession/fletcher",
+        "assets/minecraft/textures/entity/zombie_villager/profession/armorer",
+        "assets/minecraft/textures/entity/zombie_villager/profession/butcher",
+        "assets/minecraft/textures/entity/zombie_villager/profession/cleric",
+        "assets/minecraft/textures/entity/zombie_villager/profession/farmer",
+        "assets/minecraft/textures/entity/zombie_villager/profession/nitwit",
+        "assets/minecraft/textures/entity/zombie_villager/profession/mason",
+        "assets/minecraft/textures/entity/zombie_villager/zombie_villager",
+        "assets/minecraft/textures/entity/zombie_villager/baby/savanna",
+        "assets/minecraft/textures/entity/zombie_villager/type/savanna",
+        "assets/minecraft/textures/entity/zombie_villager/baby/plains",
+        "assets/minecraft/textures/entity/zombie_villager/type/desert",
+        "assets/minecraft/textures/entity/zombie_villager/baby/desert",
+        "assets/minecraft/textures/entity/zombie_villager/baby/jungle",
+        "assets/minecraft/textures/entity/zombie_villager/type/jungle",
+        "assets/minecraft/textures/entity/zombie_villager/type/plains",
+        "assets/minecraft/textures/entity/zombie_villager/type/swamp",
+        "assets/minecraft/textures/entity/zombie_villager/baby/swamp",
+        "assets/minecraft/textures/entity/zombie_villager/type/taiga",
+        "assets/minecraft/textures/entity/zombie_villager/baby/taiga",
+        "assets/minecraft/textures/entity/zombie_villager/baby/snow",
+        "assets/minecraft/textures/entity/zombie_villager/type/snow"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.npc.package-info",
+      "groupKey": "net.minecraft.client.model.npc",
+      "jarPath": "hge.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hge {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.npc.hge",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.npc.VillagerModel",
+      "groupKey": "net.minecraft.client.model.npc",
+      "jarPath": "hgd.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hgd extends gzm<ifs> implements gzn, gzr<ifs> {\r\n  public static final hdp b;\r\n  public hgd(hdg);\r\n  public static hdo e();\r\n  public static hdo f();\r\n  public void a(ifs);\r\n  public hdg a();\r\n  public void a(ifs, fzm);\r\n  public void a(java.lang.Object);\r\n  public void a(idf, fzm);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.npc.hgd",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/villager/profession/leatherworker",
+        "assets/minecraft/textures/entity/villager/profession_level/emerald",
+        "assets/minecraft/textures/entity/wandering_trader/wandering_trader",
+        "assets/minecraft/textures/entity/villager/profession_level/diamond",
+        "assets/minecraft/textures/entity/villager/profession/cartographer",
+        "assets/minecraft/textures/entity/villager/profession_level/stone",
+        "assets/minecraft/textures/entity/villager/profession/weaponsmith",
+        "assets/minecraft/textures/entity/villager/profession_level/iron",
+        "assets/minecraft/textures/entity/villager/profession_level/gold",
+        "assets/minecraft/textures/entity/villager/profession/toolsmith",
+        "assets/minecraft/textures/entity/villager/profession/librarian",
+        "assets/minecraft/textures/entity/villager/profession/fisherman",
+        "assets/minecraft/textures/entity/villager/profession/shepherd",
+        "assets/minecraft/textures/entity/villager/profession/fletcher",
+        "assets/minecraft/textures/entity/villager/profession/butcher",
+        "assets/minecraft/textures/entity/villager/profession/armorer",
+        "assets/minecraft/textures/entity/villager/profession/farmer",
+        "assets/minecraft/textures/entity/villager/profession/cleric",
+        "assets/minecraft/textures/entity/villager/profession/nitwit",
+        "assets/minecraft/textures/entity/villager/profession/mason",
+        "assets/minecraft/textures/entity/villager/villager_baby",
+        "assets/minecraft/textures/entity/villager/baby/savanna",
+        "assets/minecraft/textures/entity/villager/type/savanna",
+        "assets/minecraft/textures/entity/villager/baby/desert",
+        "assets/minecraft/textures/entity/villager/type/desert",
+        "assets/minecraft/textures/entity/villager/type/jungle",
+        "assets/minecraft/textures/entity/villager/type/plains",
+        "assets/minecraft/textures/entity/villager/baby/jungle",
+        "assets/minecraft/textures/entity/villager/baby/plains",
+        "assets/minecraft/textures/entity/villager/baby/swamp",
+        "assets/minecraft/textures/entity/villager/baby/taiga",
+        "assets/minecraft/textures/entity/villager/type/taiga",
+        "assets/minecraft/textures/entity/villager/type/swamp",
+        "assets/minecraft/textures/entity/villager/type/snow",
+        "assets/minecraft/textures/entity/villager/baby/snow",
+        "assets/minecraft/textures/entity/villager/villager"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.armorstand.ArmorStandArmorModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgf.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hgf extends gzo<ici> {\r\n  public hgf(hdg);\r\n  public static hvk<hdm> b(hdk, hdk);\r\n  public void a(ici);\r\n  public void a(idy);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.armorstand.hgf",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.armorstand.ArmorStandModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgg.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hgg extends hgf {\r\n  public hgg(hdg);\r\n  public static hdm e();\r\n  public void a(ici);\r\n  public void a(ici, chb, fzm);\r\n  public void a(idy);\r\n  public void a(idf, chb, fzm);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.armorstand.hgg",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/armorstand/armorstand"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.armorstand.package-info",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgh.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hgh {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.armorstand.hgh",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.banner.BannerFlagModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgi.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hgi extends gzp<java.lang.Float> {\r\n  public hgi(hdg);\r\n  public static hdm a(boolean);\r\n  public void a(java.lang.Float);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.banner.hgi",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/banner/half_horizontal_bottom",
+        "assets/minecraft/textures/entity/banner/square_bottom_right",
+        "assets/minecraft/textures/entity/banner/half_vertical_right",
+        "assets/minecraft/textures/entity/banner/square_bottom_left",
+        "assets/minecraft/textures/entity/banner/diagonal_up_right",
+        "assets/minecraft/textures/entity/banner/square_top_right",
+        "assets/minecraft/textures/entity/banner/triangles_bottom",
+        "assets/minecraft/textures/entity/banner/diagonal_up_left",
+        "assets/minecraft/textures/entity/banner/stripe_downright",
+        "assets/minecraft/textures/entity/banner/half_horizontal",
+        "assets/minecraft/textures/entity/banner/triangle_bottom",
+        "assets/minecraft/textures/entity/banner/square_top_left",
+        "assets/minecraft/textures/entity/banner/stripe_downleft",
+        "assets/minecraft/textures/entity/banner/straight_cross",
+        "assets/minecraft/textures/entity/banner/diagonal_right",
+        "assets/minecraft/textures/entity/banner/small_stripes",
+        "assets/minecraft/textures/entity/banner/half_vertical",
+        "assets/minecraft/textures/entity/banner/diagonal_left",
+        "assets/minecraft/textures/entity/banner/stripe_middle",
+        "assets/minecraft/textures/entity/banner/stripe_bottom",
+        "assets/minecraft/textures/entity/banner/triangles_top",
+        "assets/minecraft/textures/entity/banner/stripe_center",
+        "assets/minecraft/textures/entity/banner/triangle_top",
+        "assets/minecraft/textures/entity/banner/stripe_right",
+        "assets/minecraft/textures/entity/banner/curly_border",
+        "assets/minecraft/textures/entity/banner/banner_base",
+        "assets/minecraft/textures/entity/banner/gradient_up",
+        "assets/minecraft/textures/entity/banner/stripe_left",
+        "assets/minecraft/textures/entity/banner/stripe_top",
+        "assets/minecraft/textures/entity/banner/gradient",
+        "assets/minecraft/textures/entity/banner/creeper",
+        "assets/minecraft/textures/entity/banner/rhombus",
+        "assets/minecraft/textures/entity/banner/guster",
+        "assets/minecraft/textures/entity/banner/mojang",
+        "assets/minecraft/textures/entity/banner/piglin",
+        "assets/minecraft/textures/entity/banner/flower",
+        "assets/minecraft/textures/entity/banner/border",
+        "assets/minecraft/textures/entity/banner/bricks",
+        "assets/minecraft/textures/entity/banner/circle",
+        "assets/minecraft/textures/entity/banner/globe",
+        "assets/minecraft/textures/entity/banner/skull",
+        "assets/minecraft/textures/entity/banner/cross",
+        "assets/minecraft/textures/entity/banner/flow",
+        "assets/minecraft/textures/entity/banner/base"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.banner.BannerModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgj.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hgj extends gzp<bhr> {\r\n  public static final int a;\r\n  public static final int b;\r\n  public static final java.lang.String c;\r\n  public hgj(hdg);\r\n  public static hdm a(boolean);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.banner.hgj",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.banner.package-info",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgk.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hgk {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.banner.hgk",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.bell.BellModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgl.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hgl extends gzp<hgl$a> {\r\n  public hgl(hdg);\r\n  public static hdm a();\r\n  public void a(hgl$a);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.bell.hgl",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/bell/bell_body"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.bell.BellModel$1",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgl$1.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\nclass hgl$1 {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.bell.hgl$1",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.bell.BellModel$State",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgl$a.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic final class hgl$a extends java.lang.Record {\r\n  public hgl$a(float, iz);\r\n  public final java.lang.String toString();\r\n  public final int hashCode();\r\n  public final boolean equals(java.lang.Object);\r\n  public float a();\r\n  public iz b();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.bell.hgl$a",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.bell.package-info",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgm.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hgm {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.bell.hgm",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.boat.AbstractBoatModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgn.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic abstract class hgn extends gzm<icp> {\r\n  public hgn(hdg);\r\n  public void a(icp);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.boat.hgn",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.boat.BoatModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgo.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hgo extends hgn {\r\n  public hgo(hdg);\r\n  public static hdm a();\r\n  public static hdm e();\r\n  public static hdm f();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.boat.hgo",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/chest_boat/mangrove",
+        "assets/minecraft/textures/entity/chest_boat/dark_oak",
+        "assets/minecraft/textures/entity/chest_boat/pale_oak",
+        "assets/minecraft/textures/entity/chest_boat/spruce",
+        "assets/minecraft/textures/entity/chest_boat/cherry",
+        "assets/minecraft/textures/entity/chest_boat/jungle",
+        "assets/minecraft/textures/entity/chest_boat/acacia",
+        "assets/minecraft/textures/entity/chest_boat/bamboo",
+        "assets/minecraft/textures/entity/chest_boat/birch",
+        "assets/minecraft/textures/entity/chest_boat/oak",
+        "assets/minecraft/textures/entity/boat/mangrove",
+        "assets/minecraft/textures/entity/boat/pale_oak",
+        "assets/minecraft/textures/entity/boat/dark_oak",
+        "assets/minecraft/textures/entity/boat/jungle",
+        "assets/minecraft/textures/entity/boat/spruce",
+        "assets/minecraft/textures/entity/boat/cherry",
+        "assets/minecraft/textures/entity/boat/bamboo",
+        "assets/minecraft/textures/entity/boat/acacia",
+        "assets/minecraft/textures/entity/boat/birch",
+        "assets/minecraft/textures/entity/boat/oak"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.boat.package-info",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgq.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hgq {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.boat.hgq",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.boat.RaftModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgp.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hgp extends hgn {\r\n  public hgp(hdg);\r\n  public static hdm a();\r\n  public static hdm e();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.boat.hgp",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.book.BookModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgr.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hgr extends gzp<hgr$a> {\r\n  public hgr(hdg);\r\n  public static hdm a();\r\n  public void a(hgr$a);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.book.hgr",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/enchantment/enchanting_table_book"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.book.BookModel$State",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgr$a.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic final class hgr$a extends java.lang.Record {\r\n  public hgr$a(float, float, float, float);\r\n  public final java.lang.String toString();\r\n  public final int hashCode();\r\n  public final boolean equals(java.lang.Object);\r\n  public float a();\r\n  public float b();\r\n  public float c();\r\n  public float d();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.book.hgr$a",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.book.package-info",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgs.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hgs {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.book.hgs",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.cart.MinecartModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgt.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hgt extends gzm<iek> {\r\n  public hgt(hdg);\r\n  public static hdm a();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.cart.hgt",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/minecart/minecart"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.cart.package-info",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgu.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hgu {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.cart.hgu",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.chest.ChestModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgv.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hgv extends gzp<java.lang.Float> {\r\n  public hgv(hdg);\r\n  public static hdm a();\r\n  public static hdm e();\r\n  public static hdm f();\r\n  public void a(java.lang.Float);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.chest.hgv",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/chest/copper_weathered_right",
+        "assets/minecraft/textures/entity/chest/copper_weathered_left",
+        "assets/minecraft/textures/entity/chest/copper_oxidized_right",
+        "assets/minecraft/textures/entity/chest/copper_exposed_right",
+        "assets/minecraft/textures/entity/chest/copper_oxidized_left",
+        "assets/minecraft/textures/entity/chest/copper_exposed_left",
+        "assets/minecraft/textures/entity/chest/copper_weathered",
+        "assets/minecraft/textures/entity/chest/copper_oxidized",
+        "assets/minecraft/textures/entity/chest/christmas_right",
+        "assets/minecraft/textures/entity/chest/copper_exposed",
+        "assets/minecraft/textures/entity/chest/christmas_left",
+        "assets/minecraft/textures/entity/chest/trapped_right",
+        "assets/minecraft/textures/entity/chest/copper_right",
+        "assets/minecraft/textures/entity/chest/normal_right",
+        "assets/minecraft/textures/entity/chest/trapped_left",
+        "assets/minecraft/textures/entity/chest/normal_left",
+        "assets/minecraft/textures/entity/chest/copper_left",
+        "assets/minecraft/textures/entity/chest/christmas",
+        "assets/minecraft/textures/entity/chest/trapped",
+        "assets/minecraft/textures/entity/chest/normal",
+        "assets/minecraft/textures/entity/chest/copper",
+        "assets/minecraft/textures/entity/chest/ender"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.chest.package-info",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgw.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hgw {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.chest.hgw",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.crystal.EndCrystalModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgx.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hgx extends gzm<idc> {\r\n  public final hdg b;\r\n  public final hdg c;\r\n  public final hdg d;\r\n  public final hdg e;\r\n  public hgx(hdg);\r\n  public static hdm a();\r\n  public void a(idc);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.crystal.hgx",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/end_crystal/end_crystal_beam",
+        "assets/minecraft/textures/entity/end_crystal/end_crystal"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.crystal.package-info",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgy.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hgy {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.crystal.hgy",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.equipment.ElytraModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hgz.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hgz extends gzm<idy> {\r\n  public static final hdp b;\r\n  public hgz(hdg);\r\n  public static hdm a();\r\n  public void a(idy);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.equipment.hgz",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/equipment/wings/elytra"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.equipment.package-info",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hhb.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hhb {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.equipment.hhb",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.equipment.ShieldModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hha.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hha extends gzp<bhr> {\r\n  public hha(hdg);\r\n  public static hdm a();\r\n  public hdg e();\r\n  public hdg f();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.equipment.hha",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/shield/half_horizontal_bottom",
+        "assets/minecraft/textures/entity/shield/shield_base_nopattern",
+        "assets/minecraft/textures/entity/shield/square_bottom_right",
+        "assets/minecraft/textures/entity/shield/half_vertical_right",
+        "assets/minecraft/textures/entity/shield/square_bottom_left",
+        "assets/minecraft/textures/entity/shield/diagonal_up_right",
+        "assets/minecraft/textures/entity/shield/diagonal_up_left",
+        "assets/minecraft/textures/entity/shield/square_top_right",
+        "assets/minecraft/textures/entity/shield/stripe_downright",
+        "assets/minecraft/textures/entity/shield/triangles_bottom",
+        "assets/minecraft/textures/entity/shield/square_top_left",
+        "assets/minecraft/textures/entity/shield/triangle_bottom",
+        "assets/minecraft/textures/entity/shield/half_horizontal",
+        "assets/minecraft/textures/entity/shield/stripe_downleft",
+        "assets/minecraft/textures/entity/shield/straight_cross",
+        "assets/minecraft/textures/entity/shield/diagonal_right",
+        "assets/minecraft/textures/entity/shield/half_vertical",
+        "assets/minecraft/textures/entity/shield/triangles_top",
+        "assets/minecraft/textures/entity/shield/small_stripes",
+        "assets/minecraft/textures/entity/shield/stripe_center",
+        "assets/minecraft/textures/entity/shield/stripe_bottom",
+        "assets/minecraft/textures/entity/shield/stripe_middle",
+        "assets/minecraft/textures/entity/shield/diagonal_left",
+        "assets/minecraft/textures/entity/shield/curly_border",
+        "assets/minecraft/textures/entity/shield/triangle_top",
+        "assets/minecraft/textures/entity/shield/stripe_right",
+        "assets/minecraft/textures/entity/shield/gradient_up",
+        "assets/minecraft/textures/entity/shield/shield_base",
+        "assets/minecraft/textures/entity/shield/stripe_left",
+        "assets/minecraft/textures/entity/shield/stripe_top",
+        "assets/minecraft/textures/entity/shield/gradient",
+        "assets/minecraft/textures/entity/shield/rhombus",
+        "assets/minecraft/textures/entity/shield/creeper",
+        "assets/minecraft/textures/entity/shield/piglin",
+        "assets/minecraft/textures/entity/shield/mojang",
+        "assets/minecraft/textures/entity/shield/guster",
+        "assets/minecraft/textures/entity/shield/flower",
+        "assets/minecraft/textures/entity/shield/circle",
+        "assets/minecraft/textures/entity/shield/bricks",
+        "assets/minecraft/textures/entity/shield/border",
+        "assets/minecraft/textures/entity/shield/globe",
+        "assets/minecraft/textures/entity/shield/skull",
+        "assets/minecraft/textures/entity/shield/cross",
+        "assets/minecraft/textures/entity/shield/flow",
+        "assets/minecraft/textures/entity/shield/base"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.leash.LeashKnotModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hhc.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hhc extends gzm<idf> {\r\n  public hhc(hdg);\r\n  public static hdm a();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.leash.hhc",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/lead_knot/lead_knot"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.leash.package-info",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hhd.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hhd {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.leash.hhd",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.projectile.ArrowModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hhe.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hhe extends gzm<icj> {\r\n  public hhe(hdg);\r\n  public static hdm a();\r\n  public void a(icj);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.projectile.hhe",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/projectiles/arrow_spectral",
+        "assets/minecraft/textures/entity/projectiles/arrow_tipped",
+        "assets/minecraft/textures/entity/projectiles/arrow"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.projectile.package-info",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hhi.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hhi {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.projectile.hhi",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.projectile.ShulkerBulletModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hhf.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hhf extends gzm<ifa> {\r\n  public hhf(hdg);\r\n  public static hdm a();\r\n  public void a(ifa);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.projectile.hhf",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/shulker/spark"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.projectile.TridentModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hhg.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hhg extends gzp<bhr> {\r\n  public static final amo a;\r\n  public hhg(hdg);\r\n  public static hdm a();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.projectile.hhg",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/trident/trident_riptide",
+        "assets/minecraft/textures/entity/trident/trident"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.projectile.WindChargeModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hhh.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hhh extends gzm<idf> {\r\n  public hhh(hdg);\r\n  public static hdm a();\r\n  public void a(idf);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.projectile.hhh",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/projectiles/wind_charge"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.skull.DragonHeadModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hhj.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hhj extends hhm {\r\n  public hhj(hdg);\r\n  public static hdm a();\r\n  public void a(hhm$a);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.skull.hhj",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.skull.package-info",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hhn.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hhn {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.skull.hhn",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.skull.PiglinHeadModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hhk.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hhk extends hhm {\r\n  public hhk(hdg);\r\n  public static hdo a();\r\n  public void a(hhm$a);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.skull.hhk",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.skull.SkullModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hhl.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hhl extends hhm {\r\n  public hhl(hdg);\r\n  public static hdo a();\r\n  public static hdm e();\r\n  public static hdm f();\r\n  public void a(hhm$a);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.skull.hhl",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/decorated_pot/skull_pottery_pattern"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.skull.SkullModelBase",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hhm.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic abstract class hhm extends gzp<hhm$a> {\r\n  public hhm(hdg);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.skull.hhm",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.skull.SkullModelBase$State",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hhm$a.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hhm$a {\r\n  public float a;\r\n  public float b;\r\n  public float c;\r\n  public hhm$a();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.skull.hhm$a",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.statue.CopperGolemStatueModel",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hho.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hho extends gzp<iz> {\r\n  public hho(hdg);\r\n  public void a(iz);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.statue.hho",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.statue.package-info",
+      "groupKey": "net.minecraft.client.model.object",
+      "jarPath": "hhp.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hhp {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.object.statue.hhp",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.package-info",
+      "groupKey": "net.minecraft.client.model.package-info",
+      "jarPath": "hhq.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hhq {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.hhq",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.player.package-info",
+      "groupKey": "net.minecraft.client.model.player",
+      "jarPath": "hhu.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\ninterface hhu {\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.player.hhu",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.player.PlayerCapeModel",
+      "groupKey": "net.minecraft.client.model.player",
+      "jarPath": "hhr.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hhr extends hht {\r\n  public hhr(hdg);\r\n  public static hdm e();\r\n  public void a(ick);\r\n  public void a(idy);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.player.hhr",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.player.PlayerEarsModel",
+      "groupKey": "net.minecraft.client.model.player",
+      "jarPath": "hhs.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hhs extends hht {\r\n  public hhs(hdg);\r\n  public static hdm e();\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.player.hhs",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.player.PlayerModel",
+      "groupKey": "net.minecraft.client.model.player",
+      "jarPath": "hht.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class hht extends gzo<ick> {\r\n  public final hdg u;\r\n  public final hdg v;\r\n  public final hdg w;\r\n  public final hdg x;\r\n  public final hdg y;\r\n  public hht(hdg, boolean);\r\n  public static hdo a(hdk, boolean);\r\n  public static hvk<hdo> b(hdk, hdk);\r\n  public void a(ick);\r\n  public void a(boolean);\r\n  public void a(ick, chb, fzm);\r\n  public hdg a(bgr);\r\n  public void a(idy);\r\n  public void a(idf, chb, fzm);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.player.hht",
+      "manifestPrefixes": [
+        "assets/minecraft/textures/entity/player/wide/makena",
+        "assets/minecraft/textures/entity/player/slim/makena",
+        "assets/minecraft/textures/entity/player/slim/sunny",
+        "assets/minecraft/textures/entity/player/wide/sunny",
+        "assets/minecraft/textures/entity/player/slim/steve",
+        "assets/minecraft/textures/entity/player/wide/steve",
+        "assets/minecraft/textures/entity/player/wide/noor",
+        "assets/minecraft/textures/entity/player/wide/zuri",
+        "assets/minecraft/textures/entity/player/slim/alex",
+        "assets/minecraft/textures/entity/player/wide/alex",
+        "assets/minecraft/textures/entity/player/slim/zuri",
+        "assets/minecraft/textures/entity/player/slim/noor",
+        "assets/minecraft/textures/entity/player/slim/kai",
+        "assets/minecraft/textures/entity/player/slim/efe",
+        "assets/minecraft/textures/entity/player/slim/ari",
+        "assets/minecraft/textures/entity/player/wide/ari",
+        "assets/minecraft/textures/entity/player/wide/efe",
+        "assets/minecraft/textures/entity/player/wide/kai"
+      ]
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.QuadrupedModel",
+      "groupKey": "net.minecraft.client.model.QuadrupedModel",
+      "jarPath": "gzq.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic class gzq<T extends ieh> extends gzm<T> {\r\n  public static hdo a(int, boolean, boolean, hdk);\r\n  public void a(T);\r\n  public void a(java.lang.Object);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.gzq",
+      "manifestPrefixes": []
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.VillagerLikeModel",
+      "groupKey": "net.minecraft.client.model.VillagerLikeModel",
+      "jarPath": "gzr.class",
+      "javapPublic": "Compiled from \"SourceFile\"\r\npublic interface gzr<T extends idf> {\r\n  public abstract void a(T, fzm);\r\n}",
+      "obfuscatedJvmName": "net.minecraft.client.model.gzr",
+      "manifestPrefixes": []
+    }
+  ],
+  "skipJavap": false,
+  "animationBytecodeInitRelDir": "minecraft-client-model-index-1.21.11-animation-init",
+  "mappingKind": "proguard",
+  "versionLabel": "1.21.11",
+  "animationBytecodeSidecarCount": 10,
+  "generatedUtc": "2026-05-20T08:23:12.9763546Z",
+  "namedByteCodeLayout": false,
+  "clientJar": "tools/minecraft-parity/1.21.11/client.jar",
+  "manifestJson": "src/AutoPBR.Core/Data/minecraft-native/minecraft_26.1.2_entity_texture_model_manifest.json"
+}

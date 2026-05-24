@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.nautilus.NautilusSaddleModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/nautilus/NautilusSaddleModel.class",
+  "classSha256Hex": "c7c63d2861fc1bec2853622d250c23474823234bb56f607fbb8c2f75118cf58b",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.nautilus.NautilusModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.animal.nautilus.NautilusModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

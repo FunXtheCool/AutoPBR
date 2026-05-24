@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.boat.AbstractBoatModel",
+  "profile": "named_jar_26.1.2",
+  "extractionStatus": "skipped",
+  "extractionNotes": [
+    "No static mesh factory on net.minecraft.client.model.object.boat.AbstractBoatModel; structural lift skipped (interface, inner class, or non-mesh type)."
+  ],
+  "factoryMethod": "createBoatModel",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": []
+    }
+  ],
+  "jarPath": "net/minecraft/client/model/object/boat/AbstractBoatModel.class",
+  "classSha256Hex": "90c161abc7f9f843ba706a49ba72c65b17dc051c999a480a6c73a4b6f8a9ad1b",
+  "bytecodeFloatProbe": [
+    12,
+    8,
+    12,
+    -2,
+    -5,
+    -6,
+    -1.5707964,
+    12,
+    4,
+    12,
+    -2,
+    -9,
+    -6,
+    -1.5707964,
+    4,
+    -1,
+    -6,
+    -1,
+    -1.5707964,
+    -14,
+    -9,
+    -3,
+    28,
+    16,
+    3,
+    -3,
+    1.5707964
+  ],
+  "textureWidth": 128,
+  "textureHeight": 64,
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

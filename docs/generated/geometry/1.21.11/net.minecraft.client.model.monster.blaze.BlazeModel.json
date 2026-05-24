@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.monster.blaze.BlazeModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree lifted from javap_mesh_proguard_obf (mesh host net.minecraft.client.model.monster.blaze.BlazeModel).",
+    "Mesh lift parser notes (25): Lifted from javap deep concat after bytecode path produced no cuboids.; Mesh segment skipped: could not resolve part id (no ldc String before addOrReplaceChild and none before CubeListBuilder.create).; Mesh segment skipped: could not resolve part id (no ldc String before addOrReplaceChild and none before CubeListBuilder.create).; Mesh segment skipped: could not resolve part id (no ldc String before addOrReplaceChild and none before CubeListBuilder.create)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "head",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -4,
+                -4,
+                -4
+              ],
+              "to": [
+                4,
+                4,
+                4
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "hdu.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.monster.blaze.hdu",
+  "classSha256Hex": "62a9c18ae958c38a0caf659bcad0bce4a8291f2812ee7dd8fc5f9817f9e42a82",
+  "bytecodeFloatProbe": [
+    -4,
+    -4,
+    -4,
+    8,
+    8,
+    8,
+    8,
+    9,
+    -2,
+    0.25,
+    9,
+    1.5707964,
+    0.7853982,
+    7,
+    0.25,
+    7,
+    1.5707964,
+    0.47123894,
+    5,
+    11,
+    1.5,
+    0.5,
+    5,
+    1.5707964
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

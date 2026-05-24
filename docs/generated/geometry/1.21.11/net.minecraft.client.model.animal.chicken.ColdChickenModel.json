@@ -1,0 +1,212 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.animal.chicken.ColdChickenModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.chicken.ColdChickenModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "body",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -3,
+                -4,
+                -3
+              ],
+              "to": [
+                3,
+                4,
+                3
+              ],
+              "uvOrigin": [
+                0,
+                9
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            },
+            {
+              "from": [
+                0,
+                3,
+                -1
+              ],
+              "to": [
+                0,
+                6,
+                4
+              ],
+              "uvOrigin": [
+                38,
+                9
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            },
+            {
+              "from": [
+                0,
+                16,
+                0
+              ],
+              "to": [
+                1.57079637,
+                16,
+                0
+              ],
+              "uvOrigin": [
+                38,
+                9
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "head",
+          "pose": {
+            "translation": [
+              0,
+              15,
+              -4
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              15,
+              -4
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -2,
+                -6,
+                -2
+              ],
+              "to": [
+                2,
+                0,
+                1
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            },
+            {
+              "from": [
+                -3,
+                -7,
+                -2.0150001
+              ],
+              "to": [
+                3,
+                -4,
+                1.9849999
+              ],
+              "uvOrigin": [
+                44,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "hah.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.animal.chicken.hah",
+  "classSha256Hex": "fada31f555ddaaa8d0316e7adfc5ad3a8c3d9f7fb74014130d8c4b57654a6b5d",
+  "bytecodeFloatProbe": [
+    -3,
+    -4,
+    -3,
+    6,
+    8,
+    6,
+    3,
+    -1,
+    3,
+    5,
+    16,
+    1.5707964,
+    -2,
+    -6,
+    -2,
+    4,
+    6,
+    3,
+    -3,
+    -7,
+    -2.015,
+    6,
+    3,
+    4,
+    15,
+    -4
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

@@ -1,10 +1,12 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 using AutoPBR.Core;
 using AutoPBR.Core.Models;
-using NormalOperatorEnum = AutoPBR.Core.Models.NormalOperator;
-using NormalDerivativeEnum = AutoPBR.Core.Models.NormalDerivative;
+
 using DeepBumpInputModeEnum = AutoPBR.Core.Models.DeepBumpInputMode;
+using NormalDerivativeEnum = AutoPBR.Core.Models.NormalDerivative;
+using NormalOperatorEnum = AutoPBR.Core.Models.NormalOperator;
 
 namespace AutoPBR.App.Models;
 
@@ -100,6 +102,7 @@ public sealed class UserSettings
     public bool SpecularUsePercentileRemap { get; set; } = true;
     public double SpecularRemapLowPercentile { get; set; } = 0.02;
     public double SpecularRemapHighPercentile { get; set; } = 0.98;
+    public bool SpecularForceNoEmissive { get; set; }
     public bool UseMlSpecularPredictor { get; set; }
     public string? MlSpecularModelPath { get; set; }
 
@@ -157,6 +160,115 @@ public sealed class UserSettings
 
     /// <summary>Dictionary request timeout in milliseconds.</summary>
     public int DictionaryRequestTimeoutMs { get; set; } = 900;
+
+    /// <summary>0 = 2D preview, 1 = 3D preview.</summary>
+    public int PreviewDisplayMode { get; set; }
+
+    /// <summary>When in 3D preview mode, continuously rotate the block preview.</summary>
+    public bool Preview3DAutoRotate { get; set; } = true;
+
+    /// <summary>3D preview: speed multiplier for emulated entity idle animation.</summary>
+    public double Preview3DEntityAnimationSpeed { get; set; } = 1.0;
+
+    /// <summary>3D preview: amplitude multiplier for emulated entity idle animation.</summary>
+    public double Preview3DEntityAnimationAmplitude { get; set; } = 1.0;
+
+    /// <summary>3D preview: enable/disable emulated entity idle animation.</summary>
+    public bool Preview3DEnableEntityAnimation { get; set; } = true;
+
+    /// <summary>Legacy preview bob/yaw on emulated entities (independent of setupAnim IR motion).</summary>
+    public bool Preview3DEnableLegacyEntityWobble { get; set; }
+
+    /// <summary>3D preview: freeze vertex-baked emulated entity idle motion at the current clock.</summary>
+    public bool Preview3DPauseEntityIdleAnimation { get; set; }
+
+    /// <summary>When previewing sprite-style foliage in 3D, blend translucent pixels instead of alpha cutout.</summary>
+    public bool Preview3DItemUseAlphaBlend { get; set; }
+
+    /// <summary>Emulated entity 3D preview diffuse alpha handling: 0 opaque, 1 cutout (default), 2 blend.</summary>
+    public int Preview3DEntityAlphaMode { get; set; } = 1;
+
+    /// <summary>3D preview: use LabPBR normal and specular maps on runtime entity rigs.</summary>
+    public bool Preview3DEnableEntityLabPbrShading { get; set; } = true;
+
+    /// <summary>3D preview: enable POM / parallax AO / parallax self-shadow on runtime entity rigs.</summary>
+    public bool Preview3DEnableEntityParallax { get; set; }
+
+    /// <summary>Draw a ground grid in 3D preview.</summary>
+    public bool Preview3DShowGrid { get; set; } = true;
+
+    /// <summary>Draw X/Y/Z axis reference in the corner of the 3D preview.</summary>
+    public bool Preview3DShowAxes { get; set; } = true;
+
+    /// <summary>When true, 3D preview uses clamped parallax (POM) from the height map.</summary>
+    public bool Preview3DEnableParallax { get; set; } = true;
+
+    /// <summary>When true, 3D preview applies LabPBR-style normal mapping (_n).</summary>
+    public bool Preview3DEnableNormalMap { get; set; } = true;
+
+    /// <summary>When true, 3D preview applies LabPBR-style specular / metal interpretation (_s).</summary>
+    public bool Preview3DEnableSpecularMap { get; set; } = true;
+
+    /// <summary>Genesis: shader-side parallax displacement scalar (height strength, 0..0.35).</summary>
+    public double Preview3DParallaxHeightStrength { get; set; } = 0.05;
+
+    /// <summary>Genesis: enable cheap subsurface scattering approximation (LabPBR _s.b >= 65).</summary>
+    public bool Preview3DEnableSss { get; set; } = true;
+
+    /// <summary>Genesis: enable parallax self-shadow trace toward the light.</summary>
+    public bool Preview3DEnableParallaxShadow { get; set; } = true;
+
+    /// <summary>Genesis: toggle POM-derived contact AO in the 3D preview shader.</summary>
+    public bool Preview3DEnableParallaxAo { get; set; } = true;
+
+    /// <summary>Genesis: strength multiplier for POM-derived contact AO (0..2).</summary>
+    public double Preview3DParallaxAoStrength { get; set; } = 1.0;
+
+    /// <summary>Genesis: enable environment IBL (LUT-based when atmospheric sky is on; procedural hemisphere otherwise).</summary>
+    public bool Preview3DEnableIbl { get; set; } = true;
+
+    /// <summary>Atmospheric sky: render LUT-driven sky background and ambient probes.</summary>
+    public bool Preview3DEnableAtmosphericSky { get; set; } = true;
+
+    /// <summary>Atmospheric sky turbidity (haze amount).</summary>
+    public double Preview3DAtmosphereTurbidity { get; set; } = 2.6;
+
+    /// <summary>Atmospheric sky sun intensity multiplier.</summary>
+    public double Preview3DAtmosphereSunIntensity { get; set; } = 16.0;
+
+    /// <summary>Atmospheric sky horizon falloff scalar.</summary>
+    public double Preview3DAtmosphereHorizonFalloff { get; set; } = 1.35;
+
+    /// <summary>Genesis Shadows Phase 2: master toggle for the directional shadow map pass.</summary>
+    public bool Preview3DEnableShadows { get; set; } = true;
+
+    /// <summary>Genesis Shadows Phase 2: light yaw in degrees (-180..180); drives the shadow ortho frustum.</summary>
+    public double Preview3DLightYawDegrees { get; set; } = -35;
+
+    /// <summary>Genesis Shadows Phase 2: light pitch in degrees (-89..89, negative = sun above horizon).</summary>
+    public double Preview3DLightPitchDegrees { get; set; } = -55;
+
+    /// <summary>PHASE3-CSM stub: persisted toggle for cascaded shadow maps; no UI in Phase 2.</summary>
+    public bool Preview3DEnableShadowCascades { get; set; }
+
+    /// <summary>Number of crossed sprite planes to build for 2D Sprite flagged textures in 3D preview.</summary>
+    public int Preview3DSpritePlaneCount { get; set; } = 1;
+
+    /// <summary>3D preview: orbit sensitivity in radians per pixel (Alt + middle mouse).</summary>
+    public double Preview3DCameraOrbitSensitivity { get; set; } = 0.006;
+
+    /// <summary>3D preview: pan sensitivity (middle mouse without Alt); scaled by camera distance.</summary>
+    public double Preview3DCameraPanSensitivity { get; set; } = 0.0022;
+
+    /// <summary>3D preview: mouse wheel zoom step strength.</summary>
+    public double Preview3DCameraZoomSensitivity { get; set; } = 0.12;
+
+    /// <summary>3D preview: orbit boom arm length (world units), pivot-to-eye distance for default framing.</summary>
+    public double Preview3DCameraOrbitBoomDistance { get; set; } =
+        Math.Sqrt(3.6 * 3.6 + 2.6 * 2.6 + 3.6 * 3.6);
+
+    /// <summary>3D preview: keyboard key name to reset camera (Avalonia Key enum name, e.g. R, Home, Escape).</summary>
+    public string Preview3DCameraResetKey { get; set; } = "R";
 
     private static string SettingsDirectory =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AutoPBR");

@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "1.21.11",
+  "officialJvmName": "net.minecraft.client.model.animal.squid.SquidModel",
+  "profile": "proguard_1.21.11",
+  "extractionStatus": "partial",
+  "extractionNotes": [
+    "Part tree lifted from javap_mesh_proguard_obf (mesh host net.minecraft.client.model.animal.squid.SquidModel).",
+    "Strict structural validation failed (1): cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027",
+    "Mesh lift parser notes (9): Lifted from javap deep concat after bytecode path produced no cuboids.; Mesh segment skipped: could not resolve part id (no ldc String before addOrReplaceChild and none before CubeListBuilder.create).; Mesh segment skipped: could not resolve part id (no ldc String before addOrReplaceChild and none before CubeListBuilder.create).; Mesh segment skipped: could not resolve part id (no ldc String before addOrReplaceChild and none before CubeListBuilder.create)."
+  ],
+  "factoryMethod": "createBodyLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "body",
+          "pose": {
+            "translation": [
+              0,
+              8,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              8,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -6,
+                -8,
+                -6
+              ],
+              "to": [
+                6,
+                8,
+                6
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "liftWarnings": [
+                "cube_deformation_obf_inferred"
+              ],
+              "inflate": 0.02
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "hcs.class",
+  "obfuscatedJvmName": "net.minecraft.client.model.animal.squid.hcs",
+  "classSha256Hex": "2bc91e1c41c50956bd607873bd1a6823cda3f6ad57942356aa215c037a4d59ef",
+  "bytecodeFloatProbe": [
+    0.02,
+    -6,
+    -8,
+    -6,
+    12,
+    16,
+    12,
+    8,
+    -1,
+    -1,
+    18,
+    5,
+    15,
+    5,
+    15
+  ],
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.squid.BabySquidModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/squid/BabySquidModel.class",
+  "classSha256Hex": "d0d0ffbaac70b080ce4e1400ea10a1b64bb9d441b98f56d332b283b9a606abb9",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.squid.SquidModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "No local setupAnim body; inherits procedural rules from net.minecraft.client.model.animal.squid.SquidModel.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

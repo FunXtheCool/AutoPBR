@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.equipment.ElytraModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/object/equipment/ElytraModel.class",
+  "classSha256Hex": "8f28857756a755ab69bced927b313b54fb8669b5a542293c8cc4e498867acf79",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.HumanoidRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "leftWing",
+      "property": "xRot",
+      "expr": {
+        "state": "elytraRotX"
+      }
+    },
+    {
+      "partField": "leftWing",
+      "property": "zRot",
+      "expr": {
+        "state": "elytraRotZ"
+      }
+    },
+    {
+      "partField": "leftWing",
+      "property": "yRot",
+      "expr": {
+        "state": "elytraRotY"
+      }
+    },
+    {
+      "partField": "rightWing",
+      "property": "yRot",
+      "expr": {
+        "partPeer": "leftWing",
+        "peerProperty": "yRot"
+      }
+    },
+    {
+      "partField": "rightWing",
+      "property": "y",
+      "expr": {
+        "partPeer": "leftWing",
+        "peerProperty": "y"
+      }
+    },
+    {
+      "partField": "rightWing",
+      "property": "xRot",
+      "expr": {
+        "partPeer": "leftWing",
+        "peerProperty": "xRot"
+      }
+    },
+    {
+      "partField": "rightWing",
+      "property": "zRot",
+      "expr": {
+        "partPeer": "leftWing",
+        "peerProperty": "zRot"
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

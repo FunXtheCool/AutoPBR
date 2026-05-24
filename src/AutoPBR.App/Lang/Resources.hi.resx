@@ -78,7 +78,7 @@
     <value>दिखावट</value>
   </data>
   <data name="UiScaling" xml:space="preserve">
-    <value>स्केलिंग</value>
+    <value>UI स्केलिंग</value>
   </data>
   <data name="UiScalingTooltip" xml:space="preserve">
     <value>पूरे इंटरफ़ेस (टेक्स्ट, कंट्रोल और रिक्ति) का आकार बदलता है। पढ़ने में आसानी के लिए 100% से अधिक उपयोग करें।</value>
@@ -103,6 +103,7 @@
   <data name="ExploreBack" xml:space="preserve"><value>वापस</value></data>
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
   <data name="TabNormals" xml:space="preserve"><value>नॉर्मल</value></data>
+  <data name="TabShader" xml:space="preserve"><value>रेंडर</value></data>
   <data name="TabSettings" xml:space="preserve"><value>सेटिंग्स</value></data>
   <data name="Input" xml:space="preserve"><value>इनपुट</value></data>
   <data name="InputSourceModeTooltip" xml:space="preserve"><value>बंद: एकल रिसोर्स पैक (.zip / .jar)। चालू: बैच स्कैन और रूपांतरण के लिए पैकों वाला फ़ोल्डर।</value></data>
@@ -211,7 +212,7 @@
   <data name="OutputPathWatermark" xml:space="preserve"><value>आउटपुट पाथ</value></data>
   <data name="Engine" xml:space="preserve"><value>इंजन</value></data>
   <data name="DebugMode" xml:space="preserve"><value>डिबग</value></data>
-  <data name="MaxThreads" xml:space="preserve"><value>मैक्स थ्रेड</value></data>
+  <data name="MaxThreads" xml:space="preserve"><value>अधिकतम थ्रेड</value></data>
   <data name="MaxThreadsTooltip" xml:space="preserve"><value>कन्वर्ज़न वर्कर थ्रेड। 0 = ऑटो।</value></data>
   <data name="OnnxPreferTensorRt" xml:space="preserve"><value>ONNX GPU के लिए TensorRT प्राथमिक (CUDA फ़ॉलबैक)</value></data>
   <data name="OnnxPreferTensorRtTooltip" xml:space="preserve"><value>चालू: TensorRT + CUDA। बंद: केवल CUDA—तेज़ सत्र शुरुआत; पहली बार TensorRT इंजन बना सकता है।</value></data>
@@ -220,7 +221,7 @@
   <data name="TempFolderWatermark" xml:space="preserve"><value>खाली = सिस्टम टेम्प</value></data>
   <data name="CustomThreadedExtraction" xml:space="preserve"><value>कस्टम थ्रेडेड एक्सट्रैक्शन</value></data>
   <data name="CustomThreadedExtractionTooltip" xml:space="preserve"><value>पैरेलल डिफ्लेट से तेज़ एक्सट्रैक्शन।</value></data>
-  <data name="UseLegacyExtractor" xml:space="preserve"><value>पुराना एक्सट्रैक्टर इस्तेमाल करें</value></data>
+  <data name="UseLegacyExtractor" xml:space="preserve"><value>लेगेसी एक्सट्रैक्टर उपयोग करें</value></data>
   <data name="UseLegacyExtractorTooltip" xml:space="preserve"><value>डिफ़ॉल्ट पैरेलल एक्सट्रैक्टर की जगह पुराने ZipFile-आधारित एक्सट्रैक्टर का उपयोग करें। केवल तब सक्षम करें जब अजीब zip फ़ाइलों के साथ दिक्कत हो।</value></data>
   <data name="Cancel" xml:space="preserve"><value>कैंसिल</value></data>
   <data name="Convert" xml:space="preserve"><value>कन्वर्ट</value></data>
@@ -250,4 +251,59 @@
   <data name="OpenLogFolder" xml:space="preserve"><value>लॉग फ़ोल्डर खोलें</value></data>
   <data name="NormalOperatorLabel" xml:space="preserve"><value>ऑपरेटर</value></data>
   <data name="NormalKernelSizeLabel" xml:space="preserve"><value>कर्नेल आकार</value></data>
+  <data name="MaterialTagSemanticMl" xml:space="preserve"><value>सिमेंटिक टैग सुझाव (MiniLM)</value></data>
+  <data name="UseSemanticMaterialTags" xml:space="preserve"><value>सिमेंटिक सुझाव सक्षम करें</value></data>
+  <data name="MaterialTagMinSimilarity" xml:space="preserve"><value>न्यूनतम समानता</value></data>
+  <data name="MaterialTagMaxCount" xml:space="preserve"><value>अधिकतम ML टैग</value></data>
+  <data name="MaterialTagCertaintyThreshold" xml:space="preserve"><value>न्यूनतम निश्चितता</value></data>
+  <data name="DictionaryEvidenceEnabled" xml:space="preserve"><value>शब्दकोश साक्ष्य से समृद्ध करें (FreeDictionaryAPI)</value></data>
+  <data name="DictionaryEvidenceWeight" xml:space="preserve"><value>शब्दकोश मिश्रण भार</value></data>
+  <data name="DictionaryMinEvidenceScore" xml:space="preserve"><value>शब्दकोश न्यूनतम साक्ष्य</value></data>
+  <data name="DictionaryRequestTimeoutMs" xml:space="preserve"><value>शब्दकोश टाइमआउट (मि.से.)</value></data>
+  <data name="Preview3DCameraSection" xml:space="preserve"><value>3D पूर्वावलोकन कैमरा</value></data>
+  <data name="Preview3DCameraBindings" xml:space="preserve"><value>Alt + मध्य माउस: कक्षा। मध्य माउस: पैन। व्हील: ज़ूम। पूर्वावलोकन पर होवर करें और डिफ़ॉल्ट फ़्रेमिंग के लिए रीसेट कुंजी दबाएँ।</value></data>
+  <data name="Preview3DCameraOrbitSensitivity" xml:space="preserve"><value>कक्षा संवेदनशीलता</value></data>
+  <data name="Preview3DCameraPanSensitivity" xml:space="preserve"><value>पैन संवेदनशीलता</value></data>
+  <data name="Preview3DCameraZoomSensitivity" xml:space="preserve"><value>ज़ूम संवेदनशीलता</value></data>
+  <data name="Preview3DCameraResetKey" xml:space="preserve"><value>कैमरा रीसेट कुंजी</value></data>
+  <data name="PreviewPanelTitle" xml:space="preserve"><value>पूर्वावलोकन</value></data>
+  <data name="PreviewModeLabel" xml:space="preserve"><value>पूर्वावलोकन मोड</value></data>
+  <data name="PreviewMode2D" xml:space="preserve"><value>2D</value></data>
+  <data name="PreviewMode3D" xml:space="preserve"><value>3D</value></data>
+  <data name="Preview3DCameraOrbitBoomDistance" xml:space="preserve"><value>ऑर्बिट बूम दूरी</value></data>
+  <data name="Preview3DCameraOrbitBoomDistanceTooltip" xml:space="preserve"><value>ऑर्बिट मोड में डिफ़ॉल्ट पिवट-टू-कैमरा दूरी (वर्ल्ड यूनिट)। इसे बदलने पर yaw/pitch रखते हुए ज़ूम बेसलाइन रीसेट होती है।</value></data>
+  <data name="ShaderPreviewLabPbrSection" xml:space="preserve"><value>LabPBR पूर्वावलोकन (OpenGL)</value></data>
+  <data name="ShaderPreviewLabPbrDescription" xml:space="preserve"><value>ये विकल्प तब लागू होते हैं जब दाईं ओर का पूर्वावलोकन 3D मोड में हो। 2D Sprite फ्लैग वाली टेक्सचर अपने-आप क्रॉस्ड फोलीएज प्लेन्स से दिखती हैं; बाकी क्यूब पर दिखती हैं। शेडर LabPBR चैनल कन्वेंशन का पालन करता है: _h से height, _n से normal, _s से smoothness/metal।</value></data>
+  <data name="Preview3DEnableParallax" xml:space="preserve"><value>पैरालैक्स ऑक्लूज़न मैपिंग (POM)</value></data>
+  <data name="Preview3DEnableParallaxTooltip" xml:space="preserve"><value>LabPBR height map से सीमित रिलीफ़; ग्लांसिंग एंगल पर भी स्थिरता बनी रहती है।</value></data>
+  <data name="Preview3DEnableNormalMap" xml:space="preserve"><value>नॉर्मल मैपिंग (_n)</value></data>
+  <data name="Preview3DEnableNormalMapTooltip" xml:space="preserve"><value>बंद होने पर रोशनी केवल mesh normals से होगी।</value></data>
+  <data name="Preview3DEnableSpecularMap" xml:space="preserve"><value>स्पेक्युलर / LabPBR _s</value></data>
+  <data name="Preview3DEnableSpecularMapTooltip" xml:space="preserve"><value>बंद होने पर सिर्फ diffuse पूर्वावलोकन, smoothness/metal highlights नहीं।</value></data>
+  <data name="Preview3DEnableParallaxShadow" xml:space="preserve"><value>पैरालैक्स सेल्फ शैडो</value></data>
+  <data name="Preview3DEnableParallaxShadowTooltip" xml:space="preserve"><value>पैरालैक्स हाइट फील्ड पर एक छोटा सेल्फ-शैडो रे ट्रेस करें।</value></data>
+  <data name="Preview3DEnableSss" xml:space="preserve"><value>सबसरफेस स्कैटरिंग (SSS)</value></data>
+  <data name="Preview3DEnableSssTooltip" xml:space="preserve"><value>LabPBR porosity/SSS चैनल से हल्की SSS approximation सक्षम करें।</value></data>
+  <data name="Preview3DEnableIbl" xml:space="preserve"><value>परिवेश IBL (एम्बिएंट/स्पेक्युलर)</value></data>
+  <data name="Preview3DEnableIblTooltip" xml:space="preserve"><value>दृश्य परिवेश से अप्रत्यक्ष एम्बिएंट और स्पेक्युलर। वायुमंडलीय आकाश चालू होने पर आकाश LUT और परावर्तित सूर्य; अन्यथा प्रक्रियात्मक आकाश/ज़मीन गोलार्ध।</value></data>
+  <data name="Preview3DLightingSection" xml:space="preserve"><value>प्रकाश व्यवस्था</value></data>
+  <data name="Preview3DEnableShadows" xml:space="preserve"><value>दिशात्मक छायाएँ</value></data>
+  <data name="Preview3DEnableShadowsTooltip" xml:space="preserve"><value>प्रीव्यू लाइट के लिए PCF फ़िल्टरिंग के साथ दिशात्मक shadow map रेंडर करें।</value></data>
+  <data name="Preview3DLightYawDegrees" xml:space="preserve"><value>लाइट यॉ</value></data>
+  <data name="Preview3DLightYawDegreesTooltip" xml:space="preserve"><value>सूर्य का यॉ डिग्री में (-180..180); विश्व ऊर्ध्व अक्ष के चारों ओर लाइट को घुमाता है।</value></data>
+  <data name="Preview3DLightPitchDegrees" xml:space="preserve"><value>लाइट पिच</value></data>
+  <data name="Preview3DLightPitchDegreesTooltip" xml:space="preserve"><value>सूर्य की पिच डिग्री में (-89..89); ऋणात्मक मान सूर्य को क्षितिज के ऊपर रखता है।</value></data>
+  <data name="Preview3DParallaxHeightStrength" xml:space="preserve"><value>POM विस्थापन</value></data>
+  <data name="Preview3DParallaxHeightStrengthTooltip" xml:space="preserve"><value>shader-side parallax displacement strength (uHeightStrength)।</value></data>
+  <data name="Preview3DShowGrid" xml:space="preserve"><value>ग्राउंड ग्रिड (3D)</value></data>
+  <data name="Preview3DShowGridTooltip" xml:space="preserve"><value>3D पूर्वावलोकन में ऑब्जेक्ट के नीचे XZ ग्रिड दिखाएँ।</value></data>
+  <data name="Preview3DAutoRotate" xml:space="preserve"><value>3D ऑटो-रोटेट</value></data>
+  <data name="Preview3DShowAxes" xml:space="preserve"><value>3D XYZ अक्ष</value></data>
+  <data name="Preview3DItemUseAlphaBlend" xml:space="preserve"><value>आइटम अल्फा ब्लेंड</value></data>
+  <data name="Preview3DSpritePlaneCount" xml:space="preserve"><value>स्प्राइट प्लेन संख्या</value></data>
+  <data name="Preview3DSpritePlaneCountTooltip" xml:space="preserve"><value>3D पूर्वावलोकन में 2D Sprite फ्लैग वाली टेक्सचर के लिए क्रॉस्ड प्लेन्स की संख्या।</value></data>
+  <data name="Preview3DCameraDebugFlyHint" xml:space="preserve"><value>राइट-ड्रैग: देखें · राइट होल्ड + WASD: फ्लाई · R: ऑर्बिट और ऑफसेट रीसेट</value></data>
 </root>
+
+
+

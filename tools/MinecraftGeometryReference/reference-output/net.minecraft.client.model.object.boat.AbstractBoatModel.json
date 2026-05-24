@@ -1,0 +1,315 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.boat.AbstractBoatModel",
+  "extractionStatus": "reference_java",
+  "factoryMethod": "createBoatModel",
+  "meshHostJvmName": "net.minecraft.client.model.object.boat.AbstractBoatModel",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotationEulerRad": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "right_paddle",
+          "pose": {
+            "translation": [
+              3.0,
+              -5.0,
+              -9.0
+            ],
+            "rotationEulerRad": [
+              0.0,
+              3.141592741,
+              0.1963495463
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1.0,
+                0.0,
+                -5.0
+              ],
+              "to": [
+                1.0,
+                2.0,
+                13.0
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "liftKind": "reference_java"
+            },
+            {
+              "from": [
+                0.001000000047,
+                -3.0,
+                8.0
+              ],
+              "to": [
+                1.001000047,
+                3.0,
+                15.0
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "liftKind": "reference_java"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left_paddle",
+          "pose": {
+            "translation": [
+              3.0,
+              -5.0,
+              9.0
+            ],
+            "rotationEulerRad": [
+              0.0,
+              0.0,
+              0.1963495463
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1.0,
+                0.0,
+                -5.0
+              ],
+              "to": [
+                1.0,
+                2.0,
+                13.0
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "liftKind": "reference_java"
+            },
+            {
+              "from": [
+                -1.001000047,
+                -3.0,
+                8.0
+              ],
+              "to": [
+                -0.00100004673,
+                3.0,
+                15.0
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "liftKind": "reference_java"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left",
+          "pose": {
+            "translation": [
+              0.0,
+              4.0,
+              9.0
+            ],
+            "rotationEulerRad": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -14.0,
+                -7.0,
+                -1.0
+              ],
+              "to": [
+                14.0,
+                -1.0,
+                1.0
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "liftKind": "reference_java"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "bottom",
+          "pose": {
+            "translation": [
+              0.0,
+              3.0,
+              1.0
+            ],
+            "rotationEulerRad": [
+              1.570796371,
+              0.0,
+              0.0
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -14.0,
+                -9.0,
+                -3.0
+              ],
+              "to": [
+                14.0,
+                7.0,
+                0.0
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "liftKind": "reference_java"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "back",
+          "pose": {
+            "translation": [
+              -15.0,
+              4.0,
+              4.0
+            ],
+            "rotationEulerRad": [
+              0.0,
+              4.712388992,
+              0.0
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -13.0,
+                -7.0,
+                -1.0
+              ],
+              "to": [
+                5.0,
+                -1.0,
+                1.0
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "liftKind": "reference_java"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "front",
+          "pose": {
+            "translation": [
+              15.0,
+              4.0,
+              0.0
+            ],
+            "rotationEulerRad": [
+              0.0,
+              1.570796371,
+              0.0
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -8.0,
+                -7.0,
+                -1.0
+              ],
+              "to": [
+                8.0,
+                -1.0,
+                1.0
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "liftKind": "reference_java"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right",
+          "pose": {
+            "translation": [
+              0.0,
+              4.0,
+              -9.0
+            ],
+            "rotationEulerRad": [
+              0.0,
+              3.141592741,
+              0.0
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -14.0,
+                -7.0,
+                -1.0
+              ],
+              "to": [
+                14.0,
+                -1.0,
+                1.0
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "liftKind": "reference_java"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.skull.PiglinHeadModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/object/skull/PiglinHeadModel.class",
+  "classSha256Hex": "aaa5cfba467c9ffaec1eaa0e644fb88f607885401106193795f2cebfc3cc6896",
+  "renderStateType": "net.minecraft.client.model.object.skull.SkullModelBase$State",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.object.skull.SkullModelBase",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "head",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "yRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "xRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftEar",
+      "property": "zRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "state": "animationPos"
+                          },
+                          {
+                            "const": 3.1415927
+                          }
+                        ]
+                      },
+                      {
+                        "const": 0.2
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1.2
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0.2
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightEar",
+      "property": "zRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "cos",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "state": "animationPos"
+                      },
+                      {
+                        "const": 3.1415927
+                      }
+                    ]
+                  },
+                  {
+                    "const": 0.2
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0.2
+          }
+        ]
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

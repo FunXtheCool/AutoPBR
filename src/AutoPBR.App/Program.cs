@@ -1,4 +1,5 @@
 using System.Runtime.Loader;
+
 using Avalonia;
 using Avalonia.Win32;
 

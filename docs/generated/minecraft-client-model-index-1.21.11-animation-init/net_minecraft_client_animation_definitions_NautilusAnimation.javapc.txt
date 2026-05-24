@@ -1,0 +1,427 @@
+Compiled from "SourceFile"
+public class ggk {
+  public static final gfz a;
+
+  public ggk();
+    Code:
+       0: aload_0
+       1: invokespecial #28                 // Method java/lang/Object."<init>":()V
+       4: return
+
+  static {};
+    Code:
+       0: fconst_1
+       1: invokestatic  #34                 // Method gfz$a.a:(F)Lgfz$a;
+       4: invokevirtual #37                 // Method gfz$a.a:()Lgfz$a;
+       7: ldc           #39                 // String body
+       9: new           #14                 // class gfy
+      12: dup
+      13: getstatic     #42                 // Field gfy$d.c:Lgfy$c;
+      16: iconst_5
+      17: anewarray     #44                 // class gga
+      20: dup
+      21: iconst_0
+      22: new           #44                 // class gga
+      25: dup
+      26: fconst_0
+      27: dconst_1
+      28: dconst_1
+      29: dconst_1
+      30: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+      33: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+      36: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+      39: aastore
+      40: dup
+      41: iconst_1
+      42: new           #44                 // class gga
+      45: dup
+      46: ldc           #56                 // float 0.5f
+      48: dconst_1
+      49: dconst_1
+      50: ldc2_w        #57                 // double 1.2000000476837158d
+      53: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+      56: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+      59: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+      62: aastore
+      63: dup
+      64: iconst_2
+      65: new           #44                 // class gga
+      68: dup
+      69: ldc           #59                 // float 0.75f
+      71: dconst_1
+      72: dconst_1
+      73: ldc2_w        #60                 // double 0.8999999761581421d
+      76: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+      79: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+      82: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+      85: aastore
+      86: dup
+      87: iconst_3
+      88: new           #44                 // class gga
+      91: dup
+      92: ldc           #62                 // float 0.875f
+      94: dconst_1
+      95: dconst_1
+      96: dconst_1
+      97: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+     100: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     103: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     106: aastore
+     107: dup
+     108: iconst_4
+     109: new           #44                 // class gga
+     112: dup
+     113: fconst_1
+     114: dconst_1
+     115: dconst_1
+     116: dconst_1
+     117: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+     120: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     123: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     126: aastore
+     127: invokespecial #65                 // Method gfy."<init>":(Lgfy$c;[Lgga;)V
+     130: invokevirtual #68                 // Method gfz$a.a:(Ljava/lang/String;Lgfy;)Lgfz$a;
+     133: ldc           #70                 // String upper_mouth
+     135: new           #14                 // class gfy
+     138: dup
+     139: getstatic     #72                 // Field gfy$d.b:Lgfy$c;
+     142: iconst_5
+     143: anewarray     #44                 // class gga
+     146: dup
+     147: iconst_0
+     148: new           #44                 // class gga
+     151: dup
+     152: fconst_0
+     153: fconst_0
+     154: fconst_0
+     155: fconst_0
+     156: invokestatic  #75                 // Method ggc.b:(FFF)Lorg/joml/Vector3f;
+     159: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     162: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     165: aastore
+     166: dup
+     167: iconst_1
+     168: new           #44                 // class gga
+     171: dup
+     172: ldc           #56                 // float 0.5f
+     174: ldc           #76                 // float 30.0f
+     176: fconst_0
+     177: fconst_0
+     178: invokestatic  #75                 // Method ggc.b:(FFF)Lorg/joml/Vector3f;
+     181: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     184: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     187: aastore
+     188: dup
+     189: iconst_2
+     190: new           #44                 // class gga
+     193: dup
+     194: ldc           #59                 // float 0.75f
+     196: fconst_0
+     197: fconst_0
+     198: fconst_0
+     199: invokestatic  #75                 // Method ggc.b:(FFF)Lorg/joml/Vector3f;
+     202: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     205: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     208: aastore
+     209: dup
+     210: iconst_3
+     211: new           #44                 // class gga
+     214: dup
+     215: ldc           #62                 // float 0.875f
+     217: fconst_0
+     218: fconst_0
+     219: fconst_0
+     220: invokestatic  #75                 // Method ggc.b:(FFF)Lorg/joml/Vector3f;
+     223: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     226: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     229: aastore
+     230: dup
+     231: iconst_4
+     232: new           #44                 // class gga
+     235: dup
+     236: fconst_1
+     237: fconst_0
+     238: fconst_0
+     239: fconst_0
+     240: invokestatic  #75                 // Method ggc.b:(FFF)Lorg/joml/Vector3f;
+     243: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     246: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     249: aastore
+     250: invokespecial #65                 // Method gfy."<init>":(Lgfy$c;[Lgga;)V
+     253: invokevirtual #68                 // Method gfz$a.a:(Ljava/lang/String;Lgfy;)Lgfz$a;
+     256: ldc           #70                 // String upper_mouth
+     258: new           #14                 // class gfy
+     261: dup
+     262: getstatic     #42                 // Field gfy$d.c:Lgfy$c;
+     265: iconst_5
+     266: anewarray     #44                 // class gga
+     269: dup
+     270: iconst_0
+     271: new           #44                 // class gga
+     274: dup
+     275: fconst_0
+     276: dconst_1
+     277: dconst_1
+     278: dconst_1
+     279: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+     282: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     285: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     288: aastore
+     289: dup
+     290: iconst_1
+     291: new           #44                 // class gga
+     294: dup
+     295: ldc           #56                 // float 0.5f
+     297: dconst_1
+     298: dconst_1
+     299: ldc2_w        #77                 // double 1.399999976158142d
+     302: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+     305: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     308: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     311: aastore
+     312: dup
+     313: iconst_2
+     314: new           #44                 // class gga
+     317: dup
+     318: ldc           #59                 // float 0.75f
+     320: dconst_1
+     321: dconst_1
+     322: ldc2_w        #60                 // double 0.8999999761581421d
+     325: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+     328: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     331: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     334: aastore
+     335: dup
+     336: iconst_3
+     337: new           #44                 // class gga
+     340: dup
+     341: ldc           #62                 // float 0.875f
+     343: dconst_1
+     344: dconst_1
+     345: dconst_1
+     346: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+     349: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     352: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     355: aastore
+     356: dup
+     357: iconst_4
+     358: new           #44                 // class gga
+     361: dup
+     362: fconst_1
+     363: dconst_1
+     364: dconst_1
+     365: dconst_1
+     366: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+     369: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     372: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     375: aastore
+     376: invokespecial #65                 // Method gfy."<init>":(Lgfy$c;[Lgga;)V
+     379: invokevirtual #68                 // Method gfz$a.a:(Ljava/lang/String;Lgfy;)Lgfz$a;
+     382: ldc           #80                 // String inner_mouth
+     384: new           #14                 // class gfy
+     387: dup
+     388: getstatic     #42                 // Field gfy$d.c:Lgfy$c;
+     391: iconst_5
+     392: anewarray     #44                 // class gga
+     395: dup
+     396: iconst_0
+     397: new           #44                 // class gga
+     400: dup
+     401: fconst_0
+     402: dconst_1
+     403: dconst_1
+     404: dconst_1
+     405: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+     408: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     411: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     414: aastore
+     415: dup
+     416: iconst_1
+     417: new           #44                 // class gga
+     420: dup
+     421: ldc           #56                 // float 0.5f
+     423: ldc2_w        #81                 // double 0.800000011920929d
+     426: ldc2_w        #81                 // double 0.800000011920929d
+     429: dconst_1
+     430: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+     433: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     436: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     439: aastore
+     440: dup
+     441: iconst_2
+     442: new           #44                 // class gga
+     445: dup
+     446: ldc           #59                 // float 0.75f
+     448: dconst_1
+     449: dconst_1
+     450: ldc2_w        #60                 // double 0.8999999761581421d
+     453: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+     456: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     459: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     462: aastore
+     463: dup
+     464: iconst_3
+     465: new           #44                 // class gga
+     468: dup
+     469: ldc           #62                 // float 0.875f
+     471: dconst_1
+     472: dconst_1
+     473: dconst_1
+     474: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+     477: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     480: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     483: aastore
+     484: dup
+     485: iconst_4
+     486: new           #44                 // class gga
+     489: dup
+     490: fconst_1
+     491: dconst_1
+     492: dconst_1
+     493: dconst_1
+     494: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+     497: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     500: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     503: aastore
+     504: invokespecial #65                 // Method gfy."<init>":(Lgfy$c;[Lgga;)V
+     507: invokevirtual #68                 // Method gfz$a.a:(Ljava/lang/String;Lgfy;)Lgfz$a;
+     510: ldc           #84                 // String lower_mouth
+     512: new           #14                 // class gfy
+     515: dup
+     516: getstatic     #72                 // Field gfy$d.b:Lgfy$c;
+     519: iconst_5
+     520: anewarray     #44                 // class gga
+     523: dup
+     524: iconst_0
+     525: new           #44                 // class gga
+     528: dup
+     529: fconst_0
+     530: fconst_0
+     531: fconst_0
+     532: fconst_0
+     533: invokestatic  #75                 // Method ggc.b:(FFF)Lorg/joml/Vector3f;
+     536: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     539: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     542: aastore
+     543: dup
+     544: iconst_1
+     545: new           #44                 // class gga
+     548: dup
+     549: ldc           #56                 // float 0.5f
+     551: ldc           #85                 // float -30.0f
+     553: fconst_0
+     554: fconst_0
+     555: invokestatic  #75                 // Method ggc.b:(FFF)Lorg/joml/Vector3f;
+     558: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     561: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     564: aastore
+     565: dup
+     566: iconst_2
+     567: new           #44                 // class gga
+     570: dup
+     571: ldc           #59                 // float 0.75f
+     573: fconst_0
+     574: fconst_0
+     575: fconst_0
+     576: invokestatic  #75                 // Method ggc.b:(FFF)Lorg/joml/Vector3f;
+     579: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     582: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     585: aastore
+     586: dup
+     587: iconst_3
+     588: new           #44                 // class gga
+     591: dup
+     592: ldc           #62                 // float 0.875f
+     594: fconst_0
+     595: fconst_0
+     596: fconst_0
+     597: invokestatic  #75                 // Method ggc.b:(FFF)Lorg/joml/Vector3f;
+     600: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     603: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     606: aastore
+     607: dup
+     608: iconst_4
+     609: new           #44                 // class gga
+     612: dup
+     613: fconst_1
+     614: fconst_0
+     615: fconst_0
+     616: fconst_0
+     617: invokestatic  #75                 // Method ggc.b:(FFF)Lorg/joml/Vector3f;
+     620: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     623: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     626: aastore
+     627: invokespecial #65                 // Method gfy."<init>":(Lgfy$c;[Lgga;)V
+     630: invokevirtual #68                 // Method gfz$a.a:(Ljava/lang/String;Lgfy;)Lgfz$a;
+     633: ldc           #84                 // String lower_mouth
+     635: new           #14                 // class gfy
+     638: dup
+     639: getstatic     #42                 // Field gfy$d.c:Lgfy$c;
+     642: iconst_5
+     643: anewarray     #44                 // class gga
+     646: dup
+     647: iconst_0
+     648: new           #44                 // class gga
+     651: dup
+     652: fconst_0
+     653: dconst_1
+     654: dconst_1
+     655: dconst_1
+     656: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+     659: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     662: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     665: aastore
+     666: dup
+     667: iconst_1
+     668: new           #44                 // class gga
+     671: dup
+     672: ldc           #56                 // float 0.5f
+     674: dconst_1
+     675: dconst_1
+     676: ldc2_w        #77                 // double 1.399999976158142d
+     679: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+     682: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     685: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     688: aastore
+     689: dup
+     690: iconst_2
+     691: new           #44                 // class gga
+     694: dup
+     695: ldc           #59                 // float 0.75f
+     697: dconst_1
+     698: dconst_1
+     699: ldc2_w        #60                 // double 0.8999999761581421d
+     702: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+     705: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     708: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     711: aastore
+     712: dup
+     713: iconst_3
+     714: new           #44                 // class gga
+     717: dup
+     718: ldc           #62                 // float 0.875f
+     720: dconst_1
+     721: dconst_1
+     722: dconst_1
+     723: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+     726: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     729: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     732: aastore
+     733: dup
+     734: iconst_4
+     735: new           #44                 // class gga
+     738: dup
+     739: fconst_1
+     740: dconst_1
+     741: dconst_1
+     742: dconst_1
+     743: invokestatic  #49                 // Method ggc.a:(DDD)Lorg/joml/Vector3f;
+     746: getstatic     #52                 // Field gfy$b.a:Lgfy$a;
+     749: invokespecial #55                 // Method gga."<init>":(FLorg/joml/Vector3fc;Lgfy$a;)V
+     752: aastore
+     753: invokespecial #65                 // Method gfy."<init>":(Lgfy$c;[Lgga;)V
+     756: invokevirtual #68                 // Method gfz$a.a:(Ljava/lang/String;Lgfy;)Lgfz$a;
+     759: invokevirtual #88                 // Method gfz$a.b:()Lgfz;
+     762: putstatic     #90                 // Field a:Lgfz;
+     765: return
+}

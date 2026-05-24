@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.bee.BeeModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/bee/BeeModel.class",
+  "classSha256Hex": "231d08ce120b566cda1f7418963bf16930af9401b234ccc57b314142b0fe30c7",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.BeeRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "rightWing",
+      "property": "yRot",
+      "expr": {
+        "const": 0
+      }
+    },
+    {
+      "partField": "rightWing",
+      "property": "zRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "cos",
+                "args": [
+                  {
+                    "state": "ageInTicks"
+                  }
+                ]
+              },
+              {
+                "const": 3.1415927
+              }
+            ]
+          },
+          {
+            "const": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "partField": "leftWing",
+      "property": "xRot",
+      "expr": {
+        "partPeer": "rightWing",
+        "peerProperty": "xRot"
+      }
+    },
+    {
+      "partField": "leftWing",
+      "property": "yRot",
+      "expr": {
+        "partPeer": "rightWing",
+        "peerProperty": "yRot"
+      }
+    },
+    {
+      "partField": "leftWing",
+      "property": "zRot",
+      "expr": {
+        "partPeer": "rightWing",
+        "peerProperty": "zRot"
+      }
+    },
+    {
+      "partField": "frontLeg",
+      "property": "xRot",
+      "expr": {
+        "const": 0.7853982
+      }
+    },
+    {
+      "partField": "midLeg",
+      "property": "xRot",
+      "expr": {
+        "const": 0.7853982
+      }
+    },
+    {
+      "partField": "backLeg",
+      "property": "xRot",
+      "expr": {
+        "const": 0.7853982
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

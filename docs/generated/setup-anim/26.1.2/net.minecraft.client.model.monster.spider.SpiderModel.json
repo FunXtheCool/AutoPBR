@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.monster.spider.SpiderModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/monster/spider/SpiderModel.class",
+  "classSha256Hex": "7346f34913b08f8c8bee11a86316123037776d69bee8a67e78da3e9ce17cfcba",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.LivingEntityRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [
+    {
+      "partField": "head",
+      "property": "yRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "yRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "head",
+      "property": "xRot",
+      "expr": {
+        "op": "mul",
+        "args": [
+          {
+            "state": "xRot"
+          },
+          {
+            "const": 0.017453292
+          }
+        ]
+      }
+    },
+    {
+      "partField": "rightHindLeg",
+      "property": "yRot",
+      "expr": {
+        "partPeer": "leftHindLeg",
+        "peerProperty": "yRot"
+      }
+    },
+    {
+      "partField": "leftHindLeg",
+      "property": "yRot",
+      "expr": {
+        "partPeer": "rightMiddleHindLeg",
+        "peerProperty": "yRot"
+      }
+    },
+    {
+      "partField": "rightMiddleHindLeg",
+      "property": "yRot",
+      "expr": {
+        "partPeer": "leftMiddleHindLeg",
+        "peerProperty": "yRot"
+      }
+    },
+    {
+      "partField": "leftMiddleHindLeg",
+      "property": "yRot",
+      "expr": {
+        "partPeer": "rightMiddleFrontLeg",
+        "peerProperty": "yRot"
+      }
+    },
+    {
+      "partField": "rightMiddleFrontLeg",
+      "property": "yRot",
+      "expr": {
+        "partPeer": "leftMiddleFrontLeg",
+        "peerProperty": "yRot"
+      }
+    },
+    {
+      "partField": "leftMiddleFrontLeg",
+      "property": "yRot",
+      "expr": {
+        "partPeer": "rightFrontLeg",
+        "peerProperty": "yRot"
+      }
+    },
+    {
+      "partField": "rightFrontLeg",
+      "property": "yRot",
+      "expr": {
+        "partPeer": "leftFrontLeg",
+        "peerProperty": "yRot"
+      }
+    },
+    {
+      "partField": "leftFrontLeg",
+      "property": "zRot",
+      "expr": {
+        "partPeer": "rightHindLeg",
+        "peerProperty": "zRot"
+      }
+    },
+    {
+      "partField": "rightHindLeg",
+      "property": "zRot",
+      "expr": {
+        "partPeer": "leftHindLeg",
+        "peerProperty": "zRot"
+      }
+    },
+    {
+      "partField": "leftHindLeg",
+      "property": "zRot",
+      "expr": {
+        "partPeer": "rightMiddleHindLeg",
+        "peerProperty": "zRot"
+      }
+    },
+    {
+      "partField": "rightMiddleHindLeg",
+      "property": "zRot",
+      "expr": {
+        "partPeer": "leftMiddleHindLeg",
+        "peerProperty": "zRot"
+      }
+    },
+    {
+      "partField": "leftMiddleHindLeg",
+      "property": "zRot",
+      "expr": {
+        "partPeer": "rightMiddleFrontLeg",
+        "peerProperty": "zRot"
+      }
+    },
+    {
+      "partField": "rightMiddleFrontLeg",
+      "property": "zRot",
+      "expr": {
+        "partPeer": "leftMiddleFrontLeg",
+        "peerProperty": "zRot"
+      }
+    },
+    {
+      "partField": "leftMiddleFrontLeg",
+      "property": "zRot",
+      "expr": {
+        "partPeer": "rightFrontLeg",
+        "peerProperty": "zRot"
+      }
+    },
+    {
+      "partField": "rightFrontLeg",
+      "property": "zRot",
+      "expr": {
+        "partPeer": "leftFrontLeg",
+        "peerProperty": "zRot"
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

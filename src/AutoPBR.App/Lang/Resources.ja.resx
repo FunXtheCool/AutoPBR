@@ -78,7 +78,7 @@
     <value>外観</value>
   </data>
   <data name="UiScaling" xml:space="preserve">
-    <value>表示倍率</value>
+    <value>UIのスケール</value>
   </data>
   <data name="UiScalingTooltip" xml:space="preserve">
     <value>インターフェース全体（テキスト、コントロール、余白）を拡大します。読みやすさのため100%より大きくできます。</value>
@@ -103,6 +103,7 @@
   <data name="ExploreBack" xml:space="preserve"><value>戻る</value></data>
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
   <data name="TabNormals" xml:space="preserve"><value>法線</value></data>
+  <data name="TabShader" xml:space="preserve"><value>レンダー</value></data>
   <data name="TabSettings" xml:space="preserve"><value>設定</value></data>
   <data name="Input" xml:space="preserve"><value>入力</value></data>
   <data name="InputSourceModeTooltip" xml:space="preserve"><value>オフ：単一のリソースパック（.zip / .jar）。オン：一括スキャン・変換用の複数パックを含むフォルダ。</value></data>
@@ -213,7 +214,7 @@
   <data name="DebugMode" xml:space="preserve"><value>デバッグ</value></data>
   <data name="MaxThreads" xml:space="preserve"><value>最大スレッド数</value></data>
   <data name="MaxThreadsTooltip" xml:space="preserve"><value>変換用ワーカースレッド。0=自動。</value></data>
-  <data name="OnnxPreferTensorRt" xml:space="preserve"><value>ONNX GPU で TensorRT を優先（CUDA フォールバック）</value></data>
+  <data name="OnnxPreferTensorRt" xml:space="preserve"><value>ONNX GPU で TensorRT を優先（CUDA フォールバック経路）</value></data>
   <data name="OnnxPreferTensorRtTooltip" xml:space="preserve"><value>オンにすると TensorRT EP を使用し、未対応は CUDA。オフは CUDA のみ—セッション開始が速い。初回は TensorRT がエンジンをビルドする場合があります。</value></data>
   <data name="TempFolder" xml:space="preserve"><value>一時フォルダ</value></data>
   <data name="TempFolderTooltip" xml:space="preserve"><value>変換時の一時展開先。空=システムのTemp。</value></data>
@@ -250,4 +251,59 @@
   <data name="OpenLogFolder" xml:space="preserve"><value>ログフォルダーを開く</value></data>
   <data name="NormalOperatorLabel" xml:space="preserve"><value>オペレーター</value></data>
   <data name="NormalKernelSizeLabel" xml:space="preserve"><value>カーネルサイズ</value></data>
+  <data name="MaterialTagSemanticMl" xml:space="preserve"><value>セマンティックタグの候補（MiniLM）</value></data>
+  <data name="UseSemanticMaterialTags" xml:space="preserve"><value>セマンティック候補を有効にする</value></data>
+  <data name="MaterialTagMinSimilarity" xml:space="preserve"><value>最小類似度</value></data>
+  <data name="MaterialTagMaxCount" xml:space="preserve"><value>最大 ML タグ数</value></data>
+  <data name="MaterialTagCertaintyThreshold" xml:space="preserve"><value>最小確信度</value></data>
+  <data name="DictionaryEvidenceEnabled" xml:space="preserve"><value>辞書エビデンスで補強する（FreeDictionaryAPI）</value></data>
+  <data name="DictionaryEvidenceWeight" xml:space="preserve"><value>辞書ブレンドの重み</value></data>
+  <data name="DictionaryMinEvidenceScore" xml:space="preserve"><value>辞書の最小エビデンス</value></data>
+  <data name="DictionaryRequestTimeoutMs" xml:space="preserve"><value>辞書のタイムアウト（ms）</value></data>
+  <data name="Preview3DCameraSection" xml:space="preserve"><value>3Dプレビューカメラ</value></data>
+  <data name="Preview3DCameraBindings" xml:space="preserve"><value>Alt + 中ボタン：オービット。中ボタン：パン。ホイール：ズーム。プレビューにカーソルを合わせ、リセットキーで既定のフレーミングに戻します。</value></data>
+  <data name="Preview3DCameraOrbitSensitivity" xml:space="preserve"><value>オービット感度</value></data>
+  <data name="Preview3DCameraPanSensitivity" xml:space="preserve"><value>パン感度</value></data>
+  <data name="Preview3DCameraZoomSensitivity" xml:space="preserve"><value>ズーム感度</value></data>
+  <data name="Preview3DCameraResetKey" xml:space="preserve"><value>カメラリセットキー</value></data>
+  <data name="PreviewPanelTitle" xml:space="preserve"><value>プレビュー</value></data>
+  <data name="PreviewModeLabel" xml:space="preserve"><value>プレビューモード</value></data>
+  <data name="PreviewMode2D" xml:space="preserve"><value>2D</value></data>
+  <data name="PreviewMode3D" xml:space="preserve"><value>3D</value></data>
+  <data name="Preview3DCameraOrbitBoomDistance" xml:space="preserve"><value>オービット距離</value></data>
+  <data name="Preview3DCameraOrbitBoomDistanceTooltip" xml:space="preserve"><value>オービット時の既定ピボット-カメラ距離（ワールド単位）。変更すると yaw/pitch を保ったままズーム基準をリセットします。</value></data>
+  <data name="ShaderPreviewLabPbrSection" xml:space="preserve"><value>LabPBR プレビュー（OpenGL）</value></data>
+  <data name="ShaderPreviewLabPbrDescription" xml:space="preserve"><value>右側プレビューが 3D モードのときに適用されます。2D Sprite フラグ付きテクスチャは葉のような交差平面で自動表示され、それ以外はキューブ表示です。プレビューシェーダーは LabPBR のチャンネル規約（_h 高さ、_n 法線、_s 平滑度/金属）に従います。</value></data>
+  <data name="Preview3DEnableParallax" xml:space="preserve"><value>パララックスオクルージョン（POM）</value></data>
+  <data name="Preview3DEnableParallaxTooltip" xml:space="preserve"><value>LabPBR 高さマップを使った制限付きリリーフで、浅い角度でも安定します。</value></data>
+  <data name="Preview3DEnableNormalMap" xml:space="preserve"><value>法線マッピング（_n）</value></data>
+  <data name="Preview3DEnableNormalMapTooltip" xml:space="preserve"><value>オフ時はメッシュ法線のみでライティングします。</value></data>
+  <data name="Preview3DEnableSpecularMap" xml:space="preserve"><value>スペキュラー / LabPBR _s</value></data>
+  <data name="Preview3DEnableSpecularMapTooltip" xml:space="preserve"><value>オフ時は平滑度/金属ハイライトなしの拡散のみ表示。</value></data>
+  <data name="Preview3DEnableParallaxShadow" xml:space="preserve"><value>パララックス自己影</value></data>
+  <data name="Preview3DEnableParallaxShadowTooltip" xml:space="preserve"><value>パララックス高さ場に短い自己シャドウレイをトレースします。</value></data>
+  <data name="Preview3DEnableSss" xml:space="preserve"><value>サブサーフェス散乱 (SSS)</value></data>
+  <data name="Preview3DEnableSssTooltip" xml:space="preserve"><value>LabPBR の多孔質/SSS チャンネルから軽量な SSS 近似を有効化します。</value></data>
+  <data name="Preview3DEnableIbl" xml:space="preserve"><value>環境 IBL（環境光/鏡面）</value></data>
+  <data name="Preview3DEnableIblTooltip" xml:space="preserve"><value>シーン環境からの間接環境光と鏡面。大気スカイがオンならスカイ LUT と反射太陽をサンプルし、オフなら手続き的天空/地面半球。</value></data>
+  <data name="Preview3DLightingSection" xml:space="preserve"><value>ライティング</value></data>
+  <data name="Preview3DEnableShadows" xml:space="preserve"><value>指向性シャドウ</value></data>
+  <data name="Preview3DEnableShadowsTooltip" xml:space="preserve"><value>プレビュー用ライトに対し PCF フィルタリング付きの指向性シャドウマップを描画します。</value></data>
+  <data name="Preview3DLightYawDegrees" xml:space="preserve"><value>ライト ヨー</value></data>
+  <data name="Preview3DLightYawDegreesTooltip" xml:space="preserve"><value>太陽のヨー (度、-180..180)。ワールドの上方向軸の周りでライトを回転します。</value></data>
+  <data name="Preview3DLightPitchDegrees" xml:space="preserve"><value>ライト ピッチ</value></data>
+  <data name="Preview3DLightPitchDegreesTooltip" xml:space="preserve"><value>太陽のピッチ (度、-89..89)。負の値は太陽を地平線より上に置きます。</value></data>
+  <data name="Preview3DParallaxHeightStrength" xml:space="preserve"><value>POM 変位</value></data>
+  <data name="Preview3DParallaxHeightStrengthTooltip" xml:space="preserve"><value>シェーダー側のパララックス変位強度 (uHeightStrength)。</value></data>
+  <data name="Preview3DShowGrid" xml:space="preserve"><value>地面グリッド（3D）</value></data>
+  <data name="Preview3DShowGridTooltip" xml:space="preserve"><value>3Dプレビューでオブジェクト下に XZ グリッドを表示します。</value></data>
+  <data name="Preview3DAutoRotate" xml:space="preserve"><value>3D自動回転</value></data>
+  <data name="Preview3DShowAxes" xml:space="preserve"><value>3D XYZ軸</value></data>
+  <data name="Preview3DItemUseAlphaBlend" xml:space="preserve"><value>アイテムのアルファブレンド</value></data>
+  <data name="Preview3DSpritePlaneCount" xml:space="preserve"><value>スプライト平面数</value></data>
+  <data name="Preview3DSpritePlaneCountTooltip" xml:space="preserve"><value>3D プレビューで 2D Sprite フラグ付きテクスチャに使う交差平面の枚数。</value></data>
+  <data name="Preview3DCameraDebugFlyHint" xml:space="preserve"><value>右ドラッグ: 視点操作 · 右押し中 WASD: 飛行 · R: オービットとオフセットをリセット</value></data>
 </root>
+
+
+

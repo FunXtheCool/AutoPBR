@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.frog.FrogModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/frog/FrogModel.class",
+  "classSha256Hex": "3149de6cb657dcbf25e5513349972441fe650277da28f3b0ba376c9373c429ec",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.FrogRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [],
+  "bakedAnimations": [
+    {
+      "field": "jumpAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.FrogAnimation",
+      "definitionField": "FROG_JUMP",
+      "rootPartField": "root"
+    },
+    {
+      "field": "croakAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.FrogAnimation",
+      "definitionField": "FROG_CROAK",
+      "rootPartField": "root"
+    },
+    {
+      "field": "tongueAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.FrogAnimation",
+      "definitionField": "FROG_TONGUE",
+      "rootPartField": "root"
+    },
+    {
+      "field": "swimAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.FrogAnimation",
+      "definitionField": "FROG_SWIM",
+      "rootPartField": "root"
+    },
+    {
+      "field": "walkAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.FrogAnimation",
+      "definitionField": "FROG_WALK",
+      "rootPartField": "root"
+    },
+    {
+      "field": "idleWaterAnimation",
+      "definitionClass": "net.minecraft.client.animation.definitions.FrogAnimation",
+      "definitionField": "FROG_IDLE_WATER",
+      "rootPartField": "root"
+    }
+  ],
+  "playbackSteps": [
+    {
+      "mode": "apply",
+      "animationField": "jumpAnimation",
+      "stateField": "jumpAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "croakAnimation",
+      "stateField": "croakAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "tongueAnimation",
+      "stateField": "tongueAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "applyWalk",
+      "animationField": "swimAnimation",
+      "walkPosField": "walkAnimationPos",
+      "walkSpeedField": "walkAnimationSpeed",
+      "speedScale": 1.5,
+      "posScale": 2.5
+    },
+    {
+      "mode": "applyWalk",
+      "animationField": "walkAnimation",
+      "walkPosField": "walkAnimationPos",
+      "walkSpeedField": "walkAnimationSpeed",
+      "speedScale": 1.5,
+      "posScale": 2.5
+    },
+    {
+      "mode": "apply",
+      "animationField": "idleWaterAnimation",
+      "stateField": "swimIdleAnimationState",
+      "ageField": "ageInTicks"
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Visible assignment at line 59 not lifted.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

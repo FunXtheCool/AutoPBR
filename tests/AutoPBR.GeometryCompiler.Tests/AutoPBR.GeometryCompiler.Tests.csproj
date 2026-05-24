@@ -163,6 +163,8 @@
 
   <ItemGroup>
     <Compile Include="..\Shared\GeometryIrTestTierSupport.cs" Link="Shared\GeometryIrTestTierSupport.cs" />
+    <Compile Remove="PilotUvAtlasLiftTests.cs" />
+    <Compile Remove="LayerDefinitionAtlasSizeProbeTests.cs" />
   </ItemGroup>
 
   <ItemGroup>

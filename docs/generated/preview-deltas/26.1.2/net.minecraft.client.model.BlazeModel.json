@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.BlazeModel",
+  "deltas": [
+    {
+      "kind": "other",
+      "description": "Rod xRot sway from setupAnim is preview-driven; static IR documents only createBodyLayer rod placement and head pose."
+    },
+    {
+      "kind": "previewBasis",
+      "description": "Blaze preview root translation matches legacy head-anchor parity in CleanRoomEntityModelRuntime.",
+      "partId": "_root"
+    }
+  ]
+}

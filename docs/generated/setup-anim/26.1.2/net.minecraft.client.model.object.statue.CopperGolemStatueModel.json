@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.statue.CopperGolemStatueModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/object/statue/CopperGolemStatueModel.class",
+  "classSha256Hex": "99d7ccd4df07d03dd508536fbddda3e7ffc976b15e92017d1b21cad0117bc1e4",
+  "renderStateType": "net.minecraft.util.Unit",
+  "setupAnimMethod": "setupAnim",
+  "assignments": [
+    {
+      "partField": "root",
+      "property": "y",
+      "expr": {
+        "const": 0
+      }
+    },
+    {
+      "partField": "root",
+      "property": "zRot",
+      "expr": {
+        "const": 3.1415927
+      }
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

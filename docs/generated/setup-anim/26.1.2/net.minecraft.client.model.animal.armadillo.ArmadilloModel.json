@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.armadillo.ArmadilloModel",
+  "profile": "named_jar_26.1.2",
+  "jarPath": "net/minecraft/client/model/animal/armadillo/ArmadilloModel.class",
+  "classSha256Hex": "74e8a201cb4d6db398fea46061b8025fbdbca258589ff30af6a0a27151c21ef7",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.ArmadilloRenderState",
+  "setupAnimMethod": "setupAnim",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.EntityModel",
+  "superSetupAnimCall": true,
+  "assignments": [],
+  "playbackSteps": [
+    {
+      "mode": "applyWalk",
+      "animationField": "walkAnimation",
+      "walkPosField": "walkAnimationPos",
+      "walkSpeedField": "walkAnimationSpeed",
+      "speedScale": 16.5,
+      "posScale": 2.5
+    },
+    {
+      "mode": "apply",
+      "animationField": "rollOutAnimation",
+      "stateField": "rollOutAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "rollUpAnimation",
+      "stateField": "rollUpAnimationState",
+      "ageField": "ageInTicks"
+    },
+    {
+      "mode": "apply",
+      "animationField": "peekAnimation",
+      "stateField": "peekAnimationState",
+      "ageField": "ageInTicks"
+    }
+  ],
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Unsupported ModelPart property skipDraw at line 10.",
+    "Visible assignment at line 14 not lifted.",
+    "Visible assignment at line 18 not lifted.",
+    "Visible assignment at line 22 not lifted.",
+    "Visible assignment at line 26 not lifted.",
+    "Unsupported ModelPart property skipDraw at line 31.",
+    "Visible assignment at line 35 not lifted.",
+    "Visible assignment at line 39 not lifted.",
+    "Visible assignment at line 43 not lifted.",
+    "Visible assignment at line 47 not lifted.",
+    "SetupAnim IR lifted from javap setupAnim (named_jar_26.1.2)."
+  ]
+}

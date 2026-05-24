@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.chicken.ChickenModel",
+  "deltas": [
+    {
+      "kind": "other",
+      "description": "Wing idle flap uses zRot on wing parts in AutoPBR preview (not yRot); see CleanRoomEntityModelRuntime and MinecraftJavaModelPreviewTests."
+    },
+    {
+      "kind": "rendererOnlyScale",
+      "description": "Root ModelTransforms.scaling(0.5) from the renderer is not folded into static createBodyLayer IR."
+    }
+  ]
+}
