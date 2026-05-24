@@ -80,6 +80,27 @@ tools/MlSpecularTrainer/realism_dataset/
 tools/MlSpecularTrainer/stylized_dataset/
 tools/MlSpecularTrainer/shuffle_dataset/
 
+# Local scratch / agent export (root + nested)
+.tmpbuild/
+.tmpanim/
+**/.tmpbuild/
+
+# Extracted vanilla client asset trees (local preview fallback; IR lives in docs/generated/)
+src/AutoPBR.Core/Data/minecraft-native/*/assets/
+
+# Mojang client JARs (local download; see tools/minecraft-parity/*/README.md)
+tools/minecraft-parity/**/client.jar
+
+# Gradle subproject build output (MinecraftGeometryReference)
+tools/MinecraftGeometryReference/.gradle/
+tools/MinecraftGeometryReference/build/
+
+# Cursor IDE (local agent rules; not shared via repo)
+.cursor/
+
+# Ephemeral one-off scripts at repo root
+/_list_diag.py
+
 # User-specific / IDE
 *~
 *.swp
