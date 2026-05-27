@@ -114,50 +114,7 @@
           "children": []
         },
         {
-          "id": "right_hind_leg",
-          "pose": {
-            "translation": [
-              -2,
-              18,
-              4
-            ],
-            "rotationEulerRad": [
-              0,
-              0,
-              0
-            ],
-            "eulerOrder": "XYZ",
-            "setupAnimPivot": [
-              -2,
-              18,
-              4
-            ]
-          },
-          "cuboids": [
-            {
-              "from": [
-                -2,
-                0,
-                -2
-              ],
-              "to": [
-                2,
-                6,
-                2
-              ],
-              "uvOrigin": [
-                0,
-                16
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "left_hind_leg",
+          "id": "left_front_leg",
           "pose": {
             "translation": [
               -2,
@@ -243,7 +200,50 @@
           "children": []
         },
         {
-          "id": "left_front_leg",
+          "id": "left_hind_leg",
+          "pose": {
+            "translation": [
+              -2,
+              18,
+              4
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              -2,
+              18,
+              4
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -2,
+                0,
+                -2
+              ],
+              "to": [
+                2,
+                6,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right_hind_leg",
           "pose": {
             "translation": [
               -2,

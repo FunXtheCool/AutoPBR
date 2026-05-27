@@ -521,14 +521,16 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return false;
         }
 
-        var state = PreviewRenderStateSynthesis.ForLivingWalk(animationTimeSeconds, idlePhase01, wave);
+        var baselineParts = BuildSetupAnimBaselineParts(geometryRoot);
+        var state = ResolveSetupAnimPreviewState(modelJvm, animationTimeSeconds, idlePhase01, wave, out _);
         if (!VanillaSetupAnimRuntime.TryEvaluate(
                 modelJvm,
                 state,
                 animationTimeSeconds,
                 out var pose,
                 parityRule.BuilderMethod,
-                isBaby))
+                isBaby,
+                baselineParts))
         {
             return false;
         }
@@ -541,6 +543,31 @@ internal sealed partial class CleanRoomEntityModelRuntime
             emitOptions);
     }
 
+    internal static IReadOnlyDictionary<string, float> ResolveSetupAnimPreviewStateForTests(
+        string modelJvm,
+        float animationTimeSeconds,
+        float idlePhase01,
+        float wave,
+        out string source) =>
+        ResolveSetupAnimPreviewState(modelJvm, animationTimeSeconds, idlePhase01, wave, out source);
+
+    private static IReadOnlyDictionary<string, float> ResolveSetupAnimPreviewState(
+        string modelJvm,
+        float animationTimeSeconds,
+        float idlePhase01,
+        float wave,
+        out string source)
+    {
+        if (RendererStateDocumentLoader.TryLoadForModel(modelJvm, out var rendererState))
+        {
+            source = "renderer-state";
+            return RendererStatePreviewResolver.Synthesize(rendererState, animationTimeSeconds, idlePhase01, wave);
+        }
+
+        source = "living-walk";
+        return PreviewRenderStateSynthesis.ForLivingWalk(animationTimeSeconds, idlePhase01, wave);
+    }
+
 
 
     private static bool IsChickenHeadFamilyPartId(string partId) =>
@@ -550,6 +577,69 @@ internal sealed partial class CleanRoomEntityModelRuntime
         string.Equals(partId, "beak", StringComparison.Ordinal) ||
 
         string.Equals(partId, "red_thing", StringComparison.Ordinal);
+
+    private static IReadOnlyDictionary<string, VanillaSetupAnimRuntime.PartPose> BuildSetupAnimBaselineParts(JsonElement geometryRoot)
+    {
+        var map = new Dictionary<string, VanillaSetupAnimRuntime.PartPose>(StringComparer.Ordinal);
+        if (!geometryRoot.TryGetProperty("roots", out var roots) || roots.ValueKind != JsonValueKind.Array)
+        {
+            return map;
+        }
+
+        foreach (var root in roots.EnumerateArray())
+        {
+            CollectBaselineRecursive(root, map);
+        }
+
+        return map;
+    }
+
+    private static void CollectBaselineRecursive(
+        JsonElement part,
+        Dictionary<string, VanillaSetupAnimRuntime.PartPose> map)
+    {
+        var partId = part.TryGetProperty("id", out var idEl) ? idEl.GetString() ?? "" : "";
+        if (!string.IsNullOrWhiteSpace(partId))
+        {
+            var pose = new VanillaSetupAnimRuntime.PartPose();
+            if (part.TryGetProperty("pose", out var poseEl))
+            {
+                if (poseEl.TryGetProperty("translation", out var t) &&
+                    t.ValueKind == JsonValueKind.Array &&
+                    t.GetArrayLength() >= 3)
+                {
+                    pose.X = (float)t[0].GetDouble();
+                    pose.Y = (float)t[1].GetDouble();
+                    pose.Z = (float)t[2].GetDouble();
+                }
+
+                if (poseEl.TryGetProperty("rotationEulerRad", out var r) &&
+                    r.ValueKind == JsonValueKind.Array &&
+                    r.GetArrayLength() >= 3)
+                {
+                    pose.XRot = (float)r[0].GetDouble();
+                    pose.YRot = (float)r[1].GetDouble();
+                    pose.ZRot = (float)r[2].GetDouble();
+                }
+            }
+
+            map[partId] = pose;
+            if (TryResolveSetupAnimPartField(partId, out var modelPartField))
+            {
+                map[modelPartField] = pose;
+            }
+        }
+
+        if (!part.TryGetProperty("children", out var children) || children.ValueKind != JsonValueKind.Array)
+        {
+            return;
+        }
+
+        foreach (var child in children.EnumerateArray())
+        {
+            CollectBaselineRecursive(child, map);
+        }
+    }
 
     /// <summary>Survey helper: whether setupAnim bytecode exists and evaluates for a catalog rule.</summary>
     internal static void ProbeParityCatalogSetupAnimCapability(
@@ -573,7 +663,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         hasSetupAnimDocument = true;
         var wave = Wave(animationTimeSeconds, 0.8f);
-        var state = PreviewRenderStateSynthesis.ForLivingWalk(animationTimeSeconds, idlePhase01, wave);
+        var state = ResolveSetupAnimPreviewState(modelJvm, animationTimeSeconds, idlePhase01, wave, out _);
         setupAnimWouldEvaluate = VanillaSetupAnimRuntime.TryEvaluate(
             modelJvm,
             state,

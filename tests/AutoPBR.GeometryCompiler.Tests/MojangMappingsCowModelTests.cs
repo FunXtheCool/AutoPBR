@@ -15,4 +15,17 @@ public sealed class MojangMappingsCowModelTests
         Assert.Equal("net.minecraft.client.model.animal.cow.hak", obf, StringComparer.Ordinal);
         Assert.Equal("hak", MojangMappingsParser.GetJavapClassArgForObfuscated(obf), StringComparer.Ordinal);
     }
+
+    [Theory]
+    [InlineData("net.minecraft.client.model.animal.equine.AbstractEquineModel", "createBodyMesh")]
+    [InlineData("net.minecraft.client.model.monster.piglin.AbstractPiglinModel", "createMesh")]
+    public void Client_mappings_1_21_11_expose_abstract_mesh_factory_pins(string official, string namedFactory)
+    {
+        var mapsPath = Path.Combine(AppContext.BaseDirectory, "tools", "minecraft-parity", "1.21.11",
+            "client_mappings.txt");
+        Assert.True(File.Exists(mapsPath), $"Missing test data: {mapsPath}");
+        var parser = MojangMappingsParser.Load(mapsPath);
+        var pins = parser.EnumerateMeshFactoryPins(official).ToList();
+        Assert.Contains(pins, p => string.Equals(p.NamedMethod, namedFactory, StringComparison.Ordinal));
+    }
 }

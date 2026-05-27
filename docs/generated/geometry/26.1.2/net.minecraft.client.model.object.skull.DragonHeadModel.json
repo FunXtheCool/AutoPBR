@@ -55,8 +55,8 @@
                 -8
               ],
               "uvOrigin": [
-                0,
-                0
+                176,
+                44
               ],
               "textureKey": "#upper_lip",
               "liftKind": "exact",
@@ -78,8 +78,8 @@
                 6
               ],
               "uvOrigin": [
-                0,
-                0
+                112,
+                30
               ],
               "textureKey": "#upper_head",
               "liftKind": "exact",
@@ -125,7 +125,7 @@
                 -18
               ],
               "uvOrigin": [
-                0,
+                112,
                 0
               ],
               "textureKey": "#nostril",
@@ -171,7 +171,7 @@
                 -18
               ],
               "uvOrigin": [
-                0,
+                112,
                 0
               ],
               "textureKey": "#nostril",

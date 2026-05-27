@@ -3,17 +3,117 @@
   "versionLabel": "1.21.11",
   "officialJvmName": "net.minecraft.client.model.effects.SpinAttackEffectModel",
   "profile": "proguard_1.21.11",
-  "extractionStatus": "partial",
+  "extractionStatus": "ok",
   "extractionNotes": [
-    "Synthetic placeholder shard: client.jar metadata (SHA-256, javap float probe) only. Extend GeometryCompiler extraction profiles or re-run with a matching jar so javap mesh lift can emit cuboids.",
-    "ldc float constants found in createBodyLayer bytecode; part-tree IR is still incomplete or placeholder-only."
+    "Part tree lifted from javap_mesh_proguard_obf (mesh host net.minecraft.client.model.effects.SpinAttackEffectModel).",
+    "Mesh lift parser notes (1): Lifted from javap deep concat after bytecode path produced no cuboids."
   ],
   "factoryMethod": "createBodyLayer",
   "roots": [
     {
-      "id": "_placeholder",
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
       "cuboids": [],
-      "children": []
+      "children": [
+        {
+          "id": "segment0",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -8,
+                -16,
+                -8
+              ],
+              "to": [
+                8,
+                16,
+                8
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "segment1",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -8,
+                -16,
+                -8
+              ],
+              "to": [
+                8,
+                16,
+                8
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        }
+      ]
     }
   ],
   "jarPath": "hda.class",

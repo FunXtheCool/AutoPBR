@@ -30,7 +30,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             emitOptions,
             ctx =>
             {
-                if (!TryToEntityCuboid(ctx.Cuboid, emitOptions, out var entityCuboid, out var cuboidFailure))
+                if (!TryToEntityCuboid(ctx.Cuboid, ctx.PartId, emitOptions, out var entityCuboid, out var cuboidFailure))
                 {
                     walkFailure = cuboidFailure;
                     return false;
@@ -53,7 +53,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         in GeometryIrMeshEmitOptions options,
         out EntityCuboid entityCuboid,
         out string? failureReason) =>
-        TryToEntityCuboid(cuboid, options, out entityCuboid, out failureReason);
+        TryToEntityCuboid(cuboid, "", options, out entityCuboid, out failureReason);
 
     private static bool TryComposePartPose(JsonElement pose, out Matrix4x4 matrix, out string? failureReason)
     {
@@ -99,6 +99,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
     private static bool TryToEntityCuboid(
         JsonElement cuboid,
+        string partId,
         in GeometryIrMeshEmitOptions options,
         out EntityCuboid entityCuboid,
         out string? failureReason)
@@ -134,7 +135,21 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         var texU = uv[0].GetInt32();
         var texV = uv[1].GetInt32();
-        NormalizeAtlasUv(options.AtlasWidth, options.AtlasHeight, ref texU, ref texV);
+        var atlasW = options.AtlasWidth;
+        var atlasH = options.AtlasHeight;
+        if (GeometryIrCuboidMetadata.TryGetAtlasDimensions(cuboid, out var cuboidAtlasW, out var cuboidAtlasH))
+        {
+            atlasW = cuboidAtlasW;
+            atlasH = cuboidAtlasH;
+        }
+        else if (!string.IsNullOrEmpty(partId) &&
+                 options.ResolvePartAtlasDimensions?.Invoke(partId) is { Width: > 0, Height: > 0 } partAtlas)
+        {
+            atlasW = partAtlas.Width;
+            atlasH = partAtlas.Height;
+        }
+
+        NormalizeAtlasUv(atlasW, atlasH, ref texU, ref texV);
 
         var mirror = GeometryIrCuboidMetadata.GetMirrorCuboidUv(cuboid);
         var uw = -1;
@@ -178,8 +193,47 @@ internal sealed partial class CleanRoomEntityModelRuntime
             textureKey = tk;
         }
 
-        entityCuboid = new EntityCuboid(x0, y0, z0, x1, y1, z1, texU, texV, uw, uh, ud, mirror,
-            FaceMask: faceMaskArray, TextureKey: textureKey);
+        if (!string.IsNullOrEmpty(partId) && options.ResolvePartTextureKey?.Invoke(partId) is { } partTexKey)
+        {
+            textureKey = partTexKey;
+        }
+
+        var cuboidRx = 0f;
+        var cuboidRy = 0f;
+        var cuboidRz = 0f;
+        if (cuboid.TryGetProperty("cuboidRotationEulerRad", out var cuboidRot) &&
+            cuboidRot.ValueKind == JsonValueKind.Array &&
+            cuboidRot.GetArrayLength() >= 3)
+        {
+            cuboidRx = (float)cuboidRot[0].GetDouble();
+            cuboidRy = (float)cuboidRot[1].GetDouble();
+            cuboidRz = (float)cuboidRot[2].GetDouble();
+        }
+
+        Vector3? rotationPivot = null;
+        if (cuboid.TryGetProperty("rotationPivot", out var pivot) &&
+            pivot.ValueKind == JsonValueKind.Array &&
+            pivot.GetArrayLength() >= 3)
+        {
+            rotationPivot = new Vector3(
+                (float)pivot[0].GetDouble(),
+                (float)pivot[1].GetDouble(),
+                (float)pivot[2].GetDouble());
+        }
+
+        entityCuboid = new EntityCuboid(
+            x0, y0, z0, x1, y1, z1,
+            texU, texV,
+            uw, uh, ud,
+            mirror,
+            XRot: cuboidRx,
+            YRot: cuboidRy,
+            ZRot: cuboidRz,
+            FaceMask: faceMaskArray,
+            TextureKey: textureKey)
+        {
+            RotationPivot = rotationPivot
+        };
         return true;
     }
 
@@ -393,7 +447,12 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 return null;
             }
 
-            return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef));
+            return ApplyGeometryIrParityLivingEntityRendererPreviewBasis(
+                officialJvmName,
+                overrideRoot,
+                stem: null,
+                normalizedAssetPath: null,
+                b.Build(texRef));
         }
 
         if (!TryBuildMeshFromGeometryIr(b, profile, officialJvmName, options, out failureReason))
@@ -401,6 +460,42 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return null;
         }
 
-        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef));
+        return ApplyGeometryIrParityLivingEntityRendererPreviewBasis(
+            officialJvmName,
+            geometryRootOverride: null,
+            stem: null,
+            normalizedAssetPath: null,
+            b.Build(texRef));
+    }
+
+    /// <summary>
+    /// Test-only parity emit with explicit LER multiply order (see <see cref="ApplyLivingEntityRendererPreviewBasis"/>).
+    /// </summary>
+    internal static MergedJavaBlockModel? TryBuildGeometryIrParityMeshForTestsWithLerCompose(
+        string texRef,
+        string officialJvmName,
+        int atlasWidth,
+        int atlasHeight,
+        JsonElement geometryRootOverride,
+        bool lerMirrorRightComposeLocalChain,
+        out string? failureReason)
+    {
+        var b = new RigBuilder(atlasWidth, atlasHeight);
+        var options = new GeometryIrMeshEmitOptions
+        {
+            RootTransform = Matrix4x4.Identity,
+            DefaultPartScale = 1f,
+            AtlasWidth = atlasWidth,
+            AtlasHeight = atlasHeight,
+            Fidelity = GeometryIrEmitFidelity.Parity,
+            PreviewDegenerateAxisThickness = 0f,
+            OfficialJvmName = officialJvmName,
+        };
+        if (!TryEmitGeometryIrBodyLayer(b, geometryRootOverride, options, out failureReason))
+        {
+            return null;
+        }
+
+        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), lerMirrorRightComposeLocalChain);
     }
 }

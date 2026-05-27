@@ -43,45 +43,7 @@
             "eulerOrder": "XYZ"
           },
           "cuboids": [],
-          "children": [
-            {
-              "id": "right_pants",
-              "pose": {
-                "translation": [
-                  0.000000000,
-                  0.000000000,
-                  0.000000000
-                ],
-                "rotationEulerRad": [
-                  0.000000000,
-                  0.000000000,
-                  0.000000000
-                ],
-                "eulerOrder": "XYZ"
-              },
-              "cuboids": [],
-              "children": [
-                {
-                  "id": "jacket",
-                  "pose": {
-                    "translation": [
-                      0.000000000,
-                      0.000000000,
-                      0.000000000
-                    ],
-                    "rotationEulerRad": [
-                      0.000000000,
-                      0.000000000,
-                      0.000000000
-                    ],
-                    "eulerOrder": "XYZ"
-                  },
-                  "cuboids": [],
-                  "children": []
-                }
-              ]
-            }
-          ]
+          "children": []
         },
         {
           "id": "left_leg",
@@ -191,26 +153,7 @@
             "eulerOrder": "XYZ"
           },
           "cuboids": [],
-          "children": [
-            {
-              "id": "right_sleeve",
-              "pose": {
-                "translation": [
-                  0.000000000,
-                  0.000000000,
-                  0.000000000
-                ],
-                "rotationEulerRad": [
-                  0.000000000,
-                  0.000000000,
-                  0.000000000
-                ],
-                "eulerOrder": "XYZ"
-              },
-              "cuboids": [],
-              "children": []
-            }
-          ]
+          "children": []
         },
         {
           "id": "left_arm",
@@ -231,6 +174,61 @@
           "children": [
             {
               "id": "left_sleeve",
+              "pose": {
+                "translation": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "right_sleeve",
+          "pose": {
+            "translation": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [],
+          "children": []
+        },
+        {
+          "id": "right_pants",
+          "pose": {
+            "translation": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [],
+          "children": [
+            {
+              "id": "jacket",
               "pose": {
                 "translation": [
                   0.000000000,

@@ -3,10 +3,11 @@
   "versionLabel": "26.1.2",
   "officialJvmName": "net.minecraft.client.model.animal.nautilus.NautilusSaddleModel",
   "profile": "named_jar_26.1.2",
-  "extractionStatus": "ok",
+  "extractionStatus": "partial",
   "extractionNotes": [
     "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.nautilus.NautilusSaddleModel).",
-    "Mesh lift parser notes (9): Lifted via bytecode disassembly \u002B segment parser (exact pool constants).; Mesh segment skipped: could not resolve part id (no ldc String before addOrReplaceChild and none before CubeListBuilder.create).; Mesh segment at bind line 5 skipped: TryLiftSegment returned false.; Mesh segment skipped: could not resolve part id (no ldc String before addOrReplaceChild and none before CubeListBuilder.create)."
+    "Strict structural validation failed (1): reference_mismatch: part \u0027shell\u0027: cuboid count reference=1 compared=3",
+    "Mesh lift parser notes (7): Lifted via bytecode disassembly \u002B segment parser (exact pool constants).; Mesh segment skipped: could not resolve part id (no ldc String before addOrReplaceChild and none before CubeListBuilder.create).; Mesh segment at bind line 5 skipped: TryLiftSegment returned false.; Mesh segment skipped: could not resolve part id (no ldc String before addOrReplaceChild and none before CubeListBuilder.create)."
   ],
   "factoryMethod": "createSaddleLayer",
   "roots": [
@@ -14,14 +15,14 @@
       "id": "root",
       "pose": {
         "translation": [
-          0.000000000,
-          29.00000000,
-          -6.000000000
+          0,
+          0,
+          0
         ],
         "rotationEulerRad": [
-          0.000000000,
-          0.000000000,
-          0.000000000
+          0,
+          0,
+          0
         ],
         "eulerOrder": "XYZ"
       },
@@ -31,16 +32,21 @@
           "id": "shell",
           "pose": {
             "translation": [
-              0.000000000,
-              -13.00000000,
-              5.000000000
+              0,
+              -13,
+              5
             ],
             "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
+              0,
+              0,
+              0
             ],
-            "eulerOrder": "XYZ"
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              -13,
+              5
+            ]
           },
           "cuboids": [
             {
@@ -60,10 +66,45 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-              "inflate": 0.200000003,
-              "textureWidth": 128,
-              "textureHeight": 128
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            },
+            {
+              "from": [
+                -7,
+                0,
+                -7
+              ],
+              "to": [
+                7,
+                8,
+                13
+              ],
+              "uvOrigin": [
+                0,
+                26
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            },
+            {
+              "from": [
+                -7,
+                0,
+                6
+              ],
+              "to": [
+                7,
+                8,
+                6
+              ],
+              "uvOrigin": [
+                48,
+                26
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
             }
           ],
           "children": []
@@ -72,16 +113,21 @@
           "id": "body",
           "pose": {
             "translation": [
-              0.000000000,
-              -8.500000000,
-              12.30000019
+              0,
+              -8.5,
+              12.3000002
             ],
             "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
+              0,
+              0,
+              0
             ],
-            "eulerOrder": "XYZ"
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              -8.5,
+              12.3000002
+            ]
           },
           "cuboids": [
             {
@@ -128,16 +174,21 @@
               "id": "upper_mouth",
               "pose": {
                 "translation": [
-                  0.000000000,
-                  -2.509999990,
-                  7.000000000
+                  0,
+                  -2.50999999,
+                  7
                 ],
                 "rotationEulerRad": [
-                  0.000000000,
-                  0.000000000,
-                  0.000000000
+                  0,
+                  0,
+                  0
                 ],
-                "eulerOrder": "XYZ"
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  0,
+                  -2.50999999,
+                  7
+                ]
               },
               "cuboids": [
                 {
@@ -167,16 +218,21 @@
               "id": "inner_mouth",
               "pose": {
                 "translation": [
-                  0.000000000,
-                  -0.5099999905,
-                  7.500000000
+                  0,
+                  -0.50999999,
+                  7.5
                 ],
                 "rotationEulerRad": [
-                  0.000000000,
-                  0.000000000,
-                  0.000000000
+                  0,
+                  0,
+                  0
                 ],
-                "eulerOrder": "XYZ"
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  0,
+                  -0.50999999,
+                  7.5
+                ]
               },
               "cuboids": [
                 {
@@ -205,16 +261,21 @@
               "id": "lower_mouth",
               "pose": {
                 "translation": [
-                  0.000000000,
-                  1.490000010,
-                  7.000000000
+                  0,
+                  1.49000001,
+                  7
                 ],
                 "rotationEulerRad": [
-                  0.000000000,
-                  0.000000000,
-                  0.000000000
+                  0,
+                  0,
+                  0
                 ],
-                "eulerOrder": "XYZ"
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  0,
+                  1.49000001,
+                  7
+                ]
               },
               "cuboids": [
                 {
@@ -248,59 +309,6 @@
   "jarPath": "net/minecraft/client/model/animal/nautilus/NautilusSaddleModel.class",
   "classSha256Hex": "c7c63d2861fc1bec2853622d250c23474823234bb56f607fbb8c2f75118cf58b",
   "bytecodeFloatProbe": [
-    -0.5,
-    28,
-    -0.5,
-    -6,
-    -4,
-    -1,
-    7,
-    4,
-    7,
-    -6,
-    -1,
-    7,
-    4,
-    9,
-    -6,
-    5,
-    7,
-    4,
-    3,
-    -8,
-    -2,
-    -2.5,
-    -3.01,
-    -1,
-    5,
-    4,
-    7,
-    -2.5,
-    -3.01,
-    4.1,
-    5,
-    4,
-    0.5,
-    -5,
-    3,
-    -2.5,
-    -1,
-    5,
-    -0.001,
-    -2.01,
-    3.9,
-    -1.5,
-    -1,
-    -1,
-    3,
-    -1.01,
-    4.9,
-    -2.5,
-    -1,
-    5,
-    -0.001,
-    -0.01,
-    3.9,
     29,
     -6,
     -7,

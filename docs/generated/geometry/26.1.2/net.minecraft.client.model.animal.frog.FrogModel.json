@@ -140,24 +140,6 @@
               ],
               "children": [
                 {
-                  "id": "eyes",
-                  "pose": {
-                    "translation": [
-                      -0.5000000000,
-                      0.000000000,
-                      2.000000000
-                    ],
-                    "rotationEulerRad": [
-                      0.000000000,
-                      0.000000000,
-                      0.000000000
-                    ],
-                    "eulerOrder": "XYZ"
-                  },
-                  "cuboids": [],
-                  "children": []
-                },
-                {
                   "id": "right_eye",
                   "pose": {
                     "translation": [
@@ -234,6 +216,24 @@
                   "children": []
                 }
               ]
+            },
+            {
+              "id": "eyes",
+              "pose": {
+                "translation": [
+                  -0.5000000000,
+                  0.000000000,
+                  2.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [],
+              "children": []
             },
             {
               "id": "croaking_body",

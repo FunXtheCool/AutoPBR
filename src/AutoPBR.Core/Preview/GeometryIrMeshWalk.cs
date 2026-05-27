@@ -181,8 +181,9 @@ internal static class GeometryIrMeshWalk
         }
 
         var partId = part.TryGetProperty("id", out var idEl) ? idEl.GetString() ?? "" : "";
-        var skipPartCuboids = options.IncludePartIds is { Count: > 0 } include &&
-                              !include.Contains(partId);
+        var skipPartCuboids = options.ShouldEmitPartCuboids is { } shouldEmit
+            ? !shouldEmit(partId)
+            : options.IncludePartIds is { Count: > 0 } include && !include.Contains(partId);
 
         if (options.TryGetPartPoseOverride is { } poseOverride && !skipPartCuboids)
         {

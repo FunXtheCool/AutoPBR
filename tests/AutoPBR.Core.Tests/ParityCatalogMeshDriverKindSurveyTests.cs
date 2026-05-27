@@ -173,8 +173,29 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests
             $"{row.TexturePath}: driver={row.DriverKind} suppress={row.SuppressesHandFallback} ir={row.IrFailureReason} jvm={row.ResolvedGeometryJvm} detail={row.ProvenanceDetail}");
         Assert.Contains(expectedJvmSuffix, row.ResolvedGeometryJvm ?? row.ProvenanceDetail ?? "", StringComparison.Ordinal);
         Assert.True(row.SuppressesHandFallback);
+        Assert.NotEqual(CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.Skip, row.LerBasis);
         _output?.WriteLine(
-            $"{row.TexturePath}\t{row.DriverKind}\t{row.ResolvedGeometryJvm}\tsuppress={row.SuppressesHandFallback}\tsetup={row.SetupAnimWouldEvaluate}\tdefAnim={row.DefinitionAnimationJvm}");
+            $"{row.TexturePath}\t{row.DriverKind}\t{row.ResolvedGeometryJvm}\tsuppress={row.SuppressesHandFallback}\tsetup={row.SetupAnimWouldEvaluate}\tstate={row.SetupAnimStateSource}\tler={row.LerBasis}\tdefAnim={row.DefinitionAnimationJvm}");
+    }
+
+    [Fact]
+    public void Survey_rows_include_viewport_failure_classification_inputs()
+    {
+        var cow = ParityCatalogEntityPreviewDiagnostics.SurveyPath(
+            "assets/minecraft/textures/entity/cow/cow_temperate.png",
+            Profile26);
+        Assert.Equal(CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.RightComposeLocalChain, cow.LerBasis);
+        Assert.True(cow.HasSetupAnimDocument);
+        Assert.Equal("living-walk", cow.SetupAnimStateSource);
+
+        var breeze = ParityCatalogEntityPreviewDiagnostics.SurveyPath(
+            "assets/minecraft/textures/entity/breeze/breeze.png",
+            Profile26,
+            animationTimeSeconds: 2.5f,
+            applyGeometryIrSetupAnimMotion: true);
+        Assert.Equal(CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot, breeze.LerBasis);
+        Assert.True(breeze.HasSetupAnimDocument);
+        Assert.Equal("renderer-state", breeze.SetupAnimStateSource);
     }
 
     [Fact]

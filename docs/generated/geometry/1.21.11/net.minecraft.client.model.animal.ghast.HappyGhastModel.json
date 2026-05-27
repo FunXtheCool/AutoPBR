@@ -71,7 +71,7 @@
           "children": []
         },
         {
-          "id": "a_0",
+          "id": "segment0",
           "pose": {
             "translation": [
               -3.75,
@@ -114,7 +114,7 @@
           "children": []
         },
         {
-          "id": "a_1",
+          "id": "segment1",
           "pose": {
             "translation": [
               1.25,
@@ -157,7 +157,7 @@
           "children": []
         },
         {
-          "id": "a_2",
+          "id": "segment2",
           "pose": {
             "translation": [
               6.25,
@@ -200,7 +200,7 @@
           "children": []
         },
         {
-          "id": "a_3",
+          "id": "segment3",
           "pose": {
             "translation": [
               -6.25,
@@ -243,7 +243,7 @@
           "children": []
         },
         {
-          "id": "a_4",
+          "id": "segment4",
           "pose": {
             "translation": [
               -1.25,
@@ -286,7 +286,7 @@
           "children": []
         },
         {
-          "id": "a_5",
+          "id": "segment5",
           "pose": {
             "translation": [
               3.75,
@@ -329,7 +329,7 @@
           "children": []
         },
         {
-          "id": "a_6",
+          "id": "segment6",
           "pose": {
             "translation": [
               -3.75,
@@ -372,7 +372,7 @@
           "children": []
         },
         {
-          "id": "a_7",
+          "id": "segment7",
           "pose": {
             "translation": [
               1.25,
@@ -415,7 +415,7 @@
           "children": []
         },
         {
-          "id": "a_8",
+          "id": "segment8",
           "pose": {
             "translation": [
               6.25,

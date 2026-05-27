@@ -18,6 +18,7 @@ internal static class MeshFactoryMethodResolver
         "createBabyLayer",
         "createBaseChickenModel",
         "createBodyMesh",
+        "apply",
         "createSingleBodyLayer",
         "createDoubleBodyRightLayer",
         "createDoubleBodyLeftLayer",
@@ -56,13 +57,13 @@ internal static class MeshFactoryMethodResolver
             }
         }
 
-        return TryGetFirstStaticMeshFactoryMethodName(classBytes) ?? requested;
+        return TryGetFirstStaticMeshFactoryMethodName(classBytes, maps) ?? requested;
     }
 
     private static bool HasMethod(ReadOnlySpan<byte> classBytes, string methodName) =>
         JvmClassFileParser.TryGetMethodCode(classBytes, methodName) is not null;
 
-    private static string? TryGetFirstStaticMeshFactoryMethodName(ReadOnlySpan<byte> classBytes)
+    private static string? TryGetFirstStaticMeshFactoryMethodName(ReadOnlySpan<byte> classBytes, MojangMappingsParser? maps)
     {
         foreach (var (name, desc, isStatic) in JvmClassFileParser.EnumerateMethods(classBytes))
         {
@@ -71,8 +72,7 @@ internal static class MeshFactoryMethodResolver
                 continue;
             }
 
-            if (desc.Contains("MeshDefinition", StringComparison.Ordinal) ||
-                desc.Contains("LayerDefinition", StringComparison.Ordinal))
+            if (JvmClassFileParser.IsMeshFactoryDescriptor(desc, maps))
             {
                 return name;
             }

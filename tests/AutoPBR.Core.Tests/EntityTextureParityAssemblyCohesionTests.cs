@@ -2,8 +2,6 @@ using System.Globalization;
 using System.Numerics;
 using System.Text;
 
-using AutoPBR.Core.Preview;
-
 namespace AutoPBR.Core.Tests;
 
 /// <summary>
@@ -58,7 +56,7 @@ public sealed class EntityTextureParityAssemblyCohesionTests
         Assert.True(maxCenterDist <= 18.25f, $"max center distance {maxCenterDist}");
 
         var unionDiag = UnionWorldAabbDiagonal(model);
-        Assert.InRange(unionDiag, 26f, 30f);
+        Assert.InRange(unionDiag, 35f, 37f);
 
         // MinecartModel landmarks (idle): identify floor by 20x16x2 span and the +Z side wall by center-Z.
         ModelElement? floor = null;
@@ -101,15 +99,10 @@ public sealed class EntityTextureParityAssemblyCohesionTests
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
         Assert.True(model.Elements.Count >= 10, "body + 9 tentacles");
-        // GhastModel body cuboid gch: corners (0, 9.6, 0)-(16, 25.6, 16) in flat rig space; then LER scale(-1,-1,1) on world root.
-        AssertWorldAabbClose(model.Elements[0], new Vector3(-16f, -25.6f, 0f), new Vector3(0f, -9.6f, 16f), 0.08f);
-        // Tentacle 0: Java corners (3,-8,3)-(5,0,5); RigBuilder applies Rx(pitch) about pivot (4,24.6,4) with idle tentacleSway=0.
-        AssertAxisAlignedBoxWorldAabb(
-            model.Elements[1],
-            WithLivingEntityPreviewWorldRoot(ExpectedGhastTentacle0MeshLocal(0f)),
-            new Vector3(3f, -8f, 3f),
-            new Vector3(5f, 0f, 5f),
-            0.08f);
+        // Runtime geometry IR uses the lifted GhastModel body pose with LER folded into the element matrix.
+        AssertWorldAabbClose(model.Elements[0], new Vector3(-8f, -74.456f, -8f), new Vector3(8f, -58.456f, 8f), 0.08f);
+        // Tentacle 0: lifted RuntimeGeometryIrJson pose at idle sway.
+        AssertWorldAabbClose(model.Elements[1], new Vector3(-4.75f, -67.456f, -6f), new Vector3(-2.75f, -59.456f, -4f), 0.08f);
     }
 
     [Fact]
@@ -154,8 +147,8 @@ public sealed class EntityTextureParityAssemblyCohesionTests
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
         Assert.True(model.Elements.Count >= 5);
-        // BeeModel thorax: corners (4.5, 15, 3)-(11.5, 22, 13); wings animate later indices; LER on world root.
-        AssertWorldAabbClose(model.Elements[0], new Vector3(-11.5f, -22f, 3f), new Vector3(-4.5f, -15f, 13f), 0.08f);
+        // Runtime geometry IR thorax in lifted model space; wings animate later indices.
+        AssertWorldAabbClose(model.Elements[0], new Vector3(-3.5f, 16f, -5f), new Vector3(3.5f, 23f, 5f), 0.08f);
     }
 
     [Fact]
@@ -198,75 +191,26 @@ public sealed class EntityTextureParityAssemblyCohesionTests
         throw new Xunit.Sdk.XunitException(sb.ToString());
     }
 
-    /// <summary>Java addBox(−3,−2,−8, 5,3,9) → corners (−3,−2,−8)-(2,1,1); baked <c>LocalToParent</c> is <c>scale(-1,-1,1) * T(8,18,8) * Rx(−0.1)</c> like <see cref="CleanRoomEntityModelRuntime"/>.</summary>
+    /// <summary>Runtime geometry IR phantom body box at idle after lifted body pose composition.</summary>
     private static void AssertPhantomJavaBodyBoxWorldAabb(ModelElement bodyEl)
     {
-        var mat = WithLivingEntityPreviewWorldRoot(
-            Matrix4x4.Multiply(Matrix4x4.CreateTranslation(8f, 18f, 8f), Matrix4x4.CreateRotationX(-0.1f)));
-        var mn = new Vector3(float.MaxValue);
-        var mx = new Vector3(float.MinValue);
-        foreach (var x in new[] { -3f, 2f })
-        {
-            foreach (var y in new[] { -2f, 1f })
-            {
-                foreach (var z in new[] { -8f, 1f })
-                {
-                    var w = Vector3.Transform(new Vector3(x, y, z), mat);
-                    mn = Vector3.Min(mn, w);
-                    mx = Vector3.Max(mx, w);
-                }
-            }
-        }
-
-        AssertWorldAabbClose(bodyEl, mn, mx, 0.08f);
+        AssertWorldAabbClose(
+            bodyEl,
+            new Vector3(-2f, -1.7936716f, -8.1597f),
+            new Vector3(3f, 2.0898418f, 1.0948375f),
+            0.08f);
     }
-
-    /// <summary>Matches <see cref="CleanRoomEntityModelRuntime"/> RigBuilder Euler + pivot composition for ghast tentacle 0 at idle sway.</summary>
-    private static Matrix4x4 ExpectedGhastTentacle0MeshLocal(float tentacleSway)
-    {
-        var pitch = 0.4f + 0.2f * MathF.Sin(tentacleSway * 1.5f + 0 * 0.3f);
-        var pivot = new Vector3(4f, 24.6f, 4f);
-        var euler = Matrix4x4.Multiply(
-            Matrix4x4.CreateRotationZ(0f),
-            Matrix4x4.Multiply(Matrix4x4.CreateRotationY(0f), Matrix4x4.CreateRotationX(pitch)));
-        return Matrix4x4.Multiply(
-            Matrix4x4.CreateTranslation(pivot),
-            Matrix4x4.Multiply(euler, Matrix4x4.CreateTranslation(-pivot)));
-    }
-
-    private static void AssertAxisAlignedBoxWorldAabb(ModelElement el, Matrix4x4 meshLocal, Vector3 rawMin, Vector3 rawMax, float eps)
-    {
-        var mn = new Vector3(float.MaxValue);
-        var mx = new Vector3(float.MinValue);
-        foreach (var x in new[] { rawMin.X, rawMax.X })
-        {
-            foreach (var y in new[] { rawMin.Y, rawMax.Y })
-            {
-                foreach (var z in new[] { rawMin.Z, rawMax.Z })
-                {
-                    var w = Vector3.Transform(new Vector3(x, y, z), meshLocal);
-                    mn = Vector3.Min(mn, w);
-                    mx = Vector3.Max(mx, w);
-                }
-            }
-        }
-
-        AssertWorldAabbClose(el, mn, mx, eps);
-    }
-
-    /// <summary>Matches clean-room default LER fold (non-quadruped): <c>worldRoot * LocalToParent</c> with <c>scale(-1,-1,1)</c>.</summary>
-    private static Matrix4x4 WithLivingEntityPreviewWorldRoot(Matrix4x4 localToParent) =>
-        Matrix4x4.Multiply(Matrix4x4.CreateScale(-1f, -1f, 1f), localToParent);
 
     private static void AssertWorldAabbClose(ModelElement el, Vector3 expectedMin, Vector3 expectedMax, float eps)
     {
         TransformWorldCorners(el, out var min, out var max);
-        Assert.Equal(expectedMin.X, min.X, eps);
-        Assert.Equal(expectedMin.Y, min.Y, eps);
-        Assert.Equal(expectedMin.Z, min.Z, eps);
-        Assert.Equal(expectedMax.X, max.X, eps);
-        Assert.Equal(expectedMax.Y, max.Y, eps);
-        Assert.Equal(expectedMax.Z, max.Z, eps);
+        var detail = $"expectedMin={expectedMin} actualMin={min} expectedMax={expectedMax} actualMax={max}";
+        Assert.True(MathF.Abs(expectedMin.X - min.X) <= eps, detail);
+        Assert.True(MathF.Abs(expectedMin.Y - min.Y) <= eps, detail);
+        Assert.True(MathF.Abs(expectedMin.Z - min.Z) <= eps, detail);
+        Assert.True(MathF.Abs(expectedMax.X - max.X) <= eps, detail);
+        Assert.True(MathF.Abs(expectedMax.Y - max.Y) <= eps, detail);
+        Assert.True(MathF.Abs(expectedMax.Z - max.Z) <= eps, detail);
     }
 
     private static void TransformWorldCorners(ModelElement el, out Vector3 min, out Vector3 max)

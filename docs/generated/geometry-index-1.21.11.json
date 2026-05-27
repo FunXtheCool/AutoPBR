@@ -36,7 +36,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.BabyModelTransform.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.BabyModelTransform",
-      "extractionStatus": "partial",
+      "extractionStatus": "skipped",
       "classSha256Hex": "08854c32cdaf71b387e900ecd22dda25c0f7c2fd59dc4df4485521c9831a7b79",
       "jarPath": "gzl.class"
     },
@@ -144,7 +144,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.allay.AllayModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.allay.AllayModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "7672c3f86db6b256b28e60c37363fd0be6222a70d0b7477f08b2d965014315a2",
       "jarPath": "gzu.class"
     },
@@ -153,7 +153,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.armadillo.ArmadilloModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.armadillo.ArmadilloModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "9ace10c9011e9eaf9d8687901e7f6884eaab994b8c197318472d7e45224cb624",
       "jarPath": "gzw.class"
     },
@@ -162,7 +162,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.axolotl.AxolotlModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.axolotl.AxolotlModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "3046d9bb2e14501f29919fdeb1a63587225c8b4c86a87046e91f6da1768e1e63",
       "jarPath": "gzy.class"
     },
@@ -171,7 +171,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.bee.BeeModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.bee.BeeModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "a49fe17ba6d4e1e67c113bffb4373d516110501e2589dc937db80b250d866adc",
       "jarPath": "haa.class"
     },
@@ -198,7 +198,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.camel.CamelSaddleModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.camel.CamelSaddleModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "b983f62688d8b35fef3c9ab4af59512b3ddbe29900ae7ae0c91fc4d3a29d2b03",
       "jarPath": "hae.class"
     },
@@ -261,7 +261,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.equine.AbstractEquineModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.equine.AbstractEquineModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "329f9ae4215aba1718853fecee1d283f1daebc9464ceb77c38956e5457717e75",
       "jarPath": "hap.class"
     },
@@ -270,7 +270,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.equine.DonkeyModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.equine.DonkeyModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "3be0f0fe93f04a4455dbc5962679d97fcab84583ba1213baed97052c7f5fb77c",
       "jarPath": "haq.class"
     },
@@ -279,7 +279,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.equine.EquineSaddleModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.equine.EquineSaddleModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "8a678df635e10eb2f73f7f8bcc1f51c83b729535615a6f650c6a5eb5013ffeeb",
       "jarPath": "har.class"
     },
@@ -306,7 +306,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.feline.FelineModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.feline.FelineModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "0fabb373d8b5c0abf96dfecd4fc86385cb9fbf70a8b45417a822775f7673f6ca",
       "jarPath": "hav.class"
     },
@@ -387,7 +387,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.fox.FoxModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.fox.FoxModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "54793ba97133d76687c68529a2f24290c75de27ecccf2b069dddf71b1761e84c",
       "jarPath": "hbg.class"
     },
@@ -396,7 +396,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.frog.FrogModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.frog.FrogModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "008d6b3c3bace11a87d478da464c6010ef1c5ce49635d87a52b59112a03d5ff8",
       "jarPath": "hbi.class"
     },
@@ -414,7 +414,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.ghast.HappyGhastHarnessModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.ghast.HappyGhastHarnessModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "8b3364fa17f55574690cab59b447b72e83ee75f40554c8141bdb3e681e994551",
       "jarPath": "hbl.class"
     },
@@ -441,7 +441,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.golem.CopperGolemModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.golem.CopperGolemModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "d6f3c52e390f3a9b95198328edda7fa0a15fe30b4c098dbaeea338402e2ac5d3",
       "jarPath": "hbq.class"
     },
@@ -450,7 +450,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.golem.IronGolemModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.golem.IronGolemModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "f75fea47da36a4627f8334208df9d1423a831e109b005c85b63e8513946442e3",
       "jarPath": "hbr.class"
     },
@@ -459,7 +459,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.golem.SnowGolemModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.golem.SnowGolemModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "cc589e73a7ebecf1d29646f80b6a3eacba5adafd3a1200114971ef92181c03cf",
       "jarPath": "hbs.class"
     },
@@ -486,7 +486,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.nautilus.NautilusArmorModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.nautilus.NautilusArmorModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "1b98376765011c9e4773618b68c95295f3820023366941af50925f9826ab31dd",
       "jarPath": "hbx.class"
     },
@@ -495,7 +495,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.nautilus.NautilusModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.nautilus.NautilusModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "5eea654027e5f3ebffe0145f24aa5a10c0acc4f37bdd6aa75bd2347240655335",
       "jarPath": "hby.class"
     },
@@ -504,7 +504,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.nautilus.NautilusSaddleModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.nautilus.NautilusSaddleModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "8b99a974116994690a16e0e4c41a36753f0de91faf15533a89923e706cfc4d23",
       "jarPath": "hbz.class"
     },
@@ -576,7 +576,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.sheep.SheepFurModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.sheep.SheepFurModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "517f098f5c9cf1177c7e7ac8aa1592a42d1e058e8d21ee6de5f69c7fc8a2a708",
       "jarPath": "hcn.class"
     },
@@ -594,7 +594,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.sniffer.SnifferModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.sniffer.SnifferModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "b941f5b62b52525656a50bc8bd0b0aff64f39f0f0e69f471c99d1175741329af",
       "jarPath": "hcq.class"
     },
@@ -603,7 +603,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.squid.SquidModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.squid.SquidModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "2bc91e1c41c50956bd607873bd1a6823cda3f6ad57942356aa215c037a4d59ef",
       "jarPath": "hcs.class"
     },
@@ -612,7 +612,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.animal.turtle.TurtleModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.animal.turtle.TurtleModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "d350f86ad27b2d27a9960c1e079dd9c46bc1c619b1195cd8a2b7bb3f3d3ad8b6",
       "jarPath": "hcu.class"
     },
@@ -657,7 +657,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.effects.SpinAttackEffectModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.effects.SpinAttackEffectModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "e89a5ebf97966066952920a62f9fa4af7808b8ee0914ace9049bcf17193eee64",
       "jarPath": "hda.class"
     },
@@ -684,7 +684,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.monster.creaking.CreakingModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.monster.creaking.CreakingModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "613915ccd9322703ba58f93851edec54528986c7d6d72606060dbd5107196545",
       "jarPath": "hdy.class"
     },
@@ -711,7 +711,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.monster.enderman.EndermanModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.monster.enderman.EndermanModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "ac1d69b7adeaa14f104115f4c330f387dbb9e554594d5272c66e9cf2945259e6",
       "jarPath": "hee.class"
     },
@@ -720,7 +720,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.monster.endermite.EndermiteModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.monster.endermite.EndermiteModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "4d6e5a6ffed824896e30608ea995b6bef027df7ea81041f634a65f7f6b248b20",
       "jarPath": "heg.class"
     },
@@ -756,7 +756,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.monster.hoglin.HoglinModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.monster.hoglin.HoglinModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "ba02eb7f20159a570ff2f063a5ee8f3612e34ca370146e8128b9330709b83ce9",
       "jarPath": "hen.class"
     },
@@ -765,7 +765,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.monster.illager.IllagerModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.monster.illager.IllagerModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "93fd39ceaca92d957bd95929b91e2065cc4c4db0c9f0c84942a1686793e0fe36",
       "jarPath": "hep.class"
     },
@@ -792,7 +792,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.monster.piglin.AbstractPiglinModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.monster.piglin.AbstractPiglinModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "b6a41ef4c2384abc7f40064dba9f4b5b7a401398a54d3a71bb5a3486f3f9170d",
       "jarPath": "hev.class"
     },
@@ -837,7 +837,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.monster.silverfish.SilverfishModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.monster.silverfish.SilverfishModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "e2633a2a55475e33b4b1a033fa77e277f27c1bcc2c0a8b2256edeca7d996da76",
       "jarPath": "hfd.class"
     },
@@ -855,7 +855,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.monster.skeleton.SkeletonModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.monster.skeleton.SkeletonModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "4bf2a741aeae3bb421457faac9a82608ac85ff4341247a24b106b387c236e11e",
       "jarPath": "hfg.class"
     },
@@ -900,7 +900,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.monster.vex.VexModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.monster.vex.VexModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "20becee8ad09d7c09c05d8e18ef908b3d5b4ff47228011c63bdabcc951dbbbac",
       "jarPath": "hfp.class"
     },
@@ -918,7 +918,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.monster.witch.WitchModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.monster.witch.WitchModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "9998400ade305b7d28243390f343b27356fdb4e9ed4d987718f895e9c4d55531",
       "jarPath": "hft.class"
     },
@@ -972,7 +972,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.monster.zombie.ZombieVillagerModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.monster.zombie.ZombieVillagerModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "c379e2b9905a3fe057dd6c9a4754db66da5f251c8a3bc708a7aaedad2bfc151b",
       "jarPath": "hgb.class"
     },
@@ -981,7 +981,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.npc.VillagerModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.npc.VillagerModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "37c682dab3cceaa5c7299737e7bfb98d1f6f883a3add4cec8593c0d1e1d8005b",
       "jarPath": "hgd.class"
     },
@@ -1125,7 +1125,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.object.equipment.ElytraModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.object.equipment.ElytraModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "eb5eeb0eef4232fcac6172c961b036929b8d6a23ca79e0924cbe182f10b6a182",
       "jarPath": "hgz.class"
     },
@@ -1197,7 +1197,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.object.skull.PiglinHeadModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.object.skull.PiglinHeadModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "00266e80f6d1bb0f37515b77c3f2be60fa4118d20963eebf165265899672ab83",
       "jarPath": "hhk.class"
     },
@@ -1206,7 +1206,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.object.skull.SkullModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.object.skull.SkullModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "a5204c5353eef014e579724d2dac452509b9d50e4a179de70a4e9a42676fe3f8",
       "jarPath": "hhl.class"
     },
@@ -1251,7 +1251,7 @@
       "shardRelPath": "geometry/1.21.11/net.minecraft.client.model.player.PlayerEarsModel.json",
       "profile": "proguard_1.21.11",
       "modelIndexJvmName": "net.minecraft.client.model.player.PlayerEarsModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "9677b6560152829ff52b6713462a70c87bdf9e1a430be27e100b855529d2ccb4",
       "jarPath": "hhs.class"
     },

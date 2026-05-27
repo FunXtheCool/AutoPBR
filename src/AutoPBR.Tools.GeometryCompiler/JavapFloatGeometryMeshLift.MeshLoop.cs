@@ -11,7 +11,7 @@ internal static partial class JavapFloatGeometryMeshLift
     private readonly record struct CountedLoop(int LoopVarSlot, int Limit);
 
     private static readonly Regex GetStaticIntMatrixFieldRegex = new(
-        @"getstatic\s+#\d+\s+//\s*Field\s+[\w$./]+\.(\w+)",
+        @"getstatic\s+#\d+\s+//\s*Field\s+(?:[\w$./]+\.)?(\w+)",
         RegexOptions.CultureInvariant | RegexOptions.Compiled,
         TimeSpan.FromSeconds(2));
 

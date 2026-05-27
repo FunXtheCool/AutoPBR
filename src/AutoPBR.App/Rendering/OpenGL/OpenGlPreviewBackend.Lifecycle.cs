@@ -302,4 +302,172 @@ public sealed partial class OpenGlPreviewBackend
         UploadEntitySkinningUboTail(gl, 1, boneSnapshotCount, meshSpaceLiftY);
     }
 
+    /// <summary>Called from <see cref="AutoPBR.App.Controls.GlPbrPreviewControl.OnOpenGlInit"/> only.</summary>
+    internal void GlInit(GlInterface glInterface)
+    {
+        lock (_sync)
+        {
+            _lastError = null;
+            try
+            {
+                _gl = GL.GetApi(glInterface.GetProcAddress);
+            }
+            catch (Exception ex)
+            {
+                _lastError = ex.ToString();
+                EmitDiagnostic("[3D preview] " + _lastError);
+                return;
+            }
+
+            var gl = _gl;
+            string versionStr;
+            unsafe
+            {
+                var p = gl.GetString(StringName.Version);
+                versionStr = p is null ? "(unknown)" : Marshal.PtrToStringUTF8((nint)p) ?? "(unknown)";
+            }
+
+            var useOpenGlEs = versionStr.Contains("OpenGL ES", StringComparison.OrdinalIgnoreCase);
+            _program = new GlShaderProgram(gl, "genesis.vert", "genesis.frag", useOpenGlEs, out var err);
+            if (!_program.IsValid)
+            {
+                _lastError = err ?? "Shader link failed.";
+                EmitDiagnostic("[3D preview] " + _lastError);
+                _program.Dispose();
+                _program = null;
+                return;
+            }
+
+            EmitDiagnostic(useOpenGlEs
+                ? $"[3D preview] Context: {versionStr} (Genesis shader path, GLSL ES 3.0)."
+                : $"[3D preview] Context: {versionStr} (Genesis shader path, GLSL 330 core).");
+
+            // Genesis Shadows Phase 2: depth-only program + FBO shadow target. If either fails we keep
+            // the main path running and just disable shadow sampling at draw time.
+            // PHASE3-CSM hook: when cascades arrive, allocate N targets here (or one array texture).
+            _shadowProgram = new GlShaderProgram(gl, "genesis_shadow.vert", "genesis_shadow.frag", useOpenGlEs,
+                out var shadowErr);
+            if (!_shadowProgram.IsValid)
+            {
+                EmitDiagnostic("[3D preview] Shadow program: " + (shadowErr ?? "link failed"));
+                _shadowProgram.Dispose();
+                _shadowProgram = null;
+            }
+
+            var shadowResolution = Math.Clamp(_settings.ShadowMapResolution, 256, 4096);
+            try
+            {
+                _shadowTarget = new GlShadowMapTarget(gl, shadowResolution, useOpenGlEs);
+                EmitDiagnostic(
+                    $"[3D preview] Shadow map: {shadowResolution}x{shadowResolution}");
+            }
+            catch (Exception ex)
+            {
+                _shadowTarget = null;
+                EmitDiagnostic("[3D preview] Shadow target init failed: " + ex.Message);
+            }
+
+            var nearest = true;
+            _albedo = new GlTexture2D(gl, nearest);
+            _normal = new GlTexture2D(gl, nearest);
+            _spec = new GlTexture2D(gl, nearest);
+            _height = new GlTexture2D(gl, nearest);
+            _mesh = new GlMeshBuffer(gl);
+            _groundMesh = new GlMeshBuffer(gl);
+            var groundGeom = PreviewMeshFactory.CreatePreviewGroundPlane();
+            _groundMesh.Upload(groundGeom.InterleavedVertices, groundGeom.Indices);
+
+            _neutralNormal = new GlTexture2D(gl, nearest);
+            _neutralNormal.UploadRgba(1, 1, [128, 128, 255, 255], nearest);
+            _neutralSpec = new GlTexture2D(gl, nearest);
+            _neutralSpec.UploadRgba(1, 1, [120, 60, 40, 255], nearest);
+            _neutralHeight = new GlTexture2D(gl, nearest);
+            _neutralHeight.UploadRgba(1, 1, [128, 128, 128, 255], nearest);
+
+            _grassGroundAlbedo = new GlTexture2D(gl, nearest);
+            _grassGroundReady = TryUploadGrassGroundTexture(gl);
+
+            TryInitLineOverlay(gl, useOpenGlEs);
+            TryInitSunBillboard(gl, useOpenGlEs);
+            TryInitAtmosphere(gl, useOpenGlEs);
+            InitEntitySkinningBoneUbo(gl);
+            _gpuAlive = true;
+            _materialDirty = true;
+            _meshDirty = true;
+
+            // Context init can complete after SetScene; re-derive orbit from the current scene so updated
+            // PreviewCamera defaults (or first scene push) always match the GPU path.
+            if (_scene is not null)
+            {
+                SyncOrbitFromSceneLocked(_scene);
+                _orbitSyncedKind = _scene.SceneKind == PreviewSceneKind.ItemPlane
+                    ? PreviewSceneKind.ItemPlane
+                    : PreviewSceneKind.BlockCube;
+            }
+
+            _loggedMeshReady = false;
+            _loggedZeroIndex = false;
+        }
+    }
+
+    /// <summary>Called from <see cref="AutoPBR.App.Controls.GlPbrPreviewControl.OnOpenGlDeinit"/> only.</summary>
+    internal void GlDeinit(GlInterface glInterface)
+    {
+        _ = glInterface;
+        lock (_sync)
+        {
+            _gpuAlive = false;
+            _mesh?.Dispose();
+            _mesh = null;
+            _groundMesh?.Dispose();
+            _groundMesh = null;
+            _grassGroundAlbedo?.Dispose();
+            _grassGroundAlbedo = null;
+            _neutralNormal?.Dispose();
+            _neutralNormal = null;
+            _neutralSpec?.Dispose();
+            _neutralSpec = null;
+            _neutralHeight?.Dispose();
+            _neutralHeight = null;
+            _grassGroundReady = false;
+            _albedo?.Dispose();
+            _albedo = null;
+            _normal?.Dispose();
+            _normal = null;
+            _spec?.Dispose();
+            _spec = null;
+            _height?.Dispose();
+            _height = null;
+            _program?.Dispose();
+            _program = null;
+            _shadowProgram?.Dispose();
+            _shadowProgram = null;
+            _shadowTarget?.Dispose();
+            _shadowTarget = null;
+            DestroyAtmosphereResources();
+            DestroySunBillboard();
+            DestroyLineOverlay();
+            if (_entityBoneUbo != 0)
+            {
+                _gl?.DeleteBuffer(_entityBoneUbo);
+                _entityBoneUbo = 0;
+            }
+
+            _gl = null;
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        lock (_sync)
+        {
+            _gpuAlive = false;
+        }
+    }
 }

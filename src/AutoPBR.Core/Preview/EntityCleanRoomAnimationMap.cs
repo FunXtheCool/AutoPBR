@@ -49,14 +49,14 @@ public static class EntityCleanRoomAnimationMap
 
     private static EntityCleanRoomAnimationMapRoot EnsureLoaded()
     {
-        if (_root is not null)
+        if (_root is not null && _byAnimation is not null && _byBuilder is not null)
         {
             return _root;
         }
 
         lock (Gate)
         {
-            if (_root is not null)
+            if (_root is not null && _byAnimation is not null && _byBuilder is not null)
             {
                 return _root;
             }
@@ -65,14 +65,14 @@ public static class EntityCleanRoomAnimationMap
             var path = Path.Combine(nativeDir, MapFileName);
             if (!File.Exists(path))
             {
+                _byAnimation = FrozenDictionary<string, EntityCleanRoomAnimationBinding>.Empty;
+                _byBuilder = FrozenDictionary<string, FrozenSet<EntityCleanRoomAnimationBinding>>.Empty;
                 _root = new EntityCleanRoomAnimationMapRoot(
                     1,
                     "26.1.2",
                     "animation-index-26.1.2.json",
                     "animation/26.1.2",
                     []);
-                _byAnimation = FrozenDictionary<string, EntityCleanRoomAnimationBinding>.Empty;
-                _byBuilder = FrozenDictionary<string, FrozenSet<EntityCleanRoomAnimationBinding>>.Empty;
                 return _root;
             }
 
@@ -109,13 +109,6 @@ public static class EntityCleanRoomAnimationMap
                 list.Add(new EntityCleanRoomAnimationBinding(anim, builders, restrict, notes));
             }
 
-            _root = new EntityCleanRoomAnimationMapRoot(
-                root.TryGetProperty("schemaVersion", out var sv) && sv.TryGetInt32(out var v) ? v : 1,
-                ver,
-                indexName,
-                shardRoot,
-                list);
-
             var byAnim = new Dictionary<string, EntityCleanRoomAnimationBinding>(StringComparer.Ordinal);
             var byBuilder = new Dictionary<string, HashSet<EntityCleanRoomAnimationBinding>>(StringComparer.Ordinal);
             foreach (var binding in list)
@@ -138,6 +131,12 @@ public static class EntityCleanRoomAnimationMap
                 static kv => kv.Key,
                 static kv => kv.Value.ToFrozenSet(),
                 StringComparer.Ordinal);
+            _root = new EntityCleanRoomAnimationMapRoot(
+                root.TryGetProperty("schemaVersion", out var sv) && sv.TryGetInt32(out var v) ? v : 1,
+                ver,
+                indexName,
+                shardRoot,
+                list);
             return _root;
         }
     }

@@ -3,25 +3,26 @@
   "versionLabel": "26.1.2",
   "officialJvmName": "net.minecraft.client.model.object.armorstand.ArmorStandArmorModel",
   "profile": "named_jar_26.1.2",
-  "extractionStatus": "ok",
+  "extractionStatus": "partial",
   "extractionNotes": [
     "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.object.armorstand.ArmorStandArmorModel).",
+    "Strict structural validation failed (1): reference_mismatch: part \u0027rightarm\u0027: cuboid count reference=0 compared=1",
     "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
   ],
-  "factoryMethod": "createArmorLayerSet",
+  "factoryMethod": "createBaseMesh",
   "roots": [
     {
       "id": "root",
       "pose": {
         "translation": [
-          0.000000000,
-          0.000000000,
-          0.000000000
+          0,
+          0,
+          0
         ],
         "rotationEulerRad": [
-          0.000000000,
-          0.000000000,
-          0.000000000
+          0,
+          0,
+          0
         ],
         "eulerOrder": "XYZ"
       },
@@ -31,52 +32,108 @@
           "id": "right_leg",
           "pose": {
             "translation": [
-              -1.899999976,
-              11.00000000,
-              0.000000000
+              -1.89999998,
+              11,
+              0
             ],
             "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
+              0,
+              0,
+              0
             ],
-            "eulerOrder": "XYZ"
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              -1.89999998,
+              11,
+              0
+            ]
           },
-          "cuboids": [],
+          "cuboids": [
+            {
+              "from": [
+                -2,
+                0,
+                -2
+              ],
+              "to": [
+                2,
+                12,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
           "children": []
         },
         {
           "id": "left_leg",
           "pose": {
             "translation": [
-              1.899999976,
-              11.00000000,
-              0.000000000
+              1.89999998,
+              11,
+              0
             ],
             "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
+              0,
+              0,
+              0
             ],
-            "eulerOrder": "XYZ"
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              1.89999998,
+              11,
+              0
+            ]
           },
-          "cuboids": [],
+          "cuboids": [
+            {
+              "from": [
+                -2,
+                0,
+                -2
+              ],
+              "to": [
+                2,
+                12,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "mirrorU": true
+            }
+          ],
           "children": []
         },
         {
           "id": "head",
           "pose": {
             "translation": [
-              0.000000000,
-              1.000000000,
-              0.000000000
+              0,
+              1,
+              0
             ],
             "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
+              0,
+              0,
+              0
             ],
-            "eulerOrder": "XYZ"
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              1,
+              0
+            ]
           },
           "cuboids": [
             {
@@ -104,16 +161,21 @@
               "id": "hat",
               "pose": {
                 "translation": [
-                  0.000000000,
-                  0.000000000,
-                  0.000000000
+                  0,
+                  0,
+                  0
                 ],
                 "rotationEulerRad": [
-                  0.000000000,
-                  0.000000000,
-                  0.000000000
+                  0,
+                  0,
+                  0
                 ],
-                "eulerOrder": "XYZ"
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  0,
+                  0,
+                  0
+                ]
               },
               "cuboids": [
                 {
@@ -144,54 +206,130 @@
           "id": "body",
           "pose": {
             "translation": [
-              0.000000000,
-              0.000000000,
-              0.000000000
+              0,
+              0,
+              0
             ],
             "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
+              0,
+              0,
+              0
             ],
-            "eulerOrder": "XYZ"
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
           },
-          "cuboids": [],
+          "cuboids": [
+            {
+              "from": [
+                -4,
+                0,
+                -2
+              ],
+              "to": [
+                4,
+                12,
+                2
+              ],
+              "uvOrigin": [
+                16,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
           "children": []
         },
         {
           "id": "right_arm",
           "pose": {
             "translation": [
-              -5.000000000,
-              2.000000000,
-              0.000000000
+              -5,
+              2,
+              0
             ],
             "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
+              0,
+              0,
+              0
             ],
-            "eulerOrder": "XYZ"
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              -5,
+              2,
+              0
+            ]
           },
-          "cuboids": [],
+          "cuboids": [
+            {
+              "from": [
+                -3,
+                -2,
+                -2
+              ],
+              "to": [
+                1,
+                10,
+                2
+              ],
+              "uvOrigin": [
+                40,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
           "children": []
         },
         {
           "id": "left_arm",
           "pose": {
             "translation": [
-              5.000000000,
-              2.000000000,
-              0.000000000
+              5,
+              2,
+              0
             ],
             "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
+              0,
+              0,
+              0
             ],
-            "eulerOrder": "XYZ"
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              5,
+              2,
+              0
+            ]
           },
-          "cuboids": [],
+          "cuboids": [
+            {
+              "from": [
+                -1,
+                -2,
+                -2
+              ],
+              "to": [
+                3,
+                10,
+                2
+              ],
+              "uvOrigin": [
+                40,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "mirrorU": true
+            }
+          ],
           "children": []
         }
       ]
@@ -261,8 +399,39 @@
     12,
     4,
     1.9,
-    12
+    12,
+    -4,
+    -8,
+    -4,
+    8,
+    8,
+    8,
+    -4,
+    -8,
+    -4,
+    8,
+    8,
+    8,
+    0.5,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -0.1,
+    -1.9,
+    11,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -0.1,
+    1.9,
+    11
   ],
+  "textureWidth": 64,
+  "textureHeight": 32,
   "liftSummary": {
     "cuboidApproxCount": 0,
     "poseApproxCount": 0,

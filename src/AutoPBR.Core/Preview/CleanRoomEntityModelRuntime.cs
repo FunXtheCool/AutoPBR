@@ -53,6 +53,13 @@ internal sealed partial class CleanRoomEntityModelRuntime : IEntityModelRuntime
             return false;
         }
 
+        // JVM stems like adultfelinemodel falsely match quadruped key "cat"; feline uses cow-class LER via JVM gate.
+        if (stem.Contains("feline", StringComparison.OrdinalIgnoreCase) ||
+            stem.Contains("rabbit", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
         if (ContainsAny(stem, QuadrupedKeys))
         {
             return true;
@@ -151,6 +158,44 @@ internal sealed partial class CleanRoomEntityModelRuntime : IEntityModelRuntime
         var texRef = ToTextureRef(norm);
         var stem = Path.GetFileNameWithoutExtension(norm).ToLowerInvariant();
         var isBaby = LooksLikeBabyTexture(stem, norm);
+        if (EntityTextureParityCatalog.IsCatalogued(norm) &&
+            TryBuildStaticMesh(
+                norm,
+                profile,
+                idlePhase01,
+                animationTimeSeconds,
+                out var irMerged,
+                out var irProvenance,
+                applyGeometryIrSetupAnimMotion: true) &&
+            irProvenance.Kind == PreviewMeshDriverKind.RuntimeGeometryIrJson)
+        {
+            if (irMerged.Elements.Count == 0)
+            {
+                if (routeCacheOwner is not null)
+                {
+                    routeCacheOwner.GpuBoneDispatchRoute = null;
+                }
+
+                return false;
+            }
+
+            foreach (var el in irMerged.Elements)
+            {
+                scratch.Add(el.LocalToParent);
+            }
+
+            boneCount = scratch.Count;
+            if (routeCacheOwner is not null)
+            {
+                var rule = EntityTextureParityCatalog.ResolveRule(norm, stem);
+                routeCacheOwner.GpuBoneDispatchRoute = rule is null
+                    ? null
+                    : EntityGpuBoneDispatchRoute.ForParity(rule.BuilderMethod, irProvenance.Detail);
+            }
+
+            return true;
+        }
+
         EntityGpuBoneDispatchRoute discoveredRoute;
         using (EntityRigPoseCapture.Use(scratch))
         {
@@ -187,14 +232,9 @@ internal sealed partial class CleanRoomEntityModelRuntime : IEntityModelRuntime
         if (EntityGpuBoneFillPolicy.ShouldApplyStandardLivingPreviewBasis(norm, stem) &&
             discoveredRoute.Kind != EntityGpuBoneDispatchKind.ParityCatalog)
         {
-            if (UsesQuadrupedLerMirrorRightComposeLocalChain(stem, norm))
-            {
-                ApplyQuadrupedLivingEntityRendererBasisToBoneMatrices(scratch);
-            }
-            else
-            {
-                ApplyStandardLivingEntityRendererBasisToBoneMatrices(scratch);
-            }
+            ApplyLivingEntityRendererBasisToBoneMatrices(
+                scratch,
+                ResolveGeometryIrLerBasis(discoveredRoute.GeometryIrOfficialJvm, stem, norm));
         }
 
         boneCount = scratch.Count;
@@ -216,6 +256,24 @@ internal sealed partial class CleanRoomEntityModelRuntime : IEntityModelRuntime
         for (var i = 0; i < bones.Count; i++)
         {
             bones[i] = Matrix4x4.Multiply(bones[i], worldRoot);
+        }
+    }
+
+    private static void ApplyLivingEntityRendererBasisToBoneMatrices(
+        List<Matrix4x4> bones,
+        GeometryIrLerBasisKind basis)
+    {
+        switch (basis)
+        {
+            case GeometryIrLerBasisKind.Skip:
+            case GeometryIrLerBasisKind.EquineDedicated:
+                return;
+            case GeometryIrLerBasisKind.RightComposeLocalChain:
+                ApplyQuadrupedLivingEntityRendererBasisToBoneMatrices(bones);
+                return;
+            default:
+                ApplyStandardLivingEntityRendererBasisToBoneMatrices(bones);
+                return;
         }
     }
 

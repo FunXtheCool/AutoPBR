@@ -33,6 +33,17 @@
     { "renderStateField": "idleAnimationState", "setupAnimStateField": "idleAnimationState", "entityAnimationState": "CopperGolem.idle" }
 
   ],
+  "waivedSetupAnimStateFields": [
+
+    "interactionGetItem",
+
+    "interactionGetNoItem",
+
+    "interactionDropItem",
+
+    "interactionDropNoItem"
+
+  ],
 
   "livingEntityFields": [
 

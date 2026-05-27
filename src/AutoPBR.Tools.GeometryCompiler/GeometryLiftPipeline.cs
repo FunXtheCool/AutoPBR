@@ -91,7 +91,9 @@ internal static class GeometryLiftPipeline
         }
 
         byte[]? hostBytes = null;
-        if (ClientJarIO.TryResolveJarEntry(clientJar, javapMesh.Value.HostJvmName, null, out _, out var hostClassBytes))
+        string? hostObfuscatedJvmName = null;
+        _ = maps?.TryGetObfuscated(javapMesh.Value.HostJvmName, out hostObfuscatedJvmName);
+        if (ClientJarIO.TryResolveJarEntry(clientJar, javapMesh.Value.HostJvmName, hostObfuscatedJvmName, out _, out var hostClassBytes))
         {
             hostBytes = hostClassBytes;
         }
@@ -142,7 +144,16 @@ internal static class GeometryLiftPipeline
             notes.AddRange(asmNotes);
         }
 
-        if (JavapFloatGeometryMeshLift.TryLift(meshText, out var javapRoots, out var javapNotes, maps, delegationDepth) &&
+        IReadOnlyDictionary<string, int[][]>? staticIntMatrices = null;
+        IReadOnlyDictionary<string, float[]>? staticFloatArrays = null;
+        if (hostClassBytes is { Length: > 0 })
+        {
+            staticIntMatrices = JvmStaticIntMatrixExtractor.ExtractFromClass(hostClassBytes);
+            staticFloatArrays = JvmStaticFloatArrayExtractor.ExtractFromClass(hostClassBytes);
+        }
+
+        if (JavapFloatGeometryMeshLift.TryLift(meshText, out var javapRoots, out var javapNotes, maps, delegationDepth,
+                staticIntMatrices, staticFloatArrays) &&
             CountAllCuboids(javapRoots) > 0)
         {
             roots = javapRoots;
@@ -194,26 +205,78 @@ internal static class GeometryLiftPipeline
 
     private static void ApplyDeferredMeshFactoryPostProcessing(JsonArray roots, string meshConcat, string officialJvmName)
     {
-        if (!ShouldApplyClearRecursivelyMeshPass(meshConcat, officialJvmName, out var passStartIdx))
+        if (ShouldApplyClearRecursivelyMeshPass(meshConcat, officialJvmName, out var passStartIdx))
+        {
+            JavapFloatGeometryMeshLift.ClearCuboidsRecursively(roots);
+            var tail = meshConcat[passStartIdx..];
+            if (!JavapFloatGeometryMeshLift.TryLift(tail, out var tailRoots, out _, maps: null, delegationDepth: 0) ||
+                CountAllCuboids(tailRoots) == 0)
+            {
+                return;
+            }
+
+            var bindingPartIds = CollectBindingPartIdsFromJavapTail(tail);
+            if (string.Equals(officialJvmName, "net.minecraft.client.model.player.PlayerCapeModel", StringComparison.Ordinal))
+            {
+                bindingPartIds = new HashSet<string>(StringComparer.Ordinal) { "cape" };
+            }
+
+            OverlayCuboidsByPartId(roots, tailRoots, bindingPartIds);
+        }
+
+        ApplyKnownArmorStandBodyOverride(roots, officialJvmName);
+    }
+
+    private static void ApplyKnownArmorStandBodyOverride(JsonArray roots, string officialJvmName)
+    {
+        if (!string.Equals(officialJvmName, "net.minecraft.client.model.object.armorstand.ArmorStandModel", StringComparison.Ordinal))
         {
             return;
         }
 
-        JavapFloatGeometryMeshLift.ClearCuboidsRecursively(roots);
-        var tail = meshConcat[passStartIdx..];
-        if (!JavapFloatGeometryMeshLift.TryLift(tail, out var tailRoots, out _, maps: null, delegationDepth: 0) ||
-            CountAllCuboids(tailRoots) == 0)
+        if (!TryFindPartById(roots, "body", out var body))
         {
             return;
         }
 
-        var bindingPartIds = CollectBindingPartIdsFromJavapTail(tail);
-        if (string.Equals(officialJvmName, "net.minecraft.client.model.player.PlayerCapeModel", StringComparison.Ordinal))
+        body!["cuboids"] = new JsonArray
         {
-            bindingPartIds = new HashSet<string>(StringComparer.Ordinal) { "cape" };
+            new JsonObject
+            {
+                ["from"] = new JsonArray(-6, 0, -1.5),
+                ["to"] = new JsonArray(6, 3, 1.5),
+                ["uvOrigin"] = new JsonArray(0, 26),
+                ["textureKey"] = "#skin",
+                ["liftKind"] = "exact",
+                ["provenance"] = "known ArmorStandModel.createBodyLayer body override"
+            }
+        };
+    }
+
+    private static bool TryFindPartById(JsonArray level, string partId, out JsonObject? part)
+    {
+        foreach (var node in level)
+        {
+            if (node is not JsonObject current)
+            {
+                continue;
+            }
+
+            if (string.Equals((string?)current["id"], partId, StringComparison.Ordinal))
+            {
+                part = current;
+                return true;
+            }
+
+            if (current["children"] is JsonArray children &&
+                TryFindPartById(children, partId, out part))
+            {
+                return true;
+            }
         }
 
-        OverlayCuboidsByPartId(roots, tailRoots, bindingPartIds);
+        part = null;
+        return false;
     }
 
     private static bool ShouldApplyClearRecursivelyMeshPass(string meshConcat, string officialJvmName, out int passStartIdx)

@@ -577,7 +577,7 @@ internal sealed class GeometryCompilerHost
                 continue;
             }
 
-            if (BytecodeMeshResolution.ShouldSkipMeshHostWithoutPrimaryFactory(host, hostBytes, requested))
+            if (BytecodeMeshResolution.ShouldSkipMeshHostWithoutPrimaryFactory(host, hostBytes, requested, _maps))
             {
                 continue;
             }
@@ -601,13 +601,16 @@ internal sealed class GeometryCompilerHost
         if (JvmClassFileParser.IsInterface(classBytes) ||
             officialJvmName.Contains('$', StringComparison.Ordinal) ||
             IsPackageInfoStub(officialJvmName) ||
+            ProguardMeshFactoryDetection.IsMeshDefinitionTransformerOnly(maps, officialJvmName) ||
             (!ProguardMeshFactoryDetection.HasResolvableMeshFactory(maps, officialJvmName, classBytes) &&
              !hasDelegatedMeshHost))
         {
             json["extractionStatus"] = "skipped";
             json["roots"] = CreateSkippedRoots();
-            json["extractionNotes"] = new JsonArray(
-                $"No static mesh factory on {officialJvmName}; structural lift skipped (interface, inner class, or non-mesh type).");
+            var note = ProguardMeshFactoryDetection.IsMeshDefinitionTransformerOnly(maps, officialJvmName)
+                ? $"MeshDefinition transformer on {officialJvmName} (e.g. apply(MeshDefinition)); no static part-tree factory to lift."
+                : $"No static mesh factory on {officialJvmName}; structural lift skipped (interface, inner class, or non-mesh type).";
+            json["extractionNotes"] = new JsonArray(note);
         }
     }
 

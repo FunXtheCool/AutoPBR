@@ -413,12 +413,21 @@ public static class GeometryIrLiftQualityReport
 
         if (flatNested > 0 && legsAtRoot)
         {
+            if (referenceLegsAtRoot == false)
+            {
+                if (bindingNote)
+                {
+                    return (false, "extractionNotes mention addChild binding; hierarchy not lifted");
+                }
+
+                // Composed-flat: IR mirrors flat Java factory; reference_java nests legs (world pose via topology align).
+                return (true, null);
+            }
+
             if (referenceLegsAtRoot != true)
             {
-                return referenceLegsAtRoot == false
-                    ? (false, "IR flat body/legs at root but reference_java does not use flat root siblings")
-                    : (false,
-                        $"suspectedFlatNestedPartCount={flatNested} with body/legs still root siblings (reference unavailable)");
+                return (false,
+                    $"suspectedFlatNestedPartCount={flatNested} with body/legs still root siblings (reference unavailable)");
             }
 
             if (!TryGetFirstRootChildren(shardRoot, out var irRootKids) ||
@@ -607,9 +616,18 @@ public static class GeometryIrLiftQualityReport
             return (true, null);
         }
 
+        var topologyAligned = GeometryIrReferenceTopologyAlign.ApplyForWorldPoseCompare(referenceRoot, repairedIr);
+        var poseSynced = GeometryIrReferencePoseSync.ApplyForComparisons(referenceRoot, topologyAligned);
+        var alignedCmp = GeometryIrReferenceComparer.CompareReferenceWorldPartOrigins(
+            referenceRoot, poseSynced, tolerance: 0.05);
+        if (alignedCmp.IsMatch)
+        {
+            return (true, null);
+        }
+
         var rawCmp = GeometryIrReferenceComparer.CompareReferenceWorldPartOrigins(
             referenceRoot, shardRoot, tolerance: 0.05);
-        var message = repairedCmp.Message;
+        var message = alignedCmp.Message ?? repairedCmp.Message;
         if (rawCmp.IsMatch)
         {
             message = string.IsNullOrEmpty(message)

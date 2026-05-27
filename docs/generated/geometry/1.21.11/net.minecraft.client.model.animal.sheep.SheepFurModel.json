@@ -3,10 +3,9 @@
   "versionLabel": "1.21.11",
   "officialJvmName": "net.minecraft.client.model.animal.sheep.SheepFurModel",
   "profile": "proguard_1.21.11",
-  "extractionStatus": "partial",
+  "extractionStatus": "ok",
   "extractionNotes": [
     "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.sheep.SheepFurModel).",
-    "Strict structural validation failed (6): cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027; cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027; cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027; cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027",
     "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
   ],
   "factoryMethod": "createBodyLayer",
@@ -67,9 +66,6 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf",
-              "liftWarnings": [
-                "cube_deformation_obf_inferred"
-              ],
               "inflate": 0.600000024
             }
           ],
@@ -114,9 +110,6 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf",
-              "liftWarnings": [
-                "cube_deformation_obf_inferred"
-              ],
               "inflate": 1.75
             },
             {
@@ -142,7 +135,7 @@
           "children": []
         },
         {
-          "id": "right_hind_leg",
+          "id": "left_front_leg",
           "pose": {
             "translation": [
               -3,
@@ -180,56 +173,6 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf",
-              "liftWarnings": [
-                "cube_deformation_obf_inferred"
-              ],
-              "inflate": 0.5
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "left_hind_leg",
-          "pose": {
-            "translation": [
-              -3,
-              12,
-              7
-            ],
-            "rotationEulerRad": [
-              0,
-              0,
-              0
-            ],
-            "eulerOrder": "XYZ",
-            "setupAnimPivot": [
-              -3,
-              12,
-              7
-            ]
-          },
-          "cuboids": [
-            {
-              "from": [
-                0,
-                -2,
-                4
-              ],
-              "to": [
-                6,
-                2,
-                4.5
-              ],
-              "uvOrigin": [
-                0,
-                16
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf",
-              "liftWarnings": [
-                "cube_deformation_obf_inferred"
-              ],
               "inflate": 0.5
             }
           ],
@@ -274,16 +217,13 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf",
-              "liftWarnings": [
-                "cube_deformation_obf_inferred"
-              ],
               "inflate": 0.5
             }
           ],
           "children": []
         },
         {
-          "id": "left_front_leg",
+          "id": "left_hind_leg",
           "pose": {
             "translation": [
               -3,
@@ -321,9 +261,50 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf",
-              "liftWarnings": [
-                "cube_deformation_obf_inferred"
+              "inflate": 0.5
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right_hind_leg",
+          "pose": {
+            "translation": [
+              -3,
+              12,
+              7
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              -3,
+              12,
+              7
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                -2,
+                4
               ],
+              "to": [
+                6,
+                2,
+                4.5
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
               "inflate": 0.5
             }
           ],

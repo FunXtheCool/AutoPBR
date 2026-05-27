@@ -3,10 +3,9 @@
   "versionLabel": "1.21.11",
   "officialJvmName": "net.minecraft.client.model.animal.ghast.HappyGhastHarnessModel",
   "profile": "proguard_1.21.11",
-  "extractionStatus": "partial",
+  "extractionStatus": "ok",
   "extractionNotes": [
     "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.ghast.HappyGhastHarnessModel).",
-    "Strict structural validation failed (1): cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027",
     "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
   ],
   "factoryMethod": "createBodyLayer",
@@ -110,9 +109,6 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf",
-              "liftWarnings": [
-                "cube_deformation_obf_inferred"
-              ],
               "inflate": 0.150000006
             }
           ],

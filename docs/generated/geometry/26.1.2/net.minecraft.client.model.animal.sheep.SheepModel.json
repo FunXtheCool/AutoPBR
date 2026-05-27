@@ -28,82 +28,6 @@
       "cuboids": [],
       "children": [
         {
-          "id": "head",
-          "pose": {
-            "translation": [
-              0.000000000,
-              6.000000000,
-              -8.000000000
-            ],
-            "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
-            {
-              "from": [
-                -3,
-                -4,
-                -6
-              ],
-              "to": [
-                3,
-                2,
-                2
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "body",
-          "pose": {
-            "translation": [
-              0.000000000,
-              5.000000000,
-              2.000000000
-            ],
-            "rotationEulerRad": [
-              1.570796371,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
-            {
-              "from": [
-                -4,
-                -10,
-                -7
-              ],
-              "to": [
-                4,
-                6,
-                -1
-              ],
-              "uvOrigin": [
-                28,
-                8
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
-        },
-        {
           "id": "right_hind_leg",
           "pose": {
             "translation": [
@@ -254,6 +178,82 @@
             }
           ],
           "children": []
+        },
+        {
+          "id": "head",
+          "pose": {
+            "translation": [
+              0.000000000,
+              6.000000000,
+              -8.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -3,
+                -4,
+                -6
+              ],
+              "to": [
+                3,
+                2,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "body",
+          "pose": {
+            "translation": [
+              0.000000000,
+              5.000000000,
+              2.000000000
+            ],
+            "rotationEulerRad": [
+              1.570796371,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -4,
+                -10,
+                -7
+              ],
+              "to": [
+                4,
+                6,
+                -1
+              ],
+              "uvOrigin": [
+                28,
+                8
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
         }
       ]
     }
@@ -261,6 +261,22 @@
   "jarPath": "net/minecraft/client/model/animal/sheep/SheepModel.class",
   "classSha256Hex": "f15eceed52453e5393892ee70caec4c360a0d9403c271341c47707426f0092a0",
   "bytecodeFloatProbe": [
+    -2,
+    -2,
+    4,
+    4,
+    -2,
+    -2,
+    4,
+    4,
+    -3,
+    7,
+    3,
+    7,
+    -3,
+    -5,
+    3,
+    -5,
     -4,
     -4,
     -8,
@@ -275,6 +291,22 @@
     16,
     8,
     1.5707964,
+    -2,
+    -2,
+    4,
+    4,
+    -2,
+    -2,
+    4,
+    4,
+    -3,
+    7,
+    3,
+    7,
+    -3,
+    -5,
+    3,
+    -5,
     -3,
     -4,
     -6,

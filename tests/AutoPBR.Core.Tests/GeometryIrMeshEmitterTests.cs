@@ -50,11 +50,7 @@ public sealed class GeometryIrMeshEmitterTests
         Assert.True(File.Exists(path), $"Missing Cod geometry shard: {path}");
         using var doc = JsonDocument.Parse(File.ReadAllText(path));
         var parts = new Dictionary<string, JsonElement>(StringComparer.Ordinal);
-        foreach (var ch in doc.RootElement.GetProperty("roots")[0].GetProperty("children").EnumerateArray())
-        {
-            parts[ch.GetProperty("id").GetString()!] = ch;
-        }
-
+        CollectPartTree(doc.RootElement.GetProperty("roots")[0], parts);
         Assert.Equal(7, parts.Count);
         AssertTranslation(parts["body"], 0, 22, 0);
         AssertTranslation(parts["head"], 0, 22, 0);
@@ -123,6 +119,24 @@ public sealed class GeometryIrMeshEmitterTests
         Assert.Equal(7, aquatic.Elements.Count);
         Assert.True(HasElementWithLocalExtents(
             aquatic, x0: -2f, y0: -0.08f, z0: -1f, x1: 0f, y1: 0.08f, z1: 1f, tol: 1e-3f));
+    }
+
+    private static void CollectPartTree(JsonElement part, Dictionary<string, JsonElement> parts)
+    {
+        if (part.TryGetProperty("id", out var idEl) &&
+            idEl.GetString() is { } id &&
+            !string.Equals(id, "root", StringComparison.Ordinal))
+        {
+            parts[id] = part;
+        }
+
+        if (part.TryGetProperty("children", out var children) && children.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var ch in children.EnumerateArray())
+            {
+                CollectPartTree(ch, parts);
+            }
+        }
     }
 
     private static void AssertMeshesEquivalent(MergedJavaBlockModel a, MergedJavaBlockModel b, float tol)

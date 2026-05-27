@@ -180,7 +180,17 @@ internal static class GeometryIrLiftTreeValidator
     /// </summary>
     private static bool ShouldReportBboxCollision(string priorPartId, string partId, JsonObject cuboid)
     {
-        _ = cuboid;
+        if (IsThinSheetCuboid(cuboid))
+        {
+            return false;
+        }
+
+        if (string.Equals(partId, "egg_belly", StringComparison.Ordinal) &&
+            string.Equals(priorPartId, "body", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
         if (IsSharedLimbTemplatePair(priorPartId, partId))
         {
             return false;

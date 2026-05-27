@@ -303,8 +303,8 @@
                     0
                   ],
                   "uvOrigin": [
-                    0,
-                    0
+                    26,
+                    1
                   ],
                   "textureKey": "#front_legs",
                   "liftKind": "exact",
@@ -345,8 +345,8 @@
                     0
                   ],
                   "uvOrigin": [
-                    0,
-                    0
+                    26,
+                    3
                   ],
                   "textureKey": "#middle_legs",
                   "liftKind": "exact",
@@ -387,8 +387,8 @@
                     0
                   ],
                   "uvOrigin": [
-                    0,
-                    0
+                    26,
+                    5
                   ],
                   "textureKey": "#back_legs",
                   "liftKind": "exact",

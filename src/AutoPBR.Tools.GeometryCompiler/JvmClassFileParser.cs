@@ -120,23 +120,66 @@ internal static class JvmClassFileParser
     public static bool IsInterface(ReadOnlySpan<byte> classFile) =>
         TryGetClassAccessFlags(classFile, out var access) && (access & AccInterface) != 0;
 
-    public static bool HasStaticMeshFactoryMethod(ReadOnlySpan<byte> classFile)
+    public static bool HasStaticMeshFactoryMethod(ReadOnlySpan<byte> classFile, MojangMappingsParser? maps = null)
     {
         foreach (var (_, desc, isStatic) in EnumerateMethods(classFile))
         {
-            if (!isStatic)
-            {
-                continue;
-            }
-
-            if (desc.Contains("MeshDefinition", StringComparison.Ordinal) ||
-                desc.Contains("LayerDefinition", StringComparison.Ordinal))
+            if (isStatic && IsMeshFactoryDescriptor(desc, maps))
             {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /// <summary>Extracts the return-type jar simple name from a method descriptor (e.g. <c>(Lgzk;)Lgzl;</c> → <c>gzl</c>).</summary>
+    public static bool TryGetMethodReturnTypeJarSimple(string methodDescriptor, out string jarSimple)
+    {
+        jarSimple = string.Empty;
+        var close = methodDescriptor.LastIndexOf(')');
+        if (close < 0 || close >= methodDescriptor.Length - 1)
+        {
+            return false;
+        }
+
+        var ret = methodDescriptor[(close + 1)..];
+        if (ret.Length <= 1 || ret[0] != 'L' || ret[^1] != ';')
+        {
+            return false;
+        }
+
+        var internalName = ret[1..^1];
+        var slash = internalName.LastIndexOf('/');
+        jarSimple = slash >= 0 ? internalName[(slash + 1)..] : internalName;
+        return jarSimple.Length > 0;
+    }
+
+    /// <summary>Detects mesh/layer factory methods on deobfuscated or ProGuard descriptors.</summary>
+    public static bool IsMeshFactoryDescriptor(string descriptor, MojangMappingsParser? maps = null)
+    {
+        if (descriptor.Contains("MeshDefinition", StringComparison.Ordinal) &&
+            !descriptor.Contains("ArmorModelSet", StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        if (descriptor.Contains("LayerDefinition", StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        if (maps is null || !TryGetMethodReturnTypeJarSimple(descriptor, out var retShort))
+        {
+            return false;
+        }
+
+        if (maps.TryIsObfuscatedReturnType(retShort, "MeshDefinition"))
+        {
+            return true;
+        }
+
+        return maps.TryIsObfuscatedReturnType(retShort, "LayerDefinition");
     }
 
     public static IReadOnlyList<(string Name, string Descriptor, bool IsStatic)> EnumerateMethods(ReadOnlySpan<byte> classFile)

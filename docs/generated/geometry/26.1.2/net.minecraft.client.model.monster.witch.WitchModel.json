@@ -97,9 +97,7 @@
                   ],
                   "textureKey": "#skin",
                   "liftKind": "exact",
-                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-                  "textureWidth": 64,
-                  "textureHeight": 128
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
                 }
               ],
               "children": [
@@ -136,12 +134,50 @@
                       ],
                       "textureKey": "#skin",
                       "liftKind": "exact",
-                      "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-                      "textureWidth": 64,
-                      "textureHeight": 128
+                      "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
                     }
                   ],
-                  "children": []
+                  "children": [
+                    {
+                      "id": "mole",
+                      "pose": {
+                        "translation": [
+                          0.000000000,
+                          -2.000000000,
+                          0.000000000
+                        ],
+                        "rotationEulerRad": [
+                          0.000000000,
+                          0.000000000,
+                          0.000000000
+                        ],
+                        "eulerOrder": "XYZ"
+                      },
+                      "cuboids": [
+                        {
+                          "from": [
+                            0,
+                            3,
+                            -6.75
+                          ],
+                          "to": [
+                            1,
+                            4,
+                            -5.75
+                          ],
+                          "uvOrigin": [
+                            0,
+                            0
+                          ],
+                          "textureKey": "#skin",
+                          "liftKind": "exact",
+                          "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                          "inflate": -0.25
+                        }
+                      ],
+                      "children": []
+                    }
+                  ]
                 }
               ]
             },
@@ -178,9 +214,7 @@
                   ],
                   "textureKey": "#skin",
                   "liftKind": "exact",
-                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-                  "textureWidth": 64,
-                  "textureHeight": 128
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
                 }
               ],
               "children": [
@@ -218,55 +252,12 @@
                       "textureKey": "#skin",
                       "liftKind": "exact",
                       "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-                      "inflate": 0.25,
-                      "textureWidth": 64,
-                      "textureHeight": 128
+                      "inflate": 0.25
                     }
                   ],
                   "children": []
                 }
               ]
-            },
-            {
-              "id": "mole",
-              "pose": {
-                "translation": [
-                  0.000000000,
-                  -2.000000000,
-                  0.000000000
-                ],
-                "rotationEulerRad": [
-                  0.000000000,
-                  0.000000000,
-                  0.000000000
-                ],
-                "eulerOrder": "XYZ"
-              },
-              "cuboids": [
-                {
-                  "from": [
-                    0,
-                    3,
-                    -6.75
-                  ],
-                  "to": [
-                    1,
-                    4,
-                    -5.75
-                  ],
-                  "uvOrigin": [
-                    0,
-                    0
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-                  "inflate": -0.25,
-                  "textureWidth": 64,
-                  "textureHeight": 128
-                }
-              ],
-              "children": []
             },
             {
               "id": "hat_rim",

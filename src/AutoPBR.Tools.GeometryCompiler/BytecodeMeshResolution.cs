@@ -97,7 +97,7 @@ internal static class BytecodeMeshResolution
                 continue;
             }
 
-            if (ShouldSkipMeshHostWithoutPrimaryFactory(host, classBytes, factoryMethod))
+            if (ShouldSkipMeshHostWithoutPrimaryFactory(host, classBytes, factoryMethod, maps))
             {
                 continue;
             }
@@ -149,6 +149,7 @@ internal static class BytecodeMeshResolution
         Add(factoryMethod);
         Add("createBodyLayer");
         Add("createMesh");
+        Add("apply");
         Add("createCapeLayer");
         Add("createHeadModel");
         Add("createBodyMesh");
@@ -160,10 +161,14 @@ internal static class BytecodeMeshResolution
         {
             foreach (var (name, desc, isStatic) in JvmClassFileParser.EnumerateMethods(hostClassBytes))
             {
-                if (!isStatic ||
-                    !desc.Contains("LayerDefinition", StringComparison.Ordinal) ||
-                    string.Equals(name, factoryMethod, StringComparison.Ordinal))
+                if (!isStatic)
                 {
+                    continue;
+                }
+
+                if (JvmClassFileParser.IsMeshFactoryDescriptor(desc, maps))
+                {
+                    Add(name);
                     continue;
                 }
 
@@ -195,7 +200,7 @@ internal static class BytecodeMeshResolution
 
         if (string.IsNullOrEmpty(layer))
         {
-            return BytecodeGeometryMeshLift.ConcatMeshFactoryCodeFromClass(hostClassBytes);
+            return BytecodeGeometryMeshLift.ConcatMeshFactoryCodeFromClass(hostClassBytes, maps);
         }
 
         if (IsStandalonePartTreeMeshFactory(layer))
@@ -276,7 +281,19 @@ internal static class BytecodeMeshResolution
                 return;
             }
 
-            var nested = BytecodeGeometryMeshLift.BuildSyntheticMeshConcat(remoteBytes, [meth], out var ok);
+            var nested = string.Empty;
+            var ok = false;
+            if (!string.Equals(owner, hostOfficialJvmName, StringComparison.Ordinal))
+            {
+                nested = BuildMeshConcatDeep(clientJar, maps, owner, remoteBytes, meth);
+                ok = nested.Length > 0;
+            }
+
+            if (!ok)
+            {
+                nested = BytecodeGeometryMeshLift.BuildSyntheticMeshConcat(remoteBytes, [meth], out ok);
+            }
+
             if (!ok || string.IsNullOrWhiteSpace(nested))
             {
                 return;
@@ -359,7 +376,7 @@ internal static class BytecodeMeshResolution
             }
 
             if (nested.Length == 0 &&
-                TryLoadClassBytes(clientJar, maps, hostOfficialJvmName, out var hostBytes))
+                TryLoadClassBytes(clientJar, maps, hostOfficialJvmName, out _))
             {
                 foreach (var sup in EnumerateSuperclassChain(clientJar, maps, owner, remoteBytes, 8))
                 {
@@ -371,7 +388,6 @@ internal static class BytecodeMeshResolution
                     nested = BytecodeGeometryMeshLift.BuildSyntheticMeshConcat(supBytes, [meth], out ok);
                     if (ok && !string.IsNullOrWhiteSpace(nested))
                     {
-                        remoteBytes = supBytes;
                         owner = sup;
                         break;
                     }
@@ -586,12 +602,6 @@ internal static class BytecodeMeshResolution
             foreach (var r in JavapMeshBytecodeProfiles.EnumerateInvokeStaticVoidMeshHelperRefs(foldedScan))
             {
                 var owner = r.OwnerJarSimple?.Replace('/', '.') ?? hostOfficialJvmName;
-                if (string.Equals(owner, hostOfficialJvmName, StringComparison.Ordinal) &&
-                    seenOwners.Contains(hostOfficialJvmName + "::" + r.Method + ":hostvoid"))
-                {
-                    continue;
-                }
-
                 TryPullVoidHelperMethod(owner, r.Method, insertIslandBoundaryBeforeNested);
             }
         }
@@ -610,10 +620,9 @@ internal static class BytecodeMeshResolution
             }
         }
 
-        // Pull void helpers (e.g. QuadrupedModel.createLegs) from the host layer before it is appended so leg
-        // cuboids are not lost when createBodyMesh is the only factory method in the concat.
+        // Pull host void helpers before the host layer so createBodyMesh-style factories still expose leg cuboids.
+        // The final override pass below appends marked helper islands again when needed so replacements win.
         AppendHostVoidMeshHelpersFromLayer(layer, insertIslandBoundaryBeforeNested: sb.Length > 0);
-        AppendVoidMeshHelperTargets(layer, insertIslandBoundaryBeforeNested: sb.Length > 0);
 
         if (!deferHostLayerUntilAfterPulls)
         {
@@ -641,15 +650,10 @@ internal static class BytecodeMeshResolution
                     continue;
                 }
 
-                if (TryAppendCompanionMeshHelperIsland(r.Method, sig, insertIslandBoundaryBeforeNested: true))
-                {
-                    continue;
-                }
-
+                _ = TryAppendCompanionMeshHelperIsland(r.Method, sig, insertIslandBoundaryBeforeNested: true);
                 continue;
             }
 
-            own = r.OwnerJarSimple;
             var methodKey = own + "::" + r.Method;
             if (seenOwners.Contains(methodKey))
             {
@@ -677,11 +681,11 @@ internal static class BytecodeMeshResolution
 
         EnsureHostCompanionAddHeadIsland(layer);
 
+        AppendMeshTransformerLambdaIslands();
+
         // Void helpers (e.g. SkeletonModel.createDefaultSkeletonMesh) must stay the final island so arm/leg
         // addOrReplaceChild overrides win over prepended HumanoidModel.createMesh defaults.
         AppendVoidMeshHelperTargets(sb.ToString(), insertIslandBoundaryBeforeNested: true);
-
-        AppendMeshTransformerLambdaIslands();
 
         return NormalizeMeshIslandBoundaries(sb.ToString());
 
@@ -774,7 +778,7 @@ internal static class BytecodeMeshResolution
     }
 
     internal static bool ShouldSkipMeshHostWithoutPrimaryFactory(string hostOfficialJvmName,
-        ReadOnlySpan<byte> hostClassBytes, string factoryMethod)
+        ReadOnlySpan<byte> hostClassBytes, string factoryMethod, MojangMappingsParser? maps = null)
     {
         if (!string.Equals(factoryMethod, "createBodyLayer", StringComparison.Ordinal) &&
             !string.Equals(factoryMethod, "createMesh", StringComparison.Ordinal))
@@ -788,26 +792,17 @@ internal static class BytecodeMeshResolution
             return false;
         }
 
-        foreach (var (name, desc, isStatic) in JvmClassFileParser.EnumerateMethods(hostClassBytes))
+        // ProGuard jars use short method names (e.g. createBodyLayer(float) -> a); match by return type, not Java name.
+        if (JvmClassFileParser.HasStaticMeshFactoryMethod(hostClassBytes, maps))
         {
-            if (!isStatic)
-            {
-                continue;
-            }
-
-            if (string.Equals(name, factoryMethod, StringComparison.Ordinal) &&
-                (desc.Contains("LayerDefinition", StringComparison.Ordinal) ||
-                 desc.Contains("MeshDefinition", StringComparison.Ordinal)))
-            {
-                return false;
-            }
+            return false;
         }
 
         return true;
     }
 
     private static bool IsDelegateOnlyLayerDefinitionFactory(string layerCode) =>
-        InvokeStaticReturnsLayerDefinitionCommentRegex.IsMatch(layerCode) &&
+        HasNonTerminalLayerDefinitionFactoryInvoke(layerCode) &&
         !InvokeStaticReturnsMeshDefinitionCommentRegex.IsMatch(layerCode) &&
         !layerCode.Contains("addOrReplaceChild", StringComparison.Ordinal);
 
@@ -819,7 +814,7 @@ internal static class BytecodeMeshResolution
     {
         if (!layerCode.Contains("addOrReplaceChild", StringComparison.Ordinal) ||
             InvokeStaticReturnsMeshDefinitionCommentRegex.IsMatch(layerCode) ||
-            InvokeStaticReturnsLayerDefinitionCommentRegex.IsMatch(layerCode))
+            HasNonTerminalLayerDefinitionFactoryInvoke(layerCode))
         {
             return false;
         }
@@ -828,6 +823,33 @@ internal static class BytecodeMeshResolution
         var folded = string.Join('\n', JavapFloatGeometryMeshLift.FoldJavapWrappedBytecodeLinesForTests(
             layerCode.Split('\n').Select(l => l.TrimEnd('\r')).ToList()));
         return !JavapMeshBytecodeProfiles.EnumerateInvokeStaticVoidMeshHelperRefs(folded).Any();
+    }
+
+    private static bool HasNonTerminalLayerDefinitionFactoryInvoke(string layerCode)
+    {
+        foreach (Match m in InvokeStaticReturnsLayerDefinitionCommentRegex.Matches(layerCode))
+        {
+            if (IsTerminalLayerDefinitionCreate(m.Groups[1].Value, m.Groups[2].Value))
+            {
+                continue;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsTerminalLayerDefinitionCreate(string ownerGroup, string methodName)
+    {
+        if (!string.Equals(methodName, "create", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        var owner = ownerGroup.Replace('/', '.');
+        return string.Equals(owner, "net.minecraft.client.model.geom.builders.LayerDefinition",
+            StringComparison.Ordinal);
     }
 
     private static string? TryExtractNullOwnerStaticMeshFromHostSupertypes(

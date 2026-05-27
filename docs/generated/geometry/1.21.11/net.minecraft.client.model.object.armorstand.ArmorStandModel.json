@@ -108,7 +108,7 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
+              "provenance": "known ArmorStandModel.createBodyLayer body override"
             }
           ],
           "children": []

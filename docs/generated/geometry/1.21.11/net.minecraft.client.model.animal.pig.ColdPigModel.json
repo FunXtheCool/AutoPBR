@@ -66,6 +66,45 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf"
+            },
+            {
+              "from": [
+                -10,
+                -7,
+                10
+              ],
+              "to": [
+                6,
+                1,
+                10.5
+              ],
+              "uvOrigin": [
+                28,
+                32
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "inflate": 0.5
+            },
+            {
+              "from": [
+                0,
+                11,
+                2
+              ],
+              "to": [
+                1.57079637,
+                11,
+                2
+              ],
+              "uvOrigin": [
+                28,
+                32
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
             }
           ],
           "children": []

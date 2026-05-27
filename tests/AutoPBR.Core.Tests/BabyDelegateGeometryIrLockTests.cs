@@ -8,7 +8,7 @@ namespace AutoPBR.Core.Tests;
 public sealed class BabyDelegateGeometryIrLockTests
 {
     private static string ContentPath(params string[] segments) =>
-        Path.Combine([AppContext.BaseDirectory, .. segments]);
+        Path.Combine([GeometryIrTestTierSupport.FindRepoRoot(), .. segments]);
 
     private static string RootsJson(string relativeUnderDocsGenerated)
     {

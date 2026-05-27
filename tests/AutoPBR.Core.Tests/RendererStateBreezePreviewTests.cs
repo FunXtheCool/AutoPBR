@@ -39,6 +39,21 @@ public sealed class RendererStateBreezePreviewTests
     }
 
     [Fact]
+    public void Geometry_ir_setup_anim_state_uses_renderer_state_when_model_has_p6_shard()
+    {
+        var state = CleanRoomEntityModelRuntime.ResolveSetupAnimPreviewStateForTests(
+            BreezeModel,
+            animationTimeSeconds: 2.5f,
+            idlePhase01: 0.3f,
+            wave: 0.2f,
+            out var source);
+
+        Assert.Equal("renderer-state", source);
+        Assert.True(state["shoot"] >= 0f);
+        Assert.Equal(RendererStatePreviewResolver.InactiveAnimationStateSentinel, state["slide"]);
+    }
+
+    [Fact]
     public void Breeze_setup_anim_head_pose_differs_between_idle_and_shoot_phases()
     {
         var idleState = PreviewRenderStateSynthesis.ForBreeze(0.5f, 0.3f, 0.2f);

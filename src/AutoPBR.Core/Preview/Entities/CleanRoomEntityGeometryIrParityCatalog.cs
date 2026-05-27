@@ -86,6 +86,26 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return false;
         }
 
+        if (string.Equals(parityRule.BuilderMethod, "Breeze", StringComparison.Ordinal))
+        {
+            return TryBuildParityCatalogBreezeMeshFromGeometryIr(
+                normalizedAssetPath,
+                stem,
+                texRef,
+                profile,
+                isBaby,
+                idlePhase01,
+                animationTimeSeconds,
+                parityRule,
+                applyGeometryIrSetupAnimMotion,
+                officialJvm,
+                geometryRoot,
+                atlasW,
+                atlasH,
+                out merged,
+                out geometryIrOfficialJvm);
+        }
+
         var wave = Wave(animationTimeSeconds, 0.8f);
         var emitOptions = GeometryIrParityEmitPresetRegistry.CreateEmitOptions(
             parityRule.BuilderMethod,
@@ -151,6 +171,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         merged = ApplyParityCatalogGeometryIrPreviewBasis(
             parityRule.BuilderMethod,
+            officialJvm,
             normalizedAssetPath,
             stem,
             texRef,
@@ -330,15 +351,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
     private static MergedJavaBlockModel ApplyParityCatalogGeometryIrPreviewBasis(
         string builderMethod,
+        string officialJvm,
         string normalizedAssetPath,
         string stem,
         string texRef,
         MergedJavaBlockModel built)
     {
         var norm = normalizedAssetPath.Replace('\\', '/').TrimStart('/');
-        if (norm.Contains("horse", StringComparison.OrdinalIgnoreCase) ||
-            norm.Contains("donkey", StringComparison.OrdinalIgnoreCase) ||
-            norm.Contains("mule", StringComparison.OrdinalIgnoreCase))
+        var basis = ResolveGeometryIrLerBasis(officialJvm, stem, norm);
+        if (basis == GeometryIrLerBasisKind.EquineDedicated)
         {
             var scale = string.Equals(builderMethod, "DonkeyMuleHorse", StringComparison.Ordinal)
                 ? (texRef.Contains("/mule", StringComparison.OrdinalIgnoreCase) ? 0.92f : 0.87f)
@@ -346,17 +367,14 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return ApplyEquineLivingEntityRendererPreviewBasis(built, scale);
         }
 
-        if (EntityGpuBoneFillPolicy.SkipsLivingEntityRendererBasis(stem))
+        if (basis == GeometryIrLerBasisKind.Skip ||
+            norm.Contains("/textures/entity/boat/", StringComparison.OrdinalIgnoreCase) ||
+            norm.Contains("/textures/entity/chest_boat/", StringComparison.OrdinalIgnoreCase))
         {
             return built;
         }
 
-        if (UsesQuadrupedLerMirrorRightComposeLocalChain(stem, norm))
-        {
-            return ApplyLivingEntityRendererPreviewBasis(built, lerMirrorRightComposeLocalChain: true);
-        }
-
-        return ApplyLivingEntityRendererPreviewBasis(built);
+        return ApplyLivingEntityRendererPreviewBasis(built, basis);
     }
 
     /// <summary>
@@ -396,15 +414,26 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return "atlas_failed";
         }
 
-        var emitOptions = GeometryIrParityEmitPresetRegistry.CreateEmitOptions(
-            rule.BuilderMethod,
-            profile,
-            isBaby,
-            surveyJvm,
-            atlasW,
-            atlasH,
-            idlePhase01: 0f,
-            wave: 0f);
+        var emitOptions = string.Equals(rule.BuilderMethod, "Breeze", StringComparison.Ordinal)
+            ? GeometryIrParityEmitPresetRegistry.CreateBreezeEmitOptions(
+                profile,
+                surveyJvm,
+                atlasW,
+                atlasH,
+                isEyesTexturePath: normalizedAssetPath.Contains("breeze_eyes", StringComparison.OrdinalIgnoreCase),
+                isWindTexturePath: normalizedAssetPath.Contains("breeze_wind", StringComparison.OrdinalIgnoreCase),
+                idlePhase01: 0f,
+                wave: 0f,
+                animationTimeSeconds: 0f)
+            : GeometryIrParityEmitPresetRegistry.CreateEmitOptions(
+                rule.BuilderMethod,
+                profile,
+                isBaby,
+                surveyJvm,
+                atlasW,
+                atlasH,
+                idlePhase01: 0f,
+                wave: 0f);
 
         var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(geometryRoot, emitOptions);
         var b = new RigBuilder(atlasW, atlasH);

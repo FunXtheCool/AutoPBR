@@ -3,23 +3,86 @@
   "versionLabel": "1.21.11",
   "officialJvmName": "net.minecraft.client.model.monster.piglin.AbstractPiglinModel",
   "profile": "proguard_1.21.11",
-  "extractionStatus": "partial",
+  "extractionStatus": "ok",
   "extractionNotes": [
-    "Synthetic placeholder shard: client.jar metadata (SHA-256, javap float probe) only. Extend GeometryCompiler extraction profiles or re-run with a matching jar so javap mesh lift can emit cuboids.",
-    "javap float probe failed or missing createBodyLayer Code block."
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.monster.piglin.AbstractPiglinModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
   ],
   "factoryMethod": "createMesh",
   "roots": [
     {
-      "id": "_placeholder",
+      "id": "root",
+      "pose": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotationEulerRad": [
+          0,
+          0,
+          0
+        ],
+        "eulerOrder": "XYZ"
+      },
       "cuboids": [],
-      "children": []
+      "children": [
+        {
+          "id": "body",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -4,
+                0,
+                -2
+              ],
+              "to": [
+                4,
+                12,
+                2
+              ],
+              "uvOrigin": [
+                16,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        }
+      ]
     }
   ],
   "jarPath": "hev.class",
   "obfuscatedJvmName": "net.minecraft.client.model.monster.piglin.hev",
   "classSha256Hex": "b6a41ef4c2384abc7f40064dba9f4b5b7a401398a54d3a71bb5a3486f3f9170d",
-  "bytecodeFloatProbe": [],
+  "bytecodeFloatProbe": [
+    -4,
+    -2,
+    8,
+    12,
+    4
+  ],
   "liftSummary": {
     "cuboidApproxCount": 0,
     "poseApproxCount": 0,

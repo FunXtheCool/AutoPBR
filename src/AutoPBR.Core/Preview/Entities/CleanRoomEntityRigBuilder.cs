@@ -284,5 +284,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 Textures = textures
             };
         }
+
+        internal int EmittedElementCount => _elements.Count;
+
+        internal void ClearEmittedElements()
+        {
+            _elements.Clear();
+            _packCursorU = 0;
+            _packCursorV = 0;
+            _packRowHeight = 0;
+        }
     }
 }

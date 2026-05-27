@@ -142,6 +142,32 @@ public static class GeometryIrCuboidMetadata
         return true;
     }
 
+    /// <summary>Optional per-cuboid atlas when a multi-factory lift merged islands with different <c>LayerDefinition.create</c> sizes.</summary>
+    public static bool TryGetAtlasDimensions(JsonElement cuboid, out int atlasWidth, out int atlasHeight)
+    {
+        atlasWidth = 0;
+        atlasHeight = 0;
+        if (cuboid.ValueKind != JsonValueKind.Object ||
+            !cuboid.TryGetProperty("textureWidth", out var tw) ||
+            tw.ValueKind != JsonValueKind.Number ||
+            !cuboid.TryGetProperty("textureHeight", out var th) ||
+            th.ValueKind != JsonValueKind.Number)
+        {
+            return false;
+        }
+
+        var w = tw.GetInt32();
+        var h = th.GetInt32();
+        if (w <= 0 || h <= 0)
+        {
+            return false;
+        }
+
+        atlasWidth = w;
+        atlasHeight = h;
+        return true;
+    }
+
     public static bool TryGetTextureKey(JsonElement cuboid, out string textureKey)
     {
         textureKey = "#skin";

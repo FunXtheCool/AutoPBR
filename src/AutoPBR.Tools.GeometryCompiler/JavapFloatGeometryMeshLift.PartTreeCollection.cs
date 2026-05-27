@@ -33,7 +33,9 @@ internal static partial class JavapFloatGeometryMeshLift
         return islandBytecode.Contains("getRoot:", StringComparison.Ordinal) ||
             islandBytecode.Contains("createMesh", StringComparison.Ordinal) ||
             islandBytecode.Contains("createLegs", StringComparison.Ordinal) ||
-            islandBytecode.Contains("createBase", StringComparison.Ordinal);
+            islandBytecode.Contains("createBase", StringComparison.Ordinal) ||
+            islandBytecode.Contains(":[[I", StringComparison.Ordinal) ||
+            islandBytecode.Contains(":[[F", StringComparison.Ordinal);
     }
 
     internal static bool TryCollectLiftedRootChildren(string meshFactoryJavap, List<string> notes,
@@ -66,7 +68,6 @@ internal static partial class JavapFloatGeometryMeshLift
             return false;
         }
 
-        var receiverSlotGraph = BuildReceiverLocalSlotGraph(lines);
         var deformInflateByRefSlot = BuildCubeDeformationInflateByRefLocalSlot(lines, _maps);
         var scopeForMeshConstants = meshWideLines is { Count: > 0 } ? meshWideLines : lines;
         var poseFloatLocals = BuildPoseFloatLocalConstantsFromSimpleFstores(lines);
@@ -174,7 +175,7 @@ internal static partial class JavapFloatGeometryMeshLift
                         continue;
                     }
 
-                    AttachLiftedPartToForest(rootChildren, receiverSlotGraph, lines, segEnd, loopPartNode,
+                    AttachLiftedPartToForest(rootChildren, lines, segEnd, loopPartNode,
                         loopPartName, pendingAttaches);
                     FlushPendingPartAttaches(rootChildren, pendingAttaches);
                     if (lastClearRecursivelyLine >= 0 && segEnd > lastClearRecursivelyLine)
@@ -204,7 +205,7 @@ internal static partial class JavapFloatGeometryMeshLift
                 continue;
             }
 
-            AttachLiftedPartToForest(rootChildren, receiverSlotGraph, lines, segEnd, partNode, partName,
+            AttachLiftedPartToForest(rootChildren, lines, segEnd, partNode, partName,
                 pendingAttaches);
             FlushPendingPartAttaches(rootChildren, pendingAttaches);
             if (lastClearRecursivelyLine >= 0 && segEnd > lastClearRecursivelyLine)
@@ -246,6 +247,12 @@ internal static partial class JavapFloatGeometryMeshLift
         var map = new Dictionary<int, ReceiverSlotEntry>();
         for (var i = 0; i < lines.Count; i++)
         {
+            if (JavapBytecodeStreamAnalyzer.IsJavapMethodCodeHeaderLine(lines[i]))
+            {
+                map.Clear();
+                continue;
+            }
+
             if (IsMeshRootGetRootInvokeLine(lines[i]) &&
                 TryFindFirstAstoreLocalSlotAfter(lines, i, 1, 10, out _, out var rootSlot))
             {
@@ -1048,24 +1055,45 @@ internal static partial class JavapFloatGeometryMeshLift
     }
 
     private static void AttachLiftedPartToForest(JsonArray rootForest,
-        Dictionary<int, ReceiverSlotEntry> receiverSlotGraph, List<string> lines, int bindingLineIdx, JsonObject partNode,
+        List<string> lines, int bindingLineIdx, JsonObject partNode,
         string partName, List<PendingPartAttach> pendingAttaches)
     {
         var graphAtBind = BuildReceiverLocalSlotGraph(lines.GetRange(0, Math.Min(bindingLineIdx + 1, lines.Count)));
         var recv = TryInferReceiverLocalSlotForBinding(lines, bindingLineIdx, partName);
-        var parentPartId = recv is int r
+        var parentPartId = recv is { } r
             ? ResolveParentPartIdFromReceiverSlot(r, graphAtBind)
             : null;
 
-        if (IsQuadrupedLegPartName(partName))
+        var keepFlatRootLeg = IsTinyBabyQuadrupedLeg(partName, partNode) ||
+            IsGenericQuadrupedHelperLegContext(lines, partName);
+        if (keepFlatRootLeg && IsStandardQuadrupedLegPartName(partName))
         {
             parentPartId = null;
         }
-        else if (string.IsNullOrEmpty(parentPartId) &&
-                 GeometryLiftForestMerge.KnownNestedChildToParent.TryGetValue(partName, out var knownParent) &&
-                 GeometryLiftForestMerge.TryFindPartObjectByIdInForest(rootForest, knownParent, out _))
+
+        var standardLegParent = ShouldAttachStandardQuadrupedLegUnderBody(lines, partName, partNode)
+            ? "body"
+            : null;
+        if (string.IsNullOrEmpty(parentPartId) &&
+            !keepFlatRootLeg &&
+            GeometryLiftForestMerge.KnownNestedChildToParent.TryGetValue(partName, out var knownParent) &&
+            GeometryLiftForestMerge.TryFindPartObjectByIdInForest(rootForest, knownParent, out _))
         {
             parentPartId = knownParent;
+        }
+        else if (string.IsNullOrEmpty(parentPartId) &&
+                 standardLegParent is not null &&
+                 GeometryLiftForestMerge.TryFindPartObjectByIdInForest(rootForest, standardLegParent, out _))
+        {
+            parentPartId = standardLegParent;
+        }
+        else if (string.IsNullOrEmpty(parentPartId) &&
+                 !keepFlatRootLeg &&
+                 standardLegParent is not null &&
+                 HasFuturePartBinding(lines, bindingLineIdx, standardLegParent))
+        {
+            pendingAttaches.Add(new PendingPartAttach(standardLegParent, partNode, partName));
+            return;
         }
 
         if (string.IsNullOrEmpty(parentPartId))
@@ -1074,14 +1102,67 @@ internal static partial class JavapFloatGeometryMeshLift
             return;
         }
 
-        if (!GeometryLiftForestMerge.TryFindPartObjectByIdInForest(rootForest, parentPartId!, out var parentObj) ||
+        if (!GeometryLiftForestMerge.TryFindPartObjectByIdInForest(rootForest, parentPartId, out var parentObj) ||
             parentObj is null)
         {
-            pendingAttaches.Add(new PendingPartAttach(parentPartId!, partNode, partName));
+            pendingAttaches.Add(new PendingPartAttach(parentPartId, partNode, partName));
             return;
         }
 
         GeometryLiftForestMerge.AttachPartUnderParent(parentObj, partNode, partName);
+    }
+
+    private static bool IsStandardQuadrupedLegPartName(string partName) =>
+        partName is "right_hind_leg" or "left_hind_leg" or "right_front_leg" or "left_front_leg";
+
+    private static bool HasFuturePartBinding(List<string> lines, int bindingLineIdx, string partName)
+    {
+        for (var i = bindingLineIdx + 1; i < lines.Count; i++)
+        {
+            if (!JavapMeshBytecodeProfiles.IsNamedOrObfuscatedMeshBindingLine(lines[i]))
+            {
+                continue;
+            }
+
+            var head = lines.GetRange(0, i + 1);
+            var child = FindPartNameNearAddOrReplaceChild(head, new Dictionary<int, int>()) ??
+                        FindLdcPartNameImmediatelyBeforeBinding(lines, i);
+            if (string.Equals(child, partName, StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsGenericQuadrupedHelperLegContext(List<string> lines, string partName) =>
+        IsStandardQuadrupedLegPartName(partName) &&
+        lines.Any(static l =>
+            l.Contains("QuadrupedModel.createBodyMesh", StringComparison.Ordinal) ||
+            l.Contains("QuadrupedModel.createLegs", StringComparison.Ordinal));
+
+    private static bool ShouldAttachStandardQuadrupedLegUnderBody(List<string> lines, string partName,
+        JsonObject partNode) =>
+        IsStandardQuadrupedLegPartName(partName) &&
+        !IsTinyBabyQuadrupedLeg(partName, partNode) &&
+        !lines.Any(static l => l.Contains("QuadrupedModel.createLegs", StringComparison.Ordinal));
+
+    private static bool IsTinyBabyQuadrupedLeg(string partName, JsonObject partNode)
+    {
+        if (!IsStandardQuadrupedLegPartName(partName) ||
+            partNode["cuboids"] is not JsonArray { Count: > 0 } cuboids ||
+            cuboids[0] is not JsonObject cuboid ||
+            cuboid["from"] is not JsonArray from ||
+            cuboid["to"] is not JsonArray to ||
+            from.Count < 2 ||
+            to.Count < 2)
+        {
+            return false;
+        }
+
+        var height = to[1]?.GetValue<double>() - from[1]?.GetValue<double>();
+        return height is >= 0 and <= 3.0;
     }
 
     /// <summary>
@@ -1096,7 +1177,7 @@ internal static partial class JavapFloatGeometryMeshLift
             return null;
         }
 
-        if (entry.ParentReceiverSlot is int parentSlot &&
+        if (entry.ParentReceiverSlot is { } parentSlot &&
             receiverSlotGraph.TryGetValue(parentSlot, out var parentEntry) &&
             !string.IsNullOrEmpty(parentEntry.PartId))
         {

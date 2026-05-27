@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.renderer.entity.RabbitRenderer",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.RabbitRenderState",
+  "modelJvmNames": [
+    "net.minecraft.client.model.animal.rabbit.RabbitModel",
+    "net.minecraft.client.model.animal.rabbit.AdultRabbitModel",
+    "net.minecraft.client.model.animal.rabbit.BabyRabbitModel"
+  ],
+  "extractionStatus": "partial hand-pilot",
+  "extractionNotes": [
+    "P6 hand shard: idle preview alternates hop and idle head tilt AnimationState fields used by RabbitModel.setupAnim.",
+    "RendererStateLift compiler remains deferred; this shard supplies preview timing only."
+  ],
+  "animationStateFields": [
+    { "renderStateField": "hopAnimationState", "setupAnimStateField": "hopAnimationState", "entityAnimationState": "Rabbit.jump" },
+    { "renderStateField": "idleHeadTiltAnimationState", "setupAnimStateField": "idleHeadTiltAnimationState", "entityAnimationState": "Rabbit.idleHeadTilt" }
+  ],
+  "livingEntityFields": [
+    "ageInTicks",
+    "walkAnimationPos",
+    "walkAnimationSpeed",
+    "xRot",
+    "yRot"
+  ],
+  "previewDriver": "rabbit_clip_cycle",
+  "clipLengthsSeconds": {
+    "walkOnly": 1.5,
+    "hopAnimationState": 0.75,
+    "idleHeadTiltAnimationState": 2
+  }
+}

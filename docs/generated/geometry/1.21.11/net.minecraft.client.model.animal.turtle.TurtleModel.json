@@ -3,10 +3,9 @@
   "versionLabel": "1.21.11",
   "officialJvmName": "net.minecraft.client.model.animal.turtle.TurtleModel",
   "profile": "proguard_1.21.11",
-  "extractionStatus": "partial",
+  "extractionStatus": "ok",
   "extractionNotes": [
     "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.turtle.TurtleModel).",
-    "Strict structural validation failed (1): cuboid_bbox_collision: bbox matches part \u0027body\u0027",
     "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
   ],
   "factoryMethod": "createBodyLayer",
@@ -129,25 +128,6 @@
               "textureKey": "#belly",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf"
-            },
-            {
-              "from": [
-                0,
-                11,
-                -10
-              ],
-              "to": [
-                1.57079637,
-                11,
-                -10
-              ],
-              "uvOrigin": [
-                31,
-                1
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
             }
           ],
           "children": []
@@ -183,25 +163,6 @@
                 4.5,
                 21,
                 -13
-              ],
-              "uvOrigin": [
-                70,
-                33
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
-            },
-            {
-              "from": [
-                0,
-                11,
-                -10
-              ],
-              "to": [
-                1.57079637,
-                11,
-                -10
               ],
               "uvOrigin": [
                 70,

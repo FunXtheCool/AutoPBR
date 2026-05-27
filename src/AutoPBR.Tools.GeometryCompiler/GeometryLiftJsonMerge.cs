@@ -47,7 +47,7 @@ internal static class GeometryLiftJsonMerge
         var merged = JsonNode.Parse(incoming.ToJsonString())!.AsObject();
         var earlierCuboids = earlier["cuboids"] as JsonArray ?? new JsonArray();
         var incomingCuboids = merged["cuboids"] as JsonArray ?? new JsonArray();
-        var preferIncomingCuboids = ShouldPreferIncomingCuboidsOverUnion(merged, incomingCuboids, earlierCuboids);
+        var preferIncomingCuboids = ShouldPreferIncomingCuboidsOverUnion(merged, incomingCuboids);
         var dropHumanoidHatForPiglinEars = incoming["children"] is JsonArray incomingKidsForHat &&
             (ContainsChildPartId(incomingKidsForHat, "left_ear") ||
              ContainsChildPartId(incomingKidsForHat, "right_ear") ||
@@ -61,11 +61,26 @@ internal static class GeometryLiftJsonMerge
         }
         else
         {
-            merged["cuboids"] = incomingCuboids.Count > 0
-                ? earlierCuboids.Count > 0 && incomingCuboids.Count > earlierCuboids.Count && !preferIncomingCuboids
-                    ? MergeCuboidArraysUnionByFingerprint(earlierCuboids, incomingCuboids)
-                    : JsonNode.Parse(incomingCuboids.ToJsonString())!.AsArray()
-                : JsonNode.Parse(earlierCuboids.ToJsonString())!.AsArray();
+            if (incomingCuboids.Count == 0)
+            {
+                merged["cuboids"] = JsonNode.Parse(earlierCuboids.ToJsonString())!.AsArray();
+            }
+            else if (earlierCuboids.Count == 0 || preferIncomingCuboids)
+            {
+                merged["cuboids"] = JsonNode.Parse(incomingCuboids.ToJsonString())!.AsArray();
+            }
+            else if (incomingCuboids.Count > earlierCuboids.Count)
+            {
+                merged["cuboids"] = MergeCuboidArraysUnionByFingerprint(earlierCuboids, incomingCuboids);
+            }
+            else if (incomingCuboids.Count < earlierCuboids.Count)
+            {
+                merged["cuboids"] = JsonNode.Parse(earlierCuboids.ToJsonString())!.AsArray();
+            }
+            else
+            {
+                merged["cuboids"] = JsonNode.Parse(incomingCuboids.ToJsonString())!.AsArray();
+            }
         }
 
         var earlierKids = earlier["children"] as JsonArray ?? new JsonArray();
@@ -105,7 +120,7 @@ internal static class GeometryLiftJsonMerge
     }
 
     /// <summary>
-    /// Stable fingerprint for deduplicating cuboids during union merge (from/to, uv, face mask).
+    /// Stable fingerprint for deduplicating cuboids during union merge (shape, inflate, face mask).
     /// </summary>
     public static string LiftedCuboidFingerprint(JsonObject cuboid)
     {
@@ -128,22 +143,6 @@ internal static class GeometryLiftJsonMerge
             return "0,0,0";
         }
 
-        static string Uv(JsonNode? node)
-        {
-            if (node is JsonArray a && a.Count >= 2)
-            {
-                return string.Create(CultureInfo.InvariantCulture,
-                    $"{a[0]!.GetValue<double>().ToString("R", CultureInfo.InvariantCulture)},{a[1]!.GetValue<double>().ToString("R", CultureInfo.InvariantCulture)}");
-            }
-
-            if (node is JsonObject o)
-            {
-                return string.Create(CultureInfo.InvariantCulture, $"{F(o, "u")},{F(o, "v")}");
-            }
-
-            return "0,0";
-        }
-
         static string FaceMask(JsonNode? node)
         {
             if (node is not JsonArray a || a.Count == 0)
@@ -164,8 +163,9 @@ internal static class GeometryLiftJsonMerge
             return string.Join(",", faces);
         }
 
+        var inflate = cuboid["inflate"]?.GetValue<double>().ToString("R", CultureInfo.InvariantCulture) ?? "0";
         return string.Create(CultureInfo.InvariantCulture,
-            $"{Vec3(cuboid["from"])}|{Vec3(cuboid["to"])}|{Uv(cuboid["uv"] ?? cuboid["uvOrigin"])}|{FaceMask(cuboid["faceMask"])}");
+            $"{Vec3(cuboid["from"])}|{Vec3(cuboid["to"])}|{inflate}|{FaceMask(cuboid["faceMask"])}");
     }
 
     /// <summary>
@@ -257,15 +257,8 @@ internal static class GeometryLiftJsonMerge
 
     private static bool ShouldPreferIncomingCuboidsOverUnion(
         JsonObject incomingPart,
-        JsonArray incomingCuboids,
-        JsonArray earlierCuboids)
+        JsonArray incomingCuboids)
     {
-        if (incomingCuboids.Count > 0 && earlierCuboids.Count > 0 &&
-            incomingCuboids.Count < MergeCuboidArraysUnionByFingerprint(earlierCuboids, incomingCuboids).Count)
-        {
-            return true;
-        }
-
         if (incomingCuboids.Count < 3)
         {
             return false;

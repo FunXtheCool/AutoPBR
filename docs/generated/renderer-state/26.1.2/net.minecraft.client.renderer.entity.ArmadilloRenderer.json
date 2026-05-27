@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.renderer.entity.ArmadilloRenderer",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.ArmadilloRenderState",
+  "modelJvmNames": [
+    "net.minecraft.client.model.animal.armadillo.ArmadilloModel",
+    "net.minecraft.client.model.animal.armadillo.AdultArmadilloModel",
+    "net.minecraft.client.model.animal.armadillo.BabyArmadilloModel"
+  ],
+  "extractionStatus": "partial hand-pilot",
+  "extractionNotes": [
+    "P6 hand shard: idle preview cycles walk, roll-out, roll-up, and peek AnimationState fields used by ArmadilloModel.setupAnim.",
+    "RendererStateLift compiler remains deferred; this shard supplies honest preview state timing only."
+  ],
+  "animationStateFields": [
+    { "renderStateField": "rollOutAnimationState", "setupAnimStateField": "rollOutAnimationState", "entityAnimationState": "Armadillo.rollOut" },
+    { "renderStateField": "rollUpAnimationState", "setupAnimStateField": "rollUpAnimationState", "entityAnimationState": "Armadillo.rollUp" },
+    { "renderStateField": "peekAnimationState", "setupAnimStateField": "peekAnimationState", "entityAnimationState": "Armadillo.peek" }
+  ],
+  "livingEntityFields": [
+    "ageInTicks",
+    "walkAnimationPos",
+    "walkAnimationSpeed",
+    "xRot",
+    "yRot"
+  ],
+  "previewDriver": "armadillo_clip_cycle",
+  "clipLengthsSeconds": {
+    "walkOnly": 2,
+    "rollOutAnimationState": 1,
+    "peekAnimationState": 2,
+    "rollUpAnimationState": 1
+  }
+}

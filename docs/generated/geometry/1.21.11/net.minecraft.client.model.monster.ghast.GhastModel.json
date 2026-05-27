@@ -6,7 +6,7 @@
   "extractionStatus": "ok",
   "extractionNotes": [
     "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.monster.ghast.GhastModel).",
-    "Mesh lift parser notes (19): Lifted via bytecode disassembly \u002B segment parser (exact pool constants).; addBox at line 66: could not parse six floats.; segment \u0027a_0\u0027: addBox present but no cuboids parsed (1 addBox site(s)).; addBox at line 66: could not parse six floats."
+    "Mesh lift parser notes (19): Lifted via bytecode disassembly \u002B segment parser (exact pool constants).; addBox at line 66: could not parse six floats.; segment \u0027segment0\u0027: addBox present but no cuboids parsed (1 addBox site(s)).; addBox at line 66: could not parse six floats."
   ],
   "factoryMethod": "createBodyLayer",
   "roots": [

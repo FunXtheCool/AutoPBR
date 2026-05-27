@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.renderer.entity.SalmonRenderer",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.LivingEntityRenderState",
+  "modelJvmNames": [
+    "net.minecraft.client.model.animal.fish.SalmonModel"
+  ],
+  "extractionStatus": "partial hand-pilot",
+  "extractionNotes": [
+    "P6 hand shard: idle preview supplies isInWater=true so salmon setupAnim uses swim amplitude.",
+    "RendererStateLift compiler remains deferred; this shard supplies a static scalar/boolean preview default."
+  ],
+  "scalarRenderStateFields": [
+    { "renderStateField": "isInWater", "setupAnimStateField": "isInWater" }
+  ],
+  "livingEntityFields": [
+    "ageInTicks",
+    "walkAnimationPos",
+    "walkAnimationSpeed",
+    "xRot",
+    "yRot"
+  ],
+  "previewDriver": "static_scalar_state",
+  "scalarDefaults": {
+    "isInWater": true
+  }
+}

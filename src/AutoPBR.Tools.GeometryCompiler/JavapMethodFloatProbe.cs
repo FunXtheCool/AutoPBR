@@ -67,6 +67,11 @@ internal static partial class JavapMethodFloatProbe
                 block = JavapClassDisassembly.ExtractFirstMappedMeshFactoryCode(stdout, maps, meshHostOfficialOuter);
             }
 
+            if (block is null && maps is not null && !string.IsNullOrEmpty(meshHostOfficialOuter))
+            {
+                block = JavapClassDisassembly.ExtractFirstMappedMeshFactoryCode(stdout, maps, meshHostOfficialOuter);
+            }
+
             block ??= JavapClassDisassembly.ExtractMethodCodeBlock(stdout, methodName);
             if (block is null)
             {

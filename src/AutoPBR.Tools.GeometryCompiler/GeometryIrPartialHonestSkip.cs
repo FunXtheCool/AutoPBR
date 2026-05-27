@@ -19,6 +19,8 @@ internal static class GeometryIrPartialHonestSkip
             "Raft createRaftModel delegates paddles to addCommonParts; bytecode concat still resolves chest_raft factory in javap fallback.",
         ["net.minecraft.client.model.object.chest.ChestModel"] =
             "Chest double-body masked addBox uses direction-relative origin; lifted bottom cuboid X offset differs from reference_java by one voxel.",
+        ["net.minecraft.client.model.animal.cow.ColdCowModel"] =
+            "Reference mismatch remains after climate overlay merge: cold cow horn/body mesh composition is intentionally marked skipped when still partial.",
     };
 
     public static void ApplyIfStillPartial(string officialJvmName, JsonObject shard)

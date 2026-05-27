@@ -3,10 +3,9 @@
   "versionLabel": "1.21.11",
   "officialJvmName": "net.minecraft.client.model.animal.nautilus.NautilusSaddleModel",
   "profile": "proguard_1.21.11",
-  "extractionStatus": "partial",
+  "extractionStatus": "ok",
   "extractionNotes": [
     "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.nautilus.NautilusSaddleModel).",
-    "Strict structural validation failed (2): cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027; duplicate_part_id: duplicate part id \u0027root\u0027 in tree",
     "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
   ],
   "factoryMethod": "createBodyLayer",
@@ -29,12 +28,12 @@
       "cuboids": [],
       "children": [
         {
-          "id": "root",
+          "id": "shell",
           "pose": {
             "translation": [
               0,
-              29,
-              -6
+              -13,
+              5
             ],
             "rotationEulerRad": [
               0,
@@ -44,60 +43,33 @@
             "eulerOrder": "XYZ",
             "setupAnimPivot": [
               0,
-              29,
-              -6
+              -13,
+              5
             ]
           },
-          "cuboids": [],
-          "children": [
+          "cuboids": [
             {
-              "id": "shell",
-              "pose": {
-                "translation": [
-                  0,
-                  -13,
-                  5
-                ],
-                "rotationEulerRad": [
-                  0,
-                  0,
-                  0
-                ],
-                "eulerOrder": "XYZ",
-                "setupAnimPivot": [
-                  0,
-                  -13,
-                  5
-                ]
-              },
-              "cuboids": [
-                {
-                  "from": [
-                    -10,
-                    -7,
-                    14
-                  ],
-                  "to": [
-                    0,
-                    9,
-                    14.200000003
-                  ],
-                  "uvOrigin": [
-                    0,
-                    0
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift fluent addBox profile_proguard_obf",
-                  "liftWarnings": [
-                    "cube_deformation_obf_inferred"
-                  ],
-                  "inflate": 0.200000003
-                }
+              "from": [
+                -10,
+                -7,
+                14
               ],
-              "children": []
+              "to": [
+                0,
+                9,
+                14.200000003
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "inflate": 0.200000003
             }
-          ]
+          ],
+          "children": []
         }
       ]
     }

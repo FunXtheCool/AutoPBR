@@ -60,9 +60,7 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-              "textureWidth": 64,
-              "textureHeight": 64
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
             }
           ],
           "children": [
@@ -99,9 +97,7 @@
                   ],
                   "textureKey": "#skin",
                   "liftKind": "exact",
-                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-                  "textureWidth": 64,
-                  "textureHeight": 64
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
                 }
               ],
               "children": []
@@ -139,9 +135,7 @@
                   ],
                   "textureKey": "#skin",
                   "liftKind": "exact",
-                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-                  "textureWidth": 64,
-                  "textureHeight": 64
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
                 }
               ],
               "children": []
@@ -182,9 +176,7 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-              "inflate": 0.0149999997,
-              "textureWidth": 64,
-              "textureHeight": 64
+              "inflate": 0.0149999997
             },
             {
               "from": [
@@ -203,9 +195,7 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-              "textureWidth": 64,
-              "textureHeight": 64
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
             },
             {
               "from": [
@@ -225,9 +215,7 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-              "inflate": -0.0149999997,
-              "textureWidth": 64,
-              "textureHeight": 64
+              "inflate": -0.0149999997
             },
             {
               "from": [
@@ -247,9 +235,7 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-              "inflate": -0.0149999997,
-              "textureWidth": 64,
-              "textureHeight": 64
+              "inflate": -0.0149999997
             }
           ],
           "children": []
@@ -287,9 +273,7 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-              "textureWidth": 64,
-              "textureHeight": 64
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
             }
           ],
           "children": []
@@ -327,9 +311,7 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-              "textureWidth": 64,
-              "textureHeight": 64
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
             }
           ],
           "children": []
@@ -340,6 +322,63 @@
   "jarPath": "net/minecraft/client/model/animal/golem/CopperGolemModel.class",
   "classSha256Hex": "72213f54f64c78a16560309c618944a78e654668f4e6338900c9ea0cdc0a984b",
   "bytecodeFloatProbe": [
+    -4,
+    -6,
+    -3,
+    8,
+    6,
+    6,
+    -5,
+    -4,
+    -5,
+    -5,
+    8,
+    5,
+    10,
+    0.015,
+    -1,
+    -2,
+    -6,
+    3,
+    -1,
+    -9,
+    -1,
+    4,
+    -0.015,
+    -2,
+    -13,
+    -2,
+    4,
+    4,
+    4,
+    -0.015,
+    -6,
+    -3,
+    -1,
+    -2,
+    3,
+    10,
+    4,
+    -4,
+    -6,
+    -1,
+    -2,
+    3,
+    10,
+    4,
+    4,
+    -6,
+    -4,
+    -2,
+    4,
+    5,
+    4,
+    -5,
+    -2,
+    4,
+    5,
+    4,
+    -5,
     -4,
     -6,
     -3,

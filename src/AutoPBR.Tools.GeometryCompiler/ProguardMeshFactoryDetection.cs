@@ -15,7 +15,7 @@ internal static class ProguardMeshFactoryDetection
             }
         }
 
-        return JvmClassFileParser.HasStaticMeshFactoryMethod(classBytes);
+        return JvmClassFileParser.HasStaticMeshFactoryMethod(classBytes, maps);
     }
 
     public static string ResolveFactoryMethod(MojangMappingsParser? maps, string officialJvmName, string requested)
@@ -25,18 +25,55 @@ internal static class ProguardMeshFactoryDetection
             return requested;
         }
 
-        if (maps.EnumerateMeshFactoryPins(officialJvmName).Any(p =>
-                string.Equals(p.NamedMethod, requested, StringComparison.Ordinal)))
+        var pins = maps.EnumerateMeshFactoryPins(officialJvmName).ToList();
+        if (pins.Any(p => string.Equals(p.NamedMethod, requested, StringComparison.Ordinal)))
         {
             return requested;
         }
 
-        if (maps.EnumerateMeshFactoryPins(officialJvmName).Any(p =>
-                string.Equals(p.NamedMethod, "createMesh", StringComparison.Ordinal)))
+        if (string.Equals(requested, "createBodyLayer", StringComparison.Ordinal))
         {
-            return "createMesh";
+            if (pins.Any(p => string.Equals(p.NamedMethod, "createMesh", StringComparison.Ordinal)))
+            {
+                return "createMesh";
+            }
+
+            if (pins.Any(p => string.Equals(p.NamedMethod, "createBodyLayer", StringComparison.Ordinal)))
+            {
+                return "createBodyLayer";
+            }
+
+            if (pins.Any(p => string.Equals(p.NamedMethod, "apply", StringComparison.Ordinal)))
+            {
+                return "apply";
+            }
         }
 
         return requested;
+    }
+
+    /// <summary>
+    /// Types like <c>BabyModelTransform</c> only expose <c>MeshDefinition apply(MeshDefinition)</c> — pose/scale transforms, not part trees.
+    /// </summary>
+    public static bool IsMeshDefinitionTransformerOnly(MojangMappingsParser? maps, string officialJvmName)
+    {
+        if (maps is null)
+        {
+            return false;
+        }
+
+        var pins = maps.EnumerateMeshFactoryPins(officialJvmName).ToList();
+        if (pins.Count == 0)
+        {
+            return false;
+        }
+
+        var hasApply = pins.Any(p => string.Equals(p.NamedMethod, "apply", StringComparison.Ordinal));
+        var hasBodyFactory = pins.Any(p =>
+            string.Equals(p.NamedMethod, "createBodyLayer", StringComparison.Ordinal) ||
+            string.Equals(p.NamedMethod, "createMesh", StringComparison.Ordinal) ||
+            string.Equals(p.NamedMethod, "createBodyMesh", StringComparison.Ordinal));
+
+        return hasApply && !hasBodyFactory;
     }
 }

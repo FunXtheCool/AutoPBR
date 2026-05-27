@@ -98,9 +98,7 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-              "textureWidth": 64,
-              "textureHeight": 64
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
             }
           ],
           "children": []
@@ -291,9 +289,7 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-              "textureWidth": 64,
-              "textureHeight": 64
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
             }
           ],
           "children": []

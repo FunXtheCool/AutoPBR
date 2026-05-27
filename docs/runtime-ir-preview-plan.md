@@ -1,9 +1,9 @@
 # Runtime-IR preview plan (geometry + animation + setupAnim)
 
-**Status:** Active canonical plan  
+**Status:** Active canonical plan — automated tracks complete except human Manual Explore  
 **Pinned version:** 26.1.2 (`tools/minecraft-parity/26.1.2/client.jar`)  
 **Assembly pilots:** 56 JVMs ([`geometry-assembly-parity-pilots-26.1.2.txt`](generated/geometry-assembly-parity-pilots-26.1.2.txt))  
-**Quality snapshot:** [`geometry-lift-quality-26.1.2.json`](generated/geometry-lift-quality-26.1.2.json) — `generatedUtc` 2026-05-21T20:47:16Z · **Completion audit:** [`plan-completion-audit.md`](generated/plan-completion-audit.md) · **Automated tracks:** [`automated-tracks-complete.md`](generated/automated-tracks-complete.md)  
+**Quality snapshot:** [`geometry-lift-quality-26.1.2.json`](generated/geometry-lift-quality-26.1.2.json) — `generatedUtc` 2026-05-26T02:32:22Z · **Completion audit:** [`plan-completion-audit.md`](generated/plan-completion-audit.md) · **Automated tracks:** [`automated-tracks-complete.md`](generated/automated-tracks-complete.md)  
 **Related:** [`test-guidance-geometry-animation-ir.md`](test-guidance-geometry-animation-ir.md) (tiers), [`generated/geometry-ir-conventions.md`](generated/geometry-ir-conventions.md), [`vanilla-preview-parity.md`](vanilla-preview-parity.md), [`cleanroom-entity-cuboid.md`](cleanroom-entity-cuboid.md)  
 **Superseded plans:** [`archive/README.md`](archive/README.md) (historical roadmaps only — do not edit for new work)
 
@@ -33,6 +33,18 @@ Preview-only layers are **temporary guardrails**, not substitutes for lifter fix
 ## North star
 
 Explore 3D and CleanRoom parity preview match **vanilla-as-lifted**: correct part hierarchy, factory-accurate rest poses, sampled definition clips where IR is complete, and setupAnim evaluation against a honest render-state bag. Promotion uses **allowlists + quality gates**, not preview hacks.
+
+## Current status (2026-05-26 audit)
+
+**Automated geometry / animation / setupAnim work is complete for this plan.** The remaining plan-done blocker is **§ A.4 Manual Explore**: a human must open the listed parity-catalog previews, refresh/compare screenshots, and mark each row signed off.
+
+**Deferred / optional work remains but does not block the plan:**
+
+- **P6 renderer-state compiler:** hand renderer-state pilot shards + resolver are landed; bytecode `RendererStateLift` stays deferred behind [`archive/p6-renderer-state-lift-blockers.md`](archive/p6-renderer-state-lift-blockers.md).
+- **Phase 1C cube deformation:** `inflate` is lifted but parity emit intentionally skips corner expansion until reference bake / viewport policy changes.
+- **Reference-output freshness:** JDK 25 reference batches may be stale; re-bake only when validating reference artifacts.
+- **Catalog/CleanRoom hygiene:** catalog manifest paths are strict IR; remaining hand `Build*` work is optional CleanRoom cleanup (`BuildQuadruped` legacy path).
+- **Regeneration hygiene:** re-run full geometry/setup/animation indexes when new lifts land; current committed geometry index has no `partial` rows.
 
 ---
 
@@ -68,9 +80,9 @@ Hand-catalog for per-mob `Build*` / renderer javap: exists separately in [`vanil
 | Artifact | Count / metric |
 |----------|----------------|
 | Geometry index rows | **184** ([`geometry-index-26.1.2.json`](generated/geometry-index-26.1.2.json)) |
-| Index `extractionStatus` (2026-05-22 Wave 11 partial drain + concat/island merge fixes) | **155** `ok` · **27** `skipped` · **2** `partial` · **0** `fail` |
-| Quality report `ok` rows | **141** |
-| `prioritizedBacklogJvmNames` | **40** (flat-nested pattern; index-wide backlog — see appendix) |
+| Index `extractionStatus` (2026-05-25/26 Wave C partial drain) | **157** `ok` · **27** `skipped` · **0** `partial` · **0** `fail` |
+| Quality report `ok` rows | **157** |
+| `prioritizedBacklogJvmNames` | **60** (flat-nested / composed-preview suspects; tracked for Explore/promotion context — see appendix) |
 | **Pilot** `assemblyGatePass` | **56 / 56** pass |
 | **Pilot** `javapPoseOracleMatch` | **56 / 56** pass (2026-05-21: same-class `createBodyMesh`/`createBase*` + `createLegs` delegate merge) |
 | **Pilot dual gate** (`assemblyGatePass` ∧ `javapPoseOracleMatch`) | **56 / 56** (2026-05-21: camel host/saddle + pilot UV atlas gates green after UV batch) |
@@ -159,7 +171,7 @@ Legacy `referenceCuboidsMatch` / `referencePosesMatch` / `referenceMeshMatch` va
 
 **Human-only (cannot auto sign-off):** Agents and CI must **not** mark **Manual Explore** as done. Owner workflow: [`manual-explore-playbook.md`](manual-explore-playbook.md) (per-batch 4C-1…5, Creeper canary, screenshot checklist). Plan completion criterion **#1** is **blocked on human** until every row below leaves `pending`.
 
-**Automated gates (2026-05-21):** For rows below, committed quality JSON has **`assemblyGatePass` ✓**, **`javapPoseOracleMatch` ✓**, **`referenceWorldPoseMatch` ✓**, **`referenceHierarchyMatch` ✓**; T1 viewport **`GeometryIrAssemblyViewportSanityTests`** green for all **55** JVMs on `geometry_ir_assembly_viewport_strict_jvm.txt` (**54** dual-gate + `SheepModel` T1-only). **Remaining work is manual Explore only** (screenshot + silhouette).
+**Automated gates (current quality snapshot):** For rows below, committed quality JSON has **`assemblyGatePass` ✓**, **`javapPoseOracleMatch` ✓**, **`referenceWorldPoseMatch` ✓**, **`referenceHierarchyMatch` ✓**; T1 viewport **`GeometryIrAssemblyViewportSanityTests`** green for all **55** JVMs on `geometry_ir_assembly_viewport_strict_jvm.txt` (**54** dual-gate + `SheepModel` T1-only). **Remaining work is manual Explore only** (screenshot + silhouette).
 
 **Manual checklist (per JVM):** (1) Open Explore 3D parity-catalog preview with texture below. (2) Confirm single connected quadruped silhouette (no floating torso / head-on-ground / leg islands). (3) Optional: compare to `docs/images/quadruped-*.png` where listed. (4) Mark sign-off in this table.
 
@@ -415,18 +427,22 @@ Details and allowlist table: [`test-guidance-geometry-animation-ir.md`](test-gui
 - Javap pose oracle parser pass (nested cuboid names, parametric head Y, delegate merge, `root` skip) + `GeometryJavapPoseOracleTests`
 - **Pilot 4C promotion (2026-05-21):** **54 / 56** dual gate (`geometry_ir_partial_to_ok_promotion_jvm.txt` ∩ 56 pilots): batch 1 (**16**); batch 2 (**8**); batch 3 (**11**); batch 4 (**11**); batch 5 — `EnderDragonModel`, `RavagerModel`, `BabyDonkeyModel`, `BabyFelineModel`, feline×4 (**8**). **Not on 4C:** `SheepModel` (T1 viewport probe only); `QuadrupedModel` (abstract). **Feline (2026-05-21):** `AbstractFelineModel` + cat×2 on partial→ok + T1 strict (LER fix; not 4C). **AdultOcelot:** delegate → `AdultFelineModel`, manifest `geometry_ir_official_jvm`, shard `ok`.
 - **Full 184 geometry index (2026-05-21, Part A.2 #3):** `Generate-GeometryIndex.ps1` batch on `minecraft_26.1.2_client_model_classes.txt`; `geometry-index-26.1.2.json` rows aligned to `docs/generated/geometry/26.1.2/` shards; **56** assembly pilots restored from pre-batch backup (byte-identical)
+- **Wave C geometry partial drain (2026-05-25/26):** `geometry-index-26.1.2.json` now has **157** `ok` · **27** `skipped` · **0** `partial` · **0** `fail`; `ArmorStandModel` final body-stick row promoted; quality snapshot `generatedUtc` **2026-05-26T02:32:22Z**.
+- **Automated plan closure:** [`automated-tracks-complete.md`](generated/automated-tracks-complete.md) marks every automated workstream complete except documented deferrals; **only § A.4 Manual Explore** blocks plan “done”.
 
-## BLOCKED
+## Remaining / deferred
 
-- **Reference batch:** JDK 25 required for class file 69; pilot `reference-output` may be stale  
-- **P6 renderer lift:** Breeze/Sniffer/Allay/Camel/Warden/Frog/Creaking/**Nautilus**/**CopperGolem** pilot shards + preview resolver landed; synthesis fallback for other mobs; compiler blocked on multi-layer renderers (Warden)  
+- **Manual Explore sign-off:** Human-only § A.4 canary rows are still `pending`; use [`manual-explore-playbook.md`](manual-explore-playbook.md) and `tools/export-manual-explore-checklist.ps1`.
+- **Reference batch freshness:** JDK 25 required for class file 69; pilot `reference-output` may be stale.
+- **P6 renderer lift:** Breeze/Sniffer/Allay/Camel/Warden/Frog/Creaking/**Nautilus**/**CopperGolem** pilot shards + preview resolver landed; synthesis fallback for other mobs; bytecode compiler remains deferred.
+- **Phase 1C cube deformation:** `BabyZombieModel` `inflate: 0.25` is recorded in IR; parity emit skips inflate until reference/viewport policy changes.
+- **Optional CleanRoom cleanup:** catalog paths are strict IR; remaining hand adult `BuildQuadruped` cleanup is not a plan blocker.
 
-## Optional / in progress
+## Optional hygiene
 
-- Phase 1C cube deformation — **BabyZombieModel** `inflate: 0.25` in shard; parity emit skips inflate (reference bake pre-inflate) — **deferred**; see [`plan-completion-audit.md`](generated/plan-completion-audit.md) Phase 1C probe  
-- Animation backlog rows (Part B table); setupAnim `partial` → `ok` expansion  
-- ~~1.21.11 animation lift: **10/10 `ok`** on jar holders (§ B.2.1); copy to `Data/minecraft-native/animation/1.21.11/` when wiring preview~~ (2026-05-21: `docs/generated/animation/1.21.11/` linked via `AutoPBR.Core.csproj`)  
-- Manual Explore sign-off on canary set — owner playbook [`manual-explore-playbook.md`](manual-explore-playbook.md); export: `pwsh -File tools/export-manual-explore-checklist.ps1` (optional `-Batch 4C-3`)  
+- Re-run `Generate-GeometryIndex.ps1`, `Generate-SetupAnimIndex.ps1`, and animation index scripts when new lifts land.
+- Re-run `plan-completion-audit.md` / `automated-tracks-complete.md` when completion criteria or generated metrics change.
+- Optional: `AUTOPBR_RUN_ASSEMBLY_VIEWPORT_PROBES=1` + pilot regen to refresh viewport/probe confidence after preview-policy edits.
 
 ---
 
@@ -484,11 +500,11 @@ Vanilla draws most mobs after `PoseStack.scale(-1,-1,1)`. Explore folds that int
 
 **Failure mode:** For flat quadrupeds, the **body** part carries `Rx(π/2)` plus a Y offset (e.g. Cow `T(0,5,2)`, Panda `T(0,10,0)`), while **head** and **legs** are mostly translation-only root siblings. Applying the **wrong** LER order leaves the rotated torso in a different preview Y band than head/legs → screenshot “floating body / head on ground / legs on plane.”
 
-**Catalog-path gap:** `TryBuildParityCatalogMeshFromGeometryIr` ends with `ApplyParityCatalogGeometryIrPreviewBasis`, which calls `ResolveGeometryIrLerMirrorRightComposeLocalChain(**null**, stem, norm)` — it never passes `officialJvmName`, so JVM-scoped policy in `UsesFlatPartPoseOffsetQuadrupedJvm` / future polar-bear exclusions cannot apply. Test-only emit uses `ApplyGeometryIrParityLivingEntityRendererPreviewBasis(officialJvmName, …)` in `GeometryIrMeshEmitter.cs` and **does** pass the JVM.
+**Historical catalog-path gap (fixed):** `TryBuildParityCatalogMeshFromGeometryIr` previously ended with `ApplyParityCatalogGeometryIrPreviewBasis` resolving LER without `officialJvmName`, so JVM-scoped policy in `UsesFlatPartPoseOffsetQuadrupedJvm` / future polar-bear exclusions could not apply. Test-only emit already used `ApplyGeometryIrParityLivingEntityRendererPreviewBasis(officialJvmName, …)` in `GeometryIrMeshEmitter.cs`; catalog now delegates through the same JVM-aware helper.
 
 **Mis-classification (fixed 2026-05-21):** Treating panda/polar **adult** as hoglin-class default LER left body cuboid centroids outside the leg–head band (viewport cohesion tests). Empirical policy: cow-class right-compose for panda/polar adults; hoglin/ravager stay default.
 
-**Lifter angle:** Not a missing parent chain in committed shards. Remaining lifter work is **classification accuracy** (which factories are flat-offset vs offset-and-rotation) feeding preview policy — not rewriting cuboid pivots for these three.
+**Lifter angle:** Not a missing parent chain in committed shards. The completed fix was **classification accuracy** (which factories are flat-offset vs offset-and-rotation) feeding preview policy — not rewriting cuboid pivots for these three.
 
 **GPU path (secondary):** Explore emulated entities may GPU-skin with bind pose from `TryPrepareGpuSkinnedEmulatedMesh` while animating bones via `TryFillBoneMatricesFast` / setupAnim. Any mismatch in `applyGeometryIrSetupAnimMotion` between bind VBO and bone matrices (Breeze-class) can re-separate parts even when static parity emit tests pass.
 
@@ -531,25 +547,38 @@ Vanilla draws most mobs after `PoseStack.scale(-1,-1,1)`. Explore folds that int
 | Track | Status | Next action |
 |-------|--------|-------------|
 | **Manual Explore (§ A.4)** | Pending all canary rows (`automated_prereq` ✓) | **Human-only** — [`manual-explore-playbook.md`](manual-explore-playbook.md); export: `pwsh -File tools/export-manual-explore-checklist.ps1 -Batch 4C-1` … |
-| **Plan completion audit** | [`plan-completion-audit.md`](generated/plan-completion-audit.md) (2026-05-21) | Re-run when metrics or § completion criteria change |
+| **Plan completion audit** | [`plan-completion-audit.md`](generated/plan-completion-audit.md) (2026-05-25 Wave C) | Re-run when metrics or § completion criteria change |
 | **RendererStateLift compiler (Part D)** | Pilots: Breeze/Sniffer/Allay/Camel/Warden/Frog/Creaking/**Nautilus**/**CopperGolem** (hand JSON) | Bytecode lift blocked — [`archive/p6-renderer-state-lift-blockers.md`](archive/p6-renderer-state-lift-blockers.md) |
 | **Phase 1C deformation** | Lift ✓; parity emit skips (reference pre-inflate) | **Deferred** — audit Phase 1C probe; re-bake reference or viewport-only path |
-| **Geometry index partial drain** | **146** `ok` · **27** `skipped` · **11** `partial` · **0** `fail` | Honest index counts (Wave 12 sync); `BannerModel` ok (Wave 9); partial drain continues — full regen via `Generate-GeometryIndex.ps1` |
+| **Geometry index partial drain** | **Complete:** **157** `ok` · **27** `skipped` · **0** `partial` · **0** `fail` | Wave C: `ArmorStandModel` final partial promoted; re-run full regen only when new lifts land |
 | **Rig-accuracy batches** | **Populated** under [`generated/rig-accuracy-batches/`](generated/rig-accuracy-batches/) | 56-pilot tables + humanoid/flying quality rows; cross-link § A.3.1 |
-| **Entity cuboid codegen (A.9)** | **20** pilot tables (+`PolarBearModel` 2026-05-22) | Wire remaining hand `Build*` per [`mob-ir-parity-backlog.txt`](generated/mob-ir-parity-backlog.txt); temperate `CowModel` uses lifted IR emit (no codegen table yet) |
+| **Entity cuboid codegen (A.9)** | **20** pilot tables (+`PolarBearModel` 2026-05-22); catalog 100% IR | Optional CleanRoom cleanup only; `BuildQuadruped` legacy hand path remains in [`mob-ir-parity-backlog.txt`](generated/mob-ir-parity-backlog.txt) |
 | **Animation B.3** | **Closed** (2026-05-21) — primary + depth rows wired | Residual **deferred** only: Warden tendril; Sniffer scent/search **setupAnim-only**; Breeze **SLIDE wind ROTATION** IR-gap; Fox adult absent; Copper chest clips |
 
 ### Plan completion criteria
 
-**Audit (2026-05-21):** [`plan-completion-audit.md`](generated/plan-completion-audit.md) — per-bullet ✅ automated / ⏳ human-only / 🔧 deferred.
+**Audit (2026-05-25 Wave C):** [`plan-completion-audit.md`](generated/plan-completion-audit.md) — per-bullet ✅ automated / ⏳ human-only / 🔧 deferred.
 
 This plan is **done** when all of the following hold (no further edits required except hygiene regen):
 
-1. **Geometry:** All **56** assembly pilots pass dual gate (`assemblyGatePass` + T1 viewport) **and** § A.4 Manual Explore signed off for every canary row — **blocked on human** ([`manual-explore-playbook.md`](manual-explore-playbook.md); automated gates ✅ 2026-05-21).
-2. **Catalog:** **761** manifest diffuse paths remain `RuntimeGeometryIrJson` with no `cleanRoom` fallback (`ParityCatalogMeshDriverKindSurveyTests` strict gate — **0** `cleanRoom` as of 2026-05-21). Block-entity boat/chest/chest-boat paths use `ParityCatalogHandLiftGeometryIrCatalog` (`BoatModel` hull, synthetic `ChestBoatModel`, `ChestModel`; index rows stay `skipped`). Adult `HumanoidZombieVillager` paths resolve `ZombieVillagerModel` via manifest `geometry_ir_official_jvm` (no `ZombieModel` override).
-3. **SetupAnim:** **169/169** `ok` on 26.1.2 index; no hand `Compute*` mirrors (`HandParityForbiddenSymbolsTests`).
-4. **Animation (26.1.2):** 16/16 definition shards `ok`; B.3 backlog table rows either wired or explicitly deferred with IR gap documented.
-5. **P6 (optional for “done”):** Renderer-state compiler replaces synthesis for mob families beyond the four pilots — until then Part D stays **blocked** but not blocking geometry/animation “done”.
+1. **Geometry:** All **56** assembly pilots pass automated gates (`assemblyGatePass`, `javapPoseOracleMatch`, reference world/hierarchy, T1 viewport) **and** § A.4 Manual Explore signed off for every canary row — **only remaining blocker; human-only** ([`manual-explore-playbook.md`](manual-explore-playbook.md)).
+2. **Catalog:** **761** manifest diffuse paths remain `RuntimeGeometryIrJson` with no `cleanRoom` fallback (`ParityCatalogMeshDriverKindSurveyTests` strict gate — **0** `cleanRoom`). Block-entity boat/chest/chest-boat paths use `ParityCatalogHandLiftGeometryIrCatalog` (`BoatModel` hull, synthetic `ChestBoatModel`, `ChestModel`; index rows stay `skipped`). Adult `HumanoidZombieVillager` paths resolve `ZombieVillagerModel` via manifest `geometry_ir_official_jvm` (no `ZombieModel` override). **Complete.**
+3. **SetupAnim:** **169/169** `ok` on 26.1.2 index; no hand `Compute*` mirrors (`HandParityForbiddenSymbolsTests`). **Complete.**
+4. **Animation (26.1.2):** 16/16 definition shards `ok`; B.3 backlog table rows either wired or explicitly deferred with IR gap documented. **Complete except documented deferrals.**
+5. **P6 (optional for “done”):** Renderer-state compiler replaces synthesis for mob families beyond pilot shards; until then Part D stays **deferred** and does not block geometry/animation “done”.
+
+**Current verdict:** automated plan work is complete; final sign-off is § A.4 Manual Explore.
+
+---
+
+## Wave C landed (2026-05-25/26) — final geometry partial drain
+
+| Track | Outcome |
+|-------|---------|
+| **Geometry index** | **157** `ok` · **27** `skipped` · **0** `partial` · **0** `fail`; final partial row promoted |
+| **ArmorStandModel** | Body-stick override fixed; `ArmorStandModel` shard/index row is `ok` |
+| **Quality snapshot** | `geometry-lift-quality-26.1.2.json` `generatedUtc` **2026-05-26T02:32:22Z**, `okEntryCount` **157** |
+| **Plan “done” blocker** | Still **only § A.4 Manual Explore**; P6 / Phase 1C / reference freshness remain deferred |
 
 ---
 
@@ -570,8 +599,8 @@ This plan is **done** when all of the following hold (no further edits required 
 |-------|---------|
 | **Pilot quality restore** | Pre-regen backup + targeted lift: **DonkeyModel**/**BabyCatModel** from `.tmpbuild/full-index-pilot-backup`; **BabyOcelotModel** re-lift (`BabyFelineModel` host, was `AdultFelineModel`); `regen-assembly-pilots.ps1 -SkipLift` — **56/56** on all four gate columns |
 | **Concat cycle guard** | `BytecodeMeshResolution.BuildMeshConcatDeep` — `concatResolutionChain` set breaks delegate cycles during mesh-host deep concat |
-| **Geometry index (honest)** | **146** `ok` · **27** `skipped` · **11** `partial` · **0** `fail` — rollup docs corrected from stale **154/30/0** |
-| **Partial drain** | In progress (**11** `partial`); Wave 7–9 promotions unchanged for pilots already `ok` |
+| **Geometry index (honest at Wave 12)** | **146** `ok` · **27** `skipped` · **11** `partial` · **0** `fail` — superseded by Wave C **157/27/0/0** |
+| **Partial drain** | Superseded by Wave C; **0** `partial` rows remain |
 | **A.9 PolarBear adult** | `PolarBearModel` IR + codegen table (**20** tables); `BuildPolarBear` → `TryBuildPolarBearMeshFromGeometryIr` (PandaModel pattern) |
 | **B.3 depth wired** | Creaking invulnerable/death; Camel baby hind CATMULLROM; BabyAxolotl swim legs/tail; Armadillo peek — see [`automated-tracks-complete.md`](generated/automated-tracks-complete.md) |
 | **Plan “done” blocker** | **Only § A.4 Manual Explore** ([`automated-tracks-complete.md`](generated/automated-tracks-complete.md)) |
@@ -596,8 +625,8 @@ This plan is **done** when all of the following hold (no further edits required 
 | Track | Outcome |
 |-------|---------|
 | **Plan completion audit** | [`plan-completion-audit.md`](generated/plan-completion-audit.md) — criterion **#2** `ZombieVillagerModel` ✅; catalog **761** hand-lift; B.3 + P6 **Frog**/**Creaking** |
-| **Live metrics + Wave 8 table** | Index **146/27/11/0** (honest, Wave 12); B.3 **closed**; A.9 **20** cuboid tables (+PolarBear) |
-| **Pilot quality regen** | `pwsh -File tools/regen-assembly-pilots.ps1 -SkipLift` — `generatedUtc` 2026-05-21T20:47:16Z; **56/56** gates; flatCount stable at **4** (**39/56** pilots with `suspectedFlatNestedPartCount > 0`) |
+| **Live metrics + Wave 8 table** | Index **157/27/0/0** (Wave C); B.3 **closed**; A.9 **20** cuboid tables (+PolarBear) |
+| **Pilot quality regen** | `pwsh -File tools/regen-assembly-pilots.ps1 -SkipLift` — latest quality `generatedUtc` 2026-05-26T02:32:22Z; **56/56** gates; flatCount stable at **4** (**39/56** pilots with `suspectedFlatNestedPartCount > 0`) |
 | **Backlog appendix** | `prioritizedBacklogJvmNames` (**40**) — see appendix (pilot regen vs index-only) |
 | **Next (post Wave 10)** | § A.4 Manual Explore only for plan “done”; optional `AUTOPBR_RUN_ASSEMBLY_VIEWPORT_PROBES=1`; full index regen when new lifts land |
 
@@ -654,9 +683,9 @@ pwsh -File tools/Generate-SetupAnimIndex.ps1 -ClientJar tools/minecraft-parity/2
 
 ---
 
-## Appendix — `prioritizedBacklogJvmNames` (40)
+## Appendix — `prioritizedBacklogJvmNames` (60)
 
-Flat-nested suspects with `reference*Match` true in [`geometry-lift-quality-26.1.2.json`](generated/geometry-lift-quality-26.1.2.json) (`generatedUtc` 2026-05-21T20:47:16Z). **56-pilot / promotion path:** `pwsh -File tools/regen-assembly-pilots.ps1` (add `-SkipLift` for quality-only refresh). **Index-only** (e.g. `BabyPigModel`): `Generate-GeometryIndex.ps1 -Single <fqn>`. **Sign-off:** manual Explore § A.4 when on canary/promotion path ([`manual-explore-playbook.md`](manual-explore-playbook.md)).
+Flat-nested / composed-preview suspects with `reference*Match` true in [`geometry-lift-quality-26.1.2.json`](generated/geometry-lift-quality-26.1.2.json) (`generatedUtc` 2026-05-26T02:32:22Z). This list is **not** an active lift-failure queue; it preserves Explore/promotion context for flat-offset families. **56-pilot / promotion path:** `pwsh -File tools/regen-assembly-pilots.ps1` (add `-SkipLift` for quality-only refresh). **Index-only** (e.g. `BabyPigModel`, climate variants): `Generate-GeometryIndex.ps1 -Single <fqn>`. **Sign-off:** manual Explore § A.4 when on canary/promotion path ([`manual-explore-playbook.md`](manual-explore-playbook.md)).
 
 | Short name | Official JVM | Regen | Explore / promotion |
 |------------|--------------|-------|---------------------|
@@ -664,17 +693,26 @@ Flat-nested suspects with `reference*Match` true in [`geometry-lift-quality-26.1
 | AdultArmadilloModel | `…armadillo.AdultArmadilloModel` | pilot regen | § A.4 batch 3 |
 | ArmadilloModel | `…armadillo.ArmadilloModel` | pilot regen | § A.4 batch 3 |
 | BabyArmadilloModel | `…armadillo.BabyArmadilloModel` | pilot regen | § A.4 batch 3 |
+| AdultAxolotlModel | `…axolotl.AdultAxolotlModel` | pilot regen | § A.4 batch 4 |
+| BabyAxolotlModel | `…axolotl.BabyAxolotlModel` | pilot regen | § A.4 batch 4 |
 | AdultCamelModel | `…camel.AdultCamelModel` | pilot regen | § A.4 batch 1 |
 | BabyCamelModel | `…camel.BabyCamelModel` | pilot regen | § A.4 batch 1 |
 | CamelModel | `…camel.CamelModel` | pilot regen | § A.4 batch 1 |
 | CamelSaddleModel | `…camel.CamelSaddleModel` | pilot regen | § A.4 batch 1 |
 | BabyCowModel | `…cow.BabyCowModel` | pilot regen | § A.4 batch 3 |
+| ColdCowModel | `…cow.ColdCowModel` | index regen | climate cow Explore when promoted |
 | CowModel | `…cow.CowModel` | pilot regen | § A.4 batch 1 |
+| WarmCowModel | `…cow.WarmCowModel` | index regen | climate cow Explore when promoted |
 | AbstractEquineModel | `…equine.AbstractEquineModel` | pilot regen | § A.4 batch 1 |
+| BabyDonkeyModel | `…equine.BabyDonkeyModel` | pilot regen | § A.4 batch 5 |
 | BabyHorseModel | `…equine.BabyHorseModel` | pilot regen | § A.4 batch 1 |
 | DonkeyModel | `…equine.DonkeyModel` | pilot regen | § A.4 batch 1 |
 | EquineSaddleModel | `…equine.EquineSaddleModel` | pilot regen | § A.4 batch 1 |
 | HorseModel | `…equine.HorseModel` | pilot regen | § A.4 batch 1 |
+| AbstractFelineModel | `…feline.AbstractFelineModel` | pilot regen | § A.4 partial→ok batch 5 |
+| AdultCatModel | `…feline.AdultCatModel` | pilot regen | § A.4 partial→ok batch 5 |
+| AdultFelineModel | `…feline.AdultFelineModel` | pilot regen | § A.4 partial→ok batch 5 |
+| AdultOcelotModel | `…feline.AdultOcelotModel` | pilot regen | § A.4 batch 4 |
 | BabyCatModel | `…feline.BabyCatModel` | pilot regen | § A.4 partial→ok batch 5 |
 | BabyFelineModel | `…feline.BabyFelineModel` | pilot regen | § A.4 batch 5 |
 | BabyOcelotModel | `…feline.BabyOcelotModel` | pilot regen | § A.4 batch 4 |
@@ -683,26 +721,37 @@ Flat-nested suspects with `reference*Match` true in [`geometry-lift-quality-26.1
 | FoxModel | `…fox.FoxModel` | pilot regen | § A.4 batch 2 |
 | BabyGoatModel | `…goat.BabyGoatModel` | pilot regen | § A.4 batch 2 |
 | GoatModel | `…goat.GoatModel` | pilot regen | § A.4 batch 2 |
+| BabyLlamaModel | `…llama.BabyLlamaModel` | pilot regen | § A.4 batch 4 |
+| LlamaModel | `…llama.LlamaModel` | pilot regen | § A.4 batch 4 |
 | BabyPandaModel | `…panda.BabyPandaModel` | pilot regen | § A.4 batch 3 |
 | PandaModel | `…panda.PandaModel` | pilot regen | § A.4 batch 1 |
 | BabyPigModel | `…pig.BabyPigModel` | index regen | Explore when promoted (not 56-pilot) |
+| ColdPigModel | `…pig.ColdPigModel` | index regen | climate pig Explore when promoted |
 | PigModel | `…pig.PigModel` | pilot regen | § A.4 batch 1 |
 | BabyPolarBearModel | `…polarbear.BabyPolarBearModel` | pilot regen | § A.4 batch 3 |
 | PolarBearModel | `…polarbear.PolarBearModel` | pilot regen | § A.4 batch 1 |
+| AdultRabbitModel | `…rabbit.AdultRabbitModel` | pilot regen | § A.4 batch 4 |
+| BabyRabbitModel | `…rabbit.BabyRabbitModel` | pilot regen | § A.4 batch 4 |
+| RabbitModel | `…rabbit.RabbitModel` | pilot regen | § A.4 batch 4 |
 | BabySheepModel | `…sheep.BabySheepModel` | pilot regen | § A.4 batch 3 |
 | SheepFurModel | `…sheep.SheepFurModel` | pilot regen | § A.4 batch 3 |
 | SheepModel | `…sheep.SheepModel` | pilot regen | § A.4 T1-only (not 4C) |
+| SnifferModel | `…sniffer.SnifferModel` | pilot regen | § A.4 batch 4 |
+| SniffletModel | `…sniffer.SniffletModel` | pilot regen | § A.4 batch 4 |
 | AdultTurtleModel | `…turtle.AdultTurtleModel` | pilot regen | § A.4 batch 3 |
 | BabyTurtleModel | `…turtle.BabyTurtleModel` | pilot regen | § A.4 batch 3 |
 | TurtleModel | `…turtle.TurtleModel` | pilot regen | § A.4 batch 3 |
+| AdultWolfModel | `…wolf.AdultWolfModel` | pilot regen | § A.4 batch 2 |
 | BabyWolfModel | `…wolf.BabyWolfModel` | pilot regen | § A.4 batch 2 |
+| WolfModel | `…wolf.WolfModel` | pilot regen | § A.4 batch 2 |
 | CreeperModel | `…creeper.CreeperModel` | pilot regen | § A.4 batch 1 (canary) |
+| EnderDragonModel | `…dragon.EnderDragonModel` | pilot regen | § A.4 batch 5 |
 | BabyHoglinModel | `…hoglin.BabyHoglinModel` | pilot regen | § A.4 batch 1 |
 | HoglinModel | `…hoglin.HoglinModel` | pilot regen | § A.4 batch 1 |
 | RavagerModel | `…ravager.RavagerModel` | pilot regen | § A.4 batch 5 |
 
-Pilot-only backlog JVMs not in this list (e.g. axolotl, sniffer, rabbit, llama, feline hosts) still use pilot regen + § A.4 when on the 56-pilot manifest.
+Future pilot-only backlog JVMs still use pilot regen + § A.4 when added to the 56-pilot manifest.
 
 ---
 
-*Update live metrics when regenerating `geometry-lift-quality-26.1.2.json` or pilot regen. Creeper remains geometry regression canary.*
+*Update live metrics when regenerating `geometry-lift-quality-26.1.2.json`, `geometry-index-26.1.2.json`, or pilot regen. Creeper remains geometry regression canary.*

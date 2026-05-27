@@ -2618,6 +2618,7 @@
       "deobf_model_class": "net.minecraft.client.model.animal.fox.FoxModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.FoxModel",
       "notes": "",
+      "geometry_ir_official_jvm_baby": "net.minecraft.client.model.animal.fox.BabyFoxModel",
       "geometry_ir_texture_width": 48,
       "geometry_ir_texture_height": 32
     },
@@ -4809,6 +4810,7 @@
       "deobf_model_class": "net.minecraft.client.model.animal.pig.ColdPigModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.ColdPigModel",
       "notes": "",
+      "geometry_ir_official_jvm_baby": "net.minecraft.client.model.animal.pig.BabyPigModel",
       "geometry_ir_texture_width": 64,
       "geometry_ir_texture_height": 64
     },
@@ -6252,6 +6254,7 @@
       "deobf_model_class": "net.minecraft.client.model.animal.fox.FoxModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.FoxModel",
       "notes": "",
+      "geometry_ir_official_jvm_baby": "net.minecraft.client.model.animal.fox.BabyFoxModel",
       "geometry_ir_texture_width": 48,
       "geometry_ir_texture_height": 32
     },

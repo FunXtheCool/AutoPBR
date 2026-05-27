@@ -196,11 +196,17 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(officialJvmName, geometryRoot);
         var opts = options with { OfficialJvmName = officialJvmName };
+        var emittedBefore = builder.EmittedElementCount;
         if (opts.PreferCodegenCuboids &&
             GeometryIrCodegenTables.TryGetBodyLayerSpan(officialJvmName, out var codegen) &&
             TryEmitGeometryIrBodyLayerFromCodegen(builder, geometryRoot, codegen, opts, out failureReason))
         {
             return true;
+        }
+
+        if (builder.EmittedElementCount > emittedBefore)
+        {
+            builder.ClearEmittedElements();
         }
 
         return TryEmitGeometryIrBodyLayer(builder, geometryRoot, opts, out failureReason);

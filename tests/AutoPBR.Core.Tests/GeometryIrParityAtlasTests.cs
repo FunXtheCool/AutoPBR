@@ -19,9 +19,10 @@ public sealed class GeometryIrParityAtlasTests
     }
 
     [Fact]
-    public void Chicken_geometry_shard_documents_texture_dims_matching_manifest_row()    {
+    public void Chicken_geometry_shard_documents_texture_dims_matching_manifest_row()
+    {
         var shardPath = Path.Combine(
-            AppContext.BaseDirectory,
+            GeometryIrTestTierSupport.FindRepoRoot(),
             "docs",
             "generated",
             "geometry",

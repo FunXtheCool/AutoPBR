@@ -5,7 +5,7 @@
   "profile": "named_jar_26.1.2",
   "extractionStatus": "ok",
   "extractionNotes": [
-    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.monster.zombie.BabyZombieModel).",
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.monster.zombie.BabyDrownedModel).",
     "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
   ],
   "factoryMethod": "createBodyLayer",

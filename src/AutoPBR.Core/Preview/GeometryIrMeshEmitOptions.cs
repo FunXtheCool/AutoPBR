@@ -37,6 +37,17 @@ internal readonly struct GeometryIrMeshEmitOptions
     /// <summary>When set, only parts whose <c>id</c> is in this set are emitted (equipment armor subsets).</summary>
     public IReadOnlySet<string>? IncludePartIds { get; init; }
 
+    /// <summary>When set, only parts for which this returns true emit cuboids (multi-layer path filtering).</summary>
+    public Func<string, bool>? ShouldEmitPartCuboids { get; init; }
+
+    /// <summary>
+    /// When cuboid IR omits per-cuboid atlas tags, resolve atlas dimensions per part (e.g. Breeze wind tiers on 128²).
+    /// </summary>
+    public Func<string, (int Width, int Height)>? ResolvePartAtlasDimensions { get; init; }
+
+    /// <summary>Override lifted cuboid <c>textureKey</c> by part id (e.g. main Breeze diffuse maps wind tiers to <c>#wind</c>).</summary>
+    public Func<string, string?>? ResolvePartTextureKey { get; init; }
+
     public static GeometryIrMeshEmitOptions Default => ForViewport();
 
     public static GeometryIrMeshEmitOptions ForViewport() => new()

@@ -3,10 +3,9 @@
   "versionLabel": "1.21.11",
   "officialJvmName": "net.minecraft.client.model.animal.frog.FrogModel",
   "profile": "proguard_1.21.11",
-  "extractionStatus": "partial",
+  "extractionStatus": "ok",
   "extractionNotes": [
     "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.frog.FrogModel).",
-    "Strict structural validation failed (2): cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027; duplicate_part_id: duplicate part id \u0027root\u0027 in tree",
     "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
   ],
   "factoryMethod": "createBodyLayer",
@@ -29,12 +28,12 @@
       "cuboids": [],
       "children": [
         {
-          "id": "root",
+          "id": "body",
           "pose": {
             "translation": [
               0,
-              24,
-              0
+              -2,
+              4
             ],
             "rotationEulerRad": [
               0,
@@ -44,19 +43,39 @@
             "eulerOrder": "XYZ",
             "setupAnimPivot": [
               0,
-              24,
-              0
+              -2,
+              4
             ]
           },
-          "cuboids": [],
+          "cuboids": [
+            {
+              "from": [
+                -3.5,
+                -2,
+                -8
+              ],
+              "to": [
+                3.5,
+                1,
+                1
+              ],
+              "uvOrigin": [
+                3,
+                1
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
           "children": [
             {
-              "id": "body",
+              "id": "eyes",
               "pose": {
                 "translation": [
+                  -0.5,
                   0,
-                  -2,
-                  4
+                  2
                 ],
                 "rotationEulerRad": [
                   0,
@@ -65,169 +84,20 @@
                 ],
                 "eulerOrder": "XYZ",
                 "setupAnimPivot": [
+                  -0.5,
                   0,
-                  -2,
-                  4
+                  2
                 ]
               },
-              "cuboids": [
-                {
-                  "from": [
-                    -3.5,
-                    -2,
-                    -8
-                  ],
-                  "to": [
-                    3.5,
-                    1,
-                    1
-                  ],
-                  "uvOrigin": [
-                    3,
-                    1
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift fluent addBox profile_proguard_obf"
-                },
-                {
-                  "from": [
-                    -3.5,
-                    -1,
-                    -8
-                  ],
-                  "to": [
-                    3.5,
-                    -1,
-                    1
-                  ],
-                  "uvOrigin": [
-                    23,
-                    22
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift fluent addBox profile_proguard_obf"
-                }
-              ],
-              "children": [
-                {
-                  "id": "eyes",
-                  "pose": {
-                    "translation": [
-                      -0.5,
-                      0,
-                      2
-                    ],
-                    "rotationEulerRad": [
-                      0,
-                      0,
-                      0
-                    ],
-                    "eulerOrder": "XYZ",
-                    "setupAnimPivot": [
-                      -0.5,
-                      0,
-                      2
-                    ]
-                  },
-                  "cuboids": [],
-                  "children": []
-                },
-                {
-                  "id": "left_hand",
-                  "pose": {
-                    "translation": [
-                      0,
-                      3,
-                      -1
-                    ],
-                    "rotationEulerRad": [
-                      0,
-                      0,
-                      0
-                    ],
-                    "eulerOrder": "XYZ",
-                    "setupAnimPivot": [
-                      0,
-                      3,
-                      -1
-                    ]
-                  },
-                  "cuboids": [
-                    {
-                      "from": [
-                        -4,
-                        0.0099999998,
-                        -4
-                      ],
-                      "to": [
-                        4,
-                        0.0099999998,
-                        4
-                      ],
-                      "uvOrigin": [
-                        18,
-                        40
-                      ],
-                      "textureKey": "#skin",
-                      "liftKind": "exact",
-                      "provenance": "javap lift fluent addBox profile_proguard_obf"
-                    }
-                  ],
-                  "children": []
-                },
-                {
-                  "id": "right_hand",
-                  "pose": {
-                    "translation": [
-                      0,
-                      3,
-                      0
-                    ],
-                    "rotationEulerRad": [
-                      0,
-                      0,
-                      0
-                    ],
-                    "eulerOrder": "XYZ",
-                    "setupAnimPivot": [
-                      0,
-                      3,
-                      0
-                    ]
-                  },
-                  "cuboids": [
-                    {
-                      "from": [
-                        -4,
-                        0.0099999998,
-                        -5
-                      ],
-                      "to": [
-                        4,
-                        0.0099999998,
-                        3
-                      ],
-                      "uvOrigin": [
-                        2,
-                        40
-                      ],
-                      "textureKey": "#skin",
-                      "liftKind": "exact",
-                      "provenance": "javap lift fluent addBox profile_proguard_obf"
-                    }
-                  ],
-                  "children": []
-                }
-              ]
+              "cuboids": [],
+              "children": []
             },
             {
-              "id": "head",
+              "id": "left_hand",
               "pose": {
                 "translation": [
                   0,
-                  -2,
+                  3,
                   -1
                 ],
                 "rotationEulerRad": [
@@ -238,146 +108,130 @@
                 "eulerOrder": "XYZ",
                 "setupAnimPivot": [
                   0,
-                  -2,
+                  3,
                   -1
+                ]
+              },
+              "cuboids": [],
+              "children": []
+            },
+            {
+              "id": "right_hand",
+              "pose": {
+                "translation": [
+                  0,
+                  3,
+                  0
+                ],
+                "rotationEulerRad": [
+                  0,
+                  0,
+                  0
+                ],
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  0,
+                  3,
+                  0
+                ]
+              },
+              "cuboids": [],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "head",
+          "pose": {
+            "translation": [
+              0,
+              -2,
+              -1
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              -2,
+              -1
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -3.5,
+                -2,
+                -7
+              ],
+              "to": [
+                3.5,
+                1,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                13
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": [
+            {
+              "id": "right_eye",
+              "pose": {
+                "translation": [
+                  -1.5,
+                  -3,
+                  -6.5
+                ],
+                "rotationEulerRad": [
+                  0,
+                  0,
+                  0
+                ],
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  -1.5,
+                  -3,
+                  -6.5
                 ]
               },
               "cuboids": [
                 {
                   "from": [
-                    -3.5,
+                    -1.5,
                     -1,
-                    -7
+                    -1.5
                   ],
                   "to": [
-                    3.5,
-                    -1,
-                    2
-                  ],
-                  "uvOrigin": [
-                    23,
-                    13
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift fluent addBox profile_proguard_obf"
-                },
-                {
-                  "from": [
-                    -3.5,
-                    -2,
-                    -7
-                  ],
-                  "to": [
-                    3.5,
+                    1.5,
                     1,
-                    2
+                    1.5
                   ],
                   "uvOrigin": [
                     0,
-                    13
+                    0
                   ],
                   "textureKey": "#skin",
                   "liftKind": "exact",
                   "provenance": "javap lift fluent addBox profile_proguard_obf"
                 }
               ],
-              "children": [
-                {
-                  "id": "right_eye",
-                  "pose": {
-                    "translation": [
-                      -1.5,
-                      -3,
-                      -6.5
-                    ],
-                    "rotationEulerRad": [
-                      0,
-                      0,
-                      0
-                    ],
-                    "eulerOrder": "XYZ",
-                    "setupAnimPivot": [
-                      -1.5,
-                      -3,
-                      -6.5
-                    ]
-                  },
-                  "cuboids": [
-                    {
-                      "from": [
-                        -1.5,
-                        -1,
-                        -1.5
-                      ],
-                      "to": [
-                        1.5,
-                        1,
-                        1.5
-                      ],
-                      "uvOrigin": [
-                        0,
-                        0
-                      ],
-                      "textureKey": "#skin",
-                      "liftKind": "exact",
-                      "provenance": "javap lift fluent addBox profile_proguard_obf"
-                    }
-                  ],
-                  "children": []
-                },
-                {
-                  "id": "left_eye",
-                  "pose": {
-                    "translation": [
-                      2.5,
-                      -3,
-                      -6.5
-                    ],
-                    "rotationEulerRad": [
-                      0,
-                      0,
-                      0
-                    ],
-                    "eulerOrder": "XYZ",
-                    "setupAnimPivot": [
-                      2.5,
-                      -3,
-                      -6.5
-                    ]
-                  },
-                  "cuboids": [
-                    {
-                      "from": [
-                        -1.5,
-                        -1,
-                        -1.5
-                      ],
-                      "to": [
-                        1.5,
-                        1,
-                        1.5
-                      ],
-                      "uvOrigin": [
-                        0,
-                        5
-                      ],
-                      "textureKey": "#skin",
-                      "liftKind": "exact",
-                      "provenance": "javap lift fluent addBox profile_proguard_obf"
-                    }
-                  ],
-                  "children": []
-                }
-              ]
+              "children": []
             },
             {
-              "id": "croaking_body",
+              "id": "left_eye",
               "pose": {
                 "translation": [
-                  0,
-                  -1,
-                  -5
+                  2.5,
+                  -3,
+                  -6.5
                 ],
                 "rotationEulerRad": [
                   0,
@@ -386,331 +240,26 @@
                 ],
                 "eulerOrder": "XYZ",
                 "setupAnimPivot": [
-                  0,
-                  -1,
-                  -5
+                  2.5,
+                  -3,
+                  -6.5
                 ]
               },
               "cuboids": [
                 {
                   "from": [
-                    -0.100000001,
-                    -2.9000001,
-                    7
+                    -1.5,
+                    -1,
+                    -1.5
                   ],
                   "to": [
-                    1.899999999,
-                    0.0999999,
-                    6.899999999
+                    1.5,
+                    1,
+                    1.5
                   ],
                   "uvOrigin": [
-                    26,
+                    0,
                     5
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift fluent addBox profile_proguard_obf",
-                  "liftWarnings": [
-                    "cube_deformation_obf_inferred"
-                  ],
-                  "inflate": -0.100000001
-                }
-              ],
-              "children": []
-            },
-            {
-              "id": "tongue",
-              "pose": {
-                "translation": [
-                  0,
-                  -1.00999999,
-                  1
-                ],
-                "rotationEulerRad": [
-                  0,
-                  0,
-                  0
-                ],
-                "eulerOrder": "XYZ",
-                "setupAnimPivot": [
-                  0,
-                  -1.00999999,
-                  1
-                ]
-              },
-              "cuboids": [
-                {
-                  "from": [
-                    -2,
-                    0,
-                    -7.0999999
-                  ],
-                  "to": [
-                    2,
-                    0,
-                    -0.0999999
-                  ],
-                  "uvOrigin": [
-                    17,
-                    13
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift fluent addBox profile_proguard_obf"
-                }
-              ],
-              "children": []
-            },
-            {
-              "id": "left_arm",
-              "pose": {
-                "translation": [
-                  4,
-                  -1,
-                  -6.5
-                ],
-                "rotationEulerRad": [
-                  0,
-                  0,
-                  0
-                ],
-                "eulerOrder": "XYZ",
-                "setupAnimPivot": [
-                  4,
-                  -1,
-                  -6.5
-                ]
-              },
-              "cuboids": [
-                {
-                  "from": [
-                    -1,
-                    0,
-                    -1
-                  ],
-                  "to": [
-                    1,
-                    3,
-                    2
-                  ],
-                  "uvOrigin": [
-                    0,
-                    32
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift fluent addBox profile_proguard_obf"
-                }
-              ],
-              "children": []
-            },
-            {
-              "id": "right_arm",
-              "pose": {
-                "translation": [
-                  -4,
-                  -1,
-                  -6.5
-                ],
-                "rotationEulerRad": [
-                  0,
-                  0,
-                  0
-                ],
-                "eulerOrder": "XYZ",
-                "setupAnimPivot": [
-                  -4,
-                  -1,
-                  -6.5
-                ]
-              },
-              "cuboids": [
-                {
-                  "from": [
-                    -1,
-                    0,
-                    -1
-                  ],
-                  "to": [
-                    1,
-                    3,
-                    2
-                  ],
-                  "uvOrigin": [
-                    0,
-                    38
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift fluent addBox profile_proguard_obf"
-                }
-              ],
-              "children": []
-            },
-            {
-              "id": "left_leg",
-              "pose": {
-                "translation": [
-                  3.5,
-                  -3,
-                  4
-                ],
-                "rotationEulerRad": [
-                  0,
-                  0,
-                  0
-                ],
-                "eulerOrder": "XYZ",
-                "setupAnimPivot": [
-                  3.5,
-                  -3,
-                  4
-                ]
-              },
-              "cuboids": [
-                {
-                  "from": [
-                    -1,
-                    0,
-                    -2
-                  ],
-                  "to": [
-                    2,
-                    3,
-                    2
-                  ],
-                  "uvOrigin": [
-                    14,
-                    25
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift fluent addBox profile_proguard_obf"
-                }
-              ],
-              "children": []
-            },
-            {
-              "id": "left_foot",
-              "pose": {
-                "translation": [
-                  2,
-                  3,
-                  0
-                ],
-                "rotationEulerRad": [
-                  0,
-                  0,
-                  0
-                ],
-                "eulerOrder": "XYZ",
-                "setupAnimPivot": [
-                  2,
-                  3,
-                  0
-                ]
-              },
-              "cuboids": [
-                {
-                  "from": [
-                    -4,
-                    0.0099999998,
-                    -4
-                  ],
-                  "to": [
-                    4,
-                    0.0099999998,
-                    4
-                  ],
-                  "uvOrigin": [
-                    2,
-                    32
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift fluent addBox profile_proguard_obf"
-                }
-              ],
-              "children": []
-            },
-            {
-              "id": "right_leg",
-              "pose": {
-                "translation": [
-                  -3.5,
-                  -3,
-                  4
-                ],
-                "rotationEulerRad": [
-                  0,
-                  0,
-                  0
-                ],
-                "eulerOrder": "XYZ",
-                "setupAnimPivot": [
-                  -3.5,
-                  -3,
-                  4
-                ]
-              },
-              "cuboids": [
-                {
-                  "from": [
-                    -2,
-                    0,
-                    -2
-                  ],
-                  "to": [
-                    1,
-                    3,
-                    2
-                  ],
-                  "uvOrigin": [
-                    0,
-                    25
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift fluent addBox profile_proguard_obf"
-                }
-              ],
-              "children": []
-            },
-            {
-              "id": "right_foot",
-              "pose": {
-                "translation": [
-                  -2,
-                  3,
-                  0
-                ],
-                "rotationEulerRad": [
-                  0,
-                  0,
-                  0
-                ],
-                "eulerOrder": "XYZ",
-                "setupAnimPivot": [
-                  -2,
-                  3,
-                  0
-                ]
-              },
-              "cuboids": [
-                {
-                  "from": [
-                    -4,
-                    0.0099999998,
-                    -4
-                  ],
-                  "to": [
-                    4,
-                    0.0099999998,
-                    4
-                  ],
-                  "uvOrigin": [
-                    18,
-                    32
                   ],
                   "textureKey": "#skin",
                   "liftKind": "exact",
@@ -720,6 +269,291 @@
               "children": []
             }
           ]
+        },
+        {
+          "id": "croaking_body",
+          "pose": {
+            "translation": [
+              0,
+              -1,
+              -5
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              -1,
+              -5
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -0.100000001,
+                -2.9000001,
+                7
+              ],
+              "to": [
+                1.899999999,
+                0.0999999,
+                6.899999999
+              ],
+              "uvOrigin": [
+                26,
+                5
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "inflate": -0.100000001
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "tongue",
+          "pose": {
+            "translation": [
+              0,
+              -1.00999999,
+              1
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              -1.00999999,
+              1
+            ]
+          },
+          "cuboids": [],
+          "children": []
+        },
+        {
+          "id": "left_arm",
+          "pose": {
+            "translation": [
+              4,
+              -1,
+              -6.5
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              4,
+              -1,
+              -6.5
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1,
+                0,
+                -1
+              ],
+              "to": [
+                1,
+                3,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                32
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right_arm",
+          "pose": {
+            "translation": [
+              -4,
+              -1,
+              -6.5
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              -4,
+              -1,
+              -6.5
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1,
+                0,
+                -1
+              ],
+              "to": [
+                1,
+                3,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                38
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left_leg",
+          "pose": {
+            "translation": [
+              3.5,
+              -3,
+              4
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              3.5,
+              -3,
+              4
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1,
+                0,
+                -2
+              ],
+              "to": [
+                2,
+                3,
+                2
+              ],
+              "uvOrigin": [
+                14,
+                25
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left_foot",
+          "pose": {
+            "translation": [
+              2,
+              3,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              2,
+              3,
+              0
+            ]
+          },
+          "cuboids": [],
+          "children": []
+        },
+        {
+          "id": "right_leg",
+          "pose": {
+            "translation": [
+              -3.5,
+              -3,
+              4
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              -3.5,
+              -3,
+              4
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -2,
+                0,
+                -2
+              ],
+              "to": [
+                1,
+                3,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                25
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right_foot",
+          "pose": {
+            "translation": [
+              -2,
+              3,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              -2,
+              3,
+              0
+            ]
+          },
+          "cuboids": [],
+          "children": []
         }
       ]
     }

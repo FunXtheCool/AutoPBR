@@ -24,6 +24,29 @@ internal static class Program
         var parallelism = ResolveMaxParallelism(opt);
         var versionLabel = opt.VersionLabel ?? "26.1.2";
 
+        if (opt.LiftRendererState)
+        {
+            var rendererStateHost = new RendererStateCompilerHost(
+                opt.ClientJar!,
+                versionLabel,
+                outDir,
+                opt.Javap,
+                parallelism,
+                opt.Quiet);
+            if (!string.IsNullOrWhiteSpace(opt.Single))
+            {
+                return rendererStateHost.RunSingle(opt.Single!.Trim());
+            }
+
+            if (!string.IsNullOrWhiteSpace(opt.BatchList))
+            {
+                return rendererStateHost.RunBatch(Path.GetFullPath(opt.BatchList!));
+            }
+
+            Console.Error.WriteLine("--lift-renderer-state requires --single <renderer.jvm.Class> or --batch-list <renderer-classes.txt>.");
+            return 2;
+        }
+
         if (opt.LiftSetupAnim)
         {
             var setupHost = new SetupAnimCompilerHost(opt.ClientJar!, versionLabel, outDir, opt.Javap,
@@ -105,12 +128,13 @@ internal static class Program
               AutoPBR.Tools.AnimationCompiler --client-jar <client.jar>
                 [--version-label 26.1.2] [--mappings <client_mappings.txt>] [--out-dir <docs/generated>] [--javap <path>]
                 (--single <official.jvm.Class> | --batch-list <classes.txt>)
-                [--lift-setup-anim]
+                [--lift-setup-anim] [--lift-renderer-state]
                 [--parallel] [--max-parallelism <n>] [--quiet] [--stats]
 
             Default batch list (when neither --single nor --batch-list is set):
               AnimationDefinition: minecraft_<versionLabel>_client_animation_definition_classes.txt
               With --lift-setup-anim: minecraft_<versionLabel>_client_model_classes.txt
+              With --lift-renderer-state: pass --single or --batch-list with renderer classes
 
             Examples:
               dotnet run --project src/AutoPBR.Tools.AnimationCompiler -- --client-jar tools/minecraft-parity/26.1.2/client.jar --version-label 26.1.2
@@ -149,6 +173,7 @@ internal static class Program
         public bool Quiet { get; private init; }
         public bool Stats { get; private init; }
         public bool LiftSetupAnim { get; private init; }
+        public bool LiftRendererState { get; private init; }
 
         public static ArgMap Parse(string[] args)
         {
@@ -158,6 +183,7 @@ internal static class Program
             var quiet = false;
             var stats = false;
             var liftSetupAnim = false;
+            var liftRendererState = false;
             for (var i = 0; i < args.Length; i++)
             {
                 var a = args[i];
@@ -219,6 +245,10 @@ internal static class Program
                 {
                     liftSetupAnim = true;
                 }
+                else if (string.Equals(a, "--lift-renderer-state", StringComparison.OrdinalIgnoreCase))
+                {
+                    liftRendererState = true;
+                }
             }
 
             return new ArgMap
@@ -234,7 +264,8 @@ internal static class Program
                 ParallelInvoked = parallelFlag,
                 Quiet = quiet,
                 Stats = stats,
-                LiftSetupAnim = liftSetupAnim
+                LiftSetupAnim = liftSetupAnim,
+                LiftRendererState = liftRendererState
             };
         }
     }

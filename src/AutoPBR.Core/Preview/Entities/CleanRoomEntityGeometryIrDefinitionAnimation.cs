@@ -17,7 +17,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
         float animationTimeSeconds,
         MergedJavaBlockModel merged,
         JsonElement geometryRoot,
-        GeometryIrMeshEmitOptions emitOptions)
+        GeometryIrMeshEmitOptions emitOptions,
+        bool skipBreezeIdleWind = false)
     {
         if (!TryBuildDefinitionAnimationGeometryIrPose(
                 builderMethod,
@@ -25,6 +26,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 profile,
                 isBaby,
                 animationTimeSeconds,
+                skipBreezeIdleWind,
                 out var pose))
         {
             return;
@@ -44,6 +46,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         MinecraftNativeProfile profile,
         bool isBaby,
         float animationTimeSeconds,
+        bool skipBreezeIdleWind,
         out VanillaSetupAnimRuntime.PoseResult pose)
     {
         pose = new VanillaSetupAnimRuntime.PoseResult();
@@ -52,7 +55,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
             case "Armadillo":
                 return TryAddArmadilloDefinitionAnimationPose(profile, isBaby, animationTimeSeconds, pose);
             case "Breeze":
-                return TryAddBreezeDefinitionAnimationPose(normalizedAssetPath, profile, animationTimeSeconds, pose);
+                return TryAddBreezeDefinitionAnimationPose(
+                    normalizedAssetPath, profile, animationTimeSeconds, pose, skipBreezeIdleWind);
             case "Fox":
                 return TryAddFoxDefinitionAnimationPose(profile, isBaby, animationTimeSeconds, pose);
             default:
@@ -98,14 +102,38 @@ internal sealed partial class CleanRoomEntityModelRuntime
         string normalizedAssetPath,
         MinecraftNativeProfile profile,
         float animationTimeSeconds,
-        VanillaSetupAnimRuntime.PoseResult pose)
+        VanillaSetupAnimRuntime.PoseResult pose,
+        bool skipIdleWind = false)
     {
         var norm = normalizedAssetPath.Replace('\\', '/').TrimStart('/');
         var isWindTexture = norm.Contains("breeze_wind", StringComparison.OrdinalIgnoreCase);
         var isEyesTexture = norm.Contains("breeze_eyes", StringComparison.OrdinalIgnoreCase);
-        var wind = !isEyesTexture && TryAddBreezeIdleWindDefinitionPose(profile, animationTimeSeconds, pose);
+        var wind = !skipIdleWind && !isEyesTexture &&
+                   TryAddBreezeIdleWindDefinitionPose(profile, animationTimeSeconds, pose);
         var head = !isWindTexture && TryAddBreezeShootHeadDefinitionPose(profile, animationTimeSeconds, pose);
-        return wind || head;
+        var rods = !isWindTexture && !isEyesTexture &&
+                   TryAddBreezeIdleRodsDefinitionPose(profile, animationTimeSeconds, pose);
+        return wind || head || rods;
+    }
+
+    private static bool TryAddBreezeIdleRodsDefinitionPose(
+        MinecraftNativeProfile profile,
+        float animationTimeSeconds,
+        VanillaSetupAnimRuntime.PoseResult pose)
+    {
+        if (!DefinitionAnimationPreviewSampling.TrySampleBreezeIdleRodsRotationDegrees(
+                profile, animationTimeSeconds, out var rodsDeg))
+        {
+            return false;
+        }
+
+        pose.Parts["rods"] = new VanillaSetupAnimRuntime.PartPose
+        {
+            XRot = rodsDeg.X * (MathF.PI / 180f),
+            YRot = rodsDeg.Y * (MathF.PI / 180f),
+            ZRot = rodsDeg.Z * (MathF.PI / 180f),
+        };
+        return true;
     }
 
     private static bool TryAddBreezeIdleWindDefinitionPose(
@@ -113,7 +141,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         float animationTimeSeconds,
         VanillaSetupAnimRuntime.PoseResult pose)
     {
-        if (!DefinitionAnimationPreviewSampling.TrySampleBreezeIdleWindPositions(
+        if (!DefinitionAnimationPreviewSampling.TryResolveCatalogBreezeIdleWindTranslations(
                 profile, animationTimeSeconds, out var windMid, out var windTop))
         {
             return false;

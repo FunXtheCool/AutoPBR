@@ -162,44 +162,6 @@
           "children": []
         },
         {
-          "id": "right_hind_leg",
-          "pose": {
-            "translation": [
-              -2.500000000,
-              18.00000000,
-              3.500000000
-            ],
-            "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
-            {
-              "from": [
-                -1.5,
-                0,
-                -1.5
-              ],
-              "to": [
-                1.5,
-                6,
-                1.5
-              ],
-              "uvOrigin": [
-                22,
-                27
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
-        },
-        {
           "id": "left_hind_leg",
           "pose": {
             "translation": [
@@ -238,12 +200,12 @@
           "children": []
         },
         {
-          "id": "right_front_leg",
+          "id": "right_hind_leg",
           "pose": {
             "translation": [
               -2.500000000,
               18.00000000,
-              -3.500000000
+              3.500000000
             ],
             "rotationEulerRad": [
               0.000000000,
@@ -266,7 +228,7 @@
               ],
               "uvOrigin": [
                 22,
-                18
+                27
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
@@ -312,6 +274,44 @@
             }
           ],
           "children": []
+        },
+        {
+          "id": "right_front_leg",
+          "pose": {
+            "translation": [
+              -2.500000000,
+              18.00000000,
+              -3.500000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1.5,
+                0,
+                -1.5
+              ],
+              "to": [
+                1.5,
+                6,
+                1.5
+              ],
+              "uvOrigin": [
+                22,
+                18
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
         }
       ]
     }
@@ -319,60 +319,6 @@
   "jarPath": "net/minecraft/client/model/animal/cow/BabyCowModel.class",
   "classSha256Hex": "938885251f3aefac90bf8cc43276f725fa8c8ece8d70405c455fd56cdaed686c",
   "bytecodeFloatProbe": [
-    -4,
-    -4,
-    -6,
-    8,
-    8,
-    6,
-    -3,
-    -7,
-    6,
-    3,
-    -5,
-    -5,
-    -5,
-    3,
-    4,
-    -5,
-    -5,
-    3,
-    4,
-    -8,
-    -6,
-    -10,
-    -7,
-    12,
-    18,
-    10,
-    -2,
-    -8,
-    4,
-    6,
-    5,
-    1.5707964,
-    -2,
-    -2,
-    4,
-    12,
-    4,
-    -2,
-    -2,
-    4,
-    12,
-    4,
-    -4,
-    12,
-    7,
-    4,
-    12,
-    7,
-    -4,
-    12,
-    -5,
-    4,
-    12,
-    -5,
     -3,
     -4.569,
     -4.8333,

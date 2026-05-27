@@ -16,7 +16,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
     /// <b>Rigging policy:</b> compose vanilla <c>PartPose</c>-equivalent chains only through these methods
     /// (<see cref="Mul"/>, <see cref="T"/>, <see cref="Rx"/>, <see cref="Ry"/>, <see cref="Rz"/>, <see cref="Er"/>).
     /// Do not duplicate local <c>static Mul/T/Er</c> helpers in new or refactored builders.
-    /// Living-entity previews should end with <see cref="ApplyLivingEntityRendererPreviewBasis"/> (LER <c>scale(-1,-1,1)</c> folded as world-root),
+    /// Living-entity previews should end with the LER preview-basis helper (LER <c>scale(-1,-1,1)</c> folded as world-root),
     /// except equines which use <see cref="ApplyEquineLivingEntityRendererPreviewBasis"/> / <see cref="ApplyBabyEquineLivingEntityRendererPreviewBasis"/> for tuned multiply order and baby yaw,
     /// and quadruped rigs that pass <c>lerMirrorRightComposeLocalChain: true</c> so torso chains match vanilla (see <see cref="UsesQuadrupedLerMirrorRightComposeLocalChain"/>).
     /// </summary>
@@ -287,6 +287,18 @@ internal sealed partial class CleanRoomEntityModelRuntime
         lerMirrorRightComposeLocalChain
             ? ApplyGlobalTransform(model, Matrix4x4.CreateScale(-1f, -1f, 1f))
             : ApplyPreviewWorldRoot(model, Matrix4x4.CreateScale(-1f, -1f, 1f));
+
+    private static MergedJavaBlockModel ApplyLivingEntityRendererPreviewBasis(
+        MergedJavaBlockModel model,
+        GeometryIrLerBasisKind basis) =>
+        basis switch
+        {
+            GeometryIrLerBasisKind.Skip => model,
+            GeometryIrLerBasisKind.RightComposeLocalChain => ApplyLivingEntityRendererPreviewBasis(
+                model,
+                lerMirrorRightComposeLocalChain: true),
+            _ => ApplyLivingEntityRendererPreviewBasis(model)
+        };
 
 
     private static string ToTextureRef(string normalizedAssetPath)

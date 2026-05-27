@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.renderer.entity.BatRenderer",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.BatRenderState",
+  "modelJvmNames": [
+    "net.minecraft.client.model.ambient.BatModel"
+  ],
+  "extractionStatus": "partial hand-pilot",
+  "extractionNotes": [
+    "P6 hand shard: idle preview alternates flying and resting AnimationState fields used by BatModel.setupAnim.",
+    "RendererStateLift compiler remains deferred; this shard supplies preview timing only."
+  ],
+  "animationStateFields": [
+    { "renderStateField": "flyAnimationState", "setupAnimStateField": "flyAnimationState", "entityAnimationState": "Bat.fly" },
+    { "renderStateField": "restAnimationState", "setupAnimStateField": "restAnimationState", "entityAnimationState": "Bat.rest" }
+  ],
+  "livingEntityFields": [
+    "ageInTicks",
+    "walkAnimationPos",
+    "walkAnimationSpeed",
+    "xRot",
+    "yRot"
+  ],
+  "previewDriver": "bat_clip_cycle",
+  "clipLengthsSeconds": {
+    "flyAnimationState": 2,
+    "restAnimationState": 2
+  }
+}

@@ -43,7 +43,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 out mergedModel,
                 out var irJvm))
         {
-            discoveredRoute = EntityGpuBoneDispatchRoute.ForParity(cachedParityMethod);
+            discoveredRoute = EntityGpuBoneDispatchRoute.ForParity(cachedParityMethod, irJvm);
             meshProvenance = new(PreviewMeshDriverKind.RuntimeGeometryIrJson, irJvm);
             stopDispatch = true;
             return true;

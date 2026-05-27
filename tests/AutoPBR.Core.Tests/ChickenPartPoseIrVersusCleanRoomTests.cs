@@ -20,7 +20,7 @@ namespace AutoPBR.Core.Tests;
 public sealed class ChickenPartPoseIrVersusCleanRoomTests
 {
     private static string ContentPath(params string[] segments) =>
-        Path.Combine([AppContext.BaseDirectory, .. segments]);
+        Path.Combine([GeometryIrTestTierSupport.FindRepoRoot(), .. segments]);
 
     /// <summary>Matches <see cref="CleanRoomEntityModelRuntime"/> <c>EntityParityTemplate.Er</c> (Z then Y then X).</summary>
     private static Matrix4x4 Er(float xRad, float yRad, float zRad) =>

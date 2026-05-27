@@ -4,11 +4,11 @@
 
 **Plan:** [`runtime-ir-preview-plan.md`](../runtime-ir-preview-plan.md) § Plan completion criteria  
 
-**Pinned:** 26.1.2 · **Audit UTC:** 2026-05-22 (Wave 12 hygiene sync)  
+**Pinned:** 26.1.2 · **Audit UTC:** 2026-05-25 (Wave C geometry partial drain)  
 
-**Quality snapshot:** [`geometry-lift-quality-26.1.2.json`](geometry-lift-quality-26.1.2.json) (`generatedUtc` 2026-05-21T20:47:16Z)  
+**Quality snapshot:** [`geometry-lift-quality-26.1.2.json`](geometry-lift-quality-26.1.2.json) (`generatedUtc` 2026-05-25T18:14:17Z)  
 
-**Geometry index:** [`geometry-index-26.1.2.json`](geometry-index-26.1.2.json) — **155** `ok` · **27** `skipped` · **2** `partial` · **0** `fail` (Wave 11 partial drain: **10/11** mission JVMs `ok`; `ArmorStandModel` body fingerprint; `CowModel` separate regression)  
+**Geometry index:** [`geometry-index-26.1.2.json`](geometry-index-26.1.2.json) — **157** `ok` · **27** `skipped` · **0** `partial` · **0** `fail` (Wave C geometry partial drain: `ArmorStandModel` body fingerprint fixed)  
 
 **Automated tracks rollup:** [`automated-tracks-complete.md`](automated-tracks-complete.md)
 

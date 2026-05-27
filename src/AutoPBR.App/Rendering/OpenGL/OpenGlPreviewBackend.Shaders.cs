@@ -56,4 +56,52 @@ public sealed partial class OpenGlPreviewBackend
             _gl!.Uniform1(loc, v);
         }
     }
+
+    private void SetMatrix(string name, Matrix4x4 m)
+    {
+        var loc = _program!.GetUniformLocation(name);
+        if (loc < 0)
+        {
+            return;
+        }
+
+        var mt = Matrix4x4.Transpose(m);
+        _gl!.UniformMatrix4(loc, 1, false, in mt.M11);
+    }
+
+    private void SetVec2(string name, Vector2 v)
+    {
+        var loc = _program!.GetUniformLocation(name);
+        if (loc >= 0)
+        {
+            _gl!.Uniform2(loc, v.X, v.Y);
+        }
+    }
+
+    private void SetVec3(string name, Vector3 v)
+    {
+        var loc = _program!.GetUniformLocation(name);
+        if (loc >= 0)
+        {
+            _gl!.Uniform3(loc, v.X, v.Y, v.Z);
+        }
+    }
+
+    private void SetFloat(string name, float v)
+    {
+        var loc = _program!.GetUniformLocation(name);
+        if (loc >= 0)
+        {
+            _gl!.Uniform1(loc, v);
+        }
+    }
+
+    private void SetInt(string name, int v)
+    {
+        var loc = _program!.GetUniformLocation(name);
+        if (loc >= 0)
+        {
+            _gl!.Uniform1(loc, v);
+        }
+    }
 }

@@ -9,7 +9,7 @@ namespace AutoPBR.Tools.GeometryCompiler;
 internal static class JvmStaticIntMatrixExtractor
 {
     private static readonly Regex PutStaticFieldRegex = new(
-        @"putstatic\s+#\d+\s+//\s*Field\s+[\w$./]+\.(\w+)",
+        @"putstatic\s+#\d+\s+//\s*Field\s+(?:[\w$./]+\.)?(\w+)",
         RegexOptions.CultureInvariant | RegexOptions.Compiled,
         TimeSpan.FromSeconds(2));
 

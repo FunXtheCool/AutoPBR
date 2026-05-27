@@ -291,46 +291,45 @@
                   "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
                 }
               ],
-              "children": [
+              "children": []
+            },
+            {
+              "id": "nose",
+              "pose": {
+                "translation": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
                 {
-                  "id": "nose",
-                  "pose": {
-                    "translation": [
-                      0.000000000,
-                      0.000000000,
-                      0.000000000
-                    ],
-                    "rotationEulerRad": [
-                      0.000000000,
-                      0.000000000,
-                      0.000000000
-                    ],
-                    "eulerOrder": "XYZ"
-                  },
-                  "cuboids": [
-                    {
-                      "from": [
-                        -1,
-                        2,
-                        -7
-                      ],
-                      "to": [
-                        1,
-                        4,
-                        -3
-                      ],
-                      "uvOrigin": [
-                        0,
-                        13
-                      ],
-                      "textureKey": "#skin",
-                      "liftKind": "exact",
-                      "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-                    }
+                  "from": [
+                    -1,
+                    2,
+                    -7
                   ],
-                  "children": []
+                  "to": [
+                    1,
+                    4,
+                    -3
+                  ],
+                  "uvOrigin": [
+                    0,
+                    13
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
                 }
-              ]
+              ],
+              "children": []
             }
           ]
         }

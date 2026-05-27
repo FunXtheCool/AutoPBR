@@ -1,4 +1,5 @@
 using AutoPBR.Core.Models;
+using System.Text.Json;
 
 namespace AutoPBR.Core.Preview;
 
@@ -20,6 +21,12 @@ internal static class ParityCatalogEntityPreviewDiagnostics
         GeometryIrParityTier ParityTier,
         bool HasSetupAnimDocument,
         bool SetupAnimWouldEvaluate,
+        string SetupAnimStateSource,
+        CleanRoomEntityModelRuntime.GeometryIrLerBasisKind LerBasis,
+        bool LerComposeProbeAvailable,
+        float LerDefaultLegMinusHeadY,
+        float LerRightComposeLegMinusHeadY,
+        string LerComposeRecommended,
         string? DefinitionAnimationJvm,
         string? ProvenanceDetail);
 
@@ -58,6 +65,7 @@ internal static class ParityCatalogEntityPreviewDiagnostics
 
         var hasSetupAnim = false;
         var setupAnimEval = false;
+        var setupStateSource = "";
         if (rule is not null)
         {
             CleanRoomEntityModelRuntime.ProbeParityCatalogSetupAnimCapability(
@@ -68,6 +76,20 @@ internal static class ParityCatalogEntityPreviewDiagnostics
                 idlePhase01,
                 out hasSetupAnim,
                 out setupAnimEval);
+            if (hasSetupAnim)
+            {
+                var modelJvm = SetupAnimParityResolver.ResolveModelJvmForPreview(
+                    rule.BuilderMethod,
+                    rule.DeobfuscatedModelClass,
+                    isBaby,
+                    resolvedJvm ?? "");
+                _ = CleanRoomEntityModelRuntime.ResolveSetupAnimPreviewStateForTests(
+                    modelJvm,
+                    animationTimeSeconds,
+                    idlePhase01,
+                    MathF.Sin(animationTimeSeconds * MathF.PI * 2f * 0.8f),
+                    out setupStateSource);
+            }
         }
 
         var runtime = EntityModelRuntimeFactory.Create();
@@ -97,6 +119,34 @@ internal static class ParityCatalogEntityPreviewDiagnostics
                 profile, rule, norm, stem, isBaby);
         }
 
+        var lerProbeAvailable = false;
+        var lerDefaultLegMinusHeadY = 0f;
+        var lerRightLegMinusHeadY = 0f;
+        var lerRecommended = "";
+        if (rule is not null &&
+            !string.IsNullOrWhiteSpace(resolvedJvm) &&
+            GeometryIrParityJvmResolver.TryResolveLiftedRoot(
+                profile,
+                rule,
+                norm,
+                stem,
+                isBaby,
+                out var probeJvm,
+                out var probeRoot))
+        {
+            probeRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(probeJvm, probeRoot);
+            if (TryResolveAtlasDimensionsForLerProbe(rule, probeRoot, out var atlasW, out var atlasH) &&
+                TryProbeLerComposeOrdering(probeJvm, probeRoot, atlasW, atlasH, out lerDefaultLegMinusHeadY, out lerRightLegMinusHeadY))
+            {
+                lerProbeAvailable = true;
+                lerRecommended = MathF.Abs(lerDefaultLegMinusHeadY - lerRightLegMinusHeadY) < 1e-4f
+                    ? ""
+                    : lerRightLegMinusHeadY < lerDefaultLegMinusHeadY
+                        ? CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.RightComposeLocalChain.ToString()
+                        : CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot.ToString();
+            }
+        }
+
         return new Row(
             norm,
             builder,
@@ -109,6 +159,12 @@ internal static class ParityCatalogEntityPreviewDiagnostics
             tier,
             hasSetupAnim,
             setupAnimEval,
+            setupStateSource,
+            CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(resolvedJvm, stem, norm),
+            lerProbeAvailable,
+            lerDefaultLegMinusHeadY,
+            lerRightLegMinusHeadY,
+            lerRecommended,
             definitionJvm,
             buildOk ? provenance.Detail : null);
     }
@@ -122,7 +178,7 @@ internal static class ParityCatalogEntityPreviewDiagnostics
     internal static string FormatGainChecklistTable(IEnumerable<Row> rows)
     {
         var sb = new System.Text.StringBuilder();
-        sb.AppendLine("path\tbaby\tbuilder\tdriver\tjvm\tsuppress\tir_reason\ttier\tsetup_doc\tsetup_eval\tdef_anim\tbuild_ok");
+        sb.AppendLine("path\tbaby\tbuilder\tdriver\tjvm\tsuppress\tir_reason\ttier\tsetup_doc\tsetup_eval\tsetup_state\tler_basis\tler_probe\tler_default_leg_minus_head\tler_right_leg_minus_head\tler_recommended\tdef_anim\tbuild_ok");
         foreach (var r in rows)
         {
             sb.Append(r.TexturePath);
@@ -144,6 +200,18 @@ internal static class ParityCatalogEntityPreviewDiagnostics
             sb.Append(r.HasSetupAnimDocument ? "1" : "0");
             sb.Append('\t');
             sb.Append(r.SetupAnimWouldEvaluate ? "1" : "0");
+            sb.Append('\t');
+            sb.Append(r.SetupAnimStateSource);
+            sb.Append('\t');
+            sb.Append(r.LerBasis);
+            sb.Append('\t');
+            sb.Append(r.LerComposeProbeAvailable ? "1" : "0");
+            sb.Append('\t');
+            sb.Append(r.LerDefaultLegMinusHeadY.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture));
+            sb.Append('\t');
+            sb.Append(r.LerRightComposeLegMinusHeadY.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture));
+            sb.Append('\t');
+            sb.Append(r.LerComposeRecommended);
             sb.Append('\t');
             sb.Append(r.DefinitionAnimationJvm ?? "");
             sb.Append('\t');
@@ -172,5 +240,157 @@ internal static class ParityCatalogEntityPreviewDiagnostics
         }
 
         return match;
+    }
+
+    private static bool TryResolveAtlasDimensionsForLerProbe(
+        EntityTextureParityRule rule,
+        JsonElement geometryRoot,
+        out int atlasWidth,
+        out int atlasHeight)
+    {
+        atlasWidth = 64;
+        atlasHeight = 64;
+        if (rule.GeometryIrTextureWidth is > 0 and var rw &&
+            rule.GeometryIrTextureHeight is > 0 and var rh)
+        {
+            atlasWidth = rw;
+            atlasHeight = rh;
+            return true;
+        }
+
+        if (geometryRoot.TryGetProperty("textureWidth", out var tw) &&
+            tw.TryGetInt32(out var twi) &&
+            twi > 0 &&
+            geometryRoot.TryGetProperty("textureHeight", out var th) &&
+            th.TryGetInt32(out var thi) &&
+            thi > 0)
+        {
+            atlasWidth = twi;
+            atlasHeight = thi;
+        }
+
+        return true;
+    }
+
+    private static bool TryProbeLerComposeOrdering(
+        string officialJvmName,
+        JsonElement geometryRoot,
+        int atlasWidth,
+        int atlasHeight,
+        out float defaultLegMinusHeadY,
+        out float rightComposeLegMinusHeadY)
+    {
+        defaultLegMinusHeadY = 0f;
+        rightComposeLegMinusHeadY = 0f;
+        var defaultMesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTestsWithLerCompose(
+            "entity/test",
+            officialJvmName,
+            atlasWidth,
+            atlasHeight,
+            geometryRoot,
+            lerMirrorRightComposeLocalChain: false,
+            out _);
+        var rightMesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTestsWithLerCompose(
+            "entity/test",
+            officialJvmName,
+            atlasWidth,
+            atlasHeight,
+            geometryRoot,
+            lerMirrorRightComposeLocalChain: true,
+            out _);
+        if (defaultMesh is null || rightMesh is null)
+        {
+            return false;
+        }
+
+        if (!TryMeasureLegMinusHeadY(defaultMesh, geometryRoot, atlasWidth, atlasHeight, officialJvmName, out defaultLegMinusHeadY) ||
+            !TryMeasureLegMinusHeadY(rightMesh, geometryRoot, atlasWidth, atlasHeight, officialJvmName, out rightComposeLegMinusHeadY))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static bool TryMeasureLegMinusHeadY(
+        MergedJavaBlockModel mesh,
+        JsonElement geometryRoot,
+        int atlasWidth,
+        int atlasHeight,
+        string officialJvmName,
+        out float legMinusHeadY)
+    {
+        legMinusHeadY = 0f;
+        var options = new GeometryIrMeshEmitOptions
+        {
+            RootTransform = System.Numerics.Matrix4x4.Identity,
+            DefaultPartScale = 1f,
+            AtlasWidth = atlasWidth,
+            AtlasHeight = atlasHeight,
+            Fidelity = GeometryIrEmitFidelity.Parity,
+            OfficialJvmName = officialJvmName,
+        };
+        var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(geometryRoot, options);
+        if (partIds.Count != mesh.Elements.Count)
+        {
+            return false;
+        }
+
+        float headSum = 0f;
+        var headCount = 0;
+        float legSum = 0f;
+        var legCount = 0;
+        for (var i = 0; i < mesh.Elements.Count; i++)
+        {
+            var partId = partIds[i];
+            var cy = MeasureElementCenterY(mesh.Elements[i]);
+            if (partId.Contains("head", StringComparison.OrdinalIgnoreCase) &&
+                !partId.Contains("leg", StringComparison.OrdinalIgnoreCase))
+            {
+                headSum += cy;
+                headCount++;
+            }
+
+            if (partId.Contains("leg", StringComparison.OrdinalIgnoreCase))
+            {
+                legSum += cy;
+                legCount++;
+            }
+        }
+
+        if (headCount == 0 || legCount == 0)
+        {
+            return false;
+        }
+
+        legMinusHeadY = (legSum / legCount) - (headSum / headCount);
+        return true;
+    }
+
+    private static float MeasureElementCenterY(ModelElement element)
+    {
+        var minY = float.PositiveInfinity;
+        var maxY = float.NegativeInfinity;
+        ReadOnlySpan<(float x, float y, float z)> corners =
+        [
+            (element.From[0], element.From[1], element.From[2]),
+            (element.To[0], element.From[1], element.From[2]),
+            (element.From[0], element.To[1], element.From[2]),
+            (element.To[0], element.To[1], element.From[2]),
+            (element.From[0], element.From[1], element.To[2]),
+            (element.To[0], element.From[1], element.To[2]),
+            (element.From[0], element.To[1], element.To[2]),
+            (element.To[0], element.To[1], element.To[2]),
+        ];
+        foreach (var (x, y, z) in corners)
+        {
+            var w = System.Numerics.Vector3.Transform(
+                new System.Numerics.Vector3(x, y, z),
+                element.LocalToParent);
+            minY = MathF.Min(minY, w.Y);
+            maxY = MathF.Max(maxY, w.Y);
+        }
+
+        return (minY + maxY) * 0.5f;
     }
 }

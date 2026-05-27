@@ -79,6 +79,33 @@ public sealed class MobFamilyGeometryIrFidelityTests
             parity, x0: -2f, y0: -0.08f, z0: -1f, x1: 0f, y1: 0.08f, z1: 1f, tol: 1e-3f));
     }
 
+    [Fact]
+    public void Generic_viewport_emit_thickens_salmon_zero_extent_fins_without_changing_parity_emit()
+    {
+        const string salmonJvm = "net.minecraft.client.model.animal.fish.SalmonModel";
+        var profile = new MinecraftNativeProfile(
+            GeometryIrTestTierSupport.MobFamilyPilotVersionLabel,
+            "unused",
+            new Version(26, 1, 2));
+        var p = CleanRoomEntityModelRuntime.BabyProfile.Adult;
+        var parity = CleanRoomEntityModelRuntime.TryBuildSalmonGeometryIrMeshForTests(
+            "entity/fish/salmon", profile, p, tailSway: 0f, out var parityFailure);
+        var viewport = CleanRoomEntityModelRuntime.TryBuildGeometryIrViewportMeshForTests(
+            "entity/fish/salmon",
+            profile,
+            salmonJvm,
+            atlasWidth: 32,
+            atlasHeight: 32,
+            out var viewportFailure);
+
+        Assert.Null(parityFailure);
+        Assert.Null(viewportFailure);
+        Assert.NotNull(parity);
+        Assert.NotNull(viewport);
+        Assert.True(CountDegenerateXElements(parity!) > 0);
+        Assert.Equal(0, CountDegenerateXElements(viewport!));
+    }
+
     [Theory]
     [MemberData(nameof(PilotCases))]
     public void Packaged_preview_delta_loads_when_present(string officialJvmName, int atlasW, int atlasH)
@@ -118,5 +145,19 @@ public sealed class MobFamilyGeometryIrFidelityTests
         }
 
         return false;
+    }
+
+    private static int CountDegenerateXElements(MergedJavaBlockModel mesh)
+    {
+        var count = 0;
+        foreach (var e in mesh.Elements)
+        {
+            if (MathF.Abs(e.To[0] - e.From[0]) <= 1e-5f)
+            {
+                count++;
+            }
+        }
+
+        return count;
     }
 }

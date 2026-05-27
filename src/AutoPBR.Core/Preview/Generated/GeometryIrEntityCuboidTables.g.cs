@@ -5,6 +5,7 @@ internal static partial class GeometryIrEntityCuboidTables
 {
     private static readonly CleanRoomEntityModelRuntime.EntityCuboid[] CodModelBodyLayerData =
     [
+        new CleanRoomEntityModelRuntime.EntityCuboid(-1f, -2f, 0f, 1f, 2f, 7f, 0, 0),
         new CleanRoomEntityModelRuntime.EntityCuboid(-1f, -2f, -3f, 1f, 2f, 0f, 11, 0),
         new CleanRoomEntityModelRuntime.EntityCuboid(-1f, -2f, -1f, 1f, 1f, 0f, 0, 0),
         new CleanRoomEntityModelRuntime.EntityCuboid(-2f, 0f, -1f, 0f, 0f, 1f, 22, 1),
@@ -17,11 +18,12 @@ internal static partial class GeometryIrEntityCuboidTables
 
     private static readonly CleanRoomEntityModelRuntime.EntityCuboid[] SalmonModelBodyLayerData =
     [
+        new CleanRoomEntityModelRuntime.EntityCuboid(-1.5f, -2.5f, 0f, 1.5f, 2.5f, 8f, 0, 0),
+        new CleanRoomEntityModelRuntime.EntityCuboid(0f, 0f, 0f, 0f, 2f, 3f, 2, 1),
         new CleanRoomEntityModelRuntime.EntityCuboid(-1.5f, -2.5f, 0f, 1.5f, 2.5f, 8f, 0, 13),
         new CleanRoomEntityModelRuntime.EntityCuboid(0f, -2.5f, 0f, 0f, 2.5f, 6f, 20, 10),
         new CleanRoomEntityModelRuntime.EntityCuboid(0f, 0f, 0f, 0f, 2f, 4f, 0, 2),
         new CleanRoomEntityModelRuntime.EntityCuboid(-1f, -2f, -3f, 1f, 2f, 0f, 22, 0),
-        new CleanRoomEntityModelRuntime.EntityCuboid(0f, 0f, 0f, 0f, 2f, 3f, 2, 1),
         new CleanRoomEntityModelRuntime.EntityCuboid(-2f, 0f, 0f, 0f, 0f, 2f, -4, 0),
         new CleanRoomEntityModelRuntime.EntityCuboid(0f, 0f, 0f, 2f, 0f, 2f, 0, 0),
     ];
@@ -30,6 +32,7 @@ internal static partial class GeometryIrEntityCuboidTables
 
     private static readonly CleanRoomEntityModelRuntime.EntityCuboid[] ChickenModelBodyLayerData =
     [
+        new CleanRoomEntityModelRuntime.EntityCuboid(-2f, -6f, -2f, 2f, 0f, 1f, 0, 0),
         new CleanRoomEntityModelRuntime.EntityCuboid(-2f, -4f, -4f, 2f, -2f, -2f, 14, 0),
         new CleanRoomEntityModelRuntime.EntityCuboid(-1f, -2f, -3f, 1f, 0f, -1f, 14, 4),
         new CleanRoomEntityModelRuntime.EntityCuboid(-3f, -4f, -3f, 3f, 4f, 3f, 0, 9),

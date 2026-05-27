@@ -50,6 +50,26 @@
           "cuboids": [
             {
               "from": [
+                -10,
+                -7,
+                12
+              ],
+              "to": [
+                8,
+                3,
+                12.5
+              ],
+              "uvOrigin": [
+                20,
+                32
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "inflate": 0.5
+            },
+            {
+              "from": [
                 -6,
                 -10,
                 -7

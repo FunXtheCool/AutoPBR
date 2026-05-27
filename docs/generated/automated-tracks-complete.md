@@ -2,7 +2,7 @@
 
 **Canonical plan:** [`runtime-ir-preview-plan.md`](../runtime-ir-preview-plan.md)  
 **Completion audit:** [`plan-completion-audit.md`](plan-completion-audit.md)  
-**Pinned:** 26.1.2 · **Summary UTC:** 2026-05-22 (Wave 12)
+**Pinned:** 26.1.2 · **Summary UTC:** 2026-05-25 (Wave C geometry partial drain)
 
 Legend: **✅ automated** (CI/tests or committed artifacts) · **⏳ human-only** · **🔧 deferred** (documented backlog; does not block other automated gates)
 
@@ -16,7 +16,7 @@ Legend: **✅ automated** (CI/tests or committed artifacts) · **⏳ human-only*
 |------------|--------|-------|
 | A.1 Lifter (1A–1D) | ✅ automated | 56/56 pilots: `assemblyGatePass`, `javapPoseOracleMatch`, `referenceWorldPoseMatch`, `referenceHierarchyMatch` |
 | A.2 Quality gates + quality JSON | ✅ automated | [`geometry-lift-quality-26.1.2.json`](geometry-lift-quality-26.1.2.json); regen via `regen-assembly-pilots.ps1` |
-| A.2 Index + shard regen | ✅ automated | [`geometry-index-26.1.2.json`](geometry-index-26.1.2.json) — **155** `ok` · **27** `skipped` · **2** `partial` · **0** `fail` (Wave 11: mission partial drain **10/11** `ok`; `ArmorStandModel` fingerprint; `CowModel` tracked separately) |
+| A.2 Index + shard regen | ✅ automated | [`geometry-index-26.1.2.json`](geometry-index-26.1.2.json) — **157** `ok` · **27** `skipped` · **0** `partial` · **0** `fail` (Wave C: `ArmorStandModel` body-stick override promoted the final partial row) |
 | A.3 Pilot dual gate (56) | ✅ automated | **56/56** assembly + oracle + world + hierarchy (`generatedUtc` 2026-05-22T08:38:46Z); **54/56** promotion dual gate (`SheepModel` T1-only; `QuadrupedModel` abstract skip) |
 | A.4 Manual Explore | ⏳ human-only | [`manual-explore-playbook.md`](../manual-explore-playbook.md); export `tools/export-manual-explore-checklist.ps1` |
 | A.8 Preview-deltas | ✅ automated (artifacts) | 12 overlays committed; Explore sign-off still ⏳ via § A.4 |

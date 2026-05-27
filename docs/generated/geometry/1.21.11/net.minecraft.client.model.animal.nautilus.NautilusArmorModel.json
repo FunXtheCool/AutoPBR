@@ -3,10 +3,9 @@
   "versionLabel": "1.21.11",
   "officialJvmName": "net.minecraft.client.model.animal.nautilus.NautilusArmorModel",
   "profile": "proguard_1.21.11",
-  "extractionStatus": "partial",
+  "extractionStatus": "ok",
   "extractionNotes": [
     "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.nautilus.NautilusArmorModel).",
-    "Strict structural validation failed (3): cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027; cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027; duplicate_part_id: duplicate part id \u0027root\u0027 in tree",
     "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
   ],
   "factoryMethod": "createBodyLayer",
@@ -28,29 +27,6 @@
       },
       "cuboids": [],
       "children": [
-        {
-          "id": "root",
-          "pose": {
-            "translation": [
-              0,
-              29,
-              -6
-            ],
-            "rotationEulerRad": [
-              0,
-              0,
-              0
-            ],
-            "eulerOrder": "XYZ",
-            "setupAnimPivot": [
-              0,
-              29,
-              -6
-            ]
-          },
-          "cuboids": [],
-          "children": []
-        },
         {
           "id": "shell",
           "pose": {
@@ -90,9 +66,6 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf",
-              "liftWarnings": [
-                "cube_deformation_obf_inferred"
-              ],
               "inflate": 0.0099999998
             },
             {
@@ -113,29 +86,7 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf",
-              "liftWarnings": [
-                "cube_deformation_obf_inferred"
-              ],
               "inflate": 0.0099999998
-            },
-            {
-              "from": [
-                0,
-                6,
-                14
-              ],
-              "to": [
-                8,
-                6,
-                14
-              ],
-              "uvOrigin": [
-                48,
-                26
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
             }
           ],
           "children": []

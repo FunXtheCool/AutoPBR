@@ -10,17 +10,13 @@ namespace AutoPBR.Core.Tests;
 [Trait(GeometryIrTestTierSupport.DiagnosticCategory, "LiftQuality")]
 public sealed class MultilayerLiftQualityReferenceTests
 {
-    /// <summary>Ok shards with referenceCuboidsMatch; cape/nautilus tracked in compiler tests until promoted.</summary>
+    /// <summary>Ok shards with referenceCuboidsMatch.</summary>
     private static readonly string[] MultilayerJvmNames =
     [
         "net.minecraft.client.model.effects.SpinAttackEffectModel",
         "net.minecraft.client.model.monster.witch.WitchModel",
         "net.minecraft.client.model.monster.strider.AdultStriderModel",
         "net.minecraft.client.model.monster.strider.StriderModel",
-    ];
-
-    private static readonly string[] MultilayerPartialJvmNames =
-    [
         "net.minecraft.client.model.monster.nautilus.ZombieNautilusCoralModel",
         "net.minecraft.client.model.player.PlayerCapeModel",
     ];
@@ -78,16 +74,6 @@ public sealed class MultilayerLiftQualityReferenceTests
                 row.TryGetProperty("referenceCuboidsMatch", out var match) &&
                 match.ValueKind == JsonValueKind.True,
                 $"{jvm}: referenceCuboidsMatch={match}");
-        }
-
-        foreach (var jvm in MultilayerPartialJvmNames)
-        {
-            if (!byJvm.TryGetValue(jvm, out var row))
-            {
-                continue;
-            }
-
-            Assert.Equal("partial", row.GetProperty("extractionStatus").GetString());
         }
     }
 }

@@ -3,10 +3,9 @@
   "versionLabel": "1.21.11",
   "officialJvmName": "net.minecraft.client.model.animal.golem.CopperGolemModel",
   "profile": "proguard_1.21.11",
-  "extractionStatus": "partial",
+  "extractionStatus": "ok",
   "extractionNotes": [
     "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.animal.golem.CopperGolemModel).",
-    "Strict structural validation failed (2): cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027; cuboid_lift_warning: forbidden cuboid liftWarning \u0027cube_deformation_obf_inferred\u0027",
     "Mesh lift parser notes (3): Lifted via bytecode disassembly \u002B segment parser (exact pool constants).; addBox at line 10: could not parse texOffs (defaulting to 0,0).; addBox at line 10: could not parse texOffs (defaulting to 0,0)."
   ],
   "factoryMethod": "createBodyLayer",
@@ -51,13 +50,51 @@
           "cuboids": [
             {
               "from": [
+                -4,
                 -6,
+                -3
+              ],
+              "to": [
+                4,
+                0,
+                3
+              ],
+              "uvOrigin": [
+                0,
+                15
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            },
+            {
+              "from": [
+                -4,
+                -4.5250001,
+                6
+              ],
+              "to": [
                 -3,
+                1.4749999,
+                6
+              ],
+              "uvOrigin": [
+                3,
+                19
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf"
+            },
+            {
+              "from": [
+                -3,
+                -3.5250001,
                 8
               ],
               "to": [
-                0,
                 3,
+                2.4749999,
                 8
               ],
               "uvOrigin": [
@@ -444,9 +481,6 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf",
-              "liftWarnings": [
-                "cube_deformation_obf_inferred"
-              ],
               "inflate": -0.0149999997
             },
             {
@@ -467,9 +501,6 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf",
-              "liftWarnings": [
-                "cube_deformation_obf_inferred"
-              ],
               "inflate": -0.0149999997
             }
           ],
@@ -999,7 +1030,11 @@
     5,
     4,
     1.65,
-    -0.2618
+    -0.2618,
+    0.017453292,
+    0.017453292,
+    2.5,
+    2.5
   ],
   "liftSummary": {
     "cuboidApproxCount": 0,

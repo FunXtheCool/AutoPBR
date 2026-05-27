@@ -132,11 +132,12 @@
               ],
               "uvOrigin": [
                 28,
-                8
+                32
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "inflate": 0.5
             }
           ],
           "children": []
@@ -325,6 +326,21 @@
     16,
     8,
     1.5707964,
+    -5,
+    -10,
+    -7,
+    10,
+    16,
+    8,
+    -5,
+    -10,
+    -7,
+    10,
+    16,
+    8,
+    0.5,
+    11,
+    1.5707964,
     -4,
     -4,
     -8,
@@ -352,22 +368,7 @@
     -3,
     -5,
     3,
-    -5,
-    -5,
-    -10,
-    -7,
-    10,
-    16,
-    8,
-    -5,
-    -10,
-    -7,
-    10,
-    16,
-    8,
-    0.5,
-    11,
-    1.5707964
+    -5
   ],
   "textureWidth": 64,
   "textureHeight": 64,

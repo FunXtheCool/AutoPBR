@@ -159,13 +159,13 @@ internal static class BytecodeGeometryMeshLift
     /// <summary>
     /// Disassembles every static mesh-factory method on the class (same coverage as <see cref="JavapClassDisassembly.ConcatMeshFactoryCodeNamed"/>).
     /// </summary>
-    public static string ConcatMeshFactoryCodeFromClass(ReadOnlySpan<byte> classFile)
+    public static string ConcatMeshFactoryCodeFromClass(ReadOnlySpan<byte> classFile, MojangMappingsParser? maps = null)
     {
         var methods = new List<string>();
         var seen = new HashSet<string>(StringComparer.Ordinal);
         foreach (var (name, desc, isStatic) in JvmClassFileParser.EnumerateMethods(classFile))
         {
-            if (!isStatic || !IsMeshFactoryDescriptor(desc))
+            if (!isStatic || !JvmClassFileParser.IsMeshFactoryDescriptor(desc, maps))
             {
                 continue;
             }
@@ -228,8 +228,4 @@ internal static class BytecodeGeometryMeshLift
         return methodName.Length > 0;
     }
 
-    private static bool IsMeshFactoryDescriptor(string descriptor) =>
-        (descriptor.Contains("MeshDefinition", StringComparison.Ordinal) &&
-         !descriptor.Contains("ArmorModelSet", StringComparison.Ordinal)) ||
-        descriptor.Contains("LayerDefinition", StringComparison.Ordinal);
 }

@@ -89,7 +89,9 @@ public sealed class GeometryIrLerMirrorComposeClassificationTests
 
         var (defaultHead, defaultLeg) = MeasureHeadLegCentroidYPair(defaultMesh!, repaired, 64, 64, AdultFelineJvm);
         var (rightHead, rightLeg) = MeasureHeadLegCentroidYPair(rightMesh!, repaired, 64, 64, AdultFelineJvm);
-        Assert.False(defaultLeg < defaultHead, $"default LER: legY={defaultLeg:F3} headY={defaultHead:F3}");
+        // Nested feline host: default S*L keeps +Y corner centroids; cow-class L*S folds to -Y LER preview space.
+        Assert.True(defaultLeg > 0f && rightLeg < 0f,
+            $"default +Y vs right-compose -Y: default leg={defaultLeg:F3} head={defaultHead:F3}; right leg={rightLeg:F3} head={rightHead:F3}");
         Assert.True(rightLeg < rightHead, $"right-compose LER: legY={rightLeg:F3} headY={rightHead:F3}");
     }
 
@@ -210,6 +212,29 @@ public sealed class GeometryIrLerMirrorComposeClassificationTests
             CleanRoomEntityModelRuntime.UsesQuadrupedLerMirrorRightComposeLocalChain(
                 "horsemodel",
                 normalizedAssetPath: ""));
+        Assert.Equal(
+            CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.EquineDedicated,
+            CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(
+                HorseJvm,
+                "horsemodel",
+                "assets/minecraft/textures/entity/horse/horse_white.png"));
+    }
+
+    [Theory]
+    [InlineData(CowJvm, "cowmodel", "", "RightComposeLocalChain")]
+    [InlineData(AdultFelineJvm, "adultfelinemodel", "", "RightComposeLocalChain")]
+    [InlineData(RabbitJvm, "rabbitmodel", "", "StandardWorldRoot")]
+    [InlineData("net.minecraft.client.model.monster.hoglin.HoglinModel", "hoglinmodel", "", "StandardWorldRoot")]
+    [InlineData("", "arrow", "assets/minecraft/textures/entity/projectiles/arrow.png", "Skip")]
+    public void Shared_ler_basis_resolver_classifies_viewport_policy(
+        string officialJvm,
+        string stem,
+        string normalizedAssetPath,
+        string expected)
+    {
+        Assert.Equal(
+            expected,
+            CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(officialJvm, stem, normalizedAssetPath).ToString());
     }
 
     [Theory]

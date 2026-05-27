@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.renderer.entity.ChickenRenderer",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.ChickenRenderState",
+  "modelJvmNames": [
+    "net.minecraft.client.model.animal.chicken.ChickenModel",
+    "net.minecraft.client.model.animal.chicken.AdultChickenModel",
+    "net.minecraft.client.model.animal.chicken.BabyChickenModel",
+    "net.minecraft.client.model.animal.chicken.ColdChickenModel",
+    "net.minecraft.client.model.animal.chicken.WarmChickenModel"
+  ],
+  "extractionStatus": "partial hand-pilot",
+  "extractionNotes": [
+    "P6 hand shard: idle preview supplies flap/flapSpeed scalar fields used by chicken setupAnim.",
+    "RendererStateLift compiler remains deferred; this shard supplies preview scalar timing only."
+  ],
+  "scalarRenderStateFields": [
+    { "renderStateField": "flap", "setupAnimStateField": "flap" },
+    { "renderStateField": "flapSpeed", "setupAnimStateField": "flapSpeed" }
+  ],
+  "livingEntityFields": [
+    "ageInTicks",
+    "walkAnimationPos",
+    "walkAnimationSpeed",
+    "xRot",
+    "yRot"
+  ],
+  "previewDriver": "chicken_idle_flap",
+  "scalarDefaults": {
+    "flap": 0,
+    "flapSpeed": 0.35
+  }
+}

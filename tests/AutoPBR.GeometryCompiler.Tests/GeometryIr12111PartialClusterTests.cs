@@ -8,6 +8,8 @@ namespace AutoPBR.GeometryCompiler.Tests;
 /// </summary>
 public sealed class GeometryIr12111PartialClusterTests
 {
+    private static readonly JsonSerializerOptions ClusterJsonOptions = new() { WriteIndented = true };
+
     private static readonly string[] PromotionPilotJvmNames =
     [
         "net.minecraft.client.model.animal.fish.CodModel",
@@ -81,7 +83,7 @@ public sealed class GeometryIr12111PartialClusterTests
             Directory.CreateDirectory(dir);
         }
 
-        File.WriteAllText(writePath, JsonSerializer.Serialize(payload, new JsonSerializerOptions { WriteIndented = true }));
+        File.WriteAllText(writePath, JsonSerializer.Serialize(payload, ClusterJsonOptions));
         Assert.True(File.Exists(writePath));
         Assert.True(clusters.Count > 0);
     }
@@ -145,6 +147,63 @@ public sealed class GeometryIr12111PartialClusterTests
     public static IEnumerable<object[]> PromotionPilotCases() =>
         PromotionPilotJvmNames.Select(j => new object[] { j });
 
+    [Theory]
+    [InlineData("net.minecraft.client.model.animal.equine.AbstractEquineModel")]
+    [InlineData("net.minecraft.client.model.monster.piglin.AbstractPiglinModel")]
+    public void Obfuscated_abstract_mesh_hosts_lift_with_mapped_factory_pins(string jvm)
+    {
+        var root = Program.FindRepoRoot();
+        var jar = Path.Combine(root, "tools", "minecraft-parity", "1.21.11", "client.jar");
+        if (!File.Exists(jar))
+        {
+            return;
+        }
+
+        var mapsPath = Path.Combine(AppContext.BaseDirectory, "tools", "minecraft-parity", "1.21.11",
+            "client_mappings.txt");
+        if (!File.Exists(mapsPath))
+        {
+            mapsPath = Path.Combine(root, "tools", "minecraft-parity", "1.21.11", "client_mappings.txt");
+        }
+
+        var maps = MojangMappingsParser.Load(mapsPath);
+        var javap = JavapLocator.FindJavap();
+        Assert.True(
+            GeometryLiftPipeline.TryLiftWithJavapFallback(javap, jar, maps, jvm, "createBodyLayer", preferAsm: true,
+                out var attempt),
+            $"{jvm}: {string.Join("; ", attempt.Notes)}");
+        Assert.True(CountCuboids(attempt.Roots) > 0, jvm);
+    }
+
+    [Theory]
+    [InlineData("net.minecraft.client.model.monster.endermite.EndermiteModel")]
+    [InlineData("net.minecraft.client.model.monster.silverfish.SilverfishModel")]
+    public void Obfuscated_segment_name_helpers_lift_zero_cuboid_partial_backlog(string jvm)
+    {
+        var root = Program.FindRepoRoot();
+        var jar = Path.Combine(root, "tools", "minecraft-parity", "1.21.11", "client.jar");
+        if (!File.Exists(jar))
+        {
+            return;
+        }
+
+        var mapsPath = Path.Combine(AppContext.BaseDirectory, "tools", "minecraft-parity", "1.21.11",
+            "client_mappings.txt");
+        if (!File.Exists(mapsPath))
+        {
+            mapsPath = Path.Combine(root, "tools", "minecraft-parity", "1.21.11", "client_mappings.txt");
+        }
+
+        var maps = MojangMappingsParser.Load(mapsPath);
+        var javap = JavapLocator.FindJavap();
+        Assert.True(
+            GeometryLiftPipeline.TryLiftWithJavapFallback(javap, jar, maps, jvm, "createBodyLayer", preferAsm: true,
+                out var attempt),
+            $"{jvm}: {string.Join("; ", attempt.Notes)}");
+        Assert.True(CountCuboids(attempt.Roots) > 0, $"{jvm}: expected obfuscated segment helper lift to emit cuboids");
+        Assert.DoesNotContain(0f, CollectCuboidWidths(attempt.Roots));
+    }
+
     private static int CountCuboids(JsonArray roots)
     {
         var n = 0;
@@ -157,6 +216,43 @@ public sealed class GeometryIr12111PartialClusterTests
         }
 
         return n;
+    }
+
+    private static IEnumerable<float> CollectCuboidWidths(JsonArray roots)
+    {
+        foreach (var root in roots.OfType<JsonObject>())
+        {
+            foreach (var width in CollectCuboidWidths(root))
+            {
+                yield return width;
+            }
+        }
+    }
+
+    private static IEnumerable<float> CollectCuboidWidths(JsonObject part)
+    {
+        if (part["cuboids"] is JsonArray cuboids)
+        {
+            foreach (var cuboid in cuboids.OfType<JsonObject>())
+            {
+                if (cuboid["from"] is JsonArray from && cuboid["to"] is JsonArray to &&
+                    from.Count >= 1 && to.Count >= 1)
+                {
+                    yield return to[0]!.GetValue<float>() - from[0]!.GetValue<float>();
+                }
+            }
+        }
+
+        if (part["children"] is JsonArray kids)
+        {
+            foreach (var child in kids.OfType<JsonObject>())
+            {
+                foreach (var width in CollectCuboidWidths(child))
+                {
+                    yield return width;
+                }
+            }
+        }
     }
 
     private static int CountPart(JsonObject part)

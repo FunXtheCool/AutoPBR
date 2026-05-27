@@ -3,12 +3,11 @@
   "versionLabel": "26.1.2",
   "officialJvmName": "net.minecraft.client.model.object.chest.ChestModel",
   "profile": "named_jar_26.1.2",
-  "extractionStatus": "skipped",
+  "extractionStatus": "partial",
   "extractionNotes": [
     "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.object.chest.ChestModel).",
     "Strict structural validation failed (1): reference_mismatch: part \u0027bottom\u0027: fingerprint mismatch at 0: reference=1,0,1|15,10,15 compared=0,0,1|15,10,15",
-    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants).",
-    "Chest double-body masked addBox uses direction-relative origin; lifted bottom cuboid X offset differs from reference_java by one voxel."
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
   ],
   "factoryMethod": "createSingleBodyLayer",
   "roots": [
@@ -73,10 +72,8 @@
                 "up",
                 "north",
                 "south",
-                "west"
-              ],
-              "textureWidth": 64,
-              "textureHeight": 64
+                "east"
+              ]
             }
           ],
           "children": []
@@ -125,10 +122,8 @@
                 "up",
                 "north",
                 "south",
-                "west"
-              ],
-              "textureWidth": 64,
-              "textureHeight": 64
+                "east"
+              ]
             }
           ],
           "children": []
@@ -177,10 +172,8 @@
                 "up",
                 "north",
                 "south",
-                "west"
-              ],
-              "textureWidth": 64,
-              "textureHeight": 64
+                "east"
+              ]
             }
           ],
           "children": []

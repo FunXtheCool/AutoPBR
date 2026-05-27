@@ -297,7 +297,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.animal.chicken.ColdChickenModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.animal.chicken.ColdChickenModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "4ec98583a37370a9243aefb83c772eb8a0d16badb8c947a55f17bd00474dc32b",
       "jarPath": "net/minecraft/client/model/animal/chicken/ColdChickenModel.class"
     },
@@ -315,7 +315,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.animal.cow.ColdCowModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.animal.cow.ColdCowModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "83623c18bea4ee4df51063b1c6258db01f8c2a8c172101998920a1fe844a1f92",
       "jarPath": "net/minecraft/client/model/animal/cow/ColdCowModel.class"
     },
@@ -333,7 +333,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.animal.cow.WarmCowModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.animal.cow.WarmCowModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "0acfd84a02ecc14446e7ef9dd57b22c76c908165182f2a5ba80735bda8e10fc7",
       "jarPath": "net/minecraft/client/model/animal/cow/WarmCowModel.class"
     },
@@ -693,7 +693,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.animal.nautilus.NautilusSaddleModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.animal.nautilus.NautilusSaddleModel",
-      "extractionStatus": "ok",
+      "extractionStatus": "partial",
       "classSha256Hex": "c7c63d2861fc1bec2853622d250c23474823234bb56f607fbb8c2f75118cf58b",
       "jarPath": "net/minecraft/client/model/animal/nautilus/NautilusSaddleModel.class"
     },
@@ -738,7 +738,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.animal.pig.BabyPigModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.animal.pig.BabyPigModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "5a01f08703b54efeeb450a60dd5e3d2a6754e204fd80be99493c8c6b11d813b2",
       "jarPath": "net/minecraft/client/model/animal/pig/BabyPigModel.class"
     },
@@ -747,7 +747,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.animal.pig.ColdPigModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.animal.pig.ColdPigModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "323d5708e2c5996a0676ab882af7d75a7cc2f12ca65d7d02515c6b05ae21bad7",
       "jarPath": "net/minecraft/client/model/animal/pig/ColdPigModel.class"
     },
@@ -1296,7 +1296,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.monster.zombie.AbstractZombieModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.monster.zombie.AbstractZombieModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "d3b462f785f618b811727a0cd8fa39f285e39f472dca938694a4010cf4fa0d27",
       "jarPath": "net/minecraft/client/model/monster/zombie/AbstractZombieModel.class"
     },
@@ -1305,7 +1305,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.monster.zombie.BabyDrownedModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.monster.zombie.BabyDrownedModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "cf3f8f4cd2e1b901d175692881e36d38b24210d550f782af5c21ac2e367a81e6",
       "jarPath": "net/minecraft/client/model/monster/zombie/BabyDrownedModel.class"
     },
@@ -1314,7 +1314,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.monster.zombie.BabyZombieModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.monster.zombie.BabyZombieModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "b9faee3ec9e333d68b8eb71eb106fcceff42b765c45a45628c13a7a612c6297e",
       "jarPath": "net/minecraft/client/model/monster/zombie/BabyZombieModel.class"
     },
@@ -1350,7 +1350,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.monster.zombie.ZombieModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.monster.zombie.ZombieModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "9d75ec510bb5305e6c13ab3cf61416a648f2062523f6014e37ce795f2aeee21e",
       "jarPath": "net/minecraft/client/model/monster/zombie/ZombieModel.class"
     },
@@ -1449,7 +1449,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.object.boat.AbstractBoatModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.object.boat.AbstractBoatModel",
-      "extractionStatus": "skipped",
+      "extractionStatus": "ok",
       "classSha256Hex": "90c161abc7f9f843ba706a49ba72c65b17dc051c999a480a6c73a4b6f8a9ad1b",
       "jarPath": "net/minecraft/client/model/object/boat/AbstractBoatModel.class"
     },
@@ -1458,7 +1458,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.object.boat.BoatModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.object.boat.BoatModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "44746e7008a7148507df1d5675fc4c574b5b9edcb7f6a48d04cd714a37f09425",
       "jarPath": "net/minecraft/client/model/object/boat/BoatModel.class"
     },
@@ -1467,7 +1467,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.object.boat.RaftModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.object.boat.RaftModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "43db0e1bb2f3d1b722ea92fac0bfeff6f231415b79b9a5e099b16cfdb6c01359",
       "jarPath": "net/minecraft/client/model/object/boat/RaftModel.class"
     },
@@ -1656,7 +1656,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.player.PlayerModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.player.PlayerModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "2b079f3f2f1ec200bfd080b5eac968c057f67b955374ec5c567a8765fed83981",
       "jarPath": "net/minecraft/client/model/player/PlayerModel.class"
     }

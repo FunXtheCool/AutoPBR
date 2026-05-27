@@ -90,6 +90,24 @@ internal static class GeometryIrParityHandLiftJvmMap
             return true;
         }
 
+        if (string.Equals(builderMethod, "Boat", StringComparison.OrdinalIgnoreCase))
+        {
+            officialJvm = "net.minecraft.client.model.object.boat.BoatModel";
+            return true;
+        }
+
+        if (string.Equals(builderMethod, "ChestBoat", StringComparison.OrdinalIgnoreCase))
+        {
+            officialJvm = "net.minecraft.client.model.object.boat.ChestBoatModel";
+            return true;
+        }
+
+        if (string.Equals(builderMethod, "ChestEntity", StringComparison.OrdinalIgnoreCase))
+        {
+            officialJvm = "net.minecraft.client.model.object.chest.ChestModel";
+            return true;
+        }
+
         return false;
     }
 }

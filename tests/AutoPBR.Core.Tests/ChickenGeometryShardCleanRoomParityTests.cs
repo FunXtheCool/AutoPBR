@@ -9,7 +9,7 @@ namespace AutoPBR.Core.Tests;
 public sealed class ChickenGeometryShardCleanRoomParityTests
 {
     private static string ContentPath(params string[] segments) =>
-        Path.Combine([AppContext.BaseDirectory, .. segments]);
+        Path.Combine([GeometryIrTestTierSupport.FindRepoRoot(), .. segments]);
 
     [Theory]
     [InlineData("26.1.2")]
