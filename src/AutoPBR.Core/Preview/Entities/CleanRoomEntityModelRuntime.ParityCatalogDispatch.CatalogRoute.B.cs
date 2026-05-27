@@ -21,99 +21,11 @@ internal sealed partial class CleanRoomEntityModelRuntime
         merged = null!;
         switch (builderMethod)
         {
-            case "Slime":
+            case "Cow":
 
 
 
-                merged = BuildSlime(texRef, profile, isBaby);
 
-
-
-                return true;
-
-            case "Silverfish":
-
-
-
-                merged = BuildSilverfish(texRef, profile, isBaby, ageInTicks: wave);
-
-
-
-                return true;
-
-            case "Endermite":
-
-
-
-                merged = BuildEndermite(texRef, profile, isBaby, ageInTicks: wave);
-
-
-
-                return true;
-
-            case "ShulkerBullet":
-
-
-
-                merged = BuildShulkerBullet(texRef, profile, isBaby, yRotDegrees: animationTimeSeconds * 45f, xRotDegrees: wave * 25f);
-
-
-
-                return true;
-
-            case "Shulker":
-
-
-
-                merged = BuildShulker(
-
-
-
-                    texRef,
-
-
-
-                    profile,
-
-
-
-                    isBaby,
-
-
-
-                    peekAmount: Math.Clamp((wave + 1f) * 0.5f, 0f, 1f),
-
-
-
-                    ageInTicks: animationTimeSeconds * 20f,
-
-
-
-                    xRotDegrees: 0f,
-
-
-
-                    yHeadRotDegrees: 180f,
-
-
-
-                    yBodyRotDegrees: 0f);
-
-
-
-                return true;
-
-            case "SnowGolem":
-
-
-
-                merged = BuildSnowGolem(texRef, profile, isBaby, yRotDegrees: animationTimeSeconds * 40f, xRotDegrees: 0f);
-
-
-
-                return true;
-
-            case "IronGolem":
 
 
 
@@ -121,47 +33,343 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
-                    var (walkPos, walkSpeed) = ComputePreviewEntityWalkCycle(animationTimeSeconds, idlePhase01, wave);
 
 
 
-                    merged = BuildIronGolem(
+
+                    var (rh, lh, rf, lf) = ComputePreviewStandardQuadrupedLegPitches(animationTimeSeconds, idlePhase01, wave, "Cow");
 
 
 
-                        texRef,
 
 
 
-                        profile,
+
+                    var headPitch = idlePhase01 * 0.35f + wave * 0.15f;
 
 
 
-                        isBaby,
 
 
 
-                        attackTicksRemaining: 0f,
+
+                    if (normalizedAssetPath.Contains("/textures/entity/cow/cow_cold", StringComparison.OrdinalIgnoreCase))
 
 
 
-                        offerFlowerTick: 0,
 
 
 
-                        walkAnimationPos: walkPos,
+
+                    {
 
 
 
-                        walkAnimationSpeed: walkSpeed,
 
 
 
-                        yRotDegrees: animationTimeSeconds * 28f,
+
+                        merged = BuildColdCow(
 
 
 
-                        xRotDegrees: 0f);
+
+
+
+
+                            texRef,
+
+
+
+
+
+
+
+                            profile,
+
+
+
+
+
+
+
+                            isBaby,
+
+
+
+
+
+
+
+                            headPitch,
+
+
+
+
+
+
+
+                            hasHorns: true,
+
+
+
+
+
+
+
+                            rightHindLegPitchRad: rh,
+
+
+
+
+
+
+
+                            leftHindLegPitchRad: lh,
+
+
+
+
+
+
+
+                            rightFrontLegPitchRad: rf,
+
+
+
+
+
+
+
+                            leftFrontLegPitchRad: lf);
+
+
+
+
+
+
+
+                    }
+
+
+
+
+
+
+
+                    else if (normalizedAssetPath.Contains("/textures/entity/cow/cow_warm", StringComparison.OrdinalIgnoreCase))
+
+
+
+
+
+
+
+                    {
+
+
+
+
+
+
+
+                        merged = BuildWarmCow(
+
+
+
+
+
+
+
+                            texRef,
+
+
+
+
+
+
+
+                            profile,
+
+
+
+
+
+
+
+                            isBaby,
+
+
+
+
+
+
+
+                            headPitch,
+
+
+
+
+
+
+
+                            hasHorns: true,
+
+
+
+
+
+
+
+                            rightHindLegPitchRad: rh,
+
+
+
+
+
+
+
+                            leftHindLegPitchRad: lh,
+
+
+
+
+
+
+
+                            rightFrontLegPitchRad: rf,
+
+
+
+
+
+
+
+                            leftFrontLegPitchRad: lf);
+
+
+
+
+
+
+
+                    }
+
+
+
+
+
+
+
+                    else
+
+
+
+
+
+
+
+                    {
+
+
+
+
+
+
+
+                        merged = BuildCow(
+
+
+
+
+
+
+
+                            texRef,
+
+
+
+
+
+
+
+                            profile,
+
+
+
+
+
+
+
+                            isBaby,
+
+
+
+
+
+
+
+                            headPitch,
+
+
+
+
+
+
+
+                            hasHorns: true,
+
+
+
+
+
+
+
+                            rightHindLegPitchRad: rh,
+
+
+
+
+
+
+
+                            leftHindLegPitchRad: lh,
+
+
+
+
+
+
+
+                            rightFrontLegPitchRad: rf,
+
+
+
+
+
+
+
+                            leftFrontLegPitchRad: lf);
+
+
+
+
+
+
+
+                    }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -169,147 +377,118 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                 }
 
-            case "EndCrystal":
+            case "Wolf":
 
 
 
-                merged = BuildEndCrystal(texRef, profile, isBaby, spin: idlePhase01 * 180f + animationTimeSeconds * 30f);
 
 
 
-                return true;
 
-            case "EvokerFangs":
+                {
 
 
 
-                merged = BuildEvokerFangs(texRef, profile, isBaby, bitePhase: idlePhase01);
 
 
 
-                return true;
 
-            case "LlamaSpit":
+                    var (rh, lh, rf, lf) = ComputePreviewStandardQuadrupedLegPitches(animationTimeSeconds, idlePhase01, wave, "Wolf");
 
 
 
-                merged = BuildLlamaSpit(texRef, profile, isBaby);
 
 
 
-                return true;
 
-            case "Arrow":
+                    merged = BuildWolf(
 
 
 
-                merged = BuildArrow(texRef, profile, isBaby, wobble: wave);
 
 
 
-                return true;
 
-            case "ArrowSpectral":
+                        texRef,
 
 
 
-                merged = BuildArrow(texRef, profile, isBaby, wobble: wave);
 
 
 
-                return true;
 
-            case "ArrowTipped":
+                        profile,
 
 
 
-                merged = BuildArrow(texRef, profile, isBaby, wobble: wave);
 
 
 
-                return true;
 
-            case "WindCharge":
+                        isBaby,
 
 
 
-                merged = BuildWindCharge(texRef, profile, isBaby, spin: animationTimeSeconds);
 
 
 
-                return true;
 
-            case "Trident":
+                        headPitch: idlePhase01 * 0.45f + wave * 0.20f,
 
 
 
-                merged = BuildTrident(texRef, profile, isBaby);
 
 
 
-                return true;
 
-            case "Shield":
+                        rightHindLegPitchRad: rh,
 
 
 
-                merged = BuildShield(texRef, profile, isBaby);
 
 
 
-                return true;
 
-            case "BannerFlagStanding":
+                        leftHindLegPitchRad: lh,
 
 
 
-                merged = BuildBannerFlag(texRef, profile, isBaby, isWall: false);
 
 
 
-                return true;
 
-            case "BannerFlagWall":
+                        rightFrontLegPitchRad: rf,
 
 
 
-                merged = BuildBannerFlag(texRef, profile, isBaby, isWall: true);
 
 
 
-                return true;
 
-            case "Bed":
+                        leftFrontLegPitchRad: lf);
 
 
 
-                merged = BuildBed(texRef, profile, isBaby);
 
 
 
-                return true;
 
-            case "EquipmentLayer":
+                    return true;
 
 
 
-                merged = BuildEquipmentLayer(texRef, profile, isBaby, normalizedAssetPath);
 
 
 
-                return true;
 
-            case "EquipmentWings":
+                }
 
-
-
-                merged = BuildEquipmentLayer(texRef, profile, isBaby, normalizedAssetPath);
-
-
-
-                return true;
         }
 
         return false;

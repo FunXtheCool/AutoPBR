@@ -25,7 +25,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                 merged = BuildEquipmentLayer(texRef, profile, isBaby, normalizedAssetPath);
+
+
+
+
 
 
 
@@ -35,7 +43,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                 merged = BuildEquipmentLayer(texRef, profile, isBaby, normalizedAssetPath);
+
+
+
+
 
 
 
@@ -45,7 +61,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                 merged = BuildEquipmentLayer(texRef, profile, isBaby, normalizedAssetPath);
+
+
+
+
 
 
 
@@ -55,7 +79,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                 merged = BuildEquipmentLayer(texRef, profile, isBaby, normalizedAssetPath);
+
+
+
+
 
 
 
@@ -65,7 +97,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                 merged = BuildEquipmentLayer(texRef, profile, isBaby, normalizedAssetPath);
+
+
+
+
 
 
 
@@ -75,7 +115,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                 merged = BuildEquipmentLayer(texRef, profile, isBaby, normalizedAssetPath);
+
+
+
+
 
 
 
@@ -85,7 +133,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                 merged = BuildEquipmentLayer(texRef, profile, isBaby, normalizedAssetPath);
+
+
+
+
 
 
 
@@ -95,7 +151,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                 merged = BuildEquipmentLayer(texRef, profile, isBaby, normalizedAssetPath);
+
+
+
+
 
 
 
@@ -105,7 +169,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                 merged = BuildEquipmentLayer(texRef, profile, isBaby, normalizedAssetPath);
+
+
+
+
 
 
 
@@ -115,7 +187,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                 merged = BuildEquipmentLayer(texRef, profile, isBaby, normalizedAssetPath);
+
+
+
+
 
 
 
@@ -125,7 +205,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                 merged = BuildSkull(texRef, profile, isBaby, headPitch: idlePhase01 * 0.2f + wave * 0.1f);
+
+
+
+
 
 
 
@@ -135,7 +223,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                 merged = BuildBell(texRef, profile, isBaby, swing: idlePhase01 * 0.5f + wave * 0.15f);
+
+
+
+
 
 
 
@@ -145,7 +241,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                 merged = BuildMinecart(texRef, profile, isBaby);
+
+
+
+
 
 
 
@@ -155,7 +259,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                 merged = BuildBoat(
+
+
+
+
 
 
 
@@ -163,7 +275,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                     profile,
+
+
+
+
 
 
 
@@ -171,7 +291,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                     isChestBoat: normalizedAssetPath.Contains("/textures/entity/chest_boat/", StringComparison.OrdinalIgnoreCase));
+
+
+
+
 
 
 
@@ -181,7 +309,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                 merged = BuildBoat(texRef, profile, isBaby, isChestBoat: true);
+
+
+
+
 
 
 
@@ -191,7 +327,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                 merged = BuildLeashKnot(texRef, profile, isBaby);
+
+
+
+
 
 
 
@@ -201,7 +345,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                 merged = BuildArmorStand(texRef, profile, isBaby);
+
+
+
+
 
 
 
@@ -211,7 +363,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                 {
+
+
+
+
 
 
 
@@ -219,7 +379,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                     merged = BuildRavager(
+
+
+
+
 
 
 
@@ -227,11 +395,23 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                         profile,
 
 
 
+
+
+
+
                         isBaby,
+
+
+
+
 
 
 
@@ -239,7 +419,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                         yRotDegrees: animationTimeSeconds * 32f,
+
+
+
+
 
 
 
@@ -247,7 +435,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                         walkAnimationSpeed: walkSpeed,
+
+
+
+
 
 
 
@@ -255,7 +451,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
+
+
+
+
                         stunnedTicksRemaining: 0f,
+
+
+
+
 
 
 
@@ -263,93 +467,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
-                    return true;
 
-
-
-                }
-
-            case "Armadillo":
-
-
-
-                {
-
-
-
-                    var armadilloTailWalkRad = 0f;
-
-
-
-                    if (isBaby)
-
-
-
-                    {
-
-
-
-                        if (DefinitionAnimationPreviewSampling.TrySampleBabyArmadilloWalkTailRotationDegrees(profile, animationTimeSeconds, out var babyTailDeg))
-
-
-
-                        {
-
-
-
-                            armadilloTailWalkRad = babyTailDeg.X * (MathF.PI / 180f);
-
-
-
-                        }
-
-
-
-                    }
-
-
-
-                    else if (DefinitionAnimationPreviewSampling.TrySampleArmadilloWalkTailRotationDegrees(profile, animationTimeSeconds, out var adultTailDeg))
-
-
-
-                    {
-
-
-
-                        armadilloTailWalkRad = adultTailDeg.X * (MathF.PI / 180f);
-
-
-
-                    }
-
-
-
-
-
-
-
-                    merged = BuildArmadillo(
-
-
-
-                        texRef,
-
-
-
-                        profile,
-
-
-
-                        isBaby,
-
-
-
-                        headPitch: idlePhase01 * 0.14f + wave * 0.08f,
-
-
-
-                        tailWalkPitchRad: armadilloTailWalkRad);
 
 
 
@@ -357,115 +475,12 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
-                }
 
-            case "Breeze":
-
-
-
-                {
-
-
-
-                    var shootHeadPitchRad = 0f;
-
-
-
-                    if (DefinitionAnimationPreviewSampling.TrySampleBreezeShootHeadRotationDegrees(profile, animationTimeSeconds, out var shootHeadDeg))
-
-
-
-                    {
-
-
-
-                        shootHeadPitchRad = shootHeadDeg.X * (MathF.PI / 180f);
-
-
-
-                    }
-
-
-
-
-
-
-
-                    var shootHeadPos = Vector3.Zero;
-
-
-
-                    if (DefinitionAnimationPreviewSampling.TrySampleBreezeShootHeadPosition(profile, animationTimeSeconds, out var shootHeadTranslation))
-
-
-
-                    {
-
-
-
-                        shootHeadPos = shootHeadTranslation;
-
-
-
-                    }
-
-
-
-
-
-
-
-                    merged = BuildBreeze(
-
-
-
-                        normalizedAssetPath,
-
-
-
-                        texRef,
-
-
-
-                        profile,
-
-
-
-                        isBaby,
-
-
-
-                        swirl: idlePhase01 * 0.6f + wave * 0.2f,
-
-
-
-                        windAnimTimeSeconds: animationTimeSeconds,
-
-
-
-                        shootHeadAdditivePitchRad: shootHeadPitchRad,
-
-
-
-                        shootHeadAdditiveTranslate: shootHeadPos);
-
-
-
-                    return true;
 
 
 
                 }
 
-            case "Llama":
-
-
-
-                merged = BuildLlama(texRef, profile, isBaby, neckBend: idlePhase01 * 0.30f + wave * 0.10f);
-
-
-
-                return true;
         }
 
         return false;

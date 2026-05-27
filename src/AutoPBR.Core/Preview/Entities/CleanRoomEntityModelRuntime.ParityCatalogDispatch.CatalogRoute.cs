@@ -24,6 +24,21 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return true;
         }
 
-        return TryInvokeParityCatalogBuilderCatalogRouteB(builderMethod, normalizedAssetPath, stem, texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, out merged);
+        if (TryInvokeParityCatalogBuilderCatalogRouteB(builderMethod, normalizedAssetPath, stem, texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, out merged))
+        {
+            return true;
+        }
+
+        if (TryInvokeParityCatalogBuilderCatalogRouteC(builderMethod, normalizedAssetPath, stem, texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, out merged))
+        {
+            return true;
+        }
+
+        if (TryInvokeParityCatalogBuilderCatalogRouteD(builderMethod, normalizedAssetPath, stem, texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, out merged))
+        {
+            return true;
+        }
+
+        return TryInvokeParityCatalogBuilderCatalogRouteE(builderMethod, normalizedAssetPath, stem, texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, out merged);
     }
 }

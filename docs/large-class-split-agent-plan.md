@@ -89,7 +89,7 @@ Use **one task ID per agent thread**. Claim in PR title `[REF-01N]` and in the t
 | **H — Geometry compiler** | REF-012 | **High** — `JavapFloatGeometryMeshLift` partial type; **one agent** or serial sub-shards | Independent of preview runtime |
 | **I — Core preview sampling** | REF-013, REF-014 | **Medium** — REF-013 touches `DefinitionAnimationPreviewSampling`; REF-014 touches `ParityCatalogDispatch.*` | **Do not** run REF-014 in parallel with dispatch slot edits |
 | **J — App shell** | REF-015, REF-016 | Low–medium — VM vs. Views vs. GL; avoid same file | REF-015 and REF-016 can parallel if files disjoint |
-| **K — Core generators** | REF-017 | Low — separate static classes | |
+| **K — Core generators** | REF-017 | Low — separate static classes | done |
 | **L — Tools (non-javap)** | REF-018 | Low — `BytecodeMeshResolution`, `SetupAnimExpressionLift`, etc. | |
 | **M — Core preview (optional)** | REF-019 | Medium — `GeometryIr*` preview helpers | Defer until H–L stable |
 | **N — Tests (optional)** | REF-020 | Low | Large test fixtures only |
@@ -170,7 +170,7 @@ Production `src/` (hand-written `.cs`, excludes `obj`/`bin`/`.g.cs`):
 | Tools / geometry compiler partials | ≤ **600** lines | ≤ **200** lines |
 | Tests (fixture splits) | ≤ **450** lines | N/A |
 
-Tests (`tests/`, ≥ 450 lines): `GeometryIrLerMirrorComposeClassificationTests` (518), `PreviewRenderingTests` (463), `BindingGapPilotMeshLiftTests` (481) — **REF-020** optional.
+Tests (`tests/`, ≥ 450 lines): **REF-020 done** — `GeometryIrLerMirrorComposeClassificationTests` (4 partials), `PreviewRenderingTests` (5 partials) + `GlslIncludeResolverTests`, `BindingGapPilotMeshLiftTests` (4 partials); all shards ≤ **195** lines.
 
 **Re-baseline command** (PowerShell):
 
@@ -208,10 +208,10 @@ Python (repo root): aggregate histogram — see Phase 2 audit notes in git histo
 | **REF-014** | Parity-catalog route **line rebalance** | **P1** | **`todo`** | A/B halves uneven (921/957/681 vs 317/473/369) |
 | **REF-015** | MainWindowViewModel Settings + ScanConvert | **P1** | **`todo`** | 868 + 709 lines |
 | **REF-016** | App GL Render + `MainWindow.axaml.cs` | **P1** | **`todo`** | 823 + 753 lines |
-| **REF-017** | Core generators (Specular, TextureScanner, embeddings) | **P2** | **`todo`** | Standalone classes → `partial` |
+| **REF-017** | Core generators (Specular, TextureScanner, embeddings) | **P2** | **`done`** | Standalone classes → `partial` |
 | **REF-018** | Tools: BytecodeMeshResolution, SetupAnimExpressionLift, … | **P2** | **`todo`** | Independent of REF-012 |
 | **REF-019** | Core preview helpers (LiftQuality, PartTreeRepair, Baker) | **P3** | **`backlog`** | Optional |
-| **REF-020** | Large test fixtures | **P3** | **`backlog`** | Optional |
+| **REF-020** | Large test fixtures | **P3** | **`done`** | Partial splits: LER classification, PreviewRendering, BindingGap pilot |
 
 ---
 
