@@ -6,6 +6,8 @@ namespace AutoPBR.Core.Preview;
 
 internal sealed partial class CleanRoomEntityModelRuntime
 {
+    private const float SetupAnimBaselineEpsilon = 1e-5f;
+
     private static bool TryGetSetupAnimPartPose(
         string partId,
         VanillaSetupAnimRuntime.PoseResult pose,
@@ -26,7 +28,25 @@ internal sealed partial class CleanRoomEntityModelRuntime
         return false;
     }
 
+    private static bool TryGetBaselinePartPose(
+        string partId,
+        IReadOnlyDictionary<string, VanillaSetupAnimRuntime.PartPose> baselineParts,
+        out VanillaSetupAnimRuntime.PartPose baseline)
+    {
+        if (baselineParts.TryGetValue(partId, out baseline!))
+        {
+            return true;
+        }
 
+        if (TryResolveSetupAnimPartField(partId, out var modelPartField) &&
+            baselineParts.TryGetValue(modelPartField, out baseline!))
+        {
+            return true;
+        }
+
+        baseline = null!;
+        return false;
+    }
 
     private static bool TryResolveSetupAnimPartField(string geometryPartId, out string modelPartField)
 
@@ -78,16 +98,32 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
     }
 
-
+    private static VanillaSetupAnimRuntime.PartPose MergeSetupAnimEffectivePose(
+        VanillaSetupAnimRuntime.PartPose anim,
+        VanillaSetupAnimRuntime.PartPose baseline)
+    {
+        var assigned = anim.Assigned;
+        return new VanillaSetupAnimRuntime.PartPose
+        {
+            X = (assigned & VanillaSetupAnimRuntime.PartPoseChannel.X) != 0 ? anim.X : baseline.X,
+            Y = (assigned & VanillaSetupAnimRuntime.PartPoseChannel.Y) != 0 ? anim.Y : baseline.Y,
+            Z = (assigned & VanillaSetupAnimRuntime.PartPoseChannel.Z) != 0 ? anim.Z : baseline.Z,
+            XRot = (assigned & VanillaSetupAnimRuntime.PartPoseChannel.XRot) != 0 ? anim.XRot : baseline.XRot,
+            YRot = (assigned & VanillaSetupAnimRuntime.PartPoseChannel.YRot) != 0 ? anim.YRot : baseline.YRot,
+            ZRot = (assigned & VanillaSetupAnimRuntime.PartPoseChannel.ZRot) != 0 ? anim.ZRot : baseline.ZRot,
+        };
+    }
 
     /// <summary>
     /// World-space setupAnim delta: <c>partWorld * partLocalAnim * inverse(partWorld)</c> so
     /// <c>L' = deltaWorld * L</c> matches <c>partWorld * R_anim * cuboid</c> (ModelPart rotate at joint, not cuboid corner).
+    /// Geometry IR already bakes rest pose; only assigned channels are applied relative to that baseline.
     /// </summary>
     private static bool TryBuildSetupAnimPartWorldDelta(
         string partId,
         VanillaSetupAnimRuntime.PartPose partPose,
         IReadOnlyDictionary<string, Matrix4x4> partOriginWorld,
+        IReadOnlyDictionary<string, VanillaSetupAnimRuntime.PartPose> baselineParts,
         out Matrix4x4 deltaWorld)
     {
         deltaWorld = Matrix4x4.Identity;
@@ -96,6 +132,66 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             return false;
         }
+
+        if (partPose.Assigned == VanillaSetupAnimRuntime.PartPoseChannel.None)
+        {
+            return TryBuildSetupAnimPartWorldDeltaAbsolute(partId, partPose, partWorld, partInv, out deltaWorld);
+        }
+
+        _ = TryGetBaselinePartPose(partId, baselineParts, out var baseline);
+        var effective = MergeSetupAnimEffectivePose(partPose, baseline);
+
+        var hasPosChannel = (partPose.Assigned & (VanillaSetupAnimRuntime.PartPoseChannel.X |
+                                                   VanillaSetupAnimRuntime.PartPoseChannel.Y |
+                                                   VanillaSetupAnimRuntime.PartPoseChannel.Z)) != 0;
+        var dx = effective.X - baseline.X;
+        var dy = effective.Y - baseline.Y;
+        var dz = effective.Z - baseline.Z;
+        var hasPos = hasPosChannel &&
+                     (MathF.Abs(dx) > SetupAnimBaselineEpsilon ||
+                      MathF.Abs(dy) > SetupAnimBaselineEpsilon ||
+                      MathF.Abs(dz) > SetupAnimBaselineEpsilon);
+
+        var hasRotChannel = (partPose.Assigned & (VanillaSetupAnimRuntime.PartPoseChannel.XRot |
+                                                   VanillaSetupAnimRuntime.PartPoseChannel.YRot |
+                                                   VanillaSetupAnimRuntime.PartPoseChannel.ZRot)) != 0;
+        Matrix4x4 targetRot = Matrix4x4.Identity;
+        Matrix4x4 baselineRot = Matrix4x4.Identity;
+        var hasTargetRot = hasRotChannel &&
+                           TryBuildSetupAnimRotationMatrix(partId, effective, out targetRot);
+        var hasBaselineRot = TryBuildSetupAnimRotationMatrix(partId, baseline, out baselineRot);
+
+        if (!hasRotChannel && !hasPos)
+        {
+            return false;
+        }
+
+        var partLocal = Matrix4x4.Identity;
+        if (hasPos)
+        {
+            partLocal = EntityParityTemplate.T(dx, dy, dz);
+        }
+
+        if (hasTargetRot)
+        {
+            var rotDelta = hasBaselineRot && Matrix4x4.Invert(baselineRot, out var baselineRotInv)
+                ? EntityParityTemplate.Mul(targetRot, baselineRotInv)
+                : targetRot;
+            partLocal = hasPos ? EntityParityTemplate.Mul(partLocal, rotDelta) : rotDelta;
+        }
+
+        deltaWorld = EntityParityTemplate.Mul(EntityParityTemplate.Mul(partWorld, partLocal), partInv);
+        return true;
+    }
+
+    private static bool TryBuildSetupAnimPartWorldDeltaAbsolute(
+        string partId,
+        VanillaSetupAnimRuntime.PartPose partPose,
+        Matrix4x4 partWorld,
+        Matrix4x4 partInv,
+        out Matrix4x4 deltaWorld)
+    {
+        deltaWorld = Matrix4x4.Identity;
 
         var hasPos = partPose.X != 0f || partPose.Y != 0f || partPose.Z != 0f;
         var hasRot = TryBuildSetupAnimRotationMatrix(partId, partPose, out var localRot);
@@ -118,8 +214,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
         deltaWorld = EntityParityTemplate.Mul(EntityParityTemplate.Mul(partWorld, partLocal), partInv);
         return true;
     }
-
-
 
     private static bool TryBuildSetupAnimRotationMatrix(
 

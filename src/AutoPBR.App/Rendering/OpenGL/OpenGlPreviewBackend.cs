@@ -78,17 +78,36 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private double _lastEmulatedEntityRebakeRenderTime = double.NegativeInfinity;
     private string? _emulatedRebakeSubjectKey;
     private string? _emulatedGpuSkinPrepFailedKey;
+    /// <summary>Last emulated subject that received a successful animation-off IR bind-pose CPU rebake.</summary>
+    private string? _entityBindPoseCommittedKey;
 
     private readonly Matrix4x4[] _entityBoneScratch = new Matrix4x4[EntityGpuSkinningLimits.MaxBones];
     /// <summary>std140: 64 mat4 (row-major source floats interpreted as column-major in GLSL) + 16 B tail scalars.</summary>
-    private const int EntitySkinningUboMatrixBytes = 64 * 64;
+    private const int EntitySkinningUboMatrixBytes = EntityGpuSkinningLimits.MaxBones * 64;
 
-    private const int EntitySkinningUboTotalBytes = EntitySkinningUboMatrixBytes + 16;
+    private const int EntitySkinningUboTotalBytes = EntitySkinningUboMatrixBytes;
 
     private readonly byte[] _entitySkinningUboScratch = new byte[EntitySkinningUboTotalBytes];
     private uint _entityBoneUbo;
 
     private const uint EntitySkinningUboBindingPoint = 2;
+
+    private readonly record struct EntitySkinningUniformLocs(
+        int PreviewSpaceVerts,
+        int BindMesh,
+        int GpuSkinning,
+        int BoneCount,
+        int MeshLiftY)
+    {
+        public bool IsComplete =>
+            PreviewSpaceVerts >= 0 && BindMesh >= 0 && GpuSkinning >= 0 && BoneCount >= 0 && MeshLiftY >= 0;
+    }
+
+    private EntitySkinningUniformLocs _mainEntityUniformLocs;
+    private EntitySkinningUniformLocs _shadowEntityUniformLocs;
+    private bool _loggedEntityShaderInit;
+    private bool _entityBoneUboBlockBoundMain;
+    private bool _entityBoneUboBlockBoundShadow;
 
     private bool _disposed;
     private string? _lastError;
@@ -96,9 +115,11 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private Action<string>? _diagnosticLog;
     private bool _loggedMeshReady;
     private bool _loggedZeroIndex;
+    private int _lastMeshUploadStride = PreviewMesh.FloatsPerVertex;
+    private string? _entityBindPosePrepDiagKey;
 
     /// <summary>Orbit camera is re-synced from the scene only when this changes (block vs item), so texture swaps keep user framing.</summary>
-    private PreviewSceneKind? _orbitSyncedKind;
+    private string? _orbitSyncedKey;
 
     private Vector3 _orbitBaseTarget;
     private float _orbitYaw;
@@ -168,19 +189,32 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     {
         lock (_sync)
         {
-            var orbitBucket = scene.SceneKind == PreviewSceneKind.ItemPlane
-                ? PreviewSceneKind.ItemPlane
-                : PreviewSceneKind.BlockCube;
-            var reseedOrbit = _orbitSyncedKind is null || _orbitSyncedKind != orbitBucket;
+            var orbitKey = ResolveOrbitSyncKey(scene, _blockModelSubject);
+            var reseedOrbit = _orbitSyncedKey is null || !string.Equals(_orbitSyncedKey, orbitKey, StringComparison.Ordinal);
             if (reseedOrbit)
             {
                 SyncOrbitFromSceneLocked(scene);
-                _orbitSyncedKind = orbitBucket;
+                _orbitSyncedKey = orbitKey;
             }
 
             _scene = scene;
             _meshDirty = true;
         }
+    }
+
+    private static string ResolveOrbitSyncKey(IRenderPreviewScene scene, PreviewModelSubject? blockModel)
+    {
+        if (scene.SceneKind == PreviewSceneKind.ItemPlane)
+        {
+            return "item_plane";
+        }
+
+        if (blockModel?.EmulatedRebake?.AssetArchivePath is { Length: > 0 } entityPath)
+        {
+            return "entity:" + entityPath.Replace('\\', '/').TrimStart('/');
+        }
+
+        return scene.SceneKind == PreviewSceneKind.BlockModel ? "block_model" : "block_cube";
     }
 
     public void SetMaterial(PreviewMaterial? material)
@@ -194,11 +228,90 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         }
     }
 
+    private static bool IsGpuSkinnedEntitySubject(PreviewModelSubject? subject) =>
+        subject is
+        {
+            GpuEntityBoneSkinning: true,
+            VertexStrideFloats: EntityEmulatedPreviewMeshLayout.SkinnedFloatsPerVertex,
+            EmulatedRebake: not null
+        };
+
+    private static bool SameEntityPreviewAsset(PreviewModelSubject? a, PreviewModelSubject? b)
+    {
+        var pa = a?.EmulatedRebake?.AssetArchivePath;
+        var pb = b?.EmulatedRebake?.AssetArchivePath;
+        return pa is not null && pb is not null &&
+               string.Equals(
+                   pa.Replace('\\', '/').TrimStart('/'),
+                   pb.Replace('\\', '/').TrimStart('/'),
+                   StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool BlockModelGeometryChanged(PreviewModelSubject? prev, PreviewModelSubject? next)
+    {
+        if (ReferenceEquals(prev, next))
+        {
+            return false;
+        }
+
+        if (prev is null || next is null)
+        {
+            return true;
+        }
+
+        return !ReferenceEquals(prev.InterleavedVertices, next.InterleavedVertices) ||
+               !ReferenceEquals(prev.Indices, next.Indices) ||
+               prev.VertexStrideFloats != next.VertexStrideFloats ||
+               prev.GpuEntityBoneSkinning != next.GpuEntityBoneSkinning ||
+               !SameEntityPreviewAsset(prev, next);
+    }
+
+    private void RecordMeshUpload(int strideFloats)
+    {
+        _lastMeshUploadStride = strideFloats;
+    }
+
+    private void UploadPreviewMesh(float[] interleavedVertices, uint[] indices, int strideFloats = PreviewMesh.FloatsPerVertex)
+    {
+        _mesh!.Upload(interleavedVertices, indices, strideFloats);
+        RecordMeshUpload(strideFloats);
+    }
+
     /// <summary>Multi-material Java block model preview. Cleared by <see cref="SetMaterial"/>.</summary>
     public void SetBlockModelPreview(PreviewModelSubject? subject, PreviewMaterial[]? slotMaterials)
     {
         lock (_sync)
         {
+            var prev = _blockModelSubject;
+            var prevPath = prev?.EmulatedRebake?.AssetArchivePath;
+            var nextPath = subject?.EmulatedRebake?.AssetArchivePath;
+            if (!string.Equals(prevPath, nextPath, StringComparison.OrdinalIgnoreCase) &&
+                subject?.EmulatedRebake is { } rebake)
+            {
+                rebake.GpuPreparedBoneCount = null;
+                rebake.GpuBindPoseInverseLocalToParent = null;
+                rebake.GpuBindPoseBonePalette = null;
+                rebake.GpuBindPoseInterleavedVertices = null;
+                rebake.GpuBoneDispatchRoute = null;
+                _emulatedGpuSkinPrepFailedKey = null;
+                _emulatedRebakeSubjectKey = null;
+                _entityBindPoseCommittedKey = null;
+                _entityBindPosePrepDiagKey = null;
+                _parityPlacementDiagKey = null;
+                _entityCpuRebakeDiagKey = null;
+                ResetEntityGpuRuntimeDiagState();
+            }
+
+            // UI re-pushes pack-converter CPU mesh every settings tick; keep the GPU bind VBO subject instead.
+            if (subject is not null &&
+                prev is not null &&
+                IsGpuSkinnedEntitySubject(prev) &&
+                SameEntityPreviewAsset(prev, subject) &&
+                !IsGpuSkinnedEntitySubject(subject))
+            {
+                subject = prev;
+            }
+
             _blockModelSubject = subject;
             _blockModelSlots = slotMaterials;
             _prevPauseEntityIdleAnimation = false;
@@ -209,7 +322,20 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
             }
 
             _materialDirty = true;
-            _meshDirty = true;
+            if (BlockModelGeometryChanged(prev, subject))
+            {
+                _meshDirty = true;
+            }
+
+            if (_scene is not null)
+            {
+                var orbitKey = ResolveOrbitSyncKey(_scene, subject);
+                if (_orbitSyncedKey is null || !string.Equals(_orbitSyncedKey, orbitKey, StringComparison.Ordinal))
+                {
+                    SyncOrbitFromSceneLocked(_scene);
+                    _orbitSyncedKey = orbitKey;
+                }
+            }
         }
     }
 
@@ -234,6 +360,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
             _settings = CloneSettings(settings);
             if (_settings.DrawPreviewSubject != prev.DrawPreviewSubject ||
                 _settings.EnableEntityAnimation != prev.EnableEntityAnimation ||
+                _settings.ForceEntityCpuSkinning != prev.ForceEntityCpuSkinning ||
                 _settings.PauseEntityIdleAnimation != prev.PauseEntityIdleAnimation ||
                 Math.Abs(_settings.EntityAnimationSpeed - prev.EntityAnimationSpeed) > 1e-6f ||
                 Math.Abs(_settings.EntityAnimationAmplitude - prev.EntityAnimationAmplitude) > 1e-6f)
@@ -245,6 +372,16 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
                 _settings.PauseEntityIdleAnimation != prev.PauseEntityIdleAnimation)
             {
                 _lastEmulatedEntityRebakeRenderTime = double.NegativeInfinity;
+            }
+
+            if (!_settings.EnableEntityAnimation && prev.EnableEntityAnimation)
+            {
+                _entityBindPoseCommittedKey = null;
+            }
+
+            if (!_settings.ForceEntityCpuSkinning && prev.ForceEntityCpuSkinning)
+            {
+                _entityBindPoseCommittedKey = null;
             }
         }
     }
@@ -513,6 +650,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         EnableEntityAnimation = s.EnableEntityAnimation,
         PauseEntityIdleAnimation = s.PauseEntityIdleAnimation,
         EnableLegacyEntityWobble = s.EnableLegacyEntityWobble,
+        ForceEntityCpuSkinning = s.ForceEntityCpuSkinning,
         EnableShadows = s.EnableShadows,
         ShadowMapResolution = s.ShadowMapResolution,
         ShadowMinBias = s.ShadowMinBias,

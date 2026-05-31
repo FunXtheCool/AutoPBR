@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using AutoPBR.Core.Models;
 
 namespace AutoPBR.Core.Preview;
@@ -7,6 +8,27 @@ namespace AutoPBR.Core.Preview;
 internal sealed partial class CleanRoomEntityModelRuntime
 {
     /// <summary>Parity-catalog: apply idle preview animation drivers to IR-emitted chicken elements.</summary>
+
+    internal static void ApplyChickenGeometryIrPreviewAnimPassForTests(
+        MergedJavaBlockModel merged,
+        JsonElement geometryRoot,
+        bool isBaby,
+        float headPitchRad,
+        float headYawRad,
+        float wingZRadians,
+        float rightLegPitchRad,
+        float leftLegPitchRad,
+        GeometryIrMeshEmitOptions emitOptions) =>
+        ApplyChickenGeometryIrPreviewAnimPass(
+            merged,
+            geometryRoot,
+            isBaby,
+            headPitchRad,
+            headYawRad,
+            wingZRadians,
+            rightLegPitchRad,
+            leftLegPitchRad,
+            emitOptions);
 
     private static void ApplyChickenGeometryIrPreviewAnimPass(
 
@@ -34,11 +56,33 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             Parts =
             {
-                ["head"] = new VanillaSetupAnimRuntime.PartPose { XRot = headPitchRad, YRot = headYawRad },
-                ["rightWing"] = new VanillaSetupAnimRuntime.PartPose { ZRot = wingZRadians },
-                ["leftWing"] = new VanillaSetupAnimRuntime.PartPose { ZRot = -wingZRadians },
-                ["rightLeg"] = new VanillaSetupAnimRuntime.PartPose { XRot = rightLegPitchRad },
-                ["leftLeg"] = new VanillaSetupAnimRuntime.PartPose { XRot = leftLegPitchRad },
+                ["head"] = new VanillaSetupAnimRuntime.PartPose
+                {
+                    XRot = headPitchRad,
+                    YRot = headYawRad,
+                    Assigned = VanillaSetupAnimRuntime.PartPoseChannel.XRot |
+                               VanillaSetupAnimRuntime.PartPoseChannel.YRot,
+                },
+                ["rightWing"] = new VanillaSetupAnimRuntime.PartPose
+                {
+                    ZRot = wingZRadians,
+                    Assigned = VanillaSetupAnimRuntime.PartPoseChannel.ZRot,
+                },
+                ["leftWing"] = new VanillaSetupAnimRuntime.PartPose
+                {
+                    ZRot = -wingZRadians,
+                    Assigned = VanillaSetupAnimRuntime.PartPoseChannel.ZRot,
+                },
+                ["rightLeg"] = new VanillaSetupAnimRuntime.PartPose
+                {
+                    XRot = rightLegPitchRad,
+                    Assigned = VanillaSetupAnimRuntime.PartPoseChannel.XRot,
+                },
+                ["leftLeg"] = new VanillaSetupAnimRuntime.PartPose
+                {
+                    XRot = leftLegPitchRad,
+                    Assigned = VanillaSetupAnimRuntime.PartPoseChannel.XRot,
+                },
             },
         };
 
@@ -90,6 +134,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return false;
         }
 
+        StripUnsafeFlatQuadrupedPeerPositionChannels(modelJvm, pose);
+
         return ApplySetupAnimToGeometryIrMesh(
             merged,
             geometryRoot,
@@ -132,6 +178,116 @@ internal sealed partial class CleanRoomEntityModelRuntime
         string.Equals(partId, "beak", StringComparison.Ordinal) ||
 
         string.Equals(partId, "red_thing", StringComparison.Ordinal);
+
+    /// <summary>
+    /// Flat quadruped setupAnim peer position writes are parent-local aliases and can scatter when applied as world deltas.
+    /// Keep direct/self positional channels; strip only x/y/z assignments sourced from partPeer expressions.
+    /// </summary>
+    private static void StripUnsafeFlatQuadrupedPeerPositionChannels(string modelJvm, VanillaSetupAnimRuntime.PoseResult pose)
+    {
+        if (!UsesFlatPartPoseOffsetQuadrupedJvm(modelJvm))
+        {
+            return;
+        }
+
+        if (!TryCollectPeerPositionChannels(modelJvm, out var stripMap))
+        {
+            return;
+        }
+
+        foreach (var (partField, mask) in stripMap)
+        {
+            if (pose.Parts.TryGetValue(partField, out var partPose))
+            {
+                partPose.Assigned &= ~mask;
+            }
+        }
+    }
+
+    private static bool TryCollectPeerPositionChannels(
+        string modelJvm,
+        out Dictionary<string, VanillaSetupAnimRuntime.PartPoseChannel> stripMap)
+    {
+        stripMap = new Dictionary<string, VanillaSetupAnimRuntime.PartPoseChannel>(StringComparer.Ordinal);
+        var visited = new HashSet<string>(StringComparer.Ordinal);
+        return CollectPeerPositionChannelsRecursive(modelJvm, visited, stripMap);
+    }
+
+    private static bool CollectPeerPositionChannelsRecursive(
+        string modelJvm,
+        HashSet<string> visited,
+        Dictionary<string, VanillaSetupAnimRuntime.PartPoseChannel> stripMap)
+    {
+        if (!visited.Add(modelJvm) || !SetupAnimDocumentLoader.TryLoad(modelJvm, out var doc))
+        {
+            return false;
+        }
+
+        var any = false;
+        if (doc["assignments"] is JsonArray assignments)
+        {
+            foreach (var n in assignments)
+            {
+                if (n is not JsonObject a)
+                {
+                    continue;
+                }
+
+                var partField = (string?)a["partField"] ?? "";
+                var property = (string?)a["property"] ?? "";
+                if (string.IsNullOrWhiteSpace(partField) || !TryMapPositionPropertyToChannel(property, out var channel))
+                {
+                    continue;
+                }
+
+                if (a["expr"] is JsonObject expr && expr["partPeer"] is not null)
+                {
+                    stripMap[partField] = stripMap.TryGetValue(partField, out var prev) ? (prev | channel) : channel;
+                    any = true;
+                }
+            }
+        }
+
+        if (doc["inheritsSetupAnimFrom"] is JsonValue inh)
+        {
+            var parent = inh.GetValue<string>();
+            if (!string.IsNullOrWhiteSpace(parent))
+            {
+                any |= CollectPeerPositionChannelsRecursive(parent, visited, stripMap);
+            }
+        }
+
+        return any;
+    }
+
+    private static bool TryMapPositionPropertyToChannel(
+        string property,
+        out VanillaSetupAnimRuntime.PartPoseChannel channel)
+    {
+        channel = property switch
+        {
+            "x" => VanillaSetupAnimRuntime.PartPoseChannel.X,
+            "y" => VanillaSetupAnimRuntime.PartPoseChannel.Y,
+            "z" => VanillaSetupAnimRuntime.PartPoseChannel.Z,
+            _ => VanillaSetupAnimRuntime.PartPoseChannel.None,
+        };
+        return channel != VanillaSetupAnimRuntime.PartPoseChannel.None;
+    }
+
+    internal static bool TryHasFlatQuadrupedPeerPositionAssignmentsForTests(string modelJvm) =>
+        UsesFlatPartPoseOffsetQuadrupedJvm(modelJvm) &&
+        TryCollectPeerPositionChannels(modelJvm, out var stripMap) &&
+        stripMap.Count > 0;
+    
+    internal static bool TryHasFlatQuadrupedPeerPositionAssignmentsForTests(
+        string modelJvm,
+        out Dictionary<string, VanillaSetupAnimRuntime.PartPoseChannel> stripMap)
+    {
+        stripMap = new Dictionary<string, VanillaSetupAnimRuntime.PartPoseChannel>(StringComparer.Ordinal);
+        return UsesFlatPartPoseOffsetQuadrupedJvm(modelJvm) &&
+               TryCollectPeerPositionChannels(modelJvm, out stripMap) &&
+               stripMap.Count > 0;
+    }
 
     private static IReadOnlyDictionary<string, VanillaSetupAnimRuntime.PartPose> BuildSetupAnimBaselineParts(JsonElement geometryRoot)
     {

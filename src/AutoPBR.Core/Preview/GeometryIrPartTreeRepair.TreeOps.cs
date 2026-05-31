@@ -74,8 +74,6 @@ internal static partial class GeometryIrPartTreeRepair
 
     {
 
-        TrimInnerBodyFleeceCuboidFromBody(bodyPart);
-
         if (bodyPart["children"] is not JsonArray bodyKids)
 
         {
@@ -86,6 +84,7 @@ internal static partial class GeometryIrPartTreeRepair
 
 
 
+        var removedInnerBodyChild = false;
         for (var i = bodyKids.Count - 1; i >= 0; i--)
 
         {
@@ -97,11 +96,19 @@ internal static partial class GeometryIrPartTreeRepair
             {
 
                 bodyKids.RemoveAt(i);
+                removedInnerBodyChild = true;
 
                 break;
 
             }
 
+        }
+
+        // Only trim fleece duplicate when an inner_body child was present.
+        // This avoids stripping legitimate body-shell cuboids on flat quadrupeds.
+        if (removedInnerBodyChild)
+        {
+            TrimInnerBodyFleeceCuboidFromBody(bodyPart);
         }
 
     }
@@ -153,81 +160,72 @@ internal static partial class GeometryIrPartTreeRepair
 
 
     private static void ReparentFlatPart(JsonArray rootChildren, string childId, string parentId)
-
     {
-
-        JsonObject? childNode = null;
-
-        var childIdx = -1;
-
-        for (var i = 0; i < rootChildren.Count; i++)
-
+        if (!TryFindDirectChildSlotRecursive(rootChildren, childId, out var childArray, out var childIdx, out var childNode) ||
+            childNode is null ||
+            childArray is null ||
+            childIdx < 0)
         {
-
-            if (rootChildren[i] is JsonObject o && string.Equals((string?)o["id"], childId, StringComparison.Ordinal))
-
-            {
-
-                childNode = o;
-
-                childIdx = i;
-
-                break;
-
-            }
-
-        }
-
-
-
-        if (childNode is null || childIdx < 0)
-
-        {
-
             return;
-
         }
-
-
 
         if (!TryFindPartById(rootChildren, parentId, out var parentNode) || parentNode is null)
-
         {
-
             return;
-
         }
-
-
 
         if (parentNode["children"] is not JsonArray parentKids)
-
         {
-
             parentKids = [];
-
             parentNode["children"] = parentKids;
-
         }
-
-
 
         if (parentKids.Any(n => n is JsonObject o && string.Equals((string?)o["id"], childId, StringComparison.Ordinal)))
-
         {
-
-            rootChildren.RemoveAt(childIdx);
+            if (!ReferenceEquals(childArray, parentKids))
+            {
+                childArray.RemoveAt(childIdx);
+            }
 
             return;
-
         }
 
-
-
         parentKids.Add(childNode.DeepClone());
+        childArray.RemoveAt(childIdx);
+    }
 
-        rootChildren.RemoveAt(childIdx);
+    private static bool TryFindDirectChildSlotRecursive(
+        JsonArray siblings,
+        string id,
+        out JsonArray? parentArray,
+        out int index,
+        out JsonObject? node)
+    {
+        for (var i = 0; i < siblings.Count; i++)
+        {
+            if (siblings[i] is JsonObject o && string.Equals((string?)o["id"], id, StringComparison.Ordinal))
+            {
+                parentArray = siblings;
+                index = i;
+                node = o;
+                return true;
+            }
+        }
 
+        foreach (var n in siblings)
+        {
+            if (n is JsonObject o &&
+                o["children"] is JsonArray kids &&
+                TryFindDirectChildSlotRecursive(kids, id, out parentArray, out index, out node))
+            {
+                return true;
+            }
+        }
+
+        parentArray = null;
+        index = -1;
+        node = null;
+        return false;
     }
 
 
@@ -440,6 +438,81 @@ internal static partial class GeometryIrPartTreeRepair
 
         }
 
+    }
+
+    /// <summary>
+    /// <c>DonkeyModel.createBodyLayer</c> lifts with <c>root</c> at <c>T(0,24,0)</c> (layer-definition anchor only).
+    /// Child <c>PartPose</c> values already match <c>AbstractEquineModel.createBodyMesh</c> entity space — drop the root offset.
+    /// </summary>
+    private static bool ShouldZeroEquineCreateBodyLayerRootOffset(
+        string? officialJvmName,
+        JsonObject shardDoc,
+        JsonObject rootPart)
+    {
+        if (string.IsNullOrWhiteSpace(officialJvmName) ||
+            !officialJvmName.Contains(".animal.equine.", StringComparison.Ordinal) ||
+            officialJvmName.Contains("AbstractEquine", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        var factory = shardDoc["factoryMethod"]?.GetValue<string>();
+        if (!string.Equals(factory, "createBodyLayer", StringComparison.Ordinal) &&
+            !string.Equals(factory, "createBabyLayer", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        if (rootPart["pose"] is not JsonObject pose ||
+            pose["translation"] is not JsonArray tr ||
+            tr.Count < 2)
+        {
+            return false;
+        }
+
+        var dy = tr[1]?.GetValue<double>() ?? 0;
+        return Math.Abs(dy) > 0.5;
+    }
+
+    private static void ZeroRootTranslation(JsonObject rootPart)
+    {
+        if (rootPart["pose"] is not JsonObject pose ||
+            pose["translation"] is not JsonArray tr ||
+            tr.Count < 3)
+        {
+            return;
+        }
+
+        tr[0] = 0;
+        tr[1] = 0;
+        tr[2] = 0;
+    }
+
+    /// <summary>
+    /// When the head stack lives under <c>body</c> but legs are still root siblings, the lifter emitted
+    /// body-relative leg offsets at root (see <c>BabyDonkeyModel</c>). Reparent legs under body; do not treat as flat quadruped bake.
+    /// Documented: runtime-ir-preview-plan § Baby JVM family; vanilla-preview-parity § Baby equine pass 3.
+    /// </summary>
+    private static bool HeadStackNestedUnderBody(JsonArray rootChildren)
+    {
+        if (!TryFindPartById(rootChildren, "body", out var bodyNode) || bodyNode is null ||
+            bodyNode["children"] is not JsonArray bodyKids)
+        {
+            return false;
+        }
+
+        foreach (var headId in new[] { "head_parts", "head", "neck", "neck_r1" })
+        {
+            foreach (var n in bodyKids)
+            {
+                if (n is JsonObject o && string.Equals((string?)o["id"], headId, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
 }

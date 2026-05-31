@@ -12,8 +12,9 @@ internal static class EntityGpuBoneFillPolicy
     /// instead of <see cref="CleanRoomEntityModelRuntime.TryFillBoneMatricesFast"/> pose capture.
     /// </summary>
     /// <remarks>
-    /// Equine rigs apply LER mirror as <c>LocalToParent * S</c> via a dedicated path. Quadruped cow/wolf/pig-style rigs use the same compose order when
-    /// <see cref="CleanRoomEntityModelRuntime.UsesQuadrupedLerMirrorRightComposeLocalChain"/> matches. Chicken forces full mesh extract as an A/B path.
+    /// Equine rigs apply LER mirror as <c>LocalToParent * S</c> via a dedicated path. Chicken forces full mesh extract as an A/B path.
+    /// When <c>GpuBindPoseInverseLocalToParent</c> is present, the default path is fast pose capture composed as
+    /// <c>invBind · M_anim</c> (see <see cref="EntityEmulatedPreviewRebaker.TryFillEmulatedEntityBoneMatrices"/>).
     /// </remarks>
     public static bool RequiresFullMeshBoneExtract(string normalizedAssetPath)
     {
@@ -55,8 +56,9 @@ internal static class EntityGpuBoneFillPolicy
         StemsSkippingLivingPreviewBasis.Contains(stemLower);
 
     /// <summary>
-    /// When true, fast pose-captured bones still need the vanilla LER <c>scale(-1,-1,1)</c> folded as <c>worldRoot * bone</c> (default), or
-    /// <c>bone * worldRoot</c> for quadrupeds when <see cref="CleanRoomEntityModelRuntime.UsesQuadrupedLerMirrorRightComposeLocalChain"/> matches.
+    /// When true, fast pose-captured bones still need the vanilla LER <c>scale(-1,-1,1)</c> folded per
+    /// <see cref="CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis"/> (same policy as catalog emit).
+    /// Parity-catalog geometry IR meshes already include LER — see <see cref="EntityGpuBoneDispatchKind.ParityCatalog"/>.
     /// </summary>
     public static bool ShouldApplyStandardLivingPreviewBasis(string normalizedAssetPath, string stemLower)
     {

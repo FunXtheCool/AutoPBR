@@ -1,6 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
+using AutoPBR.Core.Models;
+
 namespace AutoPBR.Core.Preview;
 
 /// <summary>Repairs known flat IR trees before parity emit (lift ordering gaps).</summary>
@@ -18,6 +20,16 @@ internal static partial class GeometryIrPartTreeRepair
 
         ("nose", "head"),
 
+        ("left_ear", "head"),
+
+        ("right_ear", "head"),
+
+        ("head_r1", "head"),
+
+        ("neck_r1", "head_parts"),
+
+        ("head", "head_parts"),
+
         ("mole", "head"),
 
         ("top_gills", "head"),
@@ -33,6 +45,8 @@ internal static partial class GeometryIrPartTreeRepair
         ("rods", "body"),
 
         ("tail2", "tail1"),
+
+        ("tail_r1", "tail"),
 
         ("wind_bottom", "wind_body"),
 
@@ -90,6 +104,11 @@ internal static partial class GeometryIrPartTreeRepair
 
     {
 
+        if (EntityPreviewDebugSettings.SkipAllPartTreeRepair)
+        {
+            return geometryRoot;
+        }
+
         var node = JsonNode.Parse(geometryRoot.GetRawText());
 
         if (node is not JsonObject doc || doc["roots"] is not JsonArray roots)
@@ -117,59 +136,73 @@ internal static partial class GeometryIrPartTreeRepair
 
 
             var skipQuadrupedLegReparent = UsesVanillaFlatQuadrupedLegBake(rootKids, doc);
-
-
-
-            foreach (var (childId, parentId) in GlobalReparentRules)
-
+            if (EntityPreviewDebugSettings.RepairForceLegReparentOnFlatBake)
             {
+                skipQuadrupedLegReparent = false;
+            }
 
-                ReparentFlatPart(rootKids, childId, parentId);
-
+            if (!EntityPreviewDebugSettings.RepairHeadStackLegReparent &&
+                HeadStackNestedUnderBody(rootKids))
+            {
+                skipQuadrupedLegReparent = true;
             }
 
 
 
-            if (!skipQuadrupedLegReparent)
-
+            if (EntityPreviewDebugSettings.RepairGlobalReparentRules)
             {
-
-                foreach (var (childId, parentId) in QuadrupedLegReparentRules)
-
+                foreach (var (childId, parentId) in GlobalReparentRules)
                 {
-
                     ReparentFlatPart(rootKids, childId, parentId);
-
                 }
-
             }
 
 
 
-            RemoveRootSiblingWhenNested(rootKids);
+            if (!skipQuadrupedLegReparent && EntityPreviewDebugSettings.RepairQuadrupedLegReparent)
+            {
+                foreach (var (childId, parentId) in QuadrupedLegReparentRules)
+                {
+                    ReparentFlatPart(rootKids, childId, parentId);
+                }
+            }
 
-            CollapseInnerBodyUnderBody(rootKids);
 
-            DeduplicateNestedPartIds(ro);
+
+            if (EntityPreviewDebugSettings.RepairRemoveDuplicateRootSiblings)
+            {
+                RemoveRootSiblingWhenNested(rootKids);
+            }
+
+            if (EntityPreviewDebugSettings.RepairCollapseInnerBody)
+            {
+                CollapseInnerBodyUnderBody(rootKids);
+            }
+
+            if (EntityPreviewDebugSettings.RepairDeduplicateNestedPartIds)
+            {
+                DeduplicateNestedPartIds(ro);
+            }
+
+            if (EntityPreviewDebugSettings.RepairZeroEquineRootOffset &&
+                ShouldZeroEquineCreateBodyLayerRootOffset(officialJvmName, doc, ro))
+            {
+                ZeroRootTranslation(ro);
+            }
 
         }
 
 
 
-        _ = officialJvmName;
-
         return JsonDocument.Parse(doc.ToJsonString()).RootElement;
 
     }
 
-
-
     /// <summary>
-
     /// True when Java factory keeps <c>body</c> and leg parts as flat <c>root</c> siblings (no addChild hierarchy).
-
     /// Matches <see cref="GeometryIrLiftQualityReport"/> flat-nested / legs-at-root detection for pilot quadrupeds.
-
+    /// When true, skip <see cref="QuadrupedLegReparentRules"/> — runtime-ir-preview-plan § Quadruped body placement regression
+    /// and § Baby JVM family (fox, cow, chicken, <c>BabyHorseModel</c>, …). Exception: <see cref="HeadStackNestedUnderBody"/>.
     /// </summary>
 
     internal static bool UsesVanillaFlatQuadrupedLegBake(JsonArray rootChildren, JsonObject? shardDoc = null)
@@ -209,6 +242,17 @@ internal static partial class GeometryIrPartTreeRepair
 
 
         if (!QuadrupedLegPartIds.Any(rootIds.Contains))
+
+        {
+
+            return false;
+
+        }
+
+
+
+        // Nested head stack (baby donkey class): flat leg siblings are body-relative offsets mis-lifted to root.
+        if (HeadStackNestedUnderBody(rootChildren))
 
         {
 

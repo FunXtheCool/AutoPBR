@@ -46,23 +46,102 @@ internal sealed partial class CleanRoomEntityModelRuntime
     }
 
     internal static bool TryComposePartPosePublic(JsonElement pose, out Matrix4x4 matrix) =>
-        TryComposePartPose(pose, out matrix, out _);
+        TryComposePartPose(pose, Matrix4x4.Identity, out matrix, out _);
 
-    internal static bool TryToEntityCuboidForTests(
-        JsonElement cuboid,
-        in GeometryIrMeshEmitOptions options,
-        out EntityCuboid entityCuboid,
-        out string? failureReason) =>
-        TryToEntityCuboid(cuboid, "", options, out entityCuboid, out failureReason);
+    internal static bool TryComposePartPosePublic(JsonElement pose, Matrix4x4 parentWorld, out Matrix4x4 matrix) =>
+        TryComposePartPose(pose, parentWorld, out matrix, out _);
 
-    private static bool TryComposePartPose(JsonElement pose, out Matrix4x4 matrix, out string? failureReason)
+    /// <summary>Vanilla bind pose <c>ModelPart.translateAndRotate</c> local delta in block space (PoseStack /16).</summary>
+    internal static bool TryComposePartRenderLocalBlock(
+        JsonElement pose,
+        out Matrix4x4 localBlock,
+        out string? failureReason)
+    {
+        localBlock = Matrix4x4.Identity;
+        failureReason = null;
+
+        if (!TryReadPose(pose, out var tx, out var ty, out var tz, out var rx, out var ry, out var rz, out var order, out failureReason))
+        {
+            return false;
+        }
+
+        var translation = EntityParityTemplate.T(tx / 16f, ty / 16f, tz / 16f);
+        var rotation = EntityParityTemplate.ComposeEuler(order, rx, ry, rz);
+        // ModelPart.translateAndRotate: bind translation row + Euler upper 3×3 (not Er×T matrix product).
+        localBlock = new Matrix4x4(
+            rotation.M11, rotation.M12, rotation.M13, rotation.M14,
+            rotation.M21, rotation.M22, rotation.M23, rotation.M24,
+            rotation.M31, rotation.M32, rotation.M33, rotation.M34,
+            translation.M41, translation.M42, translation.M43, translation.M44);
+        return true;
+    }
+
+    private static bool TryComposePartPose(
+        JsonElement pose,
+        Matrix4x4 parentWorld,
+        out Matrix4x4 matrix,
+        out string? failureReason)
+    {
+        if (EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose)
+        {
+            return TryComposeLegacyPartPoseTexel(pose, out matrix, out failureReason);
+        }
+
+        if (!TryComposePartRenderLocalBlock(pose, out var localBlock, out failureReason))
+        {
+            matrix = Matrix4x4.Identity;
+            return false;
+        }
+
+        var parentBlock = TexelRowAffineToBlock(parentWorld);
+        matrix = BlockRowAffineToTexel(Matrix4x4.Multiply(localBlock, parentBlock));
+        return true;
+    }
+
+    private static bool TryComposeLegacyPartPoseTexel(JsonElement pose, out Matrix4x4 matrix, out string? failureReason)
     {
         matrix = Matrix4x4.Identity;
         failureReason = null;
 
-        var tx = 0f;
-        var ty = 0f;
-        var tz = 0f;
+        if (!TryReadPose(pose, out var tx, out var ty, out var tz, out var rx, out var ry, out var rz, out var order, out failureReason))
+        {
+            return false;
+        }
+
+        var translation = EntityParityTemplate.T(tx, ty, tz);
+        var rotation = EntityParityTemplate.ComposeEuler(order, rx, ry, rz);
+        matrix = EntityParityTemplate.Mul(translation, rotation);
+        return true;
+    }
+    internal static Matrix4x4 BlockRowAffineToTexel(Matrix4x4 blockRow) =>
+        new(
+            blockRow.M11, blockRow.M12, blockRow.M13, blockRow.M14,
+            blockRow.M21, blockRow.M22, blockRow.M23, blockRow.M24,
+            blockRow.M31, blockRow.M32, blockRow.M33, blockRow.M34,
+            blockRow.M41 * 16f, blockRow.M42 * 16f, blockRow.M43 * 16f, blockRow.M44);
+
+    internal static Matrix4x4 TexelRowAffineToBlock(Matrix4x4 texelRow) =>
+        new(
+            texelRow.M11, texelRow.M12, texelRow.M13, texelRow.M14,
+            texelRow.M21, texelRow.M22, texelRow.M23, texelRow.M24,
+            texelRow.M31, texelRow.M32, texelRow.M33, texelRow.M34,
+            texelRow.M41 / 16f, texelRow.M42 / 16f, texelRow.M43 / 16f, texelRow.M44);
+
+    private static bool TryReadPose(
+        JsonElement pose,
+        out float tx,
+        out float ty,
+        out float tz,
+        out float rx,
+        out float ry,
+        out float rz,
+        out string? order,
+        out string? failureReason)
+    {
+        tx = ty = tz = rx = ry = rz = 0f;
+        order = "XYZ";
+        failureReason = null;
+
         if (pose.TryGetProperty("translation", out var t) && t.GetArrayLength() >= 3)
         {
             tx = (float)t[0].GetDouble();
@@ -70,9 +149,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
             tz = (float)t[2].GetDouble();
         }
 
-        var rx = 0f;
-        var ry = 0f;
-        var rz = 0f;
         if (pose.TryGetProperty("rotationEulerRad", out var r) && r.GetArrayLength() >= 3)
         {
             rx = (float)r[0].GetDouble();
@@ -80,7 +156,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             rz = (float)r[2].GetDouble();
         }
 
-        var order = pose.TryGetProperty("eulerOrder", out var orderEl) ? orderEl.GetString() : "XYZ";
+        order = pose.TryGetProperty("eulerOrder", out var orderEl) ? orderEl.GetString() : "XYZ";
         var supportedOrders = new HashSet<string>(StringComparer.Ordinal)
         {
             "XYZ", "XZY", "YXZ", "YZX", "ZXY", "ZYX"
@@ -91,11 +167,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return false;
         }
 
-        matrix = EntityParityTemplate.Mul(
-            EntityParityTemplate.T(tx, ty, tz),
-            EntityParityTemplate.ComposeEuler(order, rx, ry, rz));
         return true;
     }
+
+    internal static bool TryToEntityCuboidForTests(
+        JsonElement cuboid,
+        in GeometryIrMeshEmitOptions options,
+        out EntityCuboid entityCuboid,
+        out string? failureReason) =>
+        TryToEntityCuboid(cuboid, "", options, out entityCuboid, out failureReason);
 
     private static bool TryToEntityCuboid(
         JsonElement cuboid,
@@ -429,17 +509,24 @@ internal sealed partial class CleanRoomEntityModelRuntime
         out string? failureReason,
         JsonElement? geometryRootOverride = null)
     {
+        var lerPlan = ResolveGeometryIrParityEmitPlan(
+            officialJvmName,
+            stemLower: null,
+            normalizedAssetPath: null,
+            deferLivingEntityRendererUntilAfterMotionPasses: false);
         var b = new RigBuilder(atlasWidth, atlasHeight);
-        var options = new GeometryIrMeshEmitOptions
-        {
-            RootTransform = Matrix4x4.Identity,
-            DefaultPartScale = 1f,
-            AtlasWidth = atlasWidth,
-            AtlasHeight = atlasHeight,
-            Fidelity = GeometryIrEmitFidelity.Parity,
-            PreviewDegenerateAxisThickness = 0f,
-            OfficialJvmName = officialJvmName,
-        };
+        var options = ApplyLivingEntityRendererEmitPlan(
+            new GeometryIrMeshEmitOptions
+            {
+                RootTransform = Matrix4x4.Identity,
+                DefaultPartScale = 1f,
+                AtlasWidth = atlasWidth,
+                AtlasHeight = atlasHeight,
+                Fidelity = GeometryIrEmitFidelity.Parity,
+                PreviewDegenerateAxisThickness = 0f,
+                OfficialJvmName = officialJvmName,
+            },
+            lerPlan);
         if (geometryRootOverride is { } overrideRoot)
         {
             if (!TryEmitGeometryIrBodyLayer(b, overrideRoot, options, out failureReason))
@@ -447,12 +534,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 return null;
             }
 
-            return ApplyGeometryIrParityLivingEntityRendererPreviewBasis(
-                officialJvmName,
-                overrideRoot,
-                stem: null,
-                normalizedAssetPath: null,
-                b.Build(texRef));
+            return FinishGeometryIrMeshLivingEntityRendererBasis(b.Build(texRef), lerPlan);
         }
 
         if (!TryBuildMeshFromGeometryIr(b, profile, officialJvmName, options, out failureReason))
@@ -460,12 +542,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return null;
         }
 
-        return ApplyGeometryIrParityLivingEntityRendererPreviewBasis(
-            officialJvmName,
-            geometryRootOverride: null,
-            stem: null,
-            normalizedAssetPath: null,
-            b.Build(texRef));
+        return FinishGeometryIrMeshLivingEntityRendererBasis(b.Build(texRef), lerPlan);
     }
 
     /// <summary>

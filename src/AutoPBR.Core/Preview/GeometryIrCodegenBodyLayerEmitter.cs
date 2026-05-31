@@ -55,12 +55,10 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var world = parentWorld;
         if (part.TryGetProperty("pose", out var poseEl))
         {
-            if (!TryComposePartPose(poseEl, out var local, out failureReason))
+            if (!TryComposePartPose(poseEl, parentWorld, out world, out failureReason))
             {
                 return false;
             }
-
-            world = EntityParityTemplate.Mul(parentWorld, local);
         }
 
         var partId = part.TryGetProperty("id", out var idEl) ? idEl.GetString() ?? "" : "";

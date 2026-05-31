@@ -9,6 +9,67 @@ public sealed class GeometryIrSetupAnimPivotTests
         new("26.1.2", Path.Combine(AppContext.BaseDirectory, "Data", "minecraft-native", "26.1.2"), new Version(26, 1, 2));
 
     [Fact]
+    public void Cat_geometry_ir_walk_leg_motion_hinges_at_part_origin()
+    {
+        const string path = "assets/minecraft/textures/entity/cat/cat_british_shorthair.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.3f, animationTimeSeconds: 0f,
+            out var bind, out _));
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.3f, animationTimeSeconds: 1.25f,
+            out var walk, out var provenance, applyGeometryIrSetupAnimMotion: true));
+        Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
+        Assert.True(bind.Elements.Count >= 10, $"expected full feline bind cuboid set, got {bind.Elements.Count}");
+        Assert.True(walk.Elements.Count >= 10, $"expected full feline walk cuboid set, got {walk.Elements.Count}");
+        var maxDelta = 0f;
+        for (var i = 0; i < bind.Elements.Count; i++)
+        {
+            maxDelta = MathF.Max(
+                maxDelta,
+                MathF.Abs(bind.Elements[i].LocalToParent.M41 - walk.Elements[i].LocalToParent.M41) +
+                MathF.Abs(bind.Elements[i].LocalToParent.M42 - walk.Elements[i].LocalToParent.M42) +
+                MathF.Abs(bind.Elements[i].LocalToParent.M43 - walk.Elements[i].LocalToParent.M43));
+        }
+
+        Assert.True(maxDelta > 0.05f, "expected visible feline setupAnim mesh change");
+    }
+
+    [Theory]
+    [InlineData("assets/minecraft/textures/entity/cat/cat_all_black.png")]
+    [InlineData("assets/minecraft/textures/entity/cat/cat_red_baby.png")]
+    public void Feline_geometry_ir_setup_anim_does_not_explode_bind_pose(string path)
+    {
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.3f, animationTimeSeconds: 0f,
+            out var bind, out _));
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.3f, animationTimeSeconds: 1.25f,
+            out var walk, out var provenance, applyGeometryIrSetupAnimMotion: true));
+        Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
+        Assert.True(bind.Elements.Count >= 10, $"expected full feline bind cuboid set, got {bind.Elements.Count}");
+        Assert.False(TryHasCatastrophicRootStretch(bind, walk),
+            "feline setupAnim should not scatter cuboids away from bind pose");
+    }
+
+    [Theory]
+    [InlineData("assets/minecraft/textures/entity/cow/cow_temperate.png")]
+    [InlineData("assets/minecraft/textures/entity/pig/pig_temperate.png")]
+    [InlineData("assets/minecraft/textures/entity/wolf/wolf.png")]
+    [InlineData("assets/minecraft/textures/entity/panda/panda.png")]
+    [InlineData("assets/minecraft/textures/entity/bear/polarbear.png")]
+    [InlineData("assets/minecraft/textures/entity/goat/goat.png")]
+    [InlineData("assets/minecraft/textures/entity/creeper/creeper.png")]
+    public void Flat_quadruped_family_setup_anim_overlay_does_not_explode_mesh(string path)
+    {
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.3f, animationTimeSeconds: 0f,
+            out var bind, out _));
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.3f, animationTimeSeconds: 1.25f,
+            out var walk, out var provenance, applyGeometryIrSetupAnimMotion: true));
+        Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
+        Assert.False(TryHasCatastrophicRootStretch(bind, walk),
+            $"setupAnim overlay should not explode flat quadruped family mesh for {path}");
+    }
+
+    [Fact]
     public void Cow_geometry_ir_walk_leg_motion_hinges_at_part_origin_not_root()
     {
         const string path = "assets/minecraft/textures/entity/cow/cow_temperate.png";

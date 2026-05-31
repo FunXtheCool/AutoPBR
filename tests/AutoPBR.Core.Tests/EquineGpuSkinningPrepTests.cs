@@ -41,6 +41,25 @@ public sealed class EquineGpuSkinningPrepTests
     }
 
     [Fact]
+    public void Adult_horse_bind_pose_ignores_preview_animation_clock_when_setup_anim_off()
+    {
+        var runtime = EntityModelRuntimeFactory.Create();
+        const string path = "assets/minecraft/textures/entity/horse/horse_white.png";
+        var profile = new MinecraftNativeProfile("1.21.11", "unused", new Version(1, 21, 11));
+        const float idle = 0.28f;
+
+        Assert.True(runtime.TryBuildStaticMesh(path, profile, idle, 0.1f, out var a, applyGeometryIrSetupAnimMotion: false));
+        Assert.True(runtime.TryBuildStaticMesh(path, profile, idle, 2.7f, out var b, applyGeometryIrSetupAnimMotion: false));
+
+        Assert.True(a.Elements.Count > 1 && b.Elements.Count > 1);
+        var ma = a.Elements[1].LocalToParent;
+        var mb = b.Elements[1].LocalToParent;
+        Assert.True(
+            Math.Abs(ma.M43 - mb.M43) + Math.Abs(ma.M42 - mb.M42) + Math.Abs(ma.M41 - mb.M41) <= 1e-4f,
+            "bind pose must not apply equine preview neck/tail overrides when setupAnim is off");
+    }
+
+    [Fact]
     public void TryFillEmulatedEntityBoneMatrices_horse_neck_matrices_differ_across_animation_clock()
     {
         var runtime = EntityModelRuntimeFactory.Create();
@@ -48,8 +67,8 @@ public sealed class EquineGpuSkinningPrepTests
         var profile = new MinecraftNativeProfile("1.21.11", "unused", new Version(1, 21, 11));
         const float idle = 0.28f;
 
-        Assert.True(runtime.TryBuildStaticMesh(path, profile, idle, 0.1f, out var a));
-        Assert.True(runtime.TryBuildStaticMesh(path, profile, idle, 2.7f, out var b));
+        Assert.True(runtime.TryBuildStaticMesh(path, profile, idle, 0.1f, out var a, applyGeometryIrSetupAnimMotion: true));
+        Assert.True(runtime.TryBuildStaticMesh(path, profile, idle, 2.7f, out var b, applyGeometryIrSetupAnimMotion: true));
 
         // Head_parts is element index 1 in AbstractEquine-style rigs (body is 0).
         Assert.True(a.Elements.Count > 1 && b.Elements.Count > 1);

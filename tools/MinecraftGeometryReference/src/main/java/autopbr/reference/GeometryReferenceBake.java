@@ -87,6 +87,9 @@ public final class GeometryReferenceBake {
         var roots = new ArrayList<String>();
         roots.add(walkPart(rootPart, "root", PartWorldPoseMath.Mat4.identity()));
 
+        var renderCenters = new StringBuilder();
+        ModelPartRenderPoseMath.appendRenderCenters(rootPart, renderCenters);
+
         var json = """
             {
               "schemaVersion": 2,
@@ -95,10 +98,10 @@ public final class GeometryReferenceBake {
               "extractionStatus": "reference_java",
               "factoryMethod": "%s",
               "meshHostJvmName": "%s",
-              "roots": [%s]
+              "roots": [%s]%s
             }
             """.formatted(VERSION_LABEL, fqn, resolved.factoryMethod(), resolved.host().getName(),
-                String.join(",", roots));
+                String.join(",", roots), renderCenters);
 
         var outDir = Path.of("reference-output");
         Files.createDirectories(outDir);
@@ -387,7 +390,7 @@ public final class GeometryReferenceBake {
     }
 
     @SuppressWarnings("unchecked")
-    private static List<Object> getCubes(Object part) throws Exception {
+    static List<Object> getCubes(Object part) throws Exception {
         var f = part.getClass().getDeclaredField("cubes");
         f.setAccessible(true);
         return (List<Object>) f.get(part);
@@ -400,7 +403,7 @@ public final class GeometryReferenceBake {
     }
 
     @SuppressWarnings("unchecked")
-    private static Map<String, Object> getChildren(Object part) throws Exception {
+    static Map<String, Object> getChildren(Object part) throws Exception {
         var f = part.getClass().getDeclaredField("children");
         f.setAccessible(true);
         return (Map<String, Object>) f.get(part);
@@ -453,7 +456,7 @@ public final class GeometryReferenceBake {
         return String.valueOf(v);
     }
 
-    private static String escape(String s) {
+    static String escape(String s) {
         return s.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 }

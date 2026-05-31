@@ -30,7 +30,9 @@ internal static class GeometryIrParityJvmResolver
                 return true;
             }
 
-            if (GeometryIrDocumentLoader.TryLoadLiftedForParityCatalog(profile, candidate, out geometryRoot))
+            if (GeometryIrDocumentLoader.TryLoadLiftedForParityCatalog(profile, candidate, out geometryRoot) &&
+                !IsMisLiftedAdultEquineHorseModelShard(candidate, geometryRoot) &&
+                !IsAdultEquineJvmRejectedForBaby(isBaby, candidate))
             {
                 officialJvmName = candidate;
                 return true;
@@ -109,7 +111,20 @@ internal static class GeometryIrParityJvmResolver
             var normalizedStem = NormalizeModelStem(modelStem);
             if (isBaby)
             {
-                yield return $"{pkg}.Baby{normalizedStem}Model";
+                if (IsEquineModelPackage(pkg) &&
+                    string.Equals(normalizedStem, "Horse", StringComparison.Ordinal))
+                {
+                    yield return $"{pkg}.BabyHorseModel";
+                }
+                else if (IsEquineModelPackage(pkg) &&
+                         string.Equals(normalizedStem, "Donkey", StringComparison.Ordinal))
+                {
+                    yield return $"{pkg}.BabyDonkeyModel";
+                }
+                else
+                {
+                    yield return $"{pkg}.Baby{normalizedStem}Model";
+                }
             }
             else
             {
@@ -125,8 +140,16 @@ internal static class GeometryIrParityJvmResolver
                 }
                 else
                 {
-                    yield return $"{pkg}.Adult{normalizedStem}Model";
-                    yield return $"{pkg}.{normalizedStem}Model";
+                    if (IsEquineModelPackage(pkg) &&
+                        string.Equals(normalizedStem, "Horse", StringComparison.Ordinal))
+                    {
+                        yield return $"{pkg}.AbstractEquineModel";
+                    }
+                    else
+                    {
+                        yield return $"{pkg}.Adult{normalizedStem}Model";
+                        yield return $"{pkg}.{normalizedStem}Model";
+                    }
                 }
             }
         }
@@ -235,6 +258,86 @@ internal static class GeometryIrParityJvmResolver
 
         package = officialJvm[..idx];
         return true;
+    }
+
+    /// <summary>
+    /// Package ends with <c>.equine</c> (no trailing segment); <c>.animal.equine.</c> never matches that suffix.
+    /// </summary>
+    private static bool IsEquineModelPackage(string package) =>
+        package.Contains(".animal.equine", StringComparison.Ordinal);
+
+    /// <summary>
+    /// Baby textures must not bind adult mesh hosts when a <c>Baby*</c> shard exists in the index.
+    /// </summary>
+    private static bool IsAdultEquineJvmRejectedForBaby(bool isBaby, string candidate)
+    {
+        if (!isBaby ||
+            !candidate.Contains(".animal.equine", StringComparison.Ordinal) ||
+            SimpleClassNameContainsBaby(candidate))
+        {
+            return false;
+        }
+
+        return candidate.EndsWith(".AbstractEquineModel", StringComparison.Ordinal) ||
+               candidate.EndsWith(".HorseModel", StringComparison.Ordinal) ||
+               candidate.EndsWith(".DonkeyModel", StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// <c>equine.HorseModel</c> shard was lifted from <c>BabyHorseModel</c> bytecode (body Y≈12.5); adult hosts use <c>AbstractEquineModel</c> (Y≈11).
+    /// </summary>
+    private static bool IsMisLiftedAdultEquineHorseModelShard(string candidate, JsonElement geometryRoot)
+    {
+        if (!candidate.EndsWith(".animal.equine.HorseModel", StringComparison.Ordinal) ||
+            SimpleClassNameContainsBaby(candidate))
+        {
+            return false;
+        }
+
+        if (!geometryRoot.TryGetProperty("roots", out var roots) || roots.ValueKind != JsonValueKind.Array)
+        {
+            return false;
+        }
+
+        foreach (var root in roots.EnumerateArray())
+        {
+            if (TryFindPartBodyTranslationY(root, out var bodyY) && bodyY > 11.75f)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool TryFindPartBodyTranslationY(JsonElement part, out float translationY)
+    {
+        translationY = 0f;
+        if (part.TryGetProperty("id", out var idEl) &&
+            string.Equals(idEl.GetString(), "body", StringComparison.Ordinal) &&
+            part.TryGetProperty("pose", out var pose) &&
+            pose.TryGetProperty("translation", out var tr) &&
+            tr.ValueKind == JsonValueKind.Array &&
+            tr.GetArrayLength() >= 2 &&
+            tr[1].TryGetSingle(out translationY))
+        {
+            return true;
+        }
+
+        if (!part.TryGetProperty("children", out var children) || children.ValueKind != JsonValueKind.Array)
+        {
+            return false;
+        }
+
+        foreach (var child in children.EnumerateArray())
+        {
+            if (TryFindPartBodyTranslationY(child, out translationY))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static bool PathImpliesClimate(string normalizedAssetPath, string stem, string token)

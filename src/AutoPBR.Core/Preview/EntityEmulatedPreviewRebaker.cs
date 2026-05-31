@@ -103,6 +103,26 @@ public static class EntityEmulatedPreviewRebaker
             return false;
         }
 
+        var profileForParts = profile;
+        EntityPreviewPlacement.TryPopulateRebakeElementPartIds(rebake, profileForParts, merged.Elements.Count);
+        EntityPreviewPlacement.TryMeasureMergedModelPartCentroidsY(
+            merged,
+            rebake.ElementPartIds,
+            out var bindBodyY,
+            out var bindHeadY,
+            out var bindLegY);
+        var placement = EntityPreviewPlacement.ApplyToPreviewVertices(
+            verts,
+            MinecraftModelBaker.FloatsPerVertex,
+            rebake.ElementPartIds,
+            EntityPreviewPlacement.DefaultFloorY);
+        rebake.LastGroundContactY = placement.GroundContactY;
+        rebake.LastGroundLiftY = placement.GroundLiftY;
+        var placementYOffset = placement.AnchorOffset.Y + placement.GroundLiftY;
+        rebake.LastBodyCentroidY = bindBodyY != 0f ? bindBodyY + placementYOffset : placement.BodyCentroidY;
+        rebake.LastHeadCentroidY = bindHeadY != 0f ? bindHeadY + placementYOffset : placement.HeadCentroidY;
+        rebake.LastLegCentroidY = bindLegY != 0f ? bindLegY + placementYOffset : placement.LegCentroidY;
+
         interleavedVertices = verts;
         indices = idx;
         drawBatches = batchesList.ToArray();
@@ -123,7 +143,8 @@ public static class EntityEmulatedPreviewRebaker
         out uint[]? indices,
         out PreviewDrawBatch[]? drawBatches,
         out int boneCount,
-        out float meshSpaceLiftY)
+        out float meshSpaceLiftY,
+        bool applyGeometryIrSetupAnimMotion = false)
     {
         interleavedVertices = null;
         indices = null;
@@ -131,6 +152,8 @@ public static class EntityEmulatedPreviewRebaker
         boneCount = 0;
         meshSpaceLiftY = 0f;
         rebake.GpuBindPoseInverseLocalToParent = null;
+        rebake.GpuBindPoseBonePalette = null;
+        rebake.GpuBindPoseInterleavedVertices = null;
 
         if (string.IsNullOrWhiteSpace(rebake.NativeRootDirectory) || !Directory.Exists(rebake.NativeRootDirectory))
         {
@@ -159,10 +182,13 @@ public static class EntityEmulatedPreviewRebaker
                 profile,
                 rebake.IdlePhase01,
                 0f,
-                out var mergedBind))
+                out var mergedBind,
+                applyGeometryIrSetupAnimMotion: false))
         {
             return false;
         }
+
+        EntityPreviewPlacement.TryPopulateRebakeElementPartIds(rebake, profile, mergedBind.Elements.Count);
 
         if (mergedBind.Elements.Count > EntityGpuSkinningLimits.MaxBones)
         {
@@ -215,11 +241,22 @@ public static class EntityEmulatedPreviewRebaker
         }
 
         rebake.GpuBindPoseInverseLocalToParent = inv;
+        rebake.GpuBindPoseBonePalette = EntityGpuShaderDiagnostics.BuildBindPoseBonePalette(mergedBind);
+        rebake.GpuBindPoseInterleavedVertices = verts;
 
-        meshSpaceLiftY = EntityEmulatedGpuSkinningMath.ComputeMeshSpaceGroundLift(
+        var placement = EntityPreviewPlacement.ApplyToGpuBindVertices(
             verts,
+            rebake.ElementPartIds,
             groundPlaneY,
             groundClearance);
+        meshSpaceLiftY = placement.GroundLiftY;
+        rebake.LastGroundContactY = placement.GroundContactY;
+        rebake.LastGroundLiftY = placement.GroundLiftY;
+        rebake.LastBodyCentroidY = placement.BodyCentroidY;
+        rebake.LastHeadCentroidY = placement.HeadCentroidY;
+        rebake.LastLegCentroidY = placement.LegCentroidY;
+
+        _ = applyGeometryIrSetupAnimMotion;
 
         interleavedVertices = verts;
         indices = idx;
@@ -232,7 +269,8 @@ public static class EntityEmulatedPreviewRebaker
         EntityEmulatedPreviewRebakeContext rebake,
         float animationTimeSeconds,
         Span<Matrix4x4> bonesOut,
-        out int boneCount)
+        out int boneCount,
+        bool applyGeometryIrSetupAnimMotion = true)
     {
         boneCount = 0;
         if (bonesOut.Length < EntityGpuSkinningLimits.MaxBones)
@@ -257,15 +295,17 @@ public static class EntityEmulatedPreviewRebaker
             parsed);
 
         var runtime = EntityModelRuntimeFactory.Create();
-        if (EntityGpuBoneFillPolicy.RequiresFullMeshBoneExtract(rebake.AssetArchivePath))
+        var animTime = applyGeometryIrSetupAnimMotion ? animationTimeSeconds : 0f;
+        var useFullMeshExtract = EntityGpuBoneFillPolicy.RequiresFullMeshBoneExtract(rebake.AssetArchivePath);
+        if (useFullMeshExtract)
         {
             if (!runtime.TryBuildStaticMesh(
                     rebake.AssetArchivePath,
                     profile,
                     rebake.IdlePhase01,
-                    animationTimeSeconds,
+                    animTime,
                     out var merged,
-                    applyGeometryIrSetupAnimMotion: true))
+                    applyGeometryIrSetupAnimMotion))
             {
                 return false;
             }
@@ -288,7 +328,7 @@ public static class EntityEmulatedPreviewRebaker
             {
                 for (var i = 0; i < boneCount; i++)
                 {
-                    bonesOut[i] = Matrix4x4.Multiply(inv[i], merged.Elements[i].LocalToParent);
+                    bonesOut[i] = ComposeGpuBonePaletteEntry(inv[i], merged.Elements[i].LocalToParent);
                 }
             }
             else
@@ -314,10 +354,11 @@ public static class EntityEmulatedPreviewRebaker
                 rebake.AssetArchivePath,
                 profile,
                 rebake.IdlePhase01,
-                animationTimeSeconds,
+                animTime,
                 scratch,
                 out boneCount,
-                rebake))
+                rebake,
+                applyGeometryIrSetupAnimMotion))
         {
             return false;
         }
@@ -339,7 +380,7 @@ public static class EntityEmulatedPreviewRebaker
         {
             for (var i = 0; i < boneCount; i++)
             {
-                bonesOut[i] = Matrix4x4.Multiply(invFast[i], scratch[i]);
+                bonesOut[i] = ComposeGpuBonePaletteEntry(invFast[i], scratch[i]);
             }
         }
         else
@@ -358,4 +399,7 @@ public static class EntityEmulatedPreviewRebaker
 
         return true;
     }
+
+    private static Matrix4x4 ComposeGpuBonePaletteEntry(in Matrix4x4 invBind, in Matrix4x4 anim) =>
+        Matrix4x4.Multiply(invBind, anim);
 }

@@ -20,6 +20,7 @@ internal static class PreviewRenderStateSynthesis
         {
             ["walkAnimationPos"] = walkPos,
             ["walkAnimationSpeed"] = walkSpeed,
+            ["ageScale"] = 1f,
             ["xRot"] = headPitchDegrees,
             ["yRot"] = headYawDegrees,
             ["ageInTicks"] = animationTimeSeconds * 20f

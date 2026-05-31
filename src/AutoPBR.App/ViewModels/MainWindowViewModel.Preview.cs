@@ -9,6 +9,7 @@ using AutoPBR.App.Lang;
 using AutoPBR.App.Rendering;
 using AutoPBR.App.Rendering.Abstractions;
 using AutoPBR.Core.Models;
+using AutoPBR.Core.Preview;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -40,6 +41,7 @@ public partial class MainWindowViewModel
     [ObservableProperty] private double _preview3DEntityAnimationAmplitude = 1.0;
     [ObservableProperty] private bool _preview3DEnableEntityAnimation = true;
     [ObservableProperty] private bool _preview3DEnableLegacyEntityWobble;
+    [ObservableProperty] private bool _preview3DForceEntityCpuSkinning;
     [ObservableProperty] private bool _preview3DPauseEntityIdleAnimation;
     [ObservableProperty] private bool _preview3DItemUseAlphaBlend;
     [ObservableProperty] private int _preview3DEntityAlphaMode = 1;
@@ -120,6 +122,7 @@ public partial class MainWindowViewModel
     partial void OnPreview3DEntityAnimationAmplitudeChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEnableEntityAnimationChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEnableLegacyEntityWobbleChanged(bool value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DForceEntityCpuSkinningChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DPauseEntityIdleAnimationChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DItemUseAlphaBlendChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEntityAlphaModeChanged(int value) => OnPreview3DGpuSettingChanged(value);
@@ -180,9 +183,27 @@ public partial class MainWindowViewModel
         _lastPreviewTextureMaps = previewResult.Maps;
         _lastPreviewModelSubject = previewResult.ModelSubject;
         _lastPreviewMeshProvenance = previewResult.MeshProvenance ?? previewResult.ModelSubject?.MeshProvenance;
+        ApplyExploreParityCatalogPreviewDefaults(_lastPreviewModelSubject);
         LogPreviewMeshProvenance(_lastPreviewMeshProvenance);
         OnPropertyChanged(nameof(IsPreview3DItemMode));
         Apply3DPreviewIfNeeded();
+    }
+
+    private void ApplyExploreParityCatalogPreviewDefaults(PreviewModelSubject? subject)
+    {
+        if (subject?.EmulatedRebake?.AssetArchivePath is not { } path)
+        {
+            return;
+        }
+
+        var norm = path.Replace('\\', '/').TrimStart('/');
+        if (!EntityTextureParityCatalog.IsCatalogued(norm))
+        {
+            return;
+        }
+
+        Preview3DEnableEntityAnimation = false;
+        Preview3DEnableLegacyEntityWobble = false;
     }
 
     private PreviewRenderSettings BuildPreview3DRenderSettings() =>
@@ -220,7 +241,8 @@ public partial class MainWindowViewModel
             EntityAnimationAmplitude = (float)Preview3DEntityAnimationAmplitude,
             EnableEntityAnimation = Preview3DEnableEntityAnimation,
             PauseEntityIdleAnimation = Preview3DPauseEntityIdleAnimation,
-            EnableLegacyEntityWobble = Preview3DEnableLegacyEntityWobble
+            EnableLegacyEntityWobble = Preview3DEnableLegacyEntityWobble,
+            ForceEntityCpuSkinning = Preview3DForceEntityCpuSkinning
         };
 
     private void PushPreview3DCamera()
@@ -241,7 +263,27 @@ public partial class MainWindowViewModel
             (float)Preview3DCameraOrbitBoomDistance);
     }
 
-    private void Push3DRenderSettingsOnly() => Push3DPreviewStateToGpu();
+    private void Push3DRenderSettingsOnly()
+    {
+        if (_glPreview is null || !IsPreview3D)
+        {
+            return;
+        }
+
+        try
+        {
+            _glPreview.UpdatePreview3DSettings(BuildPreview3DRenderSettings());
+            _lastPreview3DLoggedError = null;
+        }
+        catch (Exception ex)
+        {
+            if (!string.Equals(_lastPreview3DLoggedError, ex.Message, StringComparison.Ordinal))
+            {
+                _lastPreview3DLoggedError = ex.Message;
+                AddLogLine($"[Preview 3D] GPU update failed: {ex.Message}");
+            }
+        }
+    }
 
     private void Push3DPreviewStateToGpu()
     {

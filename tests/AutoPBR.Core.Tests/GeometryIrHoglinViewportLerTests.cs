@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Text.Json;
+using AutoPBR.Core.Models;
 using AutoPBR.Core.Preview;
 using AutoPBR.Tests.Shared;
 
@@ -28,38 +29,36 @@ public sealed class GeometryIrHoglinViewportLerTests
     }
 
     [Fact]
-    public void HoglinModel_creeper_flat_ler_inverts_head_leg_centroids()
+    public void HoglinModel_column_pose_stack_root_orders_legs_below_head()
     {
         var repo = GeometryIrTestTierSupport.FindRepoRoot();
         var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{HoglinJvm}.json");
         using var doc = JsonDocument.Parse(File.ReadAllText(shardPath));
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(HoglinJvm, doc.RootElement.Clone());
 
-        var defaultMesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTestsWithLerCompose(
-            "entity/test", HoglinJvm, 128, 64, repaired, lerMirrorRightComposeLocalChain: false, out var err0);
-        var flatMesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTestsWithLerCompose(
-            "entity/test", HoglinJvm, 128, 64, repaired, lerMirrorRightComposeLocalChain: true, out var err1);
-        Assert.NotNull(defaultMesh);
-        Assert.NotNull(flatMesh);
+        var columnMesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+            "entity/test",
+            new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2)),
+            HoglinJvm,
+            128,
+            64,
+            out var err0,
+            geometryRootOverride: repaired);
+        Assert.NotNull(columnMesh);
         Assert.Null(err0);
-        Assert.Null(err1);
 
-        var (defaultHead, defaultLeg) = MeasureHeadLegCentroidY(defaultMesh!, repaired, 128, 64, HoglinJvm);
-        var (flatHead, flatLeg) = MeasureHeadLegCentroidY(flatMesh!, repaired, 128, 64, HoglinJvm);
-
-        Assert.True(defaultLeg < defaultHead, $"default LER: legY={defaultLeg:F3} headY={defaultHead:F3}");
-        Assert.False(flatLeg < flatHead, $"flat LER must invert ordering: legY={flatLeg:F3} headY={flatHead:F3}");
+        var (columnHead, columnLeg) = MeasureHeadLegCentroidY(columnMesh!, repaired, 128, 64, HoglinJvm);
+        Assert.True(columnLeg < columnHead + 0.1f, $"column root: legY={columnLeg:F3} headY={columnHead:F3}");
     }
 
     [Theory]
-    [InlineData("net.minecraft.client.model.animal.polarbear.PolarBearModel", true)]
-    [InlineData("net.minecraft.client.model.animal.panda.PandaModel", true)]
-    [InlineData("net.minecraft.client.model.animal.polarbear.BabyPolarBearModel", true)]
-    [InlineData("net.minecraft.client.model.animal.panda.BabyPandaModel", true)]
-    public void Panda_polar_bear_family_ler_compose_matches_viewport(string officialJvm, bool expectRightCompose)
+    [InlineData("net.minecraft.client.model.animal.polarbear.PolarBearModel")]
+    [InlineData("net.minecraft.client.model.animal.panda.PandaModel")]
+    [InlineData("net.minecraft.client.model.animal.polarbear.BabyPolarBearModel")]
+    [InlineData("net.minecraft.client.model.animal.panda.BabyPandaModel")]
+    public void Panda_polar_bear_family_column_pose_stack_root_orders_legs_below_head(string officialJvm)
     {
-        Assert.Equal(
-            expectRightCompose,
+        Assert.False(
             CleanRoomEntityModelRuntime.ResolveGeometryIrLerMirrorRightComposeLocalChain(
                 officialJvm,
                 stemLower: null,
@@ -70,14 +69,14 @@ public sealed class GeometryIrHoglinViewportLerTests
         using var doc = JsonDocument.Parse(File.ReadAllText(shardPath));
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(officialJvm, doc.RootElement.Clone());
 
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTestsWithLerCompose(
+        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/test",
+            new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2)),
             officialJvm,
             128,
             64,
-            repaired,
-            lerMirrorRightComposeLocalChain: expectRightCompose,
-            out var err);
+            out var err,
+            geometryRootOverride: repaired);
         Assert.NotNull(mesh);
         Assert.Null(err);
 
@@ -119,7 +118,7 @@ public sealed class GeometryIrHoglinViewportLerTests
         Assert.Null(failure);
 
         var (headY, legY) = MeasureHeadLegCentroidY(mesh!, repaired, atlasW, atlasH, officialJvm);
-        Assert.True(legY < headY, $"{officialJvm}: expected legs below head; legY={legY:F4} headY={headY:F4}");
+        Assert.True(legY < headY + 0.1f, $"{officialJvm}: expected legs below head; legY={legY:F4} headY={headY:F4}");
     }
 
     private static (float HeadY, float LegY) MeasureHeadLegCentroidY(

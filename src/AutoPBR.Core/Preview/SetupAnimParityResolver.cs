@@ -16,7 +16,7 @@ internal static class SetupAnimParityResolver
         ["Rabbit"] = "net.minecraft.client.model.animal.rabbit.AdultRabbitModel",
         ["Panda"] = "net.minecraft.client.model.animal.panda.PandaModel",
         ["Chicken"] = "net.minecraft.client.model.animal.chicken.ChickenModel",
-        ["Horse"] = "net.minecraft.client.model.animal.equine.HorseModel",
+        ["Horse"] = "net.minecraft.client.model.animal.equine.AbstractEquineModel",
         ["DonkeyMuleHorse"] = "net.minecraft.client.model.animal.equine.DonkeyModel",
         ["HumanoidZombie"] = "net.minecraft.client.model.monster.zombie.ZombieModel",
         ["Zombie"] = "net.minecraft.client.model.monster.zombie.ZombieModel",

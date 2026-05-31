@@ -14,6 +14,7 @@ public partial class MainWindow : Window
     private const int LogScrollThrottleMs = 200;
     private DateTime _lastLogScrollUtc = DateTime.MinValue;
     private UvDebugWindow? _uvDebugWindow;
+    private EntityPreviewDebugWindow? _entityPreviewDebugWindow;
     private void OnLoaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (DataContext is MainWindowViewModel vm && LogScrollViewer is { } scroll)
@@ -100,6 +101,28 @@ public partial class MainWindow : Window
         };
         window.Closed += (_, _) => _uvDebugWindow = null;
         _uvDebugWindow = window;
+        window.Show(this);
+    }
+
+    private void OpenEntityPreviewDebugWindow_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm)
+        {
+            return;
+        }
+
+        if (_entityPreviewDebugWindow is { IsVisible: true })
+        {
+            _entityPreviewDebugWindow.Activate();
+            return;
+        }
+
+        var window = new EntityPreviewDebugWindow
+        {
+            DataContext = new EntityPreviewDebugWindowViewModel(vm)
+        };
+        window.Closed += (_, _) => _entityPreviewDebugWindow = null;
+        _entityPreviewDebugWindow = window;
         window.Show(this);
     }
 }

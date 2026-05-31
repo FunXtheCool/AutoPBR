@@ -52,4 +52,30 @@ public sealed class EntityEmulatedPreviewRebakeContext
     /// <c>x/16−½</c> cuboid scale) compose as <c>v · M_bind⁻¹ · M_anim</c> (same as GLSL <c>M_anim · M_bind⁻¹ · v</c> with row-major UBO bytes), not <c>M_anim · M_bind⁻¹</c> on the wrong multiply side.
     /// </summary>
     public Matrix4x4[]? GpuBindPoseInverseLocalToParent { get; set; }
+
+    /// <summary>
+    /// Bind-pose GPU palette captured at <see cref="EntityEmulatedPreviewRebakeContext.GpuPreparedBoneCount"/> prep:
+    /// <c>invBind[i] · M_bind[i]</c> (≈ identity on bind VBO). Used for animation-off draws without re-extracting IR.
+    /// </summary>
+    public Matrix4x4[]? GpuBindPoseBonePalette { get; set; }
+
+    /// <summary>
+    /// 13-float bind-pose interleaved vertices from the last successful GPU mesh prep (same layout as the GPU VBO).
+    /// Used for CPU skinning fallback and bone-index diagnostics without re-tessellating.
+    /// </summary>
+    public float[]? GpuBindPoseInterleavedVertices { get; set; }
+
+    /// <summary>Cuboid-owner part ids aligned with <c>MergedJavaBlockModel.Elements</c> (parity catalog geometry IR).</summary>
+    public string[]? ElementPartIds { get; set; }
+
+    /// <summary>Last placement diagnostics from initial bake (Explore dev log).</summary>
+    public float LastGroundContactY { get; set; }
+
+    public float LastGroundLiftY { get; set; }
+
+    public float LastBodyCentroidY { get; set; }
+
+    public float LastHeadCentroidY { get; set; }
+
+    public float LastLegCentroidY { get; set; }
 }

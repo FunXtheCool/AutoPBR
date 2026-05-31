@@ -560,9 +560,11 @@ Treat as **family fixes** in the lifter, not one-off creeper hacks. Authoritativ
 | Item | Path / note |
 |------|-------------|
 | Java bake | `tools/MinecraftGeometryReference/src/main/java/autopbr/reference/GeometryReferenceBake.java`, `PartWorldPoseMath.java` |
-| Sample outputs | `tools/MinecraftGeometryReference/reference-output/net.minecraft.client.model.monster.creeper.CreeperModel.json` (and `CowModel`, `QuadrupedModel`) |
+| JVM render affines | `ModelPartRenderPoseMath.java` → optional **`renderPartAffines`**, **`renderCuboidCenters`** in `reference-output/*.json` |
+| Sample outputs | `tools/MinecraftGeometryReference/reference-output/net.minecraft.client.model.monster.creeper.CreeperModel.json` (and `CowModel`, `ColdCowModel`, `QuadrupedModel`) |
 | Batch export | `pwsh -File tools/Export-GeometryReference.ps1 -ModelsFromFile docs/generated/geometry-assembly-parity-pilots-26.1.2.txt` |
-| C# consumer | `GeometryIrMeshWalk.TryCollectBakedWorldTranslations` → `GeometryIrReferenceComparer.CompareReferenceWorldPartOrigins` |
+| C# consumer (origins) | `GeometryIrMeshWalk.TryCollectBakedWorldTranslations` → `GeometryIrReferenceComparer.CompareReferenceWorldPartOrigins` |
+| C# consumer (render) | `ColdCowHornPreviewPlacementTests`, `ModelPartTranslateAndRotateProbeTests` vs **`renderCuboidCenters` / `renderPartAffines`** |
 | Quality field | `referenceWorldPoseMatch` in `docs/generated/geometry-lift-quality-26.1.2.json` |
 
 Each part node may include:
@@ -571,7 +573,14 @@ Each part node may include:
 "worldPose": { "translation": [x, y, z], "eulerOrder": "XYZ" }
 ```
 
-Composed with the same row-vector convention as `GeometryIrMeshEmitter` / `EntityParityTemplate` (translation × XYZ Euler).
+Composed with **`PartWorldPoseMath`**: `mul(Er, T)` row convention (bind offset not rotated into parent axis). **Not identical** to bind **`ModelPart.translateAndRotate`** render affines for cuboid draw on attached rotated parts — see [runtime-ir-preview-plan.md](runtime-ir-preview-plan.md) § *PartPose vs ModelPart render*.
+
+Top-level reference JSON may also include:
+
+```json
+"renderPartAffines": [{ "id": "right_horn", "matrixRowMajor": [[...], ...] }],
+"renderCuboidCenters": [{ "partId": "right_horn", "renderCenterTexel": [x, y, z] }]
+```
 
 ---
 

@@ -30,7 +30,20 @@ internal static class ParityCatalogEntityPreviewDiagnostics
         string? DefinitionAnimationJvm,
         string? ProvenanceDetail);
 
-    internal static Row SurveyPath(
+    internal static string FormatExplorePlacementLine(
+        string normalizedTexturePath,
+        string lerBasis,
+        bool gpuSkinning,
+        float liftY,
+        float frameAnimClock,
+        bool setupAnimMotion,
+        float groundContactY,
+        float bodyCentroidY,
+        float headCentroidY,
+        float legCentroidY) =>
+        $"[3D preview] Parity placement: path={normalizedTexturePath} ler={lerBasis} gpuSubject={(gpuSkinning ? 1 : 0)} liftY={liftY:0.####} animClock={frameAnimClock:0.###} setupAnimMotion={(setupAnimMotion ? 1 : 0)} contactY={groundContactY:0.####} bodyY={bodyCentroidY:0.####} headY={headCentroidY:0.####} legY={legCentroidY:0.####} (rebake ctx; see GPU runtime line for shader UBO)";
+
+    public static Row SurveyPath(
         string entityTextureAssetPath,
         MinecraftNativeProfile profile,
         float idlePhase01 = 0.2f,

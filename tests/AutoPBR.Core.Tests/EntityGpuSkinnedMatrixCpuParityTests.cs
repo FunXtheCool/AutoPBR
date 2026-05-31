@@ -102,9 +102,20 @@ public sealed class EntityGpuSkinnedMatrixCpuParityTests
     [InlineData("assets/minecraft/textures/entity/chicken/chicken_cold.png", 0f, 0f)]
     [InlineData("assets/minecraft/textures/entity/chicken/chicken_cold.png", 0.27f, 1.41f)]
     [InlineData("assets/minecraft/textures/entity/camel/camel.png", 0.3f, 1.25f)]
+    [InlineData("assets/minecraft/textures/entity/cow/cow_temperate.png", 0.2f, 1.1f)]
+    [InlineData("assets/minecraft/textures/entity/panda/panda.png", 0.15f, 0.9f)]
+    [InlineData("assets/minecraft/textures/entity/horse/horse_black_baby.png", 0f, 0f)]
+    [InlineData("assets/minecraft/textures/entity/cow/cow_temperate_baby.png", 0.2f, 1.1f)]
+    [InlineData("assets/minecraft/textures/entity/fox/fox_baby.png", 0f, 0f)]
+    [InlineData("assets/minecraft/textures/entity/cat/cat_british_shorthair_baby.png", 0f, 0f)]
+    [InlineData("assets/minecraft/textures/entity/goat/goat_baby.png", 0f, 0f)]
+    [InlineData("assets/minecraft/textures/entity/bear/polarbear_baby.png", 0f, 2.5f)]
+    [InlineData("assets/minecraft/textures/entity/horse/donkey.png", 0.2f, 3.1f)]
     public void Skinned_bind_pose_vertices_with_M_anim_inv_then_component_W_match_cpu_bake(string assetPath, float idle, float anim)
     {
-        var setupAnim = assetPath.Contains("/camel/", StringComparison.OrdinalIgnoreCase);
+        var setupAnim = assetPath.Contains("/camel/", StringComparison.OrdinalIgnoreCase) ||
+            assetPath.Contains("/cow/", StringComparison.OrdinalIgnoreCase) ||
+            assetPath.Contains("/panda/", StringComparison.OrdinalIgnoreCase);
         BakeCpuAndGpuBind(assetPath, idle, anim, out var cpuVerts, out var gpuVerts, out var invBind, out var mergedAnim, setupAnim);
         const int cpuStride = MinecraftModelBaker.FloatsPerVertex;
         const int gpuStride = MinecraftModelBaker.FloatsPerSkinnedVertex;
@@ -126,6 +137,56 @@ public sealed class EntityGpuSkinnedMatrixCpuParityTests
             Assert.True(
                 Vector3.Distance(expected, actual) <= eps,
                 $"vertex {vi} bone {bi} path {assetPath}: expected {expected}, got {actual} (idle={idle}, anim={anim})");
+        }
+    }
+
+    [Theory]
+    [InlineData("assets/minecraft/textures/entity/cow/cow_temperate.png", 0.2f, 1.1f, false)]
+    [InlineData("assets/minecraft/textures/entity/cow/cow_temperate.png", 0.2f, 1.1f, true)]
+    [InlineData("assets/minecraft/textures/entity/panda/panda.png", 0.15f, 0.9f, false)]
+    public void Parity_catalog_gpu_bones_respect_setup_anim_motion_flag(
+        string path,
+        float idle,
+        float anim,
+        bool setupAnimMotion)
+    {
+        var profile = new MinecraftNativeProfile("26.1.2", AppContext.BaseDirectory, new Version(26, 1, 2));
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, profile, idle, 0f, out var bindMerged));
+        Assert.True(runtime.TryBuildStaticMesh(
+            path,
+            profile,
+            idle,
+            anim,
+            out var animMerged,
+            applyGeometryIrSetupAnimMotion: setupAnimMotion));
+        var n = animMerged.Elements.Count;
+        var inv = InvertBindPoses(bindMerged);
+        var rebake = new EntityEmulatedPreviewRebakeContext
+        {
+            PackZipPath = "test.zip",
+            AssetArchivePath = path,
+            NativeRootDirectory = profile.RootDirectory,
+            NativeProfileName = profile.Name,
+            ModelDefaultNamespace = "minecraft",
+            IdlePhase01 = idle,
+            OrderedTextureZipPaths = [path],
+            GpuPreparedBoneCount = n,
+            GpuBindPoseInverseLocalToParent = inv,
+        };
+
+        Span<Matrix4x4> bones = stackalloc Matrix4x4[EntityGpuSkinningLimits.MaxBones];
+        Assert.True(EntityEmulatedPreviewRebaker.TryFillEmulatedEntityBoneMatrices(
+            rebake,
+            anim,
+            bones,
+            out var boneCount,
+            applyGeometryIrSetupAnimMotion: setupAnimMotion));
+        Assert.Equal(n, boneCount);
+        for (var i = 0; i < n; i++)
+        {
+            var expected = Matrix4x4.Multiply(inv[i], animMerged.Elements[i].LocalToParent);
+            Assert.True(MatricesClose(expected, bones[i], 1e-5f), $"bone {i} path {path} setupAnim={setupAnimMotion}");
         }
     }
 

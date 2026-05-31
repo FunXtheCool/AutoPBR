@@ -1,10 +1,12 @@
 # Large-class split refactor plan (multi-agent)
 
-**Status:** Phase 1 complete — Phase 2 roadmap active (geometry compiler, catalog sampling, app shell, line-balanced parity routes)  
+**Status:** Phase 1–2 complete — optional P3 trims done (DeepBump tiling, quadruped adults farm shard, JVM disassembler helpers)  
 **Created:** 2026-05-22 (line-count audit of `src/` + `tests/`)  
-**Updated:** 2026-05-27 (Phase 2 rebaseline + multi-agent roadmap after CleanRoom / dispatch / parity-catalog pass 5)  
+**Updated:** 2026-05-27 (Phase 2 merged to `main`; doc rebaseline + REF-021 P3 splits)  
 **Goal:** Improve AI context readability, IDE navigation, and compile-time locality **without** behavior changes.  
-**Related:** [`runtime-ir-preview-plan.md`](runtime-ir-preview-plan.md), [`manual-explore-playbook.md`](manual-explore-playbook.md), [`test-guidance-geometry-animation-ir.md`](test-guidance-geometry-animation-ir.md), [`vanilla-preview-parity.md`](vanilla-preview-parity.md), [`meta-001-test-triage.md`](meta-001-test-triage.md)
+**Related:** [`runtime-ir-preview-plan.md`](runtime-ir-preview-plan.md) (§ Quadruped body placement regression, § Baby JVM family), [`manual-explore-playbook.md`](manual-explore-playbook.md), [`test-guidance-geometry-animation-ir.md`](test-guidance-geometry-animation-ir.md), [`vanilla-preview-parity.md`](vanilla-preview-parity.md), [`meta-001-test-triage.md`](meta-001-test-triage.md)
+
+**Preview parity:** Any agent touching `GeometryIrMeshWalk`, `GeometryIrPartTreeRepair`, LER emit, or parity-catalog baby routes must follow the locked policies in **runtime-ir-preview-plan** (adult quadruped fixes first; baby work extends — never reintroduces reversed walk order, flat-quadruped leg reparent, or absolute limb/tail emit overrides).
 
 ---
 
@@ -12,14 +14,14 @@
 
 **Phase 1 (2026-05-25):** REF-001–011 and META-001 complete. Core suite green; GeometryCompiler has unrelated bytecode/lift failures.
 
-**Phase 2 (2026-05-27):** Pass 5 complete (dispatch micro-shards, CleanRoom families, parity-catalog A/B, Explore tags, sampler tests). Active work: **REF-012–018** — see [Phase 2 roadmap](#phase-2-roadmap-2026-05-27--multi-agent).
+**Phase 2 (2026-05-27):** REF-012–020 merged — javap PartTree/MeshLoop, DefAnim catalog families, parity-catalog line rebalance, VM/GL splits, core generators, tools bytecode/expression, preview IR helpers, large test fixtures. **REF-021 (P3):** `DeepBumpNormalsGenerator`, `CleanRoomEntityQuadrupeds.Build.Adults`, `JvmBytecodeDisassembler` — all shards now ≤ **600** lines.
 
 | Area | State | Notes |
 |------|-------|-------|
 | **REF-001 VM** | **Done** | Seven partials: main (573), Preview (375), Settings (869), ScanConvert (710), Progress (422), Explore (406), TagRules (208). |
 | **REF-002 Dispatch** | **Done** | Pass 5: 10 slot fragments (max **597** lines); 117 slots order-stable. See **REF-002 pass 5** in Phase 2 log. |
 | **REF-002b CleanRoom families** | **Done** | Monsters, humanoids, quadrupeds, aquatic, flying — coordinators + themed build partials. |
-| **REF-002c Parity catalog routes** | **Done** | 3 coordinators + 6 switch shards (A/B per route); case order preserved. Line imbalance remains — **REF-014**. |
+| **REF-002c Parity catalog routes** | **Done** | Line rebalance (**REF-014**): many route shards ≤ **600** lines; case order preserved. |
 | **REF-009b Sampler tests** | **Done** | `VanillaAnimationIrPreviewSamplerTests` split per mob (**129** tests). |
 | **REF-011b Explore tags** | **Done** | `ExploreTreeController.Tags.*` — coordinator **57** lines; largest tag shard **399**. |
 | **REF-003 MeshEmitter** | **Done** | `GeometryIrMeshEmitter.cs` **363** lines — under target; no further split needed now. |
@@ -29,7 +31,9 @@
 | **REF-007 NormalHeight** | **Done** | Split into three partials: main/orchestration (**562**), classical kernels (**602**), DeepBump adapter/fallback (**424**). |
 | **REF-008 JavapFloat** | **Done** | Main shard **138** lines (13 partials total); segment, part-name, reused-builder, addBox, pose, and cube-deformation helpers split out. |
 | **REF-009 / REF-010 tests** | **Superseded** | Monolithic `MinecraftJavaModelPreviewTests.cs` / `EntityTextureParityCatalogTests.cs` **no longer in tree**. Coverage is spread across smaller test classes. See **META-001** (csproj cleanup + re-enable). |
-| **REF-011 Explore** | **Done** | Coordinator **78**, `TreeBuild` **691**, `BatchUi` **234**; tags sub-split via **REF-011b**. |
+| **REF-011 Explore** | **Done** | Coordinator **78**, `TreeBuild` + `TreeBuild.Filter` (**384** + **305**), `BatchUi` **234**; tags via **REF-011b**. |
+| **REF-012–020** | **Done** | See [Task status](#task-status); merged on `main` (`0aa29ff`+). |
+| **REF-021 P3 trims** | **Done** | `DeepBumpNormals` → main + `Tiling`; quadruped adults → `Adults` + `Adults.Farm`; JVM disassembler → main + `Helpers`. |
 | **META-001 tests** | **Done** | `AutoPBR.Core.Tests.csproj` has **0 `Compile Remove` rows**; Core suite is **1853 pass / 0 fail**. |
 
 Verification checkpoint:
@@ -103,62 +107,45 @@ Use **one task ID per agent thread**. Claim in PR title `[REF-01N]` and in the t
 
 ---
 
-## Baseline metrics (2026-05-27)
+## Baseline metrics (2026-05-27 post–Phase 2)
 
 Production `src/` (hand-written `.cs`, excludes `obj`/`bin`/`.g.cs`):
 
 | Bucket | Count | Target |
 |--------|------:|--------|
-| Total files | **387** | — |
-| &lt; 300 lines | **287** (74%) | Ideal agent context |
-| 300–599 lines | **75** (19%) | OK |
-| 600–899 lines | **20** (5%) | Phase 2 split candidates |
-| 900–1199 lines | **4** | P0 splits |
-| ≥ 1200 lines | **1** | P0 — `PartTreeCollection.cs` only |
+| Total files | **~450+** (after splits) | — |
+| ≥ 600 lines | **0** | Per-shard ≤ **600** |
+| 300–599 lines | majority of large partials | OK |
+| &lt; 300 lines | majority of files | Ideal agent context |
 
-### Top shards (≥ 600 lines)
+### Top shards (post–REF-021, hand-written `src/`)
 
-| Lines | Path | Phase 2 task |
-|------:|------|----------------|
-| 1224 | `src/AutoPBR.Tools.GeometryCompiler/JavapFloatGeometryMeshLift.PartTreeCollection.cs` | **REF-012** |
-| 992 | `src/AutoPBR.Tools.GeometryCompiler/BytecodeMeshResolution.cs` | **REF-018** |
-| 972 | `src/AutoPBR.Core/Preview/DefinitionAnimationPreviewSampling.Catalog.cs` | **REF-013** |
-| 957 | `src/AutoPBR.Core/Preview/Entities/...ParityCatalogDispatch.EquipmentRoute.B.cs` | **REF-014** (rebalance) |
-| 921 | `src/AutoPBR.Core/Preview/Entities/...ParityCatalogDispatch.CatalogRoute.A.cs` | **REF-014** (rebalance) |
-| 868 | `src/AutoPBR.App/ViewModels/MainWindowViewModel.Settings.cs` | **REF-015** |
-| 842 | `src/AutoPBR.Tools.GeometryCompiler/JavapFloatGeometryMeshLift.MeshLoop.cs` | **REF-012** |
-| 823 | `src/AutoPBR.App/Rendering/OpenGL/OpenGlPreviewBackend.Render.cs` | **REF-016** |
-| 813 | `src/AutoPBR.Core/SpecularGenerator.cs` | **REF-017** |
-| 809 | `src/AutoPBR.Tools.GeometryCompiler/JavapClassDisassembly.cs` | **REF-018** |
-| 790 | `src/AutoPBR.Core/Embeddings/MaterialTagSemanticMatcher.cs` | **REF-017** |
-| 768 | `src/AutoPBR.Tools.GeometryCompiler/GeometryCompilerHost.cs` | **REF-018** |
-| 753 | `src/AutoPBR.App/Views/MainWindow.axaml.cs` | **REF-016** |
-| 748 | `src/AutoPBR.Core/Preview/GeometryIrLiftQualityReport.cs` | **REF-019** |
-| 709 | `src/AutoPBR.App/ViewModels/MainWindowViewModel.ScanConvert.cs` | **REF-015** |
-| 708 | `src/AutoPBR.Tools.AnimationCompiler/SetupAnimExpressionLift.cs` | **REF-018** |
-| 691 | `src/AutoPBR.App/Services/ExploreTreeController.TreeBuild.cs` | Optional / P3 |
-| 681 | `src/AutoPBR.Core/Preview/Entities/...ParityCatalogDispatch.Fallbacks.A.cs` | **REF-014** |
-| 678 | `src/AutoPBR.Core/Preview/Entities/CleanRoomEntityGeometryIrParityMotion.cs` | **REF-019** (optional) |
-| 673 | `src/AutoPBR.Core/Preview/GeometryIrPartTreeRepair.cs` | **REF-019** |
-| 669 | `src/AutoPBR.Core/TextureScanner.cs` | **REF-017** |
-| 635 | `src/AutoPBR.Core/Preview/Entities/CleanRoomEntityQuadrupeds.Build.Adults.cs` | Optional / P3 |
-| 622 | `src/AutoPBR.Core/Preview/MinecraftModelBaker.cs` | **REF-019** |
-| 601 | `src/AutoPBR.Core/NormalHeightGenerator.Classical.cs` | Done (REF-007) |
-| 597 | `src/AutoPBR.Core/Preview/Entities/CleanRoomEntityDispatch.SpecificSlots.S01-25.cs` | Done — at target |
+| Lines | Path | Notes |
+|------:|------|-------|
+| 384 | `src/AutoPBR.App/Services/ExploreTreeController.TreeBuild.cs` | Lifecycle + lazy load + texture-type overrides |
+| 305 | `src/AutoPBR.App/Services/ExploreTreeController.TreeBuild.Filter.cs` | Text/tag filter, visibility, node lookup |
+| 597 | `src/AutoPBR.Core/Preview/Entities/CleanRoomEntityDispatch.SpecificSlots.S01-25.cs` | Pass 5 target |
+| ~580 | Various parity-catalog / CleanRoom partials | Under **600** |
+| 348 | `src/AutoPBR.Tools.GeometryCompiler/JvmBytecodeDisassembler.cs` | **REF-021** — opcode switch |
+| 313 | `src/AutoPBR.Core/HeightFromNormals/DeepBumpNormals.Tiling.cs` | **REF-021** — tile merge/mask |
+| 313 | `src/AutoPBR.Core/Preview/Entities/CleanRoomEntityQuadrupeds.Build.Adults.cs` | **REF-021** — pig/wolf/goat/… |
+| 296 | `src/AutoPBR.Core/HeightFromNormals/DeepBumpNormals.cs` | **REF-021** — session + `Generate` |
+| 273 | `src/AutoPBR.Core/Preview/Entities/CleanRoomEntityQuadrupeds.Build.Adults.Farm.cs` | **REF-021** — cow/sheep/fox/… |
 
 ### Partial aggregates (rebaselined)
 
 | Aggregate | Total lines | Files | Max shard | Status |
 |-----------|------------:|------:|----------:|--------|
-| `JavapFloatGeometryMeshLift` | ~5047 | 13 | **1224** | **REF-012** — PartTreeCollection + MeshLoop |
-| `CleanRoomEntityModelRuntime.ParityCatalogDispatch` | ~3840 | 10 | **957** | Routes split; **REF-014** line rebalance |
+| `JavapFloatGeometryMeshLift` | ~5k+ | **20** | ~**600** | **Done** (REF-012) |
+| `CleanRoomEntityModelRuntime.ParityCatalogDispatch` | ~4k+ | 20+ | ≤ **600** | **Done** (REF-014) |
 | `CleanRoomEntityDispatch.SpecificSlots` | ~3240 | 12 | **597** | **Done** (pass 5) |
-| `MainWindowViewModel` | ~2984 | 7 | **868** | **REF-015** Settings + ScanConvert |
-| `CleanRoomEntity*` (families) | ~8k+ | 40+ | **635** | **Done** (pass 5) |
-| `OpenGlPreviewBackend` | ~2071 | 6 | **823** | **REF-016** Render pass |
-| `ExploreTreeController` | ~2089 | 8 | **691** | Tags **done**; TreeBuild optional |
-| `SetupAnimLift` | ~2387 | 10 | **489** | **Done** |
-| `DefinitionAnimationPreviewSampling` | ~1050 | 2 | **972** | **REF-013** Catalog shard |
+| `MainWindowViewModel` | ~3k | 10+ | ≤ **700** | **Done** (REF-015) |
+| `CleanRoomEntity*` (families) | ~8k+ | 40+ | ≤ **600** | **Done** (pass 5 + REF-021 adults) |
+| `OpenGlPreviewBackend` | ~2k | 8+ | ≤ **600** | **Done** (REF-016) |
+| `ExploreTreeController` | ~2k | 9 | **384** | Tags **done**; TreeBuild + **Filter** partial |
+| `DeepBumpNormalsGenerator` | ~610 | 2 | **313** | **Done** (REF-021) |
+| `JvmBytecodeDisassembler` | ~570 | 2 | **348** | **Done** (REF-021) |
+| `DefinitionAnimationPreviewSampling` | ~1k+ | 15+ | ~200 | **Done** (REF-013) |
 | `VanillaAnimationIrPreviewSamplerTests` | ~1394 | 13 | ~180 | **Done** (REF-009b) |
 
 ### Acceptance line budgets (agent context)
@@ -203,27 +190,28 @@ Python (repo root): aggregate histogram — see Phase 2 audit notes in git histo
 | REF-010 | EntityTextureParityCatalogTests fixture split | P2 | **`superseded`** | Monolith removed; see META-001 |
 | REF-011 | ExploreTreeController partials (optional) | P3 | **`done`** | Tags sub-split **REF-011b**; `TreeBuild` 691 optional |
 | **META-001** | Core.Tests csproj hygiene + re-enable | **P0** | **`done`** | Core suite **1853 pass / 0 fail** |
-| **REF-012** | JavapFloat `PartTreeCollection` + `MeshLoop` | **P0** | **`todo`** | Only ≥1200 and top ≥800 javap shards |
-| **REF-013** | `DefinitionAnimationPreviewSampling.Catalog` | **P0** | **`todo`** | Split by mob family (~972 lines) |
-| **REF-014** | Parity-catalog route **line rebalance** | **P1** | **`todo`** | A/B halves uneven (921/957/681 vs 317/473/369) |
-| **REF-015** | MainWindowViewModel Settings + ScanConvert | **P1** | **`todo`** | 868 + 709 lines |
-| **REF-016** | App GL Render + `MainWindow.axaml.cs` | **P1** | **`todo`** | 823 + 753 lines |
+| **REF-012** | JavapFloat `PartTreeCollection` + `MeshLoop` | **P0** | **`done`** | 20 partials; max shard ~**600** lines |
+| **REF-013** | `DefinitionAnimationPreviewSampling.Catalog` | **P0** | **`done`** | Per-mob-family `Catalog.*` partials |
+| **REF-014** | Parity-catalog route **line rebalance** | **P1** | **`done`** | Line-budget script; 781 routing/parity tests |
+| **REF-015** | MainWindowViewModel Settings + ScanConvert | **P1** | **`done`** | Section partials under ~**700** lines |
+| **REF-016** | App GL Render + `MainWindow.axaml.cs` | **P1** | **`done`** | Render + code-behind partials |
 | **REF-017** | Core generators (Specular, TextureScanner, embeddings) | **P2** | **`done`** | Standalone classes → `partial` |
-| **REF-018** | Tools: BytecodeMeshResolution, SetupAnimExpressionLift, … | **P2** | **`todo`** | Independent of REF-012 |
-| **REF-019** | Core preview helpers (LiftQuality, PartTreeRepair, Baker) | **P3** | **`backlog`** | Optional |
-| **REF-020** | Large test fixtures | **P3** | **`done`** | Partial splits: LER classification, PreviewRendering, BindingGap pilot |
+| **REF-018** | Tools: BytecodeMeshResolution, SetupAnimExpressionLift, … | **P2** | **`done`** | + **REF-018b** `GeometryCompilerHost`, `JavapClassDisassembly` |
+| **REF-019** | Core preview helpers (LiftQuality, PartTreeRepair, Baker) | **P3** | **`done`** | Optional batch completed |
+| **REF-020** | Large test fixtures | **P3** | **`done`** | LER classification, PreviewRendering, BindingGap pilot |
+| **REF-021** | P3 context trims (DeepBump, quadruped adults, JVM) | **P3** | **`done`** | All new shards ≤ **600** lines |
 
 ---
 
 ## Phase 2 roadmap (2026-05-27) — multi-agent
 
-Phase 1 (REF-001–011, META-001, dispatch pass 4) is **complete**. Phase 2 targets files still above agent-context thresholds after **pass 5** (CleanRoom families, SpecificSlots micro-shards, parity-catalog A/B routes, sampler tests, Explore tags).
+Phase 1 (REF-001–011, META-001, dispatch pass 4) and Phase 2 (REF-012–020) are **complete** on `main`. **REF-021** closed the last ≥600-line hand-written shards listed in the 2026-05-27 rebaseline (except `ExploreTreeController.TreeBuild` at exactly **600**).
 
 ### Multitalk / worktree quick start
 
 | Step | Action |
 |------|--------|
-| 1 | Pick an unclaimed **`todo`** row from [Task status](#task-status) (REF-012–018). |
+| 1 | Pick an unclaimed task only if a file **regrows** past threshold — do not re-run completed REF rows. |
 | 2 | Post claim: `Claiming REF-01N` in thread; set row to **`in_progress`** in your PR description. |
 | 3 | Read [Parallel groups — Phase 2](#parallel-groups--phase-2-multi-agent--multitalk) — do not collide on same files. |
 | 4 | Branch or worktree: `split/ref-01N-short-name` off latest `main`. |
@@ -368,6 +356,13 @@ dotnet test tests/AutoPBR.Core.Tests/AutoPBR.Core.Tests.csproj \
 - **Explore tags:** `ExploreTreeController.Tags.*` (RuleResolution, BatchOps, CatalogLookup, Diagnostics).
 - **Sampler tests:** `VanillaAnimationIrPreviewSamplerTests.*` per mob.
 - Routing/parity filter: **781/781** pass.
+
+**Completed 2026-05-27 — Phase 2 merge (REF-012–020) + REF-021 P3 trims**
+
+- **REF-012–020:** Applied to `main` — javap mesh lift, DefAnim catalog, parity rebalance, VM/GL, generators, tools, preview IR, test fixtures.
+- **REF-021:** `DeepBumpNormalsGenerator` → `DeepBumpNormals.cs` + `DeepBumpNormals.Tiling.cs`; `CleanRoomEntityQuadrupeds.Build.Adults` + `Adults.Farm`; `JvmBytecodeDisassembler` + `JvmBytecodeDisassembler.Helpers`.
+- **REF-011c:** `ExploreTreeController.TreeBuild` → `TreeBuild.cs` + `TreeBuild.Filter.cs` (**384** + **305** lines).
+- Post–REF-021 / REF-011c: **0** hand-written `src/` files &gt; **600** lines.
 
 Completed priorities — see [`meta-001-test-triage.md`](meta-001-test-triage.md) for non-split runtime triage:
 
@@ -795,8 +790,9 @@ Verify: dotnet test --filter EntityTextureRoutingInventory|EntityTextureParity|C
 
 | ID | Target | Note |
 |----|--------|------|
-| REF-019 | `GeometryIrLiftQualityReport`, `GeometryIrPartTreeRepair`, `MinecraftModelBaker`, optional `CleanRoomEntityGeometryIrParityMotion` | When editing preview IR often |
-| REF-020 | Test fixtures ≥450 lines | Lowest priority |
+| REF-019 | `GeometryIrLiftQualityReport`, `GeometryIrPartTreeRepair`, `MinecraftModelBaker`, optional `CleanRoomEntityGeometryIrParityMotion` | **Done** |
+| REF-020 | Test fixtures ≥450 lines | **Done** |
+| REF-021 | `DeepBumpNormalsGenerator`, quadruped `Build.Adults`, `JvmBytecodeDisassembler` | **Done** |
 
 ---
 
@@ -862,6 +858,8 @@ src/AutoPBR.Tools.AnimationCompiler/SetupAnimLift*.cs
 src/AutoPBR.Tools.AnimationCompiler/SetupAnimExpressionLift.cs
 src/AutoPBR.Tools.GeometryCompiler/JavapFloatGeometryMeshLift*.cs
 src/AutoPBR.Tools.GeometryCompiler/BytecodeMeshResolution.cs
+src/AutoPBR.Tools.GeometryCompiler/JvmBytecodeDisassembler*.cs
+src/AutoPBR.Core/HeightFromNormals/DeepBumpNormals*.cs
 tools/split-parity-catalog-dispatch.py
 tools/split-parity-catalog-route-half.py
 tools/split-specific-slots-51-end.py

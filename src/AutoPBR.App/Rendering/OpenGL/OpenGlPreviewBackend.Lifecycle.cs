@@ -205,7 +205,8 @@ public sealed partial class OpenGlPreviewBackend
 
         var mainProg = _program.Program;
         var mainBlock = gl.GetUniformBlockIndex(mainProg, blockName);
-        if (mainBlock != uint.MaxValue)
+        _entityBoneUboBlockBoundMain = mainBlock != uint.MaxValue;
+        if (_entityBoneUboBlockBoundMain)
         {
             gl.UniformBlockBinding(mainProg, mainBlock, EntitySkinningUboBindingPoint);
         }
@@ -214,7 +215,8 @@ public sealed partial class OpenGlPreviewBackend
         {
             var shadowProg = _shadowProgram.Program;
             var shadowBlock = gl.GetUniformBlockIndex(shadowProg, blockName);
-            if (shadowBlock != uint.MaxValue)
+            _entityBoneUboBlockBoundShadow = shadowBlock != uint.MaxValue;
+            if (_entityBoneUboBlockBoundShadow)
             {
                 gl.UniformBlockBinding(shadowProg, shadowBlock, EntitySkinningUboBindingPoint);
             }
@@ -223,12 +225,242 @@ public sealed partial class OpenGlPreviewBackend
         gl.BindBuffer(BufferTargetARB.UniformBuffer, 0);
     }
 
-    private static void WriteEntitySkinningUboTailScalars(Span<byte> tail16, int gpuSkinning, int boneCount, float meshLiftY)
+    private static EntitySkinningUniformLocs ResolveEntitySkinningUniformLocs(GlShaderProgram program) =>
+        new(
+            program.GetUniformLocation("uEntityPreviewSpaceVerts"),
+            program.GetUniformLocation("uEntityBindMesh"),
+            program.GetUniformLocation("uEntityGpuSkinning"),
+            program.GetUniformLocation("uEntityBoneCount"),
+            program.GetUniformLocation("uEntityMeshLiftY"));
+
+    private void LogEntityShaderInitDiagnosticsOnce()
     {
-        BinaryPrimitives.WriteInt32LittleEndian(tail16, gpuSkinning);
-        BinaryPrimitives.WriteInt32LittleEndian(tail16.Slice(4), boneCount);
-        BinaryPrimitives.WriteSingleLittleEndian(tail16.Slice(8), meshLiftY);
-        BinaryPrimitives.WriteInt32LittleEndian(tail16.Slice(12), 0);
+        if (_loggedEntityShaderInit)
+        {
+            return;
+        }
+
+        _loggedEntityShaderInit = true;
+        EmitDiagnostic(EntityGpuShaderDiagnostics.FormatEntityShaderInitLine(
+            "main",
+            _mainEntityUniformLocs.PreviewSpaceVerts,
+            _mainEntityUniformLocs.BindMesh,
+            _mainEntityUniformLocs.GpuSkinning,
+            _mainEntityUniformLocs.BoneCount,
+            _mainEntityUniformLocs.MeshLiftY,
+            _entityBoneUboBlockBoundMain));
+        EmitDiagnostic(EntityGpuShaderDiagnostics.FormatEntityShaderInitLine(
+            "shadow",
+            _shadowEntityUniformLocs.PreviewSpaceVerts,
+            _shadowEntityUniformLocs.BindMesh,
+            _shadowEntityUniformLocs.GpuSkinning,
+            _shadowEntityUniformLocs.BoneCount,
+            _shadowEntityUniformLocs.MeshLiftY,
+            _entityBoneUboBlockBoundShadow));
+        if (!_mainEntityUniformLocs.IsComplete || !_shadowEntityUniformLocs.IsComplete)
+        {
+            EmitDiagnostic(
+                "[3D preview] GPU WARN: entity scalar uniform locations incomplete at init; 13-float entity meshes may render exploded (anim-on and anim-off) until shaders reload.");
+        }
+
+        if (!_entityBoneUboBlockBoundMain || (_shadowProgram is { IsValid: true } && !_entityBoneUboBlockBoundShadow))
+        {
+            EmitDiagnostic(
+                "[3D preview] GPU WARN: EntitySkinningBones UBO block not bound on one or more programs; anim-on bone multiply will not run.");
+        }
+    }
+
+    private void ApplyEntityBoneSkinningUniformsBeforeDraw(
+        GlShaderProgram? program,
+        EntitySkinningUniformLocs locs,
+        PreviewModelSubject? model,
+        float meshSpaceLiftY,
+        bool boneSnapshotValid,
+        int boneSnapshotCount,
+        bool setupAnimMotion,
+        bool bonePaletteUploaded,
+        string passLabel)
+    {
+        if (bonePaletteUploaded && _entityBoneUbo != 0)
+        {
+            _gl!.BindBufferBase(BufferTargetARB.UniformBuffer, EntitySkinningUboBindingPoint, _entityBoneUbo);
+        }
+
+        var resolveOk = TryApplyEntityBoneSkinningUniforms(
+            program,
+            locs,
+            model,
+            meshSpaceLiftY,
+            boneSnapshotValid,
+            boneSnapshotCount,
+            setupAnimMotion);
+        EmitEntityDrawContractDiagnostic(
+            passLabel,
+            locs,
+            model,
+            setupAnimMotion,
+            boneSnapshotValid,
+            boneSnapshotCount,
+            bonePaletteUploaded,
+            resolveOk);
+    }
+
+    private bool TryApplyEntityBoneSkinningUniforms(
+        GlShaderProgram? program,
+        EntitySkinningUniformLocs locs,
+        PreviewModelSubject? model,
+        float meshSpaceLiftY,
+        bool boneSnapshotValid,
+        int boneSnapshotCount,
+        bool setupAnimMotion)
+    {
+        if (TryResolveEntitySkinningDrawState(
+                model,
+                meshSpaceLiftY,
+                boneSnapshotValid,
+                boneSnapshotCount,
+                setupAnimMotion,
+                out var previewSpaceVerts,
+                out var bindMesh,
+                out var gpuSkinning,
+                out var boneCount,
+                out var liftY))
+        {
+            ApplyEntitySkinningUniforms(program, locs, previewSpaceVerts, bindMesh, gpuSkinning, boneCount, liftY);
+            _lastUploadedPreviewSpaceVerts = previewSpaceVerts > 0.5f ? 1 : 0;
+            _lastUploadedBindMesh = bindMesh > 0.5f ? 1 : 0;
+            _lastUploadedGpuSkinning = gpuSkinning;
+            _lastUploadedBoneCount = boneCount;
+            _lastUploadedLiftY = liftY;
+            return true;
+        }
+
+        ApplyEntitySkinningUniforms(program, locs, 0f, 0f, 0f, 0f, 0f);
+        _lastUploadedPreviewSpaceVerts = 0;
+        _lastUploadedBindMesh = 0;
+        _lastUploadedGpuSkinning = 0;
+        _lastUploadedBoneCount = 0;
+        _lastUploadedLiftY = 0f;
+        return false;
+    }
+
+    private void ApplyEntitySkinningUniforms(
+        GlShaderProgram? program,
+        EntitySkinningUniformLocs locs,
+        float previewSpaceVerts,
+        float bindMesh,
+        float gpuSkinning,
+        float boneCount,
+        float meshLiftY)
+    {
+        if (program is not { IsValid: true })
+        {
+            return;
+        }
+
+        if (locs.PreviewSpaceVerts >= 0)
+        {
+            _gl!.Uniform1(locs.PreviewSpaceVerts, previewSpaceVerts);
+        }
+
+        if (locs.BindMesh >= 0)
+        {
+            _gl!.Uniform1(locs.BindMesh, bindMesh);
+        }
+
+        if (locs.GpuSkinning >= 0)
+        {
+            _gl!.Uniform1(locs.GpuSkinning, gpuSkinning);
+        }
+
+        if (locs.BoneCount >= 0)
+        {
+            _gl!.Uniform1(locs.BoneCount, boneCount);
+        }
+
+        if (locs.MeshLiftY >= 0)
+        {
+            _gl!.Uniform1(locs.MeshLiftY, meshLiftY);
+        }
+    }
+
+    private void ApplyEntitySkinningUniforms(
+        GlShaderProgram? program,
+        EntitySkinningUniformLocs locs,
+        float previewSpaceVerts,
+        float gpuSkinning,
+        float boneCount,
+        float meshLiftY) =>
+        ApplyEntitySkinningUniforms(program, locs, previewSpaceVerts, 0f, gpuSkinning, boneCount, meshLiftY);
+
+    private void ApplyEntitySkinningUniforms(GlShaderProgram? program, int gpuSkinning, int boneCount, float meshLiftY) =>
+        ApplyEntitySkinningUniforms(
+            program,
+            program == _shadowProgram ? _shadowEntityUniformLocs : _mainEntityUniformLocs,
+            0f,
+            0f,
+            gpuSkinning,
+            boneCount,
+            meshLiftY);
+
+    private bool TryResolveEntitySkinningDrawState(
+        PreviewModelSubject? model,
+        float meshSpaceLiftY,
+        bool boneSnapshotValid,
+        int boneSnapshotCount,
+        bool setupAnimMotion,
+        out float previewSpaceVerts,
+        out float bindMesh,
+        out int gpuSkinning,
+        out int boneCount,
+        out float liftY)
+    {
+        previewSpaceVerts = 0f;
+        bindMesh = 0f;
+        gpuSkinning = 0;
+        boneCount = 0;
+        liftY = 0f;
+        if (model is not { GpuEntityBoneSkinning: true, EmulatedRebake.GpuPreparedBoneCount: > 0 and var preparedCount })
+        {
+            return false;
+        }
+
+        if (model.EntityGpuVerticesInPreviewSpace)
+        {
+            previewSpaceVerts = 1f;
+            gpuSkinning = 0;
+            boneCount = 0;
+            liftY = 0f;
+            return true;
+        }
+
+        var paletteReady = boneSnapshotValid && boneSnapshotCount > 0;
+        previewSpaceVerts = 0f;
+        bindMesh = 1f;
+        gpuSkinning = paletteReady && setupAnimMotion ? 1 : 0;
+        boneCount = paletteReady ? boneSnapshotCount : preparedCount;
+        liftY = meshSpaceLiftY;
+
+        return true;
+    }
+
+    private void ApplyEntityBoneSkinningUniforms(
+        GlShaderProgram? program,
+        PreviewModelSubject? model,
+        float meshSpaceLiftY,
+        bool boneSnapshotValid,
+        int boneSnapshotCount,
+        bool setupAnimMotion)
+    {
+        var locs = program == _shadowProgram ? _shadowEntityUniformLocs : _mainEntityUniformLocs;
+        TryApplyEntityBoneSkinningUniforms(
+            program,
+            locs,
+            model,
+            meshSpaceLiftY,
+            boneSnapshotValid,
+            boneSnapshotCount,
+            setupAnimMotion);
     }
 
     private void UploadEntitySkinningBoneMatrices(GL gl, int boneSnapshotCount)
@@ -257,49 +489,6 @@ public sealed partial class OpenGlPreviewBackend
         gl.BufferSubData<byte>(BufferTargetARB.UniformBuffer, 0, _entitySkinningUboScratch.AsSpan(0, EntitySkinningUboMatrixBytes));
         gl.BindBufferBase(BufferTargetARB.UniformBuffer, EntitySkinningUboBindingPoint, _entityBoneUbo);
         gl.BindBuffer(BufferTargetARB.UniformBuffer, 0);
-    }
-
-    /// <summary>Updates only the tail of the entity skinning UBO (GPU skinning flag, bone count, mesh lift).</summary>
-    private void UploadEntitySkinningUboTail(GL gl, int gpuSkinning, int boneCount, float meshLiftY)
-    {
-        if (_entityBoneUbo == 0)
-        {
-            return;
-        }
-
-        WriteEntitySkinningUboTailScalars(
-            _entitySkinningUboScratch.AsSpan(EntitySkinningUboMatrixBytes, 16),
-            gpuSkinning,
-            boneCount,
-            meshLiftY);
-        gl.BindBuffer(BufferTargetARB.UniformBuffer, _entityBoneUbo);
-        gl.BufferSubData<byte>(
-            BufferTargetARB.UniformBuffer,
-            EntitySkinningUboMatrixBytes,
-            _entitySkinningUboScratch.AsSpan(EntitySkinningUboMatrixBytes, 16));
-        gl.BindBufferBase(BufferTargetARB.UniformBuffer, EntitySkinningUboBindingPoint, _entityBoneUbo);
-        gl.BindBuffer(BufferTargetARB.UniformBuffer, 0);
-    }
-
-    private void ApplyEntityBoneSkinningUboTail(
-        GL gl,
-        PreviewModelSubject? model,
-        float meshSpaceLiftY,
-        bool boneSnapshotValid,
-        int boneSnapshotCount)
-    {
-        if (_entityBoneUbo == 0)
-        {
-            return;
-        }
-
-        if (!boneSnapshotValid || model?.GpuEntityBoneSkinning != true || boneSnapshotCount <= 0)
-        {
-            UploadEntitySkinningUboTail(gl, 0, 0, 0f);
-            return;
-        }
-
-        UploadEntitySkinningUboTail(gl, 1, boneSnapshotCount, meshSpaceLiftY);
     }
 
     /// <summary>Called from <see cref="AutoPBR.App.Controls.GlPbrPreviewControl.OnOpenGlInit"/> only.</summary>
@@ -341,6 +530,7 @@ public sealed partial class OpenGlPreviewBackend
             EmitDiagnostic(useOpenGlEs
                 ? $"[3D preview] Context: {versionStr} (Genesis shader path, GLSL ES 3.0)."
                 : $"[3D preview] Context: {versionStr} (Genesis shader path, GLSL 330 core).");
+            _mainEntityUniformLocs = ResolveEntitySkinningUniformLocs(_program);
 
             // Genesis Shadows Phase 2: depth-only program + FBO shadow target. If either fails we keep
             // the main path running and just disable shadow sampling at draw time.
@@ -353,6 +543,13 @@ public sealed partial class OpenGlPreviewBackend
                 _shadowProgram.Dispose();
                 _shadowProgram = null;
             }
+            else
+            {
+                _shadowEntityUniformLocs = ResolveEntitySkinningUniformLocs(_shadowProgram);
+            }
+
+            InitEntitySkinningBoneUbo(gl);
+            LogEntityShaderInitDiagnosticsOnce();
 
             var shadowResolution = Math.Clamp(_settings.ShadowMapResolution, 256, 4096);
             try
@@ -390,7 +587,6 @@ public sealed partial class OpenGlPreviewBackend
             TryInitLineOverlay(gl, useOpenGlEs);
             TryInitSunBillboard(gl, useOpenGlEs);
             TryInitAtmosphere(gl, useOpenGlEs);
-            InitEntitySkinningBoneUbo(gl);
             _gpuAlive = true;
             _materialDirty = true;
             _meshDirty = true;
@@ -400,9 +596,7 @@ public sealed partial class OpenGlPreviewBackend
             if (_scene is not null)
             {
                 SyncOrbitFromSceneLocked(_scene);
-                _orbitSyncedKind = _scene.SceneKind == PreviewSceneKind.ItemPlane
-                    ? PreviewSceneKind.ItemPlane
-                    : PreviewSceneKind.BlockCube;
+                _orbitSyncedKey = ResolveOrbitSyncKey(_scene, _blockModelSubject);
             }
 
             _loggedMeshReady = false;

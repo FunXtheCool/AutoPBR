@@ -55,9 +55,9 @@ internal sealed partial class CleanRoomEntityModelRuntime
             var world = parentWorld;
 
             if (part.TryGetProperty("pose", out var poseEl) &&
-                TryComposePartPosePublic(poseEl, out var local))
+                TryComposePartPosePublic(poseEl, parentWorld, out var worldTexel))
             {
-                world = EntityParityTemplate.Mul(parentWorld, local);
+                world = worldTexel;
             }
 
 
@@ -128,7 +128,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         }
 
-
+        var baselineParts = BuildSetupAnimBaselineParts(geometryRoot);
 
         for (var i = 0; i < merged.Elements.Count; i++)
         {
@@ -138,7 +138,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 continue;
             }
 
-            if (!TryBuildSetupAnimPartWorldDelta(partId, partPose, partOriginWorld, out var deltaWorld))
+            if (!TryBuildSetupAnimPartWorldDelta(partId, partPose, partOriginWorld, baselineParts, out var deltaWorld))
             {
                 continue;
             }

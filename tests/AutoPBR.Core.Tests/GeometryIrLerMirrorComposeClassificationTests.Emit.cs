@@ -16,8 +16,9 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(texturePath, profile, 0f, 0f, out var mesh, out var provenance));
         Assert.Contains(expectedJvm, provenance.Detail ?? "", StringComparison.Ordinal);
-        Assert.True(
-            CleanRoomEntityModelRuntime.ResolveGeometryIrLerMirrorRightComposeLocalChain(
+        Assert.Equal(
+            CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot,
+            CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(
                 expectedJvm,
                 Path.GetFileNameWithoutExtension(texturePath).ToLowerInvariant(),
                 texturePath));
@@ -37,6 +38,7 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
     [InlineData(PolarBearJvm, 128, 64)]
     [InlineData(BabyPandaJvm, 64, 64)]
     [InlineData(BabyPolarBearJvm, 128, 64)]
+    [InlineData(AdultCatJvm, 64, 64)]
     public void Flat_quadruped_ir_emit_body_centroid_between_legs_and_head_when_shard_ok(
         string officialJvm,
         int atlasW,
@@ -61,6 +63,7 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
     }
 
     [Theory]
+    [InlineData("assets/minecraft/textures/entity/cat/cat_all_black.png", AdultCatJvm)]
     [InlineData("assets/minecraft/textures/entity/cow/cow_temperate.png", CowJvm)]
     [InlineData("assets/minecraft/textures/entity/cow/cow_cold.png", ColdCowJvm)]
     [InlineData("assets/minecraft/textures/entity/cow/cow_warm.png", WarmCowJvm)]
@@ -72,7 +75,14 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
     {
         var profile = new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2));
         var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(texturePath, profile, 0f, 0f, out var mesh, out var provenance));
+        Assert.True(runtime.TryBuildStaticMesh(
+            texturePath,
+            profile,
+            0f,
+            0f,
+            out var mesh,
+            out var provenance,
+            applyGeometryIrSetupAnimMotion: false));
         Assert.Contains(expectedJvm, provenance.Detail ?? "", StringComparison.Ordinal);
 
         var repo = GeometryIrTestTierSupport.FindRepoRoot();

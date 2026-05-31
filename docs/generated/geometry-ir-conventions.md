@@ -78,6 +78,22 @@ Pilot hierarchy expectations (nested vs flat vs binding_gap): [`runtime-ir-previ
 
 When adding or changing geometry IR tests, follow [test-guidance-geometry-animation-ir.md](../test-guidance-geometry-animation-ir.md) (tiers, allowlists, promotion). Runtime-IR preview plan: [`runtime-ir-preview-plan.md`](../runtime-ir-preview-plan.md).
 
+## Living-entity renderer (LER) preview fold — **regression guard**
+
+Vanilla `LivingEntityRenderer` applies `scale(-1,-1,1)` **once before** the model part tree. Preview must not use a different “world space” — both Blaze3D and OpenGL paths use the same **model texel space**; bugs are **matrix composition** in C#.
+
+| Do | Don’t |
+|----|--------|
+| Compose part chains in **`GeometryIrMeshWalk`** as **`local × parentWorld`** (block space **÷16** on bind translations) | `parentWorld × local` or texel-scale chain without block conversion |
+| Local part delta: **`Er` upper 3×3 + bind translation in row 4** (ModelPart / PartWorldPoseMath convention), then **`localBlock × parentBlock`** | Legacy **`T × Er`** (`UseLegacyTranslationTimesRotationPartPose`) or full **`T × R`** matrix product as local delta |
+| Fold LER with **`ApplyLivingEntityRendererColumnRootScale`** after model-space emit (one batch post setupAnim/definition-anim) | `ApplyPreviewWorldRoot` / walk `RootTransform = S` / per-element **`LocalToParent × S`** for rotated torsos |
+| Assert **cuboid render** vs JVM **`renderPartAffines` / `renderCuboidCenters`** when attached parts rotate under parents | Treat **`worldPose.translation`** alone as render ground truth for horns/ears |
+| Use **`ResolveGeometryIrParityEmitPlan`** + **`GeometryIrLerBasisKind.StandardWorldRoot`** on catalog paths | Re-enable cow-class **`RightComposeLocalChain`** for production emit |
+
+**Note:** Reference **`worldPose`** still uses **`PartWorldPoseMath`** (`mul(Er, T)`). That remains correct for lift-quality / origin probes. Preview emit uses the **ModelPart block stack** documented in [`runtime-ir-preview-plan.md` § PartPose vs ModelPart render](../runtime-ir-preview-plan.md#partpose-vs-modelpart-render--do-not-conflate-2026-05-28). After changing compose policy, rebake with `pwsh -File tools/Export-GeometryReference.ps1 -AllExistingOutput -Parallel`.
+
+**Tests:** `PigLerEmitSanityTests`, `GeometryIrLerMirrorComposeClassificationTests`, `ChickenPreviewZClusterTests`, `ColdCowHornPreviewPlacementTests`, `ModelPartTranslateAndRotateProbeTests`, `EntityGpuSkinnedMatrixCpuParityTests`. Full write-up: [`runtime-ir-preview-plan.md` § PartPose vs ModelPart render](../runtime-ir-preview-plan.md#partpose-vs-modelpart-render--do-not-conflate-2026-05-28).
+
 ## CleanRoom preview consumption
 
 Static body-layer geometry uses the **`EntityCuboid`** record plus optional **`GeometryIrMeshEmitter`** ([`GeometryIrMeshEmitter.cs`](../../src/AutoPBR.Core/Preview/GeometryIrMeshEmitter.cs)) — see [`cleanroom-entity-cuboid.md`](../cleanroom-entity-cuboid.md). Parity catalog calls **`GeometryIrLiftPolicy`** and rejects shards whose cuboids are not `exact` (except allowlisted `tex_crop_static`). **Cod** / **Salmon** are IR-only builders; parity catalog tries generic IR emit before legacy code-built `Build*` fallbacks.

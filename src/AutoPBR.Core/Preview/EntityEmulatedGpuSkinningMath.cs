@@ -5,6 +5,13 @@ namespace AutoPBR.Core.Preview;
 internal static class EntityEmulatedGpuSkinningMath
 {
     /// <summary>
+    /// Decodes the bit-cast element index stored in the last float of a skinned vertex
+    /// (<see cref="MinecraftModelBaker.TryBakeBindPoseForGpuSkinning"/> / <c>floatBitsToInt</c> in the vertex shader).
+    /// </summary>
+    internal static int DecodeSkinnedBoneIndexFromFloat(float boneWord) =>
+        BitConverter.SingleToInt32Bits(boneWord);
+
+    /// <summary>
     /// Component-wise cuboid scale (same as <see cref="MinecraftModelBaker"/> <c>W()</c> on vertex positions).
     /// </summary>
     internal static Vector3 PreviewCuboidNormalizeTexelPosition(in Vector3 texelModelPos) =>

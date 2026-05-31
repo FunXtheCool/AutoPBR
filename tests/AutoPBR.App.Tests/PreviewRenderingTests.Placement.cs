@@ -98,7 +98,7 @@ public sealed partial class PreviewRenderingTests
         };
 
         var lifted = PreviewSubjectPlacement.LiftSubjectIfClipping(subject);
-        Assert.NotSame(subject, lifted);
+        Assert.Same(subject, lifted);
         Assert.NotNull(lifted.EmulatedRebake);
         Assert.Same(rebake, lifted.EmulatedRebake);
         Assert.True(lifted.GpuEntityBoneSkinning);

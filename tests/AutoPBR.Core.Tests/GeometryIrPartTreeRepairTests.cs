@@ -72,6 +72,64 @@ public sealed class GeometryIrPartTreeRepairTests
         Assert.True(PartNestedUnder(repaired, "beak", "head"), "beak should nest under head after repair");
     }
 
+    [Fact]
+    public void Baby_donkey_repair_nests_flat_leg_siblings_under_body()
+    {
+        const string jvm = "net.minecraft.client.model.animal.equine.BabyDonkeyModel";
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
+        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
+            !string.Equals(status, "ok", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
+        Assert.True(PartNestedUnder(repaired, "left_front_leg", "body"));
+        Assert.True(PartNestedUnder(repaired, "right_hind_leg", "body"));
+        Assert.True(PartNestedUnder(repaired, "tail_r1", "tail"));
+        Assert.True(PartNestedUnder(repaired, "head", "head_parts"));
+        Assert.True(PartNestedUnder(repaired, "head_r1", "head"));
+        Assert.True(PartNestedUnder(repaired, "left_ear", "head"));
+        Assert.True(PartNestedUnder(repaired, "neck_r1", "head_parts"));
+    }
+
+    [Fact]
+    public void Baby_horse_repair_nests_ears_under_head()
+    {
+        const string jvm = "net.minecraft.client.model.animal.equine.BabyHorseModel";
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
+        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
+            !string.Equals(status, "ok", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
+        Assert.True(PartNestedUnder(repaired, "left_ear", "head"));
+        Assert.True(PartNestedUnder(repaired, "right_ear", "head"));
+    }
+
+    [Fact]
+    public void Baby_horse_flat_bake_does_not_reparent_root_sibling_legs()
+    {
+        const string jvm = "net.minecraft.client.model.animal.equine.BabyHorseModel";
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
+        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
+            !string.Equals(status, "ok", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
+        Assert.False(PartNestedUnder(repaired, "left_front_leg", "body"));
+    }
+
     private static bool PartNestedUnder(JsonElement geometryRoot, string childId, string parentId)
     {
         if (!geometryRoot.TryGetProperty("roots", out var roots) || roots.ValueKind != JsonValueKind.Array)

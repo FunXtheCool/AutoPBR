@@ -21,6 +21,7 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
     private const string HorseJvm = "net.minecraft.client.model.animal.equine.HorseModel";
     private const string AbstractFelineJvm = "net.minecraft.client.model.animal.feline.AbstractFelineModel";
     private const string AdultFelineJvm = "net.minecraft.client.model.animal.feline.AdultFelineModel";
+    private const string AdultCatJvm = "net.minecraft.client.model.animal.feline.AdultCatModel";
     private const string BabyRabbitJvm = "net.minecraft.client.model.animal.rabbit.BabyRabbitModel";
     private const string RabbitJvm = "net.minecraft.client.model.animal.rabbit.RabbitModel";
 }

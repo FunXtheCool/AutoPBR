@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using System.Numerics;
 
 using AutoPBR.Core.Models;
 using AutoPBR.Core.Preview;
@@ -191,7 +192,7 @@ public static class ResourcePackConverter
                             animTime,
                             out var emuModel,
                             out meshProvenance,
-                            applyGeometryIrSetupAnimMotion: true))
+                            applyGeometryIrSetupAnimMotion: false))
                     {
                         var entityNs = TryGetAssetNamespace(archivePath) ?? "minecraft";
                         var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(emuModel, entityNs);
@@ -286,6 +287,9 @@ public static class ResourcePackConverter
                         var primary = workOrdered[primIdx];
                         var sprite = primary.Sprite2DFoliageTarget;
                         EntityEmulatedPreviewRebakeContext? emulatedRebake = null;
+                        var anchorOffset = Vector3.Zero;
+                        var placementApplied = false;
+                        var isParityCatalogEntity = EntityTextureParityCatalog.IsCatalogued(normSel);
                         if (isEmulatedEntityModel)
                         {
                             var prof = ResolvePreviewMeshNativeProfile(previewNativeProfile);
@@ -293,7 +297,7 @@ public static class ResourcePackConverter
                             emulatedRebake = new EntityEmulatedPreviewRebakeContext
                             {
                                 PackZipPath = inputZipPath,
-                                AssetArchivePath = archivePath.Replace('\\', '/').TrimStart('/'),
+                                AssetArchivePath = normSel,
                                 NativeRootDirectory = prof.RootDirectory,
                                 NativeProfileName = prof.Name,
                                 NativeParsedVersion = prof.ParsedVersion?.ToString(),
@@ -301,6 +305,28 @@ public static class ResourcePackConverter
                                 IdlePhase01 = idlePh,
                                 OrderedTextureZipPaths = orderedModelTextures.ToArray()
                             };
+                            EntityPreviewPlacement.TryPopulateRebakeElementPartIds(
+                                emulatedRebake,
+                                prof,
+                                mergedModel.Elements.Count);
+                            EntityPreviewPlacement.TryMeasureMergedModelPartCentroidsY(
+                                mergedModel,
+                                emulatedRebake.ElementPartIds,
+                                out var bindBodyY,
+                                out var bindHeadY,
+                                out var bindLegY);
+                            var placement = EntityPreviewPlacement.ApplyToPreviewVertices(
+                                verts,
+                                MinecraftModelBaker.FloatsPerVertex,
+                                emulatedRebake.ElementPartIds);
+                            anchorOffset = placement.AnchorOffset;
+                            placementApplied = true;
+                            emulatedRebake.LastGroundContactY = placement.GroundContactY;
+                            emulatedRebake.LastGroundLiftY = placement.GroundLiftY;
+                            var placementYOffset = placement.AnchorOffset.Y + placement.GroundLiftY;
+                            emulatedRebake.LastBodyCentroidY = bindBodyY != 0f ? bindBodyY + placementYOffset : placement.BodyCentroidY;
+                            emulatedRebake.LastHeadCentroidY = bindHeadY != 0f ? bindHeadY + placementYOffset : placement.HeadCentroidY;
+                            emulatedRebake.LastLegCentroidY = bindLegY != 0f ? bindLegY + placementYOffset : placement.LegCentroidY;
                         }
 
                         var subject = new PreviewModelSubject
@@ -311,10 +337,12 @@ public static class ResourcePackConverter
                             Materials = materials,
                             PrimaryMaterialIndex = primIdx,
                             Sprite2DFoliageTarget = sprite,
-                            EnableRenderTimeAnimation = isEmulatedEntityModel,
+                            EnableRenderTimeAnimation = isEmulatedEntityModel && !isParityCatalogEntity,
                             AnimationPreset = isEmulatedEntityModel ? "entity_emulated" : null,
                             EmulatedRebake = emulatedRebake,
-                            MeshProvenance = meshProvenance
+                            MeshProvenance = meshProvenance,
+                            EntityPreviewAnchorOffset = anchorOffset,
+                            EntityPreviewPlacementApplied = placementApplied
                         };
 
                         if (emulatedRebake is not null)

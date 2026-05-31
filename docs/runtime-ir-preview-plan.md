@@ -61,7 +61,7 @@ client.jar
     │                                      ▲
     │                                      └── PreviewRenderStateSynthesis (timing only; P6 replaces)
     │
-    └─► MinecraftGeometryReference (JDK 25) ──► reference-output/ (cuboid + worldPose bake)
+    └─► MinecraftGeometryReference (JDK 25) ──► reference-output/ (cuboid + worldPose bake + optional JVM render affines)
 ```
 
 | Layer | Owns | Does not own |
@@ -237,7 +237,7 @@ Legacy `referenceCuboidsMatch` / `referencePosesMatch` / `referenceMeshMatch` va
 
 **54 pilot 4C dual-gate** (`geometry_ir_partial_to_ok_promotion_jvm.txt` ∩ 56 pilots): batch 1 (**16**); batch 2 (**8**); batch 3 (**11**); batch 4 (**11**); batch 5 — `EnderDragonModel`, `RavagerModel`, `BabyDonkeyModel`, `BabyFelineModel`, feline×4 (**8**). All automated gates ✓; **all 54 need manual Explore** above (plus T1-only: `SheepModel`).
 
-Flat quadrupeds need cow-class `LocalToParent * S` LER on parity emit where classified (`UsesFlatPartPoseOffsetQuadrupedJvm`). Re-run Explore after lifter or preview-delta changes.
+Flat quadrupeds and most catalog mobs use **column-root LER** (`ApplyLivingEntityRendererColumnRootScale`) after model-space emit — see **§ Quadruped body placement regression**. Re-run Explore after any change to `GeometryIrMeshWalk` or LER helpers.
 
 ## A.5 Geometry commands
 
@@ -482,44 +482,119 @@ Details and allowlist table: [`test-guidance-geometry-animation-ir.md`](test-gui
 | Layer | Finding |
 |-------|---------|
 | **Geometry lift (shards)** | `CowModel`, `PandaModel`, `PolarBearModel` (and babies) are `extractionStatus: ok`, `referenceWorldPoseMatch: true`, `referenceHierarchyMatch: true`, `assemblyGatePass: true`. Shards keep **flat** `root` children (`head`, `body`, four legs) with root-absolute `PartPose.offset` — same composed-flat pattern as Creeper / `QuadrupedModel` hosts (`suspectedFlatNestedPartCount: 4`). |
-| **`GeometryIrMeshWalk`** | Composes `parentWorld × localPartPose` per cuboid; no cow/panda-specific branch. Used consistently for emit, setupAnim cuboid order, and world-translation probes. |
+| **`GeometryIrMeshWalk`** | Composes **`localPartPose × parentWorld`** (row-vector / `System.Numerics` — matches `Vector3.Transform` in the baker). Used consistently for emit, setupAnim cuboid order, and world-translation probes. |
 | **`GeometryIrEntityCuboidTables.g.cs`** | **20** codegen tables (babies + climate cows + panda/polar + fish/chicken pilots). Temperate **`CowModel`** catalog preview uses lifted IR emit (`TryBuildCowMeshFromGeometryIr`, 2026-05-22). **`PolarBearModel`** adult uses IR + codegen (2026-05-22). |
 | **Harmful leg reparent** | `GeometryIrPartTreeRepair` skips `QuadrupedLegReparentRules` when `UsesVanillaFlatQuadrupedLegBake` (body + legs as root siblings). Regressed creeper stacking is covered by `GeometryIrPartTreeRepairTests.Creeper_repair_does_not_stack_body_y_onto_leg_origins`. |
 
-### Root cause (preview assembly, shared bug class)
+### Root cause (preview assembly, shared bug class) — **regression guard (2026-05-28)**
 
-**Living-entity renderer (LER) preview basis — multiply order of `scale(-1,-1,1)` vs per-part `LocalToParent`.**
+**Living-entity renderer (LER) preview basis — not a different Blaze3D/OpenGL world, but wrong matrix composition in `System.Numerics`.**
 
-Vanilla draws most mobs after `PoseStack.scale(-1,-1,1)`. Explore folds that into each cuboid’s `ModelElement.LocalToParent` in one of two orders:
+Vanilla applies **`PoseStack.scale(-1,-1,1)` once before the part tree** (column semantics: **`S × (T × R)`** on model points). AutoPBR bakes that into each cuboid’s `ModelElement.LocalToParent` for Explore.
 
-| Order | API | Typical mobs |
-|-------|-----|--------------|
-| **Default** | `worldRoot × LocalToParent` (`ApplyPreviewWorldRoot`) | Hoglin, ravager (`UsesComposedOffsetAndRotationBodyDefaultLerJvm`) |
-| **Right-compose** | `LocalToParent × worldRoot` (`ApplyGlobalTransform`) | Cow family, creeper, pig, sheep, wolf, goat, **panda/polar bear adult**, feline host, armadillo, turtle, `QuadrupedModel` flat hosts |
-| **Default (nested head)** | `worldRoot × LocalToParent` | **Rabbit** (head under `offsetAndRotation` body; stem `rabbit` excluded from quadruped right-compose), hoglin, ravager |
+**Two bugs caused the “floating torso / separated body” class** (cow, pig, creeper, chicken, bee, camel, hoglin, and many other catalog IR mobs — not quadruped-only):
 
-**Failure mode:** For flat quadrupeds, the **body** part carries `Rx(π/2)` plus a Y offset (e.g. Cow `T(0,5,2)`, Panda `T(0,10,0)`), while **head** and **legs** are mostly translation-only root siblings. Applying the **wrong** LER order leaves the rotated torso in a different preview Y band than head/legs → screenshot “floating body / head on ground / legs on plane.”
+| Bug | Symptom | Wrong code | Correct code |
+|-----|---------|------------|--------------|
+| **Walk multiply order** | Part chains drift even before LER | `parentWorld × local` in `GeometryIrMeshWalk.VisitPart` | **`local × parentWorld`** (row-vector convention used by `Vector3.Transform` in `MinecraftModelBaker`) |
+| **LER fold** | Rotated body (`Rx(π/2)` torso) detaches from head/legs; raw `Matrix4x4.Multiply(S, M)` does not flip origins | `ApplyPreviewWorldRoot` / emit `RootTransform = S` / per-element **`M × S`** (`ApplyGlobalTransform`) | **`ApplyLivingEntityRendererColumnRootScale`** — rebuild row affine so column **`S × M`** applies to **corner points** (basis vectors + origin transformed by `S`) |
+| **PartPose compose (legacy texel product)** | Chicken (and other `offsetAndRotation` torsos): body centroid on **Z≈16** while head/legs cluster near **Z≈−4** | **`T × Er`** in `TryComposePartPose` (rotates offset into Z) | **`Er × T`** matrix product — translation is not rotated; matches `PartPose.offsetAndRotation` / reference `worldPose` bake |
 
-**Historical catalog-path gap (fixed):** `TryBuildParityCatalogMeshFromGeometryIr` previously ended with `ApplyParityCatalogGeometryIrPreviewBasis` resolving LER without `officialJvmName`, so JVM-scoped policy in `UsesFlatPartPoseOffsetQuadrupedJvm` / future polar-bear exclusions could not apply. Test-only emit already used `ApplyGeometryIrParityLivingEntityRendererPreviewBasis(officialJvmName, …)` in `GeometryIrMeshEmitter.cs`; catalog now delegates through the same JVM-aware helper.
+**Do not reintroduce** per-element `LocalToParent × S` for flat quadrupeds or `RootTransform = S` on the walk without column-root rebuild — tests may pass on translation-only parts while **rotated body cuboids** still float in Explore.
 
-**Mis-classification (fixed 2026-05-21):** Treating panda/polar **adult** as hoglin-class default LER left body cuboid centroids outside the leg–head band (viewport cohesion tests). Empirical policy: cow-class right-compose for panda/polar adults; hoglin/ravager stay default.
+**Lifter angle:** When `referenceWorldPoseMatch` is already true, prefer fixing **walk order + LER fold + compose policy** before `GeometryIrPartTreeRepair` reparent hacks (creeper leg-stack regression).
 
-**Lifter angle:** Not a missing parent chain in committed shards. The completed fix was **classification accuracy** (which factories are flat-offset vs offset-and-rotation) feeding preview policy — not rewriting cuboid pivots for these three.
+### PartPose vs ModelPart render — **do not conflate (2026-05-28+)**
 
-**GPU path (secondary):** Explore emulated entities may GPU-skin with bind pose from `TryPrepareGpuSkinnedEmulatedMesh` while animating bones via `TryFillBoneMatricesFast` / setupAnim. Any mismatch in `applyGeometryIrSetupAnimMotion` between bind VBO and bone matrices (Breeze-class) can re-separate parts even when static parity emit tests pass.
+Preview emit must match **vanilla cuboid draw**, not only reference **`worldPose.translation`**. Those are related but not identical for rotated attached parts (horns, ears, nested head stacks).
+
+| Layer | Java source | What it answers | C# / reference |
+|-------|-------------|-----------------|----------------|
+| **`PartPose.offsetAndRotation`** | Factory / `getInitialPose()` | Bind offset + Euler; **offset not rotated into parent axis** | Reference `worldPose` via `PartWorldPoseMath` (`mul(Er, T)` row convention) |
+| **`ModelPart.translateAndRotate`** | Runtime PoseStack walk before cuboid draw | **Full 4×4** per part after parent chain; cuboid corners use this | JVM `renderPartAffines` + `renderCuboidCenters` (`ModelPartRenderPoseMath.java`) |
+
+**2026-05-28 adult regression class** (chicken body Z, exploded catalog parts) was **`System.Numerics` composition**, not “Er×T is impossible in C#”:
+
+1. **Walk order** — must be **`local × parentWorld`** (row-vector / `Vector3.Transform`), not `parent × local`.
+2. **LER fold** — column-root `ApplyLivingEntityRendererColumnRootScale`, not per-element `M × S`.
+3. **Anti-`T × Er`** — legacy `Mul(translation, rotation)` at texel scale rotates bind offsets into the wrong axis (Entity Debug toggle `UseLegacyTranslationTimesRotationPartPose`).
+
+**2026-05-28 horn / attached-part class** (`ColdCowModel` horns inside body while `referenceWorldPoseMatch` stayed green):
+
+- Reference **`worldPose`** for `right_horn` stayed near the body cluster (Z ≈ +0.5) while JVM **`renderCenterTexel`** was on the head cluster (Z ≈ −13).
+- Passing **`worldPose`-only** tests does **not** guarantee Explore cuboid placement.
+- **Production default (2026-05-28+)** — **ModelPart block stack** in `TryComposePartPose` / `GeometryIrMeshWalk` (not texel-scale `Mul(Er, T)` alone):
+
+| Step | Rule |
+|------|------|
+| **Units** | PoseStack **block space**: bind translations **÷ 16** before chain (`TexelRowAffineToBlock` / `BlockRowAffineToTexel`). |
+| **Local part delta** | **`Er` in upper 3×3 + bind translation in row 4** — same **bind-offset convention** as `PartWorldPoseMath` / Er×T, **not** a full `T × R` matrix product and **not** legacy **`T × Er`**. |
+| **Parent chain** | **`localBlock × parentBlock`** then scale row 4 to texel (JVM probe: `TR/localHead` on cold-cow horn). |
+| **Ground truth for render** | Prefer **`renderPartAffines` / `renderCuboidCenters`** in `reference-output/*.json` over **`worldPose.translation`** when asserting cuboid placement. |
+
+**Legacy debug only:** `UseLegacyTranslationTimesRotationPartPose` → texel-scale **`T × Er`** (pre–2026-05-28 adult catalog GPU explosion). Use Entity Debug for A/B; do not ship as default.
+
+**Tests:** `ModelPartTranslateAndRotateProbeTests`, `ColdCowHornPreviewPlacementTests` (JVM `renderCenterTexel`), `ChickenPreviewZClusterTests`, `AttachedPartWorldMatrixParityTests`. Obsolete: `HornComposeOrderProbeTests` (texel Er×T vs T×Er with wrong walk order — superseded by JVM render compare).
+
+### Canonical LER policy (2026-05-28 — do not regress)
+
+| Piece | Rule |
+|-------|------|
+| **Classification** | `ResolveGeometryIrLerBasis` → **`StandardWorldRoot`** for almost all catalog mobs (`UsesFlatPartPoseOffsetQuadrupedJvm`, hoglin/ravager/rabbit, etc.). **`RightComposeLocalChain`** is **legacy / test-only** (`TryBuildGeometryIrParityMeshForTestsWithLerCompose`). |
+| **Emit plan** | `ResolveGeometryIrParityEmitPlan`: **model-space emit** (`EmitRootTransform = Identity`), **one** post-batch after setupAnim/definition-anim → `FinishGeometryIrMeshLivingEntityRendererBasis` → **`ApplyLivingEntityRendererColumnRootScale`**. |
+| **Hand `Build*` fallbacks** | Same as catalog: `ApplyLivingEntityRendererPreviewBasis(mesh, GeometryIrLerBasisKind.StandardWorldRoot)` or parameterless overload (column root). **Not** `lerMirrorRightComposeLocalChain: true`. |
+| **GPU bones** | `ApplyLivingEntityRendererColumnRootScale` per bone; parity-catalog meshes → **no second LER** in `TryFillBoneMatricesFast`. |
+| **Tests** | `PigLerEmitSanityTests`, `GeometryIrLerMirrorComposeClassificationTests`, `GeometryIrQuadrupedReferenceWorldPoseTests`, `GeometryIrHoglinViewportLerTests`, **`ChickenPreviewZClusterTests`** (temperate/cold/baby body Z vs head/legs). |
+
+Implementation: `CleanRoomEntityShared.ApplyLivingEntityRendererColumnRootScale`, `GeometryIrMeshWalk`, `CleanRoomEntityGeometryIrLerTestHooks.ResolveGeometryIrParityEmitPlan`.
 
 ### Fix approach / status
 
-| Item | Status | Action |
+| Item | Status | Notes |
 |------|--------|--------|
-| Unify catalog LER dispatch | **Done (2026-05-21)** | `ApplyParityCatalogGeometryIrPreviewBasis` delegates to `ApplyGeometryIrParityLivingEntityRendererPreviewBasis(officialJvm, …)`; parity emit sets `OfficialJvmName` on `GeometryIrMeshEmitOptions`. |
-| Per-JVM LER classification | **Done (2026-05-21; rabbit 2026-05-22)** | Cow-family + panda/polar **adult** + **feline host** (nested legs under `body`) → cow-class `LocalToParent * S` via `UsesFlatPartPoseOffsetQuadrupedJvm`; hoglin/ravager + **rabbit** → default (`UsesComposedOffsetAndRotationBodyDefaultLerJvm`); baby panda/polar → right-compose via JVM + stem gate; feline/rabbit stems exclude quadruped substring false positives (`cat`, `rabbit`). **BabyDonkey** parity/viewport emit applies `head_parts` setupAnim pitch via `GeometryIrMeshEmitPresets.ForParityAssemblyViewportProbe`. Hand `Build*` fallbacks use same resolver (baby rabbit catalog still uses explicit right-compose on hand path). |
-| GPU fast-bone JVM | **Done (2026-05-21)** | `EntityGpuBoneDispatchRoute.GeometryIrOfficialJvm` set on parity-catalog IR builds; non-catalog rebakes pass JVM into `ResolveGeometryIrLerMirrorRightComposeLocalChain`. |
-| Baby polar catalog JVM | **Done (2026-05-21)** | Manifest `geometry_ir_official_jvm_baby` for `polarbear_baby.png` → `BabyPolarBearModel`. |
-| Viewport cohesion tests | **Done (2026-05-21)** | `GeometryIrLerMirrorComposeClassificationTests` — body-in-band + vertical-span probes for Cow/Cold/Warm/Panda/PolarBear (+ babies); catalog static-mesh smokes for temperate/cold/warm cow, panda, polar bear. |
-| Manual Explore sign-off | **Pending** | § A.4 canary rows — refresh screenshots after local Explore pass. |
+| Column-root LER + walk order | **Done (2026-05-28)** | High-impact across catalog IR (bee, camel, chicken partial, hoglin, quadrupeds, …). |
+| Catalog JVM-aware LER dispatch | **Done (2026-05-21)** | `ApplyGeometryIrParityLivingEntityRendererPreviewBasis(officialJvm, …)`. |
+| Hand `Build*` aligned to column root | **Done (2026-05-28)** | Quadruped `Build*` + default `ApplyLivingEntityRendererPreviewBasis` overload. |
+| Reference world-pose tests | **Done** | `GeometryIrQuadrupedReferenceWorldPoseTests` vs `reference_java`. |
+| Chicken body Z displacement | **Done (2026-05-28)** | Anti-**`T × Er`** at texel scale (Entity Debug confirmed adult catalog GPU fix). Legacy **`T × Er`** via `UseLegacyTranslationTimesRotationPartPose` only. |
+| ModelPart render stack (attached parts) | **Done (2026-05-28)** | Block-space **`Er` upper 3×3 + bind row 4**, **`local × parent`**, JVM `renderCuboidCenters` (`ColdCowModel` horns). |
+| Manual Explore sign-off | **Done (2026-05-28)** | Cow cold horns + adult catalog cohesion verified in Explore. Refresh § A.4 screenshots when convenient. |
 
-**Do not** “fix” via `GeometryIrPartTreeRepair` leg-under-body reparent for these JVMs — that stacks root-absolute leg Y onto body space (creeper regression; plan § A.5 / Phase 5A).
+**Do not** “fix” floating torsos via `GeometryIrPartTreeRepair` leg-under-body reparent for flat quadruped JVMs.
+
+### Explore scene placement (2026-05-29)
+
+Single policy for emulated / parity-catalog Explore 3D preview (implementation: `EntityPreviewGrounding`, `EntityPreviewPlacement`, `PreviewSubjectPlacement`, `OpenGlPreviewBackend.Render.PassSetup`):
+
+| Policy | Rule |
+|--------|------|
+| **Animation default** | Parity-catalog textures load with entity animation **off** and legacy whole-mesh wobble **off**; rebake uses `applyGeometryIrSetupAnimMotion: false` until the user enables animation. |
+| **Ground contact** | Lift from the **same posed mesh** drawn (bind when anim off, animated bones when anim on). Contact Y prefers **leg** part ids (`leg` ∧ ¬`head`) when geometry IR part ids are on the rebake context; else **bottom quartile** of vertex Y. |
+| **Lift application** | **One** path: CPU bakes lift+anchor into vertices (`EntityGpuMeshSpaceLiftY = 0`); GPU uses bind-pose VBO + `uEntityMeshLiftY` only (recomputed per frame when anim on). No second global `min-Y` lift in `GlPbrPreviewControl` for emulated subjects. |
+| **Anchor** | After bake+LER, one translation centers XZ and places feet on `PreviewStageConstants.GridWorldY` (+ clearance); stored on `PreviewModelSubject.EntityPreviewAnchorOffset` / rebake diagnostics. |
+| **Camera** | Orbit pivot reseeds per entity texture path (not shared with unit-cube bucket); target ≈ chest height from posed AABB. |
+| **GPU bones** | Bind VBO from `TryPrepareGpuSkinnedEmulatedMesh` (`applyGeometryIrSetupAnimMotion: false`). **Animation off:** `uEntityGpuSkinning=0`, `uEntityBoneCount>0` → shader `W()`+lift only (vertices already bind posed). **Animation on:** `bone[i]=invBind[i]·M_anim[i]` from full `TryBuildStaticMesh` when inverse bind exists; `uEntityGpuSkinning=1`. See [`entity-preview-gpu-cpu-parity.md`](entity-preview-gpu-cpu-parity.md). |
+| **Diagnostics** | `ParityCatalogEntityPreviewDiagnostics.FormatExplorePlacementLine` → preview log: ler basis, gpuSkinning, liftY, animClock, setupAnimMotion, part centroid Y (preview space; refreshed on GPU bind prep). |
+
+Tests: `EntityPreviewPlacementTests.Cow_temperate_bind_pose_foot_contact_near_preview_floor_after_placement`, `PreviewRenderingTests.Placement`, `EntityGpuSkinnedMatrixCpuParityTests` (cow/panda).
+
+### Baby JVM family (same canonical policy as adults — 2026-05-28+)
+
+Baby fixes must **extend** the adult world-preview rules above, not reintroduce hand-builder shortcuts that fight lifted IR. See also [`vanilla-preview-parity.md`](vanilla-preview-parity.md) § *Reusable entity runtime parity playbook* and [`generated/rig-accuracy-batches/equine.md`](generated/rig-accuracy-batches/equine.md).
+
+| Rule | Detail |
+|------|--------|
+| **IR host** | Resolve dedicated `Baby*Model` shards on 26.1.2+ (`GeometryIrParityJvmResolver`); never scale adult rigs or mis-lifted adult hosts (e.g. adult `HorseModel` for baby horse). |
+| **Walk + LER + compose** | Same as adults: `GeometryIrMeshWalk` **`local × parentWorld`**, post-batch **`ApplyLivingEntityRendererColumnRootScale`**, production **ModelPart block stack** (see § PartPose vs ModelPart render). Do not “fix” babies with per-element `M × S`, reversed walk order, or legacy **`T × Er`**. |
+| **Flat quadruped legs** | `UsesVanillaFlatQuadrupedLegBake` → **skip** `QuadrupedLegReparentRules` (fox, cow, chicken, `BabyHorseModel`, …). **Do not** reparent to fix floating torsos — that was the adult cow/panda regression class. |
+| **Nested-head exception** | `HeadStackNestedUnderBody` (`BabyDonkeyModel`): head stack under `body` but legs still at root with **body-relative** offsets → reparent legs under `body` only (see `GeometryIrPartTreeRepairTests`). |
+| **Baby scale emit** | `ParityCatalogDefaultBabyProfile`: post–26.1 dedicated `Baby*` JVM → `BabyProfile.Adult` (unit scale). Pre–26.1 only: `VanillaUniformBaby` (0.5). |
+| **Equine baby tail / hierarchy** | Tail and `tail_r1` use **IR walk world** only; no hand absolute tail overrides in emit presets (they duplicated body pose and separated tail from nested IR). Head idle overrides may remain where javap baseline differs from static layer. |
+| **setupAnim on flat IR** | `StripUnsafeFlatQuadrupedPeerPositionChannels` for flat JVM families; merge **assigned** channels with geometry baseline (delta), not full absolute part transforms. Rotation-only overlay for chicken dedicated pass. |
+| **Explore defaults** | Parity-catalog preview: animation **off** + legacy wobble **off** until user enables (`ApplyExploreParityCatalogPreviewDefaults`). Initial mesh bake uses `applyGeometryIrSetupAnimMotion: false`. |
+| **Verification** | `BabyFamilyAttachmentClusterTests`, `EquinePreviewReferenceClusterTests` (baby leg/tail clusters), `BabyCatalogGeometryIrPreviewTests`; manual § A.4 rows for `BabyFoxModel`, `BabyCowModel`, `BabyDonkeyModel`, etc. |
+
+**Do not** add family-wide `TryGetPartPoseOverride` absolute poses for limbs/tail on catalog IR emit — that bypasses the same world-pose chain validated by `referenceWorldPoseMatch`.
 
 ### Impact on lift pipeline
 
@@ -533,11 +608,15 @@ Vanilla draws most mobs after `PoseStack.scale(-1,-1,1)`. Explore folds that int
 ### Verification checklist
 
 - [x] `ApplyParityCatalogGeometryIrPreviewBasis` passes `officialJvmName` into LER resolver (delegates to shared helper).
-- [x] `ResolveGeometryIrLerMirrorRightComposeLocalChain(PolarBearModel, …)` → **true** (cow-class); hoglin/ravager → **false** (default).
+- [x] `ResolveGeometryIrLerMirrorRightComposeLocalChain(PolarBearModel, …)` → **false** (column-root `StandardWorldRoot`); legacy `M×S` only in explicit test hooks.
 - [x] `dotnet test tests/AutoPBR.Core.Tests --filter "GeometryIrLerMirrorComposeClassificationTests|GeometryIrHoglinViewportLerTests|GeometryIrAssemblyViewportSanityTests"` — green (2026-05-21).
 - [x] Cohesion tests: body within leg–head vertical band + span cap for Cow/Cold/Warm/Panda/PolarBear IR + catalog static mesh.
 - [ ] Explore 3D: Cow temperate/cold/warm, Panda, PolarBear adult+baby — single connected silhouette (compare to screenshots above).
 - [x] GPU path: parity-catalog IR records `GeometryIrOfficialJvm` on dispatch route (no double LER on catalog meshes).
+- [x] GPU bind-pose shader applies `W()`+lift whenever `uEntityBoneCount>0` (not only when skinning active) — [`entity-preview-gpu-cpu-parity.md`](entity-preview-gpu-cpu-parity.md).
+- [x] GPU animated bones use full mesh `LocalToParent` when bind inverse present (same source as CPU).
+- [x] LER folded once per build (`ResolveGeometryIrParityEmitPlan`); definition-animation before final LER on catalog path (2026-05-28).
+- [x] `GeometryIrQuadrupedReferenceWorldPoseTests` green for cow / panda / creeper / pig / polar (shard + catalog static).
 - [ ] Optional: `AUTOPBR_RUN_ASSEMBLY_VIEWPORT_PROBES=1` + pilot regen unchanged for flat-count metrics.
 
 ---

@@ -182,7 +182,8 @@ if (-not $SkipReference) {
     }
     $refArgs = @(
         "-File", (Join-Path $repoRoot "tools/Export-GeometryReference.ps1"),
-        "-ModelsFromFile", $PilotList
+        "-ModelsFromFile", $PilotList,
+        "-Parallel"
     )
     if (-not [string]::IsNullOrWhiteSpace($JavaHome)) {
         $refArgs += @("-JavaHome", $JavaHome)

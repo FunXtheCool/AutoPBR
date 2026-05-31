@@ -84,7 +84,7 @@ final class PartWorldPoseMath {
             var xRot = ((Number) pose.getClass().getMethod("xRot").invoke(pose)).floatValue();
             var yRot = ((Number) pose.getClass().getMethod("yRot").invoke(pose)).floatValue();
             var zRot = ((Number) pose.getClass().getMethod("zRot").invoke(pose)).floatValue();
-            return mul(translation(x, y, z), eulerXyz(xRot, yRot, zRot));
+            return mul(eulerXyz(xRot, yRot, zRot), translation(x, y, z));
         }
 
         float tx() {

@@ -184,7 +184,7 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests
         var cow = ParityCatalogEntityPreviewDiagnostics.SurveyPath(
             "assets/minecraft/textures/entity/cow/cow_temperate.png",
             Profile26);
-        Assert.Equal(CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.RightComposeLocalChain, cow.LerBasis);
+        Assert.Equal(CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot, cow.LerBasis);
         Assert.True(cow.HasSetupAnimDocument);
         Assert.Equal("living-walk", cow.SetupAnimStateSource);
 

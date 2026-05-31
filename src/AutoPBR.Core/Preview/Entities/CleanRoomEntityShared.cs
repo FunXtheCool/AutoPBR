@@ -16,9 +16,9 @@ internal sealed partial class CleanRoomEntityModelRuntime
     /// <b>Rigging policy:</b> compose vanilla <c>PartPose</c>-equivalent chains only through these methods
     /// (<see cref="Mul"/>, <see cref="T"/>, <see cref="Rx"/>, <see cref="Ry"/>, <see cref="Rz"/>, <see cref="Er"/>).
     /// Do not duplicate local <c>static Mul/T/Er</c> helpers in new or refactored builders.
-    /// Living-entity previews should end with the LER preview-basis helper (LER <c>scale(-1,-1,1)</c> folded as world-root),
-    /// except equines which use <see cref="ApplyEquineLivingEntityRendererPreviewBasis"/> / <see cref="ApplyBabyEquineLivingEntityRendererPreviewBasis"/> for tuned multiply order and baby yaw,
-    /// and quadruped rigs that pass <c>lerMirrorRightComposeLocalChain: true</c> so torso chains match vanilla (see <see cref="UsesQuadrupedLerMirrorRightComposeLocalChain"/>).
+    /// Living-entity previews should end with column-root LER (<see cref="ApplyLivingEntityRendererColumnRootScale"/>)
+    /// after model-space emit. Legacy hand paths may still pass <c>lerMirrorRightComposeLocalChain: true</c> for A/B tests only; production emit uses
+    /// <see cref="ApplyLivingEntityRendererColumnRootScale"/> (see <see cref="GeometryIrLerBasisKind.StandardWorldRoot"/>).
     /// </summary>
     private static class EntityParityTemplate
     {
@@ -272,21 +272,67 @@ internal sealed partial class CleanRoomEntityModelRuntime
     }
 
     /// <summary>
+    /// Vanilla LER <c>PoseStack.scale(-1,-1,1)</c> before the model tree: column <c>S * M</c> on points, stored as row affine.
+    /// </summary>
+    internal static Matrix4x4 ApplyLivingEntityRendererColumnRootScale(in Matrix4x4 modelPose)
+    {
+        var origin = Vector3.Transform(Vector3.Zero, modelPose);
+        var axisX = Vector3.Transform(Vector3.UnitX, modelPose) - origin;
+        var axisY = Vector3.Transform(Vector3.UnitY, modelPose) - origin;
+        var axisZ = Vector3.Transform(Vector3.UnitZ, modelPose) - origin;
+        var s = LivingEntityRendererPreviewRootScale;
+        origin = Vector3.Transform(origin, s);
+        axisX = Vector3.Transform(axisX, s);
+        axisY = Vector3.Transform(axisY, s);
+        axisZ = Vector3.Transform(axisZ, s);
+        return CreateRowAffine(origin, axisX, axisY, axisZ);
+    }
+
+    private static Matrix4x4 CreateRowAffine(Vector3 origin, Vector3 axisX, Vector3 axisY, Vector3 axisZ) =>
+        new(
+            axisX.X, axisX.Y, axisX.Z, 0f,
+            axisY.X, axisY.Y, axisY.Z, 0f,
+            axisZ.X, axisZ.Y, axisZ.Z, 0f,
+            origin.X, origin.Y, origin.Z, 1f);
+
+    private static MergedJavaBlockModel ApplyLivingEntityRendererColumnRootScale(MergedJavaBlockModel model)
+    {
+        var transformed = new List<ModelElement>(model.Elements.Count);
+        foreach (var e in model.Elements)
+        {
+            transformed.Add(new ModelElement
+            {
+                From = e.From,
+                To = e.To,
+                Faces = e.Faces,
+                LocalToParent = ApplyLivingEntityRendererColumnRootScale(e.LocalToParent),
+            });
+        }
+
+        return new MergedJavaBlockModel
+        {
+            Elements = transformed,
+            Textures = model.Textures,
+        };
+    }
+
+    /// <summary>
     /// Vanilla <c>LivingEntityRenderer</c> applies <c>PoseStack.scale(-1, -1, 1)</c> before drawing most mob models.
-    /// Default fold is <c>worldRoot * LocalToParent</c>; quadruped cow-class style torsos match vanilla when folded as
-    /// <c>LocalToParent * worldRoot</c> (same idea as <see cref="ApplyEquineLivingEntityRendererPreviewBasis"/>).
+    /// Geometry IR uses <see cref="ResolveGeometryIrParityEmitPlan"/> for a single fold: PoseStack root on emit, or one post-batch
+    /// (<see cref="ApplyPreviewWorldRoot"/> / <see cref="ApplyGlobalTransform"/>). Hand-built rigs may pass
+    /// <paramref name="lerMirrorRightComposeLocalChain"/> directly (see <see cref="ApplyEquineLivingEntityRendererPreviewBasis"/>).
     /// </summary>
     /// <remarks>
-    /// Horse/donkey/mule use <see cref="ApplyEquineLivingEntityRendererPreviewBasis"/> / <see cref="ApplyBabyEquineLivingEntityRendererPreviewBasis"/> instead
-    /// (model-scale-aware and baby yaw). Pass <paramref name="lerMirrorRightComposeLocalChain"/> for other quadrupeds (see
-    /// <see cref="UsesQuadrupedLerMirrorRightComposeLocalChain"/> + fast GPU bone path in <see cref="TryFillBoneMatricesFast"/>).
+    /// Geometry IR and hand <c>Build*</c> fallbacks use
+    /// <see cref="GeometryIrLerBasisKind.StandardWorldRoot"/> column-root scale unless a test passes
+    /// <paramref name="lerMirrorRightComposeLocalChain"/> explicitly.
     /// </remarks>
     private static MergedJavaBlockModel ApplyLivingEntityRendererPreviewBasis(
         MergedJavaBlockModel model,
         bool lerMirrorRightComposeLocalChain = false) =>
         lerMirrorRightComposeLocalChain
             ? ApplyGlobalTransform(model, Matrix4x4.CreateScale(-1f, -1f, 1f))
-            : ApplyPreviewWorldRoot(model, Matrix4x4.CreateScale(-1f, -1f, 1f));
+            : ApplyLivingEntityRendererColumnRootScale(model);
 
     private static MergedJavaBlockModel ApplyLivingEntityRendererPreviewBasis(
         MergedJavaBlockModel model,
@@ -297,7 +343,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
             GeometryIrLerBasisKind.RightComposeLocalChain => ApplyLivingEntityRendererPreviewBasis(
                 model,
                 lerMirrorRightComposeLocalChain: true),
-            _ => ApplyLivingEntityRendererPreviewBasis(model)
+            GeometryIrLerBasisKind.StandardWorldRoot => ApplyLivingEntityRendererColumnRootScale(model),
+            _ => ApplyLivingEntityRendererColumnRootScale(model)
         };
 
 

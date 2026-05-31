@@ -17,7 +17,7 @@ namespace AutoPBR.Core.Tests;
 /// CleanRoom folds head look into the same <c>headPose</c> matrix for head, beak, and wattle cuboids, so merged
 /// bind-pose matrices for those three elements match <b>head</b> IR pose, not the beak/wattle IR rows.
 /// </remarks>
-public sealed class ChickenPartPoseIrVersusCleanRoomTests
+public sealed partial class ChickenPartPoseIrVersusCleanRoomTests
 {
     private static string ContentPath(params string[] segments) =>
         Path.Combine([GeometryIrTestTierSupport.FindRepoRoot(), .. segments]);
@@ -32,7 +32,7 @@ public sealed class ChickenPartPoseIrVersusCleanRoomTests
 
     private static Matrix4x4 Translation(float x, float y, float z) => Matrix4x4.CreateTranslation(x, y, z);
 
-    /// <summary>IR <c>pose</c> as a single part-local matrix: <c>T · Er</c> (same as head/body chains in CleanRoom).</summary>
+    /// <summary>Production uses <c>Er × T</c> in <see cref="GeometryIrMeshEmitter"/> (Explore GPU parity, 2026-05-28).</summary>
     private static Matrix4x4 MatrixFromIrPartPose(JsonElement pose)
     {
         var t = pose.GetProperty("translation");
@@ -43,7 +43,7 @@ public sealed class ChickenPartPoseIrVersusCleanRoomTests
         var rx = (float)r[0].GetDouble();
         var ry = (float)r[1].GetDouble();
         var rz = (float)r[2].GetDouble();
-        return Mul(Translation(tx, ty, tz), Er(rx, ry, rz));
+        return Mul(Er(rx, ry, rz), Translation(tx, ty, tz));
     }
 
     private static Dictionary<string, Matrix4x4> LoadChicken26IrBindPoseMatrices()
@@ -86,63 +86,6 @@ public sealed class ChickenPartPoseIrVersusCleanRoomTests
                Math.Abs(a.M44 - b.M44) <= eps;
     }
 
-    [Fact]
-    public void Bind_pose_stripped_merged_matrices_match_ir_for_root_aligned_parts()
-    {
-        GeometryIrParityPolicy.ResetForTests();
-        var ir = LoadChicken26IrBindPoseMatrices();
-        var headPoseIr = ir["head"];
-        var bodyPoseIr = ir["body"];
-        var rightLegIr = ir["right_leg"];
-        var rightWingIr = ir["right_wing"];
-        var leftWingIr = ir["left_wing"];
-        var beakLeafIr = ir["beak"];
-
-        var runtime = new CleanRoomEntityModelRuntime();
-        const string path = "assets/minecraft/textures/entity/chicken/chicken.png";
-        var profile = new MinecraftNativeProfile("26.1.2", TestEnvironmentPaths.AbsentNativeRoot, new Version(26, 1, 2));
-        Assert.True(runtime.TryBuildStaticMesh(path, profile, idlePhase01: 0f, animationTimeSeconds: 0f, out var merged));
-        Assert.Equal(8, merged.Elements.Count);
-
-        var worldRoot = Matrix4x4.CreateScale(-1f, -1f, 1f);
-        Assert.True(Matrix4x4.Invert(worldRoot, out var invWorld));
-        Matrix4x4 Strip(in Matrix4x4 m) => Mul(invWorld, m);
-
-        // BuildChicken order: head slab, beak, wattle, body, R leg, L leg, R wing, L wing — all angles zero at bind.
-        var m0 = Strip(merged.Elements[0].LocalToParent);
-        var m1 = Strip(merged.Elements[1].LocalToParent);
-        var m2 = Strip(merged.Elements[2].LocalToParent);
-        var m3 = Strip(merged.Elements[3].LocalToParent);
-        var m4 = Strip(merged.Elements[4].LocalToParent);
-        var m5 = Strip(merged.Elements[5].LocalToParent);
-        var m6 = Strip(merged.Elements[6].LocalToParent);
-        var m7 = Strip(merged.Elements[7].LocalToParent);
-
-        const float eps = 1e-4f;
-        Assert.True(MatricesClose(m0, headPoseIr, eps), "head slab");
-        Assert.True(MatricesClose(m3, bodyPoseIr, eps), "body");
-
-        // Geometry IR part poses come from createBodyLayer only. Preview BuildChicken always applies setupAnim:
-        // legs use cos(limbSwing·0.6662+phase)·1.4·amount (non-zero at t=0); wings use (sin(flap)+1)·flapSpeed.
-        // So IR right_leg / wing poses do not match merged matrices at animationTimeSeconds == 0.
-        Assert.False(MatricesClose(m4, rightLegIr, 1e-2f), "right leg preview includes walk-cycle pitch vs static IR");
-        Assert.False(MatricesClose(m6, rightWingIr, 1e-2f), "right wing preview includes flap bias vs static IR");
-        Assert.False(MatricesClose(m7, leftWingIr, 1e-2f), "left wing preview includes flap bias vs static IR");
-
-        // Beak / wattle use head chain in CleanRoom, not IR leaf poses (IR has identity translation on those nodes).
-        Assert.True(MatricesClose(m1, headPoseIr, eps), "beak merged pose should match head IR pose");
-        Assert.True(MatricesClose(m2, headPoseIr, eps), "wattle merged pose should match head IR pose");
-        Assert.False(
-            MatricesClose(m1, beakLeafIr, 0.05f),
-            "beak IR leaf pose is not the merged model matrix (flat IR vs head-local Java).");
-
-        // Left leg: mirrored root X vs right_leg; at anim 0 still gets quadruped pitch (inverted phase vs right).
-        var limbSwingAmount = Math.Clamp(0.22f + 0f * 0.18f + 0f * 0.12f, 0.05f, 0.95f);
-        var leftPitch = MathF.Cos(0f * 0.6662f + MathF.PI) * 1.4f * limbSwingAmount;
-        var leftLegExpected = Mul(Translation(1f, 19f, 1f), Er(leftPitch, 0f, 0f));
-        Assert.True(MatricesClose(m5, leftLegExpected, eps), "left leg at anim 0 matches inverted-phase cosine leg pitch");
-    }
-
     private static (Matrix4x4 head, Matrix4x4 body) LoadColdChicken26IrHeadBodyPoses()
     {
         var path = ContentPath("docs", "generated", "geometry", "26.1.2",
@@ -177,45 +120,59 @@ public sealed class ChickenPartPoseIrVersusCleanRoomTests
     {
         GeometryIrParityPolicy.ResetForTests();
         var (headPoseIr, bodyPoseIr) = LoadColdChicken26IrHeadBodyPoses();
-        var runtime = new CleanRoomEntityModelRuntime();
-        const string path = "assets/minecraft/textures/entity/chicken/chicken_cold.png";
-        var profile = new MinecraftNativeProfile("26.1.2", TestEnvironmentPaths.AbsentNativeRoot, new Version(26, 1, 2));
-        Assert.True(runtime.TryBuildStaticMesh(path, profile, idlePhase01: 0f, animationTimeSeconds: 0f, out var merged));
-        Assert.Equal(10, merged.Elements.Count);
-
-        var worldRoot = Matrix4x4.CreateScale(-1f, -1f, 1f);
-        Assert.True(Matrix4x4.Invert(worldRoot, out var invWorld));
-        Matrix4x4 Strip(in Matrix4x4 m) => Mul(invWorld, m);
+        const string jvm = "net.minecraft.client.model.animal.chicken.ColdChickenModel";
+        var geometryRoot = LoadRepairedGeometryRoot(jvm);
+        var merged = CleanRoomEntityModelRuntime.TryBuildGeometryIrModelSpaceParityMeshForTests(
+            "entity/chicken/chicken_cold", jvm, 64, 32, geometryRoot, out _);
+        Assert.NotNull(merged);
+        Assert.Equal(10, merged!.Elements.Count);
 
         const float eps = 1e-4f;
-        Assert.True(MatricesClose(Strip(merged.Elements[0].LocalToParent), headPoseIr, eps), "cold head main");
-        Assert.True(MatricesClose(Strip(merged.Elements[1].LocalToParent), headPoseIr, eps), "cold hood");
-        Assert.True(MatricesClose(Strip(merged.Elements[2].LocalToParent), headPoseIr, eps), "cold beak under head");
-        Assert.True(MatricesClose(Strip(merged.Elements[3].LocalToParent), headPoseIr, eps), "cold wattle under head");
-        Assert.True(MatricesClose(Strip(merged.Elements[4].LocalToParent), bodyPoseIr, eps), "cold body main");
-        Assert.True(MatricesClose(Strip(merged.Elements[5].LocalToParent), bodyPoseIr, eps), "cold body crest");
+        Assert.True(MatricesClose(merged.Elements[0].LocalToParent, headPoseIr, eps), "cold head main");
+        Assert.True(MatricesClose(merged.Elements[1].LocalToParent, headPoseIr, eps), "cold hood");
+        Assert.True(MatricesClose(merged.Elements[2].LocalToParent, headPoseIr, eps), "cold beak under head");
+        Assert.True(MatricesClose(merged.Elements[3].LocalToParent, headPoseIr, eps), "cold wattle under head");
+        Assert.True(MatricesClose(merged.Elements[4].LocalToParent, bodyPoseIr, eps), "cold body main");
+        Assert.True(MatricesClose(merged.Elements[5].LocalToParent, bodyPoseIr, eps), "cold body crest");
     }
 
     [Fact]
-    public void Head_pitch_from_idle_phase_stripped_matrix_tracks_ir_head_pose_plus_Euler()
+    public void Head_pitch_preview_mesh_keeps_body_Z_clustered_with_head()
     {
         GeometryIrParityPolicy.ResetForTests();
-        var ir = LoadChicken26IrBindPoseMatrices();
-        var headBase = ir["head"];
-
-        const float pitch = 0.11f;
-        var headAnimatedIr = Mul(headBase, Er(pitch, 0f, 0f));
-
         var runtime = new CleanRoomEntityModelRuntime();
         const string path = "assets/minecraft/textures/entity/chicken/chicken.png";
         var profile = new MinecraftNativeProfile("26.1.2", TestEnvironmentPaths.AbsentNativeRoot, new Version(26, 1, 2));
-        // Drive head look via BuildChicken: headPitchDegrees = idle*8 + wave*5, headYaw = wave*10; anim 0 => wave = 0.
+        var pitch = 0.11f;
         var idle = pitch / (8f * (MathF.PI / 180f));
         Assert.True(runtime.TryBuildStaticMesh(path, profile, idlePhase01: idle, animationTimeSeconds: 0f, out var merged));
-        var worldRoot = Matrix4x4.CreateScale(-1f, -1f, 1f);
-        Assert.True(Matrix4x4.Invert(worldRoot, out var invWorld));
-        var m0 = Mul(invWorld, merged.Elements[0].LocalToParent);
-        const float eps = 2e-3f;
-        Assert.True(MatricesClose(m0, headAnimatedIr, eps), "head slab should include Er(pitch, yaw, 0) on top of IR base");
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        const string jvm = "net.minecraft.client.model.animal.chicken.ChickenModel";
+        using var shard = JsonDocument.Parse(File.ReadAllText(Path.Combine(
+            repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json")));
+        var geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
+        var options = GeometryIrMeshEmitOptions.ForParity(64, 32) with { OfficialJvmName = jvm };
+        var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(geometryRoot, options);
+        float headZ = 0f, bodyZ = 0f;
+        var headN = 0;
+        var bodyN = 0;
+        for (var i = 0; i < merged.Elements.Count; i++)
+        {
+            var cz = ChickenPreviewZClusterTests.CornerCentroidZ(merged.Elements[i]);
+            if (partIds[i].Contains("head", StringComparison.Ordinal))
+            {
+                headZ += cz;
+                headN++;
+            }
+            else if (string.Equals(partIds[i], "body", StringComparison.Ordinal))
+            {
+                bodyZ += cz;
+                bodyN++;
+            }
+        }
+
+        Assert.True(headN > 0 && bodyN > 0);
+        Assert.True(MathF.Abs(bodyZ / bodyN - headZ / headN) <= 8f,
+            $"pitched head should not detach body on Z: bodyZ={bodyZ / bodyN:F3} headZ={headZ / headN:F3}");
     }
 }

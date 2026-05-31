@@ -1,0 +1,16 @@
+texture	jvm	ler_basis	probe	default_leg_minus_head	right_leg_minus_head	recommended	mismatch	build_ok	driver
+assets/minecraft/textures/entity/allay/allay.png	AllayModel	StandardWorldRoot	0	0	0			1	RuntimeGeometryIrJson
+assets/minecraft/textures/entity/axolotl/axolotl_cyan.png	AdultAxolotlModel	StandardWorldRoot	1	-21.5	15.5	StandardWorldRoot		1	RuntimeGeometryIrJson
+assets/minecraft/textures/entity/blaze/blaze.png	BlazeModel	StandardWorldRoot	0	0	0			1	RuntimeGeometryIrJson
+assets/minecraft/textures/entity/camel/camel.png	AdultCamelModel	RightComposeLocalChain	1	-24.333	-24.333			1	RuntimeGeometryIrJson
+assets/minecraft/textures/entity/cat/cat_tabby.png	AdultCatModel	RightComposeLocalChain	1	-3.95	-6.05	RightComposeLocalChain		1	RuntimeGeometryIrJson
+assets/minecraft/textures/entity/cow/cow_temperate.png	CowModel	RightComposeLocalChain	1	0.875	-15.125	RightComposeLocalChain		1	RuntimeGeometryIrJson
+assets/minecraft/textures/entity/cow/cow_cold.png	ColdCowModel	RightComposeLocalChain	1	3.25	-12.75	RightComposeLocalChain		1	RuntimeGeometryIrJson
+assets/minecraft/textures/entity/creeper/creeper.png	CreeperModel	RightComposeLocalChain	1	5	-19	RightComposeLocalChain		1	RuntimeGeometryIrJson
+assets/minecraft/textures/entity/fox/fox.png	AdultFoxModel	RightComposeLocalChain	1	-1.5	-3.5	RightComposeLocalChain		1	RuntimeGeometryIrJson
+assets/minecraft/textures/entity/panda/panda.png	PandaModel	RightComposeLocalChain	1	-3.375	-10.375	RightComposeLocalChain		1	RuntimeGeometryIrJson
+assets/minecraft/textures/entity/bear/polarbear.png	PolarBearModel	RightComposeLocalChain	1	-1.75	-9.75	RightComposeLocalChain		1	RuntimeGeometryIrJson
+assets/minecraft/textures/entity/pig/pig_temperate.png	PigModel	RightComposeLocalChain	1	3.75	-8.25	RightComposeLocalChain		1	RuntimeGeometryIrJson
+assets/minecraft/textures/entity/pig/pig_cold.png	ColdPigModel	RightComposeLocalChain	1	3.75	-8.25	RightComposeLocalChain		1	RuntimeGeometryIrJson
+assets/minecraft/textures/entity/pig/pig_warm.png	PigModel	RightComposeLocalChain	1	3.75	-8.25	RightComposeLocalChain		1	RuntimeGeometryIrJson
+assets/minecraft/textures/entity/sheep/sheep.png	SheepModel	RightComposeLocalChain	1	-1	-13	RightComposeLocalChain		1	RuntimeGeometryIrJson

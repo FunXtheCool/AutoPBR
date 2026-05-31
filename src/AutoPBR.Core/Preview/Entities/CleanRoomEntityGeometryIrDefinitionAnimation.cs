@@ -81,6 +81,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             pose.Parts["tail"] = new VanillaSetupAnimRuntime.PartPose
             {
                 XRot = babyTailDeg.X * (MathF.PI / 180f),
+                Assigned = VanillaSetupAnimRuntime.PartPoseChannel.XRot,
             };
             return true;
         }
@@ -94,6 +95,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         pose.Parts["tail"] = new VanillaSetupAnimRuntime.PartPose
         {
             XRot = adultTailDeg.X * (MathF.PI / 180f),
+            Assigned = VanillaSetupAnimRuntime.PartPoseChannel.XRot,
         };
         return true;
     }
@@ -132,6 +134,9 @@ internal sealed partial class CleanRoomEntityModelRuntime
             XRot = rodsDeg.X * (MathF.PI / 180f),
             YRot = rodsDeg.Y * (MathF.PI / 180f),
             ZRot = rodsDeg.Z * (MathF.PI / 180f),
+            Assigned = VanillaSetupAnimRuntime.PartPoseChannel.XRot |
+                       VanillaSetupAnimRuntime.PartPoseChannel.YRot |
+                       VanillaSetupAnimRuntime.PartPoseChannel.ZRot,
         };
         return true;
     }
@@ -152,12 +157,18 @@ internal sealed partial class CleanRoomEntityModelRuntime
             X = windMid.X,
             Y = windMid.Y,
             Z = windMid.Z,
+            Assigned = VanillaSetupAnimRuntime.PartPoseChannel.X |
+                       VanillaSetupAnimRuntime.PartPoseChannel.Y |
+                       VanillaSetupAnimRuntime.PartPoseChannel.Z,
         };
         pose.Parts["wind_top"] = new VanillaSetupAnimRuntime.PartPose
         {
             X = windTop.X,
             Y = windTop.Y,
             Z = windTop.Z,
+            Assigned = VanillaSetupAnimRuntime.PartPoseChannel.X |
+                       VanillaSetupAnimRuntime.PartPoseChannel.Y |
+                       VanillaSetupAnimRuntime.PartPoseChannel.Z,
         };
         return true;
     }
@@ -173,6 +184,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 profile, animationTimeSeconds, out var shootHeadDeg))
         {
             headPose.XRot = shootHeadDeg.X * (MathF.PI / 180f);
+            headPose.Assigned |= VanillaSetupAnimRuntime.PartPoseChannel.XRot;
             any = true;
         }
 
@@ -182,6 +194,9 @@ internal sealed partial class CleanRoomEntityModelRuntime
             headPose.X = shootHeadTranslation.X;
             headPose.Y = shootHeadTranslation.Y;
             headPose.Z = shootHeadTranslation.Z;
+            headPose.Assigned |= VanillaSetupAnimRuntime.PartPoseChannel.X |
+                                 VanillaSetupAnimRuntime.PartPoseChannel.Y |
+                                 VanillaSetupAnimRuntime.PartPoseChannel.Z;
             any = true;
         }
 
@@ -210,6 +225,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         pose.Parts["right_hind_leg"] = new VanillaSetupAnimRuntime.PartPose
         {
             XRot = foxBabyRhDeg.X * (MathF.PI / 180f),
+            Assigned = VanillaSetupAnimRuntime.PartPoseChannel.XRot,
         };
         return true;
     }

@@ -13,12 +13,22 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [],
   "children": [{
   "id": "head",
   "pose": {
   "translation": [0.000000000, 15.25000000, 0.000000000],
   "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 15.25000000, 0.000000000],
   "eulerOrder": "XYZ"
 }
 ,
@@ -43,6 +53,11 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [0.000000000, 15.25000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [],
   "children": []
 }
@@ -53,6 +68,11 @@
   "pose": {
   "translation": [-3.000000000, 15.50000000, 0.000000000],
   "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [-3.000000000, 15.50000000, 0.000000000],
   "eulerOrder": "XYZ"
 }
 ,
@@ -73,6 +93,11 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [1.000000000, 20.00000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [{
   "from": [-1.000000000, 0.000000000, -1.000000000],
   "to": [1.000000000, 4.000000000, 1.000000000],
@@ -87,6 +112,11 @@
   "pose": {
   "translation": [3.000000000, 15.50000000, 0.000000000],
   "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [3.000000000, 15.50000000, 0.000000000],
   "eulerOrder": "XYZ"
 }
 ,
@@ -107,6 +137,11 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [-1.000000000, 20.00000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [{
   "from": [-1.000000000, 0.000000000, -1.000000000],
   "to": [1.000000000, 4.000000000, 1.000000000],
@@ -121,6 +156,11 @@
   "pose": {
   "translation": [0.000000000, 17.50000000, 0.000000000],
   "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 17.50000000, 0.000000000],
   "eulerOrder": "XYZ"
 }
 ,

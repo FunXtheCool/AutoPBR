@@ -69,6 +69,17 @@ public sealed class SetupAnimGeometryIrPreviewTests
     }
 
     [Fact]
+    public void Flat_quadruped_peer_position_strip_applies_to_feline_not_cow()
+    {
+        Assert.True(
+            CleanRoomEntityModelRuntime.TryHasFlatQuadrupedPeerPositionAssignmentsForTests(
+                "net.minecraft.client.model.animal.feline.AdultCatModel"));
+        Assert.False(
+            CleanRoomEntityModelRuntime.TryHasFlatQuadrupedPeerPositionAssignmentsForTests(
+                "net.minecraft.client.model.animal.cow.CowModel"));
+    }
+
+    [Fact]
     public void Horse_setup_anim_hind_leg_pitch_varies_with_walk()
     {
         var rest = EquinePreviewState(0f, 0f);

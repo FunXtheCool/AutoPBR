@@ -140,7 +140,8 @@ internal sealed partial class CleanRoomEntityModelRuntime : IEntityModelRuntime
         float animationTimeSeconds,
         List<Matrix4x4> scratch,
         out int boneCount,
-        EntityEmulatedPreviewRebakeContext? routeCacheOwner = null)
+        EntityEmulatedPreviewRebakeContext? routeCacheOwner = null,
+        bool applyGeometryIrSetupAnimMotion = true)
     {
         boneCount = 0;
         scratch.Clear();
@@ -166,7 +167,7 @@ internal sealed partial class CleanRoomEntityModelRuntime : IEntityModelRuntime
                 animationTimeSeconds,
                 out var irMerged,
                 out var irProvenance,
-                applyGeometryIrSetupAnimMotion: true) &&
+                applyGeometryIrSetupAnimMotion) &&
             irProvenance.Kind == PreviewMeshDriverKind.RuntimeGeometryIrJson)
         {
             if (irMerged.Elements.Count == 0)
@@ -208,7 +209,7 @@ internal sealed partial class CleanRoomEntityModelRuntime : IEntityModelRuntime
                     idlePhase01,
                     animationTimeSeconds,
                     routeCacheOwner?.GpuBoneDispatchRoute,
-                    applyGeometryIrSetupAnimMotion: true,
+                    applyGeometryIrSetupAnimMotion,
                     out discoveredRoute,
                     out _,
                     out _))
@@ -228,7 +229,7 @@ internal sealed partial class CleanRoomEntityModelRuntime : IEntityModelRuntime
             }
         }
 
-        // Geometry IR parity capture records post-basis LocalToParent (see TryBuildParityCatalogMeshFromGeometryIr).
+        // Parity-catalog IR static meshes already folded LER once (ResolveGeometryIrParityEmitPlan); do not double-apply.
         if (EntityGpuBoneFillPolicy.ShouldApplyStandardLivingPreviewBasis(norm, stem) &&
             discoveredRoute.Kind != EntityGpuBoneDispatchKind.ParityCatalog)
         {
@@ -243,10 +244,9 @@ internal sealed partial class CleanRoomEntityModelRuntime : IEntityModelRuntime
 
     private static void ApplyStandardLivingEntityRendererBasisToBoneMatrices(List<Matrix4x4> bones)
     {
-        var worldRoot = Matrix4x4.CreateScale(-1f, -1f, 1f);
         for (var i = 0; i < bones.Count; i++)
         {
-            bones[i] = Matrix4x4.Multiply(worldRoot, bones[i]);
+            bones[i] = ApplyLivingEntityRendererColumnRootScale(bones[i]);
         }
     }
 
@@ -266,7 +266,6 @@ internal sealed partial class CleanRoomEntityModelRuntime : IEntityModelRuntime
         switch (basis)
         {
             case GeometryIrLerBasisKind.Skip:
-            case GeometryIrLerBasisKind.EquineDedicated:
                 return;
             case GeometryIrLerBasisKind.RightComposeLocalChain:
                 ApplyQuadrupedLivingEntityRendererBasisToBoneMatrices(bones);

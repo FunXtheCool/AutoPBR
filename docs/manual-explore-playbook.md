@@ -126,16 +126,17 @@ Use for every signed-off JVM (minimum bar):
 - [ ] Head attached to body (not on ground plane alone)
 - [ ] Legs on same visual “ground” band as body
 - [ ] UV/atlas looks sane (no smeared wind rods on wrong mobs)
-- [ ] If row cites **preview-delta** or **cow-class LER**: compare before/after when changing preview code
+- [ ] If row cites **preview-delta** or touches **LER / `GeometryIrMeshWalk`**: re-run canaries (Creeper, Cow, Pig) and any mob you changed — see plan § **column-root LER** (do not restore `M×S` right-compose on catalog emit)
 - [ ] File named and stored if used for regression (`docs/images/explore/…`)
 
-**Known regression references (re-check after LER changes):**
+**Known regression references (re-check after LER / walk-order changes):**
 
-| Mob | Reference image |
-|-----|-----------------|
-| Panda | `docs/images/quadruped-panda-preview.png` |
-| Cow | `docs/images/quadruped-cow-preview.png` |
-| Polar bear | capture to `docs/images/quadruped-polarbear-preview.png` when available |
+| Mob | Reference image | Notes |
+|-----|-----------------|-------|
+| Creeper | — | **Canary** — flat quadruped + rotated-less body |
+| Cow / Pig / Panda | `docs/images/quadruped-*.png` | Torso must stay attached (column-root LER) |
+| Chicken | Explore capture | Wings/legs often OK; **body Z displacement** may remain (open) |
+| Polar bear | capture when available | Origin tests may still diverge — separate from LER class |
 
 ---
 

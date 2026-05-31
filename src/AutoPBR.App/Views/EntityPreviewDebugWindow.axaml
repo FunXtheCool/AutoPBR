@@ -1,0 +1,330 @@
+<Window xmlns="https://github.com/avaloniaui"
+
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+
+        xmlns:vm="using:AutoPBR.App.ViewModels"
+
+        x:Class="AutoPBR.App.Views.EntityPreviewDebugWindow"
+
+        x:DataType="vm:EntityPreviewDebugWindowViewModel"
+
+        Width="760"
+
+        Height="820"
+
+        MinWidth="560"
+
+        MinHeight="420"
+
+        WindowStartupLocation="CenterOwner"
+
+        Background="Transparent"
+
+        SystemDecorations="None"
+
+        ExtendClientAreaToDecorationsHint="True"
+
+        TransparencyLevelHint="None">
+
+    <Border Background="{Binding WindowBackground}"
+
+            BorderBrush="{Binding CardBorderBrush}"
+
+            BorderThickness="1"
+
+            CornerRadius="8"
+
+            Padding="1">
+
+        <Grid RowDefinitions="Auto,*">
+
+            <Border Grid.Row="0"
+
+                    Height="40"
+
+                    Background="{Binding WindowBackground}"
+
+                    BorderBrush="{Binding CardBorderBrush}"
+
+                    BorderThickness="0,0,0,1"
+
+                    PointerPressed="TitleBarDragRegion_PointerPressed">
+
+                <Grid ColumnDefinitions="*,Auto">
+
+                    <TextBlock Text="{Binding HeaderTitle}"
+
+                               HorizontalAlignment="Center"
+
+                               VerticalAlignment="Center"
+
+                               FontSize="16"
+
+                               FontWeight="SemiBold"
+
+                               Foreground="{Binding ForegroundBrush}" />
+
+                    <Button Grid.Column="1"
+
+                            Width="36"
+
+                            Height="28"
+
+                            Margin="0,6,6,6"
+
+                            HorizontalAlignment="Right"
+
+                            VerticalAlignment="Center"
+
+                            Background="Transparent"
+
+                            BorderThickness="0"
+
+                            Foreground="{Binding ForegroundBrush}"
+
+                            Content="✕"
+
+                            Click="CloseWindow_Click" />
+
+                </Grid>
+
+            </Border>
+
+
+
+            <Border Grid.Row="1"
+
+                    Margin="12"
+
+                    Padding="0"
+
+                    Background="{Binding CardBackground}"
+
+                    BorderBrush="{Binding CardBorderBrush}"
+
+                    BorderThickness="1"
+
+                    CornerRadius="6">
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+
+                              HorizontalScrollBarVisibility="Disabled"
+
+                              MinHeight="220">
+
+                    <StackPanel Spacing="10" Margin="12">
+
+                        <TextBlock Text="Baby preview live fixes"
+
+                                   Foreground="{Binding ForegroundBrush}"
+
+                                   FontWeight="SemiBold" />
+
+                        <TextBlock Text="Trial/error switches for baby body/head/leg separation in Explore. Changes rebake mesh immediately — load a baby texture (fox_baby, cow_temperate_baby, donkey_baby, …) and toggle one fix at a time."
+
+                                   Foreground="{Binding ForegroundBrush}"
+
+                                   Opacity="0.8"
+
+                                   FontSize="12" />
+
+
+
+                        <TextBlock Text="Baseline compare"
+
+                                   Foreground="{Binding ForegroundBrush}"
+
+                                   FontWeight="SemiBold"
+
+                                   Margin="0,8,0,0" />
+
+                        <CheckBox Content="Force CPU skinning (12-float preview VBO)"
+
+                                  IsChecked="{Binding ForceCpuSkinning, Mode=TwoWay}"
+
+                                  ToolTip.Tip="Correct mesh on CPU but separated on GPU ⇒ GPU bind/W() path, not IR walk." />
+
+                        <CheckBox Content="Log entity draw contract every frame"
+
+                                  IsChecked="{Binding LogDrawContractEveryFrame, Mode=TwoWay}"
+
+                                  ToolTip.Tip="Watch bodyY/headY/legY in the preview log while toggling fixes." />
+
+
+
+                        <TextBlock Text="Part pose compose (rebakes mesh)"
+
+                                   Foreground="{Binding ForegroundBrush}"
+
+                                   FontWeight="SemiBold"
+
+                                   Margin="0,8,0,0" />
+
+                        <WrapPanel ItemSpacing="8" LineSpacing="6">
+
+                            <RadioButton Content="Er × T (production)"
+
+                                         IsChecked="{Binding PartPoseErTimesT, Mode=TwoWay}"
+
+                                         GroupName="EntityPartPose" />
+
+                            <RadioButton Content="T × Er (legacy adult explode)"
+
+                                         IsChecked="{Binding PartPoseLegacyTxEr, Mode=TwoWay}"
+
+                                         GroupName="EntityPartPose"
+
+                                         ToolTip.Tip="Usually wrong for adults; try on babies if limbs detach along parent rotation." />
+
+                        </WrapPanel>
+
+
+
+                        <TextBlock Text="LER fold (rebakes mesh)"
+
+                                   Foreground="{Binding ForegroundBrush}"
+
+                                   FontWeight="SemiBold"
+
+                                   Margin="0,8,0,0" />
+
+                        <WrapPanel ItemSpacing="8" LineSpacing="6">
+
+                            <RadioButton Content="Policy default"
+
+                                         IsChecked="{Binding LerPolicyDefault, Mode=TwoWay}"
+
+                                         GroupName="EntityLerBasis" />
+
+                            <RadioButton Content="StandardWorldRoot (column S·M)"
+
+                                         IsChecked="{Binding LerStandardWorldRoot, Mode=TwoWay}"
+
+                                         GroupName="EntityLerBasis" />
+
+                            <RadioButton Content="RightComposeLocalChain (M·S)"
+
+                                         IsChecked="{Binding LerRightComposeLocalChain, Mode=TwoWay}"
+
+                                         GroupName="EntityLerBasis"
+
+                                         ToolTip.Tip="Per-element M×S — can detach rotated body cuboids on quadrupeds." />
+
+                            <RadioButton Content="Skip LER"
+
+                                         IsChecked="{Binding LerSkip, Mode=TwoWay}"
+
+                                         GroupName="EntityLerBasis" />
+
+                        </WrapPanel>
+
+
+
+                        <TextBlock Text="Part-tree repair"
+
+                                   Foreground="{Binding ForegroundBrush}"
+
+                                   FontWeight="SemiBold"
+
+                                   Margin="0,8,0,0" />
+
+                        <CheckBox Content="Skip all part-tree repair (raw lifted IR)"
+
+                                  IsChecked="{Binding SkipAllPartTreeRepair, Mode=TwoWay}"
+
+                                  ToolTip.Tip="Bypass GeometryIrPartTreeRepair entirely — see lifter output before any baby fixes." />
+
+
+
+                        <TextBlock Text="Individual repair steps (production defaults ON)"
+
+                                   Foreground="{Binding ForegroundBrush}"
+
+                                   FontWeight="SemiBold"
+
+                                   Margin="0,4,0,0" />
+
+                        <TextBlock Text="Uncheck a step to see whether it helps or hurts the current baby. Skip-all overrides these."
+
+                                   Foreground="{Binding ForegroundBrush}"
+
+                                   Opacity="0.8"
+
+                                   FontSize="12" />
+
+                        <CheckBox Content="Global reparent (ears, head→head_parts, horns, breeze wind, …)"
+
+                                  IsChecked="{Binding RepairGlobalReparentRules, Mode=TwoWay}" />
+
+                        <CheckBox Content="Quadruped leg reparent under body"
+
+                                  IsChecked="{Binding RepairQuadrupedLegReparent, Mode=TwoWay}"
+
+                                  ToolTip.Tip="When not a flat root bake — baby donkey/horse head-stack class uses head-stack rule below." />
+
+                        <CheckBox Content="Force leg reparent on flat quadruped bake (experimental)"
+
+                                  IsChecked="{Binding RepairForceLegReparentOnFlatBake, Mode=TwoWay}"
+
+                                  ToolTip.Tip="Try on fox/cow/chicken babies where legs stay root siblings with body-relative offsets." />
+
+                        <CheckBox Content="Head-stack nested: reparent flat root legs (baby equine)"
+
+                                  IsChecked="{Binding RepairHeadStackLegReparent, Mode=TwoWay}"
+
+                                  ToolTip.Tip="BabyHorseModel / BabyDonkeyModel — head under body but legs still at root." />
+
+                        <CheckBox Content="Remove duplicate root siblings"
+
+                                  IsChecked="{Binding RepairRemoveDuplicateRootSiblings, Mode=TwoWay}" />
+
+                        <CheckBox Content="Collapse inner_body / fleece trim under body"
+
+                                  IsChecked="{Binding RepairCollapseInnerBody, Mode=TwoWay}" />
+
+                        <CheckBox Content="Deduplicate nested part ids"
+
+                                  IsChecked="{Binding RepairDeduplicateNestedPartIds, Mode=TwoWay}" />
+
+                        <CheckBox Content="Zero equine createBodyLayer root offset (horse/donkey)"
+
+                                  IsChecked="{Binding RepairZeroEquineRootOffset, Mode=TwoWay}"
+
+                                  ToolTip.Tip="Drops root T(0,24,0) anchor on equine createBodyLayer/createBabyLayer bakes." />
+
+
+
+                        <Border Margin="0,8,0,0"
+
+                                Padding="8"
+
+                                CornerRadius="4"
+
+                                BorderBrush="{Binding CardBorderBrush}"
+
+                                BorderThickness="1">
+
+                            <TextBlock Text="Suggested baby workflow: (1) skip-all repair to see raw IR, (2) re-enable production steps one by one, (3) try force leg reparent or head-stack rule on equine babies, (4) compare CPU vs GPU skinning, (5) only then try T×Er or RightCompose LER if clusters still drift."
+
+                                       Foreground="{Binding ForegroundBrush}"
+
+                                       Opacity="0.8"
+
+                                       FontSize="12"
+
+                                       TextWrapping="Wrap" />
+
+                        </Border>
+
+                    </StackPanel>
+
+                </ScrollViewer>
+
+            </Border>
+
+        </Grid>
+
+    </Border>
+
+</Window>
+

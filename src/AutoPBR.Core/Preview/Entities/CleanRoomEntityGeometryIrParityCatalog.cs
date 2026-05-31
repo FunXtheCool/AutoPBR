@@ -73,6 +73,12 @@ internal sealed partial class CleanRoomEntityModelRuntime
             geometryIrOfficialJvm = parityRule.GeometryIrOfficialJvm ?? parityRule.DeobfuscatedModelClass ?? "";
         }
 
+        // Hand BuildColdChicken matches javap Er×T body pose; lifted IR keeps template beak/wattle and T×Er reference compose.
+        if (string.Equals(stem, "chicken_cold", StringComparison.OrdinalIgnoreCase) && !isBaby)
+        {
+            return false;
+        }
+
         var officialJvm = geometryIrOfficialJvm;
         geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(officialJvm, geometryRoot);
 
@@ -107,15 +113,27 @@ internal sealed partial class CleanRoomEntityModelRuntime
         }
 
         var wave = Wave(animationTimeSeconds, 0.8f);
-        var emitOptions = GeometryIrParityEmitPresetRegistry.CreateEmitOptions(
-            parityRule.BuilderMethod,
-            profile,
-            isBaby,
+        var norm = normalizedAssetPath.Replace('\\', '/').TrimStart('/');
+        var lerPlan = ResolveGeometryIrParityEmitPlan(
             officialJvm,
-            atlasW,
-            atlasH,
-            idlePhase01,
-            wave);
+            stem,
+            norm,
+            deferLivingEntityRendererUntilAfterMotionPasses: applyGeometryIrSetupAnimMotion);
+        var emitOptions = ApplyLivingEntityRendererEmitPlan(
+            GeometryIrParityEmitPresetRegistry.CreateEmitOptions(
+                parityRule.BuilderMethod,
+                profile,
+                isBaby,
+                officialJvm,
+                atlasW,
+                atlasH,
+                idlePhase01,
+                applyGeometryIrSetupAnimMotion ? wave : 0f) with { OfficialJvmName = officialJvm },
+            lerPlan);
+        if (!applyGeometryIrSetupAnimMotion)
+        {
+            emitOptions = emitOptions with { TryGetPartPoseOverride = null };
+        }
 
         var b = new RigBuilder(atlasW, atlasH);
         if (!TryEmitGeometryIrBodyLayer(b, geometryRoot, emitOptions, out _))
@@ -123,7 +141,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return false;
         }
 
-        var built = b.Build(texRef);
+        var built = b.Build(texRef, BuildGeometryIrTextureRefs(geometryRoot, texRef));
         if (built.Elements.Count == 0)
         {
             return false;
@@ -169,23 +187,20 @@ internal sealed partial class CleanRoomEntityModelRuntime
             }
         }
 
-        merged = ApplyParityCatalogGeometryIrPreviewBasis(
-            parityRule.BuilderMethod,
-            officialJvm,
-            normalizedAssetPath,
-            stem,
-            texRef,
-            built);
+        if (applyGeometryIrSetupAnimMotion)
+        {
+            TryApplyDefinitionAnimationGeometryIrPreviewPass(
+                parityRule.BuilderMethod,
+                normalizedAssetPath,
+                profile,
+                isBaby,
+                animationTimeSeconds,
+                built,
+                geometryRoot,
+                emitOptions);
+        }
 
-        TryApplyDefinitionAnimationGeometryIrPreviewPass(
-            parityRule.BuilderMethod,
-            normalizedAssetPath,
-            profile,
-            isBaby,
-            animationTimeSeconds,
-            merged,
-            geometryRoot,
-            emitOptions);
+        merged = FinishGeometryIrMeshLivingEntityRendererBasis(built, lerPlan);
 
         if (EntityRigPoseCapture.IsActive)
         {
@@ -245,6 +260,11 @@ internal sealed partial class CleanRoomEntityModelRuntime
         out string irFailureReason)
     {
         irFailureReason = "";
+        if (string.Equals(stem, "chicken_cold", StringComparison.OrdinalIgnoreCase) && !isBaby)
+        {
+            return false;
+        }
+
         if (!GeometryIrParityJvmResolver.TryResolveLiftedRoot(
                 profile, rule, normalizedAssetPath, stem, isBaby, out _, out _))
         {
@@ -319,6 +339,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
     /// <summary>
     /// Post–26.1 <c>Baby*Model</c> IR hosts are already baby-sized; only scale adult mesh hosts (e.g. <c>SkeletonModel</c>).
+    /// Policy: runtime-ir-preview-plan § Baby JVM family (do not apply <see cref="BabyProfile.VanillaUniformBaby"/> on dedicated Baby* shards).
     /// </summary>
     private static BabyProfile ParityCatalogDefaultBabyProfile(
         MinecraftNativeProfile profile,
@@ -359,14 +380,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
     {
         var norm = normalizedAssetPath.Replace('\\', '/').TrimStart('/');
         var basis = ResolveGeometryIrLerBasis(officialJvm, stem, norm);
-        if (basis == GeometryIrLerBasisKind.EquineDedicated)
-        {
-            var scale = string.Equals(builderMethod, "DonkeyMuleHorse", StringComparison.Ordinal)
-                ? (texRef.Contains("/mule", StringComparison.OrdinalIgnoreCase) ? 0.92f : 0.87f)
-                : 1f;
-            return ApplyEquineLivingEntityRendererPreviewBasis(built, scale);
-        }
-
         if (basis == GeometryIrLerBasisKind.Skip ||
             norm.Contains("/textures/entity/boat/", StringComparison.OrdinalIgnoreCase) ||
             norm.Contains("/textures/entity/chest_boat/", StringComparison.OrdinalIgnoreCase))
@@ -374,7 +387,68 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return built;
         }
 
-        return ApplyLivingEntityRendererPreviewBasis(built, basis);
+        var plan = ResolveGeometryIrParityEmitPlan(
+            officialJvm,
+            stem,
+            norm,
+            deferLivingEntityRendererUntilAfterMotionPasses: true);
+        return FinishGeometryIrMeshLivingEntityRendererBasis(built, plan);
+    }
+
+    private static IReadOnlyDictionary<string, string>? BuildGeometryIrTextureRefs(JsonElement geometryRoot, string texRef)
+    {
+        var refs = new Dictionary<string, string>(StringComparer.Ordinal);
+        if (!geometryRoot.TryGetProperty("roots", out var roots) || roots.ValueKind != JsonValueKind.Array)
+        {
+            return null;
+        }
+
+        foreach (var root in roots.EnumerateArray())
+        {
+            CollectTextureRefsRecursive(root, texRef, refs);
+        }
+
+        return refs.Count == 0 ? null : refs;
+    }
+
+    private static void CollectTextureRefsRecursive(JsonElement part, string texRef, Dictionary<string, string> refs)
+    {
+        if (part.TryGetProperty("cuboids", out var cuboids) && cuboids.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var cuboid in cuboids.EnumerateArray())
+            {
+                if (!cuboid.TryGetProperty("textureKey", out var tk) || tk.ValueKind != JsonValueKind.String)
+                {
+                    continue;
+                }
+
+                var key = tk.GetString() ?? "";
+                if (key.Length == 0)
+                {
+                    continue;
+                }
+
+                if (key[0] == '#')
+                {
+                    key = key[1..];
+                }
+
+                if (key.Length > 0 && !refs.ContainsKey(key))
+                {
+                    refs[key] = texRef;
+                }
+            }
+        }
+
+        if (!part.TryGetProperty("children", out var children) || children.ValueKind != JsonValueKind.Array)
+        {
+            return;
+        }
+
+        foreach (var child in children.EnumerateArray())
+        {
+            CollectTextureRefsRecursive(child, texRef, refs);
+        }
     }
 
     /// <summary>

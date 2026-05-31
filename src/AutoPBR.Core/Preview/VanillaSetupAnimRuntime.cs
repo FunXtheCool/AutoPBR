@@ -16,6 +16,19 @@ internal static class VanillaSetupAnimRuntime
         public Dictionary<string, PartPose> Parts { get; } = new(StringComparer.Ordinal);
     }
 
+    [Flags]
+    public enum PartPoseChannel : byte
+    {
+        None = 0,
+        XRot = 1 << 0,
+        YRot = 1 << 1,
+        ZRot = 1 << 2,
+        X = 1 << 3,
+        Y = 1 << 4,
+        Z = 1 << 5,
+        Visible = 1 << 6,
+    }
+
     public sealed class PartPose
     {
         public float XRot { get; set; }
@@ -25,6 +38,7 @@ internal static class VanillaSetupAnimRuntime
         public float Y { get; set; }
         public float Z { get; set; }
         public bool? Visible { get; set; }
+        public PartPoseChannel Assigned { get; set; }
     }
 
     public static bool TryEvaluate(
@@ -117,6 +131,7 @@ internal static class VanillaSetupAnimRuntime
             }
 
             partPose.XRot = xRot;
+            partPose.Assigned |= PartPoseChannel.XRot;
         }
     }
 
@@ -213,13 +228,34 @@ internal static class VanillaSetupAnimRuntime
     {
         switch (prop)
         {
-            case "xRot": partPose.XRot = v; break;
-            case "yRot": partPose.YRot = v; break;
-            case "zRot": partPose.ZRot = v; break;
-            case "x": partPose.X = v; break;
-            case "y": partPose.Y = v; break;
-            case "z": partPose.Z = v; break;
-            case "visible": partPose.Visible = v >= 0.5f; break;
+            case "xRot":
+                partPose.XRot = v;
+                partPose.Assigned |= PartPoseChannel.XRot;
+                break;
+            case "yRot":
+                partPose.YRot = v;
+                partPose.Assigned |= PartPoseChannel.YRot;
+                break;
+            case "zRot":
+                partPose.ZRot = v;
+                partPose.Assigned |= PartPoseChannel.ZRot;
+                break;
+            case "x":
+                partPose.X = v;
+                partPose.Assigned |= PartPoseChannel.X;
+                break;
+            case "y":
+                partPose.Y = v;
+                partPose.Assigned |= PartPoseChannel.Y;
+                break;
+            case "z":
+                partPose.Z = v;
+                partPose.Assigned |= PartPoseChannel.Z;
+                break;
+            case "visible":
+                partPose.Visible = v >= 0.5f;
+                partPose.Assigned |= PartPoseChannel.Visible;
+                break;
         }
     }
 
@@ -358,12 +394,14 @@ internal static class VanillaSetupAnimRuntime
                 partPose.XRot = vec.X * PreviewRenderStateSynthesis.DegToRad;
                 partPose.YRot = vec.Y * PreviewRenderStateSynthesis.DegToRad;
                 partPose.ZRot = vec.Z * PreviewRenderStateSynthesis.DegToRad;
+                partPose.Assigned |= PartPoseChannel.XRot | PartPoseChannel.YRot | PartPoseChannel.ZRot;
             }
             else if (string.Equals(target, "POSITION", StringComparison.OrdinalIgnoreCase))
             {
                 partPose.X = vec.X;
                 partPose.Y = vec.Y;
                 partPose.Z = vec.Z;
+                partPose.Assigned |= PartPoseChannel.X | PartPoseChannel.Y | PartPoseChannel.Z;
             }
         }
     }

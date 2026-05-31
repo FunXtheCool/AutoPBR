@@ -229,4 +229,83 @@ public sealed class GeometryIrReferenceRigTests
 
         return (reference, JsonDocument.Parse(File.ReadAllText(irPath)));
     }
+
+    [Fact]
+    public void AdultCat_runtime_static_mesh_matches_reference_java_pose()
+    {
+        const string jvm = "net.minecraft.client.model.animal.feline.AdultCatModel";
+        const string texturePath = "assets/minecraft/textures/entity/cat/cat_all_black.png";
+        var root = GeometryIrTestTierSupport.FindRepoRoot();
+        var referencePath = Path.Combine(root, "tools", "MinecraftGeometryReference", "reference-output", $"{jvm}.json");
+        if (!File.Exists(referencePath))
+        {
+            return;
+        }
+
+        using var reference = JsonDocument.Parse(File.ReadAllText(referencePath));
+        if (reference.RootElement.GetProperty("extractionStatus").GetString() is not "reference_java")
+        {
+            return;
+        }
+
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(
+            runtime.TryBuildStaticMesh(
+                texturePath,
+                Profile26,
+                idlePhase01: 0f,
+                animationTimeSeconds: 0f,
+                out var mesh,
+                out var provenance,
+                applyGeometryIrSetupAnimMotion: false));
+        Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
+        Assert.Contains(jvm, provenance.Detail ?? "", StringComparison.Ordinal);
+
+        var cmp = GeometryIrReferenceComparer.CompareReferenceToParityMesh(reference.RootElement, mesh, tolerance: 0.08);
+        Assert.True(cmp.IsMatch, cmp.Message);
+    }
+
+    [Theory]
+    [InlineData("assets/minecraft/textures/entity/cow/cow_temperate.png", "net.minecraft.client.model.animal.cow.CowModel")]
+    [InlineData("assets/minecraft/textures/entity/cow/cow_cold.png", "net.minecraft.client.model.animal.cow.ColdCowModel")]
+    [InlineData("assets/minecraft/textures/entity/pig/pig_temperate.png", "net.minecraft.client.model.animal.pig.PigModel")]
+    [InlineData("assets/minecraft/textures/entity/creeper/creeper.png", "net.minecraft.client.model.monster.creeper.CreeperModel")]
+    [InlineData("assets/minecraft/textures/entity/armadillo/armadillo.png", "net.minecraft.client.model.animal.armadillo.ArmadilloModel")]
+    [InlineData("assets/minecraft/textures/entity/sheep/sheep.png", "net.minecraft.client.model.animal.sheep.SheepModel")]
+    [InlineData("assets/minecraft/textures/entity/goat/goat.png", "net.minecraft.client.model.animal.goat.GoatModel")]
+    [InlineData("assets/minecraft/textures/entity/wolf/wolf.png", "net.minecraft.client.model.animal.wolf.WolfModel")]
+    [InlineData("assets/minecraft/textures/entity/fox/fox.png", "net.minecraft.client.model.animal.fox.AdultFoxModel")]
+    [InlineData("assets/minecraft/textures/entity/panda/panda.png", "net.minecraft.client.model.animal.panda.PandaModel")]
+    [InlineData("assets/minecraft/textures/entity/bear/polarbear.png", "net.minecraft.client.model.animal.polarbear.PolarBearModel")]
+    public void Quadruped_runtime_static_mesh_matches_reference_java_pose(
+        string texturePath,
+        string jvm)
+    {
+        var root = GeometryIrTestTierSupport.FindRepoRoot();
+        var referencePath = Path.Combine(root, "tools", "MinecraftGeometryReference", "reference-output", $"{jvm}.json");
+        if (!File.Exists(referencePath))
+        {
+            return;
+        }
+
+        using var reference = JsonDocument.Parse(File.ReadAllText(referencePath));
+        if (reference.RootElement.GetProperty("extractionStatus").GetString() is not "reference_java")
+        {
+            return;
+        }
+
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(
+            runtime.TryBuildStaticMesh(
+                texturePath,
+                Profile26,
+                idlePhase01: 0f,
+                animationTimeSeconds: 0f,
+                out var mesh,
+                out _,
+                applyGeometryIrSetupAnimMotion: false));
+
+        var cmp = GeometryIrReferenceComparer.CompareReferenceToParityMesh(reference.RootElement, mesh, tolerance: 0.08);
+        Assert.True(cmp.IsMatch, $"{jvm} ({texturePath}): {cmp.Message}");
+    }
 }

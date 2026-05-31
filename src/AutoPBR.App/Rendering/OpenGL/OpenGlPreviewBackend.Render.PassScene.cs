@@ -159,7 +159,7 @@ public sealed partial class OpenGlPreviewBackend
                     SetInt("uEnableSpecularMap", 0);
                     SetInt("uSceneKind", 0);
                     SetInt("uEntityAlphaMode", 0);
-                    UploadEntitySkinningUboTail(frame.Gl, 0, 0, 0f);
+                    ApplyEntitySkinningUniforms(_program, 0, 0, 0f);
                     SetInt("uHasNormal", 0);
                     SetInt("uHasSpecular", 0);
                     SetInt("uHasHeight", 0);
@@ -227,12 +227,6 @@ public sealed partial class OpenGlPreviewBackend
                         frame.Gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
                     }
 
-                    ApplyEntityBoneSkinningUboTail(
-                        frame.Gl,
-                        frame.BlockModel,
-                        frame.BlockModel.EntityGpuMeshSpaceLiftY,
-                        frame.EntityBoneSnapshotValid,
-                        frame.EntityBoneSnapshotCount);
                     foreach (var batch in frame.BlockModel.DrawBatches)
                     {
                         if ((uint)batch.MaterialIndex >= (uint)frame.BlockSlots.Length)
@@ -256,6 +250,16 @@ public sealed partial class OpenGlPreviewBackend
                         SetInt("uNormal", 1);
                         SetInt("uSpecular", 2);
                         SetInt("uHeight", 3);
+                        ApplyEntityBoneSkinningUniformsBeforeDraw(
+                            _program,
+                            _mainEntityUniformLocs,
+                            frame.BlockModel,
+                            frame.BlockModel.EntityGpuMeshSpaceLiftY,
+                            frame.EntityBoneSnapshotValid,
+                            frame.EntityBoneSnapshotCount,
+                            frame.Settings.EnableEntityAnimation,
+                            frame.EntityBonePaletteUploaded,
+                            "main");
                         _mesh.DrawRange(batch.FirstIndex, batch.IndexCount);
                     }
 
@@ -287,7 +291,7 @@ public sealed partial class OpenGlPreviewBackend
                         _loggedMeshReady = true;
                     }
 
-                    UploadEntitySkinningUboTail(frame.Gl, 0, 0, 0f);
+                    ApplyEntitySkinningUniforms(_program, 0, 0, 0f);
                     _mesh.Draw();
                 }
     }

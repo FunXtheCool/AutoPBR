@@ -6,21 +6,24 @@ layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec2 aUv;
 layout(location = 3) in vec4 aTangent;
-layout(location = 4) in int aBoneIndex;
+layout(location = 4) in float aBoneIndexBits;
 
 uniform mat4 uModel;
 uniform mat4 uView;
 uniform mat4 uProj;
 uniform mat4 uLightViewProj;
 
-// Bone palette + skinning scalars in one std140 UBO (binding set from API; see OpenGlPreviewBackend).
+// Bone palette only in UBO (std140 mat4[64]). Scalars are plain float uniforms — avoids std140 tail
+// layout mismatches and GLES/ANGLE int-uniform quirks on Windows preview contexts.
 layout(std140) uniform EntitySkinningBones {
     mat4 uBoneMatrices[64];
-    int uEntityGpuSkinning;
-    int uEntityBoneCount;
-    float uEntityMeshLiftY;
-    int _entitySkinningPad0;
 };
+
+uniform float uEntityPreviewSpaceVerts;
+uniform float uEntityBindMesh;
+uniform float uEntityGpuSkinning;
+uniform float uEntityBoneCount;
+uniform float uEntityMeshLiftY;
 
 out vec3 vWorldPos;
 out vec3 vWorldNormal;
@@ -33,17 +36,32 @@ void main()
     vec4 entityPos;
     vec3 entityN;
     vec3 entityT;
-    if (uEntityGpuSkinning != 0 && uEntityBoneCount > 0)
+    if (uEntityPreviewSpaceVerts > 0.5)
     {
-        int bi = clamp(aBoneIndex, 0, uEntityBoneCount - 1);
-        mat4 bone = uBoneMatrices[bi];
-        entityPos = bone * vec4(aPos, 1.0);
-        // Match MinecraftModelBaker W(): texel model space -> Genesis preview unit box (CPU baker applies this after LocalToParent).
+        entityPos = vec4(aPos, 1.0);
+        entityN = aNormal;
+        entityT = aTangent.xyz;
+    }
+    else if (uEntityBindMesh > 0.5)
+    {
+        entityPos = vec4(aPos, 1.0);
+        if (uEntityGpuSkinning > 0.5)
+        {
+            int bi = clamp(floatBitsToInt(aBoneIndexBits), 0, int(uEntityBoneCount + 0.5) - 1);
+            mat4 bone = uBoneMatrices[bi];
+            entityPos = bone * entityPos;
+            mat3 nBone = mat3(transpose(inverse(bone)));
+            entityN = normalize(nBone * aNormal * 16.0);
+            entityT = normalize(nBone * aTangent.xyz * 16.0);
+        }
+        else
+        {
+            entityN = normalize(aNormal * 16.0);
+            entityT = normalize(aTangent.xyz * 16.0);
+        }
+
         entityPos.xyz = entityPos.xyz / 16.0 - vec3(0.5);
         entityPos.y += uEntityMeshLiftY;
-        mat3 nBone = mat3(transpose(inverse(mat4(bone))));
-        entityN = normalize(nBone * aNormal * 16.0);
-        entityT = normalize(nBone * aTangent.xyz * 16.0);
     }
     else
     {

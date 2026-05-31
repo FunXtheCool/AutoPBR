@@ -13,12 +13,22 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [],
   "children": [{
   "id": "head",
   "pose": {
   "translation": [0.000000000, 0.000000000, 0.000000000],
   "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
   "eulerOrder": "XYZ"
 }
 ,
@@ -37,12 +47,22 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [],
   "children": [{
   "id": "brown_mushroom_3",
   "pose": {
   "translation": [-2.000000000, -1.000000000, 4.000000000],
   "rotationEulerRad": [-1.570796371, 0.000000000, 0.7853981853],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [-2.000000000, -1.000000000, 4.000000000],
   "eulerOrder": "XYZ"
 }
 ,
@@ -63,6 +83,11 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [-3.000000000, -8.000000000, -3.000000000],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [{
   "from": [-3.000000000, -3.000000000, 0.000000000],
   "to": [3.000000000, 1.000000000, 0.000000000],
@@ -77,6 +102,11 @@
   "pose": {
   "translation": [-2.000000000, -1.000000000, 4.000000000],
   "rotationEulerRad": [-1.570796371, 0.000000000, 2.356194496],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [-2.000000000, -1.000000000, 4.000000000],
   "eulerOrder": "XYZ"
 }
 ,
@@ -97,6 +127,11 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [3.000000000, -8.000000000, 3.000000000],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [{
   "from": [-3.000000000, -3.000000000, 0.000000000],
   "to": [3.000000000, 1.000000000, 0.000000000],
@@ -114,6 +149,11 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [3.000000000, -8.000000000, 3.000000000],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [{
   "from": [-3.000000000, -3.000000000, 0.000000000],
   "to": [3.000000000, 1.000000000, 0.000000000],
@@ -128,6 +168,11 @@
   "pose": {
   "translation": [-3.000000000, -8.000000000, -3.000000000],
   "rotationEulerRad": [0.000000000, 0.7853981853, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [-3.000000000, -8.000000000, -3.000000000],
   "eulerOrder": "XYZ"
 }
 ,
@@ -150,6 +195,11 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [{
   "from": [-4.000000000, -8.000000000, -4.000000000],
   "to": [4.000000000, 0.000000000, 4.000000000],
@@ -166,6 +216,11 @@
   "pose": {
   "translation": [-5.000000000, 2.000000000, 0.000000000],
   "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [-5.000000000, 2.000000000, 0.000000000],
   "eulerOrder": "XYZ"
 }
 ,
@@ -186,6 +241,11 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [2.000000000, 12.00000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [{
   "from": [-1.000000000, 0.000000000, -1.000000000],
   "to": [1.000000000, 12.00000000, 1.000000000],
@@ -200,6 +260,11 @@
   "pose": {
   "translation": [5.000000000, 2.000000000, 0.000000000],
   "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [5.000000000, 2.000000000, 0.000000000],
   "eulerOrder": "XYZ"
 }
 ,
@@ -220,6 +285,11 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [-2.000000000, 12.00000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [{
   "from": [-1.000000000, 0.000000000, -1.000000000],
   "to": [1.000000000, 12.00000000, 1.000000000],
@@ -234,6 +304,11 @@
   "pose": {
   "translation": [0.000000000, 0.000000000, 0.000000000],
   "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
   "eulerOrder": "XYZ"
 }
 ,

@@ -28,11 +28,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
         new EntityCuboid(2f, -9f, -6f, 3f, -7f, -4f, 29, 5, UvSizeW: 1, UvSizeH: 2, UvSizeD: 2).Emit(b, Matrix4x4.Identity, 1f);
         new EntityCuboid(-3f, -9f, -6f, -2f, -7f, -4f, 29, 5, UvSizeW: 1, UvSizeH: 2, UvSizeD: 2).Emit(b, Matrix4x4.Identity, 1f);
 
-        var leftLinePose = Matrix4x4.Multiply(Matrix4x4.CreateTranslation(3.1f, -6f, -8f), Matrix4x4.CreateRotationX(-0.5235988f));
+        var leftLinePose = EntityParityTemplate.Mul(
+            EntityParityTemplate.Rx(-0.5235988f),
+            EntityParityTemplate.T(3.1f, -6f, -8f));
         new EntityCuboid(-thin, 0f, 0f, thin, 3f, 16f, 32, 2, UvSizeW: 1, UvSizeH: 3, UvSizeD: 16).Emit(b, leftLinePose, 1f);
-        var rightLinePose = Matrix4x4.Multiply(Matrix4x4.CreateTranslation(-3.1f, -6f, -8f), Matrix4x4.CreateRotationX(-0.5235988f));
+        var rightLinePose = EntityParityTemplate.Mul(
+            EntityParityTemplate.Rx(-0.5235988f),
+            EntityParityTemplate.T(-3.1f, -6f, -8f));
         new EntityCuboid(-thin, 0f, 0f, thin, 3f, 16f, 32, 2, UvSizeW: 1, UvSizeH: 3, UvSizeD: 16).Emit(b, rightLinePose, 1f);
-        return ApplyEquineLivingEntityRendererPreviewBasis(b.Build(texRef), modelScale: 1f);
+        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), GeometryIrLerBasisKind.StandardWorldRoot);
     }
 
     private static MergedJavaBlockModel BuildEquipmentBodyOverlay(string texRef, MinecraftNativeProfile profile, bool isBaby)
@@ -43,7 +47,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var b = new RigBuilder(64, 64);
         var bodyT = Matrix4x4.CreateTranslation(0f, 11f, 5f);
         new EntityCuboid(-5f, -8f, -17f, 5f, 2f, 5f, 0, 32).Emit(b, bodyT, p.BodyScale);
-        return ApplyEquineLivingEntityRendererPreviewBasis(b.Build(texRef), modelScale: 1f);
+        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), GeometryIrLerBasisKind.StandardWorldRoot);
     }
 
     private static MergedJavaBlockModel BuildHorse(string texRef, MinecraftNativeProfile profile, bool isBaby, float neckBend) =>
@@ -62,8 +66,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
     private static void AppendEquineDonkeyChestPair(RigBuilder b, Matrix4x4 bodyPose, float skinScale)
     {
-        var leftChestPose = EntityParityTemplate.Mul(bodyPose, EntityParityTemplate.Mul(EntityParityTemplate.T(6f, -8f, 0f), EntityParityTemplate.Ry(-MathF.PI / 2f)));
-        var rightChestPose = EntityParityTemplate.Mul(bodyPose, EntityParityTemplate.Mul(EntityParityTemplate.T(-6f, -8f, 0f), EntityParityTemplate.Ry(MathF.PI / 2f)));
+        var leftChestPose = EntityParityTemplate.Mul(bodyPose, EntityParityTemplate.Mul(EntityParityTemplate.Ry(-MathF.PI / 2f), EntityParityTemplate.T(6f, -8f, 0f)));
+        var rightChestPose = EntityParityTemplate.Mul(bodyPose, EntityParityTemplate.Mul(EntityParityTemplate.Ry(MathF.PI / 2f), EntityParityTemplate.T(-6f, -8f, 0f)));
         new EntityCuboid(-4f, 0f, -2f, 4f, 8f, 1f, 26, 21).Emit(b, leftChestPose, skinScale);
         new EntityCuboid(-4f, 0f, -2f, 4f, 8f, 1f, 26, 21).Emit(b, rightChestPose, skinScale);
     }
@@ -141,10 +145,12 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var tailYOffset = walkSpeed * ageScale;
         var tailZOffset = walkSpeed * 2f * ageScale;
 
-        var bodyPose = EntityParityTemplate.Mul(EntityParityTemplate.T(0f, 11f, 5f), EntityParityTemplate.Rx(bodyXRot));
+        var bodyPose = EntityParityTemplate.Mul(EntityParityTemplate.Rx(bodyXRot), EntityParityTemplate.T(0f, 11f, 5f));
         new EntityCuboid(-5f, -8f, -17f, 5f, 2f, 5f, 0, 32).Emit(b, bodyPose, p.BodyScale);
 
-        var headPartsPose = EntityParityTemplate.Mul(EntityParityTemplate.T(0f, 4f + headYOffset, headZ), EntityParityTemplate.Er(headXRot + neckBend, headYRot, 0f));
+        var headPartsPose = EntityParityTemplate.Mul(
+            EntityParityTemplate.Er(headXRot + neckBend, headYRot, 0f),
+            EntityParityTemplate.T(0f, 4f + headYOffset, headZ));
         new EntityCuboid(-2.05f, -6f, -2f, 1.95f, 6f, 5f, 0, 35).Emit(b, headPartsPose, p.HeadScale);
 
         // Root legs (left leg UV mirrored in vanilla).
@@ -154,7 +160,11 @@ internal sealed partial class CleanRoomEntityModelRuntime
         new EntityCuboid(-1f, -1.01f, -1.9f, 3f, 9.99f, 2.1f, 48, 21, XRot: legRightFrontXRot, YRot: 0f, ZRot: 0f) { RotationPivot = new Vector3(-4f, 14f - legFrontYOffset, -10f + legFrontZOffset) }.Emit(b, EntityParityTemplate.T(-4f, 14f - legFrontYOffset, -10f + legFrontZOffset), p.LegScale); // right_front_leg
 
         // Body child tail.
-        var tailPose = EntityParityTemplate.Mul(bodyPose, EntityParityTemplate.Mul(EntityParityTemplate.T(0f, -5f + tailYOffset, 2f + tailZOffset), EntityParityTemplate.Er(tailXRot, tailYRot, 0f)));
+        var tailPose = EntityParityTemplate.Mul(
+            bodyPose,
+            EntityParityTemplate.Mul(
+                EntityParityTemplate.Er(tailXRot, tailYRot, 0f),
+                EntityParityTemplate.T(0f, -5f + tailYOffset, 2f + tailZOffset)));
         EntityParityTemplate.AssertFinitePose(bodyPose, "equine adult bodyPose");
         EntityParityTemplate.AssertFinitePose(headPartsPose, "equine adult headPartsPose");
         EntityParityTemplate.AssertFinitePose(tailPose, "equine adult tailPose");
@@ -173,8 +183,16 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         if (donkeyEars)
         {
-            var earLeftPose = EntityParityTemplate.Mul(headPose, EntityParityTemplate.Mul(EntityParityTemplate.T(1.25f, -10f, 4f), EntityParityTemplate.Er(0.2617994f, 0f, 0.2617994f)));
-            var earRightPose = EntityParityTemplate.Mul(headPose, EntityParityTemplate.Mul(EntityParityTemplate.T(-1.25f, -10f, 4f), EntityParityTemplate.Er(0.2617994f, 0f, -0.2617994f)));
+            var earLeftPose = EntityParityTemplate.Mul(
+                headPose,
+                EntityParityTemplate.Mul(
+                    EntityParityTemplate.Er(0.2617994f, 0f, 0.2617994f),
+                    EntityParityTemplate.T(1.25f, -10f, 4f)));
+            var earRightPose = EntityParityTemplate.Mul(
+                headPose,
+                EntityParityTemplate.Mul(
+                    EntityParityTemplate.Er(0.2617994f, 0f, -0.2617994f),
+                    EntityParityTemplate.T(-1.25f, -10f, 4f)));
             new EntityCuboid(-1f, -7f, 0f, 1f, 0f, 1f, 0, 12).Emit(b, earLeftPose, p.HeadScale); // 2x7x1
             new EntityCuboid(-1f, -7f, 0f, 1f, 0f, 1f, 0, 12).Emit(b, earRightPose, p.HeadScale); // 2x7x1
         }
@@ -185,9 +203,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             new EntityCuboid(-2.55f, -13f, 4f, -0.55f, -10f, 5f, 19, 16, OffsetX: -0.001f, OffsetY: -0.001f, OffsetZ: -0.001f).Emit(b, headPose, p.HeadScale);
         }
 
-        // Strict parity sweep: keep bytecode cuboids/poses untouched and apply only vanilla->preview axis conversion.
-        // Equine parity uses right-compose scale on each part (see <see cref="ApplyEquineLivingEntityRendererPreviewBasis"/>); do not replace with <see cref="ApplyLivingEntityRendererPreviewBasis"/> without retuning.
-        return ApplyEquineLivingEntityRendererPreviewBasis(b.Build(texRef), modelScale);
+        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), GeometryIrLerBasisKind.StandardWorldRoot);
     }
 
     internal static float ComputeAbstractEquineTailParentPitchRad(float tailXRotOffsetRad, float walkSpeed) =>
@@ -243,7 +259,11 @@ internal sealed partial class CleanRoomEntityModelRuntime
             // PartPose offsets match 26.1.2 javap (same −Z/+Z head-vs-tail relationship as adult AbstractEquine after global XY mirror).
             var babyHorseTailPitch = ComputeAbstractEquineTailParentPitchRad(-MathF.PI / 2f, walkSpeed: 0f);
             // setupAnim assigns tail.xRot (replaces mesh default); same signed pitch as javap / AbstractEquine.
-            var tailPose = EntityParityTemplate.Mul(bodyPose, EntityParityTemplate.Mul(EntityParityTemplate.T(0f, -1f, 7f), EntityParityTemplate.Er(babyHorseTailPitch, 0f, 0f)));
+            var tailPose = EntityParityTemplate.Mul(
+                bodyPose,
+                EntityParityTemplate.Mul(
+                    EntityParityTemplate.Er(babyHorseTailPitch, 0f, 0f),
+                    EntityParityTemplate.T(0f, -1f, 7f)));
             new EntityCuboid(-1.5f, -1.5f, -1f, 1.5f, 1.5f, 7f, 24, 34).Emit(b, tailPose, 1f);
 
             new EntityCuboid(-1.5f, -1f, -1.5f, 1.5f, 8f, 1.5f, 12, 46).Emit(b, EntityParityTemplate.T(2.4f, 16f, 5.4f), 1f);
@@ -271,16 +291,17 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 eatAnimation,
                 baseHeadPartsY,
                 baseHeadPartsZ);
-            // Root child head_parts: same Mul(T, Er) order as adult AbstractEquine head_parts / translateAndRotate.
-            var headPartsPose = EntityParityTemplate.Mul(EntityParityTemplate.T(0f, headPartsY, headPartsZ), EntityParityTemplate.Er(headXRot + neckBend, headYRot, 0f));
+            var headPartsPose = EntityParityTemplate.Mul(
+                EntityParityTemplate.Er(headXRot + neckBend, headYRot, 0f),
+                EntityParityTemplate.T(0f, headPartsY, headPartsZ));
             EntityParityTemplate.AssertFinitePose(bodyPose, "equine baby horse bodyPose");
             EntityParityTemplate.AssertFinitePose(tailPose, "equine baby horse tailPose");
             EntityParityTemplate.AssertFinitePose(headPartsPose, "equine baby horse headPartsPose");
             new EntityCuboid(-2f, -6f, -2f, 2f, 2f, 2f, 30, 0).Emit(b, headPartsPose, 1f);
             var headPose = EntityParityTemplate.Mul(headPartsPose, EntityParityTemplate.T(0f, -6.0516f, -0.2951f));
             new EntityCuboid(-3f, -3.9484f, -6.705f, 3f, 0.0516f, 2.295f, 0, 0).Emit(b, headPose, 1f);
-            new EntityCuboid(-1f, -2.5f, -0.8f, 1f, 0.5f, 0.2f, 0, 4).Emit(b, EntityParityTemplate.Mul(headPose, EntityParityTemplate.Mul(EntityParityTemplate.T(2f, -4.2484f, 1.9451f), EntityParityTemplate.Rz(0.2618f))), 1f);
-            new EntityCuboid(-1f, -2.5f, -0.5f, 1f, 0.5f, 0.5f, 0, 0).Emit(b, EntityParityTemplate.Mul(headPose, EntityParityTemplate.Mul(EntityParityTemplate.T(-2f, -4.2484f, 1.645f), EntityParityTemplate.Rz(-0.2618f))), 1f);
+            new EntityCuboid(-1f, -2.5f, -0.8f, 1f, 0.5f, 0.2f, 0, 4).Emit(b, EntityParityTemplate.Mul(headPose, EntityParityTemplate.Mul(EntityParityTemplate.Rz(0.2618f), EntityParityTemplate.T(2f, -4.2484f, 1.9451f))), 1f);
+            new EntityCuboid(-1f, -2.5f, -0.5f, 1f, 0.5f, 0.5f, 0, 0).Emit(b, EntityParityTemplate.Mul(headPose, EntityParityTemplate.Mul(EntityParityTemplate.Rz(-0.2618f), EntityParityTemplate.T(-2f, -4.2484f, 1.645f))), 1f);
         }
         else
         {
@@ -290,7 +311,11 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
             // Tail Part + tail_r1: parent pitch from AbstractEquine + BabyDonkeyModel.getTailXRotOffset(-π/4); child keeps mesh X -0.7418.
             var tailParentPitch = ComputeAbstractEquineTailParentPitchRad(-MathF.PI / 4f, walkSpeed: 0f);
-            var tailGroupPose = EntityParityTemplate.Mul(bodyPose, EntityParityTemplate.Mul(EntityParityTemplate.T(0f, -1.5f, 6.5f), EntityParityTemplate.Er(tailParentPitch, 0f, 0f)));
+            var tailGroupPose = EntityParityTemplate.Mul(
+                bodyPose,
+                EntityParityTemplate.Mul(
+                    EntityParityTemplate.Er(tailParentPitch, 0f, 0f),
+                    EntityParityTemplate.T(0f, -1.5f, 6.5f)));
             new EntityCuboid(-2.5f, -1f, -0.5f, 0.5f, 2f, 7.5f, 24, 33).Emit(b, EntityParityTemplate.Mul(tailGroupPose, EntityParityTemplate.Er(-0.7418f, 0f, 0f)), 1f);
 
             // In BabyDonkeyModel these are body children (not root children).
@@ -306,15 +331,19 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 feedingAnimation: 0f,
                 ageInTicks: 0f,
                 entityPitchDegreesAfterBabyMutation: -30f);
-            var headPartsPose = EntityParityTemplate.Mul(bodyPose, EntityParityTemplate.Mul(EntityParityTemplate.T(0f, -3f, -5f), EntityParityTemplate.Er(babyDonkeyHeadPartsPitch + neckBend, 0f, 0f)));
+            var headPartsPose = EntityParityTemplate.Mul(
+                bodyPose,
+                EntityParityTemplate.Mul(
+                    EntityParityTemplate.Er(babyDonkeyHeadPartsPitch + neckBend, 0f, 0f),
+                    EntityParityTemplate.T(0f, -3f, -5f)));
             EntityParityTemplate.AssertFinitePose(bodyPose, "equine baby donkey bodyPose");
             EntityParityTemplate.AssertFinitePose(tailGroupPose, "equine baby donkey tailGroupPose");
             EntityParityTemplate.AssertFinitePose(headPartsPose, "equine baby donkey headPartsPose");
             new EntityCuboid(-3f, -6f, -3f, 1f, 2f, 1f, 30, 9).Emit(b, EntityParityTemplate.Mul(headPartsPose, EntityParityTemplate.Er(0.3927f, 0f, 0f)), 1f);
             var headPose = EntityParityTemplate.Mul(headPartsPose, EntityParityTemplate.T(0f, -5f, -3f));
-            new EntityCuboid(-4f, -3.6f, -8.4f, 2f, 0.4f, 0.6f, 0, 0).Emit(b, EntityParityTemplate.Mul(headPose, EntityParityTemplate.Mul(EntityParityTemplate.T(0f, -1f, 1f), EntityParityTemplate.Er(0.3927f, 0f, 0f))), 1f);
-            new EntityCuboid(-2f, -6.5f, -0.3f, 0f, 0.5f, 0.7f, 0, 0).Emit(b, EntityParityTemplate.Mul(headPose, EntityParityTemplate.Mul(EntityParityTemplate.T(2f, -3.5f, -1f), EntityParityTemplate.Er(0.48f, 0f, 0.48f))), 1f);
-            new EntityCuboid(-2f, -6.5f, -0.3f, 0f, 0.5f, 0.7f, 22, 0, MirrorUv: true).Emit(b, EntityParityTemplate.Mul(headPose, EntityParityTemplate.Mul(EntityParityTemplate.T(-2f, -3.5f, -1f), EntityParityTemplate.Er(0.48f, 0f, -0.48f))), 1f);
+            new EntityCuboid(-4f, -3.6f, -8.4f, 2f, 0.4f, 0.6f, 0, 0).Emit(b, EntityParityTemplate.Mul(headPose, EntityParityTemplate.Mul(EntityParityTemplate.Er(0.3927f, 0f, 0f), EntityParityTemplate.T(0f, -1f, 1f))), 1f);
+            new EntityCuboid(-2f, -6.5f, -0.3f, 0f, 0.5f, 0.7f, 0, 0).Emit(b, EntityParityTemplate.Mul(headPose, EntityParityTemplate.Mul(EntityParityTemplate.Er(0.48f, 0f, 0.48f), EntityParityTemplate.T(2f, -3.5f, -1f))), 1f);
+            new EntityCuboid(-2f, -6.5f, -0.3f, 0f, 0.5f, 0.7f, 22, 0, MirrorUv: true).Emit(b, EntityParityTemplate.Mul(headPose, EntityParityTemplate.Mul(EntityParityTemplate.Er(0.48f, 0f, -0.48f), EntityParityTemplate.T(-2f, -3.5f, -1f))), 1f);
 
             if (donkeyChests)
             {
@@ -322,17 +351,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
             }
         }
 
-        // Vanilla local PartPose chain is kept exactly as javap. Baby equine layer orientation is opposite adult under
-        // preview-space mirror, so apply world yaw as a post-multiply correction (Local * Mirror * Yaw(π)).
-        return ApplyBabyEquineLivingEntityRendererPreviewBasis(b.Build(texRef), modelScale);
+        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), GeometryIrLerBasisKind.StandardWorldRoot);
     }
-
-    private static MergedJavaBlockModel ApplyEquineLivingEntityRendererPreviewBasis(MergedJavaBlockModel model, float modelScale) =>
-        ApplyGlobalTransform(model, Matrix4x4.CreateScale(-modelScale, -modelScale, modelScale));
-
-    private static MergedJavaBlockModel ApplyBabyEquineLivingEntityRendererPreviewBasis(MergedJavaBlockModel model, float modelScale) =>
-        ApplyGlobalTransform(
-            model,
-            Matrix4x4.CreateScale(-modelScale, -modelScale, modelScale),
-            postMultiplyWorld: Matrix4x4.CreateRotationY(MathF.PI));
 }

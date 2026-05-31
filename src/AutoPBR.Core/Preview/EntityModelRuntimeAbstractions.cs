@@ -29,7 +29,8 @@ internal interface IEntityModelRuntime
         float animationTimeSeconds,
         List<Matrix4x4> scratch,
         out int boneCount,
-        EntityEmulatedPreviewRebakeContext? routeCacheOwner = null);
+        EntityEmulatedPreviewRebakeContext? routeCacheOwner = null,
+        bool applyGeometryIrSetupAnimMotion = true);
 }
 
 internal static class EntityModelRuntimeFactory

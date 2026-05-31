@@ -13,11 +13,11 @@ public sealed class GeometryIrDefinitionAnimationPreviewTests
         const string path = "assets/minecraft/textures/entity/armadillo/armadillo.png";
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.2f, animationTimeSeconds: 0f,
-            out var bind, out var provenance));
+            out var bind, out var provenance, applyGeometryIrSetupAnimMotion: true));
         Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
 
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.2f, animationTimeSeconds: 0.25f,
-            out var walk, out _));
+            out var walk, out _, applyGeometryIrSetupAnimMotion: true));
 
         var tailIdx = FindTailElementIndex(bind);
         Assert.True(tailIdx >= 0, "expected tail cuboid on adult armadillo geometry IR mesh");
@@ -35,11 +35,11 @@ public sealed class GeometryIrDefinitionAnimationPreviewTests
         const string path = "assets/minecraft/textures/entity/breeze/breeze_wind.png";
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.3f, animationTimeSeconds: 0f,
-            out var atZero, out var provenance));
+            out var atZero, out var provenance, applyGeometryIrSetupAnimMotion: true));
         Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
 
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.3f, animationTimeSeconds: 0.5f,
-            out var atHalf, out _));
+            out var atHalf, out _, applyGeometryIrSetupAnimMotion: true));
 
         Assert.True(TryMaxCornerDelta(atZero, atHalf, out var maxDelta));
         Assert.True(maxDelta > 0.05f, $"wind tier should animate (max corner delta={maxDelta:F3})");
@@ -51,11 +51,11 @@ public sealed class GeometryIrDefinitionAnimationPreviewTests
         const string path = "assets/minecraft/textures/entity/breeze/breeze.png";
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.3f, animationTimeSeconds: 0f,
-            out var bind, out var provenance));
+            out var bind, out var provenance, applyGeometryIrSetupAnimMotion: true));
         Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
 
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.3f, animationTimeSeconds: 0.25f,
-            out var shoot, out _));
+            out var shoot, out _, applyGeometryIrSetupAnimMotion: true));
 
         Assert.True(TryMaxCornerDelta(bind, shoot, out var maxDelta));
         Assert.True(maxDelta > 0.02f, $"head SHOOT channels should move IR mesh (max delta={maxDelta:F3})");
@@ -67,14 +67,28 @@ public sealed class GeometryIrDefinitionAnimationPreviewTests
         const string path = "assets/minecraft/textures/entity/fox/fox_baby.png";
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.25f, animationTimeSeconds: 0f,
-            out var bind, out var provenance));
+            out var bind, out var provenance, applyGeometryIrSetupAnimMotion: true));
         Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
 
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.25f, animationTimeSeconds: 0.25f,
-            out var walk, out _));
+            out var walk, out _, applyGeometryIrSetupAnimMotion: true));
 
         Assert.True(TryMaxCornerDelta(bind, walk, out var maxDelta));
         Assert.True(maxDelta > 0.02f, $"baby fox FOX_BABY_WALK IR should move mesh (max delta={maxDelta:F4})");
+    }
+
+    [Fact]
+    public void Armadillo_static_bind_pose_ignores_definition_animation_when_setup_anim_off()
+    {
+        const string path = "assets/minecraft/textures/entity/armadillo/armadillo.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.2f, animationTimeSeconds: 0f,
+            out var atZero, out _, applyGeometryIrSetupAnimMotion: false));
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.2f, animationTimeSeconds: 0.25f,
+            out var atQuarter, out _, applyGeometryIrSetupAnimMotion: false));
+
+        Assert.True(TryMaxCornerDelta(atZero, atQuarter, out var maxDelta));
+        Assert.True(maxDelta <= 1e-5f, $"bind pose should stay static when setupAnim/definition pass is off (max delta={maxDelta:F6})");
     }
 
     private static bool TryMaxCornerDelta(MergedJavaBlockModel a, MergedJavaBlockModel b, out float maxDelta)

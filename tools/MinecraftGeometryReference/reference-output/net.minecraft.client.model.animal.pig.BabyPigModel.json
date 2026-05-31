@@ -13,12 +13,22 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [],
   "children": [{
   "id": "head",
   "pose": {
   "translation": [0.000000000, 19.00000000, -2.000000000],
   "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 19.00000000, -2.000000000],
   "eulerOrder": "XYZ"
 }
 ,
@@ -45,6 +55,11 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [-2.500000000, 22.00000000, -3.000000000],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [{
   "from": [-1.000000000, 0.000000000, -1.000000000],
   "to": [1.000000000, 2.000000000, 1.000000000],
@@ -59,6 +74,11 @@
   "pose": {
   "translation": [-2.500000000, 22.00000000, 4.000000000],
   "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [-2.500000000, 22.00000000, 4.000000000],
   "eulerOrder": "XYZ"
 }
 ,
@@ -79,6 +99,11 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [2.500000000, 22.00000000, 4.000000000],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [{
   "from": [-1.000000000, 0.000000000, -1.000000000],
   "to": [1.000000000, 2.000000000, 1.000000000],
@@ -96,6 +121,11 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [0.000000000, 19.00000000, 0.5000000000],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [{
   "from": [-3.500000000, -3.000000000, -4.500000000],
   "to": [3.500000000, 3.000000000, 4.500000000],
@@ -110,6 +140,11 @@
   "pose": {
   "translation": [2.500000000, 22.00000000, -3.000000000],
   "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [2.500000000, 22.00000000, -3.000000000],
   "eulerOrder": "XYZ"
 }
 ,

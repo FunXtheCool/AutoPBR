@@ -49,7 +49,7 @@ Land quadrupeds and feline hosts from the **56-pilot** assembly set ([`geometry-
 
 ## Notes
 
-- **LER:** Flat hosts (cow, pig, panda, polar, sheep, creeper, ...) use cow-class `LocalToParent * S` when classified; nested hosts (feline, llama, rabbit, wolf adult) use same policy via `UsesFlatPartPoseOffsetQuadrupedJvm` + stem rules.
+- **LER:** Catalog + hand fallbacks use **column-root** `ApplyLivingEntityRendererColumnRootScale` (`StandardWorldRoot`) after model-space emit — see plan § Quadruped body placement regression. **Do not** regress to per-element `M×S` right-compose for production paths.
 - **Preview-deltas (2026-05-21):** `CowModel`, `PigModel`, `PandaModel`, `PolarBearModel` — cow-class LER notes; babies inherit JVM+stem gate (no separate overlay unless Explore diverges).
 - **SheepModel:** T1 viewport probe only (not partial->ok 4C). **QuadrupedModel:** abstract mesh host; assembly/oracle pass; not on 4C promotion list.
 - **Manual Explore:** All rows pending SS A.4 sign-off; panda/polar/cow regression screenshots in quadruped body-placement section.

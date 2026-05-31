@@ -172,7 +172,7 @@ internal static partial class MinecraftModelBaker
         v.Add(wSign);
         if (appendBoneIndex)
         {
-            // Stored as IEEE bits so the GPU path can use glVertexAttribIPointer (GLES/ANGLE mediump float is unsafe for indices).
+            // Stored as IEEE bits; shader decodes with floatBitsToInt (GLES/ANGLE-safe vs int vertex attribs).
             v.Add(BitConverter.Int32BitsToSingle(boneElementIndex));
         }
     }

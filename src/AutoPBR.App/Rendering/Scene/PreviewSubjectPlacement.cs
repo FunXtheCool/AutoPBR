@@ -1,5 +1,6 @@
 using AutoPBR.App.Rendering.Abstractions;
 using AutoPBR.Core.Models;
+using AutoPBR.Core.Preview;
 
 namespace AutoPBR.App.Rendering.Scene;
 
@@ -63,6 +64,12 @@ public static class PreviewSubjectPlacement
         float floorY = PreviewStageConstants.GridWorldY,
         float clearance = 0.002f)
     {
+        if (subject.EntityPreviewPlacementApplied ||
+            subject.EmulatedRebake is not null)
+        {
+            return subject;
+        }
+
         var stride = subject.VertexStrideFloats > 0 ? subject.VertexStrideFloats : PreviewMesh.FloatsPerVertex;
         var liftY = ComputeLiftToAvoidGroundClip(subject.InterleavedVertices, floorY, clearance, stride);
         if (liftY <= 0f)
@@ -70,9 +77,16 @@ public static class PreviewSubjectPlacement
             return subject;
         }
 
-        return new PreviewModelSubject
+        return CopySubjectWithVertices(subject, ApplyLift(subject.InterleavedVertices, liftY, stride), subject.EntityGpuMeshSpaceLiftY);
+    }
+
+    internal static PreviewModelSubject CopySubjectWithVertices(
+        PreviewModelSubject subject,
+        float[] vertices,
+        float gpuLiftY) =>
+        new()
         {
-            InterleavedVertices = ApplyLift(subject.InterleavedVertices, liftY, stride),
+            InterleavedVertices = vertices,
             Indices = subject.Indices,
             DrawBatches = subject.DrawBatches,
             Materials = subject.Materials,
@@ -83,7 +97,10 @@ public static class PreviewSubjectPlacement
             EmulatedRebake = subject.EmulatedRebake,
             GpuEntityBoneSkinning = subject.GpuEntityBoneSkinning,
             VertexStrideFloats = subject.VertexStrideFloats,
-            EntityGpuMeshSpaceLiftY = subject.EntityGpuMeshSpaceLiftY
+            EntityGpuMeshSpaceLiftY = gpuLiftY,
+            EntityGpuVerticesInPreviewSpace = subject.EntityGpuVerticesInPreviewSpace,
+            EntityPreviewAnchorOffset = subject.EntityPreviewAnchorOffset,
+            EntityPreviewPlacementApplied = subject.EntityPreviewPlacementApplied,
+            MeshProvenance = subject.MeshProvenance
         };
-    }
 }

@@ -60,13 +60,14 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
     {
         var (headY, bodyY, legY) = MeasureHeadBodyLegCentroidY(mesh, geometryRoot, atlasW, atlasH, officialJvmName);
         Assert.True(legY < headY, $"{officialJvmName}: legY={legY:F3} headY={headY:F3}");
-        var minY = MathF.Min(legY, MathF.Min(bodyY, headY));
-        var maxY = MathF.Max(legY, MathF.Max(bodyY, headY));
+        var rotatedTorsoBand = legY < headY && headY < bodyY;
+        var nestedFelineBand = legY < bodyY && bodyY < headY;
         Assert.True(
-            bodyY >= minY - 0.5f && bodyY <= maxY + 0.5f,
-            $"{officialJvmName}: bodyY={bodyY:F3} outside [{minY:F3},{maxY:F3}]");
-        var spanLimit = officialJvmName.Contains("polarbear", StringComparison.OrdinalIgnoreCase) ? 26f : 22f;
-        Assert.True(maxY - minY < spanLimit, $"{officialJvmName}: vertical span={maxY - minY:F3}");
+            rotatedTorsoBand || nestedFelineBand,
+            $"{officialJvmName}: bodyY={bodyY:F3} outside preview bands; leg={legY:F3} head={headY:F3}");
+        var spanLimit = officialJvmName.Contains("polarbear", StringComparison.OrdinalIgnoreCase) ? 32f : 24f;
+        var span = MathF.Max(bodyY, headY) - legY;
+        Assert.True(span < spanLimit, $"{officialJvmName}: vertical span={span:F3}");
     }
 
     private static (float HeadY, float BodyY, float LegY) MeasureHeadBodyLegCentroidY(

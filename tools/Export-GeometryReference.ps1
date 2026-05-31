@@ -10,11 +10,23 @@
   Text file of official JVM names (one per line; # comments). Overrides -Models when set.
   Example: docs/generated/geometry-assembly-parity-pilots-26.1.2.txt (56 assembly-parity pilots).
 
+.PARAMETER AllExistingOutput
+  Rebake every model that already has reference-output/<fqn>.json (Er×T policy refresh).
+
+.PARAMETER Parallel
+  Bake models concurrently (PowerShell 7+). Uses -MaxParallelism workers.
+
+.PARAMETER MaxParallelism
+  Worker cap for -Parallel. 0 = [Environment]::ProcessorCount.
+
 .EXAMPLE
   pwsh -File tools/Export-GeometryReference.ps1
 
 .EXAMPLE
-  pwsh -File tools/Export-GeometryReference.ps1 -ModelsFromFile docs/generated/geometry-assembly-parity-pilots-26.1.2.txt
+  pwsh -File tools/Export-GeometryReference.ps1 -AllExistingOutput -Parallel
+
+.EXAMPLE
+  pwsh -File tools/Export-GeometryReference.ps1 -ModelsFromFile docs/generated/geometry-assembly-parity-pilots-26.1.2.txt -Parallel -MaxParallelism 8
 
 .EXAMPLE
   pwsh -File tools/Export-GeometryReference.ps1 -Models @(
@@ -45,7 +57,6 @@ param(
         'net.minecraft.client.model.monster.warden.WardenModel',
         'net.minecraft.client.model.monster.vex.VexModel',
         'net.minecraft.client.model.player.PlayerCapeModel',
-        # Layer A static rig pilots (feline / fox / armadillo / breeze + baby JVMs)
         'net.minecraft.client.model.animal.feline.AdultCatModel',
         'net.minecraft.client.model.animal.feline.BabyCatModel',
         'net.minecraft.client.model.animal.feline.AdultFelineModel',
@@ -57,7 +68,6 @@ param(
         'net.minecraft.client.model.animal.armadillo.AdultArmadilloModel',
         'net.minecraft.client.model.animal.armadillo.BabyArmadilloModel',
         'net.minecraft.client.model.monster.breeze.BreezeModel',
-        # Lift-quality batch 1 (geometry-lift-quality-26.1.2 referenceCuboidsMatch)
         'net.minecraft.client.model.QuadrupedModel',
         'net.minecraft.client.model.animal.bee.AdultBeeModel',
         'net.minecraft.client.model.animal.bee.BabyBeeModel',
@@ -97,14 +107,37 @@ param(
 
     [string] $JavaHome = '',
 
-    [string] $ModelsFromFile = ''
+    [string] $ModelsFromFile = '',
+
+    [switch] $AllExistingOutput,
+
+    [switch] $Parallel,
+
+    [int] $MaxParallelism = 0
 )
 
 $ErrorActionPreference = 'Stop'
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $repoRoot = Split-Path -Parent $here
 
-if (-not [string]::IsNullOrWhiteSpace($ModelsFromFile)) {
+$refRoot = Join-Path $here 'MinecraftGeometryReference'
+if (-not (Test-Path -LiteralPath $refRoot)) {
+    throw "MinecraftGeometryReference not found: $refRoot"
+}
+
+$outputDir = Join-Path $refRoot 'reference-output'
+
+if ($AllExistingOutput) {
+    if (-not (Test-Path -LiteralPath $outputDir)) {
+        throw "reference-output not found: $outputDir"
+    }
+
+    $Models = Get-ChildItem -LiteralPath $outputDir -Filter '*.json' |
+        Sort-Object Name |
+        ForEach-Object { $_.BaseName }
+    Write-Host "Rebaking $($Models.Count) models from $outputDir"
+}
+elseif (-not [string]::IsNullOrWhiteSpace($ModelsFromFile)) {
     $manifestPath = if ([System.IO.Path]::IsPathRooted($ModelsFromFile)) {
         $ModelsFromFile
     }
@@ -120,9 +153,8 @@ if (-not [string]::IsNullOrWhiteSpace($ModelsFromFile)) {
     Write-Host "Loaded $($Models.Count) models from $manifestPath"
 }
 
-$refRoot = Join-Path $here 'MinecraftGeometryReference'
-if (-not (Test-Path -LiteralPath $refRoot)) {
-    throw "MinecraftGeometryReference not found: $refRoot"
+if ($Models.Count -eq 0) {
+    throw 'No models to bake.'
 }
 
 $gradleJava = 'C:\Program Files\Eclipse Adoptium\jdk-21.0.6.7-hotspot'
@@ -142,17 +174,17 @@ See tools/MinecraftGeometryReference/README.md
 "@
 }
 
+$parityRoot = Join-Path $repoRoot 'tools/minecraft-parity/26.1.2'
+$libRoot = Join-Path $parityRoot 'libraries'
+if (-not (Test-Path -LiteralPath $libRoot) -or -not (Get-ChildItem -LiteralPath $libRoot -Recurse -Filter '*.jar' -ErrorAction SilentlyContinue)) {
+    Write-Host 'Runtime libraries missing; downloading from version.json...'
+    & (Join-Path $here 'Download-MinecraftRuntimeLibs.ps1') -VersionRoot $parityRoot
+}
+
 $props = Join-Path $refRoot 'gradle.properties'
 $installLine = "org.gradle.java.installations.paths=$($JavaHome -replace '\\','/')"
-if (Test-Path -LiteralPath $props) {
-    $content = Get-Content -LiteralPath $props -Raw
-    if ($content -notmatch 'org\.gradle\.java\.installations\.paths=') {
-        Add-Content -LiteralPath $props -Value $installLine
-    }
-}
-else {
-    Set-Content -LiteralPath $props -Value $installLine
-}
+Set-Content -LiteralPath $props -Value $installLine -NoNewline
+Add-Content -LiteralPath $props -Value ''
 
 $createMeshModels = @(
     'net.minecraft.client.model.player.PlayerModel',
@@ -177,37 +209,119 @@ $createHarnessLayerModels = @(
     'net.minecraft.client.model.animal.ghast.HappyGhastHarnessModel'
 )
 
+function Get-ReferenceFactoryMethod {
+    param([string] $ModelName)
+
+    if ($createMeshModels -contains $ModelName) { return 'createMesh' }
+    if ($createCapeLayerModels -contains $ModelName) { return 'createCapeLayer' }
+    if ($createSaddleLayerModels -contains $ModelName) { return 'createSaddleLayer' }
+    if ($createHarnessLayerModels -contains $ModelName) { return 'createHarnessLayer' }
+    if ($createFurLayerModels -contains $ModelName) { return 'createFurLayer' }
+    return $FactoryMethod
+}
+
+function Invoke-ReferenceBake {
+    param(
+        [string] $ModelName,
+        [string] $MethodName,
+        [string] $ReferenceRoot,
+        [string] $GradleJavaHome
+    )
+
+    Push-Location $ReferenceRoot
+    try {
+        $env:JAVA_HOME = $GradleJavaHome
+        & .\gradlew.bat run --quiet --args="$ModelName $MethodName"
+        return [pscustomobject]@{
+            Model = $ModelName
+            Method = $MethodName
+            ExitCode = $LASTEXITCODE
+        }
+    }
+    finally {
+        Pop-Location
+    }
+}
+
 Push-Location $refRoot
 try {
     $env:JAVA_HOME = $gradleJava
-    foreach ($m in $Models) {
-        $method = if ($createMeshModels -contains $m) {
-            'createMesh'
-        }
-        elseif ($createCapeLayerModels -contains $m) {
-            'createCapeLayer'
-        }
-        elseif ($createSaddleLayerModels -contains $m) {
-            'createSaddleLayer'
-        }
-        elseif ($createHarnessLayerModels -contains $m) {
-            'createHarnessLayer'
-        }
-        elseif ($createFurLayerModels -contains $m) {
-            'createFurLayer'
-        }
-        else {
-            $FactoryMethod
-        }
-        Write-Host "Baking reference: $m ($method)"
-        & .\gradlew.bat run --quiet --args="$m $method"
-        if ($LASTEXITCODE -ne 0) {
-            throw "Reference bake failed for $m (exit $LASTEXITCODE)"
-        }
+    Write-Host 'Compiling reference harness...'
+    & .\gradlew.bat classes --quiet
+    if ($LASTEXITCODE -ne 0) {
+        throw "Gradle classes failed (exit $LASTEXITCODE)"
     }
 }
 finally {
     Pop-Location
 }
 
-Write-Host "Reference output: $refRoot\reference-output"
+$jobs = foreach ($m in $Models) {
+    [pscustomobject]@{
+        Model = $m
+        Method = Get-ReferenceFactoryMethod $m
+    }
+}
+
+if ($Parallel) {
+    if ($PSVersionTable.PSVersion.Major -lt 7) {
+        throw '-Parallel requires PowerShell 7+.'
+    }
+
+    $workers = if ($MaxParallelism -gt 0) { $MaxParallelism } else { [Environment]::ProcessorCount }
+    Write-Host "Parallel reference bake: $($jobs.Count) models, $workers workers."
+
+    $results = $jobs | ForEach-Object -Parallel {
+        function Invoke-ReferenceBakeParallel {
+            param(
+                [string] $ModelName,
+                [string] $MethodName,
+                [string] $ReferenceRoot,
+                [string] $GradleJavaHome
+            )
+
+            Push-Location $ReferenceRoot
+            try {
+                $env:JAVA_HOME = $GradleJavaHome
+                $null = & .\gradlew.bat run --quiet --args="$ModelName $MethodName" 2>&1
+                $exitCode = $LASTEXITCODE
+                if ($null -eq $exitCode) {
+                    $exitCode = if ($?) { 0 } else { 1 }
+                }
+
+                return [pscustomobject]@{
+                    Model = $ModelName
+                    Method = $MethodName
+                    ExitCode = $exitCode
+                }
+            }
+            finally {
+                Pop-Location
+            }
+        }
+
+        Invoke-ReferenceBakeParallel -ModelName $_.Model -MethodName $_.Method -ReferenceRoot $using:refRoot -GradleJavaHome $using:gradleJava
+    } -ThrottleLimit $workers
+
+    $results = @($results | Where-Object { $_ })
+    $failed = @($results | Where-Object { $_.ExitCode -ne 0 })
+    foreach ($ok in ($results | Where-Object { $_.ExitCode -eq 0 })) {
+        Write-Host "OK $($ok.Model) ($($ok.Method))"
+    }
+
+    if ($failed.Count -gt 0) {
+        $names = ($failed | ForEach-Object { $_.Model }) -join ', '
+        throw "Reference bake failed for $($failed.Count) model(s): $names"
+    }
+}
+else {
+    foreach ($job in $jobs) {
+        Write-Host "Baking reference: $($job.Model) ($($job.Method))"
+        $result = Invoke-ReferenceBake -ModelName $job.Model -MethodName $job.Method -ReferenceRoot $refRoot -GradleJavaHome $gradleJava
+        if ($result.ExitCode -ne 0) {
+            throw "Reference bake failed for $($job.Model) (exit $($result.ExitCode))"
+        }
+    }
+}
+
+Write-Host "Reference output: $outputDir ($($jobs.Count) models)"

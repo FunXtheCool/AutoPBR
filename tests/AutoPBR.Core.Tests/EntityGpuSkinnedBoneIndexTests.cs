@@ -10,7 +10,7 @@ namespace AutoPBR.Core.Tests;
 /// <summary>
 /// GPU skinning bind-pose bake stores the element index in the last float word (bit-cast int) per
 /// <see cref="MinecraftModelBaker.TryBakeBindPoseForGpuSkinning"/>; <see cref="GlMeshBuffer"/> binds it as
-/// <c>glVertexAttribIPointer(4, …, offset 12 * sizeof(float))</c> for <c>layout(location = 4) in int aBoneIndex</c>.
+/// <c>VertexAttribPointer(4, …, offset 12 * sizeof(float))</c> for <c>layout(location = 4) in float aBoneIndexBits</c> + <c>floatBitsToInt</c>.
 /// </summary>
 public sealed class EntityGpuSkinnedBoneIndexTests
 {
@@ -88,6 +88,25 @@ public sealed class EntityGpuSkinnedBoneIndexTests
             Assert.True(b >= prev, $"bone index decreased at vertex {vi} ({assetPath}): {prev} -> {b}");
             prev = b;
         }
+    }
+
+    [Fact]
+    public void CollectBoneIndices_decodes_bit_cast_bone_words()
+    {
+        var verts = new float[EntityEmulatedPreviewMeshLayout.SkinnedFloatsPerVertex * 3];
+        for (var i = 0; i < 3; i++)
+        {
+            verts[i * 13 + 12] = BitConverter.Int32BitsToSingle(i + 1);
+        }
+
+        var indices = new List<int>();
+        EntityPreviewGrounding.CollectBoneIndices(
+            verts,
+            EntityEmulatedPreviewMeshLayout.SkinnedFloatsPerVertex,
+            EntityEmulatedPreviewMeshLayout.SkinnedFloatsPerVertex - 1,
+            indices);
+
+        Assert.Equal([1, 2, 3], indices);
     }
 
     [Fact]

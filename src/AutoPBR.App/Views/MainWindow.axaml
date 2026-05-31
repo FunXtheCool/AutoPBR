@@ -2074,6 +2074,10 @@
                                     VerticalAlignment="Center"
                                     Padding="10,2"
                                     Click="OpenUvDebugWindow_Click" />
+                            <Button Content="Entity Debug"
+                                    VerticalAlignment="Center"
+                                    Padding="10,2"
+                                    Click="OpenEntityPreviewDebugWindow_Click" />
                         </StackPanel>
                         <Border IsVisible="{Binding PreviewBrickProbeDebug}"
                                 CornerRadius="4"

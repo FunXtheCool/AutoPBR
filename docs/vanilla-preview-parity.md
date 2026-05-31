@@ -34,9 +34,18 @@ For an **exhaustive** inventory of classes under `net.minecraft.client.model.**`
 
 Track A above remains the **hand-maintained parity** checklist; the generated index is the **complete class tree** reference for that pinned jar.
 
-## Reference Java bake — composed `worldPose` (26.1.2)
+## Reference Java bake — composed `worldPose` and JVM render affines (26.1.2)
 
-`tools/MinecraftGeometryReference` walks baked `ModelPart` trees and writes `worldPose.translation` per part (parent × `getInitialPose()`), alongside local `pose`. C# lift quality uses `referenceWorldPoseMatch` (repaired IR vs reference) to catch hierarchy repair drift that still passes local `referencePosesMatch`. See [runtime-ir-preview-plan.md](runtime-ir-preview-plan.md) Part A (reference world pose).
+`tools/MinecraftGeometryReference` walks baked `ModelPart` trees and writes:
+
+| Field | Semantics | Use in C# |
+|-------|-----------|-----------|
+| **`worldPose.translation`** | Parent chain × `getInitialPose()` via **`PartWorldPoseMath`** (Er×T row convention) | Lift quality `referenceWorldPoseMatch`, hierarchy drift probes |
+| **`renderPartAffines`** / **`renderCuboidCenters`** | Bind PoseStack **`translateAndRotate`** walk (`ModelPartRenderPoseMath.java`) | **Cuboid render placement** — horns, ears, rotated attachments |
+
+C# emit (`TryComposePartPose` / `GeometryIrMeshWalk`) follows the **render** path (block stack above), not texel-scale `Mul(Er, T)` alone. **`worldPose` can match while Explore cuboids are wrong** on attached rotated parts — see [runtime-ir-preview-plan.md](runtime-ir-preview-plan.md) § *PartPose vs ModelPart render*.
+
+Rebake reference after compose changes: `pwsh -File tools/Export-GeometryReference.ps1 -AllExistingOutput -Parallel`.
 
 ## Parity-catalog geometry IR (26.1.2)
 
@@ -171,6 +180,10 @@ This section is **locked process policy** for every entity parity rollout. The h
 6. **Validate in layers**
    - Run focused tests (`Horse`, `Donkey`, equipment routes), then full Core suite.
    - Use screenshots for final pose parity and only then refine UV/debug layers.
+7. **GPU Explore path must match CPU preview-world policy**
+   - CPU fixes (LER column-root, walk order, compose) apply to both tessellation paths via the same `TryBuildStaticMesh` source.
+   - Bind pose on GPU: shader `W()`+lift with **`uEntityGpuSkinning=0`**; animated: **`invBind·M_anim`** from full mesh extract.
+   - Contract: [`entity-preview-gpu-cpu-parity.md`](entity-preview-gpu-cpu-parity.md).
 
 ### Reusable rollout gates/checklist (required)
 
@@ -193,14 +206,15 @@ This section is **locked process policy** for every entity parity rollout. The h
 
 ### Baby equine (HorseModel / DonkeyModel splits — 26.1.2)
 
-Rolling passes — repeat whenever preview-facing regress:
+Rolling passes — repeat whenever preview-facing regress. **Policy matches adult [Quadruped body placement regression](runtime-ir-preview-plan.md#quadruped-body-placement-regression-cow--polarbear--panda) and [Baby JVM family](runtime-ir-preview-plan.md#baby-jvm-family-same-canonical-policy-as-adults--2026-05-28) (column-root LER, IR walk order, no flat-quadruped leg reparent except `BabyDonkeyModel` nested-head case).
 
 | Pass | Goal |
 |------|------|
-| **1 — Transform audit** | `Ry(π)·diag(−s,−s,+s)` equals `diag(+s,−s,−s)` only as a **constant** factor; **pre-multiplying** `Ry` on baked locals conjugates every nested `Rx`, breaking neck/tail. Prefer folding orientation into the **per-element scale** (`CreateScale(s,−s,−s)` after javap locals) unless a proven alternative keeps head/tail Z separation without distorting PartPose chains. |
-| **2 — Anchor geometry** | Lock neck (`neck_r1` ordered **4×8×4**) vs tail (`tail_r1` **3×3×8**) world-Z separation after `LocalToParent` (`EquineBabyPreview_*_NeckCenterNegativeZOfTailCenter`). Ordered extents avoid leg (`3×8×3`) vs tail permutation ambiguity. |
-| **3 — setupAnim / idle** | Baby donkey: `ComputeBabyDonkeySetupAnimHeadPartsXRotRad` idle after forced −30° pitch (`EquineParity_BabyDonkeySetupAnimHeadPartsXRot_*`). Baby horse: mesh defaults vs `AbstractEquineModel.setupAnim` head writes; optional follow-up: `animateHeadPartsPlacement` when stand/eat ≠ 0. |
-| **4 — Visual** | Screenshots `donkey_baby`, `horse_*_baby`, `mule_baby` vs vanilla client; only then micro-tweak UV or preview-only calibration. |
+| **1 — Transform audit** | Same as adults: `ApplyLivingEntityRendererColumnRootScale` after model-space emit; **`local × parentWorld`** in `GeometryIrMeshWalk`; production **ModelPart block stack** in `TryComposePartPose` (not legacy **`T × Er`**). Prefer `AbstractEquineModel` / `BabyHorseModel` / `BabyDonkeyModel` IR hosts via `GeometryIrParityJvmResolver` (not mis-lifted `HorseModel`). |
+| **2 — Anchor geometry** | Lock neck (`neck_r1` ordered **4×8×4**) vs tail (`tail_r1` **3×3×8**) world-Z separation after `LocalToParent` (`EquineBabyPreview_*_NeckCenterNegativeZOfTailCenter`). Ordered extents avoid leg (`3×8×3`) vs tail permutation ambiguity. **Tail:** IR hierarchy walk only — no hand absolute tail overrides on emit. |
+| **3 — Part-tree repair** | `BabyDonkeyModel`: `HeadStackNestedUnderBody` → reparent flat leg siblings under `body`. `BabyHorseModel`: flat root legs — **no** reparent (`UsesVanillaFlatQuadrupedLegBake`). |
+| **4 — setupAnim / idle** | Baby donkey: `ComputeBabyDonkeySetupAnimHeadPartsXRotRad` idle after forced −30° pitch (`EquineParity_BabyDonkeySetupAnimHeadPartsXRot_*`). Flat families: peer position strip + rotation deltas only on geometry IR (see runtime plan § Baby JVM family). |
+| **5 — Visual** | Screenshots `donkey_baby`, `horse_*_baby`, `mule_baby` vs vanilla client; only then micro-tweak UV or preview-only calibration. |
 
 ## Done criteria (global)
 

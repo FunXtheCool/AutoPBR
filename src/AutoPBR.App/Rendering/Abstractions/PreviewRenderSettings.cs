@@ -99,6 +99,12 @@ public sealed class PreviewRenderSettings
     /// </summary>
     public bool EnableLegacyEntityWobble { get; init; }
 
+    /// <summary>
+    /// When true, skin entity preview on the CPU (<c>SkinAndBakeToPreviewLayout</c>) and upload a 12-float preview-space VBO
+    /// instead of the GPU bind mesh + entity shader path. Debug / parity fallback only.
+    /// </summary>
+    public bool ForceEntityCpuSkinning { get; init; }
+
     /// <summary>Genesis Shadows Phase 2: master toggle for the directional shadow map pass.</summary>
     public bool EnableShadows { get; init; } = true;
 

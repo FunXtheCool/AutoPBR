@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Text.Json;
+using AutoPBR.Core.Models;
 
 namespace AutoPBR.Core.Preview;
 
@@ -31,9 +32,13 @@ internal static class GeometryIrMeshWalk
             return false;
         }
 
+        var parentWorldBlock = EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose
+            ? rootTransform
+            : CleanRoomEntityModelRuntime.TexelRowAffineToBlock(rootTransform);
+
         foreach (var rootPart in roots.EnumerateArray())
         {
-            if (!VisitPart(rootPart, rootTransform, options, onCuboid, onPartWorld, ref failureReason))
+            if (!VisitPart(rootPart, parentWorldBlock, options, onCuboid, onPartWorld, ref failureReason))
             {
                 return false;
             }
@@ -88,20 +93,32 @@ internal static class GeometryIrMeshWalk
             var id = idEl.GetString() ?? "";
             if (id.Length > 0)
             {
-                if (!part.TryGetProperty("worldPose", out var worldPose) ||
-                    worldPose.ValueKind != JsonValueKind.Object ||
-                    !worldPose.TryGetProperty("translation", out var t) ||
-                    t.ValueKind != JsonValueKind.Array ||
-                    t.GetArrayLength() < 3)
+                if (part.TryGetProperty("worldPose", out var worldPose) &&
+                    worldPose.ValueKind == JsonValueKind.Object &&
+                    worldPose.TryGetProperty("translation", out var worldT) &&
+                    worldT.ValueKind == JsonValueKind.Array &&
+                    worldT.GetArrayLength() >= 3)
+                {
+                    collected[id] = new Vector3(
+                        (float)worldT[0].GetDouble(),
+                        (float)worldT[1].GetDouble(),
+                        (float)worldT[2].GetDouble());
+                }
+                else if (part.TryGetProperty("pose", out var pose) &&
+                         pose.TryGetProperty("translation", out var poseT) &&
+                         poseT.ValueKind == JsonValueKind.Array &&
+                         poseT.GetArrayLength() >= 3)
+                {
+                    collected[id] = new Vector3(
+                        (float)poseT[0].GetDouble(),
+                        (float)poseT[1].GetDouble(),
+                        (float)poseT[2].GetDouble());
+                }
+                else
                 {
                     failureReason = $"part '{id}' missing worldPose.translation";
                     return false;
                 }
-
-                collected[id] = new Vector3(
-                    (float)t[0].GetDouble(),
-                    (float)t[1].GetDouble(),
-                    (float)t[2].GetDouble());
             }
         }
 
@@ -160,24 +177,67 @@ internal static class GeometryIrMeshWalk
         return list;
     }
 
-    private static bool VisitPart(
-        JsonElement part,
-        Matrix4x4 parentWorld,
-        GeometryIrMeshEmitOptions options,
-        Func<CuboidVisitContext, bool>? onCuboid,
-        Action<string, Matrix4x4>? onPartWorld,
-        ref string? failureReason)
+    /// <summary>
+    /// Composes part world from parent chain using Java reference bake semantics
+    /// (<c>PartWorldPoseMath</c>: local = Er×T, world = parentWorld × local).
+    /// </summary>
+    private static bool TryComposePartWorldFromParent(
+        JsonElement poseEl,
+        Matrix4x4 parentWorldBlock,
+        out Matrix4x4 worldBlock,
+        out Matrix4x4 worldTexel,
+        out string? failureReason)
     {
-        var world = parentWorld;
-        if (part.TryGetProperty("pose", out var poseEl))
+        failureReason = null;
+        worldBlock = parentWorldBlock;
+        worldTexel = EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose
+            ? parentWorldBlock
+            : CleanRoomEntityModelRuntime.BlockRowAffineToTexel(parentWorldBlock);
+
+        if (!poseEl.ValueKind.Equals(JsonValueKind.Object))
         {
-            if (!CleanRoomEntityModelRuntime.TryComposePartPosePublic(poseEl, out var local))
+            return true;
+        }
+
+        if (EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose)
+        {
+            if (!CleanRoomEntityModelRuntime.TryComposePartPosePublic(poseEl, out var localTexel))
             {
                 failureReason = "compose part pose failed";
                 return false;
             }
 
-            world = Matrix4x4.Multiply(parentWorld, local);
+            worldTexel = Matrix4x4.Multiply(parentWorldBlock, localTexel);
+            worldBlock = worldTexel;
+            return true;
+        }
+
+        if (!CleanRoomEntityModelRuntime.TryComposePartRenderLocalBlock(poseEl, out var localBlock, out failureReason))
+        {
+            return false;
+        }
+
+        worldBlock = Matrix4x4.Multiply(localBlock, parentWorldBlock);
+        worldTexel = CleanRoomEntityModelRuntime.BlockRowAffineToTexel(worldBlock);
+        return true;
+    }
+
+    private static bool VisitPart(
+        JsonElement part,
+        Matrix4x4 parentWorldBlock,
+        GeometryIrMeshEmitOptions options,
+        Func<CuboidVisitContext, bool>? onCuboid,
+        Action<string, Matrix4x4>? onPartWorld,
+        ref string? failureReason)
+    {
+        if (!TryComposePartWorldFromParent(
+                part.TryGetProperty("pose", out var poseEl) ? poseEl : default,
+                parentWorldBlock,
+                out var worldBlock,
+                out var worldTexel,
+                out failureReason))
+        {
+            return false;
         }
 
         var partId = part.TryGetProperty("id", out var idEl) ? idEl.GetString() ?? "" : "";
@@ -187,12 +247,15 @@ internal static class GeometryIrMeshWalk
 
         if (options.TryGetPartPoseOverride is { } poseOverride && !skipPartCuboids)
         {
-            world = poseOverride(partId, world);
+            worldTexel = poseOverride(partId, worldTexel);
+            worldBlock = EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose
+                ? worldTexel
+                : CleanRoomEntityModelRuntime.TexelRowAffineToBlock(worldTexel);
         }
 
         if (partId.Length > 0)
         {
-            onPartWorld?.Invoke(partId, world);
+            onPartWorld?.Invoke(partId, worldTexel);
         }
 
         var partScale = options.ResolvePartScale?.Invoke(partId) ?? options.DefaultPartScale;
@@ -219,7 +282,7 @@ internal static class GeometryIrMeshWalk
                 if (!onCuboid(new CuboidVisitContext
                     {
                         PartId = partId,
-                        PartWorld = world,
+                        PartWorld = worldTexel,
                         PartScale = partScale,
                         Cuboid = cuboidEl
                     }))
@@ -233,7 +296,7 @@ internal static class GeometryIrMeshWalk
         {
             foreach (var child in children.EnumerateArray())
             {
-                if (!VisitPart(child, world, options, onCuboid, onPartWorld, ref failureReason))
+                if (!VisitPart(child, worldBlock, options, onCuboid, onPartWorld, ref failureReason))
                 {
                     return false;
                 }

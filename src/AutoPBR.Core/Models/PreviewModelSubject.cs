@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace AutoPBR.Core.Models;
 
 /// <summary>One contiguous index range in <see cref="PreviewModelSubject.Indices"/> drawn with one material slot.</summary>
@@ -15,8 +17,19 @@ public sealed class PreviewModelSubject
     /// <summary>When true, <see cref="InterleavedVertices"/> uses stride <see cref="VertexStrideFloats"/> and entity pose is driven by GPU bone uniforms.</summary>
     public bool GpuEntityBoneSkinning { get; init; }
 
-    /// <summary>Model-space Y offset applied after bone skinning so the subject clears the preview ground plane.</summary>
+    /// <summary>Preview-space Y offset applied after bone skinning (GPU shader only; CPU path bakes into vertices).</summary>
     public float EntityGpuMeshSpaceLiftY { get; init; }
+
+    /// <summary>
+    /// Bind VBO positions already include <c>W()</c> + lift (animation-off Explore path); shader uses CPU branch.
+    /// </summary>
+    public bool EntityGpuVerticesInPreviewSpace { get; init; }
+
+    /// <summary>Anchor translation applied at bake (CPU) or to bind vertices (GPU XZ); shared policy with lift.</summary>
+    public Vector3 EntityPreviewAnchorOffset { get; init; }
+
+    /// <summary>When true, initial load already applied <see cref="EntityPreviewPlacement"/> (avoid double lift in UI).</summary>
+    public bool EntityPreviewPlacementApplied { get; init; }
 
     public required float[] InterleavedVertices { get; init; }
     public required uint[] Indices { get; init; }

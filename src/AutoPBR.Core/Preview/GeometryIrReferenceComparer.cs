@@ -256,6 +256,141 @@ internal static class GeometryIrReferenceComparer
         return CompareFingerprintLists(refFp, meshFp, tolerance);
     }
 
+    /// <summary>
+    /// Compares per-part model-space origins: mesh <c>LocalToParent</c> translation vs reference <c>worldPose</c>
+    /// (pre–<c>LivingEntityRenderer</c> mirror).
+    /// </summary>
+    public static CompareResult CompareReferenceJavaModelWorldToParityMesh(
+        JsonElement referenceRoot,
+        JsonElement geometryRoot,
+        MergedJavaBlockModel parityMesh,
+        GeometryIrMeshEmitOptions emitOptions,
+        double tolerance = 0.35)
+        => CompareReferenceJavaWorldToParityMeshCore(
+            referenceRoot,
+            geometryRoot,
+            parityMesh,
+            emitOptions,
+            applyLivingEntityRendererMirror: false,
+            tolerance);
+
+    /// <summary>
+    /// Compares per-part preview world origins: mesh after <c>S * LocalToParent</c> vs
+    /// <c>S *</c> reference <c>worldPose</c> (model layer + vanilla LER mirror).
+    /// </summary>
+    public static CompareResult CompareReferenceJavaPreviewWorldToParityMesh(
+        JsonElement referenceRoot,
+        JsonElement geometryRoot,
+        MergedJavaBlockModel parityMesh,
+        GeometryIrMeshEmitOptions emitOptions,
+        double tolerance = 0.35)
+        => CompareReferenceJavaWorldToParityMeshCore(
+            referenceRoot,
+            geometryRoot,
+            parityMesh,
+            emitOptions,
+            applyLivingEntityRendererMirror: true,
+            tolerance);
+
+    private static CompareResult CompareReferenceJavaWorldToParityMeshCore(
+        JsonElement referenceRoot,
+        JsonElement geometryRoot,
+        MergedJavaBlockModel parityMesh,
+        GeometryIrMeshEmitOptions emitOptions,
+        bool applyLivingEntityRendererMirror,
+        double tolerance)
+    {
+        if (referenceRoot.TryGetProperty("extractionStatus", out var st) &&
+            string.Equals(st.GetString(), "reference_stub", StringComparison.Ordinal))
+        {
+            return new CompareResult(false, "reference is stub", 0, 0);
+        }
+
+        if (!GeometryIrMeshWalk.TryCollectBakedWorldTranslations(
+                referenceRoot, out var refWorld, out var refFail))
+        {
+            return new CompareResult(false, $"reference worldPose: {refFail}", 0, 0);
+        }
+
+        var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(geometryRoot, emitOptions);
+        if (partIds.Count != parityMesh.Elements.Count)
+        {
+            return new CompareResult(
+                false,
+                $"cuboid/part order reference parts={refWorld.Count} mesh elements={parityMesh.Elements.Count}",
+                refWorld.Count,
+                parityMesh.Elements.Count);
+        }
+
+        var ler = CleanRoomEntityModelRuntime.LivingEntityRendererPreviewRootScale;
+        var compared = 0;
+        var skipped = 0;
+        foreach (var (partId, refOrigin) in refWorld)
+        {
+            if (!TryMeanPartOriginInMesh(parityMesh, partIds, partId, out var meshOrigin))
+            {
+                skipped++;
+                continue;
+            }
+
+            var expected = applyLivingEntityRendererMirror
+                ? Vector3.Transform(refOrigin, ler)
+                : refOrigin;
+            if (!TranslationNear(expected, meshOrigin, tolerance))
+            {
+                var space = applyLivingEntityRendererMirror ? "preview" : "model";
+                return new CompareResult(
+                    false,
+                    $"part '{partId}' {space} origin expected=({expected.X:R},{expected.Y:R},{expected.Z:R}) " +
+                    $"mesh=({meshOrigin.X:R},{meshOrigin.Y:R},{meshOrigin.Z:R}) refModel=({refOrigin.X:R},{refOrigin.Y:R},{refOrigin.Z:R})",
+                    refWorld.Count,
+                    compared);
+            }
+
+            compared++;
+        }
+
+        if (compared == 0)
+        {
+            return new CompareResult(
+                false,
+                $"no comparable parts (reference parts={refWorld.Count} skipped={skipped})",
+                refWorld.Count,
+                0);
+        }
+
+        return new CompareResult(true, null, refWorld.Count, compared);
+    }
+
+    private static bool TryMeanPartOriginInMesh(
+        MergedJavaBlockModel mesh,
+        IReadOnlyList<string> partIds,
+        string partId,
+        out Vector3 origin)
+    {
+        origin = default;
+        var sum = Vector3.Zero;
+        var count = 0;
+        for (var i = 0; i < partIds.Count && i < mesh.Elements.Count; i++)
+        {
+            if (!string.Equals(partIds[i], partId, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            sum += Vector3.Transform(Vector3.Zero, mesh.Elements[i].LocalToParent);
+            count++;
+        }
+
+        if (count == 0)
+        {
+            return false;
+        }
+
+        origin = sum / count;
+        return true;
+    }
+
     private static CompareResult CompareFingerprintLists(List<string> reference, List<string> compared, double tolerance)
     {
         if (reference.Count != compared.Count)

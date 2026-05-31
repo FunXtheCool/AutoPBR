@@ -64,7 +64,8 @@ internal sealed class GlMeshBuffer : IDisposable
             if (floatsPerVertex >= 13)
             {
                 _gl.EnableVertexAttribArray(4);
-                _gl.VertexAttribIPointer(4, 1, VertexAttribIType.Int, stride, (void*)(12 * sizeof(float)));
+                // Bit-cast element index stored as float; decode with floatBitsToInt in the shader (ANGLE-safe).
+                _gl.VertexAttribPointer(4, 1, VertexAttribPointerType.Float, false, stride, (void*)(12 * sizeof(float)));
             }
             else
             {

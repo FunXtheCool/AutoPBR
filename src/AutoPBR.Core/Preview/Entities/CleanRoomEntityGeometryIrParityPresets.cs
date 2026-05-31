@@ -64,7 +64,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             float wave) =>
             partId switch
             {
-                "head_parts" => EntityParityTemplate.Mul(world, EntityParityTemplate.Rx(neckBend)),
+                "head_parts" => EntityParityTemplate.Mul(EntityParityTemplate.Rx(neckBend), world),
                 "tail" => EntityParityTemplate.Mul(world, EntityParityTemplate.T(0f, 0f, wave * 0.5f)),
                 _ => world
             };

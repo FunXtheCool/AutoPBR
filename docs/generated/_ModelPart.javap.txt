@@ -1,0 +1,704 @@
+Compiled from "ModelPart.java"
+public final class net.minecraft.client.model.geom.ModelPart {
+  public static final float DEFAULT_SCALE;
+
+  public float x;
+
+  public float y;
+
+  public float z;
+
+  public float xRot;
+
+  public float yRot;
+
+  public float zRot;
+
+  public float xScale;
+
+  public float yScale;
+
+  public float zScale;
+
+  public boolean visible;
+
+  public boolean skipDraw;
+
+  private final java.util.List<net.minecraft.client.model.geom.ModelPart$Cube> cubes;
+
+  private final java.util.Map<java.lang.String, net.minecraft.client.model.geom.ModelPart> children;
+
+  private net.minecraft.client.model.geom.PartPose initialPose;
+
+  public net.minecraft.client.model.geom.ModelPart(java.util.List<net.minecraft.client.model.geom.ModelPart$Cube>, java.util.Map<java.lang.String, net.minecraft.client.model.geom.ModelPart>);
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: aload_0
+         5: fconst_1
+         6: putfield      #9                  // Field xScale:F
+         9: aload_0
+        10: fconst_1
+        11: putfield      #13                 // Field yScale:F
+        14: aload_0
+        15: fconst_1
+        16: putfield      #16                 // Field zScale:F
+        19: aload_0
+        20: iconst_1
+        21: putfield      #19                 // Field visible:Z
+        24: aload_0
+        25: getstatic     #23                 // Field net/minecraft/client/model/geom/PartPose.ZERO:Lnet/minecraft/client/model/geom/PartPose;
+        28: putfield      #29                 // Field initialPose:Lnet/minecraft/client/model/geom/PartPose;
+        31: aload_0
+        32: aload_1
+        33: putfield      #32                 // Field cubes:Ljava/util/List;
+        36: aload_0
+        37: aload_2
+        38: putfield      #36                 // Field children:Ljava/util/Map;
+        41: return
+
+  public net.minecraft.client.model.geom.PartPose storePose();
+    Code:
+         0: aload_0
+         1: getfield      #40                 // Field x:F
+         4: aload_0
+         5: getfield      #43                 // Field y:F
+         8: aload_0
+         9: getfield      #46                 // Field z:F
+        12: aload_0
+        13: getfield      #49                 // Field xRot:F
+        16: aload_0
+        17: getfield      #52                 // Field yRot:F
+        20: aload_0
+        21: getfield      #55                 // Field zRot:F
+        24: invokestatic  #58                 // Method net/minecraft/client/model/geom/PartPose.offsetAndRotation:(FFFFFF)Lnet/minecraft/client/model/geom/PartPose;
+        27: areturn
+
+  public net.minecraft.client.model.geom.PartPose getInitialPose();
+    Code:
+         0: aload_0
+         1: getfield      #29                 // Field initialPose:Lnet/minecraft/client/model/geom/PartPose;
+         4: areturn
+
+  public void setInitialPose(net.minecraft.client.model.geom.PartPose);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: putfield      #29                 // Field initialPose:Lnet/minecraft/client/model/geom/PartPose;
+         5: return
+
+  public void resetPose();
+    Code:
+         0: aload_0
+         1: aload_0
+         2: getfield      #29                 // Field initialPose:Lnet/minecraft/client/model/geom/PartPose;
+         5: invokevirtual #62                 // Method loadPose:(Lnet/minecraft/client/model/geom/PartPose;)V
+         8: return
+
+  public void loadPose(net.minecraft.client.model.geom.PartPose);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: invokevirtual #66                 // Method net/minecraft/client/model/geom/PartPose.x:()F
+         5: putfield      #40                 // Field x:F
+         8: aload_0
+         9: aload_1
+        10: invokevirtual #69                 // Method net/minecraft/client/model/geom/PartPose.y:()F
+        13: putfield      #43                 // Field y:F
+        16: aload_0
+        17: aload_1
+        18: invokevirtual #71                 // Method net/minecraft/client/model/geom/PartPose.z:()F
+        21: putfield      #46                 // Field z:F
+        24: aload_0
+        25: aload_1
+        26: invokevirtual #73                 // Method net/minecraft/client/model/geom/PartPose.xRot:()F
+        29: putfield      #49                 // Field xRot:F
+        32: aload_0
+        33: aload_1
+        34: invokevirtual #75                 // Method net/minecraft/client/model/geom/PartPose.yRot:()F
+        37: putfield      #52                 // Field yRot:F
+        40: aload_0
+        41: aload_1
+        42: invokevirtual #77                 // Method net/minecraft/client/model/geom/PartPose.zRot:()F
+        45: putfield      #55                 // Field zRot:F
+        48: aload_0
+        49: aload_1
+        50: invokevirtual #79                 // Method net/minecraft/client/model/geom/PartPose.xScale:()F
+        53: putfield      #9                  // Field xScale:F
+        56: aload_0
+        57: aload_1
+        58: invokevirtual #81                 // Method net/minecraft/client/model/geom/PartPose.yScale:()F
+        61: putfield      #13                 // Field yScale:F
+        64: aload_0
+        65: aload_1
+        66: invokevirtual #83                 // Method net/minecraft/client/model/geom/PartPose.zScale:()F
+        69: putfield      #16                 // Field zScale:F
+        72: return
+
+  public boolean hasChild(java.lang.String);
+    Code:
+         0: aload_0
+         1: getfield      #36                 // Field children:Ljava/util/Map;
+         4: aload_1
+         5: invokeinterface #85,  2           // InterfaceMethod java/util/Map.containsKey:(Ljava/lang/Object;)Z
+        10: ireturn
+
+  public net.minecraft.client.model.geom.ModelPart getChild(java.lang.String);
+    Code:
+         0: aload_0
+         1: getfield      #36                 // Field children:Ljava/util/Map;
+         4: aload_1
+         5: invokeinterface #91,  2           // InterfaceMethod java/util/Map.get:(Ljava/lang/Object;)Ljava/lang/Object;
+        10: checkcast     #7                  // class net/minecraft/client/model/geom/ModelPart
+        13: astore_2
+        14: aload_2
+        15: ifnonnull     32
+        18: new           #95                 // class java/util/NoSuchElementException
+        21: dup
+        22: aload_1
+        23: invokedynamic #97,  0             // InvokeDynamic #0:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+        28: invokespecial #101                // Method java/util/NoSuchElementException."<init>":(Ljava/lang/String;)V
+        31: athrow
+        32: aload_2
+        33: areturn
+
+  public void setPos(float, float, float);
+    Code:
+         0: aload_0
+         1: fload_1
+         2: putfield      #40                 // Field x:F
+         5: aload_0
+         6: fload_2
+         7: putfield      #43                 // Field y:F
+        10: aload_0
+        11: fload_3
+        12: putfield      #46                 // Field z:F
+        15: return
+
+  public void setRotation(float, float, float);
+    Code:
+         0: aload_0
+         1: fload_1
+         2: putfield      #49                 // Field xRot:F
+         5: aload_0
+         6: fload_2
+         7: putfield      #52                 // Field yRot:F
+        10: aload_0
+        11: fload_3
+        12: putfield      #55                 // Field zRot:F
+        15: return
+
+  public void render(com.mojang.blaze3d.vertex.PoseStack, com.mojang.blaze3d.vertex.VertexConsumer, int, int);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: aload_2
+         3: iload_3
+         4: iload         4
+         6: iconst_m1
+         7: invokevirtual #106                // Method render:(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V
+        10: return
+
+  public void render(com.mojang.blaze3d.vertex.PoseStack, com.mojang.blaze3d.vertex.VertexConsumer, int, int, int);
+    Code:
+         0: aload_0
+         1: getfield      #19                 // Field visible:Z
+         4: ifne          8
+         7: return
+         8: aload_0
+         9: getfield      #32                 // Field cubes:Ljava/util/List;
+        12: invokeinterface #110,  1          // InterfaceMethod java/util/List.isEmpty:()Z
+        17: ifeq          33
+        20: aload_0
+        21: getfield      #36                 // Field children:Ljava/util/Map;
+        24: invokeinterface #116,  1          // InterfaceMethod java/util/Map.isEmpty:()Z
+        29: ifeq          33
+        32: return
+        33: aload_1
+        34: invokevirtual #117                // Method com/mojang/blaze3d/vertex/PoseStack.pushPose:()V
+        37: aload_0
+        38: aload_1
+        39: invokevirtual #122                // Method translateAndRotate:(Lcom/mojang/blaze3d/vertex/PoseStack;)V
+        42: aload_0
+        43: getfield      #126                // Field skipDraw:Z
+        46: ifne          63
+        49: aload_0
+        50: aload_1
+        51: invokevirtual #129                // Method com/mojang/blaze3d/vertex/PoseStack.last:()Lcom/mojang/blaze3d/vertex/PoseStack$Pose;
+        54: aload_2
+        55: iload_3
+        56: iload         4
+        58: iload         5
+        60: invokevirtual #133                // Method compile:(Lcom/mojang/blaze3d/vertex/PoseStack$Pose;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V
+        63: aload_0
+        64: getfield      #36                 // Field children:Ljava/util/Map;
+        67: invokeinterface #137,  1          // InterfaceMethod java/util/Map.values:()Ljava/util/Collection;
+        72: invokeinterface #141,  1          // InterfaceMethod java/util/Collection.iterator:()Ljava/util/Iterator;
+        77: astore        6
+        79: aload         6
+        81: invokeinterface #147,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        86: ifeq          116
+        89: aload         6
+        91: invokeinterface #152,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        96: checkcast     #7                  // class net/minecraft/client/model/geom/ModelPart
+        99: astore        7
+       101: aload         7
+       103: aload_1
+       104: aload_2
+       105: iload_3
+       106: iload         4
+       108: iload         5
+       110: invokevirtual #106                // Method render:(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V
+       113: goto          79
+       116: aload_1
+       117: invokevirtual #156                // Method com/mojang/blaze3d/vertex/PoseStack.popPose:()V
+       120: return
+
+  public void rotateBy(org.joml.Quaternionf);
+    Code:
+         0: new           #159                // class org/joml/Matrix3f
+         3: dup
+         4: invokespecial #161                // Method org/joml/Matrix3f."<init>":()V
+         7: aload_0
+         8: getfield      #55                 // Field zRot:F
+        11: aload_0
+        12: getfield      #52                 // Field yRot:F
+        15: aload_0
+        16: getfield      #49                 // Field xRot:F
+        19: invokevirtual #162                // Method org/joml/Matrix3f.rotationZYX:(FFF)Lorg/joml/Matrix3f;
+        22: astore_2
+        23: aload_2
+        24: aload_1
+        25: invokevirtual #166                // Method org/joml/Matrix3f.rotate:(Lorg/joml/Quaternionfc;)Lorg/joml/Matrix3f;
+        28: astore_3
+        29: aload_3
+        30: new           #170                // class org/joml/Vector3f
+        33: dup
+        34: invokespecial #172                // Method org/joml/Vector3f."<init>":()V
+        37: invokevirtual #173                // Method org/joml/Matrix3f.getEulerAnglesZYX:(Lorg/joml/Vector3f;)Lorg/joml/Vector3f;
+        40: astore        4
+        42: aload_0
+        43: aload         4
+        45: getfield      #177                // Field org/joml/Vector3f.x:F
+        48: aload         4
+        50: getfield      #178                // Field org/joml/Vector3f.y:F
+        53: aload         4
+        55: getfield      #179                // Field org/joml/Vector3f.z:F
+        58: invokevirtual #180                // Method setRotation:(FFF)V
+        61: return
+
+  public void getExtentsForGui(com.mojang.blaze3d.vertex.PoseStack, java.util.function.Consumer<org.joml.Vector3fc>);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: aload_2
+         3: invokedynamic #184,  0            // InvokeDynamic #1:visit:(Ljava/util/function/Consumer;)Lnet/minecraft/client/model/geom/ModelPart$Visitor;
+         8: invokevirtual #188                // Method visit:(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/model/geom/ModelPart$Visitor;)V
+        11: return
+
+  public void visit(com.mojang.blaze3d.vertex.PoseStack, net.minecraft.client.model.geom.ModelPart$Visitor);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: aload_2
+         3: ldc           #191                // String
+         5: invokevirtual #193                // Method visit:(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/model/geom/ModelPart$Visitor;Ljava/lang/String;)V
+         8: return
+
+  private void visit(com.mojang.blaze3d.vertex.PoseStack, net.minecraft.client.model.geom.ModelPart$Visitor, java.lang.String);
+    Code:
+         0: aload_0
+         1: getfield      #32                 // Field cubes:Ljava/util/List;
+         4: invokeinterface #110,  1          // InterfaceMethod java/util/List.isEmpty:()Z
+         9: ifeq          25
+        12: aload_0
+        13: getfield      #36                 // Field children:Ljava/util/Map;
+        16: invokeinterface #116,  1          // InterfaceMethod java/util/Map.isEmpty:()Z
+        21: ifeq          25
+        24: return
+        25: aload_1
+        26: invokevirtual #117                // Method com/mojang/blaze3d/vertex/PoseStack.pushPose:()V
+        29: aload_0
+        30: aload_1
+        31: invokevirtual #122                // Method translateAndRotate:(Lcom/mojang/blaze3d/vertex/PoseStack;)V
+        34: aload_1
+        35: invokevirtual #129                // Method com/mojang/blaze3d/vertex/PoseStack.last:()Lcom/mojang/blaze3d/vertex/PoseStack$Pose;
+        38: astore        4
+        40: iconst_0
+        41: istore        5
+        43: iload         5
+        45: aload_0
+        46: getfield      #32                 // Field cubes:Ljava/util/List;
+        49: invokeinterface #196,  1          // InterfaceMethod java/util/List.size:()I
+        54: if_icmpge     88
+        57: aload_2
+        58: aload         4
+        60: aload_3
+        61: iload         5
+        63: aload_0
+        64: getfield      #32                 // Field cubes:Ljava/util/List;
+        67: iload         5
+        69: invokeinterface #200,  2          // InterfaceMethod java/util/List.get:(I)Ljava/lang/Object;
+        74: checkcast     #203                // class net/minecraft/client/model/geom/ModelPart$Cube
+        77: invokeinterface #205,  5          // InterfaceMethod net/minecraft/client/model/geom/ModelPart$Visitor.visit:(Lcom/mojang/blaze3d/vertex/PoseStack$Pose;Ljava/lang/String;ILnet/minecraft/client/model/geom/ModelPart$Cube;)V
+        82: iinc          5, 1
+        85: goto          43
+        88: aload_3
+        89: invokedynamic #210,  0            // InvokeDynamic #2:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+        94: astore        5
+        96: aload_0
+        97: getfield      #36                 // Field children:Ljava/util/Map;
+       100: aload_1
+       101: aload_2
+       102: aload         5
+       104: invokedynamic #211,  0            // InvokeDynamic #3:accept:(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/model/geom/ModelPart$Visitor;Ljava/lang/String;)Ljava/util/function/BiConsumer;
+       109: invokeinterface #215,  2          // InterfaceMethod java/util/Map.forEach:(Ljava/util/function/BiConsumer;)V
+       114: aload_1
+       115: invokevirtual #156                // Method com/mojang/blaze3d/vertex/PoseStack.popPose:()V
+       118: return
+
+  public void translateAndRotate(com.mojang.blaze3d.vertex.PoseStack);
+    Code:
+         0: aload_1
+         1: aload_0
+         2: getfield      #40                 // Field x:F
+         5: ldc           #219                // float 16.0f
+         7: fdiv
+         8: aload_0
+         9: getfield      #43                 // Field y:F
+        12: ldc           #219                // float 16.0f
+        14: fdiv
+        15: aload_0
+        16: getfield      #46                 // Field z:F
+        19: ldc           #219                // float 16.0f
+        21: fdiv
+        22: invokevirtual #220                // Method com/mojang/blaze3d/vertex/PoseStack.translate:(FFF)V
+        25: aload_0
+        26: getfield      #49                 // Field xRot:F
+        29: fconst_0
+        30: fcmpl
+        31: ifne          52
+        34: aload_0
+        35: getfield      #52                 // Field yRot:F
+        38: fconst_0
+        39: fcmpl
+        40: ifne          52
+        43: aload_0
+        44: getfield      #55                 // Field zRot:F
+        47: fconst_0
+        48: fcmpl
+        49: ifeq          78
+        52: aload_1
+        53: new           #223                // class org/joml/Quaternionf
+        56: dup
+        57: invokespecial #225                // Method org/joml/Quaternionf."<init>":()V
+        60: aload_0
+        61: getfield      #55                 // Field zRot:F
+        64: aload_0
+        65: getfield      #52                 // Field yRot:F
+        68: aload_0
+        69: getfield      #49                 // Field xRot:F
+        72: invokevirtual #226                // Method org/joml/Quaternionf.rotationZYX:(FFF)Lorg/joml/Quaternionf;
+        75: invokevirtual #229                // Method com/mojang/blaze3d/vertex/PoseStack.mulPose:(Lorg/joml/Quaternionfc;)V
+        78: aload_0
+        79: getfield      #9                  // Field xScale:F
+        82: fconst_1
+        83: fcmpl
+        84: ifne          105
+        87: aload_0
+        88: getfield      #13                 // Field yScale:F
+        91: fconst_1
+        92: fcmpl
+        93: ifne          105
+        96: aload_0
+        97: getfield      #16                 // Field zScale:F
+       100: fconst_1
+       101: fcmpl
+       102: ifeq          121
+       105: aload_1
+       106: aload_0
+       107: getfield      #9                  // Field xScale:F
+       110: aload_0
+       111: getfield      #13                 // Field yScale:F
+       114: aload_0
+       115: getfield      #16                 // Field zScale:F
+       118: invokevirtual #233                // Method com/mojang/blaze3d/vertex/PoseStack.scale:(FFF)V
+       121: return
+
+  private void compile(com.mojang.blaze3d.vertex.PoseStack$Pose, com.mojang.blaze3d.vertex.VertexConsumer, int, int, int);
+    Code:
+         0: aload_0
+         1: getfield      #32                 // Field cubes:Ljava/util/List;
+         4: invokeinterface #236,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+         9: astore        6
+        11: aload         6
+        13: invokeinterface #147,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        18: ifeq          48
+        21: aload         6
+        23: invokeinterface #152,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        28: checkcast     #203                // class net/minecraft/client/model/geom/ModelPart$Cube
+        31: astore        7
+        33: aload         7
+        35: aload_1
+        36: aload_2
+        37: iload_3
+        38: iload         4
+        40: iload         5
+        42: invokevirtual #237                // Method net/minecraft/client/model/geom/ModelPart$Cube.compile:(Lcom/mojang/blaze3d/vertex/PoseStack$Pose;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V
+        45: goto          11
+        48: return
+
+  public net.minecraft.client.model.geom.ModelPart$Cube getRandomCube(net.minecraft.util.RandomSource);
+    Code:
+         0: aload_0
+         1: getfield      #32                 // Field cubes:Ljava/util/List;
+         4: aload_1
+         5: invokestatic  #238                // Method net/minecraft/util/Util.getRandom:(Ljava/util/List;Lnet/minecraft/util/RandomSource;)Ljava/lang/Object;
+         8: checkcast     #203                // class net/minecraft/client/model/geom/ModelPart$Cube
+        11: areturn
+
+  public boolean isEmpty();
+    Code:
+         0: aload_0
+         1: getfield      #32                 // Field cubes:Ljava/util/List;
+         4: invokeinterface #110,  1          // InterfaceMethod java/util/List.isEmpty:()Z
+         9: ireturn
+
+  public void offsetPos(org.joml.Vector3f);
+    Code:
+         0: aload_0
+         1: dup
+         2: getfield      #40                 // Field x:F
+         5: aload_1
+         6: invokevirtual #244                // Method org/joml/Vector3f.x:()F
+         9: fadd
+        10: putfield      #40                 // Field x:F
+        13: aload_0
+        14: dup
+        15: getfield      #43                 // Field y:F
+        18: aload_1
+        19: invokevirtual #245                // Method org/joml/Vector3f.y:()F
+        22: fadd
+        23: putfield      #43                 // Field y:F
+        26: aload_0
+        27: dup
+        28: getfield      #46                 // Field z:F
+        31: aload_1
+        32: invokevirtual #246                // Method org/joml/Vector3f.z:()F
+        35: fadd
+        36: putfield      #46                 // Field z:F
+        39: return
+
+  public void offsetRotation(org.joml.Vector3f);
+    Code:
+         0: aload_0
+         1: dup
+         2: getfield      #49                 // Field xRot:F
+         5: aload_1
+         6: invokevirtual #244                // Method org/joml/Vector3f.x:()F
+         9: fadd
+        10: putfield      #49                 // Field xRot:F
+        13: aload_0
+        14: dup
+        15: getfield      #52                 // Field yRot:F
+        18: aload_1
+        19: invokevirtual #245                // Method org/joml/Vector3f.y:()F
+        22: fadd
+        23: putfield      #52                 // Field yRot:F
+        26: aload_0
+        27: dup
+        28: getfield      #55                 // Field zRot:F
+        31: aload_1
+        32: invokevirtual #246                // Method org/joml/Vector3f.z:()F
+        35: fadd
+        36: putfield      #55                 // Field zRot:F
+        39: return
+
+  public void offsetScale(org.joml.Vector3f);
+    Code:
+         0: aload_0
+         1: dup
+         2: getfield      #9                  // Field xScale:F
+         5: aload_1
+         6: invokevirtual #244                // Method org/joml/Vector3f.x:()F
+         9: fadd
+        10: putfield      #9                  // Field xScale:F
+        13: aload_0
+        14: dup
+        15: getfield      #13                 // Field yScale:F
+        18: aload_1
+        19: invokevirtual #245                // Method org/joml/Vector3f.y:()F
+        22: fadd
+        23: putfield      #13                 // Field yScale:F
+        26: aload_0
+        27: dup
+        28: getfield      #16                 // Field zScale:F
+        31: aload_1
+        32: invokevirtual #246                // Method org/joml/Vector3f.z:()F
+        35: fadd
+        36: putfield      #16                 // Field zScale:F
+        39: return
+
+  public java.util.List<net.minecraft.client.model.geom.ModelPart> getAllParts();
+    Code:
+         0: new           #247                // class java/util/ArrayList
+         3: dup
+         4: invokespecial #249                // Method java/util/ArrayList."<init>":()V
+         7: astore_1
+         8: aload_1
+         9: aload_0
+        10: invokeinterface #250,  2          // InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+        15: pop
+        16: aload_0
+        17: aload_1
+        18: invokedynamic #253,  0            // InvokeDynamic #4:accept:(Ljava/util/List;)Ljava/util/function/BiConsumer;
+        23: invokevirtual #256                // Method addAllChildren:(Ljava/util/function/BiConsumer;)V
+        26: aload_1
+        27: invokestatic  #259                // InterfaceMethod java/util/List.copyOf:(Ljava/util/Collection;)Ljava/util/List;
+        30: areturn
+
+  public java.util.function.Function<java.lang.String, net.minecraft.client.model.geom.ModelPart> createPartLookup();
+    Code:
+         0: new           #263                // class java/util/HashMap
+         3: dup
+         4: invokespecial #265                // Method java/util/HashMap."<init>":()V
+         7: astore_1
+         8: aload_1
+         9: ldc_w         #268                // String root
+        12: aload_0
+        13: invokeinterface #270,  3          // InterfaceMethod java/util/Map.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+        18: pop
+        19: aload_0
+        20: aload_1
+        21: dup
+        22: invokestatic  #274                // Method java/util/Objects.requireNonNull:(Ljava/lang/Object;)Ljava/lang/Object;
+        25: pop
+        26: invokedynamic #279,  0            // InvokeDynamic #5:accept:(Ljava/util/Map;)Ljava/util/function/BiConsumer;
+        31: invokevirtual #256                // Method addAllChildren:(Ljava/util/function/BiConsumer;)V
+        34: aload_1
+        35: dup
+        36: invokestatic  #274                // Method java/util/Objects.requireNonNull:(Ljava/lang/Object;)Ljava/lang/Object;
+        39: pop
+        40: invokedynamic #282,  0            // InvokeDynamic #6:apply:(Ljava/util/Map;)Ljava/util/function/Function;
+        45: areturn
+
+  private void addAllChildren(java.util.function.BiConsumer<java.lang.String, net.minecraft.client.model.geom.ModelPart>);
+    Code:
+         0: aload_0
+         1: getfield      #36                 // Field children:Ljava/util/Map;
+         4: invokeinterface #286,  1          // InterfaceMethod java/util/Map.entrySet:()Ljava/util/Set;
+         9: invokeinterface #290,  1          // InterfaceMethod java/util/Set.iterator:()Ljava/util/Iterator;
+        14: astore_2
+        15: aload_2
+        16: invokeinterface #147,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        21: ifeq          61
+        24: aload_2
+        25: invokeinterface #152,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        30: checkcast     #293                // class java/util/Map$Entry
+        33: astore_3
+        34: aload_1
+        35: aload_3
+        36: invokeinterface #295,  1          // InterfaceMethod java/util/Map$Entry.getKey:()Ljava/lang/Object;
+        41: checkcast     #298                // class java/lang/String
+        44: aload_3
+        45: invokeinterface #300,  1          // InterfaceMethod java/util/Map$Entry.getValue:()Ljava/lang/Object;
+        50: checkcast     #7                  // class net/minecraft/client/model/geom/ModelPart
+        53: invokeinterface #303,  3          // InterfaceMethod java/util/function/BiConsumer.accept:(Ljava/lang/Object;Ljava/lang/Object;)V
+        58: goto          15
+        61: aload_0
+        62: getfield      #36                 // Field children:Ljava/util/Map;
+        65: invokeinterface #137,  1          // InterfaceMethod java/util/Map.values:()Ljava/util/Collection;
+        70: invokeinterface #141,  1          // InterfaceMethod java/util/Collection.iterator:()Ljava/util/Iterator;
+        75: astore_2
+        76: aload_2
+        77: invokeinterface #147,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        82: ifeq          103
+        85: aload_2
+        86: invokeinterface #152,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        91: checkcast     #7                  // class net/minecraft/client/model/geom/ModelPart
+        94: astore_3
+        95: aload_3
+        96: aload_1
+        97: invokevirtual #256                // Method addAllChildren:(Ljava/util/function/BiConsumer;)V
+       100: goto          76
+       103: return
+
+  private static void lambda$getAllParts$0(java.util.List, java.lang.String, net.minecraft.client.model.geom.ModelPart);
+    Code:
+         0: aload_0
+         1: aload_2
+         2: invokeinterface #250,  2          // InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+         7: pop
+         8: return
+
+  private static void lambda$visit$0(com.mojang.blaze3d.vertex.PoseStack, net.minecraft.client.model.geom.ModelPart$Visitor, java.lang.String, java.lang.String, net.minecraft.client.model.geom.ModelPart);
+    Code:
+         0: aload         4
+         2: aload_0
+         3: aload_1
+         4: aload_2
+         5: aload_3
+         6: invokedynamic #308,  0            // InvokeDynamic #7:makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+        11: invokevirtual #193                // Method visit:(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/model/geom/ModelPart$Visitor;Ljava/lang/String;)V
+        14: return
+
+  private static void lambda$getExtentsForGui$0(java.util.function.Consumer, com.mojang.blaze3d.vertex.PoseStack$Pose, java.lang.String, int, net.minecraft.client.model.geom.ModelPart$Cube);
+    Code:
+         0: aload         4
+         2: getfield      #311                // Field net/minecraft/client/model/geom/ModelPart$Cube.polygons:[Lnet/minecraft/client/model/geom/ModelPart$Polygon;
+         5: astore        5
+         7: aload         5
+         9: arraylength
+        10: istore        6
+        12: iconst_0
+        13: istore        7
+        15: iload         7
+        17: iload         6
+        19: if_icmpge     121
+        22: aload         5
+        24: iload         7
+        26: aaload
+        27: astore        8
+        29: aload         8
+        31: invokevirtual #315                // Method net/minecraft/client/model/geom/ModelPart$Polygon.vertices:()[Lnet/minecraft/client/model/geom/ModelPart$Vertex;
+        34: astore        9
+        36: aload         9
+        38: arraylength
+        39: istore        10
+        41: iconst_0
+        42: istore        11
+        44: iload         11
+        46: iload         10
+        48: if_icmpge     115
+        51: aload         9
+        53: iload         11
+        55: aaload
+        56: astore        12
+        58: aload         12
+        60: invokevirtual #321                // Method net/minecraft/client/model/geom/ModelPart$Vertex.worldX:()F
+        63: fstore        13
+        65: aload         12
+        67: invokevirtual #326                // Method net/minecraft/client/model/geom/ModelPart$Vertex.worldY:()F
+        70: fstore        14
+        72: aload         12
+        74: invokevirtual #329                // Method net/minecraft/client/model/geom/ModelPart$Vertex.worldZ:()F
+        77: fstore        15
+        79: aload_1
+        80: invokevirtual #332                // Method com/mojang/blaze3d/vertex/PoseStack$Pose.pose:()Lorg/joml/Matrix4f;
+        83: fload         13
+        85: fload         14
+        87: fload         15
+        89: new           #170                // class org/joml/Vector3f
+        92: dup
+        93: invokespecial #172                // Method org/joml/Vector3f."<init>":()V
+        96: invokevirtual #338                // Method org/joml/Matrix4f.transformPosition:(FFFLorg/joml/Vector3f;)Lorg/joml/Vector3f;
+        99: astore        16
+       101: aload_0
+       102: aload         16
+       104: invokeinterface #344,  2          // InterfaceMethod java/util/function/Consumer.accept:(Ljava/lang/Object;)V
+       109: iinc          11, 1
+       112: goto          44
+       115: iinc          7, 1
+       118: goto          15
+       121: return
+}

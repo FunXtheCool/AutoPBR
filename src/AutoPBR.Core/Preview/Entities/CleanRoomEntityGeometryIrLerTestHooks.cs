@@ -16,8 +16,75 @@ internal sealed partial class CleanRoomEntityModelRuntime
     }
 
     /// <summary>
-    /// Flat <c>PartPose.offset</c> root-sibling quadruped factories need cow-class LER fold
-    /// (<c>LocalToParent * S</c>), not default <c>S * LocalToParent</c>.
+    /// Where to fold vanilla LER for one geometry IR mesh build (emit root vs single post-batch).
+    /// </summary>
+    internal readonly struct GeometryIrLivingEntityRendererEmitPlan
+    {
+        public Matrix4x4 EmitRootTransform { get; init; }
+
+        public bool ApplyPostLivingEntityRendererBasis { get; init; }
+
+        public GeometryIrLerBasisKind Basis { get; init; }
+    }
+
+    /// <summary>
+    /// Resolves LER folding for parity/catalog emit. Motion passes (setupAnim, definition anim) stay in model space;
+    /// LER is applied <b>once</b> after them when <paramref name="deferLivingEntityRendererUntilAfterMotionPasses"/> is true.
+    /// Static bind folds LER once after emit via <see cref="ApplyLivingEntityRendererColumnRootScale"/> (column
+    /// <c>S * LocalToParent</c> on points). Motion passes stay model-space until the single post-batch when deferred.
+    /// </summary>
+    internal static GeometryIrLivingEntityRendererEmitPlan ResolveGeometryIrParityEmitPlan(
+        string? officialJvmName,
+        string? stemLower,
+        string? normalizedAssetPath,
+        bool deferLivingEntityRendererUntilAfterMotionPasses)
+    {
+        var basis = ResolveGeometryIrLerBasis(officialJvmName, stemLower, normalizedAssetPath);
+        if (basis is GeometryIrLerBasisKind.Skip)
+        {
+            return new GeometryIrLivingEntityRendererEmitPlan
+            {
+                EmitRootTransform = Matrix4x4.Identity,
+                ApplyPostLivingEntityRendererBasis = false,
+                Basis = basis,
+            };
+        }
+
+        if (deferLivingEntityRendererUntilAfterMotionPasses)
+        {
+            return new GeometryIrLivingEntityRendererEmitPlan
+            {
+                EmitRootTransform = Matrix4x4.Identity,
+                ApplyPostLivingEntityRendererBasis = true,
+                Basis = basis,
+            };
+        }
+
+        return new GeometryIrLivingEntityRendererEmitPlan
+        {
+            EmitRootTransform = Matrix4x4.Identity,
+            ApplyPostLivingEntityRendererBasis = true,
+            Basis = basis,
+        };
+    }
+
+    internal static GeometryIrMeshEmitOptions ApplyLivingEntityRendererEmitPlan(
+        GeometryIrMeshEmitOptions options,
+        in GeometryIrLivingEntityRendererEmitPlan plan) =>
+        options with { RootTransform = plan.EmitRootTransform };
+
+    internal static MergedJavaBlockModel FinishGeometryIrMeshLivingEntityRendererBasis(
+        MergedJavaBlockModel mesh,
+        in GeometryIrLivingEntityRendererEmitPlan plan) =>
+        plan.ApplyPostLivingEntityRendererBasis
+            ? ApplyLivingEntityRendererPreviewBasis(mesh, plan.Basis)
+            : mesh;
+
+    /// <summary>
+    /// Flat <c>PartPose.offset</c> root-sibling quadruped factories (cow, pig, panda, creeper class).
+    /// Production emit uses <see cref="GeometryIrLerBasisKind.StandardWorldRoot"/> →
+    /// <see cref="ApplyLivingEntityRendererColumnRootScale"/> after model-space walk (column <c>S * (T * R)</c> on points).
+    /// Legacy per-element <c>M * S</c> (<see cref="GeometryIrLerBasisKind.RightComposeLocalChain"/>) detaches rotated body cuboids.
     /// </summary>
     internal static bool UsesFlatPartPoseOffsetQuadrupedJvm(string? officialJvmName)
     {
@@ -67,6 +134,16 @@ internal sealed partial class CleanRoomEntityModelRuntime
         string? stemLower,
         string? normalizedAssetPath)
     {
+        switch (EntityPreviewDebugSettings.LerBasisOverride)
+        {
+            case EntityPreviewLerBasisOverride.StandardWorldRoot:
+                return GeometryIrLerBasisKind.StandardWorldRoot;
+            case EntityPreviewLerBasisOverride.RightComposeLocalChain:
+                return GeometryIrLerBasisKind.RightComposeLocalChain;
+            case EntityPreviewLerBasisOverride.Skip:
+                return GeometryIrLerBasisKind.Skip;
+        }
+
         var stem = (stemLower ?? "").ToLowerInvariant();
         var norm = normalizedAssetPath ?? "";
         if (EntityGpuBoneFillPolicy.SkipsLivingEntityRendererBasis(stem))
@@ -74,21 +151,18 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return GeometryIrLerBasisKind.Skip;
         }
 
-        if (UsesEquineGeometryIrPreviewBasis(officialJvmName, stem, norm))
-        {
-            return GeometryIrLerBasisKind.EquineDedicated;
-        }
-
-        if (UsesComposedOffsetAndRotationBodyDefaultLerJvm(officialJvmName))
+        if (UsesComposedOffsetAndRotationBodyDefaultLerJvm(officialJvmName) ||
+            UsesFlatPartPoseOffsetQuadrupedJvm(officialJvmName))
         {
             return GeometryIrLerBasisKind.StandardWorldRoot;
         }
 
-        return UsesFlatPartPoseOffsetQuadrupedJvm(officialJvmName) ||
-               UsesQuadrupedLerMirrorRightComposeLocalChain(stem, norm)
-            ? GeometryIrLerBasisKind.RightComposeLocalChain
-            : GeometryIrLerBasisKind.StandardWorldRoot;
+        return GeometryIrLerBasisKind.StandardWorldRoot;
     }
+
+    /// <summary>Vanilla <c>LivingEntityRenderer</c> mirror applied once before the model tree.</summary>
+    internal static Matrix4x4 LivingEntityRendererPreviewRootScale { get; } =
+        Matrix4x4.CreateScale(-1f, -1f, 1f);
 
     /// <summary>Geometry IR parity emit for horse/donkey/mule JVM rows (no entity texture path in tests).</summary>
     internal static bool UsesEquineGeometryIrPreviewBasis(
@@ -131,9 +205,40 @@ internal sealed partial class CleanRoomEntityModelRuntime
         }
 
         resolvedStem = resolvedStem.ToLowerInvariant();
-        return ApplyLivingEntityRendererPreviewBasis(
-            built,
-            ResolveGeometryIrLerBasis(officialJvmName, resolvedStem, normalizedAssetPath));
+        var plan = ResolveGeometryIrParityEmitPlan(
+            officialJvmName,
+            resolvedStem,
+            normalizedAssetPath,
+            deferLivingEntityRendererUntilAfterMotionPasses: true);
+        return FinishGeometryIrMeshLivingEntityRendererBasis(built, plan);
+    }
+
+    /// <summary>Parity emit without LER post-basis (model-space <c>LocalToParent</c> for reference_java compare).</summary>
+    internal static MergedJavaBlockModel? TryBuildGeometryIrModelSpaceParityMeshForTests(
+        string texRef,
+        string officialJvmName,
+        int atlasWidth,
+        int atlasHeight,
+        JsonElement geometryRootOverride,
+        out string? failureReason)
+    {
+        var b = new RigBuilder(atlasWidth, atlasHeight);
+        var options = new GeometryIrMeshEmitOptions
+        {
+            RootTransform = Matrix4x4.Identity,
+            DefaultPartScale = 1f,
+            AtlasWidth = atlasWidth,
+            AtlasHeight = atlasHeight,
+            Fidelity = GeometryIrEmitFidelity.Parity,
+            PreviewDegenerateAxisThickness = 0f,
+            OfficialJvmName = officialJvmName,
+        };
+        if (!TryEmitGeometryIrBodyLayer(b, geometryRootOverride, options, out failureReason))
+        {
+            return null;
+        }
+
+        return b.Build(texRef);
     }
 
     /// <summary>Hand-built parity-catalog mesh for bind-pose comparison tests (no geometry IR).</summary>

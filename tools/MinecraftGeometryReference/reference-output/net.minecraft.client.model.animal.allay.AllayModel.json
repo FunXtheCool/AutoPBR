@@ -13,6 +13,11 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [],
   "children": [{
   "id": "root",
@@ -22,12 +27,22 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [0.000000000, 23.50000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [],
   "children": [{
   "id": "head",
   "pose": {
   "translation": [0.000000000, -3.990000010, 0.000000000],
   "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 19.51000023, 0.000000000],
   "eulerOrder": "XYZ"
 }
 ,
@@ -45,6 +60,11 @@
   "pose": {
   "translation": [0.000000000, -4.000000000, 0.000000000],
   "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.000000000, 19.50000000, 0.000000000],
   "eulerOrder": "XYZ"
 }
 ,
@@ -69,6 +89,11 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [-1.750000000, 20.00000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [{
   "from": [-0.7500000000, -0.5000000000, -1.000000000],
   "to": [0.2500000000, 3.500000000, 1.000000000],
@@ -83,6 +108,11 @@
   "pose": {
   "translation": [1.750000000, 0.5000000000, 0.000000000],
   "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [1.750000000, 20.00000000, 0.000000000],
   "eulerOrder": "XYZ"
 }
 ,
@@ -103,6 +133,11 @@
   "eulerOrder": "XYZ"
 }
 ,
+  "worldPose": {
+  "translation": [-0.5000000000, 19.50000000, 0.6000000238],
+  "eulerOrder": "XYZ"
+}
+,
   "cuboids": [{
   "from": [0.000000000, 1.000000000, 0.000000000],
   "to": [0.000000000, 6.000000000, 8.000000000],
@@ -117,6 +152,11 @@
   "pose": {
   "translation": [0.5000000000, 0.000000000, 0.6000000238],
   "rotationEulerRad": [0.000000000, 0.000000000, 0.000000000],
+  "eulerOrder": "XYZ"
+}
+,
+  "worldPose": {
+  "translation": [0.5000000000, 19.50000000, 0.6000000238],
   "eulerOrder": "XYZ"
 }
 ,

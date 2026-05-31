@@ -1,0 +1,4 @@
+Rebaking 161 models from Z:\Cursor Projects\AutoPBR\tools\MinecraftGeometryReference\reference-output
+Compiling reference harness...
+Parallel reference bake: 161 models, 16 workers.
+Exception in thread "main" java.lang.reflect.InvocationTargetException

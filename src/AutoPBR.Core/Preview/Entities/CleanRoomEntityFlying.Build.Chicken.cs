@@ -87,14 +87,14 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         var headPose = EntityParityTemplate.Mul(
             root,
-            EntityParityTemplate.Mul(EntityParityTemplate.T(0f, 15f, -4f), EntityParityTemplate.Er(headPitchRad, headYawRad, 0f)));
+            EntityParityTemplate.Mul(EntityParityTemplate.Er(headPitchRad, headYawRad, 0f), EntityParityTemplate.T(0f, 15f, -4f)));
         new EntityCuboid(-2f, -6f, -2f, 2f, 0f, 1f, 0, 0, UvSizeW: 4, UvSizeH: 6, UvSizeD: 3).Emit(b, headPose, p.HeadScale);
         new EntityCuboid(-2f, -4f, -4f, 2f, -2f, -2f, 14, 0, UvSizeW: 4, UvSizeH: 2, UvSizeD: 2).Emit(b, headPose, p.HeadScale);
         new EntityCuboid(-1f, -2f, -3f, 1f, 0f, -1f, 14, 4, UvSizeW: 2, UvSizeH: 2, UvSizeD: 2).Emit(b, headPose, p.HeadScale);
 
         var bodyPose = EntityParityTemplate.Mul(
             root,
-            EntityParityTemplate.Mul(EntityParityTemplate.T(0f, 16f, 0f), EntityParityTemplate.Rx(MathF.PI / 2f)));
+            EntityParityTemplate.Mul(EntityParityTemplate.Rx(MathF.PI / 2f), EntityParityTemplate.T(0f, 16f, 0f)));
         new EntityCuboid(-3f, -4f, -3f, 3f, 4f, 3f, 0, 9, UvSizeW: 6, UvSizeH: 8, UvSizeD: 6).Emit(b, bodyPose, p.BodyScale);
 
         var rightLegPose = EntityParityTemplate.Mul(
@@ -141,13 +141,13 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         var headPose = EntityParityTemplate.Mul(
             root,
-            EntityParityTemplate.Mul(EntityParityTemplate.T(0f, 15f, -4f), EntityParityTemplate.Er(headPitchRad, headYawRad, 0f)));
+            EntityParityTemplate.Mul(EntityParityTemplate.Er(headPitchRad, headYawRad, 0f), EntityParityTemplate.T(0f, 15f, -4f)));
         new EntityCuboid(-2f, -6f, -2f, 2f, 0f, 1f, 0, 0, UvSizeW: 4, UvSizeH: 6, UvSizeD: 3).Emit(b, headPose, p.HeadScale);
         new EntityCuboid(-3f, -7f, -2.015f, 3f, -4f, 1.985f, 44, 0, UvSizeW: 6, UvSizeH: 3, UvSizeD: 4).Emit(b, headPose, p.HeadScale);
 
         var bodyPose = EntityParityTemplate.Mul(
             root,
-            EntityParityTemplate.Mul(EntityParityTemplate.T(0f, 16f, 0f), EntityParityTemplate.Rx(MathF.PI / 2f)));
+            EntityParityTemplate.Mul(EntityParityTemplate.Rx(MathF.PI / 2f), EntityParityTemplate.T(0f, 16f, 0f)));
         new EntityCuboid(-3f, -4f, -3f, 3f, 4f, 3f, 0, 9, UvSizeW: 6, UvSizeH: 8, UvSizeD: 6).Emit(b, bodyPose, p.BodyScale);
         // Javap: texOffs(38,9); addBox(0,3,-1, 0,3,5) — origin + size; zero X width matches IR corners (0,3,-1)-(0,6,4). UV w=1 minimum for unfold.
         new EntityCuboid(0f, 3f, -1f, 0f, 6f, 4f, 38, 9, UvSizeW: 1, UvSizeH: 3, UvSizeD: 5).Emit(b, bodyPose, p.BodyScale);

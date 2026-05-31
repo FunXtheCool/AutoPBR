@@ -42,6 +42,7 @@ public sealed partial class OpenGlPreviewBackend
         public bool UploadedLiveEntityAnim;
         public bool EntityBoneSnapshotValid;
         public int EntityBoneSnapshotCount;
+        public bool EntityBonePaletteUploaded;
         public Vector3 WorldLightDir;
         public Matrix4x4 ShadowVp;
         public Matrix4x4 ModelMatrix;

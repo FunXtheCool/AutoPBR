@@ -106,14 +106,14 @@ public sealed partial class OpenGlPreviewBackend
                     SetMatrixOnProgram(_shadowProgram, "uModel", Matrix4x4.Identity);
                     SetIntOnProgram(_shadowProgram, "uSceneKind", 0);
                     SetIntOnProgram(_shadowProgram, "uEntityAlphaMode", 0);
-                    UploadEntitySkinningUboTail(frame.Gl, 0, 0, 0f);
+                    ApplyEntitySkinningUniforms(_shadowProgram, 0, 0, 0f);
                     _groundMesh!.Draw();
                     if (frame.Settings.DrawPreviewSubject && _mesh.IndexCount > 0)
                     {
                         SetMatrixOnProgram(_shadowProgram, "uModel", frame.ModelMatrix);
                         if (frame.Scene.SceneKind == PreviewSceneKind.ItemPlane)
                         {
-                            UploadEntitySkinningUboTail(frame.Gl, 0, 0, 0f);
+                            ApplyEntitySkinningUniforms(_shadowProgram, 0, 0, 0f);
                             SetIntOnProgram(_shadowProgram, "uSceneKind", 1);
                             SetIntOnProgram(_shadowProgram, "uEntityAlphaMode", 0);
                             SetFloatOnProgram(_shadowProgram, "uAlphaCutoff", frame.Settings.AlphaCutoff);
@@ -135,12 +135,6 @@ public sealed partial class OpenGlPreviewBackend
                             }
 
                             SetIntOnProgram(_shadowProgram, "uEntityAlphaMode", frame.EntityAlphaModeUniform);
-                            ApplyEntityBoneSkinningUboTail(
-                                frame.Gl,
-                                frame.BlockModel,
-                                frame.BlockModel.EntityGpuMeshSpaceLiftY,
-                                frame.EntityBoneSnapshotValid,
-                                frame.EntityBoneSnapshotCount);
                             foreach (var batch in frame.BlockModel.DrawBatches)
                             {
                                 if ((uint)batch.MaterialIndex >= (uint)frame.BlockSlots.Length)
@@ -152,13 +146,23 @@ public sealed partial class OpenGlPreviewBackend
                                 frame.Gl.ActiveTexture(TextureUnit.Texture0);
                                 _albedo!.Bind(0);
                                 SetIntOnProgram(_shadowProgram, "uAlbedo", 0);
+                                ApplyEntityBoneSkinningUniformsBeforeDraw(
+                                    _shadowProgram,
+                                    _shadowEntityUniformLocs,
+                                    frame.BlockModel,
+                                    frame.BlockModel.EntityGpuMeshSpaceLiftY,
+                                    frame.EntityBoneSnapshotValid,
+                                    frame.EntityBoneSnapshotCount,
+                                    frame.Settings.EnableEntityAnimation,
+                                    frame.EntityBonePaletteUploaded,
+                                    "shadow");
                                 _mesh.DrawRange(batch.FirstIndex, batch.IndexCount);
                             }
                         }
                         else
                         {
                             SetIntOnProgram(_shadowProgram, "uEntityAlphaMode", 0);
-                            UploadEntitySkinningUboTail(frame.Gl, 0, 0, 0f);
+                            ApplyEntitySkinningUniforms(_shadowProgram, 0, 0, 0f);
                             _mesh.Draw();
                         }
                     }

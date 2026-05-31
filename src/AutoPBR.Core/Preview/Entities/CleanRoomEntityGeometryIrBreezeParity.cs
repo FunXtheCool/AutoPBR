@@ -37,16 +37,23 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var isWindTexture = norm.Contains("breeze_wind", StringComparison.OrdinalIgnoreCase);
 
         var wave = Wave(animationTimeSeconds, 0.8f);
-        var emitOptions = GeometryIrParityEmitPresetRegistry.CreateBreezeEmitOptions(
-            profile,
+        var lerPlan = ResolveGeometryIrParityEmitPlan(
             officialJvm,
-            atlasW,
-            atlasH,
-            isEyesTexture,
-            isWindTexture,
-            idlePhase01,
-            wave,
-            animationTimeSeconds);
+            stem,
+            norm,
+            deferLivingEntityRendererUntilAfterMotionPasses: applyGeometryIrSetupAnimMotion);
+        var emitOptions = ApplyLivingEntityRendererEmitPlan(
+            GeometryIrParityEmitPresetRegistry.CreateBreezeEmitOptions(
+                profile,
+                officialJvm,
+                atlasW,
+                atlasH,
+                isEyesTexture,
+                isWindTexture,
+                idlePhase01,
+                wave,
+                animationTimeSeconds),
+            lerPlan);
 
         var b = new RigBuilder(atlasW, atlasH);
         if (!TryEmitGeometryIrBodyLayer(b, geometryRoot, emitOptions, out _))
@@ -74,24 +81,21 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 emitOptions);
         }
 
-        TryApplyDefinitionAnimationGeometryIrPreviewPass(
-            parityRule.BuilderMethod,
-            normalizedAssetPath,
-            profile,
-            isBaby,
-            animationTimeSeconds,
-            built,
-            geometryRoot,
-            emitOptions,
-            skipBreezeIdleWind: !isWindTexture && !isEyesTexture);
+        if (applyGeometryIrSetupAnimMotion)
+        {
+            TryApplyDefinitionAnimationGeometryIrPreviewPass(
+                parityRule.BuilderMethod,
+                normalizedAssetPath,
+                profile,
+                isBaby,
+                animationTimeSeconds,
+                built,
+                geometryRoot,
+                emitOptions,
+                skipBreezeIdleWind: !isWindTexture && !isEyesTexture);
+        }
 
-        merged = ApplyParityCatalogGeometryIrPreviewBasis(
-            parityRule.BuilderMethod,
-            officialJvm,
-            normalizedAssetPath,
-            stem,
-            texRef,
-            built);
+        merged = FinishGeometryIrMeshLivingEntityRendererBasis(built, lerPlan);
 
         if (EntityRigPoseCapture.IsActive)
         {

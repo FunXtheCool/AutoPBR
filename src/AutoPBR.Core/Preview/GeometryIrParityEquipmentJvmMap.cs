@@ -55,7 +55,7 @@ internal static class GeometryIrParityEquipmentJvmMap
             path.Contains("/textures/entity/equipment/skeleton_horse_body/", StringComparison.OrdinalIgnoreCase) ||
             path.Contains("/textures/entity/equipment/zombie_horse_body/", StringComparison.OrdinalIgnoreCase))
         {
-            officialJvm = "net.minecraft.client.model.animal.equine.HorseModel";
+            officialJvm = "net.minecraft.client.model.animal.equine.AbstractEquineModel";
             return true;
         }
 

@@ -51,7 +51,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             EntityParityTemplate.Rx(leftHindLegPitchRad));
         new EntityCuboid(-1.5f, 0f, -1.5f, 1.5f, 6f, 1.5f, 34, 27, UvSizeW: 3, UvSizeH: 6, UvSizeD: 3, MirrorUv: true).Emit(b, lhPose, p.LegScale);
 
-        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), lerMirrorRightComposeLocalChain: true);
+        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), GeometryIrLerBasisKind.StandardWorldRoot);
     }
     private static MergedJavaBlockModel BuildBabySheep(
         string texRef,
@@ -93,7 +93,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             EntityParityTemplate.Rx(leftFrontLegPitchRad));
         new EntityCuboid(-1f, 0f, -1f, 1f, 5f, 1f, 24, 5, MirrorUv: true).Emit(b, lfPose, p.LegScale);
 
-        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), lerMirrorRightComposeLocalChain: true);
+        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), GeometryIrLerBasisKind.StandardWorldRoot);
     }
     private static MergedJavaBlockModel BuildBabyPig(
         string texRef,
@@ -136,7 +136,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             EntityParityTemplate.Rx(rightHindLegPitchRad));
         new EntityCuboid(0f, -1f, 2f, 2f, 1f, 2f, 23, 4, UvSizeW: 2, UvSizeH: 2, UvSizeD: 1).Emit(b, rhPose, p.LegScale);
 
-        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), lerMirrorRightComposeLocalChain: true);
+        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), GeometryIrLerBasisKind.StandardWorldRoot);
     }
     private static MergedJavaBlockModel BuildBabyWolf(
         string texRef,
@@ -190,7 +190,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             EntityParityTemplate.Mul(EntityParityTemplate.T(0f, -0.6f, 0.2f), EntityParityTemplate.Rx(-3.1f)));
         new EntityCuboid(-5.7f, -1f, 2f, 0.3f, 1f, 2.025f, 22, 16, UvSizeW: 6, UvSizeH: 2, UvSizeD: 1).Emit(b, tailPose, p.BodyScale);
 
-        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), lerMirrorRightComposeLocalChain: true);
+        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), GeometryIrLerBasisKind.StandardWorldRoot);
     }
     private static MergedJavaBlockModel BuildBabyGoat(
         string texRef,
@@ -245,7 +245,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var headMainPose = EntityParityTemplate.Mul(headPose, EntityParityTemplate.T(0f, -1.3126f, -1.1548f));
         new EntityCuboid(-2f, -2.5f, -4f, 2f, 1.5f, 2f, 0, 0, UvSizeW: 4, UvSizeH: 4, UvSizeD: 6).Emit(b, headMainPose, p.HeadScale);
 
-        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), lerMirrorRightComposeLocalChain: true);
+        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), GeometryIrLerBasisKind.StandardWorldRoot);
     }
     private static MergedJavaBlockModel BuildBabyLlama(string texRef, float neckBend)
     {
@@ -283,7 +283,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var chestLeft = EntityParityTemplate.Mul(EntityParityTemplate.Mul(root, EntityParityTemplate.T(5.5f, 4f, 3f)), chestRy);
         new EntityCuboid(-3f, 0f, 0f, 5f, 8f, 3f, 45, 41, UvSizeW: 8, UvSizeH: 8, UvSizeD: 3).Emit(b, chestLeft, p.BodyScale);
 
-        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), lerMirrorRightComposeLocalChain: true);
+        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), GeometryIrLerBasisKind.StandardWorldRoot);
     }
     private static MergedJavaBlockModel BuildBabyCamel(
         string texRef,
@@ -337,7 +337,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             EntityParityTemplate.Rx(rightHindLegPitchRad));
         new EntityCuboid(-1.5f, -0.5f, -1.5f, 1.5f, 12.5f, 1.5f, 0, 38, UvSizeW: 3, UvSizeH: 13, UvSizeD: 3).Emit(b, rightHindPose, p.LegScale);
 
-        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), lerMirrorRightComposeLocalChain: true);
+        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), GeometryIrLerBasisKind.StandardWorldRoot);
     }
     private static MergedJavaBlockModel BuildBabyPanda(
         string texRef,
@@ -382,7 +382,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             EntityParityTemplate.Rx(leftFrontLegPitchRad));
         new EntityCuboid(-1.5f, 0f, -1.5f, 1.5f, 2f, 1.5f, 12, 29).Emit(b, leftFrontPose, p.LegScale);
 
-        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), lerMirrorRightComposeLocalChain: true);
+        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), GeometryIrLerBasisKind.StandardWorldRoot);
     }
     private static MergedJavaBlockModel BuildBabyPolarBear(
         string texRef,
@@ -427,7 +427,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             EntityParityTemplate.Rx(leftFrontLegPitchRad));
         new EntityCuboid(-1.5f, -0.5f, -1.5f, 1.5f, 2.5f, 1.5f, 12, 28).Emit(b, leftFrontPose, p.LegScale);
 
-        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), lerMirrorRightComposeLocalChain: true);
+        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), GeometryIrLerBasisKind.StandardWorldRoot);
     }
     private static MergedJavaBlockModel BuildBabyRabbit(string texRef, float hopCompress)
     {
@@ -477,7 +477,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             EntityParityTemplate.Er(0f, 0.7854f, 0f));
         new EntityCuboid(-2f, -0.5f, 0f, 0f, 0.5f, 3f, 0, 17, UvSizeW: 2, UvSizeH: 1, UvSizeD: 3).Emit(b, rightHaunchPose, p.LegScale);
 
-        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), lerMirrorRightComposeLocalChain: true);
+        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), GeometryIrLerBasisKind.StandardWorldRoot);
     }
     private static MergedJavaBlockModel BuildBabyCat(
         string texRef,
@@ -490,7 +490,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var p = BabyProfile.Adult;
         var b = new RigBuilder(64, 64);
         AppendFelineModelQuadrupedMesh(b, p, headTilt, rightHindLegPitchRad, leftHindLegPitchRad, rightFrontLegPitchRad, leftFrontLegPitchRad);
-        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), lerMirrorRightComposeLocalChain: true);
+        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), GeometryIrLerBasisKind.StandardWorldRoot);
     }
     internal static MergedJavaBlockModel BuildBabyFeline(
         string texRef,
@@ -540,7 +540,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             EntityParityTemplate.Rx(-0.567232f));
         new EntityCuboid(-0.5f, -0.107f, 0.0849f, 0.5f, 0.893f, 5.0849f, 0, 18, UvSizeW: 1, UvSizeH: 1, UvSizeD: 5).Emit(b, tail1Pose, p.BodyScale);
 
-        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), lerMirrorRightComposeLocalChain: true);
+        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), GeometryIrLerBasisKind.StandardWorldRoot);
     }
     private static MergedJavaBlockModel BuildBabyFox(
         string texRef,
@@ -581,6 +581,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
             EntityParityTemplate.Rx(ComputeFoxTailBaselinePitchRad(tailLift)));
         new EntityCuboid(-1.48f, -1f, 3f, 1.52f, 5f, 3.025f, 0, 20, UvSizeW: 3, UvSizeH: 6, UvSizeD: 1).Emit(b, tailPose, p.BodyScale);
 
-        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), lerMirrorRightComposeLocalChain: true);
+        return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), GeometryIrLerBasisKind.StandardWorldRoot);
     }
 }

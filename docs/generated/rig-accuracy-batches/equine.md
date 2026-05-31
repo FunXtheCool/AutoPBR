@@ -23,5 +23,7 @@ Camel and equine JVMs (**10 / 56** pilots). Flat factories use root sibling legs
 ## Notes
 
 - **Binding gap hosts:** `DonkeyModel`, `HorseModel`, `EquineSaddleModel`, `CamelModel`, `CamelSaddleModel` — oracle pass via delegate/host mesh; IR keeps composed-flat sibling legs where javap uses `createBodyMesh` on root.
-- **BabyDonkeyModel:** nested hierarchy (`referenceHierarchyMatch` aligned in quality JSON).
+- **BabyDonkeyModel:** nested hierarchy (`referenceHierarchyMatch` aligned in quality JSON). Preview: `HeadStackNestedUnderBody` leg reparent under `body` only — see [runtime-ir-preview-plan.md § Baby JVM family](../../runtime-ir-preview-plan.md#baby-jvm-family-same-canonical-policy-as-adults--2026-05-28).
+- **BabyHorseModel / BabyDonkeyModel preview:** Adult world-preview canonical policy applies: column-root LER, `local × parentWorld` walk, **ModelPart block stack** compose. JVM resolver must pick `Baby*` shards (not adult `HorseModel` / mis-lifted hosts). Tail parts use IR walk only (no emit preset absolute tail overrides).
+- **Flat baby families** (fox, cow, chicken, feline, …): `UsesVanillaFlatQuadrupedLegBake` — do **not** reparent legs; attachment tests in `BabyFamilyAttachmentClusterTests`.
 - **Backlog:** Explore sign-off for camel/horse/donkey textures; no preview-delta overlays yet.

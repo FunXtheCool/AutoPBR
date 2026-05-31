@@ -1,9 +1,12 @@
 using System.Diagnostics;
 
+using System.Numerics;
+
 using AutoPBR.App.Rendering.Abstractions;
 using AutoPBR.App.Rendering.OpenGL;
 using AutoPBR.App.Rendering.Scene;
 using AutoPBR.Core.Models;
+using AutoPBR.Core.Preview;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -65,6 +68,21 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         _backend.SetOrbitBoomArmDistance(orbitBoomArmDistanceWorld);
     }
 
+    /// <summary>Updates render settings only (no scene/block-model re-push).</summary>
+    public void UpdatePreview3DSettings(PreviewRenderSettings settings)
+    {
+        void Core() => _backend.SetRenderSettings(settings);
+
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            Core();
+        }
+        else
+        {
+            Dispatcher.UIThread.Post(Core);
+        }
+    }
+
     /// <summary>Updates scene, GPU settings, and material on the UI thread.</summary>
     public void UpdatePreview3D(
         PreviewMaterial material,
@@ -78,15 +96,21 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
             PreviewScene scene;
             if (javaBlockModel is not null && javaSlotMaterials is not null)
             {
-                var liftedSubject = PreviewSubjectPlacement.LiftSubjectIfClipping(javaBlockModel);
+                var displaySubject = PreviewSubjectPlacement.LiftSubjectIfClipping(javaBlockModel);
+                var stride = displaySubject.VertexStrideFloats > 0
+                    ? displaySubject.VertexStrideFloats
+                    : PreviewMesh.FloatsPerVertex;
+                var orbitTarget = displaySubject.EmulatedRebake is not null
+                    ? EntityPreviewPlacement.ComputeEntityOrbitTarget(displaySubject.InterleavedVertices, stride)
+                    : (Vector3?)null;
                 var mesh = new PreviewMesh
                 {
                     Name = "java_block_model",
-                    InterleavedVertices = liftedSubject.InterleavedVertices,
-                    Indices = liftedSubject.Indices
+                    InterleavedVertices = displaySubject.InterleavedVertices,
+                    Indices = displaySubject.Indices
                 };
-                scene = BlockModelPreviewSceneFactory.Create(settings, mesh);
-                javaBlockModel = liftedSubject;
+                scene = BlockModelPreviewSceneFactory.Create(settings, mesh, orbitTarget);
+                javaBlockModel = displaySubject;
             }
             else if (kind == PreviewSceneKind.ItemPlane)
             {
