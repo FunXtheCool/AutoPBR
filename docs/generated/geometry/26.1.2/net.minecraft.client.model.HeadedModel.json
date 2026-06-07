@@ -4,8 +4,9 @@
   "officialJvmName": "net.minecraft.client.model.HeadedModel",
   "profile": "named_jar_26.1.2",
   "extractionStatus": "skipped",
+  "skipKind": "interface",
   "extractionNotes": [
-    "No static mesh factory on net.minecraft.client.model.HeadedModel; structural lift skipped (interface, inner class, or non-mesh type)."
+    "Interface net.minecraft.client.model.HeadedModel; mesh factories live on concrete model classes."
   ],
   "factoryMethod": "createBodyLayer",
   "roots": [
@@ -28,12 +29,11 @@
       "children": []
     }
   ],
-  "jarPath": "net/minecraft/client/model/HeadedModel.class",
-  "classSha256Hex": "097303c2c562191e2dbeb64102d0dd9b511eccdf130dd4ea35f44e7be39f3139",
-  "bytecodeFloatProbe": [],
   "liftSummary": {
     "cuboidApproxCount": 0,
     "poseApproxCount": 0,
     "delegationDepth": 0
-  }
+  },
+  "jarPath": "net/minecraft/client/model/HeadedModel.class",
+  "classSha256Hex": "097303c2c562191e2dbeb64102d0dd9b511eccdf130dd4ea35f44e7be39f3139"
 }

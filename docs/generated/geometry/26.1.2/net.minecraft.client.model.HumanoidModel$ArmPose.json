@@ -4,8 +4,9 @@
   "officialJvmName": "net.minecraft.client.model.HumanoidModel$ArmPose",
   "profile": "named_jar_26.1.2",
   "extractionStatus": "skipped",
+  "skipKind": "inner_class",
   "extractionNotes": [
-    "No static mesh factory on net.minecraft.client.model.HumanoidModel$ArmPose; structural lift skipped (interface, inner class, or non-mesh type)."
+    "Inner or synthetic nested type on net.minecraft.client.model.HumanoidModel$ArmPose; no standalone static mesh factory."
   ],
   "factoryMethod": "createBodyLayer",
   "roots": [
@@ -28,12 +29,11 @@
       "children": []
     }
   ],
-  "jarPath": "net/minecraft/client/model/HumanoidModel$ArmPose.class",
-  "classSha256Hex": "eac18c8259086ffc13e241501a62292993b923463e4b22467fc695fcf6de8e6d",
-  "bytecodeFloatProbe": [],
   "liftSummary": {
     "cuboidApproxCount": 0,
     "poseApproxCount": 0,
     "delegationDepth": 0
-  }
+  },
+  "jarPath": "net/minecraft/client/model/HumanoidModel$ArmPose.class",
+  "classSha256Hex": "eac18c8259086ffc13e241501a62292993b923463e4b22467fc695fcf6de8e6d"
 }

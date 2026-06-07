@@ -117,7 +117,15 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "faceMask": [
+                "north",
+                "south"
+              ],
+              "uvSpan": [
+                1,
+                2
+              ]
             },
             {
               "from": [
@@ -136,7 +144,16 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "faceMask": [
+                "up",
+                "down"
+              ],
+              "uvSpan": [
+                1,
+                0,
+                1
+              ]
             }
           ],
           "children": []
@@ -174,7 +191,15 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "faceMask": [
+                "north",
+                "south"
+              ],
+              "uvSpan": [
+                1,
+                2
+              ]
             },
             {
               "from": [
@@ -193,7 +218,16 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "faceMask": [
+                "up",
+                "down"
+              ],
+              "uvSpan": [
+                1,
+                0,
+                1
+              ]
             }
           ],
           "children": []
@@ -231,7 +265,16 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "faceMask": [
+                "up",
+                "down"
+              ],
+              "uvSpan": [
+                1,
+                0,
+                2
+              ]
             }
           ],
           "children": []
@@ -269,7 +312,16 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "faceMask": [
+                "up",
+                "down"
+              ],
+              "uvSpan": [
+                1,
+                0,
+                2
+              ]
             }
           ],
           "children": []

@@ -14,14 +14,14 @@
       "id": "root",
       "pose": {
         "translation": [
-          0.000000000,
-          0.000000000,
-          0.000000000
+          0,
+          0,
+          0
         ],
         "rotationEulerRad": [
-          0.000000000,
-          0.000000000,
-          0.000000000
+          0,
+          0,
+          0
         ],
         "eulerOrder": "XYZ"
       },
@@ -31,28 +31,33 @@
           "id": "head",
           "pose": {
             "translation": [
-              0.000000000,
-              0.000000000,
-              0.000000000
+              0,
+              15,
+              0
             ],
             "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
+              0,
+              0,
+              0
             ],
-            "eulerOrder": "XYZ"
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              15,
+              0
+            ]
           },
           "cuboids": [
             {
               "from": [
-                -4,
-                -8,
-                -4
+                -4.5,
+                -7,
+                -4.5
               ],
               "to": [
-                4,
-                0,
-                4
+                4.5,
+                1,
+                3.5
               ],
               "uvOrigin": [
                 0,
@@ -68,16 +73,21 @@
               "id": "hat",
               "pose": {
                 "translation": [
-                  0.000000000,
-                  0.000000000,
-                  0.000000000
+                  0,
+                  0,
+                  0
                 ],
                 "rotationEulerRad": [
-                  0.000000000,
-                  0.000000000,
-                  0.000000000
+                  0,
+                  0,
+                  0
                 ],
-                "eulerOrder": "XYZ"
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  0,
+                  0,
+                  0
+                ]
               },
               "cuboids": [
                 {
@@ -108,16 +118,499 @@
           "id": "body",
           "pose": {
             "translation": [
-              0.000000000,
-              0.000000000,
-              0.000000000
+              0,
+              18,
+              0
             ],
             "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
+              0,
+              0,
+              0
             ],
-            "eulerOrder": "XYZ"
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              18,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -3,
+                -3,
+                -1.5
+              ],
+              "to": [
+                3,
+                2,
+                1.5
+              ],
+              "uvOrigin": [
+                0,
+                17
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right_arm",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1,
+                0,
+                -1.52999997
+              ],
+              "to": [
+                1,
+                5,
+                1.47000003
+              ],
+              "uvOrigin": [
+                30,
+                25
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": [
+            {
+              "id": "right_sleeve",
+              "pose": {
+                "translation": [
+                  0,
+                  0,
+                  0
+                ],
+                "rotationEulerRad": [
+                  0,
+                  0,
+                  0
+                ],
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -3,
+                    -2,
+                    -2
+                  ],
+                  "to": [
+                    1,
+                    10,
+                    2
+                  ],
+                  "uvOrigin": [
+                    40,
+                    32
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
+              ],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "left_arm",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1,
+                0,
+                -1.52999997
+              ],
+              "to": [
+                1,
+                5,
+                1.47000003
+              ],
+              "uvOrigin": [
+                30,
+                17
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": [
+            {
+              "id": "left_sleeve",
+              "pose": {
+                "translation": [
+                  0,
+                  0,
+                  0
+                ],
+                "rotationEulerRad": [
+                  0,
+                  0,
+                  0
+                ],
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -1,
+                    -2,
+                    -2
+                  ],
+                  "to": [
+                    3,
+                    10,
+                    2
+                  ],
+                  "uvOrigin": [
+                    48,
+                    48
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
+              ],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "right_leg",
+          "pose": {
+            "translation": [
+              -1.5,
+              20,
+              0.5
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              -1.5,
+              20,
+              0.5
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1,
+                -0.200000003,
+                -2
+              ],
+              "to": [
+                2,
+                3.799999997,
+                1
+              ],
+              "uvOrigin": [
+                18,
+                17
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": [
+            {
+              "id": "left_foot",
+              "pose": {
+                "translation": [
+                  0,
+                  0,
+                  0
+                ],
+                "rotationEulerRad": [
+                  0,
+                  0,
+                  0
+                ],
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -1,
+                    2.9000001,
+                    -2
+                  ],
+                  "to": [
+                    2,
+                    3.9000001,
+                    1
+                  ],
+                  "uvOrigin": [
+                    0,
+                    29
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                  "mirrorU": true
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "right_pants",
+              "pose": {
+                "translation": [
+                  0,
+                  0,
+                  0
+                ],
+                "rotationEulerRad": [
+                  0,
+                  0,
+                  0
+                ],
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -2,
+                    0,
+                    -2
+                  ],
+                  "to": [
+                    2,
+                    12,
+                    2
+                  ],
+                  "uvOrigin": [
+                    0,
+                    32
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
+              ],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "left_leg",
+          "pose": {
+            "translation": [
+              1.5,
+              20,
+              0.5
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              1.5,
+              20,
+              0.5
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -2,
+                -0.200000003,
+                -2
+              ],
+              "to": [
+                1,
+                3.799999997,
+                1
+              ],
+              "uvOrigin": [
+                18,
+                24
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": [
+            {
+              "id": "right_foot",
+              "pose": {
+                "translation": [
+                  0,
+                  0,
+                  0
+                ],
+                "rotationEulerRad": [
+                  0,
+                  0,
+                  0
+                ],
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -2,
+                    2.9000001,
+                    -2
+                  ],
+                  "to": [
+                    1,
+                    3.9000001,
+                    1
+                  ],
+                  "uvOrigin": [
+                    0,
+                    25
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "left_pants",
+              "pose": {
+                "translation": [
+                  0,
+                  0,
+                  0
+                ],
+                "rotationEulerRad": [
+                  0,
+                  0,
+                  0
+                ],
+                "eulerOrder": "XYZ",
+                "setupAnimPivot": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -2,
+                    0,
+                    -2
+                  ],
+                  "to": [
+                    2,
+                    12,
+                    2
+                  ],
+                  "uvOrigin": [
+                    0,
+                    48
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
+              ],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "jacket",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
           },
           "cuboids": [
             {
@@ -133,7 +626,7 @@
               ],
               "uvOrigin": [
                 16,
-                16
+                32
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
@@ -143,35 +636,40 @@
           "children": []
         },
         {
-          "id": "right_arm",
+          "id": "waist",
           "pose": {
             "translation": [
-              -5.000000000,
-              2.000000000,
-              0.000000000
+              0,
+              19,
+              0
             ],
             "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
+              0,
+              0,
+              0
             ],
-            "eulerOrder": "XYZ"
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              19,
+              0
+            ]
           },
           "cuboids": [
             {
               "from": [
                 -3,
-                -2,
-                -2
+                -1.20000005,
+                -1.49000001
               ],
               "to": [
-                1,
-                10,
-                2
+                2.9000001,
+                0.79999995,
+                1.41000009
               ],
               "uvOrigin": [
-                40,
-                16
+                0,
+                36
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
@@ -181,117 +679,44 @@
           "children": []
         },
         {
-          "id": "left_arm",
+          "id": "inner_body",
           "pose": {
             "translation": [
-              5.000000000,
-              2.000000000,
-              0.000000000
+              0,
+              18,
+              0
             ],
             "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
+              0,
+              0,
+              0
             ],
-            "eulerOrder": "XYZ"
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              18,
+              0
+            ]
           },
           "cuboids": [
             {
               "from": [
-                -1,
-                -2,
-                -2
+                -3,
+                -3,
+                -1.5
               ],
               "to": [
                 3,
-                10,
-                2
-              ],
-              "uvOrigin": [
-                40,
-                16
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-              "mirrorU": true
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "right_leg",
-          "pose": {
-            "translation": [
-              -1.899999976,
-              12.00000000,
-              0.000000000
-            ],
-            "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
-            {
-              "from": [
-                -2,
-                0,
-                -2
-              ],
-              "to": [
                 2,
-                12,
-                2
+                1.5
               ],
               "uvOrigin": [
                 0,
-                16
+                17
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "left_leg",
-          "pose": {
-            "translation": [
-              1.899999976,
-              12.00000000,
-              0.000000000
-            ],
-            "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
-            {
-              "from": [
-                -2,
-                0,
-                -2
-              ],
-              "to": [
-                2,
-                12,
-                2
-              ],
-              "uvOrigin": [
-                0,
-                16
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-              "mirrorU": true
             }
           ],
           "children": []
@@ -347,7 +772,400 @@
     12,
     4,
     1.9,
-    12
+    12,
+    0.25,
+    -1,
+    -2,
+    -2,
+    3,
+    12,
+    4,
+    5,
+    -2,
+    -2,
+    -2,
+    3,
+    12,
+    4,
+    -5,
+    -1,
+    -2,
+    -2,
+    3,
+    12,
+    4,
+    0.25,
+    -2,
+    -2,
+    -2,
+    3,
+    12,
+    4,
+    0.25,
+    -1,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    5,
+    -1,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    0.25,
+    -3,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    0.25,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    1.9,
+    12,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    0.25,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    0.25,
+    -4,
+    -2,
+    8,
+    12,
+    4,
+    0.25,
+    -4,
+    -8,
+    -4,
+    8,
+    8,
+    8,
+    -4,
+    -8,
+    -4,
+    8,
+    8,
+    8,
+    0.5,
+    -4,
+    -2,
+    8,
+    12,
+    4,
+    -3,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -5,
+    -1,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    5,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -1.9,
+    12,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    1.9,
+    12,
+    -4.5,
+    -7,
+    -4.5,
+    9,
+    8,
+    8,
+    15,
+    -3,
+    -3,
+    -1.5,
+    6,
+    5,
+    3,
+    18,
+    -3,
+    -1.2,
+    -1.49,
+    5.9,
+    2.9,
+    -0.1,
+    19,
+    -1,
+    -1.53,
+    5,
+    3,
+    -3.5,
+    15.5,
+    -1,
+    -1.53,
+    5,
+    3,
+    3.5,
+    15.5,
+    -3,
+    -3,
+    -1.5,
+    6,
+    5,
+    3,
+    18,
+    -2,
+    -0.2,
+    -2,
+    3,
+    4,
+    3,
+    -0.1,
+    1.5,
+    20,
+    0.5,
+    -1,
+    -0.2,
+    -2,
+    3,
+    4,
+    3,
+    -0.1,
+    -1.5,
+    20,
+    0.5,
+    -2,
+    2.9,
+    -2,
+    3,
+    3,
+    -1,
+    2.9,
+    -2,
+    3,
+    3,
+    -4,
+    -8,
+    -4,
+    8,
+    8,
+    8,
+    -4,
+    -8,
+    -4,
+    8,
+    8,
+    8,
+    0.5,
+    -4,
+    -2,
+    8,
+    12,
+    4,
+    -3,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -5,
+    -1,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    5,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -1.9,
+    12,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    1.9,
+    12,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -0.1,
+    -1.9,
+    12,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -0.1,
+    1.9,
+    12,
+    -4.5,
+    -7,
+    -4.5,
+    9,
+    8,
+    8,
+    15,
+    -3,
+    -3,
+    -1.5,
+    6,
+    5,
+    3,
+    18,
+    -3,
+    -1.2,
+    -1.49,
+    5.9,
+    2.9,
+    -0.1,
+    19,
+    -1,
+    -1.53,
+    5,
+    3,
+    -3.5,
+    15.5,
+    -1,
+    -1.53,
+    5,
+    3,
+    3.5,
+    15.5,
+    -3,
+    -3,
+    -1.5,
+    6,
+    5,
+    3,
+    18,
+    -2,
+    -0.2,
+    -2,
+    3,
+    4,
+    3,
+    -0.1,
+    1.5,
+    20,
+    0.5,
+    -1,
+    -0.2,
+    -2,
+    3,
+    4,
+    3,
+    -0.1,
+    -1.5,
+    20,
+    0.5,
+    -2,
+    2.9,
+    -2,
+    3,
+    3,
+    -1,
+    2.9,
+    -2,
+    3,
+    3,
+    -4.5,
+    -7,
+    -4.5,
+    9,
+    8,
+    8,
+    15,
+    -3,
+    -3,
+    -1.5,
+    6,
+    5,
+    3,
+    18,
+    -3,
+    -1.2,
+    -1.49,
+    5.9,
+    2.9,
+    -0.1,
+    19,
+    -1,
+    -1.53,
+    5,
+    3,
+    -3.5,
+    15.5,
+    -1,
+    -1.53,
+    5,
+    3,
+    3.5,
+    15.5,
+    -3,
+    -3,
+    -1.5,
+    6,
+    5,
+    3,
+    18,
+    -2,
+    -0.2,
+    -2,
+    3,
+    4,
+    3,
+    -0.1,
+    1.5,
+    20,
+    0.5,
+    -1,
+    -0.2,
+    -2,
+    3,
+    4,
+    3,
+    -0.1,
+    -1.5,
+    20,
+    0.5,
+    -2,
+    2.9,
+    -2,
+    3,
+    3,
+    -1,
+    2.9,
+    -2,
+    3,
+    3
   ],
   "liftSummary": {
     "cuboidApproxCount": 0,

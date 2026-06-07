@@ -116,15 +116,9 @@ public static class GeometryIrUvAtlasQuality
 
         var (w, h, d) = ResolveCuboidUvExtents(cuboid, from, to);
         var mirrorU = GeometryIrCuboidMetadata.GetMirrorCuboidUv(cuboid);
-        string[]? faceMask = null;
-        if (GeometryIrCuboidMetadata.TryGetFaceMask(cuboid, out var mask) && mask.Length > 0)
-        {
-            faceMask = mask;
-        }
-
-        var faces = faceMask is not null
-            ? faceMask
-            : (string[])["north", "south", "east", "west", "up", "down"];
+        var faces = GeometryIrCuboidMetadata.TryGetFaceMask(cuboid, out var mask) && mask.Length > 0
+            ? mask
+            : ["north", "south", "east", "west", "up", "down"];
         if (!CuboidUvFootprintFitsAtlas(texU, texV, w, h, d, atlasW, atlasH, faces, mirrorU))
         {
             var (maxU, maxV) = ComputeUnfoldedUvMaxForFaceMask(texU, texV, w, h, d, faces, mirrorU);
@@ -133,7 +127,7 @@ public static class GeometryIrUvAtlasQuality
         }
     }
 
-    /// <summary>Max texel corner of vanilla unfolded box UV (matches <see cref="Entities.CleanRoomEntityRigBuilder"/> layout).</summary>
+    /// <summary>Max texel corner of vanilla unfolded box UV (matches entity cube UV layout).</summary>
     internal static (int MaxU, int MaxV) ComputeUnfoldedUvMax(int u, int v, int w, int h, int d, bool mirrorU = false)
     {
         if (w == 0 || h == 0 || d == 0)
@@ -283,17 +277,42 @@ public static class GeometryIrUvAtlasQuality
         }
     }
 
-    private static void NormalizeAtlasUv(int atlasW, int atlasH, ref int texU, ref int texV)
+    /// <summary>Infers axis-aligned face mask for zero-thickness cuboids (preview/lift degenerate sheets).</summary>
+    public static string[]? InferDegenerateFaceMask(int w, int h, int d)
     {
-        if (texU < 0)
+        if (w > 0 && h > 0 && d > 0)
         {
-            texU += atlasW;
+            return null;
         }
 
-        if (texV < 0)
+        if (d == 0 && w > 0 && h > 0)
         {
-            texV += atlasH;
+            return ["north", "south"];
         }
+
+        if (h == 0 && w > 0 && d > 0)
+        {
+            return ["up", "down"];
+        }
+
+        if (w == 0 && h > 0 && d > 0)
+        {
+            return ["east", "west"];
+        }
+
+        return null;
+    }
+
+    /// <summary>Clamps a bytecode face mask to faces that still exist for non-zero logical extents.</summary>
+    public static string[]? SanitizeFaceMaskForLogicalExtents(int w, int h, int d, string[] faceMask)
+    {
+        var inferred = InferDegenerateFaceMask(w, h, d);
+        if (inferred is not null)
+        {
+            return inferred;
+        }
+
+        return faceMask.Length == 0 ? null : faceMask;
     }
 
     private static bool TryGetShardAtlas(JsonElement shardRoot, out int w, out int h)

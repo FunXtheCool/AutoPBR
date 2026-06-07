@@ -48,6 +48,7 @@ internal static class GeometryIrLiftTreeRepair
                 RemoveCowHornCuboidsFromMergedHead(rootKids);
                 RemoveRootSiblingWhenNested(rootKids);
                 CollapseInnerBodyUnderBody(rootKids);
+                RemovePlayerMeshInternalParts(rootKids);
                 HoistStandardQuadrupedLegsFromBody(rootKids);
                 RemoveDuplicatePartIdsPreferCuboids(rootKids);
             }
@@ -56,6 +57,45 @@ internal static class GeometryIrLiftTreeRepair
         }
 
         return roots;
+    }
+
+    /// <summary>
+    /// <c>PlayerModel.createMesh</c> bytecode keeps waist/feet/inner_body parts that Java reference bakes omit
+    /// (piglin, player, drowned, …). Frog feet are real parts and are kept (no jacket/pants overlay kit).
+    /// </summary>
+    private static void RemovePlayerMeshInternalParts(JsonArray rootChildren)
+    {
+        if (!TryFindPartById(rootChildren, "jacket", out _) ||
+            !TryFindPartById(rootChildren, "left_pants", out _))
+        {
+            return;
+        }
+
+        RemovePartIdsFromForest(rootChildren, ["waist", "inner_body", "left_foot", "right_foot"]);
+    }
+
+    private static void RemovePartIdsFromForest(JsonArray parts, IReadOnlyList<string> idsToRemove)
+    {
+        for (var i = parts.Count - 1; i >= 0; i--)
+        {
+            if (parts[i] is not JsonObject part)
+            {
+                continue;
+            }
+
+            var id = (string?)part["id"];
+            if (!string.IsNullOrEmpty(id) &&
+                idsToRemove.Any(removeId => string.Equals(id, removeId, StringComparison.Ordinal)))
+            {
+                parts.RemoveAt(i);
+                continue;
+            }
+
+            if (part["children"] is JsonArray kids)
+            {
+                RemovePartIdsFromForest(kids, idsToRemove);
+            }
+        }
     }
 
     /// <summary>

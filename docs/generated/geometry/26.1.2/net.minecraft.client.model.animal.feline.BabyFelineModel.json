@@ -348,26 +348,25 @@
               "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
             }
           ],
-          "children": [
-            {
-              "id": "tail2",
-              "pose": {
-                "translation": [
-                  0.000000000,
-                  0.000000000,
-                  0.000000000
-                ],
-                "rotationEulerRad": [
-                  0.000000000,
-                  0.000000000,
-                  0.000000000
-                ],
-                "eulerOrder": "XYZ"
-              },
-              "cuboids": [],
-              "children": []
-            }
-          ]
+          "children": []
+        },
+        {
+          "id": "tail2",
+          "pose": {
+            "translation": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [],
+          "children": []
         }
       ]
     }

@@ -4,8 +4,9 @@
   "officialJvmName": "net.minecraft.client.model.object.bell.BellModel$State",
   "profile": "named_jar_26.1.2",
   "extractionStatus": "skipped",
+  "skipKind": "enum_or_state",
   "extractionNotes": [
-    "No static mesh factory on net.minecraft.client.model.object.bell.BellModel$State; structural lift skipped (interface, inner class, or non-mesh type)."
+    "Enum/state helper on net.minecraft.client.model.object.bell.BellModel$State; not a mesh host."
   ],
   "factoryMethod": "createBodyLayer",
   "roots": [
@@ -28,12 +29,11 @@
       "children": []
     }
   ],
-  "jarPath": "net/minecraft/client/model/object/bell/BellModel$State.class",
-  "classSha256Hex": "60f25cd17dca38588a5e655a632707c1cbd3d50f98cd2caae49f26d0dc2ebf9f",
-  "bytecodeFloatProbe": [],
   "liftSummary": {
     "cuboidApproxCount": 0,
     "poseApproxCount": 0,
     "delegationDepth": 0
-  }
+  },
+  "jarPath": "net/minecraft/client/model/object/bell/BellModel$State.class",
+  "classSha256Hex": "60f25cd17dca38588a5e655a632707c1cbd3d50f98cd2caae49f26d0dc2ebf9f"
 }

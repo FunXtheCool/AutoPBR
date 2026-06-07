@@ -4,8 +4,9 @@
   "officialJvmName": "net.minecraft.client.model.VillagerLikeModel",
   "profile": "named_jar_26.1.2",
   "extractionStatus": "skipped",
+  "skipKind": "interface",
   "extractionNotes": [
-    "No static mesh factory on net.minecraft.client.model.VillagerLikeModel; structural lift skipped (interface, inner class, or non-mesh type)."
+    "Interface net.minecraft.client.model.VillagerLikeModel; mesh factories live on concrete model classes."
   ],
   "factoryMethod": "createBodyLayer",
   "roots": [
@@ -28,12 +29,11 @@
       "children": []
     }
   ],
-  "jarPath": "net/minecraft/client/model/VillagerLikeModel.class",
-  "classSha256Hex": "bb2cc462d08290df150ed11ded87d34afac5ffee35e06b4839b93e3b284071ca",
-  "bytecodeFloatProbe": [],
   "liftSummary": {
     "cuboidApproxCount": 0,
     "poseApproxCount": 0,
     "delegationDepth": 0
-  }
+  },
+  "jarPath": "net/minecraft/client/model/VillagerLikeModel.class",
+  "classSha256Hex": "bb2cc462d08290df150ed11ded87d34afac5ffee35e06b4839b93e3b284071ca"
 }

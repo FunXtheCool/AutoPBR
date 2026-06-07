@@ -4,8 +4,9 @@
   "officialJvmName": "net.minecraft.client.model.Model$Simple",
   "profile": "named_jar_26.1.2",
   "extractionStatus": "skipped",
+  "skipKind": "inner_class",
   "extractionNotes": [
-    "No static mesh factory on net.minecraft.client.model.Model$Simple; structural lift skipped (interface, inner class, or non-mesh type)."
+    "Inner or synthetic nested type on net.minecraft.client.model.Model$Simple; no standalone static mesh factory."
   ],
   "factoryMethod": "createBodyLayer",
   "roots": [
@@ -28,12 +29,11 @@
       "children": []
     }
   ],
-  "jarPath": "net/minecraft/client/model/Model$Simple.class",
-  "classSha256Hex": "60321bdf9ef440ed9968ef77068735e47f0966a18316af7e773a87c0abb4afec",
-  "bytecodeFloatProbe": [],
   "liftSummary": {
     "cuboidApproxCount": 0,
     "poseApproxCount": 0,
     "delegationDepth": 0
-  }
+  },
+  "jarPath": "net/minecraft/client/model/Model$Simple.class",
+  "classSha256Hex": "60321bdf9ef440ed9968ef77068735e47f0966a18316af7e773a87c0abb4afec"
 }

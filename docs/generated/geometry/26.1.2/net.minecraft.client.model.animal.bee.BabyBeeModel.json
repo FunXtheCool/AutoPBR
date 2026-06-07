@@ -119,45 +119,55 @@
                   "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
                 }
               ],
-              "children": []
-            },
-            {
-              "id": "stinger",
-              "pose": {
-                "translation": [
-                  0.000000000,
-                  0.5000000000,
-                  2.500000000
-                ],
-                "rotationEulerRad": [
-                  0.000000000,
-                  0.000000000,
-                  0.000000000
-                ],
-                "eulerOrder": "XYZ"
-              },
-              "cuboids": [
+              "children": [
                 {
-                  "from": [
-                    0,
-                    -0.5,
-                    0
+                  "id": "stinger",
+                  "pose": {
+                    "translation": [
+                      0.000000000,
+                      0.5000000000,
+                      2.500000000
+                    ],
+                    "rotationEulerRad": [
+                      0.000000000,
+                      0.000000000,
+                      0.000000000
+                    ],
+                    "eulerOrder": "XYZ"
+                  },
+                  "cuboids": [
+                    {
+                      "from": [
+                        0,
+                        -0.5,
+                        0
+                      ],
+                      "to": [
+                        0,
+                        0.5,
+                        1
+                      ],
+                      "uvOrigin": [
+                        13,
+                        2
+                      ],
+                      "textureKey": "#skin",
+                      "liftKind": "exact",
+                      "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                      "faceMask": [
+                        "east",
+                        "west"
+                      ],
+                      "uvSpan": [
+                        0,
+                        1,
+                        1
+                      ]
+                    }
                   ],
-                  "to": [
-                    0,
-                    0.5,
-                    1
-                  ],
-                  "uvOrigin": [
-                    13,
-                    2
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                  "children": []
                 }
-              ],
-              "children": []
+              ]
             },
             {
               "id": "right_wing",
@@ -192,7 +202,16 @@
                   ],
                   "textureKey": "#skin",
                   "liftKind": "exact",
-                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                  "faceMask": [
+                    "up",
+                    "down"
+                  ],
+                  "uvSpan": [
+                    3,
+                    0,
+                    3
+                  ]
                 }
               ],
               "children": []
@@ -231,7 +250,16 @@
                   "textureKey": "#skin",
                   "liftKind": "exact",
                   "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-                  "mirrorU": true
+                  "faceMask": [
+                    "up",
+                    "down"
+                  ],
+                  "mirrorU": true,
+                  "uvSpan": [
+                    3,
+                    0,
+                    3
+                  ]
                 }
               ],
               "children": []
@@ -269,7 +297,15 @@
                   ],
                   "textureKey": "#skin",
                   "liftKind": "exact",
-                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                  "faceMask": [
+                    "north",
+                    "south"
+                  ],
+                  "uvSpan": [
+                    3,
+                    1
+                  ]
                 }
               ],
               "children": []
@@ -307,7 +343,15 @@
                   ],
                   "textureKey": "#skin",
                   "liftKind": "exact",
-                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                  "faceMask": [
+                    "north",
+                    "south"
+                  ],
+                  "uvSpan": [
+                    3,
+                    1
+                  ]
                 }
               ],
               "children": []
@@ -345,7 +389,15 @@
                   ],
                   "textureKey": "#skin",
                   "liftKind": "exact",
-                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                  "faceMask": [
+                    "north",
+                    "south"
+                  ],
+                  "uvSpan": [
+                    3,
+                    1
+                  ]
                 }
               ],
               "children": []

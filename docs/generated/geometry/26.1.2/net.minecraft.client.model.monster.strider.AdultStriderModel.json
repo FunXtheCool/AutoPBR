@@ -173,7 +173,16 @@
                   ],
                   "textureKey": "#skin",
                   "liftKind": "exact",
-                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                  "faceMask": [
+                    "up",
+                    "down"
+                  ],
+                  "uvSpan": [
+                    12,
+                    0,
+                    16
+                  ]
                 }
               ],
               "children": []
@@ -211,7 +220,16 @@
                   ],
                   "textureKey": "#skin",
                   "liftKind": "exact",
-                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                  "faceMask": [
+                    "up",
+                    "down"
+                  ],
+                  "uvSpan": [
+                    12,
+                    0,
+                    16
+                  ]
                 }
               ],
               "children": []
@@ -249,7 +267,16 @@
                   ],
                   "textureKey": "#skin",
                   "liftKind": "exact",
-                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                  "faceMask": [
+                    "up",
+                    "down"
+                  ],
+                  "uvSpan": [
+                    12,
+                    0,
+                    16
+                  ]
                 }
               ],
               "children": []
@@ -287,7 +314,16 @@
                   ],
                   "textureKey": "#skin",
                   "liftKind": "exact",
-                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                  "faceMask": [
+                    "up",
+                    "down"
+                  ],
+                  "uvSpan": [
+                    12,
+                    0,
+                    16
+                  ]
                 }
               ],
               "children": []
@@ -325,7 +361,16 @@
                   ],
                   "textureKey": "#skin",
                   "liftKind": "exact",
-                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                  "faceMask": [
+                    "up",
+                    "down"
+                  ],
+                  "uvSpan": [
+                    12,
+                    0,
+                    16
+                  ]
                 }
               ],
               "children": []
@@ -363,7 +408,16 @@
                   ],
                   "textureKey": "#skin",
                   "liftKind": "exact",
-                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                  "faceMask": [
+                    "up",
+                    "down"
+                  ],
+                  "uvSpan": [
+                    12,
+                    0,
+                    16
+                  ]
                 }
               ],
               "children": []

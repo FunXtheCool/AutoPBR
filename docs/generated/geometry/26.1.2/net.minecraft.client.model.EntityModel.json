@@ -4,6 +4,7 @@
   "officialJvmName": "net.minecraft.client.model.EntityModel",
   "profile": "named_jar_26.1.2",
   "extractionStatus": "skipped",
+  "skipKind": "no_mesh_factory",
   "extractionNotes": [
     "No static mesh factory on net.minecraft.client.model.EntityModel; structural lift skipped (interface, inner class, or non-mesh type)."
   ],
@@ -28,12 +29,11 @@
       "children": []
     }
   ],
-  "jarPath": "net/minecraft/client/model/EntityModel.class",
-  "classSha256Hex": "201bf4c36eac0e75a2f47f3864769cd5224e24f59c9f29e6d517b8dd82a58401",
-  "bytecodeFloatProbe": [],
   "liftSummary": {
     "cuboidApproxCount": 0,
     "poseApproxCount": 0,
     "delegationDepth": 0
-  }
+  },
+  "jarPath": "net/minecraft/client/model/EntityModel.class",
+  "classSha256Hex": "201bf4c36eac0e75a2f47f3864769cd5224e24f59c9f29e6d517b8dd82a58401"
 }

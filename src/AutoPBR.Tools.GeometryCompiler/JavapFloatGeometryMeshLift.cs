@@ -113,6 +113,7 @@ internal static partial class JavapFloatGeometryMeshLift
         }
 
             roots = GeometryLiftOutputAssembly.WrapSyntheticRoot(rootChildren);
+            roots = GeometryIrLiftTreeRepair.Apply(roots);
             return true;
         }
         finally

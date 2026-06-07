@@ -31,6 +31,7 @@
   "jarPath": "net/minecraft/client/model/monster/zombie/GiantZombieModel.class",
   "classSha256Hex": "6c249fea598ac62ea9c2f4d6fc1ed436a65488ddfcbed45c4ae7000a97fc36be",
   "bytecodeFloatProbe": [],
+  "skipKind": "no_mesh_factory",
   "liftSummary": {
     "cuboidApproxCount": 0,
     "poseApproxCount": 0,

@@ -104,50 +104,12 @@
           "children": []
         },
         {
-          "id": "left_front_leg",
-          "pose": {
-            "translation": [
-              2.000000000,
-              19.00000000,
-              -2.000000000
-            ],
-            "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
-            {
-              "from": [
-                -1,
-                0,
-                -1
-              ],
-              "to": [
-                1,
-                5,
-                1
-              ],
-              "uvOrigin": [
-                24,
-                5
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "right_front_leg",
+          "id": "right_hind_leg",
           "pose": {
             "translation": [
               -2.000000000,
               19.00000000,
-              -2.000000000
+              3.000000000
             ],
             "rotationEulerRad": [
               0.000000000,
@@ -169,7 +131,7 @@
                 1
               ],
               "uvOrigin": [
-                8,
+                0,
                 23
               ],
               "textureKey": "#skin",
@@ -218,12 +180,12 @@
           "children": []
         },
         {
-          "id": "right_hind_leg",
+          "id": "right_front_leg",
           "pose": {
             "translation": [
               -2.000000000,
               19.00000000,
-              3.000000000
+              -2.000000000
             ],
             "rotationEulerRad": [
               0.000000000,
@@ -245,8 +207,46 @@
                 1
               ],
               "uvOrigin": [
-                0,
+                8,
                 23
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left_front_leg",
+          "pose": {
+            "translation": [
+              2.000000000,
+              19.00000000,
+              -2.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1,
+                0,
+                -1
+              ],
+              "to": [
+                1,
+                5,
+                1
+              ],
+              "uvOrigin": [
+                24,
+                5
               ],
               "textureKey": "#skin",
               "liftKind": "exact",

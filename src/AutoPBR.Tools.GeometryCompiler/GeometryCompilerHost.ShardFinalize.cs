@@ -183,21 +183,35 @@ internal sealed partial class GeometryCompilerHost
             return;
         }
 
+        if (GeometryIrDelegatedMeshCopy.TryApply(_outDir, _versionLabel, officialJvmName, json, out _))
+        {
+            return;
+        }
+
         var hasDelegatedMeshHost = _useAsmLift &&
             BytecodeMeshResolution.TryResolve(_clientJar, maps, officialJvmName, factoryMethod, out _);
-        if (JvmClassFileParser.IsInterface(classBytes) ||
+        if (GeometryIrNonMeshClassifier.TryClassify(officialJvmName, classBytes, maps, out var skipKind, out var skipNote) ||
+            JvmClassFileParser.IsInterface(classBytes) ||
             officialJvmName.Contains('$', StringComparison.Ordinal) ||
             IsPackageInfoStub(officialJvmName) ||
             ProguardMeshFactoryDetection.IsMeshDefinitionTransformerOnly(maps, officialJvmName) ||
+            ProguardMeshFactoryDetection.IsMeshDefinitionTransformerOnly(classBytes, maps) ||
             (!ProguardMeshFactoryDetection.HasResolvableMeshFactory(maps, officialJvmName, classBytes) &&
              !hasDelegatedMeshHost))
         {
             json["extractionStatus"] = "skipped";
             json["roots"] = CreateSkippedRoots();
-            var note = ProguardMeshFactoryDetection.IsMeshDefinitionTransformerOnly(maps, officialJvmName)
-                ? $"MeshDefinition transformer on {officialJvmName} (e.g. apply(MeshDefinition)); no static part-tree factory to lift."
-                : $"No static mesh factory on {officialJvmName}; structural lift skipped (interface, inner class, or non-mesh type).";
+            var note = !string.IsNullOrEmpty(skipNote)
+                ? skipNote
+                : ProguardMeshFactoryDetection.IsMeshDefinitionTransformerOnly(maps, officialJvmName) ||
+                  ProguardMeshFactoryDetection.IsMeshDefinitionTransformerOnly(classBytes, maps)
+                    ? $"MeshDefinition transformer on {officialJvmName} (e.g. apply(MeshDefinition)); no static part-tree factory to lift."
+                    : $"No static mesh factory on {officialJvmName}; structural lift skipped (interface, inner class, or non-mesh type).";
             json["extractionNotes"] = new JsonArray(note);
+            if (!string.IsNullOrEmpty(skipKind))
+            {
+                json["skipKind"] = skipKind;
+            }
         }
     }
 }

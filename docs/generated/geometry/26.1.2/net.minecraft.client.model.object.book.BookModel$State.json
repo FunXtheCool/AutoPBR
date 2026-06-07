@@ -4,8 +4,9 @@
   "officialJvmName": "net.minecraft.client.model.object.book.BookModel$State",
   "profile": "named_jar_26.1.2",
   "extractionStatus": "skipped",
+  "skipKind": "enum_or_state",
   "extractionNotes": [
-    "No static mesh factory on net.minecraft.client.model.object.book.BookModel$State; structural lift skipped (interface, inner class, or non-mesh type)."
+    "Enum/state helper on net.minecraft.client.model.object.book.BookModel$State; not a mesh host."
   ],
   "factoryMethod": "createBodyLayer",
   "roots": [
@@ -28,12 +29,11 @@
       "children": []
     }
   ],
-  "jarPath": "net/minecraft/client/model/object/book/BookModel$State.class",
-  "classSha256Hex": "f6f2debf3370e42162b64c7e7a9695bd4a9687d1d482dcd3a7ef50723d95ae2b",
-  "bytecodeFloatProbe": [],
   "liftSummary": {
     "cuboidApproxCount": 0,
     "poseApproxCount": 0,
     "delegationDepth": 0
-  }
+  },
+  "jarPath": "net/minecraft/client/model/object/book/BookModel$State.class",
+  "classSha256Hex": "f6f2debf3370e42162b64c7e7a9695bd4a9687d1d482dcd3a7ef50723d95ae2b"
 }

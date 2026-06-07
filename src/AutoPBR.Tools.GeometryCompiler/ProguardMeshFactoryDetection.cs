@@ -76,4 +76,87 @@ internal static class ProguardMeshFactoryDetection
 
         return hasApply && !hasBodyFactory;
     }
+
+    /// <summary>
+    /// Bytecode fallback when mappings pins are missing but the class only exposes <c>apply(MeshDefinition)</c>.
+    /// </summary>
+    public static bool IsMeshDefinitionTransformerOnly(ReadOnlySpan<byte> classBytes, MojangMappingsParser? maps)
+    {
+        var hasApply = false;
+        var hasBodyFactory = false;
+
+        foreach (var (_, desc, isStatic) in JvmClassFileParser.EnumerateMethods(classBytes))
+        {
+            if (!isStatic)
+            {
+                continue;
+            }
+
+            if (IsLayerDefinitionFactoryDescriptor(desc, maps))
+            {
+                hasBodyFactory = true;
+            }
+            else if (IsMeshDefinitionApplyDescriptor(desc, maps))
+            {
+                hasApply = true;
+            }
+        }
+
+        return hasApply && !hasBodyFactory;
+    }
+
+    private static bool IsLayerDefinitionFactoryDescriptor(string descriptor, MojangMappingsParser? maps)
+    {
+        if (descriptor.Contains("LayerDefinition", StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        return maps is not null &&
+               JvmClassFileParser.TryGetMethodReturnTypeJarSimple(descriptor, out var ret) &&
+               maps.TryIsObfuscatedReturnType(ret, "LayerDefinition");
+    }
+
+    private static bool IsMeshDefinitionApplyDescriptor(string descriptor, MojangMappingsParser? maps)
+    {
+        if (descriptor.Contains("ArmorModelSet", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        if (!ReturnsMeshDefinition(descriptor, maps))
+        {
+            return false;
+        }
+
+        var open = descriptor.IndexOf('(');
+        var close = descriptor.IndexOf(')');
+        if (open < 0 || close <= open)
+        {
+            return false;
+        }
+
+        var parameters = descriptor[(open + 1)..close];
+        if (parameters.Contains("MeshDefinition", StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        return maps is not null &&
+               parameters.StartsWith('L') &&
+               parameters.EndsWith(';') &&
+               parameters.Count(c => c == 'L') == 1;
+    }
+
+    private static bool ReturnsMeshDefinition(string descriptor, MojangMappingsParser? maps)
+    {
+        if (descriptor.Contains("MeshDefinition", StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        return maps is not null &&
+               JvmClassFileParser.TryGetMethodReturnTypeJarSimple(descriptor, out var ret) &&
+               maps.TryIsObfuscatedReturnType(ret, "MeshDefinition");
+    }
 }

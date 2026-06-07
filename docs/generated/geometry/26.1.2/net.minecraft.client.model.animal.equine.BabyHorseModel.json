@@ -105,6 +105,158 @@
           ]
         },
         {
+          "id": "left_hind_leg",
+          "pose": {
+            "translation": [
+              2.400000095,
+              16.00000000,
+              5.400000095
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1.5,
+                -1,
+                -1.5
+              ],
+              "to": [
+                1.5,
+                8,
+                1.5
+              ],
+              "uvOrigin": [
+                12,
+                46
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right_hind_leg",
+          "pose": {
+            "translation": [
+              -2.400000095,
+              16.00000000,
+              5.400000095
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1.5,
+                -1,
+                -1.5
+              ],
+              "to": [
+                1.5,
+                8,
+                1.5
+              ],
+              "uvOrigin": [
+                0,
+                46
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left_front_leg",
+          "pose": {
+            "translation": [
+              2.400000095,
+              16.00000000,
+              -5.400000095
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1.5,
+                -1,
+                -1.5
+              ],
+              "to": [
+                1.5,
+                8,
+                1.5
+              ],
+              "uvOrigin": [
+                12,
+                34
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right_front_leg",
+          "pose": {
+            "translation": [
+              -2.400000095,
+              16.00000000,
+              -5.400000095
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1.5,
+                -1,
+                -1.5
+              ],
+              "to": [
+                1.5,
+                8,
+                1.5
+              ],
+              "uvOrigin": [
+                0,
+                34
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
           "id": "head_parts",
           "pose": {
             "translation": [
@@ -177,237 +329,86 @@
                   "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
                 }
               ],
-              "children": []
-            },
-            {
-              "id": "left_ear",
-              "pose": {
-                "translation": [
-                  2.000000000,
-                  -4.248400211,
-                  1.945099950
-                ],
-                "rotationEulerRad": [
-                  0.000000000,
-                  0.000000000,
-                  0.2617999911
-                ],
-                "eulerOrder": "XYZ"
-              },
-              "cuboids": [
+              "children": [
                 {
-                  "from": [
-                    -1,
-                    -2.5,
-                    -0.800000012
+                  "id": "left_ear",
+                  "pose": {
+                    "translation": [
+                      2.000000000,
+                      -4.248400211,
+                      1.945099950
+                    ],
+                    "rotationEulerRad": [
+                      0.000000000,
+                      0.000000000,
+                      0.2617999911
+                    ],
+                    "eulerOrder": "XYZ"
+                  },
+                  "cuboids": [
+                    {
+                      "from": [
+                        -1,
+                        -2.5,
+                        -0.800000012
+                      ],
+                      "to": [
+                        1,
+                        0.5,
+                        0.199999988
+                      ],
+                      "uvOrigin": [
+                        0,
+                        4
+                      ],
+                      "textureKey": "#skin",
+                      "liftKind": "exact",
+                      "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                    }
                   ],
-                  "to": [
-                    1,
-                    0.5,
-                    0.199999988
-                  ],
-                  "uvOrigin": [
-                    0,
-                    4
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-                }
-              ],
-              "children": []
-            },
-            {
-              "id": "right_ear",
-              "pose": {
-                "translation": [
-                  -2.000000000,
-                  -4.248400211,
-                  1.644999981
-                ],
-                "rotationEulerRad": [
-                  0.000000000,
-                  0.000000000,
-                  -0.2617999911
-                ],
-                "eulerOrder": "XYZ"
-              },
-              "cuboids": [
+                  "children": []
+                },
                 {
-                  "from": [
-                    -1,
-                    -2.5,
-                    -0.5
+                  "id": "right_ear",
+                  "pose": {
+                    "translation": [
+                      -2.000000000,
+                      -4.248400211,
+                      1.644999981
+                    ],
+                    "rotationEulerRad": [
+                      0.000000000,
+                      0.000000000,
+                      -0.2617999911
+                    ],
+                    "eulerOrder": "XYZ"
+                  },
+                  "cuboids": [
+                    {
+                      "from": [
+                        -1,
+                        -2.5,
+                        -0.5
+                      ],
+                      "to": [
+                        1,
+                        0.5,
+                        0.5
+                      ],
+                      "uvOrigin": [
+                        0,
+                        0
+                      ],
+                      "textureKey": "#skin",
+                      "liftKind": "exact",
+                      "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                    }
                   ],
-                  "to": [
-                    1,
-                    0.5,
-                    0.5
-                  ],
-                  "uvOrigin": [
-                    0,
-                    0
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                  "children": []
                 }
-              ],
-              "children": []
+              ]
             }
           ]
-        },
-        {
-          "id": "right_front_leg",
-          "pose": {
-            "translation": [
-              -2.400000095,
-              16.00000000,
-              -5.400000095
-            ],
-            "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
-            {
-              "from": [
-                -1.5,
-                -1,
-                -1.5
-              ],
-              "to": [
-                1.5,
-                8,
-                1.5
-              ],
-              "uvOrigin": [
-                0,
-                34
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "left_front_leg",
-          "pose": {
-            "translation": [
-              2.400000095,
-              16.00000000,
-              -5.400000095
-            ],
-            "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
-            {
-              "from": [
-                -1.5,
-                -1,
-                -1.5
-              ],
-              "to": [
-                1.5,
-                8,
-                1.5
-              ],
-              "uvOrigin": [
-                12,
-                34
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "right_hind_leg",
-          "pose": {
-            "translation": [
-              -2.400000095,
-              16.00000000,
-              5.400000095
-            ],
-            "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
-            {
-              "from": [
-                -1.5,
-                -1,
-                -1.5
-              ],
-              "to": [
-                1.5,
-                8,
-                1.5
-              ],
-              "uvOrigin": [
-                0,
-                46
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "left_hind_leg",
-          "pose": {
-            "translation": [
-              2.400000095,
-              16.00000000,
-              5.400000095
-            ],
-            "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
-            {
-              "from": [
-                -1.5,
-                -1,
-                -1.5
-              ],
-              "to": [
-                1.5,
-                8,
-                1.5
-              ],
-              "uvOrigin": [
-                12,
-                46
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
         }
       ]
     }

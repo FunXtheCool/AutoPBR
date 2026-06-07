@@ -4,8 +4,9 @@
   "officialJvmName": "net.minecraft.client.model.animal.parrot.ParrotModel$Pose",
   "profile": "named_jar_26.1.2",
   "extractionStatus": "skipped",
+  "skipKind": "enum_or_state",
   "extractionNotes": [
-    "No static mesh factory on net.minecraft.client.model.animal.parrot.ParrotModel$Pose; structural lift skipped (interface, inner class, or non-mesh type)."
+    "Enum/state helper on net.minecraft.client.model.animal.parrot.ParrotModel$Pose; not a mesh host."
   ],
   "factoryMethod": "createBodyLayer",
   "roots": [
@@ -28,12 +29,11 @@
       "children": []
     }
   ],
-  "jarPath": "net/minecraft/client/model/animal/parrot/ParrotModel$Pose.class",
-  "classSha256Hex": "562736b108e556ff343ad81ab57c250ad20a43e219bb77342e1c6239e0307477",
-  "bytecodeFloatProbe": [],
   "liftSummary": {
     "cuboidApproxCount": 0,
     "poseApproxCount": 0,
     "delegationDepth": 0
-  }
+  },
+  "jarPath": "net/minecraft/client/model/animal/parrot/ParrotModel$Pose.class",
+  "classSha256Hex": "562736b108e556ff343ad81ab57c250ad20a43e219bb77342e1c6239e0307477"
 }

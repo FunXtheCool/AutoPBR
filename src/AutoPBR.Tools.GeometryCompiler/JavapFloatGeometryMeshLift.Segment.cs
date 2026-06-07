@@ -280,6 +280,7 @@ internal static partial class JavapFloatGeometryMeshLift
             }
 
             var warnings = BuildCuboidLiftWarnings(liftKind, maskResult, obfDef);
+            faceMaskList = GeometryLiftDegenerateFaceMask.ApplyForLift(faceMaskList, sx, sy, sz);
             var c = CreateCuboidJson(from, to, uv, textureKey, provenanceCube, liftKind, warnings,
                 faceMaskList, mirrorU, uvSpanW, uvSpanH, inflateAmt);
 

@@ -213,7 +213,16 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "faceMask": [
+                "east",
+                "west"
+              ],
+              "uvSpan": [
+                0,
+                3,
+                5
+              ]
             }
           ],
           "children": []

@@ -48,6 +48,8 @@ internal static class GeometryLiftJsonMerge
         var earlierCuboids = earlier["cuboids"] as JsonArray ?? new JsonArray();
         var incomingCuboids = merged["cuboids"] as JsonArray ?? new JsonArray();
         var preferIncomingCuboids = ShouldPreferIncomingCuboidsOverUnion(merged, incomingCuboids);
+        var preferEarlierHumanoidArmCuboids = ShouldPreferEarlierHumanoidArmCuboids(
+            (string?)incoming["id"], earlierCuboids, incomingCuboids);
         var dropHumanoidHatForPiglinEars = incoming["children"] is JsonArray incomingKidsForHat &&
             (ContainsChildPartId(incomingKidsForHat, "left_ear") ||
              ContainsChildPartId(incomingKidsForHat, "right_ear") ||
@@ -68,6 +70,10 @@ internal static class GeometryLiftJsonMerge
             else if (earlierCuboids.Count == 0 || preferIncomingCuboids)
             {
                 merged["cuboids"] = JsonNode.Parse(incomingCuboids.ToJsonString())!.AsArray();
+            }
+            else if (preferEarlierHumanoidArmCuboids)
+            {
+                merged["cuboids"] = JsonNode.Parse(earlierCuboids.ToJsonString())!.AsArray();
             }
             else if (incomingCuboids.Count > earlierCuboids.Count)
             {
@@ -253,6 +259,46 @@ internal static class GeometryLiftJsonMerge
         }
 
         return merged;
+    }
+
+    /// <summary>
+    /// Player/piglin multi-island lifts: a later overlay island can emit undersized arm cuboids (e.g. jacket UV 30,x)
+    /// that must not replace the primary humanoid arm from an earlier island.
+    /// </summary>
+    private static bool ShouldPreferEarlierHumanoidArmCuboids(
+        string? partId,
+        JsonArray earlierCuboids,
+        JsonArray incomingCuboids)
+    {
+        if (earlierCuboids.Count != 1 || incomingCuboids.Count != 1 ||
+            !IsHumanoidArmPartId(partId))
+        {
+            return false;
+        }
+
+        return CuboidYSpan(earlierCuboids[0] as JsonObject) > CuboidYSpan(incomingCuboids[0] as JsonObject) + 1e-3;
+    }
+
+    private static bool IsHumanoidArmPartId(string? partId) =>
+        string.Equals(partId, "left_arm", StringComparison.Ordinal) ||
+        string.Equals(partId, "right_arm", StringComparison.Ordinal) ||
+        string.Equals(partId, "left_leg", StringComparison.Ordinal) ||
+        string.Equals(partId, "right_leg", StringComparison.Ordinal) ||
+        string.Equals(partId, "body", StringComparison.Ordinal) ||
+        string.Equals(partId, "head", StringComparison.Ordinal);
+
+    private static double CuboidYSpan(JsonObject? cuboid)
+    {
+        if (cuboid is null ||
+            cuboid["from"] is not JsonArray from ||
+            cuboid["to"] is not JsonArray to ||
+            from.Count < 2 ||
+            to.Count < 2)
+        {
+            return 0;
+        }
+
+        return to[1]!.GetValue<double>() - from[1]!.GetValue<double>();
     }
 
     private static bool ShouldPreferIncomingCuboidsOverUnion(

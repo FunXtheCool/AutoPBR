@@ -1,3 +1,4 @@
+// ReSharper disable CheckNamespace
 using System.Numerics;
 using System.Text.Json;
 using AutoPBR.Core.Models;
@@ -30,7 +31,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
     /// <summary>
     /// Resolves LER folding for parity/catalog emit. Motion passes (setupAnim, definition anim) stay in model space;
     /// LER is applied <b>once</b> after them when <paramref name="deferLivingEntityRendererUntilAfterMotionPasses"/> is true.
-    /// Static bind folds LER once after emit via <see cref="ApplyLivingEntityRendererColumnRootScale"/> (column
+    /// Static bind folds LER once after emit via
+    /// <see cref="ApplyLivingEntityRendererColumnRootScale(MergedJavaBlockModel)"/> (column
     /// <c>S * LocalToParent</c> on points). Motion passes stay model-space until the single post-batch when deferred.
     /// </summary>
     internal static GeometryIrLivingEntityRendererEmitPlan ResolveGeometryIrParityEmitPlan(
@@ -46,16 +48,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
             {
                 EmitRootTransform = Matrix4x4.Identity,
                 ApplyPostLivingEntityRendererBasis = false,
-                Basis = basis,
-            };
-        }
-
-        if (deferLivingEntityRendererUntilAfterMotionPasses)
-        {
-            return new GeometryIrLivingEntityRendererEmitPlan
-            {
-                EmitRootTransform = Matrix4x4.Identity,
-                ApplyPostLivingEntityRendererBasis = true,
                 Basis = basis,
             };
         }
@@ -83,7 +75,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
     /// <summary>
     /// Flat <c>PartPose.offset</c> root-sibling quadruped factories (cow, pig, panda, creeper class).
     /// Production emit uses <see cref="GeometryIrLerBasisKind.StandardWorldRoot"/> →
-    /// <see cref="ApplyLivingEntityRendererColumnRootScale"/> after model-space walk (column <c>S * (T * R)</c> on points).
+    /// <see cref="ApplyLivingEntityRendererColumnRootScale(MergedJavaBlockModel)"/> after model-space walk (column <c>S * (T * R)</c> on points).
     /// Legacy per-element <c>M * S</c> (<see cref="GeometryIrLerBasisKind.RightComposeLocalChain"/>) detaches rotated body cuboids.
     /// </summary>
     internal static bool UsesFlatPartPoseOffsetQuadrupedJvm(string? officialJvmName)
@@ -145,16 +137,22 @@ internal sealed partial class CleanRoomEntityModelRuntime
         }
 
         var stem = (stemLower ?? "").ToLowerInvariant();
-        var norm = normalizedAssetPath ?? "";
         if (EntityGpuBoneFillPolicy.SkipsLivingEntityRendererBasis(stem))
         {
             return GeometryIrLerBasisKind.Skip;
         }
 
-        if (UsesComposedOffsetAndRotationBodyDefaultLerJvm(officialJvmName) ||
-            UsesFlatPartPoseOffsetQuadrupedJvm(officialJvmName))
+        // Ghast / happy ghast bake ModelTransforms into the mesh root (large negative Y); LER mirror flips preview upright.
+        if (!string.IsNullOrWhiteSpace(officialJvmName) &&
+            (officialJvmName.Contains(".monster.ghast.", StringComparison.OrdinalIgnoreCase) ||
+             officialJvmName.Contains(".animal.ghast.", StringComparison.OrdinalIgnoreCase)))
         {
-            return GeometryIrLerBasisKind.StandardWorldRoot;
+            return GeometryIrLerBasisKind.Skip;
+        }
+
+        if (UsesEquineGeometryIrPreviewBasis(officialJvmName, stem, normalizedAssetPath))
+        {
+            return GeometryIrLerBasisKind.EquineDedicated;
         }
 
         return GeometryIrLerBasisKind.StandardWorldRoot;
@@ -187,30 +185,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
         return stemLower.Contains("horse", StringComparison.OrdinalIgnoreCase) ||
                stemLower.Contains("donkey", StringComparison.OrdinalIgnoreCase) ||
                stemLower.Contains("mule", StringComparison.OrdinalIgnoreCase);
-    }
-
-    /// <summary>LER preview basis for parity-catalog and test geometry IR emit.</summary>
-    internal static MergedJavaBlockModel ApplyGeometryIrParityLivingEntityRendererPreviewBasis(
-        string officialJvmName,
-        JsonElement? geometryRootOverride,
-        string? stem,
-        string? normalizedAssetPath,
-        MergedJavaBlockModel built)
-    {
-        var resolvedStem = stem;
-        if (string.IsNullOrWhiteSpace(resolvedStem))
-        {
-            var dot = officialJvmName.LastIndexOf('.');
-            resolvedStem = dot >= 0 ? officialJvmName[(dot + 1)..] : officialJvmName;
-        }
-
-        resolvedStem = resolvedStem.ToLowerInvariant();
-        var plan = ResolveGeometryIrParityEmitPlan(
-            officialJvmName,
-            resolvedStem,
-            normalizedAssetPath,
-            deferLivingEntityRendererUntilAfterMotionPasses: true);
-        return FinishGeometryIrMeshLivingEntityRendererBasis(built, plan);
     }
 
     /// <summary>Parity emit without LER post-basis (model-space <c>LocalToParent</c> for reference_java compare).</summary>

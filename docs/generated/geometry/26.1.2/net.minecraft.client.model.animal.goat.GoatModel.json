@@ -99,7 +99,16 @@
               ],
               "textureKey": "#goatee",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "faceMask": [
+                "east",
+                "west"
+              ],
+              "uvSpan": [
+                0,
+                7,
+                5
+              ]
             }
           ],
           "children": [
@@ -277,50 +286,12 @@
           "children": []
         },
         {
-          "id": "right_front_leg",
-          "pose": {
-            "translation": [
-              -3.000000000,
-              14.00000000,
-              -6.000000000
-            ],
-            "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
-            {
-              "from": [
-                0,
-                0,
-                0
-              ],
-              "to": [
-                3,
-                10,
-                3
-              ],
-              "uvOrigin": [
-                35,
-                2
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "left_front_leg",
+          "id": "left_hind_leg",
           "pose": {
             "translation": [
               1.000000000,
               14.00000000,
-              -6.000000000
+              4.000000000
             ],
             "rotationEulerRad": [
               0.000000000,
@@ -333,7 +304,7 @@
             {
               "from": [
                 0,
-                0,
+                4,
                 0
               ],
               "to": [
@@ -342,8 +313,8 @@
                 3
               ],
               "uvOrigin": [
-                49,
-                2
+                36,
+                29
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
@@ -391,12 +362,12 @@
           "children": []
         },
         {
-          "id": "left_hind_leg",
+          "id": "left_front_leg",
           "pose": {
             "translation": [
               1.000000000,
               14.00000000,
-              4.000000000
+              -6.000000000
             ],
             "rotationEulerRad": [
               0.000000000,
@@ -409,7 +380,7 @@
             {
               "from": [
                 0,
-                4,
+                0,
                 0
               ],
               "to": [
@@ -418,8 +389,46 @@
                 3
               ],
               "uvOrigin": [
-                36,
-                29
+                49,
+                2
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right_front_leg",
+          "pose": {
+            "translation": [
+              -3.000000000,
+              14.00000000,
+              -6.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                0
+              ],
+              "to": [
+                3,
+                10,
+                3
+              ],
+              "uvOrigin": [
+                35,
+                2
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
@@ -507,6 +516,7 @@
   "liftSummary": {
     "cuboidApproxCount": 0,
     "poseApproxCount": 0,
-    "delegationDepth": 0
+    "delegationDepth": 0,
+    "vanillaFlatQuadrupedLegBake": true
   }
 }

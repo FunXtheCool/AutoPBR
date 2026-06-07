@@ -4,8 +4,9 @@
   "officialJvmName": "net.minecraft.client.model.AnimationUtils",
   "profile": "named_jar_26.1.2",
   "extractionStatus": "skipped",
+  "skipKind": "record_utility",
   "extractionNotes": [
-    "No static mesh factory on net.minecraft.client.model.AnimationUtils; structural lift skipped (interface, inner class, or non-mesh type)."
+    "Record/utility type net.minecraft.client.model.AnimationUtils; not a mesh host."
   ],
   "factoryMethod": "createBodyLayer",
   "roots": [
@@ -28,12 +29,11 @@
       "children": []
     }
   ],
-  "jarPath": "net/minecraft/client/model/AnimationUtils.class",
-  "classSha256Hex": "36ebc1b64c9d07f3615410aa892205518ef9cf5f9780c025896b27f2c2060da5",
-  "bytecodeFloatProbe": [],
   "liftSummary": {
     "cuboidApproxCount": 0,
     "poseApproxCount": 0,
     "delegationDepth": 0
-  }
+  },
+  "jarPath": "net/minecraft/client/model/AnimationUtils.class",
+  "classSha256Hex": "36ebc1b64c9d07f3615410aa892205518ef9cf5f9780c025896b27f2c2060da5"
 }

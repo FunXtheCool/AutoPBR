@@ -4,8 +4,9 @@
   "officialJvmName": "net.minecraft.client.model.AdultAndBabyModelPair",
   "profile": "named_jar_26.1.2",
   "extractionStatus": "skipped",
+  "skipKind": "record_utility",
   "extractionNotes": [
-    "No static mesh factory on net.minecraft.client.model.AdultAndBabyModelPair; structural lift skipped (interface, inner class, or non-mesh type)."
+    "Record/utility type net.minecraft.client.model.AdultAndBabyModelPair; not a mesh host."
   ],
   "factoryMethod": "createBodyLayer",
   "roots": [
@@ -28,12 +29,11 @@
       "children": []
     }
   ],
-  "jarPath": "net/minecraft/client/model/AdultAndBabyModelPair.class",
-  "classSha256Hex": "f9c371601aecca00d9d3ab1aa1dd886b53f9922192e7baf5e55f47bdebe5ca7d",
-  "bytecodeFloatProbe": [],
   "liftSummary": {
     "cuboidApproxCount": 0,
     "poseApproxCount": 0,
     "delegationDepth": 0
-  }
+  },
+  "jarPath": "net/minecraft/client/model/AdultAndBabyModelPair.class",
+  "classSha256Hex": "f9c371601aecca00d9d3ab1aa1dd886b53f9922192e7baf5e55f47bdebe5ca7d"
 }

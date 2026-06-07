@@ -4,8 +4,9 @@
   "officialJvmName": "net.minecraft.client.model.BabyModelTransform",
   "profile": "named_jar_26.1.2",
   "extractionStatus": "skipped",
+  "skipKind": "mesh_transformer",
   "extractionNotes": [
-    "No static mesh factory on net.minecraft.client.model.BabyModelTransform; structural lift skipped (interface, inner class, or non-mesh type)."
+    "MeshDefinition transformer on net.minecraft.client.model.BabyModelTransform (apply(MeshDefinition)); transform is applied inline in parent createBodyLayer factories, not a standalone part tree."
   ],
   "factoryMethod": "createBodyLayer",
   "roots": [
@@ -28,12 +29,11 @@
       "children": []
     }
   ],
-  "jarPath": "net/minecraft/client/model/BabyModelTransform.class",
-  "classSha256Hex": "be82cfe84b578157bc0eb560671c9fedddc97eef699f027d6182ed92fc9b1dd0",
-  "bytecodeFloatProbe": [],
   "liftSummary": {
     "cuboidApproxCount": 0,
     "poseApproxCount": 0,
     "delegationDepth": 0
-  }
+  },
+  "jarPath": "net/minecraft/client/model/BabyModelTransform.class",
+  "classSha256Hex": "be82cfe84b578157bc0eb560671c9fedddc97eef699f027d6182ed92fc9b1dd0"
 }

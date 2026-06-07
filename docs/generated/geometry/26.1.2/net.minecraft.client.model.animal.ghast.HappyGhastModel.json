@@ -63,349 +63,350 @@
               "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
             }
           ],
-          "children": []
-        },
-        {
-          "id": "tentacle0",
-          "pose": {
-            "translation": [
-              -3.750000000,
-              7.000000000,
-              -5.000000000
-            ],
-            "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
+          "children": [
             {
-              "from": [
-                -1,
-                0,
-                -1
+              "id": "tentacle0",
+              "pose": {
+                "translation": [
+                  -3.750000000,
+                  7.000000000,
+                  -5.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -1,
+                    0,
+                    -1
+                  ],
+                  "to": [
+                    1,
+                    5,
+                    1
+                  ],
+                  "uvOrigin": [
+                    0,
+                    0
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
               ],
-              "to": [
-                1,
-                5,
-                1
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "tentacle1",
-          "pose": {
-            "translation": [
-              1.250000000,
-              7.000000000,
-              -5.000000000
-            ],
-            "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
+              "children": []
+            },
             {
-              "from": [
-                -1,
-                0,
-                -1
+              "id": "tentacle1",
+              "pose": {
+                "translation": [
+                  1.250000000,
+                  7.000000000,
+                  -5.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -1,
+                    0,
+                    -1
+                  ],
+                  "to": [
+                    1,
+                    7,
+                    1
+                  ],
+                  "uvOrigin": [
+                    0,
+                    0
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
               ],
-              "to": [
-                1,
-                7,
-                1
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "tentacle2",
-          "pose": {
-            "translation": [
-              6.250000000,
-              7.000000000,
-              -5.000000000
-            ],
-            "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
+              "children": []
+            },
             {
-              "from": [
-                -1,
-                0,
-                -1
+              "id": "tentacle2",
+              "pose": {
+                "translation": [
+                  6.250000000,
+                  7.000000000,
+                  -5.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -1,
+                    0,
+                    -1
+                  ],
+                  "to": [
+                    1,
+                    4,
+                    1
+                  ],
+                  "uvOrigin": [
+                    0,
+                    0
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
               ],
-              "to": [
-                1,
-                4,
-                1
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "tentacle3",
-          "pose": {
-            "translation": [
-              -6.250000000,
-              7.000000000,
-              0.000000000
-            ],
-            "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
+              "children": []
+            },
             {
-              "from": [
-                -1,
-                0,
-                -1
+              "id": "tentacle3",
+              "pose": {
+                "translation": [
+                  -6.250000000,
+                  7.000000000,
+                  0.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -1,
+                    0,
+                    -1
+                  ],
+                  "to": [
+                    1,
+                    5,
+                    1
+                  ],
+                  "uvOrigin": [
+                    0,
+                    0
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
               ],
-              "to": [
-                1,
-                5,
-                1
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "tentacle4",
-          "pose": {
-            "translation": [
-              -1.250000000,
-              7.000000000,
-              0.000000000
-            ],
-            "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
+              "children": []
+            },
             {
-              "from": [
-                -1,
-                0,
-                -1
+              "id": "tentacle4",
+              "pose": {
+                "translation": [
+                  -1.250000000,
+                  7.000000000,
+                  0.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -1,
+                    0,
+                    -1
+                  ],
+                  "to": [
+                    1,
+                    5,
+                    1
+                  ],
+                  "uvOrigin": [
+                    0,
+                    0
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
               ],
-              "to": [
-                1,
-                5,
-                1
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "tentacle5",
-          "pose": {
-            "translation": [
-              3.750000000,
-              7.000000000,
-              0.000000000
-            ],
-            "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
+              "children": []
+            },
             {
-              "from": [
-                -1,
-                0,
-                -1
+              "id": "tentacle5",
+              "pose": {
+                "translation": [
+                  3.750000000,
+                  7.000000000,
+                  0.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -1,
+                    0,
+                    -1
+                  ],
+                  "to": [
+                    1,
+                    7,
+                    1
+                  ],
+                  "uvOrigin": [
+                    0,
+                    0
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
               ],
-              "to": [
-                1,
-                7,
-                1
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "tentacle6",
-          "pose": {
-            "translation": [
-              -3.750000000,
-              7.000000000,
-              5.000000000
-            ],
-            "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
+              "children": []
+            },
             {
-              "from": [
-                -1,
-                0,
-                -1
+              "id": "tentacle6",
+              "pose": {
+                "translation": [
+                  -3.750000000,
+                  7.000000000,
+                  5.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -1,
+                    0,
+                    -1
+                  ],
+                  "to": [
+                    1,
+                    8,
+                    1
+                  ],
+                  "uvOrigin": [
+                    0,
+                    0
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
               ],
-              "to": [
-                1,
-                8,
-                1
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "tentacle7",
-          "pose": {
-            "translation": [
-              1.250000000,
-              7.000000000,
-              5.000000000
-            ],
-            "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
+              "children": []
+            },
             {
-              "from": [
-                -1,
-                0,
-                -1
+              "id": "tentacle7",
+              "pose": {
+                "translation": [
+                  1.250000000,
+                  7.000000000,
+                  5.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -1,
+                    0,
+                    -1
+                  ],
+                  "to": [
+                    1,
+                    8,
+                    1
+                  ],
+                  "uvOrigin": [
+                    0,
+                    0
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
               ],
-              "to": [
-                1,
-                8,
-                1
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "tentacle8",
-          "pose": {
-            "translation": [
-              6.250000000,
-              7.000000000,
-              5.000000000
-            ],
-            "rotationEulerRad": [
-              0.000000000,
-              0.000000000,
-              0.000000000
-            ],
-            "eulerOrder": "XYZ"
-          },
-          "cuboids": [
+              "children": []
+            },
             {
-              "from": [
-                -1,
-                0,
-                -1
+              "id": "tentacle8",
+              "pose": {
+                "translation": [
+                  6.250000000,
+                  7.000000000,
+                  5.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -1,
+                    0,
+                    -1
+                  ],
+                  "to": [
+                    1,
+                    5,
+                    1
+                  ],
+                  "uvOrigin": [
+                    0,
+                    0
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                }
               ],
-              "to": [
-                1,
-                5,
-                1
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "children": []
             }
-          ],
-          "children": []
+          ]
         }
       ]
     }

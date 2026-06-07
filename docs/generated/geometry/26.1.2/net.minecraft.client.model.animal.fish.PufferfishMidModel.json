@@ -98,7 +98,16 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "faceMask": [
+                "up",
+                "down"
+              ],
+              "uvSpan": [
+                2,
+                0,
+                2
+              ]
             }
           ],
           "children": []
@@ -136,7 +145,16 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "faceMask": [
+                "up",
+                "down"
+              ],
+              "uvSpan": [
+                2,
+                0,
+                2
+              ]
             }
           ],
           "children": []
@@ -174,7 +192,15 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "faceMask": [
+                "north",
+                "south"
+              ],
+              "uvSpan": [
+                5,
+                1
+              ]
             }
           ],
           "children": []
@@ -212,7 +238,15 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "faceMask": [
+                "north",
+                "south"
+              ],
+              "uvSpan": [
+                5,
+                1
+              ]
             }
           ],
           "children": []
@@ -250,7 +284,15 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "faceMask": [
+                "north",
+                "south"
+              ],
+              "uvSpan": [
+                1,
+                5
+              ]
             }
           ],
           "children": []
@@ -288,7 +330,15 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "faceMask": [
+                "north",
+                "south"
+              ],
+              "uvSpan": [
+                1,
+                5
+              ]
             }
           ],
           "children": []
@@ -326,7 +376,15 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "faceMask": [
+                "north",
+                "south"
+              ],
+              "uvSpan": [
+                1,
+                5
+              ]
             }
           ],
           "children": []
@@ -364,7 +422,15 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "faceMask": [
+                "north",
+                "south"
+              ],
+              "uvSpan": [
+                1,
+                5
+              ]
             }
           ],
           "children": []
@@ -402,7 +468,15 @@
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "faceMask": [
+                "north",
+                "south"
+              ],
+              "uvSpan": [
+                5,
+                1
+              ]
             }
           ],
           "children": []
