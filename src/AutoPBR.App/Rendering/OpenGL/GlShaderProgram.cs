@@ -84,12 +84,29 @@ internal sealed class GlShaderProgram : IDisposable
             var info = _gl.GetShaderInfoLog(s);
             var sb = new StringBuilder();
             sb.Append(type).Append(" compile failed: ").AppendLine(info);
+            AppendShaderContext(sb, source, info);
             error = string.IsNullOrEmpty(error) ? sb.ToString() : error + "\n" + sb;
             _gl.DeleteShader(s);
             return 0;
         }
 
         return s;
+    }
+
+    private static void AppendShaderContext(StringBuilder sb, string source, string infoLog)
+    {
+        var lineMatch = System.Text.RegularExpressions.Regex.Match(infoLog, @":(\d+):");
+        if (!lineMatch.Success || !int.TryParse(lineMatch.Groups[1].Value, out var lineNo) || lineNo < 1)
+        {
+            return;
+        }
+
+        var lines = source.Split('\n');
+        sb.AppendLine("Source context:");
+        for (var i = Math.Max(0, lineNo - 3); i < Math.Min(lines.Length, lineNo + 2); i++)
+        {
+            sb.Append(i + 1).Append(": ").AppendLine(lines[i].TrimEnd('\r'));
+        }
     }
 
     private static string LoadShader(string fileName)

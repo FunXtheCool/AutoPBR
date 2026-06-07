@@ -59,4 +59,90 @@ internal static class PreviewLightMath
         var ay = Math.Abs(lightDir.Y);
         return ay > 0.999f ? Vector3.UnitZ : Vector3.UnitY;
     }
+
+    /// <summary>
+    /// Maps clock time (0–24 h) to sun yaw/pitch. 6:00 ≈ sunrise, 12:00 ≈ solar noon, 18:00 ≈ sunset, 0:00/24:00 ≈ midnight.
+    /// </summary>
+    public static (double YawDegrees, double PitchDegrees) LightYawPitchFromTimeOfDay(
+        double hours,
+        double maxSunElevationDegrees = 58.0)
+    {
+        hours = NormalizeHours(hours);
+        var phase = (hours - 6.0) / 24.0 * Math.PI * 2.0;
+        var sunElevation = maxSunElevationDegrees * Math.Sin(phase);
+        var pitch = Math.Clamp(-sunElevation, -89.0, 89.0);
+        var yaw = (hours - 6.0) / 24.0 * 360.0;
+        if (yaw > 180.0)
+        {
+            yaw -= 360.0;
+        }
+        else if (yaw < -180.0)
+        {
+            yaw += 360.0;
+        }
+
+        return (yaw, pitch);
+    }
+
+    /// <summary>
+    /// Approximate inverse of <see cref="LightYawPitchFromTimeOfDay"/> for UI sync when yaw/pitch are edited manually.
+    /// </summary>
+    public static double TimeOfDayFromLightYawPitch(
+        double yawDegrees,
+        double pitchDegrees,
+        double referenceHours = 12.0,
+        double maxSunElevationDegrees = 58.0)
+    {
+        var hourFromYaw = NormalizeHours(6.0 + yawDegrees / 360.0 * 24.0);
+        var sunElev = Math.Clamp(-pitchDegrees, -maxSunElevationDegrees, maxSunElevationDegrees);
+        var phase = Math.Asin(sunElev / maxSunElevationDegrees);
+        var hourFromPitchA = NormalizeHours(6.0 + phase / (Math.PI * 2.0) * 24.0);
+        var hourFromPitchB = NormalizeHours(18.0 - phase / (Math.PI * 2.0) * 24.0);
+        var hourFromPitch = HoursDistance(hourFromPitchA, referenceHours) <= HoursDistance(hourFromPitchB, referenceHours)
+            ? hourFromPitchA
+            : hourFromPitchB;
+        return NormalizeHours((hourFromYaw + hourFromPitch) * 0.5);
+    }
+
+    private static double NormalizeHours(double hours)
+    {
+        hours %= 24.0;
+        if (hours < 0.0)
+        {
+            hours += 24.0;
+        }
+
+        return hours;
+    }
+
+    private static double HoursDistance(double a, double b)
+    {
+        var d = Math.Abs(a - b);
+        return Math.Min(d, 24.0 - d);
+    }
+
+    /// <summary>Clock hours for rendering, advancing when <see cref="Abstractions.PreviewRenderSettings.AnimateTimeOfDay"/> is on.</summary>
+    public static float EffectiveTimeOfDayHours(in Abstractions.PreviewRenderSettings settings, double renderTime)
+    {
+        if (!settings.AnimateTimeOfDay)
+        {
+            return settings.TimeOfDayHours;
+        }
+
+        var hours = settings.TimeOfDayHours + renderTime * settings.TimeOfDaySpeed;
+        return (float)NormalizeHours(hours);
+    }
+
+    /// <summary>Light yaw/pitch for shadow and sky passes; respects animated time-of-day.</summary>
+    public static (double YawDegrees, double PitchDegrees) EffectiveLightYawPitch(
+        in Abstractions.PreviewRenderSettings settings,
+        double renderTime)
+    {
+        if (!settings.AnimateTimeOfDay)
+        {
+            return (settings.LightYawDegrees, settings.LightPitchDegrees);
+        }
+
+        return LightYawPitchFromTimeOfDay(EffectiveTimeOfDayHours(settings, renderTime));
+    }
 }

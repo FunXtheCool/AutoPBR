@@ -15,6 +15,7 @@ uniform vec3 uSunCenter;
 uniform vec3 uSunRight;
 uniform vec3 uSunUp;
 uniform float uRadius;
+uniform float uDiscStrength;
 out vec2 vDiscCoord;
 void main()
 {
@@ -27,22 +28,22 @@ void main()
     private const string Frag330 = """
 #version 330 core
 in vec2 vDiscCoord;
+uniform float uDiscStrength;
 out vec4 FragColor;
 void main()
 {
     float d = length(vDiscCoord);
-    // Hard clip to a circle in billboard space so the quad silhouette never shows through alpha.
     if (d > 1.0)
     {
         discard;
     }
 
-    float core = 1.0 - smoothstep(0.24, 0.82, d);
-    float glow = exp(-d * 4.2) * 0.58;
-    vec3 rgb = vec3(1.0, 0.93, 0.72) * (core * 3.9 + glow * 1.05);
-    float rimFade = 1.0 - smoothstep(0.74, 1.0, d);
-    float alpha = clamp((core * 0.92 + glow * 0.52) * rimFade, 0.0, 1.0);
-    if (alpha < 0.008)
+    float strength = max(uDiscStrength, 0.0);
+    float core = 1.0 - smoothstep(0.06, 0.48, d);
+    float halo = exp(-max(d - 0.28, 0.0) * 7.5) * 0.72;
+    vec3 rgb = vec3(1.0, 0.96, 0.84) * (core * 4.2 + halo) * max(strength, 0.35);
+    float alpha = clamp(core * 0.96 + halo * 0.42, 0.0, 1.0);
+    if (alpha < 0.004)
     {
         discard;
     }

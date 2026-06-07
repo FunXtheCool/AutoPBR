@@ -1,15 +1,8 @@
-using System.Buffers.Binary;
-using System.Diagnostics;
 using System.Numerics;
-using System.Runtime.InteropServices;
 
 using AutoPBR.App.Rendering.Abstractions;
-using AutoPBR.App.Rendering.Scene;
 using AutoPBR.Core.Models;
 using AutoPBR.Core.Preview;
-
-using Avalonia.OpenGL;
-using Avalonia.Platform;
 
 using Silk.NET.OpenGL;
 
@@ -23,9 +16,12 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
 
     private readonly object _sync = new();
     private GL? _gl;
+    private bool _useOpenGlEs;
     private GlShaderProgram? _program;
     private GlShaderProgram? _shadowProgram;
     private GlShadowMapTarget? _shadowTarget;
+    private GlShadowMapTarget? _shadowTargetCascadeNear;
+    private double _lastPreviewFingerprintLogMs;
     private GlTexture2D? _albedo;
     private GlTexture2D? _normal;
     private GlTexture2D? _spec;
@@ -49,6 +45,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private GlShaderProgram? _atmoTransProgram;
     private GlShaderProgram? _atmoSkyViewProgram;
     private GlShaderProgram? _atmoSkyProgram;
+    private GlProceduralSkyProgram? _proceduralSkyProgram;
     private uint _atmoQuadVao;
     private uint _atmoQuadVbo;
     private uint _atmoTransmittanceTex;
@@ -631,6 +628,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         EnableEntityParallax = s.EnableEntityParallax,
         SpritePlaneCount = s.SpritePlaneCount,
         ShowBackgroundGrid = s.ShowBackgroundGrid,
+        ShowGroundMesh = s.ShowGroundMesh,
         ShowCornerAxes = s.ShowCornerAxes,
         DrawPreviewSubject = s.DrawPreviewSubject,
         EnableSss = s.EnableSss,
@@ -642,6 +640,13 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         AtmosphereTurbidity = s.AtmosphereTurbidity,
         AtmosphereSunIntensity = s.AtmosphereSunIntensity,
         AtmosphereHorizonFalloff = s.AtmosphereHorizonFalloff,
+        AtmosphereSkyExposure = s.AtmosphereSkyExposure,
+        AtmosphereSunDiscStrength = s.AtmosphereSunDiscStrength,
+        AerialFogStrength = s.AerialFogStrength,
+        TimeOfDayHours = s.TimeOfDayHours,
+        AnimateTimeOfDay = s.AnimateTimeOfDay,
+        TimeOfDaySpeed = s.TimeOfDaySpeed,
+        CapturePreviewFingerprint = s.CapturePreviewFingerprint,
         SssStrength = s.SssStrength,
         IblStrength = s.IblStrength,
         EmissionStrength = s.EmissionStrength,
@@ -655,6 +660,19 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         ShadowMapResolution = s.ShadowMapResolution,
         ShadowMinBias = s.ShadowMinBias,
         ShadowMaxBias = s.ShadowMaxBias,
-        EnableShadowCascades = s.EnableShadowCascades
+        EnableShadowCascades = s.EnableShadowCascades,
+        EnableGodRays = s.EnableGodRays,
+        EnableVolumeGodRays = s.EnableVolumeGodRays,
+        EnableVolumetricClouds = s.EnableVolumetricClouds,
+        VolumetricQuality = s.VolumetricQuality,
+        GodRayStrength = s.GodRayStrength,
+        GodRayConeScale = s.GodRayConeScale,
+        CloudDensity = s.CloudDensity,
+        CloudVolumeSize = s.CloudVolumeSize,
+        CloudLayerHeight = s.CloudLayerHeight,
+        CloudVolumeHeight = s.CloudVolumeHeight,
+        CloudQuality = s.CloudQuality,
+        LogVolumetricTiming = s.LogVolumetricTiming,
+        ShowSunProjectionDebug = s.ShowSunProjectionDebug
     };
 }

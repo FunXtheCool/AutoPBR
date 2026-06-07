@@ -1,6 +1,4 @@
-using System.Buffers.Binary;
 using System.Diagnostics;
-using System.Numerics;
 using System.Runtime.InteropServices;
 
 using AutoPBR.App.Rendering.Abstractions;
@@ -76,7 +74,7 @@ public sealed partial class OpenGlPreviewBackend
                 _albedo.UploadRgba(albW, albH, alb[..albPx], nearest);
             }
 
-            if (material.NormalRgba is { } nr && nr.Length >= 4)
+            if (material.NormalRgba is { Length: >= 4 } nr)
             {
                 var (nw, nh) = ResolveRgbaDimensions(material.Width, material.Height, nr.Length);
                 var nPx = nw * nh * 4;
@@ -94,7 +92,7 @@ public sealed partial class OpenGlPreviewBackend
                 _normal.UploadRgba(1, 1, [128, 128, 255, 255], nearest);
             }
 
-            if (material.SpecularRgba is { } sr && sr.Length >= 4)
+            if (material.SpecularRgba is { Length: >= 4 } sr)
             {
                 var (sw, sh) = ResolveRgbaDimensions(material.Width, material.Height, sr.Length);
                 var sPx = sw * sh * 4;
@@ -112,7 +110,7 @@ public sealed partial class OpenGlPreviewBackend
                 _spec.UploadRgba(1, 1, [120, 60, 40, 255], nearest);
             }
 
-            if (material.HeightRgba is { } hr && hr.Length >= 4)
+            if (material.HeightRgba is { Length: >= 4 } hr)
             {
                 var (hw, hh) = ResolveRgbaDimensions(material.Width, material.Height, hr.Length);
                 var hPx = hw * hh * 4;
@@ -384,15 +382,7 @@ public sealed partial class OpenGlPreviewBackend
         }
     }
 
-    private void ApplyEntitySkinningUniforms(
-        GlShaderProgram? program,
-        EntitySkinningUniformLocs locs,
-        float previewSpaceVerts,
-        float gpuSkinning,
-        float boneCount,
-        float meshLiftY) =>
-        ApplyEntitySkinningUniforms(program, locs, previewSpaceVerts, 0f, gpuSkinning, boneCount, meshLiftY);
-
+    // ReSharper disable once UnusedMember.Local -- called from PassScene/PassShadow partials
     private void ApplyEntitySkinningUniforms(GlShaderProgram? program, int gpuSkinning, int boneCount, float meshLiftY) =>
         ApplyEntitySkinningUniforms(
             program,
@@ -403,7 +393,7 @@ public sealed partial class OpenGlPreviewBackend
             boneCount,
             meshLiftY);
 
-    private bool TryResolveEntitySkinningDrawState(
+    private static bool TryResolveEntitySkinningDrawState(
         PreviewModelSubject? model,
         float meshSpaceLiftY,
         bool boneSnapshotValid,
@@ -442,25 +432,6 @@ public sealed partial class OpenGlPreviewBackend
         liftY = meshSpaceLiftY;
 
         return true;
-    }
-
-    private void ApplyEntityBoneSkinningUniforms(
-        GlShaderProgram? program,
-        PreviewModelSubject? model,
-        float meshSpaceLiftY,
-        bool boneSnapshotValid,
-        int boneSnapshotCount,
-        bool setupAnimMotion)
-    {
-        var locs = program == _shadowProgram ? _shadowEntityUniformLocs : _mainEntityUniformLocs;
-        TryApplyEntityBoneSkinningUniforms(
-            program,
-            locs,
-            model,
-            meshSpaceLiftY,
-            boneSnapshotValid,
-            boneSnapshotCount,
-            setupAnimMotion);
     }
 
     private void UploadEntitySkinningBoneMatrices(GL gl, int boneSnapshotCount)
@@ -517,6 +488,7 @@ public sealed partial class OpenGlPreviewBackend
             }
 
             var useOpenGlEs = versionStr.Contains("OpenGL ES", StringComparison.OrdinalIgnoreCase);
+            _useOpenGlEs = useOpenGlEs;
             _program = new GlShaderProgram(gl, "genesis.vert", "genesis.frag", useOpenGlEs, out var err);
             if (!_program.IsValid)
             {
@@ -555,12 +527,14 @@ public sealed partial class OpenGlPreviewBackend
             try
             {
                 _shadowTarget = new GlShadowMapTarget(gl, shadowResolution, useOpenGlEs);
+                _shadowTargetCascadeNear = new GlShadowMapTarget(gl, shadowResolution, useOpenGlEs);
                 EmitDiagnostic(
-                    $"[3D preview] Shadow map: {shadowResolution}x{shadowResolution}");
+                    $"[3D preview] Shadow map: {shadowResolution}x{shadowResolution} (near cascade ready)");
             }
             catch (Exception ex)
             {
                 _shadowTarget = null;
+                _shadowTargetCascadeNear = null;
                 EmitDiagnostic("[3D preview] Shadow target init failed: " + ex.Message);
             }
 
@@ -587,6 +561,15 @@ public sealed partial class OpenGlPreviewBackend
             TryInitLineOverlay(gl, useOpenGlEs);
             TryInitSunBillboard(gl, useOpenGlEs);
             TryInitAtmosphere(gl, useOpenGlEs);
+            TryInitGodRays(gl, useOpenGlEs);
+            TryInitVolume(gl, useOpenGlEs);
+            TryInitVolumetricClouds(gl, useOpenGlEs);
+            EmitDiagnostic(
+                "[3D preview] Feature init: " +
+                $"sky={(_atmoSkyProgram is { IsValid: true } ? "lut" : _proceduralSkyProgram is { IsValid: true } ? "procedural" : "off")}, " +
+                $"atmoLut={(_atmoTransProgram is { IsValid: true } && _atmoSkyViewProgram is { IsValid: true } ? "yes" : "no")}, " +
+                $"volume={(_volumeInjectProgram is { IsValid: true } && _volumeIntegrateProgram is { IsValid: true } ? (_volumeUseLiteShaders ? "lite" : "full") : "off")}, " +
+                $"godRays={(_godRayCompositeProgram is { IsValid: true } ? "yes" : "no")}.");
             _gpuAlive = true;
             _materialDirty = true;
             _meshDirty = true;
@@ -638,9 +621,15 @@ public sealed partial class OpenGlPreviewBackend
             _shadowProgram = null;
             _shadowTarget?.Dispose();
             _shadowTarget = null;
+            _shadowTargetCascadeNear?.Dispose();
+            _shadowTargetCascadeNear = null;
             DestroyAtmosphereResources();
+            DestroyGodRayResources();
+            DestroyVolumeResources();
+            DestroyVolumetricCloudResources();
             DestroySunBillboard();
             DestroyLineOverlay();
+            DestroySunDebugOverlay();
             if (_entityBoneUbo != 0)
             {
                 _gl?.DeleteBuffer(_entityBoneUbo);

@@ -8,6 +8,7 @@ using AutoPBR.App.Controls;
 using AutoPBR.App.Lang;
 using AutoPBR.App.Rendering;
 using AutoPBR.App.Rendering.Abstractions;
+using AutoPBR.App.Rendering.OpenGL;
 using AutoPBR.Core.Models;
 using AutoPBR.Core.Preview;
 
@@ -48,6 +49,7 @@ public partial class MainWindowViewModel
     [ObservableProperty] private bool _preview3DEnableEntityLabPbrShading = true;
     [ObservableProperty] private bool _preview3DEnableEntityParallax;
     [ObservableProperty] private bool _preview3DShowGrid = true;
+    [ObservableProperty] private bool _preview3DShowGroundMesh = true;
     [ObservableProperty] private bool _preview3DShowAxes = true;
     [ObservableProperty] private bool _preview3DEnableParallax = true;
     [ObservableProperty] private bool _preview3DEnableNormalMap = true;
@@ -60,8 +62,14 @@ public partial class MainWindowViewModel
     [ObservableProperty] private bool _preview3DEnableIbl = true;
     [ObservableProperty] private bool _preview3DEnableAtmosphericSky = true;
     [ObservableProperty] private double _preview3DAtmosphereTurbidity = 2.6;
-    [ObservableProperty] private double _preview3DAtmosphereSunIntensity = 16.0;
+    [ObservableProperty] private double _preview3DAtmosphereSunIntensity = 10.0;
     [ObservableProperty] private double _preview3DAtmosphereHorizonFalloff = 1.35;
+    [ObservableProperty] private double _preview3DAtmosphereSkyExposure = 0.85;
+    [ObservableProperty] private double _preview3DAtmosphereSunDiscStrength = 0.35;
+    [ObservableProperty] private double _preview3DHorizonFogStrength = 1.0;
+    [ObservableProperty] private double _preview3DTimeOfDayHours = 12.0;
+    [ObservableProperty] private bool _preview3DAnimateTimeOfDay;
+    [ObservableProperty] private double _preview3DTimeOfDaySpeed = 1.0;
     [ObservableProperty] private bool _preview3DEnableShadows = true;
     [ObservableProperty] private double _preview3DLightYawDegrees = -35.0;
     [ObservableProperty] private double _preview3DLightPitchDegrees = -55.0;
@@ -75,6 +83,17 @@ public partial class MainWindowViewModel
     [ObservableProperty] private string _preview3DCameraResetKey = "R";
     [ObservableProperty] private string? _preview3DCameraDebugText;
     [ObservableProperty] private bool _specularForceNoEmissive;
+    [ObservableProperty] private bool _preview3DEnableGodRays = true;
+    [ObservableProperty] private bool _preview3DEnableVolumetricClouds;
+    [ObservableProperty] private int _preview3DVolumetricQuality = 1;
+    [ObservableProperty] private double _preview3DGodRayStrength = 0.45;
+
+    public string[] Preview3DVolumetricQualityOptions { get; } =
+    [
+        LocalizedStrings.Preview3DVolumetricQualityLow,
+        LocalizedStrings.Preview3DVolumetricQualityMedium,
+        LocalizedStrings.Preview3DVolumetricQualityHigh
+    ];
 
     public bool IsPreview2D => PreviewDisplayMode == 0;
     public bool IsPreview3D => PreviewDisplayMode == 1;
@@ -129,6 +148,7 @@ public partial class MainWindowViewModel
     partial void OnPreview3DEnableEntityLabPbrShadingChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEnableEntityParallaxChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DShowGridChanged(bool value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DShowGroundMeshChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DShowAxesChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEnableParallaxChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEnableNormalMapChanged(bool value) => OnPreview3DGpuSettingChanged(value);
@@ -143,9 +163,19 @@ public partial class MainWindowViewModel
     partial void OnPreview3DAtmosphereTurbidityChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DAtmosphereSunIntensityChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DAtmosphereHorizonFalloffChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DAtmosphereSkyExposureChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DAtmosphereSunDiscStrengthChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DHorizonFogStrengthChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DTimeOfDayHoursChanged(double value) => OnPreview3DTimeOfDayChanged(value);
+    partial void OnPreview3DAnimateTimeOfDayChanged(bool value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DTimeOfDaySpeedChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DEnableGodRaysChanged(bool value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DEnableVolumetricCloudsChanged(bool value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DVolumetricQualityChanged(int value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DGodRayStrengthChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEnableShadowsChanged(bool value) => OnPreview3DGpuSettingChanged(value);
-    partial void OnPreview3DLightYawDegreesChanged(double value) => OnPreview3DGpuSettingChanged(value);
-    partial void OnPreview3DLightPitchDegreesChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DLightYawDegreesChanged(double value) => OnPreview3DLightDirectionChanged(value);
+    partial void OnPreview3DLightPitchDegreesChanged(double value) => OnPreview3DLightDirectionChanged(value);
     partial void OnPreview3DEnableShadowCascadesChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DSpritePlaneCountChanged(int value) => OnPreview3DGpuSettingChanged(value);
 
@@ -154,6 +184,39 @@ public partial class MainWindowViewModel
     partial void OnPreview3DCameraZoomSensitivityChanged(double value) => OnPreview3DCameraSettingChanged(value);
     partial void OnPreview3DCameraOrbitBoomDistanceChanged(double value) => OnPreview3DCameraSettingChanged(value);
     partial void OnPreview3DCameraResetKeyChanged(string value) => OnPreview3DCameraSettingChanged(value);
+
+    private bool _syncingPreviewLightFromTimeOfDay;
+
+    private void OnPreview3DTimeOfDayChanged(double hours)
+    {
+        if (_loadingSettings || _syncingPreviewLightFromTimeOfDay)
+        {
+            return;
+        }
+
+        _syncingPreviewLightFromTimeOfDay = true;
+        var (yaw, pitch) = PreviewLightMath.LightYawPitchFromTimeOfDay(hours);
+        Preview3DLightYawDegrees = yaw;
+        Preview3DLightPitchDegrees = pitch;
+        _syncingPreviewLightFromTimeOfDay = false;
+        OnPreview3DGpuSettingChanged(hours);
+    }
+
+    private void OnPreview3DLightDirectionChanged(double _)
+    {
+        if (_loadingSettings || _syncingPreviewLightFromTimeOfDay)
+        {
+            return;
+        }
+
+        _syncingPreviewLightFromTimeOfDay = true;
+        Preview3DTimeOfDayHours = PreviewLightMath.TimeOfDayFromLightYawPitch(
+            Preview3DLightYawDegrees,
+            Preview3DLightPitchDegrees,
+            Preview3DTimeOfDayHours);
+        _syncingPreviewLightFromTimeOfDay = false;
+        OnPreview3DGpuSettingChanged(_);
+    }
 
     private void OnPreview3DGpuSettingChanged<T>(T _)
     {
@@ -224,6 +287,7 @@ public partial class MainWindowViewModel
             EnableEntityParallax = Preview3DEnableEntityParallax,
             SpritePlaneCount = Math.Clamp(Preview3DSpritePlaneCount, 1, 8),
             ShowBackgroundGrid = Preview3DShowGrid,
+            ShowGroundMesh = Preview3DShowGroundMesh,
             ShowCornerAxes = Preview3DShowAxes,
             DrawPreviewSubject = _lastPreviewTextureMaps is not null,
             EnableSss = Preview3DEnableSss,
@@ -235,6 +299,13 @@ public partial class MainWindowViewModel
             AtmosphereTurbidity = (float)Preview3DAtmosphereTurbidity,
             AtmosphereSunIntensity = (float)Preview3DAtmosphereSunIntensity,
             AtmosphereHorizonFalloff = (float)Preview3DAtmosphereHorizonFalloff,
+            AtmosphereSkyExposure = (float)Preview3DAtmosphereSkyExposure,
+            AtmosphereSunDiscStrength = (float)Preview3DAtmosphereSunDiscStrength,
+            AerialFogStrength = (float)Preview3DHorizonFogStrength,
+            TimeOfDayHours = (float)Preview3DTimeOfDayHours,
+            AnimateTimeOfDay = Preview3DAnimateTimeOfDay,
+            TimeOfDaySpeed = (float)Preview3DTimeOfDaySpeed,
+            CapturePreviewFingerprint = DebugMode,
             EnableShadows = Preview3DEnableShadows,
             EnableShadowCascades = Preview3DEnableShadowCascades,
             EntityAnimationSpeed = (float)Preview3DEntityAnimationSpeed,
@@ -242,7 +313,14 @@ public partial class MainWindowViewModel
             EnableEntityAnimation = Preview3DEnableEntityAnimation,
             PauseEntityIdleAnimation = Preview3DPauseEntityIdleAnimation,
             EnableLegacyEntityWobble = Preview3DEnableLegacyEntityWobble,
-            ForceEntityCpuSkinning = Preview3DForceEntityCpuSkinning
+            ForceEntityCpuSkinning = Preview3DForceEntityCpuSkinning,
+            EnableGodRays = Preview3DEnableGodRays,
+            EnableVolumeGodRays = true,
+            EnableVolumetricClouds = Preview3DEnableVolumetricClouds,
+            VolumetricQuality = Math.Clamp(Preview3DVolumetricQuality, 0, 2),
+            GodRayStrength = (float)Preview3DGodRayStrength,
+            CloudQuality = PreviewVolumetricQuality.Resolve(Math.Clamp(Preview3DVolumetricQuality, 0, 2)).CloudQuality,
+            LogVolumetricTiming = DebugMode
         };
 
     private void PushPreview3DCamera()

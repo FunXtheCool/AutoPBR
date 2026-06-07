@@ -1114,6 +1114,51 @@
   <data name="Preview3DAtmosphereHorizonFalloffTooltip" xml:space="preserve">
     <value>Controls extinction rolloff near the horizon (lower = broader glow, higher = tighter band).</value>
   </data>
+  <data name="Preview3DAtmosphereSkyExposure" xml:space="preserve">
+    <value>Sky exposure</value>
+  </data>
+  <data name="Preview3DAtmosphereSkyExposureTooltip" xml:space="preserve">
+    <value>Master brightness on the sky composite pass. Lower to reduce bloom.</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscStrength" xml:space="preserve">
+    <value>Sun disc bloom</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscStrengthTooltip" xml:space="preserve">
+    <value>Additive glare around the sun disc on top of the LUT. Lower for a softer sun; higher for a sharper bloom.</value>
+  </data>
+  <data name="Preview3DHorizonFogStrength" xml:space="preserve">
+    <value>Horizon fog</value>
+  </data>
+  <data name="Preview3DHorizonFogStrengthTooltip" xml:space="preserve">
+    <value>Fog fill below the horizon in the sky dome and aerial perspective on geometry (0 = off).</value>
+  </data>
+  <data name="Preview3DVolumetricSection" xml:space="preserve">
+    <value>Volumetric effects</value>
+  </data>
+  <data name="Preview3DEnableGodRays" xml:space="preserve">
+    <value>God rays</value>
+  </data>
+  <data name="Preview3DEnableGodRaysTooltip" xml:space="preserve">
+    <value>Froxel volume light shafts toward the sun (inject + integrate + upsample).</value>
+  </data>
+  <data name="Preview3DEnableVolumetricClouds" xml:space="preserve">
+    <value>Volumetric clouds</value>
+  </data>
+  <data name="Preview3DEnableVolumetricCloudsTooltip" xml:space="preserve">
+    <value>Procedural cloud layer in the sky pass (quality follows the preset below).</value>
+  </data>
+  <data name="Preview3DVolumetricQuality" xml:space="preserve">
+    <value>Quality preset</value>
+  </data>
+  <data name="Preview3DVolumetricQualityTooltip" xml:space="preserve">
+    <value>Low / medium / high froxel resolution, slice count, cloud detail, and temporal filtering.</value>
+  </data>
+  <data name="Preview3DGodRayStrength" xml:space="preserve">
+    <value>God-ray strength</value>
+  </data>
+  <data name="Preview3DGodRayStrengthTooltip" xml:space="preserve">
+    <value>Intensity of the additive god-ray composite (0 = off).</value>
+  </data>
   <data name="Preview3DLightingSection" xml:space="preserve">
     <value>Lighting</value>
   </data>
@@ -1133,7 +1178,40 @@
     <value>Light pitch</value>
   </data>
   <data name="Preview3DLightPitchDegreesTooltip" xml:space="preserve">
-    <value>Sun pitch in degrees (-89..89); negative places the sun above the horizon.</value>
+    <value>Sun pitch in degrees (-89..89); negative places the sun above the horizon. Linked to Time of day when that slider moves.</value>
+  </data>
+  <data name="Preview3DTimeOfDayHours" xml:space="preserve">
+    <value>Time of day</value>
+  </data>
+  <data name="Preview3DTimeOfDayHoursTooltip" xml:space="preserve">
+    <value>Clock time (0–24 h) for the sun/moon cycle: 6 ≈ sunrise, 12 ≈ noon, 18 ≈ sunset, 0/24 ≈ midnight with stars.</value>
+  </data>
+  <data name="Preview3DAnimateTimeOfDay" xml:space="preserve">
+    <value>Animate time of day</value>
+  </data>
+  <data name="Preview3DAnimateTimeOfDayTooltip" xml:space="preserve">
+    <value>Advance the sun/moon cycle from the preview render clock (full day in 24 / speed seconds).</value>
+  </data>
+  <data name="Preview3DTimeOfDaySpeed" xml:space="preserve">
+    <value>Cycle speed</value>
+  </data>
+  <data name="Preview3DTimeOfDaySpeedTooltip" xml:space="preserve">
+    <value>Game-hours advanced per real second while animation is on (1 = 24 s per full day).</value>
+  </data>
+  <data name="Preview3DEnableShadowCascades" xml:space="preserve">
+    <value>Shadow cascades</value>
+  </data>
+  <data name="Preview3DEnableShadowCascadesTooltip" xml:space="preserve">
+    <value>Near + far directional shadow maps; volume god rays pick the cascade by distance from the camera.</value>
+  </data>
+  <data name="Preview3DVolumetricQualityLow" xml:space="preserve">
+    <value>Low</value>
+  </data>
+  <data name="Preview3DVolumetricQualityMedium" xml:space="preserve">
+    <value>Medium</value>
+  </data>
+  <data name="Preview3DVolumetricQualityHigh" xml:space="preserve">
+    <value>High</value>
   </data>
   <data name="Preview3DParallaxHeightStrength" xml:space="preserve">
     <value>POM displacement</value>
@@ -1158,6 +1236,12 @@
   </data>
   <data name="Preview3DShowGridTooltip" xml:space="preserve">
     <value>Show an XZ reference grid under the object in 3D preview.</value>
+  </data>
+  <data name="Preview3DShowGroundMesh" xml:space="preserve">
+    <value>Ground mesh (3D)</value>
+  </data>
+  <data name="Preview3DShowGroundMeshTooltip" xml:space="preserve">
+    <value>Show the textured grass ground plane under the object in 3D preview.</value>
   </data>
   <data name="Preview3DAutoRotate" xml:space="preserve">
     <value>3D auto-rotate</value>

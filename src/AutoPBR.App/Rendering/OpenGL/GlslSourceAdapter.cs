@@ -20,7 +20,10 @@ internal static class GlslSourceAdapter
         }
 
         var prec = type == ShaderType.FragmentShader
-            ? "precision highp float;\nprecision highp int;\nprecision highp sampler2DShadow;\n"
+            ? "precision highp float;\nprecision highp int;\n"
+              + "precision highp sampler2D;\n"
+              + "precision highp sampler2DArray;\n"
+              + "precision highp sampler2DShadow;\n"
             // Vertex skinning uses int bone indices + UBO scalars; default int precision on GLES can be too low for ANGLE.
             : "precision highp float;\nprecision highp int;\n";
 

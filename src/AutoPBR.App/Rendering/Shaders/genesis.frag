@@ -64,6 +64,7 @@ uniform vec3  uGroundTint;
 uniform float uAtmosphereTurbidity;
 uniform float uAtmosphereSunIntensity;
 uniform float uAtmosphereHorizonFalloff;
+uniform float uAerialFogStrength;
 
 // Genesis directional shadow map (Phase 2).
 uniform mat4  uLightViewProj;
@@ -245,6 +246,15 @@ void main()
 
     vec3 hdr = (direct + indirect + emission) * uExposure;
     vec3 mapped = tonemapAcesNarkowicz(hdr);
+
+    if (uAerialFogStrength > 0.0 && uEnableAtmosphericSky > 0)
+    {
+        float dist = length(vWorldPos - uCameraPos);
+        float fogAmt = (1.0 - exp(-dist * 0.042 * uAerialFogStrength)) * 0.65;
+        vec3 fogCol = mix(uGroundTint, uSkyTint, 0.55);
+        mapped = mix(mapped, fogCol, fogAmt);
+    }
+
     vec3 srgb = linearToSrgb(mapped);
 
     float a = 1.0;

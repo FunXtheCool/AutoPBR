@@ -30,6 +30,18 @@ public sealed partial class OpenGlPreviewBackend
         _gl!.UniformMatrix4(loc, 1, false, in mt.M11);
     }
 
+    private void SetMatrixOnProgram(GlProceduralSkyProgram program, string name, Matrix4x4 m)
+    {
+        var loc = program.GetUniformLocation(name);
+        if (loc < 0)
+        {
+            return;
+        }
+
+        var mt = Matrix4x4.Transpose(m);
+        _gl!.UniformMatrix4(loc, 1, false, in mt.M11);
+    }
+
     private void SetVec3OnProgram(GlShaderProgram program, string name, Vector3 v)
     {
         var loc = program.GetUniformLocation(name);
@@ -39,7 +51,34 @@ public sealed partial class OpenGlPreviewBackend
         }
     }
 
+    private void SetVec3OnProgram(GlProceduralSkyProgram program, string name, Vector3 v)
+    {
+        var loc = program.GetUniformLocation(name);
+        if (loc >= 0)
+        {
+            _gl!.Uniform3(loc, v.X, v.Y, v.Z);
+        }
+    }
+
+    private void SetVec2OnProgram(GlProceduralSkyProgram program, string name, Vector2 v)
+    {
+        var loc = program.GetUniformLocation(name);
+        if (loc >= 0)
+        {
+            _gl!.Uniform2(loc, v.X, v.Y);
+        }
+    }
+
     private void SetFloatOnProgram(GlShaderProgram program, string name, float v)
+    {
+        var loc = program.GetUniformLocation(name);
+        if (loc >= 0)
+        {
+            _gl!.Uniform1(loc, v);
+        }
+    }
+
+    private void SetFloatOnProgram(GlProceduralSkyProgram program, string name, float v)
     {
         var loc = program.GetUniformLocation(name);
         if (loc >= 0)

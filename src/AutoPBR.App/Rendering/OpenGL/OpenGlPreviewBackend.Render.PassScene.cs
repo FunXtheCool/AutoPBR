@@ -1,15 +1,6 @@
-using System.Buffers.Binary;
-using System.Diagnostics;
 using System.Numerics;
-using System.Runtime.InteropServices;
 
 using AutoPBR.App.Rendering.Abstractions;
-using AutoPBR.App.Rendering.Scene;
-using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
-
-using Avalonia.OpenGL;
-using Avalonia.Platform;
 
 using Silk.NET.OpenGL;
 
@@ -20,15 +11,25 @@ public sealed partial class OpenGlPreviewBackend
 {
     private void GlRenderPassScene(ref GlRenderFrame frame)
     {
+                if (_program is null || _albedo is null || _normal is null || _spec is null || _height is null || _mesh is null)
+                {
+                    return;
+                }
+
+                frame.GodRayCaptureActive = TryBeginGodRaySceneRender(ref frame);
+
                 // Restore main-pass framebuffer + viewport (BeginShadowPass snapshots & EndShadowPass restores
                 // the GL viewport, but binding our actual default FBO again is cheap and explicit).
-                if (frame.DefaultFbo != 0)
+                if (!frame.GodRayCaptureActive)
                 {
-                    frame.Gl.BindFramebuffer(FramebufferTarget.Framebuffer, (uint)frame.DefaultFbo);
-                }
-                else
-                {
-                    frame.Gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+                    if (frame.DefaultFbo != 0)
+                    {
+                        frame.Gl.BindFramebuffer(FramebufferTarget.Framebuffer, (uint)frame.DefaultFbo);
+                    }
+                    else
+                    {
+                        frame.Gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+                    }
                 }
 
                 frame.Gl.Viewport(frame.VpX, frame.VpY, (uint)frame.Vw, (uint)frame.Vh);
@@ -47,30 +48,11 @@ public sealed partial class OpenGlPreviewBackend
                     frame.Gl.Disable(EnableCap.CullFace);
                 }
 
-                frame.DrewAtmosphereSky = false;
-                if (frame.Settings.EnableAtmosphericSky && _atmoLutsValid && _atmoSkyProgram?.IsValid == true && _atmoSkyViewTex != 0)
-                {
-                    frame.Gl.Disable(EnableCap.DepthTest);
-                    frame.Gl.DepthMask(false);
-                    DrawAtmosphereSky(frame.Gl, frame.WorldLightDir, frame.Settings);
-                    frame.Gl.DepthMask(true);
-                    frame.DrewAtmosphereSky = true;
-                }
-
-                if (frame.DrewAtmosphereSky)
-                {
-                    frame.Gl.Clear(ClearBufferMask.DepthBufferBit);
-                }
-                else
-                {
-                    frame.Gl.ClearColor(0.12f, 0.12f, 0.14f, 1f);
-                    frame.Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-                }
-
+                // Camera must exist before sky / sun projection / froxel placement.
                 var cam = frame.Scene.Camera;
                 ComposeOrbitEye(frame.OrbitBaseTarget, frame.OrbitPan, frame.DebugFlyWorldOffset, frame.OrbitYaw, frame.OrbitPitch, frame.OrbitDistance,
                     out frame.Eye, out frame.LookTarget);
-                var aspect = frame.Vw / (float)frame.Vh;
+                var aspect = frame.Vw / (float)Math.Max(frame.Vh, 1);
                 frame.Proj = PreviewGlMatrices.CreatePerspectiveFieldOfViewOpenGl(
                     cam.FieldOfViewDegrees * (MathF.PI / 180f),
                     aspect,
@@ -78,9 +60,6 @@ public sealed partial class OpenGlPreviewBackend
                     cam.FarPlane);
                 frame.View = PreviewGlMatrices.CreateLookAtRhOpenGlRowStorage(frame.Eye, frame.LookTarget, Vector3.UnitY);
 
-                // Genesis Shadows Phase 2 routes the user-controlled yaw/pitch through PreviewLightMath so the
-                // shadow ortho frustum and the shaded direct lighting agree on direction. The frame.Scene.Light.Direction
-                // is kept as a fallback when the helper produces a degenerate vector.
                 frame.LightDir = frame.WorldLightDir;
                 if (frame.LightDir.LengthSquared() < 1e-8f)
                 {
@@ -89,11 +68,39 @@ public sealed partial class OpenGlPreviewBackend
                         : Vector3.Normalize(frame.Scene.Light.Direction);
                 }
 
+                var lutSkyReady = _atmoLutsValid && _atmoSkyViewTex != 0;
+                var drawSky = frame.Settings.EnableAtmosphericSky && _atmoQuadVao != 0 &&
+                              (_atmoSkyProgram is { IsValid: true } || _proceduralSkyProgram is { IsValid: true });
+                if (drawSky)
+                {
+                    frame.Gl.ClearColor(0.01f, 0.012f, 0.02f, 1f);
+                }
+                else
+                {
+                    frame.Gl.ClearColor(0.12f, 0.12f, 0.14f, 1f);
+                }
+
+                frame.Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+                frame.DrewAtmosphereSky = false;
+                if (drawSky)
+                {
+                    frame.Gl.Disable(EnableCap.DepthTest);
+                    frame.Gl.DepthMask(false);
+                    DrawAtmosphereSky(frame.Gl, ref frame, lutSkyReady);
+                    frame.Gl.DepthMask(true);
+                    frame.Gl.Enable(EnableCap.DepthTest);
+                    frame.DrewAtmosphereSky = true;
+                    frame.Gl.Clear(ClearBufferMask.DepthBufferBit);
+                }
+
                 // Sun billboard: draw before opaque geometry so depth testing hides it behind the cube/grid while
                 // the atmosphere sky (drawn earlier without depth) stays behind the sun.
                 frame.Gl.Enable(EnableCap.DepthTest);
                 frame.Gl.DepthFunc(GLEnum.Lequal);
-                DrawSunBillboard(frame.Gl, frame.Proj, frame.View, frame.Eye, frame.LightDir, ShouldCullSolidBackFaces(frame.Scene.SceneKind, frame.BlockModel));
+                DrawSunBillboard(frame.Gl, frame.Proj, frame.View, frame.Eye, frame.LightDir,
+                    frame.Settings.AtmosphereSunDiscStrength,
+                    ShouldCullSolidBackFaces(frame.Scene.SceneKind, frame.BlockModel));
 
                 _program.Use();
                 SetMatrix("uView", frame.View);
@@ -149,7 +156,8 @@ public sealed partial class OpenGlPreviewBackend
                 }
 
                 // Tinted vanilla grass plane sits under the grid; one texture tile per world unit (nearest + repeat).
-                if (_grassGroundReady && _grassGroundAlbedo is not null && _groundMesh!.IndexCount > 0)
+                if (frame.Settings.ShowGroundMesh &&
+                    _grassGroundReady && _grassGroundAlbedo is not null && _groundMesh!.IndexCount > 0)
                 {
                     var restoreCull = frame.Gl.IsEnabled(EnableCap.CullFace);
                     frame.Gl.Disable(EnableCap.CullFace);
@@ -294,5 +302,7 @@ public sealed partial class OpenGlPreviewBackend
                     ApplyEntitySkinningUniforms(_program, 0, 0, 0f);
                     _mesh.Draw();
                 }
+
+                FinishGodRaySceneRender(ref frame);
     }
 }

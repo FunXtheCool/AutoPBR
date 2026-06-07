@@ -197,6 +197,9 @@ public sealed class UserSettings
     /// <summary>Draw a ground grid in 3D preview.</summary>
     public bool Preview3DShowGrid { get; set; } = true;
 
+    /// <summary>Draw the textured grass ground plane in 3D preview.</summary>
+    public bool Preview3DShowGroundMesh { get; set; } = true;
+
     /// <summary>Draw X/Y/Z axis reference in the corner of the 3D preview.</summary>
     public bool Preview3DShowAxes { get; set; } = true;
 
@@ -234,10 +237,35 @@ public sealed class UserSettings
     public double Preview3DAtmosphereTurbidity { get; set; } = 2.6;
 
     /// <summary>Atmospheric sky sun intensity multiplier.</summary>
-    public double Preview3DAtmosphereSunIntensity { get; set; } = 16.0;
+    public double Preview3DAtmosphereSunIntensity { get; set; } = 10.0;
 
     /// <summary>Atmospheric sky horizon falloff scalar.</summary>
     public double Preview3DAtmosphereHorizonFalloff { get; set; } = 1.35;
+
+    /// <summary>3D preview: sky composite exposure multiplier.</summary>
+    public double Preview3DAtmosphereSkyExposure { get; set; } = 0.85;
+
+    /// <summary>3D preview: additive sun disc bloom on sky composite.</summary>
+    public double Preview3DAtmosphereSunDiscStrength { get; set; } = 0.35;
+
+    /// <summary>3D preview: clock time (0–24 h) for sun/moon cycle.</summary>
+    public double Preview3DTimeOfDayHours { get; set; } = 12.0;
+
+    public bool Preview3DAnimateTimeOfDay { get; set; }
+
+    public double Preview3DTimeOfDaySpeed { get; set; } = 1.0;
+
+    /// <summary>3D preview: below-horizon sky fog and aerial perspective on geometry.</summary>
+    public double Preview3DHorizonFogStrength { get; set; } = 1.0;
+
+    public bool Preview3DEnableGodRays { get; set; } = true;
+
+    public bool Preview3DEnableVolumetricClouds { get; set; }
+
+    /// <summary>0 = low, 1 = medium, 2 = high volumetric cost preset.</summary>
+    public int Preview3DVolumetricQuality { get; set; } = 1;
+
+    public double Preview3DGodRayStrength { get; set; } = 0.45;
 
     /// <summary>Genesis Shadows Phase 2: master toggle for the directional shadow map pass.</summary>
     public bool Preview3DEnableShadows { get; set; } = true;
@@ -248,7 +276,7 @@ public sealed class UserSettings
     /// <summary>Genesis Shadows Phase 2: light pitch in degrees (-89..89, negative = sun above horizon).</summary>
     public double Preview3DLightPitchDegrees { get; set; } = -55;
 
-    /// <summary>PHASE3-CSM stub: persisted toggle for cascaded shadow maps; no UI in Phase 2.</summary>
+    /// <summary>Two-cascade directional shadows (near + far) for volume inject and geometry.</summary>
     public bool Preview3DEnableShadowCascades { get; set; }
 
     /// <summary>Number of crossed sprite planes to build for 2D Sprite flagged textures in 3D preview.</summary>

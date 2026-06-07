@@ -1,9 +1,7 @@
 using System.Numerics;
 
 using AutoPBR.App.Rendering.Abstractions;
-using AutoPBR.App.Rendering.Scene;
 using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
 
 using Silk.NET.OpenGL;
 
@@ -45,6 +43,9 @@ public sealed partial class OpenGlPreviewBackend
         public bool EntityBonePaletteUploaded;
         public Vector3 WorldLightDir;
         public Matrix4x4 ShadowVp;
+        public Matrix4x4 ShadowVpNear;
+        public bool ShadowCascadesActive;
+        public float CascadeSplitWorldDistance;
         public Matrix4x4 ModelMatrix;
         public int EntityAlphaModeUniform;
         public bool EntityBlendDraw;
@@ -60,5 +61,9 @@ public sealed partial class OpenGlPreviewBackend
         public Matrix4x4 Proj;
         public Matrix4x4 View;
         public Vector3 LightDir;
+        public bool GodRayCaptureActive;
+        public bool VolumeFroxelsReady;
+        public double LastVolumeInjectMs;
+        public double LastVolumeIntegrateMs;
     }
 }

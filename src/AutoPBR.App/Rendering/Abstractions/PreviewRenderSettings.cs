@@ -38,6 +38,9 @@ public sealed class PreviewRenderSettings
     /// <summary>Draw a subtle XZ grid under the preview object in 3D mode.</summary>
     public bool ShowBackgroundGrid { get; init; } = true;
 
+    /// <summary>Draw the textured grass ground plane under the preview object in 3D mode.</summary>
+    public bool ShowGroundMesh { get; init; } = true;
+
     /// <summary>Draw RGB world-axis lines in a corner (matches block Y-rotation).</summary>
     public bool ShowCornerAxes { get; init; } = true;
 
@@ -68,10 +71,31 @@ public sealed class PreviewRenderSettings
     public float AtmosphereTurbidity { get; init; } = 2.6f;
 
     /// <summary>Atmospheric sky: sun radiance multiplier for sky/background lighting.</summary>
-    public float AtmosphereSunIntensity { get; init; } = 16f;
+    public float AtmosphereSunIntensity { get; init; } = 10f;
 
     /// <summary>Atmospheric sky: controls horizon extinction rolloff.</summary>
     public float AtmosphereHorizonFalloff { get; init; } = 1.35f;
+
+    /// <summary>Atmospheric sky: master brightness on the composite sky pass.</summary>
+    public float AtmosphereSkyExposure { get; init; } = 0.85f;
+
+    /// <summary>Atmospheric sky: additive glare around the sun disc (separate from scatter intensity).</summary>
+    public float AtmosphereSunDiscStrength { get; init; } = 0.35f;
+
+    /// <summary>Horizon fog on sky dome below horizon and aerial perspective on geometry.</summary>
+    public float AerialFogStrength { get; init; } = 1f;
+
+    /// <summary>Clock time (0–24 h) for sun/moon cycle UI; drives yaw/pitch when edited.</summary>
+    public float TimeOfDayHours { get; init; } = 12f;
+
+    /// <summary>When true, advance <see cref="TimeOfDayHours"/> from render time (full cycle in 24 / speed seconds).</summary>
+    public bool AnimateTimeOfDay { get; init; }
+
+    /// <summary>Game-hours advanced per real second when <see cref="AnimateTimeOfDay"/> is on.</summary>
+    public float TimeOfDaySpeed { get; init; } = 1f;
+
+    /// <summary>Debug: downsample and hash the default framebuffer after the preview frame (diagnostics only).</summary>
+    public bool CapturePreviewFingerprint { get; init; }
 
     /// <summary>Genesis: SSS contribution scalar (multiplier on wrap + transmission lobes).</summary>
     public float SssStrength { get; init; } = 1f;
@@ -122,4 +146,31 @@ public sealed class PreviewRenderSettings
     /// No runtime branch in Phase 2 (single shadow map).
     /// </summary>
     public bool EnableShadowCascades { get; init; }
+
+    /// <summary>Genesis: froxel volume god rays toward the sun.</summary>
+    public bool EnableGodRays { get; init; } = true;
+
+    /// <summary>Genesis: froxel volume inject + integrate god-ray path.</summary>
+    public bool EnableVolumeGodRays { get; init; } = true;
+
+    /// <summary>Genesis: procedural volumetric cloud layer in the sky pass.</summary>
+    public bool EnableVolumetricClouds { get; init; }
+
+    /// <summary>Volumetric cost preset: 0 = low, 1 = medium, 2 = high.</summary>
+    public int VolumetricQuality { get; init; } = 1;
+
+    public float GodRayStrength { get; init; } = 0.45f;
+    public float GodRayConeScale { get; init; } = 1f;
+
+    public float CloudDensity { get; init; } = 0.35f;
+    public float CloudVolumeSize { get; init; } = 48f;
+    public float CloudLayerHeight { get; init; }
+    public float CloudVolumeHeight { get; init; } = 24f;
+    public int CloudQuality { get; init; } = 1;
+
+    /// <summary>When true, log froxel inject/integrate timings that exceed the documented budget.</summary>
+    public bool LogVolumetricTiming { get; init; }
+
+    /// <summary>Debug overlay: sun projection frustum lines in the preview viewport.</summary>
+    public bool ShowSunProjectionDebug { get; init; }
 }

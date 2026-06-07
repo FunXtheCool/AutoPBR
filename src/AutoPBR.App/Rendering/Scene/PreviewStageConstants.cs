@@ -14,4 +14,12 @@ public static class PreviewStageConstants
 
     /// <summary>One full 16×16 grass tile per world unit (matches unit cube / block scale).</summary>
     public const float MetersPerGrassTile = 1f;
+
+    /// <summary>Base Y for the volumetric cloud layer before user height offset.</summary>
+    public const float CloudLayerBaseY = 18f;
+
+    public static float CloudLayerBaseWorldY(float layerHeightOffset) => CloudLayerBaseY + layerHeightOffset;
+
+    /// <summary>World-anchored ground mist slab height above <see cref="GroundPlaneWorldY"/>.</summary>
+    public const float GroundFogSlabHeight = 4f;
 }

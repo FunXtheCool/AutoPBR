@@ -1,4 +1,5 @@
 using AutoPBR.App.Models;
+using AutoPBR.App.Rendering.OpenGL;
 using AutoPBR.App.ViewModels;
 using AutoPBR.Core;
 using AutoPBR.Core.Models;
@@ -41,6 +42,7 @@ internal static class UserSettingsSynchronizer
         vm.Preview3DEnableLegacyEntityWobble = settings.Preview3DEnableLegacyEntityWobble;
         vm.Preview3DPauseEntityIdleAnimation = settings.Preview3DPauseEntityIdleAnimation;
         vm.Preview3DShowGrid = settings.Preview3DShowGrid;
+        vm.Preview3DShowGroundMesh = settings.Preview3DShowGroundMesh;
         vm.Preview3DShowAxes = settings.Preview3DShowAxes;
         vm.Preview3DEnableParallax = settings.Preview3DEnableParallax;
         vm.Preview3DEnableNormalMap = settings.Preview3DEnableNormalMap;
@@ -60,14 +62,38 @@ internal static class UserSettingsSynchronizer
             ? 2.6
             : Math.Clamp(settings.Preview3DAtmosphereTurbidity, 1.2, 10.0);
         vm.Preview3DAtmosphereSunIntensity = settings.Preview3DAtmosphereSunIntensity <= 0
-            ? 16.0
+            ? 10.0
             : Math.Clamp(settings.Preview3DAtmosphereSunIntensity, 0.2, 64.0);
         vm.Preview3DAtmosphereHorizonFalloff = settings.Preview3DAtmosphereHorizonFalloff <= 0
             ? 1.35
             : Math.Clamp(settings.Preview3DAtmosphereHorizonFalloff, 0.25, 4.0);
+        vm.Preview3DAtmosphereSkyExposure = settings.Preview3DAtmosphereSkyExposure <= 0
+            ? 0.85
+            : Math.Clamp(settings.Preview3DAtmosphereSkyExposure, 0.1, 3.0);
+        vm.Preview3DAtmosphereSunDiscStrength = settings.Preview3DAtmosphereSunDiscStrength < 0
+            ? 0.35
+            : Math.Clamp(settings.Preview3DAtmosphereSunDiscStrength, 0.0, 2.0);
         vm.Preview3DEnableShadows = settings.Preview3DEnableShadows;
         vm.Preview3DLightYawDegrees = Math.Clamp(settings.Preview3DLightYawDegrees, -180.0, 180.0);
         vm.Preview3DLightPitchDegrees = Math.Clamp(settings.Preview3DLightPitchDegrees, -89.0, 89.0);
+        vm.Preview3DTimeOfDayHours = settings.Preview3DTimeOfDayHours is > 0 and <= 24
+            ? settings.Preview3DTimeOfDayHours
+            : PreviewLightMath.TimeOfDayFromLightYawPitch(
+                settings.Preview3DLightYawDegrees,
+                settings.Preview3DLightPitchDegrees);
+        vm.Preview3DAnimateTimeOfDay = settings.Preview3DAnimateTimeOfDay;
+        vm.Preview3DTimeOfDaySpeed = settings.Preview3DTimeOfDaySpeed <= 0
+            ? 1.0
+            : Math.Clamp(settings.Preview3DTimeOfDaySpeed, 0.1, 4.0);
+        vm.Preview3DHorizonFogStrength = settings.Preview3DHorizonFogStrength < 0
+            ? 0
+            : Math.Clamp(settings.Preview3DHorizonFogStrength, 0.0, 2.0);
+        vm.Preview3DEnableGodRays = settings.Preview3DEnableGodRays;
+        vm.Preview3DEnableVolumetricClouds = settings.Preview3DEnableVolumetricClouds;
+        vm.Preview3DVolumetricQuality = Math.Clamp(settings.Preview3DVolumetricQuality, 0, 2);
+        vm.Preview3DGodRayStrength = settings.Preview3DGodRayStrength <= 0
+            ? 0.45
+            : Math.Clamp(settings.Preview3DGodRayStrength, 0.0, 2.0);
         vm.Preview3DEnableShadowCascades = settings.Preview3DEnableShadowCascades;
         vm.Preview3DSpritePlaneCount = settings.Preview3DSpritePlaneCount <= 0
             ? 2
@@ -232,6 +258,7 @@ internal static class UserSettingsSynchronizer
         settings.Preview3DEnableLegacyEntityWobble = vm.Preview3DEnableLegacyEntityWobble;
         settings.Preview3DPauseEntityIdleAnimation = vm.Preview3DPauseEntityIdleAnimation;
         settings.Preview3DShowGrid = vm.Preview3DShowGrid;
+        settings.Preview3DShowGroundMesh = vm.Preview3DShowGroundMesh;
         settings.Preview3DShowAxes = vm.Preview3DShowAxes;
         settings.Preview3DEnableParallax = vm.Preview3DEnableParallax;
         settings.Preview3DEnableNormalMap = vm.Preview3DEnableNormalMap;
@@ -246,6 +273,16 @@ internal static class UserSettingsSynchronizer
         settings.Preview3DAtmosphereTurbidity = Math.Clamp(vm.Preview3DAtmosphereTurbidity, 1.2, 10.0);
         settings.Preview3DAtmosphereSunIntensity = Math.Clamp(vm.Preview3DAtmosphereSunIntensity, 0.2, 64.0);
         settings.Preview3DAtmosphereHorizonFalloff = Math.Clamp(vm.Preview3DAtmosphereHorizonFalloff, 0.25, 4.0);
+        settings.Preview3DAtmosphereSkyExposure = Math.Clamp(vm.Preview3DAtmosphereSkyExposure, 0.1, 3.0);
+        settings.Preview3DAtmosphereSunDiscStrength = Math.Clamp(vm.Preview3DAtmosphereSunDiscStrength, 0.0, 2.0);
+        settings.Preview3DTimeOfDayHours = Math.Clamp(vm.Preview3DTimeOfDayHours, 0.0, 24.0);
+        settings.Preview3DAnimateTimeOfDay = vm.Preview3DAnimateTimeOfDay;
+        settings.Preview3DTimeOfDaySpeed = Math.Clamp(vm.Preview3DTimeOfDaySpeed, 0.1, 4.0);
+        settings.Preview3DHorizonFogStrength = Math.Clamp(vm.Preview3DHorizonFogStrength, 0.0, 2.0);
+        settings.Preview3DEnableGodRays = vm.Preview3DEnableGodRays;
+        settings.Preview3DEnableVolumetricClouds = vm.Preview3DEnableVolumetricClouds;
+        settings.Preview3DVolumetricQuality = Math.Clamp(vm.Preview3DVolumetricQuality, 0, 2);
+        settings.Preview3DGodRayStrength = Math.Clamp(vm.Preview3DGodRayStrength, 0.0, 2.0);
         settings.Preview3DEnableShadows = vm.Preview3DEnableShadows;
         settings.Preview3DLightYawDegrees = Math.Clamp(vm.Preview3DLightYawDegrees, -180.0, 180.0);
         settings.Preview3DLightPitchDegrees = Math.Clamp(vm.Preview3DLightPitchDegrees, -89.0, 89.0);

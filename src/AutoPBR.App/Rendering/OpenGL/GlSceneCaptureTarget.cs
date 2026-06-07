@@ -1,0 +1,173 @@
+using Silk.NET.OpenGL;
+
+namespace AutoPBR.App.Rendering.OpenGL;
+
+/// <summary>
+/// Offscreen color + depth target for Genesis god rays: scene renders here, then presents to the default FBO.
+/// </summary>
+internal sealed class GlSceneCaptureTarget(GL gl, bool useOpenGlEs) : IDisposable
+{
+    private uint _fbo;
+    private uint _colorTexture;
+    private uint _depthTexture;
+    private int _width;
+    private int _height;
+    private bool _disposed;
+
+    public uint DepthTextureHandle => _depthTexture;
+    public bool IsValid => _fbo != 0 && _colorTexture != 0 && _depthTexture != 0;
+
+    public bool EnsureSize(int width, int height)
+    {
+        width = Math.Max(1, width);
+        height = Math.Max(1, height);
+        if (_width == width && _height == height && IsValid)
+        {
+            return true;
+        }
+
+        DestroyGpuResources();
+        _width = width;
+        _height = height;
+
+        _colorTexture = gl.GenTexture();
+        gl.BindTexture(TextureTarget.Texture2D, _colorTexture);
+        unsafe
+        {
+            gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgba8, (uint)width, (uint)height, 0,
+                PixelFormat.Rgba, PixelType.UnsignedByte, (void*)0);
+        }
+
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
+
+        _depthTexture = gl.GenTexture();
+        gl.BindTexture(TextureTarget.Texture2D, _depthTexture);
+        unsafe
+        {
+            gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.DepthComponent24, (uint)width, (uint)height, 0,
+                PixelFormat.DepthComponent, PixelType.UnsignedInt, (void*)0);
+        }
+
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Nearest);
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Nearest);
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
+
+        _fbo = gl.GenFramebuffer();
+        gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);
+        gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0,
+            TextureTarget.Texture2D, _colorTexture, 0);
+        gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment,
+            TextureTarget.Texture2D, _depthTexture, 0);
+        ConfigureColorAttachment();
+        var status = gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
+        gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+        gl.BindTexture(TextureTarget.Texture2D, 0);
+        if (status != GLEnum.FramebufferComplete)
+        {
+            DestroyGpuResources();
+            return false;
+        }
+
+        return IsValid;
+    }
+
+    public void BindDraw(int width, int height)
+    {
+        if (!IsValid)
+        {
+            return;
+        }
+
+        gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);
+        ConfigureColorAttachment();
+        gl.Viewport(0, 0, (uint)Math.Max(1, width), (uint)Math.Max(1, height));
+        gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+    }
+
+    /// <summary>Blits the captured color buffer onto the Avalonia default FBO.</summary>
+    public bool BlitColorToDefault(int defaultFbo, int vpX, int vpY, int width, int height)
+    {
+        if (!IsValid)
+        {
+            return false;
+        }
+
+        var priorRead = gl.GetInteger(GetPName.ReadFramebufferBinding);
+        var priorDraw = gl.GetInteger(GetPName.DrawFramebufferBinding);
+
+        gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, _fbo);
+        gl.ReadBuffer(ReadBufferMode.ColorAttachment0);
+        gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, (uint)Math.Max(0, defaultFbo));
+        gl.Viewport(vpX, vpY, (uint)Math.Max(1, width), (uint)Math.Max(1, height));
+        gl.BlitFramebuffer(0, 0, width, height, 0, 0, width, height,
+            ClearBufferMask.ColorBufferBit, GLEnum.Linear);
+        var err = gl.GetError();
+        if (err != GLEnum.NoError)
+        {
+            gl.BlitFramebuffer(0, 0, width, height, 0, height, width, 0,
+                ClearBufferMask.ColorBufferBit, GLEnum.Linear);
+            err = gl.GetError();
+        }
+
+        gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, (uint)Math.Max(0, priorRead));
+        gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, (uint)Math.Max(0, priorDraw));
+        return err == GLEnum.NoError;
+    }
+
+    public uint ColorTextureHandle => _colorTexture;
+
+    private void ConfigureColorAttachment()
+    {
+        if (useOpenGlEs)
+        {
+            unsafe
+            {
+                var buf = DrawBufferMode.ColorAttachment0;
+                gl.DrawBuffers(1, &buf);
+            }
+        }
+        else
+        {
+            gl.DrawBuffer(DrawBufferMode.ColorAttachment0);
+        }
+    }
+
+    private void DestroyGpuResources()
+    {
+        if (_fbo != 0)
+        {
+            gl.DeleteFramebuffer(_fbo);
+            _fbo = 0;
+        }
+
+        if (_colorTexture != 0)
+        {
+            gl.DeleteTexture(_colorTexture);
+            _colorTexture = 0;
+        }
+
+        if (_depthTexture != 0)
+        {
+            gl.DeleteTexture(_depthTexture);
+            _depthTexture = 0;
+        }
+
+        _width = 0;
+        _height = 0;
+    }
+
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        DestroyGpuResources();
+    }
+}

@@ -1373,6 +1373,169 @@
                                                                ToolTip.Tip="{Binding Strings.Preview3DAtmosphereHorizonFalloffTooltip}" />
                                             </StackPanel>
                                         </Grid>
+                                        <Grid ColumnDefinitions="Auto,*"
+                                              ColumnSpacing="10"
+                                              MinWidth="0"
+                                              IsVisible="{Binding IsPreview3D}">
+                                            <TextBlock Grid.Column="0"
+                                                       VerticalAlignment="Center"
+                                                       Text="{Binding Strings.Preview3DAtmosphereSkyExposure}"
+                                                       TextWrapping="Wrap"
+                                                       ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSkyExposureTooltip}" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                <Slider Width="220"
+                                                        Minimum="0.1"
+                                                        Maximum="3.0"
+                                                        SmallChange="0.05"
+                                                        LargeChange="0.25"
+                                                        TickFrequency="0.5"
+                                                        IsEnabled="{Binding Preview3DEnableAtmosphericSky}"
+                                                        Value="{Binding Preview3DAtmosphereSkyExposure, Mode=TwoWay}"
+                                                        ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSkyExposureTooltip}" />
+                                                <NumericUpDown Minimum="0.1"
+                                                               Maximum="3.0"
+                                                               Increment="0.05"
+                                                               FormatString="F2"
+                                                               HorizontalAlignment="Left"
+                                                               MinWidth="92"
+                                                               MaxWidth="120"
+                                                               ShowButtonSpinner="False"
+                                                               AllowSpin="False"
+                                                               IsEnabled="{Binding Preview3DEnableAtmosphericSky}"
+                                                               Value="{Binding Preview3DAtmosphereSkyExposure, Mode=TwoWay}"
+                                                               ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSkyExposureTooltip}" />
+                                            </StackPanel>
+                                        </Grid>
+                                        <Grid ColumnDefinitions="Auto,*"
+                                              ColumnSpacing="10"
+                                              MinWidth="0"
+                                              IsVisible="{Binding IsPreview3D}">
+                                            <TextBlock Grid.Column="0"
+                                                       VerticalAlignment="Center"
+                                                       Text="{Binding Strings.Preview3DAtmosphereSunDiscStrength}"
+                                                       TextWrapping="Wrap"
+                                                       ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSunDiscStrengthTooltip}" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                <Slider Width="220"
+                                                        Minimum="0.0"
+                                                        Maximum="2.0"
+                                                        SmallChange="0.05"
+                                                        LargeChange="0.25"
+                                                        TickFrequency="0.5"
+                                                        IsEnabled="{Binding Preview3DEnableAtmosphericSky}"
+                                                        Value="{Binding Preview3DAtmosphereSunDiscStrength, Mode=TwoWay}"
+                                                        ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSunDiscStrengthTooltip}" />
+                                                <NumericUpDown Minimum="0.0"
+                                                               Maximum="2.0"
+                                                               Increment="0.05"
+                                                               FormatString="F2"
+                                                               HorizontalAlignment="Left"
+                                                               MinWidth="92"
+                                                               MaxWidth="120"
+                                                               ShowButtonSpinner="False"
+                                                               AllowSpin="False"
+                                                               IsEnabled="{Binding Preview3DEnableAtmosphericSky}"
+                                                               Value="{Binding Preview3DAtmosphereSunDiscStrength, Mode=TwoWay}"
+                                                               ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSunDiscStrengthTooltip}" />
+                                            </StackPanel>
+                                        </Grid>
+                                        <Grid ColumnDefinitions="Auto,*"
+                                              ColumnSpacing="10"
+                                              MinWidth="0"
+                                              IsVisible="{Binding IsPreview3D}">
+                                            <TextBlock Grid.Column="0"
+                                                       VerticalAlignment="Center"
+                                                       Text="{Binding Strings.Preview3DHorizonFogStrength}"
+                                                       TextWrapping="Wrap"
+                                                       ToolTip.Tip="{Binding Strings.Preview3DHorizonFogStrengthTooltip}" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                <Slider Width="220"
+                                                        Minimum="0.0"
+                                                        Maximum="2.0"
+                                                        SmallChange="0.05"
+                                                        LargeChange="0.25"
+                                                        TickFrequency="0.5"
+                                                        IsEnabled="{Binding Preview3DEnableAtmosphericSky}"
+                                                        Value="{Binding Preview3DHorizonFogStrength, Mode=TwoWay}"
+                                                        ToolTip.Tip="{Binding Strings.Preview3DHorizonFogStrengthTooltip}" />
+                                                <NumericUpDown Minimum="0.0"
+                                                               Maximum="2.0"
+                                                               Increment="0.05"
+                                                               FormatString="F2"
+                                                               HorizontalAlignment="Left"
+                                                               MinWidth="92"
+                                                               MaxWidth="120"
+                                                               ShowButtonSpinner="False"
+                                                               AllowSpin="False"
+                                                               IsEnabled="{Binding Preview3DEnableAtmosphericSky}"
+                                                               Value="{Binding Preview3DHorizonFogStrength, Mode=TwoWay}"
+                                                               ToolTip.Tip="{Binding Strings.Preview3DHorizonFogStrengthTooltip}" />
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <Border Margin="0,8,0,0" Padding="0,8,0,0"
+                                                BorderThickness="0,1,0,0"
+                                                BorderBrush="{Binding CardBorderBrush}">
+                                            <StackPanel Spacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                <TextBlock FontWeight="SemiBold"
+                                                           Text="{Binding Strings.Preview3DVolumetricSection}" />
+                                                <CheckBox IsChecked="{Binding Preview3DEnableGodRays, Mode=TwoWay}"
+                                                          ToolTip.Tip="{Binding Strings.Preview3DEnableGodRaysTooltip}">
+                                                    <TextBlock Text="{Binding Strings.Preview3DEnableGodRays}" TextWrapping="Wrap" />
+                                                </CheckBox>
+                                                <CheckBox IsChecked="{Binding Preview3DEnableVolumetricClouds, Mode=TwoWay}"
+                                                          ToolTip.Tip="{Binding Strings.Preview3DEnableVolumetricCloudsTooltip}">
+                                                    <TextBlock Text="{Binding Strings.Preview3DEnableVolumetricClouds}" TextWrapping="Wrap" />
+                                                </CheckBox>
+                                                <Grid ColumnDefinitions="Auto,*"
+                                                      ColumnSpacing="10"
+                                                      MinWidth="0">
+                                                    <TextBlock Grid.Column="0"
+                                                               VerticalAlignment="Center"
+                                                               Text="{Binding Strings.Preview3DVolumetricQuality}"
+                                                               TextWrapping="Wrap"
+                                                               ToolTip.Tip="{Binding Strings.Preview3DVolumetricQualityTooltip}" />
+                                                    <ComboBox Grid.Column="1"
+                                                              MinWidth="160"
+                                                              HorizontalAlignment="Left"
+                                                              ItemsSource="{Binding Preview3DVolumetricQualityOptions}"
+                                                              SelectedIndex="{Binding Preview3DVolumetricQuality, Mode=TwoWay}"
+                                                              ToolTip.Tip="{Binding Strings.Preview3DVolumetricQualityTooltip}" />
+                                                </Grid>
+                                                <Grid ColumnDefinitions="Auto,*"
+                                                      ColumnSpacing="10"
+                                                      MinWidth="0">
+                                                    <TextBlock Grid.Column="0"
+                                                               VerticalAlignment="Center"
+                                                               Text="{Binding Strings.Preview3DGodRayStrength}"
+                                                               TextWrapping="Wrap"
+                                                               ToolTip.Tip="{Binding Strings.Preview3DGodRayStrengthTooltip}" />
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                        <Slider Width="220"
+                                                                Minimum="0.0"
+                                                                Maximum="2.0"
+                                                                SmallChange="0.05"
+                                                                LargeChange="0.25"
+                                                                TickFrequency="0.5"
+                                                                IsEnabled="{Binding Preview3DEnableGodRays}"
+                                                                Value="{Binding Preview3DGodRayStrength, Mode=TwoWay}"
+                                                                ToolTip.Tip="{Binding Strings.Preview3DGodRayStrengthTooltip}" />
+                                                        <NumericUpDown Minimum="0.0"
+                                                                       Maximum="2.0"
+                                                                       Increment="0.05"
+                                                                       FormatString="F2"
+                                                                       HorizontalAlignment="Left"
+                                                                       MinWidth="92"
+                                                                       MaxWidth="120"
+                                                                       ShowButtonSpinner="False"
+                                                                       AllowSpin="False"
+                                                                       IsEnabled="{Binding Preview3DEnableGodRays}"
+                                                                       Value="{Binding Preview3DGodRayStrength, Mode=TwoWay}"
+                                                                       ToolTip.Tip="{Binding Strings.Preview3DGodRayStrengthTooltip}" />
+                                                    </StackPanel>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
 
                                         <!-- Genesis Shadows Phase 2: directional shadow + sun yaw/pitch. -->
                                         <Border Margin="0,8,0,0" Padding="0,8,0,0"
@@ -1385,6 +1548,80 @@
                                                           ToolTip.Tip="{Binding Strings.Preview3DEnableShadowsTooltip}">
                                                     <TextBlock Text="{Binding Strings.Preview3DEnableShadows}" TextWrapping="Wrap" />
                                                 </CheckBox>
+                                                <CheckBox IsChecked="{Binding Preview3DEnableShadowCascades, Mode=TwoWay}"
+                                                          IsEnabled="{Binding Preview3DEnableShadows}"
+                                                          ToolTip.Tip="{Binding Strings.Preview3DEnableShadowCascadesTooltip}">
+                                                    <TextBlock Text="{Binding Strings.Preview3DEnableShadowCascades}" TextWrapping="Wrap" />
+                                                </CheckBox>
+                                                <Grid ColumnDefinitions="Auto,*"
+                                                      ColumnSpacing="10"
+                                                      MinWidth="0"
+                                                      IsVisible="{Binding IsPreview3D}">
+                                                    <TextBlock Grid.Column="0"
+                                                               VerticalAlignment="Center"
+                                                               Text="{Binding Strings.Preview3DTimeOfDayHours}"
+                                                               TextWrapping="Wrap"
+                                                               ToolTip.Tip="{Binding Strings.Preview3DTimeOfDayHoursTooltip}" />
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                        <Slider Width="220"
+                                                                Minimum="0"
+                                                                Maximum="24"
+                                                                SmallChange="0.25"
+                                                                LargeChange="1"
+                                                                TickFrequency="3"
+                                                                Value="{Binding Preview3DTimeOfDayHours, Mode=TwoWay}"
+                                                                ToolTip.Tip="{Binding Strings.Preview3DTimeOfDayHoursTooltip}" />
+                                                        <NumericUpDown Minimum="0"
+                                                                       Maximum="24"
+                                                                       Increment="0.25"
+                                                                       FormatString="F2"
+                                                                       HorizontalAlignment="Left"
+                                                                       MinWidth="92"
+                                                                       MaxWidth="120"
+                                                                       ShowButtonSpinner="False"
+                                                                       AllowSpin="False"
+                                                                       Value="{Binding Preview3DTimeOfDayHours, Mode=TwoWay}"
+                                                                       ToolTip.Tip="{Binding Strings.Preview3DTimeOfDayHoursTooltip}" />
+                                                    </StackPanel>
+                                                </Grid>
+                                                <CheckBox IsChecked="{Binding Preview3DAnimateTimeOfDay, Mode=TwoWay}"
+                                                          IsVisible="{Binding IsPreview3D}"
+                                                          ToolTip.Tip="{Binding Strings.Preview3DAnimateTimeOfDayTooltip}">
+                                                    <TextBlock Text="{Binding Strings.Preview3DAnimateTimeOfDay}" TextWrapping="Wrap" />
+                                                </CheckBox>
+                                                <Grid ColumnDefinitions="Auto,*"
+                                                      ColumnSpacing="10"
+                                                      MinWidth="0"
+                                                      IsVisible="{Binding IsPreview3D}">
+                                                    <TextBlock Grid.Column="0"
+                                                               VerticalAlignment="Center"
+                                                               Text="{Binding Strings.Preview3DTimeOfDaySpeed}"
+                                                               TextWrapping="Wrap"
+                                                               ToolTip.Tip="{Binding Strings.Preview3DTimeOfDaySpeedTooltip}" />
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                        <Slider Width="220"
+                                                                Minimum="0.1"
+                                                                Maximum="4.0"
+                                                                SmallChange="0.1"
+                                                                LargeChange="0.5"
+                                                                TickFrequency="1.0"
+                                                                IsEnabled="{Binding Preview3DAnimateTimeOfDay}"
+                                                                Value="{Binding Preview3DTimeOfDaySpeed, Mode=TwoWay}"
+                                                                ToolTip.Tip="{Binding Strings.Preview3DTimeOfDaySpeedTooltip}" />
+                                                        <NumericUpDown Minimum="0.1"
+                                                                       Maximum="4.0"
+                                                                       Increment="0.1"
+                                                                       FormatString="F2"
+                                                                       HorizontalAlignment="Left"
+                                                                       MinWidth="92"
+                                                                       MaxWidth="120"
+                                                                       ShowButtonSpinner="False"
+                                                                       AllowSpin="False"
+                                                                       IsEnabled="{Binding Preview3DAnimateTimeOfDay}"
+                                                                       Value="{Binding Preview3DTimeOfDaySpeed, Mode=TwoWay}"
+                                                                       ToolTip.Tip="{Binding Strings.Preview3DTimeOfDaySpeedTooltip}" />
+                                                    </StackPanel>
+                                                </Grid>
                                                 <Grid ColumnDefinitions="Auto,*"
                                                       ColumnSpacing="10"
                                                       MinWidth="0"
@@ -1453,6 +1690,10 @@
                                         <CheckBox IsChecked="{Binding Preview3DShowGrid, Mode=TwoWay}"
                                                   ToolTip.Tip="{Binding Strings.Preview3DShowGridTooltip}">
                                             <TextBlock Text="{Binding Strings.Preview3DShowGrid}" TextWrapping="Wrap" />
+                                        </CheckBox>
+                                        <CheckBox IsChecked="{Binding Preview3DShowGroundMesh, Mode=TwoWay}"
+                                                  ToolTip.Tip="{Binding Strings.Preview3DShowGroundMeshTooltip}">
+                                            <TextBlock Text="{Binding Strings.Preview3DShowGroundMesh}" TextWrapping="Wrap" />
                                         </CheckBox>
                                         <CheckBox Content="{Binding Strings.Preview3DAutoRotate}"
                                                   IsChecked="{Binding Preview3DAutoRotate, Mode=TwoWay}"
