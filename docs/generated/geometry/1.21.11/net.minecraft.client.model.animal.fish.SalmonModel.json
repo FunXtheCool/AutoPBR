@@ -89,27 +89,7 @@
                   5
                 ]
               },
-              "cuboids": [
-                {
-                  "from": [
-                    0,
-                    0,
-                    0
-                  ],
-                  "to": [
-                    0,
-                    2,
-                    3
-                  ],
-                  "uvOrigin": [
-                    2,
-                    1
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift fluent addBox profile_proguard_obf"
-                }
-              ],
+              "cuboids": [],
               "children": []
             }
           ]
@@ -176,27 +156,7 @@
                   8
                 ]
               },
-              "cuboids": [
-                {
-                  "from": [
-                    0,
-                    -2.5,
-                    0
-                  ],
-                  "to": [
-                    0,
-                    2.5,
-                    6
-                  ],
-                  "uvOrigin": [
-                    20,
-                    10
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift fluent addBox profile_proguard_obf"
-                }
-              ],
+              "cuboids": [],
               "children": []
             },
             {
@@ -219,27 +179,7 @@
                   -1
                 ]
               },
-              "cuboids": [
-                {
-                  "from": [
-                    0,
-                    0,
-                    0
-                  ],
-                  "to": [
-                    0,
-                    2,
-                    4
-                  ],
-                  "uvOrigin": [
-                    0,
-                    2
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift fluent addBox profile_proguard_obf"
-                }
-              ],
+              "cuboids": [],
               "children": []
             }
           ]
@@ -307,46 +247,7 @@
               0
             ]
           },
-          "cuboids": [
-            {
-              "from": [
-                -2,
-                0,
-                0
-              ],
-              "to": [
-                0,
-                0,
-                2
-              ],
-              "uvOrigin": [
-                -4,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
-            },
-            {
-              "from": [
-                -1.5,
-                21.5,
-                -7.19999981
-              ],
-              "to": [
-                -1.5,
-                21.5,
-                -7.985397995
-              ],
-              "uvOrigin": [
-                -4,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
-            }
-          ],
+          "cuboids": [],
           "children": []
         },
         {
@@ -369,46 +270,7 @@
               0
             ]
           },
-          "cuboids": [
-            {
-              "from": [
-                0,
-                0,
-                0
-              ],
-              "to": [
-                2,
-                0,
-                2
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
-            },
-            {
-              "from": [
-                1.5,
-                21.5,
-                -7.19999981
-              ],
-              "to": [
-                1.5,
-                21.5,
-                -6.414601625
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
-            }
-          ],
+          "cuboids": [],
           "children": []
         }
       ]

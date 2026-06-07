@@ -196,25 +196,6 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf"
-            },
-            {
-              "from": [
-                0,
-                16,
-                0
-              ],
-              "to": [
-                1.57079637,
-                16,
-                0
-              ],
-              "uvOrigin": [
-                0,
-                9
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
             }
           ],
           "children": []

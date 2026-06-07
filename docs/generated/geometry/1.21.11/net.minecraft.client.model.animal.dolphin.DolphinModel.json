@@ -151,25 +151,6 @@
                   "textureKey": "#skin",
                   "liftKind": "exact",
                   "provenance": "javap lift fluent addBox profile_proguard_obf"
-                },
-                {
-                  "from": [
-                    2,
-                    -2,
-                    4
-                  ],
-                  "to": [
-                    3.04719758,
-                    -2,
-                    6.09439516
-                  ],
-                  "uvOrigin": [
-                    48,
-                    20
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift fluent addBox profile_proguard_obf"
                 }
               ],
               "children": []
@@ -213,25 +194,6 @@
                   "textureKey": "#skin",
                   "liftKind": "exact",
                   "provenance": "javap lift fluent addBox profile_proguard_obf"
-                },
-                {
-                  "from": [
-                    -2,
-                    -2,
-                    4
-                  ],
-                  "to": [
-                    -0.95280242,
-                    -2,
-                    1.90560484
-                  ],
-                  "uvOrigin": [
-                    48,
-                    20
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift fluent addBox profile_proguard_obf"
                 }
               ],
               "children": []
@@ -266,25 +228,6 @@
                   "to": [
                     2,
                     2.5,
-                    11
-                  ],
-                  "uvOrigin": [
-                    0,
-                    19
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift fluent addBox profile_proguard_obf"
-                },
-                {
-                  "from": [
-                    0,
-                    -2.5,
-                    11
-                  ],
-                  "to": [
-                    -0.104719758,
-                    -2.5,
                     11
                   ],
                   "uvOrigin": [

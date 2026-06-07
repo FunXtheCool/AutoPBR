@@ -359,25 +359,6 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf"
-            },
-            {
-              "from": [
-                0,
-                0,
-                0
-              ],
-              "to": [
-                0,
-                0,
-                0
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
             }
           ],
           "children": []
@@ -413,25 +394,6 @@
                 1,
                 4.5,
                 1
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
-            },
-            {
-              "from": [
-                0,
-                0,
-                0
-              ],
-              "to": [
-                0,
-                0,
-                0
               ],
               "uvOrigin": [
                 0,
@@ -483,25 +445,6 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf"
-            },
-            {
-              "from": [
-                0,
-                0,
-                0
-              ],
-              "to": [
-                0,
-                0,
-                0
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
             }
           ],
           "children": []
@@ -537,25 +480,6 @@
                 1,
                 4.5,
                 1
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
-            },
-            {
-              "from": [
-                0,
-                0,
-                0
-              ],
-              "to": [
-                0,
-                0,
-                0
               ],
               "uvOrigin": [
                 0,
@@ -607,25 +531,6 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf"
-            },
-            {
-              "from": [
-                0,
-                0,
-                0
-              ],
-              "to": [
-                0,
-                0,
-                0
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
             }
           ],
           "children": []
@@ -661,25 +566,6 @@
                 1,
                 4.5,
                 1
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
-            },
-            {
-              "from": [
-                0,
-                0,
-                0
-              ],
-              "to": [
-                0,
-                0,
-                0
               ],
               "uvOrigin": [
                 0,
@@ -731,25 +617,6 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf"
-            },
-            {
-              "from": [
-                0,
-                0,
-                0
-              ],
-              "to": [
-                0,
-                0,
-                0
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
             }
           ],
           "children": []
@@ -785,25 +652,6 @@
                 1,
                 4.5,
                 1
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
-            },
-            {
-              "from": [
-                0,
-                0,
-                0
-              ],
-              "to": [
-                0,
-                0,
-                0
               ],
               "uvOrigin": [
                 0,
@@ -855,25 +703,6 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf"
-            },
-            {
-              "from": [
-                0,
-                0,
-                0
-              ],
-              "to": [
-                0,
-                0,
-                0
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
             }
           ],
           "children": []
@@ -909,25 +738,6 @@
                 1,
                 4.5,
                 1
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
-            },
-            {
-              "from": [
-                0,
-                0,
-                0
-              ],
-              "to": [
-                0,
-                0,
-                0
               ],
               "uvOrigin": [
                 0,
@@ -979,25 +789,6 @@
               "textureKey": "#skin",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf"
-            },
-            {
-              "from": [
-                0,
-                0,
-                0
-              ],
-              "to": [
-                0,
-                0,
-                0
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
             }
           ],
           "children": []
@@ -1033,25 +824,6 @@
                 1,
                 4.5,
                 1
-              ],
-              "uvOrigin": [
-                0,
-                0
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift fluent addBox profile_proguard_obf"
-            },
-            {
-              "from": [
-                0,
-                0,
-                0
-              ],
-              "to": [
-                0,
-                0,
-                0
               ],
               "uvOrigin": [
                 0,

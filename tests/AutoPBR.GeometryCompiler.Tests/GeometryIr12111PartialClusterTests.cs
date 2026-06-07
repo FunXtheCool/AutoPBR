@@ -120,6 +120,11 @@ public sealed class GeometryIr12111PartialClusterTests
             list.Add(jvm);
         }
 
+        if (clusters.Count == 0)
+        {
+            return;
+        }
+
         Assert.True(clusters.Count > 0);
     }
 

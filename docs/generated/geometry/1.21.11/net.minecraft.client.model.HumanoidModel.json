@@ -107,7 +107,11 @@
                   ],
                   "textureKey": "#skin",
                   "liftKind": "exact",
-                  "provenance": "javap lift fluent addBox profile_proguard_obf"
+                  "provenance": "javap lift fluent addBox profile_proguard_obf",
+                  "faceMask": [
+                    "north",
+                    "south"
+                  ]
                 }
               ],
               "children": []

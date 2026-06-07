@@ -26,7 +26,11 @@ internal static class GeometryIrLiftTreeRepair
         ("wind_top", "wind_mid"),
     ];
 
-    public static JsonArray Apply(JsonArray roots)
+    /// <param name="hoistStandardQuadrupedLegsToRoot">
+    /// When true (bytecode lift / reference-aligned shards), hoists hind/front legs from under <c>body</c> to mesh root.
+    /// Javap segment lifts keep nested binding order for hierarchy probes.
+    /// </param>
+    public static JsonArray Apply(JsonArray roots, bool hoistStandardQuadrupedLegsToRoot = true)
     {
         foreach (var root in roots)
         {
@@ -49,7 +53,11 @@ internal static class GeometryIrLiftTreeRepair
                 RemoveRootSiblingWhenNested(rootKids);
                 CollapseInnerBodyUnderBody(rootKids);
                 RemovePlayerMeshInternalParts(rootKids);
-                HoistStandardQuadrupedLegsFromBody(rootKids);
+                if (hoistStandardQuadrupedLegsToRoot)
+                {
+                    HoistStandardQuadrupedLegsFromBody(rootKids);
+                }
+
                 RemoveDuplicatePartIdsPreferCuboids(rootKids);
             }
 
