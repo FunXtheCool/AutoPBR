@@ -88,6 +88,9 @@ internal static partial class BytecodeMeshResolution
         out Result result)
     {
         result = default!;
+        string? bestHost = null;
+        string? bestConcat = null;
+        byte[]? bestBytes = null;
         foreach (var host in MeshHostClassCandidates.Enumerate(officialJvmName))
         {
             string? obh = null;
@@ -110,7 +113,41 @@ internal static partial class BytecodeMeshResolution
                 continue;
             }
 
-            result = new Result(host, concat, classBytes);
+            if (bestHost is null || ShouldPreferMeshResolutionHost(host, bestHost))
+            {
+                bestHost = host;
+                bestConcat = concat;
+                bestBytes = classBytes;
+            }
+        }
+
+        if (bestHost is null || bestConcat is null || bestBytes is null)
+        {
+            return false;
+        }
+
+        result = new Result(bestHost, bestConcat, bestBytes);
+        return true;
+    }
+
+    /// <summary>
+    /// Mesh factories usually live on concrete classes (<c>AdultPiglinModel</c>) while batch entries may be abstract.
+    /// </summary>
+    private static bool ShouldPreferMeshResolutionHost(string candidate, string incumbent)
+    {
+        static bool IsAbstractHost(string host) =>
+            host.Contains(".Abstract", StringComparison.Ordinal);
+
+        static bool IsAdultConcreteHost(string host) =>
+            host.Contains(".Adult", StringComparison.Ordinal) && !IsAbstractHost(host);
+
+        if (IsAbstractHost(incumbent) && !IsAbstractHost(candidate))
+        {
+            return true;
+        }
+
+        if (IsAdultConcreteHost(candidate) && !IsAdultConcreteHost(incumbent))
+        {
             return true;
         }
 

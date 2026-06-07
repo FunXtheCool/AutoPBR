@@ -52,6 +52,7 @@ internal static class GeometryIrLiftTreeRepair
                 RemoveCowHornCuboidsFromMergedHead(rootKids);
                 RemoveRootSiblingWhenNested(rootKids);
                 CollapseInnerBodyUnderBody(rootKids);
+                RemoveOptionalSaddleHarnessParts(rootKids);
                 RemovePlayerMeshInternalParts(rootKids);
                 if (hoistStandardQuadrupedLegsToRoot)
                 {
@@ -65,6 +66,33 @@ internal static class GeometryIrLiftTreeRepair
         }
 
         return roots;
+    }
+
+    /// <summary>
+    /// Java reference bakes omit optional saddle harness parts from equine <c>createBodyLayer</c> (donkey/mule chest variants).
+    /// Dedicated <c>*SaddleModel.createSaddleLayer</c> lifts keep harness geometry as the primary output.
+    /// </summary>
+    private static void RemoveOptionalSaddleHarnessParts(JsonArray rootChildren)
+    {
+        if (!TryFindPartById(rootChildren, "head_parts", out _) ||
+            !TryFindPartById(rootChildren, "left_chest", out _))
+        {
+            return;
+        }
+
+        RemovePartIdsFromForest(rootChildren,
+        [
+            "saddle",
+            "head_saddle",
+            "mouth_saddle_wrap",
+            "left_saddle_mouth",
+            "right_saddle_mouth",
+            "left_saddle_line",
+            "right_saddle_line",
+            "reins",
+            "bridle",
+            "harness",
+        ]);
     }
 
     /// <summary>
@@ -119,6 +147,11 @@ internal static class GeometryIrLiftTreeRepair
             }
 
             CollapseInnerBodyRecursive(part);
+        }
+
+        if (TryFindPartById(rootChildren, "body", out _))
+        {
+            RemovePartIdsFromForest(rootChildren, ["inner_body"]);
         }
     }
 
@@ -412,7 +445,9 @@ internal static class GeometryIrLiftTreeRepair
         var dy = Math.Abs(ty - fy);
         var dz = Math.Abs(tz - fz);
         const double eps = 1e-3;
-        if (dx < eps || dy < eps || dz < eps)
+        // Mojang uses zero-thickness boxes for flat fins / arrow shafts; drop only line/point degenerates.
+        var thinDims = (dx < eps ? 1 : 0) + (dy < eps ? 1 : 0) + (dz < eps ? 1 : 0);
+        if (thinDims >= 2)
         {
             return true;
         }
@@ -448,7 +483,7 @@ internal static class GeometryIrLiftTreeRepair
             }
 
             var keep = items
-                .OrderByDescending(o => CountCuboids(o.Node))
+                .OrderByDescending(o => DirectCuboidCount(o.Node))
                 .ThenBy(o => occurrences.IndexOf(o))
                 .First();
             foreach (var remove in items.Where(o => !ReferenceEquals(o.Node, keep.Node))
@@ -491,6 +526,9 @@ internal static class GeometryIrLiftTreeRepair
             }
         }
     }
+
+    private static int DirectCuboidCount(JsonObject part) =>
+        part["cuboids"] is JsonArray cuboids ? cuboids.Count : 0;
 
     private static int CountCuboids(JsonObject part)
     {

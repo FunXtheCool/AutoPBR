@@ -283,9 +283,7 @@ internal static class GeometryLiftJsonMerge
         string.Equals(partId, "left_arm", StringComparison.Ordinal) ||
         string.Equals(partId, "right_arm", StringComparison.Ordinal) ||
         string.Equals(partId, "left_leg", StringComparison.Ordinal) ||
-        string.Equals(partId, "right_leg", StringComparison.Ordinal) ||
-        string.Equals(partId, "body", StringComparison.Ordinal) ||
-        string.Equals(partId, "head", StringComparison.Ordinal);
+        string.Equals(partId, "right_leg", StringComparison.Ordinal);
 
     private static double CuboidYSpan(JsonObject? cuboid)
     {

@@ -85,6 +85,29 @@
               "textureKey": "#left",
               "liftKind": "exact",
               "provenance": "javap lift fluent addBox profile_proguard_obf"
+            },
+            {
+              "from": [
+                -0.5,
+                -3,
+                -14
+              ],
+              "to": [
+                -0.5,
+                4,
+                -9
+              ],
+              "uvOrigin": [
+                23,
+                52
+              ],
+              "textureKey": "#goatee",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "faceMask": [
+                "east",
+                "west"
+              ]
             }
           ],
           "children": [

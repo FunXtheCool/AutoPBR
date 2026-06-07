@@ -33,7 +33,8 @@ internal static partial class JavapFloatGeometryMeshLift
         var addBoxIndices = new List<int>();
         for (var i = 0; i < seg.Count; i++)
         {
-            if (JavapMeshBytecodeProfiles.IsNamedOrObfuscatedFloatAddBoxLine(seg[i], out _))
+            var mergedLine = JavapBytecodeStreamAnalyzer.MergeJavapCommentContinuation(seg, i);
+            if (JavapMeshBytecodeProfiles.IsNamedOrObfuscatedFloatAddBoxLine(mergedLine, out _))
             {
                 addBoxIndices.Add(i);
             }

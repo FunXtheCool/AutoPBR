@@ -89,7 +89,31 @@
                   5
                 ]
               },
-              "cuboids": [],
+              "cuboids": [
+                {
+                  "from": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "to": [
+                    0,
+                    2,
+                    3
+                  ],
+                  "uvOrigin": [
+                    2,
+                    1
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift fluent addBox profile_proguard_obf",
+                  "faceMask": [
+                    "east",
+                    "west"
+                  ]
+                }
+              ],
               "children": []
             }
           ]
@@ -156,7 +180,31 @@
                   8
                 ]
               },
-              "cuboids": [],
+              "cuboids": [
+                {
+                  "from": [
+                    0,
+                    -2.5,
+                    0
+                  ],
+                  "to": [
+                    0,
+                    2.5,
+                    6
+                  ],
+                  "uvOrigin": [
+                    20,
+                    10
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift fluent addBox profile_proguard_obf",
+                  "faceMask": [
+                    "east",
+                    "west"
+                  ]
+                }
+              ],
               "children": []
             },
             {
@@ -179,7 +227,31 @@
                   -1
                 ]
               },
-              "cuboids": [],
+              "cuboids": [
+                {
+                  "from": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "to": [
+                    0,
+                    2,
+                    4
+                  ],
+                  "uvOrigin": [
+                    0,
+                    2
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift fluent addBox profile_proguard_obf",
+                  "faceMask": [
+                    "east",
+                    "west"
+                  ]
+                }
+              ],
               "children": []
             }
           ]
@@ -247,7 +319,31 @@
               0
             ]
           },
-          "cuboids": [],
+          "cuboids": [
+            {
+              "from": [
+                -2,
+                0,
+                0
+              ],
+              "to": [
+                0,
+                0,
+                2
+              ],
+              "uvOrigin": [
+                -4,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "faceMask": [
+                "up",
+                "down"
+              ]
+            }
+          ],
           "children": []
         },
         {
@@ -270,7 +366,31 @@
               0
             ]
           },
-          "cuboids": [],
+          "cuboids": [
+            {
+              "from": [
+                0,
+                0,
+                0
+              ],
+              "to": [
+                2,
+                0,
+                2
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "faceMask": [
+                "up",
+                "down"
+              ]
+            }
+          ],
           "children": []
         }
       ]
