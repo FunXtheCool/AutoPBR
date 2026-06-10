@@ -148,7 +148,7 @@ internal static partial class JavapFloatGeometryMeshLift
             JsonValue.Create(t[2]!.GetValue<double>()));
     }
 
-    private static void AppendPoseWarnings(JsonObject pose, IReadOnlyList<string> codes)
+    private static void AppendPoseWarnings(JsonObject pose, List<string> codes)
     {
         if (codes.Count == 0)
         {

@@ -29,7 +29,7 @@ public static partial class GeometryJavapPoseOracle
             return string.Join('\n', lines.Skip(methodStart).Take(methodEnd - methodStart));
         }
 
-        private static int FindMethodCodeStart(IReadOnlyList<string> lines, string methodName)
+        private static int FindMethodCodeStart(List<string> lines, string methodName)
         {
             for (var i = 0; i < lines.Count; i++)
             {
@@ -60,14 +60,14 @@ public static partial class GeometryJavapPoseOracle
             line.Contains("PartDefinition.addChild", StringComparison.Ordinal);
 
         private static bool TryParseBindingAt(
-            IReadOnlyList<string> lines,
+            List<string> lines,
             int bindIdx,
             out string partId,
             out PartPose pose,
             MeshParamContext ctx)
         {
             partId = "";
-            pose = default;
+            pose = new PartPose(0, 0, 0, 0, 0, 0);
             var searchFrom = Math.Max(0, bindIdx - 128);
             string? name = null;
             var poseInvoke = -1;
@@ -133,7 +133,7 @@ public static partial class GeometryJavapPoseOracle
             string.Equals(candidate, "nostril", StringComparison.Ordinal);
 
         /// <summary>Skips <c>ldc</c> names that are arguments to <c>addBox(String, …)</c> nested inside a part builder.</summary>
-        private static bool TryGetLdcPartName(IReadOnlyList<string> lines, int ldcIdx, out string partName)
+        private static bool TryGetLdcPartName(List<string> lines, int ldcIdx, out string partName)
         {
             partName = "";
             var sm = LdcStringRegex.Match(lines[ldcIdx]);
@@ -150,7 +150,7 @@ public static partial class GeometryJavapPoseOracle
         /// Part roots are bound via <c>CubeListBuilder.create()</c> after the part name <c>ldc</c>, or by reusing a
         /// shared builder local (e.g. Creeper legs after <c>astore_3</c>).
         /// </summary>
-        private static bool IsPartRootNameCandidate(IReadOnlyList<string> lines, int ldcIdx, int bindIdx)
+        private static bool IsPartRootNameCandidate(List<string> lines, int ldcIdx, int bindIdx)
         {
             for (var i = ldcIdx + 1; i < Math.Min(bindIdx, ldcIdx + 8); i++)
             {
@@ -178,13 +178,13 @@ public static partial class GeometryJavapPoseOracle
         }
 
         private static bool TryParsePoseInvoke(
-            IReadOnlyList<string> lines,
+            List<string> lines,
             int invokeIdx,
             int minIdx,
             out PartPose pose,
             MeshParamContext ctx)
         {
-            pose = default;
+            pose = new PartPose(0, 0, 0, 0, 0, 0);
             if (lines[invokeIdx].Contains("PartPose.ZERO", StringComparison.Ordinal))
             {
                 pose = new PartPose(0, 0, 0, 0, 0, 0);
@@ -223,7 +223,7 @@ public static partial class GeometryJavapPoseOracle
         }
 
         private static bool TryParseFloatOperandsBackward(
-            IReadOnlyList<string> lines,
+            List<string> lines,
             int startIdx,
             int minIdx,
             int count,
@@ -270,12 +270,12 @@ public static partial class GeometryJavapPoseOracle
             return values.Count == count;
         }
 
-        private static bool IsParametricIntToFloatLine(IReadOnlyList<string> lines, int idx) =>
+        private static bool IsParametricIntToFloatLine(List<string> lines, int idx) =>
             lines[idx].Contains("i2f", StringComparison.Ordinal) ||
             lines[idx].Contains("isub", StringComparison.Ordinal) ||
             Regex.IsMatch(lines[idx], @"\biload_\d+\b", RegexOptions.CultureInvariant);
 
-        private static int SkipParametricIntToFloatBlock(IReadOnlyList<string> lines, int i2fIdx, int minIdx)
+        private static int SkipParametricIntToFloatBlock(List<string> lines, int i2fIdx, int minIdx)
         {
             var j = i2fIdx - 1;
             while (j >= minIdx && IsParametricIntToFloatLine(lines, j))
@@ -287,7 +287,7 @@ public static partial class GeometryJavapPoseOracle
         }
 
         private static bool TryParseParametricFloatBackward(
-            IReadOnlyList<string> lines,
+            List<string> lines,
             int startIdx,
             int minIdx,
             MeshParamContext ctx,

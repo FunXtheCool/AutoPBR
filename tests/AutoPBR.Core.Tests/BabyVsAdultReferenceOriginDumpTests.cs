@@ -1,9 +1,10 @@
+using System.Globalization;
 using System.Numerics;
 using System.Text;
 using System.Text.Json;
 using AutoPBR.Core.Models;
 using AutoPBR.Core.Preview;
-using AutoPBR.Tests.Shared;
+using AutoPBR.Tests.TestSupport;
 
 namespace AutoPBR.Core.Tests;
 
@@ -53,7 +54,7 @@ public sealed class BabyVsAdultReferenceOriginDumpTests
         var referencePath = Path.Combine(repoRoot, "tools", "MinecraftGeometryReference", "reference-output", $"{jvm}.json");
         if (!File.Exists(referencePath))
         {
-            sb.AppendLine($"{label}\tMISSING_REF\t0\t0\t0\t0\t0\t0\t0\t0\t0");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"{label}\tMISSING_REF\t0\t0\t0\t0\t0\t0\t0\t0\t0");
             return;
         }
 
@@ -61,7 +62,7 @@ public sealed class BabyVsAdultReferenceOriginDumpTests
         if (!GeometryIrMeshWalk.TryCollectBakedWorldTranslations(
                 reference.RootElement, out var refWorld, out var refFail))
         {
-            sb.AppendLine($"{label}\tREF_FAIL:{refFail}\t0\t0\t0\t0\t0\t0\t0\t0\t0");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"{label}\tREF_FAIL:{refFail}\t0\t0\t0\t0\t0\t0\t0\t0\t0");
             return;
         }
 
@@ -69,7 +70,7 @@ public sealed class BabyVsAdultReferenceOriginDumpTests
         var runtime = EntityModelRuntimeFactory.Create();
         if (!runtime.TryBuildStaticMesh(texturePath, Profile26, 0f, 0f, out var mesh, out _))
         {
-            sb.AppendLine($"{label}\tBUILD_FAIL\t0\t0\t0\t0\t0\t0\t0\t0\t0");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"{label}\tBUILD_FAIL\t0\t0\t0\t0\t0\t0\t0\t0\t0");
             return;
         }
 
@@ -85,7 +86,7 @@ public sealed class BabyVsAdultReferenceOriginDumpTests
         {
             if (!TryMeanPartOrigin(mesh!, partIds, partId, out var meshPreviewOrigin))
             {
-                sb.AppendLine($"{label}\t{partId}\t{refOrigin.X:F3}\t{refOrigin.Y:F3}\t{refOrigin.Z:F3}\tNA\tNA\tNA\tNA\tNA\tNA");
+                sb.AppendLine(CultureInfo.InvariantCulture, $"{label}\t{partId}\t{refOrigin.X:F3}\t{refOrigin.Y:F3}\t{refOrigin.Z:F3}\tNA\tNA\tNA\tNA\tNA\tNA");
                 continue;
             }
 
@@ -93,6 +94,7 @@ public sealed class BabyVsAdultReferenceOriginDumpTests
             var gap = Vector3.Distance(expectedPreview, meshPreviewOrigin);
             var status = gap <= 0.35 ? "OK" : "FAIL";
             sb.AppendLine(
+                CultureInfo.InvariantCulture,
                 $"{label}\t{partId}\t{refOrigin.X:F3}\t{refOrigin.Y:F3}\t{refOrigin.Z:F3}\t" +
                 $"{meshPreviewOrigin.X:F3}\t{meshPreviewOrigin.Y:F3}\t{meshPreviewOrigin.Z:F3}\t{gap:F3}\t{status}");
         }
@@ -100,7 +102,7 @@ public sealed class BabyVsAdultReferenceOriginDumpTests
 
     private static bool TryMeanPartOrigin(
         MergedJavaBlockModel mesh,
-        IReadOnlyList<string> partIds,
+        List<string> partIds,
         string partId,
         out Vector3 origin)
     {

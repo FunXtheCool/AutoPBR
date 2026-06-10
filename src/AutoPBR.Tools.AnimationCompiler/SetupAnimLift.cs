@@ -38,7 +38,7 @@ internal static partial class SetupAnimLift
         (note.Contains("Could not resolve model part field", StringComparison.Ordinal) &&
          note.Contains("(visible)", StringComparison.Ordinal));
 
-    private static readonly IReadOnlyDictionary<string, string> AbstractSetupAnimHoistTemplates =
+    private static readonly Dictionary<string, string> AbstractSetupAnimHoistTemplates =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["net.minecraft.client.model.animal.feline.AbstractFelineModel"] =

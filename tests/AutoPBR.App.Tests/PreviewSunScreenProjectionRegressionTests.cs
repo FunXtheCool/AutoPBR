@@ -17,7 +17,7 @@ public sealed class PreviewSunScreenProjectionRegressionTests
     public void Compute_FixturePose_SunStaysInsideViewport(PreviewVolumetricRegressionFixtures.Pose pose)
     {
         var (view, proj) = pose.BuildMatrices();
-        PreviewSunScreenProjection.Compute(pose.Eye, pose.LightDir, view, proj, pose.Aspect, pose.ConeScale,
+        PreviewSunScreenProjection.Compute(pose.Eye, pose.LightDir, view, proj, pose.Aspect, pose.ConeScale, 1f,
             out var sunUv, out var discRadiusUv, out var coneRadiusUv, out _);
 
         Assert.InRange(sunUv.X, 0f, 1f);
@@ -31,7 +31,7 @@ public sealed class PreviewSunScreenProjectionRegressionTests
     public void Compute_FixturePose_MatchesGoldenProjection(PreviewVolumetricRegressionFixtures.Pose pose)
     {
         var (view, proj) = pose.BuildMatrices();
-        PreviewSunScreenProjection.Compute(pose.Eye, pose.LightDir, view, proj, pose.Aspect, pose.ConeScale,
+        PreviewSunScreenProjection.Compute(pose.Eye, pose.LightDir, view, proj, pose.Aspect, pose.ConeScale, 1f,
             out var sunUv, out var discRadiusUv, out var coneRadiusUv, out _);
 
         Assert.Equal(pose.GoldenSunUvX, sunUv.X, Epsilon);
@@ -71,7 +71,7 @@ public sealed class PreviewSunScreenProjectionRegressionTests
     {
         var pose = PreviewVolumetricRegressionFixtures.All.First(p => p.Id == "midnight-0h");
         var (view, proj) = pose.BuildMatrices();
-        PreviewSunScreenProjection.Compute(pose.Eye, pose.LightDir, view, proj, pose.Aspect, 1f,
+        PreviewSunScreenProjection.Compute(pose.Eye, pose.LightDir, view, proj, pose.Aspect, 1f, 1f,
             out var sunUv, out _, out _, out _);
         PreviewSunScreenProjection.ComputeMoon(pose.Eye, pose.LightDir, view, proj, pose.Aspect,
             out var moonUv, out _, out _);

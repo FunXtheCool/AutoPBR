@@ -364,7 +364,7 @@ internal static class GeometryIrReferenceComparer
 
     private static bool TryMeanPartOriginInMesh(
         MergedJavaBlockModel mesh,
-        IReadOnlyList<string> partIds,
+        List<string> partIds,
         string partId,
         out Vector3 origin)
     {

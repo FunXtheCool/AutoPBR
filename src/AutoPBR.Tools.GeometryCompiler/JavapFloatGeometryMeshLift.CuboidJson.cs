@@ -98,7 +98,7 @@ internal static partial class JavapFloatGeometryMeshLift
         };
     }
 
-    private static IReadOnlyList<string>? BuildCuboidLiftWarnings(
+    private static List<string>? BuildCuboidLiftWarnings(
         string liftKind,
         DirectionMaskParseResult maskResult,
         bool cubeDeformationObfInferred)

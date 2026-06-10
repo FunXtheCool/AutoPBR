@@ -50,7 +50,7 @@ public sealed class ColdCowHornMeshDiagnosticTests
             }
         }
 
-        Assert.True(false, string.Join("\n", lines));
+        Assert.Fail(string.Join("\n", lines));
     }
 
     private static string Fmt(float[] v) => $"<{v[0]:F2},{v[1]:F2},{v[2]:F2}>";

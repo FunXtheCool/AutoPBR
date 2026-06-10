@@ -8,7 +8,7 @@ internal static partial class JavapFloatGeometryMeshLift
     /// <summary>
     /// <c>ldc</c>/<c>fconst_*</c>/<c>fneg</c> + <c>fstore</c> patterns so <c>PartPose</c> stacks can resolve <c>fload</c> to a constant.
     /// </summary>
-    private static Dictionary<int, double> BuildPoseFloatLocalConstantsFromSimpleFstores(IReadOnlyList<string> lines)
+    private static Dictionary<int, double> BuildPoseFloatLocalConstantsFromSimpleFstores(List<string> lines)
     {
         var map = new Dictionary<int, double>();
         for (var i = 1; i < lines.Count; i++)
@@ -93,7 +93,7 @@ internal static partial class JavapFloatGeometryMeshLift
     /// <summary>
     /// Resolves <c>fload</c> slots used as the float argument to <c>createMesh(CubeDeformation, float)</c> from call sites in the same concat.
     /// </summary>
-    private static void ApplyMeshFactoryFloatParamFromCallSites(IReadOnlyList<string> lines, Dictionary<int, double> map)
+    private static void ApplyMeshFactoryFloatParamFromCallSites(List<string> lines, Dictionary<int, double> map)
     {
         for (var i = 0; i < lines.Count; i++)
         {
@@ -114,7 +114,7 @@ internal static partial class JavapFloatGeometryMeshLift
         }
     }
 
-    private static void PropagatePoseFloatLocalCopies(IReadOnlyList<string> lines, Dictionary<int, double> map)
+    private static void PropagatePoseFloatLocalCopies(List<string> lines, Dictionary<int, double> map)
     {
         for (var pass = 0; pass < 4; pass++)
         {
@@ -142,8 +142,8 @@ internal static partial class JavapFloatGeometryMeshLift
         }
     }
 
-    private static bool TryExtractBackwardFloatConstant(IReadOnlyList<string> lines, int startIdx,
-        IReadOnlyDictionary<int, double> floatLocals, out double value)
+    private static bool TryExtractBackwardFloatConstant(List<string> lines, int startIdx,
+        Dictionary<int, double> floatLocals, out double value)
     {
         value = 0;
         for (var j = startIdx; j >= 0; j--)

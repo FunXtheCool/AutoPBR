@@ -16,6 +16,8 @@ public sealed partial class OpenGlPreviewBackend
                     return;
                 }
 
+                SyncGodRayToggleState(frame.Settings);
+                SyncVolumetricToggleState(frame.Settings);
                 frame.GodRayCaptureActive = TryBeginGodRaySceneRender(ref frame);
 
                 // Restore main-pass framebuffer + viewport (BeginShadowPass snapshots & EndShadowPass restores
@@ -94,12 +96,12 @@ public sealed partial class OpenGlPreviewBackend
                     frame.Gl.Clear(ClearBufferMask.DepthBufferBit);
                 }
 
-                // Sun billboard: draw before opaque geometry so depth testing hides it behind the cube/grid while
-                // the atmosphere sky (drawn earlier without depth) stays behind the sun.
+                // Sun disc + aureole are rendered by the sky shader (skySunDiscAureole); only the moon
+                // remains a billboard, drawn before opaque geometry so depth testing hides it.
                 frame.Gl.Enable(EnableCap.DepthTest);
                 frame.Gl.DepthFunc(GLEnum.Lequal);
-                DrawSunBillboard(frame.Gl, frame.Proj, frame.View, frame.Eye, frame.LightDir,
-                    frame.Settings.AtmosphereSunDiscStrength,
+                DrawMoonBillboard(frame.Gl, frame.Proj, frame.View, frame.Eye, frame.LightDir,
+                    frame.Settings.AtmosphereSunDiscStrength * 0.85f,
                     ShouldCullSolidBackFaces(frame.Scene.SceneKind, frame.BlockModel));
 
                 _program.Use();

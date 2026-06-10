@@ -39,9 +39,10 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private int _gridVertexCount;
     private uint _axesVao;
     private uint _axesVbo;
-    private GlSunBillboardProgram? _sunProgram;
-    private uint _sunVao;
-    private uint _sunVbo;
+    private GlMoonBillboardProgram? _moonProgram;
+    private GlTexture2D? _moonAlbedo;
+    private uint _moonVao;
+    private uint _moonVbo;
     private GlShaderProgram? _atmoTransProgram;
     private GlShaderProgram? _atmoSkyViewProgram;
     private GlShaderProgram? _atmoSkyProgram;
@@ -642,6 +643,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         AtmosphereHorizonFalloff = s.AtmosphereHorizonFalloff,
         AtmosphereSkyExposure = s.AtmosphereSkyExposure,
         AtmosphereSunDiscStrength = s.AtmosphereSunDiscStrength,
+        AtmosphereSunDiscSize = s.AtmosphereSunDiscSize,
         AerialFogStrength = s.AerialFogStrength,
         TimeOfDayHours = s.TimeOfDayHours,
         AnimateTimeOfDay = s.AnimateTimeOfDay,
@@ -667,6 +669,10 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         VolumetricQuality = s.VolumetricQuality,
         GodRayStrength = s.GodRayStrength,
         GodRayConeScale = s.GodRayConeScale,
+        GodRayScatterGain = s.GodRayScatterGain,
+        GodRayExtinction = s.GodRayExtinction,
+        GodRayDebugDensity = s.GodRayDebugDensity,
+        GodRayStabilizeDebug = s.GodRayStabilizeDebug,
         CloudDensity = s.CloudDensity,
         CloudVolumeSize = s.CloudVolumeSize,
         CloudLayerHeight = s.CloudLayerHeight,

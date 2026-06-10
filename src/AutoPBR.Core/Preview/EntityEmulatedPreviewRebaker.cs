@@ -107,14 +107,14 @@ public static class EntityEmulatedPreviewRebaker
         EntityPreviewPlacement.TryPopulateRebakeElementPartIds(rebake, profileForParts, merged.Elements.Count);
         EntityPreviewPlacement.TryMeasureMergedModelPartCentroidsY(
             merged,
-            rebake.ElementPartIds,
+            rebake.ElementPartIds!,
             out var bindBodyY,
             out var bindHeadY,
             out var bindLegY);
         var placement = EntityPreviewPlacement.ApplyToPreviewVertices(
             verts,
             MinecraftModelBaker.FloatsPerVertex,
-            rebake.ElementPartIds,
+            rebake.ElementPartIds!,
             EntityPreviewPlacement.DefaultFloorY);
         rebake.LastGroundContactY = placement.GroundContactY;
         rebake.LastGroundLiftY = placement.GroundLiftY;

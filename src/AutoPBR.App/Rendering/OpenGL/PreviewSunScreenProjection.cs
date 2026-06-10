@@ -24,6 +24,7 @@ internal static class PreviewSunScreenProjection
     /// <param name="proj">Projection matrix.</param>
     /// <param name="viewportAspect">Viewport width divided by height.</param>
     /// <param name="coneScale">User shaft-width multiplier (see <c>GodRayConeScale</c>).</param>
+    /// <param name="sunSizeScale">User sun angular-size multiplier (1 = legacy size; ~0.07 = real sun).</param>
     /// <param name="sunUv">Sun center in normalized viewport UV.</param>
     /// <param name="sunDiscRadiusUv">Sun disc radius in normalized viewport UV.</param>
     /// <param name="sunConeRadiusUv">God-ray cone radius in normalized viewport UV.</param>
@@ -37,12 +38,14 @@ internal static class PreviewSunScreenProjection
         Matrix4x4 proj,
         float viewportAspect,
         float coneScale,
+        float sunSizeScale,
         out Vector2 sunUv,
         out float sunDiscRadiusUv,
         out float sunConeRadiusUv,
         out float sunCosDiscEdge)
     {
         coneScale = Math.Max(coneScale, 0.05f);
+        var sunRadius = SunRadius * Math.Clamp(sunSizeScale, 0.05f, 2f);
         var towardSun = -lightPropagationDir;
         var tls = towardSun.LengthSquared();
         if (tls < 1e-12f)
@@ -64,7 +67,7 @@ internal static class PreviewSunScreenProjection
         }
 
         var sunCenter = eye + towardSun * SunDistance;
-        var sunEdge = sunCenter + right * SunRadius;
+        var sunEdge = sunCenter + right * sunRadius;
         var viewProj = proj * view;
 
         sunUv = WorldToViewportUv(sunCenter, viewProj);
@@ -79,7 +82,7 @@ internal static class PreviewSunScreenProjection
         var edgeLen2 = edgeDir.LengthSquared();
         sunCosDiscEdge = edgeLen2 < 1e-12f
             ? 0.999f
-            : Math.Clamp(Vector3.Dot(towardSun, edgeDir / MathF.Sqrt(edgeLen2)), 0.85f, 0.9999f);
+            : Math.Clamp(Vector3.Dot(towardSun, edgeDir / MathF.Sqrt(edgeLen2)), 0.85f, 0.999999f);
     }
 
     /// <summary>Projects the antipodal moon disc (opposite the sun light propagation direction).</summary>

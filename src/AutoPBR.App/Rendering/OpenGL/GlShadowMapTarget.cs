@@ -26,6 +26,7 @@ internal sealed class GlShadowMapTarget : IDisposable
     private int _savedVpY;
     private int _savedVpW;
     private int _savedVpH;
+    private int _savedDrawFbo;
 
     /// <summary>Saved color mask (sRGB-state agnostic) so the main pass can write color again.</summary>
     private bool _savedColorWriteR;
@@ -108,6 +109,8 @@ internal sealed class GlShadowMapTarget : IDisposable
 
     public void BeginShadowPass()
     {
+        _savedDrawFbo = _gl.GetInteger(GetPName.DrawFramebufferBinding);
+
         // Snapshot main viewport so EndShadowPass restores cleanly.
         var vp = new int[4];
         _gl.GetInteger(GetPName.Viewport, vp);
@@ -137,7 +140,7 @@ internal sealed class GlShadowMapTarget : IDisposable
     public void EndShadowPass()
     {
         _gl.ColorMask(_savedColorWriteR, _savedColorWriteG, _savedColorWriteB, _savedColorWriteA);
-        _gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+        _gl.BindFramebuffer(FramebufferTarget.Framebuffer, (uint)Math.Max(0, _savedDrawFbo));
         _gl.Viewport(_savedVpX, _savedVpY, (uint)_savedVpW, (uint)_savedVpH);
     }
 

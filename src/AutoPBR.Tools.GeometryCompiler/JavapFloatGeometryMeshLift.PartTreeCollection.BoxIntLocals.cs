@@ -26,7 +26,7 @@ internal static partial class JavapFloatGeometryMeshLift
     /// first <c>CubeListBuilder.create</c>. Others (AdultAxolotlModel) ldc the first real part name before create on the
     /// mesh root — keep those lines so the body part id and cuboids are not lost.
     /// </summary>
-    private static int FindMeshLiftPrologueSkip(IReadOnlyList<string> lines)
+    private static int FindMeshLiftPrologueSkip(List<string> lines)
     {
         var getRootLine = -1;
         for (var i = 0; i < lines.Count; i++)
@@ -66,7 +66,7 @@ internal static partial class JavapFloatGeometryMeshLift
         return afterRootSetup;
     }
 
-    private static int FindFirstCubeListBuilderCreateLine(IReadOnlyList<string> lines, int startIdx)
+    private static int FindFirstCubeListBuilderCreateLine(List<string> lines, int startIdx)
     {
         for (var i = startIdx; i < lines.Count; i++)
         {
@@ -82,7 +82,7 @@ internal static partial class JavapFloatGeometryMeshLift
 
     private static Dictionary<int, int> MergeBoxIntLocalConstants(
         IReadOnlyDictionary<int, int> segmentLocals,
-        IReadOnlyDictionary<int, int> meshWideLocals)
+        Dictionary<int, int> meshWideLocals)
     {
         var merged = new Dictionary<int, int>(meshWideLocals);
         foreach (var (slot, value) in segmentLocals)
@@ -258,7 +258,7 @@ internal static partial class JavapFloatGeometryMeshLift
     }
 
     private static bool TryExtractBackwardIntConstant(IReadOnlyList<string> lines, int startIdx,
-        IReadOnlyDictionary<int, int> intLocals, out int value)
+        Dictionary<int, int> intLocals, out int value)
     {
         value = 0;
         for (var j = startIdx; j >= 0; j--)

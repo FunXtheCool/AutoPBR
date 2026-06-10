@@ -1,7 +1,7 @@
 using System.Numerics;
 using System.Text.Json;
 using AutoPBR.Core.Preview;
-using AutoPBR.Tests.Shared;
+using AutoPBR.Tests.TestSupport;
 
 namespace AutoPBR.Core.Tests;
 

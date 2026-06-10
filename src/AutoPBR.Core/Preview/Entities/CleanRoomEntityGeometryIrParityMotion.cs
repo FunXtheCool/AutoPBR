@@ -16,7 +16,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
     {
 
-        public static IReadOnlyDictionary<string, Matrix4x4> Build(JsonElement geometryRoot)
+        public static Dictionary<string, Matrix4x4> Build(JsonElement geometryRoot)
 
         {
 

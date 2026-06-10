@@ -42,7 +42,7 @@ public static class PreviewVolumetricRegressionFixtures
         public int ProjectionFingerprint()
         {
             var (view, proj) = BuildMatrices();
-            PreviewSunScreenProjection.Compute(Eye, LightDir, view, proj, Aspect, ConeScale,
+            PreviewSunScreenProjection.Compute(Eye, LightDir, view, proj, Aspect, ConeScale, 1f,
                 out var sunUv, out var discRadiusUv, out var coneRadiusUv, out _);
             return HashCode.Combine(
                 MathF.Round(sunUv.X, 4),
@@ -102,7 +102,7 @@ public static class PreviewVolumetricRegressionFixtures
             0f,
             0);
         var (view, proj) = pose.BuildMatrices();
-        PreviewSunScreenProjection.Compute(eye, pose.LightDir, view, proj, aspect, coneScale,
+        PreviewSunScreenProjection.Compute(eye, pose.LightDir, view, proj, aspect, coneScale, 1f,
             out var sunUv, out var discRadiusUv, out var coneRadiusUv, out _);
         PreviewSunScreenProjection.ComputeMoon(eye, pose.LightDir, view, proj, aspect,
             out var moonUv, out _, out _);

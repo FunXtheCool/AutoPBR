@@ -39,4 +39,12 @@ vec3 atmosphereSunColor(float sunIntensity)
     return vec3(1.0, 0.97, 0.92) * sunIntensity;
 }
 
+// Warm sun disk/sky tint: orange-red at horizon, warm white near zenith.
+vec3 atmosphereSunWarmColor(float sunIntensity, float sunElevation)
+{
+    vec3 horizonWarm = vec3(1.0, 0.62, 0.28);
+    vec3 zenithWarm = vec3(1.0, 0.96, 0.86);
+    return mix(horizonWarm, zenithWarm, smoothstep(0.0, 0.42, max(sunElevation, 0.0))) * sunIntensity;
+}
+
 #endif // GENESIS_ATMOSPHERE_GLSL

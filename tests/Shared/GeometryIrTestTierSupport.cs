@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace AutoPBR.Tests.Shared;
+namespace AutoPBR.Tests.TestSupport;
 
 /// <summary>
 /// Shared helpers for geometry IR test tiers — see docs/test-guidance-geometry-animation-ir.md.

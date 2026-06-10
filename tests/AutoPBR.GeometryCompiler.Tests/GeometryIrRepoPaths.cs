@@ -56,7 +56,7 @@ internal static class GeometryIrRepoPaths
         LoadOfficialJvmNamesFromClassList(repoRoot, "minecraft_1.21.11_geometry_strict_ok_model_classes.txt");
 
     public static IReadOnlyList<string> LoadPartialToOkPromotionJvmNames(string repoRoot) =>
-        AutoPBR.Tests.Shared.GeometryIrTestTierSupport.LoadOfficialJvmNames(
+        AutoPBR.Tests.TestSupport.GeometryIrTestTierSupport.LoadOfficialJvmNames(
             repoRoot,
             "geometry_ir_partial_to_ok_promotion_jvm.txt");
 

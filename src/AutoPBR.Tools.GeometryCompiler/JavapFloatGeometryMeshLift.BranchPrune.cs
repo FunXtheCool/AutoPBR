@@ -93,7 +93,7 @@ internal static partial class JavapFloatGeometryMeshLift
         }
     }
 
-    private static bool TryFindForwardGotoTarget(IReadOnlyList<string> lines, int afterBranchLine, out int targetOffset)
+    private static bool TryFindForwardGotoTarget(List<string> lines, int afterBranchLine, out int targetOffset)
     {
         targetOffset = 0;
         for (var i = afterBranchLine + 1; i < lines.Count && i < afterBranchLine + 256; i++)

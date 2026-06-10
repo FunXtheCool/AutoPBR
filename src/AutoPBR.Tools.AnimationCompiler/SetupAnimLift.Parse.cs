@@ -281,7 +281,7 @@ internal static partial class SetupAnimLift
             return false;
         }
 
-        iloadPattern = loopVar.StartsWith("_", StringComparison.Ordinal)
+        iloadPattern = loopVar.StartsWith('_')
             ? "iload" + loopVar
             : "iload         " + loopVar;
 

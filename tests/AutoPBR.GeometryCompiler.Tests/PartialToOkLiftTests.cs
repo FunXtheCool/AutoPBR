@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
-using AutoPBR.Tests.Shared;
+using AutoPBR.Tests.TestSupport;
 
 
 using Xunit.Abstractions;
@@ -10,7 +10,7 @@ namespace AutoPBR.GeometryCompiler.Tests;
 /// <summary>
 /// T0 jar lift + T2 committed-shard probe for partial→ok promotion list (geometry_ir_partial_to_ok_promotion_jvm.txt).
 /// </summary>
-[Collection(nameof(GeometryLiftSerialCollection))]
+[Collection(nameof(GeometryLiftSerialDefinition))]
 public sealed class PartialToOkLiftTests(ITestOutputHelper output)
 {
     private static readonly string[] PromotionJvmNames =

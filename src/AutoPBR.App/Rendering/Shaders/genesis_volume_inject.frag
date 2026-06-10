@@ -1,59 +1,107 @@
 #version 330 core
-// Froxel inject: density + sun-lit scatter into a 2D array (P3.2).
+// GENESIS_GLES_PACK rev29
+// Froxel inject: density + sun-lit scatter into a 2D array (P3.2). uDebugDensity adds a uniform
+// participating-medium floor so god rays are visible/tunable without fog or clouds enabled.
+
+
 
 //!include "common/common.glsl"
-//!include "common/godray_integration.glsl"
-//!include "common/volume_froxel.glsl"
+
+//!include "common/shadow_gates.glsl"
+
+//!include "common/volumetric_inject_density.glsl"
+
+//!include "common/volume_froxel_math.glsl"
+
+//!include "common/volume_inject_pack.glsl"
+
+
 
 in vec2 vUv;
+
 uniform sampler2DShadow uShadowMap;
+
 uniform sampler2DShadow uShadowMapNear;
+
 uniform mat4 uLightViewProj;
+
 uniform mat4 uLightViewProjNear;
+
 uniform vec3 uCameraPos;
+
 uniform vec3 uCamRight;
+
 uniform vec3 uCamUp;
+
 uniform vec3 uCamForward;
+
 uniform vec3 uLightDir;
+
 uniform vec3 uLightColor;
+
 uniform vec3 uHalfExtent;
+
 uniform int uSliceIndex;
+
 uniform int uSliceCount;
+
+uniform float uDepthDistribution;
+
 uniform float uLayerHeight;
+
 uniform float uVolumeHeight;
+
 uniform float uCloudDensity;
+
 uniform float uVolumeSize;
+
 uniform float uGroundWorldY;
+
 uniform float uFogSlabHeight;
+
 uniform float uHeightFogStrength;
+
+uniform float uDebugDensity;
+
 uniform vec2 uShadowTexelSize;
+
 uniform float uShadowMinBias;
+
 uniform int uEnableShadowMap;
+
 uniform int uEnableShadowCascades;
+
 uniform float uCascadeSplitDistance;
+
+
 
 out vec4 FragColor;
 
+
+
 void main()
+
 {
-    vec3 worldPos = vfFroxelWorldPos(vUv, uSliceIndex, uSliceCount, uCameraPos, uCamRight, uCamUp, uCamForward, uHalfExtent);
+
+    vec3 worldPos = vfFroxelWorldPos(vUv, uSliceIndex, uSliceCount, uCameraPos, uCamRight, uCamUp, uCamForward,
+
+        uHalfExtent, uDepthDistribution);
+
     float layerBase = uLayerHeight;
+
     float layerTop = layerBase + uVolumeHeight;
 
-    float density = vmMediumDensity(worldPos, uGroundWorldY, uFogSlabHeight, layerBase, layerTop,
-        uCloudDensity, uVolumeSize, uHeightFogStrength);
-    if (density <= 1e-5)
-    {
-        FragColor = vec4(0.0, 0.0, 0.0, 0.0);
-        return;
-    }
+    float mediumRho = viInjectMediumDensity(worldPos, uGroundWorldY, uFogSlabHeight, layerBase, layerTop,
 
-    float shadowT = grShadowGateCascaded(worldPos, uCameraPos, uLightViewProjNear, uLightViewProj,
+        uCloudDensity, uHeightFogStrength) + max(uDebugDensity, 0.0);
+
+    float shadowGate = grShadowGateCascaded(worldPos, uCameraPos, uLightViewProjNear, uLightViewProj,
+
         uShadowMapNear, uShadowMap, uShadowTexelSize, uShadowMinBias, uEnableShadowMap,
+
         uEnableShadowCascades, uCascadeSplitDistance);
-    vec3 sunLit = uLightColor * density * shadowT * 0.85;
-    vec4 packed;
-    packed.r = density;
-    packed.gba = sunLit;
-    FragColor = packed;
+
+    FragColor = viPackFroxelInject(mediumRho, uLightColor, shadowGate);
+
 }
+

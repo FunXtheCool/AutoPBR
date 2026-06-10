@@ -1270,6 +1270,39 @@
                                                   ToolTip.Tip="{Binding Strings.Preview3DEnableIblTooltip}">
                                             <TextBlock Text="{Binding Strings.Preview3DEnableIbl}" TextWrapping="Wrap" />
                                         </CheckBox>
+                                        <Grid ColumnDefinitions="Auto,*"
+                                              ColumnSpacing="10"
+                                              MinWidth="0"
+                                              IsVisible="{Binding IsPreview3D}">
+                                            <TextBlock Grid.Column="0"
+                                                       VerticalAlignment="Center"
+                                                       Text="{Binding Strings.Preview3DIblStrength}"
+                                                       TextWrapping="Wrap"
+                                                       ToolTip.Tip="{Binding Strings.Preview3DIblStrengthTooltip}" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                <Slider Width="220"
+                                                        Minimum="0.0"
+                                                        Maximum="2.0"
+                                                        SmallChange="0.05"
+                                                        LargeChange="0.25"
+                                                        TickFrequency="0.5"
+                                                        IsEnabled="{Binding Preview3DEnableIbl}"
+                                                        Value="{Binding Preview3DIblStrength, Mode=TwoWay}"
+                                                        ToolTip.Tip="{Binding Strings.Preview3DIblStrengthTooltip}" />
+                                                <NumericUpDown Minimum="0.0"
+                                                               Maximum="2.0"
+                                                               Increment="0.05"
+                                                               FormatString="F2"
+                                                               HorizontalAlignment="Left"
+                                                               MinWidth="92"
+                                                               MaxWidth="120"
+                                                               ShowButtonSpinner="False"
+                                                               AllowSpin="False"
+                                                               IsEnabled="{Binding Preview3DEnableIbl}"
+                                                               Value="{Binding Preview3DIblStrength, Mode=TwoWay}"
+                                                               ToolTip.Tip="{Binding Strings.Preview3DIblStrengthTooltip}" />
+                                            </StackPanel>
+                                        </Grid>
                                         <CheckBox IsChecked="{Binding Preview3DEnableAtmosphericSky, Mode=TwoWay}"
                                                   ToolTip.Tip="{Binding Strings.Preview3DEnableAtmosphericSkyTooltip}">
                                             <TextBlock Text="{Binding Strings.Preview3DEnableAtmosphericSky}" TextWrapping="Wrap" />
@@ -1445,6 +1478,39 @@
                                               IsVisible="{Binding IsPreview3D}">
                                             <TextBlock Grid.Column="0"
                                                        VerticalAlignment="Center"
+                                                       Text="{Binding Strings.Preview3DAtmosphereSunDiscSize}"
+                                                       TextWrapping="Wrap"
+                                                       ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSunDiscSizeTooltip}" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                <Slider Width="220"
+                                                        Minimum="0.05"
+                                                        Maximum="2.0"
+                                                        SmallChange="0.05"
+                                                        LargeChange="0.25"
+                                                        TickFrequency="0.5"
+                                                        IsEnabled="{Binding Preview3DEnableAtmosphericSky}"
+                                                        Value="{Binding Preview3DAtmosphereSunDiscSize, Mode=TwoWay}"
+                                                        ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSunDiscSizeTooltip}" />
+                                                <NumericUpDown Minimum="0.05"
+                                                               Maximum="2.0"
+                                                               Increment="0.05"
+                                                               FormatString="F2"
+                                                               HorizontalAlignment="Left"
+                                                               MinWidth="92"
+                                                               MaxWidth="120"
+                                                               ShowButtonSpinner="False"
+                                                               AllowSpin="False"
+                                                               IsEnabled="{Binding Preview3DEnableAtmosphericSky}"
+                                                               Value="{Binding Preview3DAtmosphereSunDiscSize, Mode=TwoWay}"
+                                                               ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSunDiscSizeTooltip}" />
+                                            </StackPanel>
+                                        </Grid>
+                                        <Grid ColumnDefinitions="Auto,*"
+                                              ColumnSpacing="10"
+                                              MinWidth="0"
+                                              IsVisible="{Binding IsPreview3D}">
+                                            <TextBlock Grid.Column="0"
+                                                       VerticalAlignment="Center"
                                                        Text="{Binding Strings.Preview3DHorizonFogStrength}"
                                                        TextWrapping="Wrap"
                                                        ToolTip.Tip="{Binding Strings.Preview3DHorizonFogStrengthTooltip}" />
@@ -1532,6 +1598,105 @@
                                                                        IsEnabled="{Binding Preview3DEnableGodRays}"
                                                                        Value="{Binding Preview3DGodRayStrength, Mode=TwoWay}"
                                                                        ToolTip.Tip="{Binding Strings.Preview3DGodRayStrengthTooltip}" />
+                                                    </StackPanel>
+                                                </Grid>
+
+                                                <TextBlock FontWeight="SemiBold"
+                                                           Margin="0,4,0,0"
+                                                           Text="God ray debug (froxel)" />
+                                                <CheckBox IsChecked="{Binding Preview3DGodRayStabilizeDebug, Mode=TwoWay}"
+                                                          IsEnabled="{Binding Preview3DEnableGodRays}"
+                                                          ToolTip.Tip="Disables froxel/integrate/upsample temporal reuse and freezes march jitter. Turn on to stop pulsing while tuning god rays.">
+                                                    <TextBlock Text="Stabilize (no temporal/jitter)" TextWrapping="Wrap" />
+                                                </CheckBox>
+                                                <Grid ColumnDefinitions="Auto,*"
+                                                      ColumnSpacing="10"
+                                                      MinWidth="0">
+                                                    <TextBlock Grid.Column="0"
+                                                               VerticalAlignment="Center"
+                                                               Text="Debug density"
+                                                               TextWrapping="Wrap"
+                                                               ToolTip.Tip="Uniform participating-medium density injected into the froxel volume so god rays are visible without height fog or clouds. 0 = production behaviour. Try 0.10-0.30." />
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                        <Slider Width="220"
+                                                                Minimum="0.0"
+                                                                Maximum="1.0"
+                                                                SmallChange="0.02"
+                                                                LargeChange="0.1"
+                                                                TickFrequency="0.25"
+                                                                IsEnabled="{Binding Preview3DEnableGodRays}"
+                                                                Value="{Binding Preview3DGodRayDebugDensity, Mode=TwoWay}" />
+                                                        <NumericUpDown Minimum="0.0"
+                                                                       Maximum="2.0"
+                                                                       Increment="0.02"
+                                                                       FormatString="F2"
+                                                                       HorizontalAlignment="Left"
+                                                                       MinWidth="92"
+                                                                       MaxWidth="120"
+                                                                       ShowButtonSpinner="False"
+                                                                       AllowSpin="False"
+                                                                       IsEnabled="{Binding Preview3DEnableGodRays}"
+                                                                       Value="{Binding Preview3DGodRayDebugDensity, Mode=TwoWay}" />
+                                                    </StackPanel>
+                                                </Grid>
+                                                <Grid ColumnDefinitions="Auto,*"
+                                                      ColumnSpacing="10"
+                                                      MinWidth="0">
+                                                    <TextBlock Grid.Column="0"
+                                                               VerticalAlignment="Center"
+                                                               Text="Scatter gain"
+                                                               TextWrapping="Wrap"
+                                                               ToolTip.Tip="In-scatter accumulation gain in the integrate march (shader default 3.4). Higher = brighter shafts." />
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                        <Slider Width="220"
+                                                                Minimum="0.0"
+                                                                Maximum="12.0"
+                                                                SmallChange="0.1"
+                                                                LargeChange="1.0"
+                                                                TickFrequency="2.0"
+                                                                IsEnabled="{Binding Preview3DEnableGodRays}"
+                                                                Value="{Binding Preview3DGodRayScatterGain, Mode=TwoWay}" />
+                                                        <NumericUpDown Minimum="0.0"
+                                                                       Maximum="20.0"
+                                                                       Increment="0.1"
+                                                                       FormatString="F2"
+                                                                       HorizontalAlignment="Left"
+                                                                       MinWidth="92"
+                                                                       MaxWidth="120"
+                                                                       ShowButtonSpinner="False"
+                                                                       AllowSpin="False"
+                                                                       IsEnabled="{Binding Preview3DEnableGodRays}"
+                                                                       Value="{Binding Preview3DGodRayScatterGain, Mode=TwoWay}" />
+                                                    </StackPanel>
+                                                </Grid>
+                                                <Grid ColumnDefinitions="Auto,*"
+                                                      ColumnSpacing="10"
+                                                      MinWidth="0">
+                                                    <TextBlock Grid.Column="0"
+                                                               VerticalAlignment="Center"
+                                                               Text="Extinction"
+                                                               TextWrapping="Wrap"
+                                                               ToolTip.Tip="Beer-Lambert extinction coefficient for transmittance falloff along the view ray (shader default 1.15). Higher = denser/shorter shafts." />
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                        <Slider Width="220"
+                                                                Minimum="0.05"
+                                                                Maximum="6.0"
+                                                                SmallChange="0.05"
+                                                                LargeChange="0.5"
+                                                                TickFrequency="1.0"
+                                                                IsEnabled="{Binding Preview3DEnableGodRays}"
+                                                                Value="{Binding Preview3DGodRayExtinction, Mode=TwoWay}" />
+                                                        <NumericUpDown Minimum="0.01"
+                                                                       Maximum="8.0"
+                                                                       Increment="0.05"
+                                                                       FormatString="F2"
+                                                                       HorizontalAlignment="Left"
+                                                                       MinWidth="92"
+                                                                       MaxWidth="120"
+                                                                       ShowButtonSpinner="False"
+                                                                       AllowSpin="False"
+                                                                       IsEnabled="{Binding Preview3DEnableGodRays}"
+                                                                       Value="{Binding Preview3DGodRayExtinction, Mode=TwoWay}" />
                                                     </StackPanel>
                                                 </Grid>
                                             </StackPanel>

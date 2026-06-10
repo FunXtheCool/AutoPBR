@@ -7,6 +7,11 @@ namespace AutoPBR.App.Tests;
 public class PreviewGlslEsAdaptTests
 {
     [Theory]
+    [InlineData("genesis.frag")]
+    [InlineData("genesis_godrays.frag")]
+    [InlineData("genesis_godrays_shadow.frag")]
+    [InlineData("genesis_scene_present.frag")]
+    [InlineData("genesis_clouds.frag")]
     [InlineData("genesis_volume_inject.frag")]
     [InlineData("genesis_volume_integrate.frag")]
     [InlineData("atmo_sky.frag")]
@@ -29,6 +34,44 @@ public class PreviewGlslEsAdaptTests
         {
             Assert.Contains("precision highp sampler2DShadow;", adapted, StringComparison.Ordinal);
         }
+
+        if (adapted.Contains("sampler3D", StringComparison.Ordinal))
+        {
+            Assert.Contains("precision highp sampler3D;", adapted, StringComparison.Ordinal);
+        }
+    }
+
+    [Fact]
+    public void EsAdapt_StripsNonAsciiCommentChars_PreservingLength()
+    {
+        const string src = "#version 330 core\n// Beer\u2013Lambert \u2014 mist\nout vec4 c;\nvoid main(){c=vec4(1.0);}\n";
+        var adapted = GlslSourceAdapter.Adapt(src, ShaderType.FragmentShader, useOpenGlEs: true);
+
+        Assert.DoesNotContain('\u2013', adapted);
+        Assert.DoesNotContain('\u2014', adapted);
+        foreach (var ch in adapted)
+        {
+            Assert.True(ch <= '\x7F');
+        }
+    }
+
+    [Fact]
+    public void EsAdaptedGenesis_IncludesSplitSumIblWithoutAtmosphereOnlySymbols()
+    {
+        var src = GlslIncludeResolver.Resolve("genesis.frag", LoadShader);
+        var adapted = GlslSourceAdapter.Adapt(src, ShaderType.FragmentShader, useOpenGlEs: true);
+
+        Assert.Contains("iblEnvBrdfFactor", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("ATM_PI", adapted, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void EsAdapt_LeavesAsciiSourceUnchangedAfterHeaderSwap()
+    {
+        const string src = "#version 330 core\n// plain ascii\nout vec4 c;\nvoid main(){c=vec4(1.0);}\n";
+        var adapted = GlslSourceAdapter.Adapt(src, ShaderType.FragmentShader, useOpenGlEs: true);
+
+        Assert.Contains("// plain ascii", adapted, StringComparison.Ordinal);
     }
 
     private static string LoadShader(string fileName)

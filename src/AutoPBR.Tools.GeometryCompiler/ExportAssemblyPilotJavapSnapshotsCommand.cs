@@ -67,7 +67,7 @@ internal static class ExportAssemblyPilotJavapSnapshotsCommand
         var javap = string.IsNullOrWhiteSpace(javapOverride) ? JavapLocator.FindJavap() : javapOverride;
         var pilots = File.ReadAllLines(pilotList)
             .Select(l => l.Trim())
-            .Where(l => l.Length > 0 && !l.StartsWith("#", StringComparison.Ordinal))
+            .Where(l => l.Length > 0 && !l.StartsWith('#'))
             .ToList();
 
         var rows = new List<string> { "jvm,factoryMethod,offsetOnlyBinds,offsetAndRotationBinds,flatRootYN,snapshotFile,bytes" };

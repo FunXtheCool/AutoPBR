@@ -61,7 +61,7 @@ public sealed class PreviewRenderSettings
     /// <summary>Genesis: contact ambient occlusion strength derived from the POM hit neighborhood.</summary>
     public float ParallaxAoStrength { get; init; } = 1f;
 
-    /// <summary>Genesis: environment IBL — sky LUT + reflected sun when atmospheric sky is on; otherwise procedural hemisphere.</summary>
+    /// <summary>Genesis: environment IBL — split-sum sky LUT specular + diffuse hemisphere when atmospheric sky is on.</summary>
     public bool EnableIbl { get; init; } = true;
 
     /// <summary>Atmospheric sky: render LUT-driven sky background and ambient probes.</summary>
@@ -81,6 +81,9 @@ public sealed class PreviewRenderSettings
 
     /// <summary>Atmospheric sky: additive glare around the sun disc (separate from scatter intensity).</summary>
     public float AtmosphereSunDiscStrength { get; init; } = 0.35f;
+
+    /// <summary>Atmospheric sky: sun angular-size multiplier (1 = legacy stylized size; ~0.07 = real sun).</summary>
+    public float AtmosphereSunDiscSize { get; init; } = 1f;
 
     /// <summary>Horizon fog on sky dome below horizon and aerial perspective on geometry.</summary>
     public float AerialFogStrength { get; init; } = 1f;
@@ -161,6 +164,19 @@ public sealed class PreviewRenderSettings
 
     public float GodRayStrength { get; init; } = 0.45f;
     public float GodRayConeScale { get; init; } = 1f;
+
+    /// <summary>Debug: inscatter accumulation gain in the froxel integrate march (shader constant was 3.4).</summary>
+    public float GodRayScatterGain { get; init; } = 3.4f;
+
+    /// <summary>Debug: extinction coefficient for Beer-Lambert transmittance in the integrate march (was 1.15).</summary>
+    public float GodRayExtinction { get; init; } = 1.15f;
+
+    /// <summary>Debug: uniform participating-medium density injected into the froxel volume so god rays are
+    /// visible without height fog or clouds (0 = off / production behaviour).</summary>
+    public float GodRayDebugDensity { get; init; }
+
+    /// <summary>Debug: disable froxel/integrate/upsample temporal reuse and freeze march jitter to stop pulsing.</summary>
+    public bool GodRayStabilizeDebug { get; init; } = true;
 
     public float CloudDensity { get; init; } = 0.35f;
     public float CloudVolumeSize { get; init; } = 48f;

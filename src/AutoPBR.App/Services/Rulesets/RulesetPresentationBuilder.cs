@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Text;
 using AutoPBR.App.Lang;
 using AutoPBR.App.ViewModels.Rulesets;
 using AutoPBR.Core;
@@ -9,6 +11,7 @@ namespace AutoPBR.App.Services.Rulesets;
 public static class RulesetPresentationBuilder
 {
     private const int KeywordPreviewLimit = 5;
+    private static readonly CompositeFormat MoreKeywordsFormat = CompositeFormat.Parse(LocalizedStrings.RulesetsMoreCount);
 
     public static IReadOnlyList<RuleDisplayItemViewModel> BuildBuiltInTagRows(Func<string, bool>? isExpanded = null)
     {
@@ -27,7 +30,7 @@ public static class RulesetPresentationBuilder
                     VisibleKeywordTokens = BuildVisibleKeywordTokens(rowKey, r.Keywords, isExpanded),
                     KeywordsExpanded = IsExpanded(rowKey, isExpanded),
                     HiddenKeywordCount = CountHiddenKeywords(rowKey, r.Keywords, isExpanded),
-                    MoreKeywordsLabel = string.Format(LocalizedStrings.RulesetsMoreCount, CountHiddenKeywords(rowKey, r.Keywords, isExpanded)),
+                    MoreKeywordsLabel = string.Format(CultureInfo.InvariantCulture, MoreKeywordsFormat, CountHiddenKeywords(rowKey, r.Keywords, isExpanded)),
                     SemanticHintTokens = r.SemanticHints.ToList(),
                     Source = RuleDisplaySource.BuiltInTag,
                     IsEditable = false
@@ -54,7 +57,7 @@ public static class RulesetPresentationBuilder
                     VisibleKeywordTokens = BuildVisibleKeywordTokens(rowKey, r.Keywords, isExpanded),
                     KeywordsExpanded = IsExpanded(rowKey, isExpanded),
                     HiddenKeywordCount = CountHiddenKeywords(rowKey, r.Keywords, isExpanded),
-                    MoreKeywordsLabel = string.Format(LocalizedStrings.RulesetsMoreCount, CountHiddenKeywords(rowKey, r.Keywords, isExpanded)),
+                    MoreKeywordsLabel = string.Format(CultureInfo.InvariantCulture, MoreKeywordsFormat, CountHiddenKeywords(rowKey, r.Keywords, isExpanded)),
                     SemanticHintTokens = r.SemanticHints.ToList(),
                     Source = RuleDisplaySource.BuiltInTag,
                     IsEditable = false
@@ -101,7 +104,7 @@ public static class RulesetPresentationBuilder
 
     private static bool IsExpanded(string id, Func<string, bool>? isExpanded) => isExpanded?.Invoke(id) == true;
 
-    private static IReadOnlyList<string> BuildVisibleKeywordTokens(
+    private static List<string> BuildVisibleKeywordTokens(
         string id,
         IReadOnlyList<string> tokens,
         Func<string, bool>? isExpanded)

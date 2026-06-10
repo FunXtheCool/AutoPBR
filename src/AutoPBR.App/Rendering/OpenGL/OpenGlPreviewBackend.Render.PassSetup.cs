@@ -529,7 +529,7 @@ public sealed partial class OpenGlPreviewBackend
                 }
 
                 var bonePaletteUploaded = false;
-                if (frame.BlockModel?.GpuEntityBoneSkinning == true && _entityBoneUbo != 0)
+                if (frame.BlockModel is { GpuEntityBoneSkinning: true } blockModel && _entityBoneUbo != 0)
                 {
                     if (frame.EntityBoneSnapshotValid &&
                         frame.EntityBoneSnapshotCount > 0)
@@ -545,8 +545,8 @@ public sealed partial class OpenGlPreviewBackend
                     }
 
                     if (TryResolveEntitySkinningDrawState(
-                            frame.BlockModel,
-                            frame.BlockModel.EntityGpuMeshSpaceLiftY,
+                            blockModel,
+                            blockModel.EntityGpuMeshSpaceLiftY,
                             frame.EntityBoneSnapshotValid,
                             frame.EntityBoneSnapshotCount,
                             setupAnimMotion,

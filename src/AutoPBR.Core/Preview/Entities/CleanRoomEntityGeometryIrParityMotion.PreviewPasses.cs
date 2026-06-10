@@ -289,7 +289,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
                stripMap.Count > 0;
     }
 
-    private static IReadOnlyDictionary<string, VanillaSetupAnimRuntime.PartPose> BuildSetupAnimBaselineParts(JsonElement geometryRoot)
+    private static Dictionary<string, VanillaSetupAnimRuntime.PartPose> BuildSetupAnimBaselineParts(JsonElement geometryRoot)
     {
         var map = new Dictionary<string, VanillaSetupAnimRuntime.PartPose>(StringComparer.Ordinal);
         if (!geometryRoot.TryGetProperty("roots", out var roots) || roots.ValueKind != JsonValueKind.Array)

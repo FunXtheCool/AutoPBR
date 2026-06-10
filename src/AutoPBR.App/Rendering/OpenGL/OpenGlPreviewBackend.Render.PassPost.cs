@@ -7,6 +7,14 @@ public sealed partial class OpenGlPreviewBackend
 {
     private void GlRenderPassPost(ref GlRenderFrame frame)
     {
+        // Clouds before god rays on the default FBO; depth is read from the capture texture (no same-FBO feedback).
+        if (frame.Settings.EnableVolumetricClouds &&
+            frame.GodRayCaptureActive &&
+            CanDrawVolumetricClouds(frame.Settings))
+        {
+            DrawVolumetricClouds(ref frame, gateSkyDepth: true);
+        }
+
         DrawGodRayComposite(ref frame);
 
         if (frame.Settings.EnableVolumetricClouds)
@@ -16,16 +24,9 @@ public sealed partial class OpenGlPreviewBackend
                 var halfExtent = ResolveVolumeHalfExtent(ref frame);
                 DrawVolumeCloudComposite(ref frame, halfExtent);
             }
-            else
+            else if (!frame.GodRayCaptureActive)
             {
-                DrawVolumetricClouds(
-                    frame.Gl,
-                    frame.Eye,
-                    frame.View,
-                    frame.Proj,
-                    frame.LightDir,
-                    frame.Scene.Light.Color,
-                    frame.Settings);
+                DrawVolumetricClouds(ref frame, gateSkyDepth: false);
             }
         }
 

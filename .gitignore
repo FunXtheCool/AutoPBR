@@ -84,6 +84,9 @@ tools/MlSpecularTrainer/shuffle_dataset/
 .tmpbuild/
 .tmpanim/
 **/.tmpbuild/
+agent-tools/
+tests/_obj*/
+tests/_out*/
 
 # Extracted vanilla client asset trees (local preview fallback; IR lives in docs/generated/)
 src/AutoPBR.Core/Data/minecraft-native/*/assets/

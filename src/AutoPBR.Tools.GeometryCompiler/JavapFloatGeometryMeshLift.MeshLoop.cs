@@ -15,7 +15,7 @@ internal static partial class JavapFloatGeometryMeshLift
         RegexOptions.CultureInvariant | RegexOptions.Compiled,
         TimeSpan.FromSeconds(2));
 
-    private static bool TryFindCountedLoopContaining(IReadOnlyList<string> lines, int bindingLineIdx, out CountedLoop loop)
+    private static bool TryFindCountedLoopContaining(List<string> lines, int bindingLineIdx, out CountedLoop loop)
     {
         loop = default;
         if (!JavapBytecodeStreamAnalyzer.TryParseLineBytecodeOffset(lines[bindingLineIdx], out var bindingOffset))
@@ -64,7 +64,7 @@ internal static partial class JavapFloatGeometryMeshLift
         return false;
     }
 
-    private static bool TryResolveCountedLoopFromIinc(IReadOnlyList<string> lines, int iincLineIdx, int loopSlot,
+    private static bool TryResolveCountedLoopFromIinc(List<string> lines, int iincLineIdx, int loopSlot,
         int bindingOffset, out CountedLoop loop)
     {
         loop = default;
@@ -118,7 +118,7 @@ internal static partial class JavapFloatGeometryMeshLift
         return false;
     }
 
-    private static int FindLineIndexByBytecodeOffset(IReadOnlyList<string> lines, int offset)
+    private static int FindLineIndexByBytecodeOffset(List<string> lines, int offset)
     {
         for (var i = 0; i < lines.Count; i++)
         {
@@ -146,7 +146,7 @@ internal static partial class JavapFloatGeometryMeshLift
                int.TryParse(m.Groups[1].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out targetOffset);
     }
 
-    private static bool TryParseLoopLimitBeforeIfIcmpge(IReadOnlyList<string> lines, int ifLineIdx, int loopSlot,
+    private static bool TryParseLoopLimitBeforeIfIcmpge(List<string> lines, int ifLineIdx, int loopSlot,
         out int limit, out int endOffset)
     {
         limit = 0;

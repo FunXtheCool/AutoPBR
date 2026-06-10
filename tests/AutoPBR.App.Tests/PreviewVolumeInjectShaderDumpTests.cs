@@ -22,11 +22,55 @@ public sealed class PreviewVolumeInjectShaderEsTests
     [Theory]
     [InlineData("genesis_volume_inject.frag")]
     [InlineData("genesis_volume_inject_lite.frag")]
-    public void EsAdaptedVolumeInject_PacksFroxelWithComponentAssignment(string fragmentFile)
+    public void EsAdaptedVolumeInject_UsesAngleSafePackHelper(string fragmentFile)
     {
         var adapted = ResolveAndAdapt(fragmentFile);
-        Assert.Contains("packed.r = density", adapted, StringComparison.Ordinal);
-        Assert.Contains("packed.gba = sunLit", adapted, StringComparison.Ordinal);
+        Assert.Contains("FragColor = viPackFroxelInject(mediumRho, uLightColor", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("return;", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("vcFbm", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("vmMediumDensity", adapted, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData("genesis_volume_integrate.frag")]
+    [InlineData("genesis_volume_integrate_lite.frag")]
+    public void EsAdaptedVolumeIntegrate_UsesTexelFetchAndGodRayOutput(string fragmentFile)
+    {
+        var adapted = ResolveAndAdapt(fragmentFile);
+        Assert.Contains("GENESIS_GLES_PACK rev29", adapted, StringComparison.Ordinal);
+        Assert.Contains("atmosphereMiePhase", adapted, StringComparison.Ordinal);
+        Assert.Contains("vmSegmentInscatterWeight", adapted, StringComparison.Ordinal);
+        Assert.Contains("vmSegmentTransmittance", adapted, StringComparison.Ordinal);
+        Assert.Contains("viSampleFroxel", adapted, StringComparison.Ordinal);
+        Assert.Contains("grWorldRayDir", adapted, StringComparison.Ordinal);
+        Assert.Contains("vfWorldToFroxelUv", adapted, StringComparison.Ordinal);
+        Assert.Contains("vfFroxelEdgeWeight", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("texelFetch(", adapted, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData("genesis_volume_inject.frag")]
+    [InlineData("genesis_volume_inject_lite.frag")]
+    [InlineData("genesis_volume_integrate.frag")]
+    [InlineData("genesis_volume_integrate_lite.frag")]
+    [InlineData("genesis_clouds.frag")]
+    public void EsAdaptedVolumeShaders_ContainNoNonAsciiBytes(string fragmentFile)
+    {
+        var adapted = ResolveAndAdapt(fragmentFile);
+        foreach (var ch in adapted)
+        {
+            Assert.True(ch <= '\x7F',
+                $"Non-ASCII char U+{(int)ch:X4} in adapted '{fragmentFile}' breaks ANGLE's GLES lexer.");
+        }
+    }
+
+    [Fact]
+    public void LiteIntegrate_ExcludesFbmCloudDensity()
+    {
+        var adapted = ResolveAndAdapt("genesis_volume_integrate_lite.frag");
+        Assert.DoesNotContain("vcFbm", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("vmMediumDensity", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("sampleShadowPcf3x3", adapted, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -35,6 +79,28 @@ public sealed class PreviewVolumeInjectShaderEsTests
         var adapted = ResolveAndAdapt("genesis_volume_inject_lite.frag");
         Assert.DoesNotContain("vcMarchClouds", adapted, StringComparison.Ordinal);
         Assert.DoesNotContain("vcIntersectLayerRange", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("vcCloudDensityEx", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("sampler3D cloudNoise", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("vfSampleFroxel", adapted, StringComparison.Ordinal);
+        Assert.Contains("viInjectMediumDensity", adapted, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void DumpAdaptedVolumeShaders_ForAngleDebug()
+    {
+        var outDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "agent-tools"));
+        Directory.CreateDirectory(outDir);
+        foreach (var f in new[]
+        {
+            "genesis_volume_inject.frag",
+            "genesis_volume_inject_lite.frag",
+            "genesis_volume_integrate.frag",
+            "genesis_volume_integrate_lite.frag"
+        })
+        {
+            var adapted = ResolveAndAdapt(f);
+            File.WriteAllText(Path.Combine(outDir, f + ".es.glsl"), adapted);
+        }
     }
 
     private static string ResolveAndAdapt(string fragmentFile)

@@ -3,6 +3,8 @@
 #ifndef GENESIS_SKY_DOME_GLSL
 #define GENESIS_SKY_DOME_GLSL
 
+//!include "atmosphere.glsl"
+
 const float SKY_PI = 3.14159265358979323846;
 
 float skyHash31(vec3 p)
@@ -20,6 +22,112 @@ float skyDayFactor(vec3 lightPropagationDir, float sunIntensity)
     float dayFromSun = smoothstep(-0.04, 0.22, sunElev);
     float dayFromIntensity = smoothstep(0.08, 2.0, sunIntensity);
     return clamp(dayFromSun * dayFromIntensity, 0.0, 1.0);
+}
+
+// Daytime sky: saturated Rayleigh blue gradient + warm horizon band near the sun.
+// Output is normalized linear RGB (~0..1.3); tone-map with skyTonemapLum, never a
+// per-channel x/(x+k) knee (that compresses every channel toward 1 = grey/white sky).
+vec3 skyDayRadiance(vec3 viewDir, vec3 lightPropagationDir, float sunIntensity, float turbidity, float horizonFalloff)
+{
+    float mu = clamp(viewDir.y, -1.0, 1.0);
+    vec3 towardSun = normalize(-lightPropagationDir);
+    float cosSun = dot(viewDir, towardSun);
+    float sunElev = max(towardSun.y, 0.0);
+
+    // Sky brightness tracks sun intensity only gently (perceptual auto-exposure).
+    float illum = 0.8 + 0.2 * smoothstep(1.0, 12.0, max(sunIntensity, 0.0));
+
+    // Rayleigh blue: saturated zenith, paler toward horizon (linear RGB targets).
+    vec3 zenithBlue = vec3(0.052, 0.22, 0.74);
+    vec3 horizonBlue = vec3(0.38, 0.62, 0.98);
+    float gradT = pow(1.0 - max(mu, 0.0), 2.4);
+    vec3 sky = mix(zenithBlue, horizonBlue, gradT);
+
+    // Haze band hugging the horizon only (high exponent = tight band).
+    float bandExp = mix(9.0, 3.5, clamp(horizonFalloff, 0.0, 1.0));
+    float horizonBand = pow(1.0 - max(mu, 0.0), bandExp);
+
+    float turbidityT = clamp((turbidity - 1.0) / 9.0, 0.0, 1.0);
+    vec3 hazeCol = mix(vec3(0.80, 0.90, 1.0), vec3(0.92, 0.88, 0.82), turbidityT);
+    sky = mix(sky, hazeCol, horizonBand * mix(0.25, 0.55, turbidityT));
+
+    // Warm sunrise/sunset band: strongest at low sun, biased toward the sun azimuth.
+    float lowSun = 1.0 - smoothstep(0.04, 0.42, sunElev);
+    float sunBias = pow(max(cosSun, 0.0) * 0.5 + 0.5, 3.0);
+    vec3 warmCol = vec3(1.0, 0.46, 0.18);
+    sky = mix(sky, warmCol, horizonBand * lowSun * sunBias * 0.85);
+
+    // Forward Mie halo around the sun (warmer when the sun is low).
+    vec3 mieTint = mix(vec3(1.0, 0.95, 0.85), warmCol, lowSun);
+    float mieAmt = atmosphereMiePhase(cosSun) * mix(0.05, 0.4, turbidityT);
+    sky += mieTint * mieAmt * 0.4;
+
+    return max(sky * illum, vec3(0.0));
+}
+
+// Luminance-preserving Reinhard: compresses brightness while keeping hue ratios,
+// so the blue sky stays blue instead of washing out to white.
+vec3 skyTonemapLum(vec3 c)
+{
+    float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
+    if (l <= 1e-5)
+    {
+        return c;
+    }
+
+    return c * ((l / (1.0 + l)) / l);
+}
+
+// Sun disc + aureole in angular space; add to sky radiance before skyTonemapLum.
+// Disc: limb-darkened core (I = 1 - u * (1 - sqrt(1 - r^2))) with a thin edge softened
+// by atmospheric seeing. Aureole: tight circumsolar glow plus a wide 1/theta^2 glare
+// skirt (CIE-like) that fades below visibility instead of hitting a circular boundary.
+vec3 skySunDiscAureole(vec3 viewDir, vec3 lightPropagationDir, float cosDiscEdge,
+    float bloomRadiusUv, float strength, float turbidity)
+{
+    if (strength <= 0.0)
+    {
+        return vec3(0.0);
+    }
+
+    vec3 towardSun = normalize(-lightPropagationDir);
+    vec3 vd = normalize(viewDir);
+    float cosAngle = clamp(dot(vd, towardSun), -1.0, 1.0);
+    float thetaDisc = max(acos(clamp(cosDiscEdge, -1.0, 1.0)), 1e-3);
+    float r = acos(cosAngle) / thetaDisc;
+
+    float sunElev = max(towardSun.y, 0.0);
+    float lowSun = 1.0 - smoothstep(0.04, 0.42, sunElev);
+    float turbidityT = clamp((turbidity - 1.0) / 9.0, 0.0, 1.0);
+
+    // Planet-curvature occlusion: per-pixel slice at the horizon line so the disc
+    // visibly sinks behind the planet edge. Edge softness is a fraction of the disc
+    // radius (atmospheric refraction smear); the glow fades over a wider band.
+    float pixelElev = asin(clamp(vd.y, -1.0, 1.0)) / thetaDisc;
+    float discCut = smoothstep(-0.22, 0.1, pixelElev);
+    float glowCut = smoothstep(-3.0, 0.5, pixelElev);
+
+    // Limb-darkened disc; edge softened over the last 8 percent of the radius.
+    float disc = 0.0;
+    if (r < 1.0)
+    {
+        float limb = 1.0 - 0.6 * (1.0 - sqrt(max(1.0 - r * r, 0.0)));
+        disc = limb * (1.0 - smoothstep(0.92, 1.0, r)) * discCut;
+    }
+
+    // Aureole width in disc radii; the bloom-radius setting and haze both widen it.
+    float spread = mix(2.5, 9.0, clamp(bloomRadiusUv * 36.0, 0.0, 1.0)) * (1.0 + turbidityT * 1.6);
+    float circumsolar = exp(-pow(max(r - 1.0, 0.0) / (spread * 0.4), 1.5));
+    float skirt = 1.0 / (1.0 + pow(r / spread, 2.0));
+
+    // White-hot disc that reddens at the horizon; glow whitens with haze.
+    vec3 discCol = mix(vec3(1.0, 0.97, 0.92), vec3(1.0, 0.55, 0.22), lowSun);
+    vec3 glowCol = mix(vec3(1.0, 0.88, 0.70), vec3(0.92, 0.93, 1.0), turbidityT * 0.7);
+    glowCol = mix(glowCol, vec3(1.0, 0.48, 0.20), lowSun * 0.85);
+
+    // Disc amplitude is HDR (tone-mapped to near-white); aureole stays in sky range.
+    vec3 glow = glowCol * (circumsolar * 1.6 + skirt * 0.35) * glowCut;
+    return (discCol * disc * 22.0 + glow) * strength;
 }
 
 vec3 skyNightZenith(vec3 viewDir)
@@ -48,8 +156,8 @@ vec3 skyHorizonGlow(vec3 viewDir, float dayAmt, vec3 sunTint)
 {
     float band = exp(-abs(viewDir.y) * 9.0);
     vec3 nightGlow = vec3(0.04, 0.05, 0.08);
-    vec3 dayGlow = sunTint * 0.35 + vec3(0.12, 0.16, 0.28);
-    return mix(nightGlow, dayGlow, dayAmt) * band * 0.55;
+    vec3 dayGlow = sunTint * 0.28 + vec3(0.28, 0.42, 0.72);
+    return mix(nightGlow, dayGlow, dayAmt) * band * 0.42;
 }
 
 vec3 skyBelowHorizonFog(vec3 viewDir, float strength)
@@ -115,22 +223,6 @@ vec3 skyMoonDiscShading(vec3 viewDir, vec3 lightPropagationDir, float cosDiscEdg
     moonCol *= 1.0 - smoothstep(0.55, 1.0, radial) * 0.35;
     moonCol *= 0.65 + 0.35 * disc;
     return moonCol * disc;
-}
-
-// Angular bloom around the sun disc; aligned to light direction (same bearing as the sun billboard).
-float skySunDiscBloom(vec3 viewDir, vec3 lightPropagationDir, float cosDiscEdge, float bloomRadiusUv, float strength)
-{
-    if (strength <= 0.0)
-    {
-        return 0.0;
-    }
-
-    float edge = max(cosDiscEdge, 0.85);
-    vec3 towardSun = normalize(-lightPropagationDir);
-    float cosAngle = dot(normalize(viewDir), towardSun);
-    float spread = (1.0 - edge) * mix(2.0, 6.0, clamp(bloomRadiusUv * 36.0, 0.0, 1.0));
-    float outerCos = clamp(edge - spread, -1.0, 1.0);
-    return smoothstep(outerCos, edge, cosAngle) * strength;
 }
 
 // Map a world-space view direction to sky-view LUT UV (matches atmo_skyview.frag).

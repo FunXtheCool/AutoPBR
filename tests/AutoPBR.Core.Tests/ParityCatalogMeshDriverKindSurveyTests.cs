@@ -117,12 +117,14 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests
     public void Catalogued_manifest_paths_milestone_builders_use_runtime_geometry_ir()
     {
         var survey = ParityCatalogIrSurveyHelper.Run();
-        Assert.Empty(survey.CleanRoomPaths.Where(p =>
-            !p.Contains("/horse/", StringComparison.OrdinalIgnoreCase) &&
-            !p.Contains("/cat/", StringComparison.OrdinalIgnoreCase) &&
-            !p.Contains("/wolf/", StringComparison.OrdinalIgnoreCase) &&
-            !p.Contains("/villager/", StringComparison.OrdinalIgnoreCase) &&
-            !p.Contains("/player/", StringComparison.OrdinalIgnoreCase)));
+        Assert.All(survey.CleanRoomPaths, path =>
+            Assert.True(
+                path.Contains("/horse/", StringComparison.OrdinalIgnoreCase) ||
+                path.Contains("/cat/", StringComparison.OrdinalIgnoreCase) ||
+                path.Contains("/wolf/", StringComparison.OrdinalIgnoreCase) ||
+                path.Contains("/villager/", StringComparison.OrdinalIgnoreCase) ||
+                path.Contains("/player/", StringComparison.OrdinalIgnoreCase),
+                path));
     }
 
     [Fact]

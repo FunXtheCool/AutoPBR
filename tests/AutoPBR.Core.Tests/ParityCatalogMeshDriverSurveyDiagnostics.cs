@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using AutoPBR.Core.Models;
 using AutoPBR.Core.Preview;
@@ -27,17 +28,17 @@ public sealed class ParityCatalogMeshDriverSurveyDiagnostics
         }
 
         var sb = new StringBuilder();
-        sb.AppendLine($"CleanRoom paths: {cleanRoom}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"CleanRoom paths: {cleanRoom}");
         sb.AppendLine("By failure reason:");
         foreach (var kv in reasons.OrderByDescending(kv => kv.Value))
         {
-            sb.AppendLine($"  {kv.Value,4}  {kv.Key}");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"  {kv.Value,4}  {kv.Key}");
         }
 
         sb.AppendLine("By builder_method:");
         foreach (var kv in byBuilder.OrderByDescending(kv => kv.Value))
         {
-            sb.AppendLine($"  {kv.Value,4}  {kv.Key}");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"  {kv.Value,4}  {kv.Key}");
         }
 
         _output.WriteLine(sb.ToString());

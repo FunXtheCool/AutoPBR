@@ -7,6 +7,12 @@
 
 //!include "common.glsl"
 
+// LabPBR roughness is already (1 - smoothness)^2; use it directly as GGX alpha.
+float brdfGgxAlpha(float roughness)
+{
+    return clamp(roughness, 0.002, 1.0);
+}
+
 float D_GGX(float NoH, float alpha)
 {
     float a2 = alpha * alpha;
@@ -34,6 +40,17 @@ vec3 F_SchlickRoughness(float NoV, vec3 f0, float roughness)
     return f0 + (fmax - f0) * pow5(1.0 - saturate1(NoV));
 }
 
+// Epic split-sum DFG approximation (Lazarov / UE4 mobile notes).
+// Specular IBL = prefilteredEnv * (f0 * scale + bias). Do not multiply by F again.
+vec2 iblEnvBrdfFactor(float NoV, float roughness)
+{
+    const vec4 c0 = vec4(-1.0, -0.0275, -0.572, 0.022);
+    const vec4 c1 = vec4(1.0, 0.0425, 1.04, -0.04);
+    vec4 r = roughness * c0 + c1;
+    float a004 = min(r.x * r.x, exp2(-9.28 * NoV)) * r.x + r.y;
+    return vec2(-1.04, 1.04) * a004 + r.zw;
+}
+
 struct BrdfResult
 {
     vec3 diffuse;   // (kD * albedo / PI) * NoL
@@ -49,7 +66,7 @@ BrdfResult cookTorrance(vec3 N, vec3 V, vec3 L, vec3 albedo, vec3 f0, float roug
     float NoH = max(dot(N, H), 0.0);
     float VoH = max(dot(V, H), 0.0);
 
-    float alpha = roughness;
+    float alpha = brdfGgxAlpha(roughness);
 
     float D = D_GGX(NoH, alpha);
     float V_ = V_SmithGGXCorrelated(NoV, max(NoL, GEN_EPS), alpha);

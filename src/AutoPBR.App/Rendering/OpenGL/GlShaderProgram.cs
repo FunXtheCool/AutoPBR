@@ -15,10 +15,17 @@ internal sealed class GlShaderProgram : IDisposable
     private bool _disposed;
 
     public GlShaderProgram(GL gl, string vertexFile, string fragmentFile, bool useOpenGlEs, out string? error)
+        : this(gl, vertexFile, fragmentFile, useOpenGlEs, out error, null)
+    {
+    }
+
+    public GlShaderProgram(GL gl, string vertexFile, string fragmentFile, bool useOpenGlEs, out string? error,
+        string? debugLabel)
     {
         _gl = gl;
         error = null;
         _program = 0;
+        var label = string.IsNullOrWhiteSpace(debugLabel) ? fragmentFile : debugLabel;
         string vSrc;
         string fSrc;
         try
@@ -36,13 +43,13 @@ internal sealed class GlShaderProgram : IDisposable
             return;
         }
 
-        var vs = Compile(ShaderType.VertexShader, vSrc, ref error);
+        var vs = Compile(ShaderType.VertexShader, vSrc, label, ref error);
         if (vs == 0)
         {
             return;
         }
 
-        var fs = Compile(ShaderType.FragmentShader, fSrc, ref error);
+        var fs = Compile(ShaderType.FragmentShader, fSrc, label, ref error);
         if (fs == 0)
         {
             _gl.DeleteShader(vs);
@@ -73,7 +80,7 @@ internal sealed class GlShaderProgram : IDisposable
 
     public int GetUniformLocation(string name) => _gl.GetUniformLocation(_program, name);
 
-    private uint Compile(ShaderType type, string source, ref string? error)
+    private uint Compile(ShaderType type, string source, string debugLabel, ref string? error)
     {
         var s = _gl.CreateShader(type);
         _gl.ShaderSource(s, source);
@@ -83,14 +90,51 @@ internal sealed class GlShaderProgram : IDisposable
         {
             var info = _gl.GetShaderInfoLog(s);
             var sb = new StringBuilder();
-            sb.Append(type).Append(" compile failed: ").AppendLine(info);
+            sb.Append(type).Append(" compile failed (").Append(debugLabel).Append("): ").AppendLine(info);
             AppendShaderContext(sb, source, info);
+            AppendShaderFingerprint(sb, source);
+            AppendShaderDumpHint(sb, type, debugLabel, source);
             error = string.IsNullOrEmpty(error) ? sb.ToString() : error + "\n" + sb;
             _gl.DeleteShader(s);
             return 0;
         }
 
         return s;
+    }
+
+    private static void AppendShaderFingerprint(StringBuilder sb, string source)
+    {
+        var packLine = source.Split('\n')
+            .Select(l => l.TrimEnd('\r'))
+            .FirstOrDefault(l => l.Contains("GENESIS_GLES_PACK", StringComparison.Ordinal));
+        sb.Append("Shader pack: ").AppendLine(string.IsNullOrEmpty(packLine) ? "(missing marker)" : packLine.Trim());
+        sb.Append("Fingerprint texture(uFroxelVolume: ")
+            .Append(source.Contains("texture(uFroxelVolume", StringComparison.Ordinal) ? "yes" : "no")
+            .Append(", texelFetch(uFroxelVolume: ")
+            .Append(source.Contains("texelFetch(uFroxelVolume", StringComparison.Ordinal) ? "yes" : "no")
+            .Append(", viMarch8Texture: ")
+            .Append(source.Contains("viMarch8Texture", StringComparison.Ordinal) ? "yes" : "no")
+            .Append(", for+texture(froxel: ")
+            .Append(System.Text.RegularExpressions.Regex.IsMatch(source, @"for\s*\([^)]*\)[\s\S]*texture\s*\(\s*uFroxelVolume", System.Text.RegularExpressions.RegexOptions.None) ? "yes" : "no")
+            .AppendLine(", lines: " + source.Split('\n').Length);
+    }
+
+    private static void AppendShaderDumpHint(StringBuilder sb, ShaderType type, string debugLabel, string source)
+    {
+        try
+        {
+            var dir = Path.Combine(Path.GetTempPath(), "AutoPBR-shader-dumps");
+            Directory.CreateDirectory(dir);
+            var safeLabel = string.Join("_", debugLabel.Split(Path.GetInvalidFileNameChars()));
+            var name = $"failed-{safeLabel}-{type}-{DateTime.UtcNow:yyyyMMddHHmmssfff}.glsl";
+            var path = Path.Combine(dir, name);
+            File.WriteAllText(path, source);
+            sb.Append("Adapted shader dump: ").AppendLine(path);
+        }
+        catch
+        {
+            // Best-effort debug aid only.
+        }
     }
 
     private static void AppendShaderContext(StringBuilder sb, string source, string infoLog)

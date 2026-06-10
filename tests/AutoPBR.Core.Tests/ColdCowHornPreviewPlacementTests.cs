@@ -104,11 +104,10 @@ public sealed class ColdCowHornPreviewPlacementTests
 
     private static Vector3? HornElementPreviewCentroid(
         MergedJavaBlockModel mesh,
-        IReadOnlyList<string> partIds,
+        List<string> partIds,
         float[] gpuBind,
         float liftY)
     {
-        const int stride = MinecraftModelBaker.FloatsPerSkinnedVertex;
         for (var e = 0; e < mesh.Elements.Count; e++)
         {
             if (!partIds[e].Contains("horn", StringComparison.Ordinal))
@@ -145,7 +144,7 @@ public sealed class ColdCowHornPreviewPlacementTests
     private static Vector3? PartCentroid(
         float[] verts,
         MergedJavaBlockModel mesh,
-        IReadOnlyList<string> partIds,
+        List<string> partIds,
         int stride,
         Func<string, bool> match)
     {
@@ -174,7 +173,7 @@ public sealed class ColdCowHornPreviewPlacementTests
     private static Vector3? GpuBindCentroid(
         float[] bindSkinned,
         MergedJavaBlockModel mesh,
-        IReadOnlyList<string> partIds,
+        List<string> partIds,
         float liftY,
         Func<string, bool> match)
     {

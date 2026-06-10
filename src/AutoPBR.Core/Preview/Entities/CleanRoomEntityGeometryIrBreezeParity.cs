@@ -108,7 +108,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         return true;
     }
 
-    private static IReadOnlyDictionary<string, string>? BuildBreezeCompanionTextureRefs(
+    private static Dictionary<string, string>? BuildBreezeCompanionTextureRefs(
         string normalizedAssetPath,
         bool isEyesTexture,
         bool isWindTexture)

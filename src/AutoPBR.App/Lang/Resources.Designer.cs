@@ -324,6 +324,8 @@ public static class Resources
     public static string Preview3DEnableSssTooltip => GetString("Preview3DEnableSssTooltip");
     public static string Preview3DEnableIbl => GetString("Preview3DEnableIbl");
     public static string Preview3DEnableIblTooltip => GetString("Preview3DEnableIblTooltip");
+    public static string Preview3DIblStrength => GetString("Preview3DIblStrength");
+    public static string Preview3DIblStrengthTooltip => GetString("Preview3DIblStrengthTooltip");
     public static string Preview3DEnableAtmosphericSky => GetString("Preview3DEnableAtmosphericSky");
     public static string Preview3DEnableAtmosphericSkyTooltip => GetString("Preview3DEnableAtmosphericSkyTooltip");
     public static string Preview3DAtmosphereTurbidity => GetString("Preview3DAtmosphereTurbidity");
@@ -336,6 +338,8 @@ public static class Resources
     public static string Preview3DAtmosphereSkyExposureTooltip => GetString("Preview3DAtmosphereSkyExposureTooltip");
     public static string Preview3DAtmosphereSunDiscStrength => GetString("Preview3DAtmosphereSunDiscStrength");
     public static string Preview3DAtmosphereSunDiscStrengthTooltip => GetString("Preview3DAtmosphereSunDiscStrengthTooltip");
+    public static string Preview3DAtmosphereSunDiscSize => GetString("Preview3DAtmosphereSunDiscSize");
+    public static string Preview3DAtmosphereSunDiscSizeTooltip => GetString("Preview3DAtmosphereSunDiscSizeTooltip");
     public static string Preview3DHorizonFogStrength => GetString("Preview3DHorizonFogStrength");
     public static string Preview3DHorizonFogStrengthTooltip => GetString("Preview3DHorizonFogStrengthTooltip");
     public static string Preview3DVolumetricSection => GetString("Preview3DVolumetricSection");

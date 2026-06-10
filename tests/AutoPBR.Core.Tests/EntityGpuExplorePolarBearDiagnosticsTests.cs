@@ -102,7 +102,7 @@ public sealed class EntityGpuExplorePolarBearDiagnosticsTests
     private static Vector3? PartCentroid(
         float[] verts,
         MergedJavaBlockModel mesh,
-        IReadOnlyList<string> partIds,
+        List<string> partIds,
         int stride,
         Func<string, bool> match)
     {
@@ -131,7 +131,7 @@ public sealed class EntityGpuExplorePolarBearDiagnosticsTests
     private static Vector3? GpuShaderCentroid(
         float[] verts,
         MergedJavaBlockModel mesh,
-        IReadOnlyList<string> partIds,
+        List<string> partIds,
         Matrix4x4[] invBind,
         float liftY,
         Func<string, bool> match)

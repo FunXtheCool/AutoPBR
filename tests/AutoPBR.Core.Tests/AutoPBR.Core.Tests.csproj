@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);CA1707</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,7 +29,7 @@
     <Using Include="AutoPBR.Core" />
     <Using Include="AutoPBR.Core.Models" />
     <Using Include="AutoPBR.Core.Preview" />
-    <Using Include="AutoPBR.Tests.Shared" />
+    <Using Include="AutoPBR.Tests.TestSupport" />
     <Using Include="Xunit" />
   </ItemGroup>
 

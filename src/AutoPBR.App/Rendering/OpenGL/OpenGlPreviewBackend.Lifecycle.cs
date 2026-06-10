@@ -559,7 +559,7 @@ public sealed partial class OpenGlPreviewBackend
             _grassGroundReady = TryUploadGrassGroundTexture(gl);
 
             TryInitLineOverlay(gl, useOpenGlEs);
-            TryInitSunBillboard(gl, useOpenGlEs);
+            TryInitMoonBillboard(gl, useOpenGlEs);
             TryInitAtmosphere(gl, useOpenGlEs);
             TryInitGodRays(gl, useOpenGlEs);
             TryInitVolume(gl, useOpenGlEs);
@@ -627,7 +627,7 @@ public sealed partial class OpenGlPreviewBackend
             DestroyGodRayResources();
             DestroyVolumeResources();
             DestroyVolumetricCloudResources();
-            DestroySunBillboard();
+            DestroyMoonBillboard();
             DestroyLineOverlay();
             DestroySunDebugOverlay();
             if (_entityBoneUbo != 0)

@@ -230,6 +230,9 @@ public sealed class UserSettings
     /// <summary>Genesis: enable environment IBL (LUT-based when atmospheric sky is on; procedural hemisphere otherwise).</summary>
     public bool Preview3DEnableIbl { get; set; } = true;
 
+    /// <summary>Genesis: indirect (IBL probe) intensity scalar.</summary>
+    public double Preview3DIblStrength { get; set; } = 0.6;
+
     /// <summary>Atmospheric sky: render LUT-driven sky background and ambient probes.</summary>
     public bool Preview3DEnableAtmosphericSky { get; set; } = true;
 
@@ -247,6 +250,9 @@ public sealed class UserSettings
 
     /// <summary>3D preview: additive sun disc bloom on sky composite.</summary>
     public double Preview3DAtmosphereSunDiscStrength { get; set; } = 0.35;
+
+    /// <summary>3D preview: sun angular-size multiplier (1 = stylized default; ~0.07 = real sun).</summary>
+    public double Preview3DAtmosphereSunDiscSize { get; set; } = 1.0;
 
     /// <summary>3D preview: clock time (0–24 h) for sun/moon cycle.</summary>
     public double Preview3DTimeOfDayHours { get; set; } = 12.0;
@@ -266,6 +272,18 @@ public sealed class UserSettings
     public int Preview3DVolumetricQuality { get; set; } = 1;
 
     public double Preview3DGodRayStrength { get; set; } = 0.45;
+
+    /// <summary>Debug: froxel god-ray inscatter gain (shader default 3.4).</summary>
+    public double Preview3DGodRayScatterGain { get; set; } = 3.4;
+
+    /// <summary>Debug: froxel god-ray Beer-Lambert extinction coefficient (shader default 1.15).</summary>
+    public double Preview3DGodRayExtinction { get; set; } = 1.15;
+
+    /// <summary>Debug: uniform froxel medium density so god rays show without fog/clouds (0 = off).</summary>
+    public double Preview3DGodRayDebugDensity { get; set; }
+
+    /// <summary>Debug: disable temporal god-ray reuse and freeze march jitter (reduces pulsing).</summary>
+    public bool Preview3DGodRayStabilizeDebug { get; set; } = true;
 
     /// <summary>Genesis Shadows Phase 2: master toggle for the directional shadow map pass.</summary>
     public bool Preview3DEnableShadows { get; set; } = true;

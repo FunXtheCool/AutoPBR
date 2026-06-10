@@ -13,6 +13,8 @@ public sealed class CreeperPartPoseLiftTests
     private const string CowJvm = "net.minecraft.client.model.animal.cow.CowModel";
     private const double HalfPi = Math.PI / 2.0;
     private const double PoseTol = 0.02;
+    private static readonly string[] CreeperLegPartIds =
+        ["right_hind_leg", "left_hind_leg", "right_front_leg", "left_front_leg"];
 
     /// <summary>1.21.11-style creeper body + legs (clean-room / <c>hcn.a</c> pattern).</summary>
     private const string CreeperHandParityBodyAndLegsSlice = """
@@ -235,7 +237,7 @@ public sealed class CreeperPartPoseLiftTests
                 out var roots, out var notes),
             string.Join("; ", notes));
 
-        var legs = new[] { "right_hind_leg", "left_hind_leg", "right_front_leg", "left_front_leg" }
+        var legs = CreeperLegPartIds
             .Select(id => Translation(FindPart(roots, id)!))
             .ToList();
         Assert.Equal(4, legs.Count);

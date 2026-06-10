@@ -239,13 +239,13 @@ internal static partial class JavapClassDisassembly
                 continue;
             }
 
-            if (!TryDisassemble(javapExe, clientJar, own, out var remoteOut, out _))
+            if (!TryDisassemble(javapExe, clientJar, own!, out var remoteOut, out _))
             {
                 continue;
             }
 
             string? remoteOfficial = null;
-            if (maps is not null && maps.TryGetNamedOuterFromJarSimple(own, out var namedOuter))
+            if (maps is not null && maps.TryGetNamedOuterFromJarSimple(own!, out var namedOuter))
             {
                 remoteOfficial = namedOuter;
             }

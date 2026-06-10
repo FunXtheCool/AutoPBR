@@ -5,14 +5,17 @@ namespace AutoPBR.App.Tests;
 public sealed class PreviewVolumetricQualityTests
 {
     [Theory]
-    [InlineData(0, 8, 24, 12, 0, 0f, 0f)]
-    [InlineData(1, 4, 32, 20, 1, 0.35f, 0.45f)]
-    [InlineData(2, 3, 48, 24, 2, 0.42f, 0.55f)]
+    [InlineData(0, 8, 24, 12, 0f, 0f, 0f, 0f, 0f, 0f)]
+    [InlineData(1, 4, 32, 20, 2.8f, 0.28f, 0.42f, 1, 0.35f, 0.45f)]
+    [InlineData(2, 3, 48, 24, 4.2f, 0.38f, 0.55f, 2, 0.42f, 0.55f)]
     public void Resolve_ReturnsExpectedProfile(
         int quality,
         int divisor,
         int minSize,
         int slices,
+        float depthExp,
+        float froxelTemporal,
+        float cloudTemporal,
         int cloudQuality,
         float volumeTemporal,
         float upsampleTemporal)
@@ -22,6 +25,9 @@ public sealed class PreviewVolumetricQualityTests
         Assert.Equal(divisor, profile.FroxelDivisor);
         Assert.Equal(minSize, profile.FroxelMinSize);
         Assert.Equal(slices, profile.FroxelSlices);
+        Assert.Equal(depthExp, profile.FroxelDepthExp);
+        Assert.Equal(froxelTemporal, profile.FroxelTemporal3DWeight);
+        Assert.Equal(cloudTemporal, profile.CloudTemporalWeight);
         Assert.Equal(cloudQuality, profile.CloudQuality);
         Assert.Equal(volumeTemporal, profile.VolumeIntegrateTemporalWeight);
         Assert.Equal(upsampleTemporal, profile.UpsampleTemporalWeight);

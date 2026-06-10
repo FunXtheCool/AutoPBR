@@ -60,12 +60,14 @@ public partial class MainWindowViewModel
     [ObservableProperty] private bool _preview3DEnableParallaxAo = true;
     [ObservableProperty] private double _preview3DParallaxAoStrength = 1.0;
     [ObservableProperty] private bool _preview3DEnableIbl = true;
+    [ObservableProperty] private double _preview3DIblStrength = 0.6;
     [ObservableProperty] private bool _preview3DEnableAtmosphericSky = true;
     [ObservableProperty] private double _preview3DAtmosphereTurbidity = 2.6;
     [ObservableProperty] private double _preview3DAtmosphereSunIntensity = 10.0;
     [ObservableProperty] private double _preview3DAtmosphereHorizonFalloff = 1.35;
     [ObservableProperty] private double _preview3DAtmosphereSkyExposure = 0.85;
     [ObservableProperty] private double _preview3DAtmosphereSunDiscStrength = 0.35;
+    [ObservableProperty] private double _preview3DAtmosphereSunDiscSize = 1.0;
     [ObservableProperty] private double _preview3DHorizonFogStrength = 1.0;
     [ObservableProperty] private double _preview3DTimeOfDayHours = 12.0;
     [ObservableProperty] private bool _preview3DAnimateTimeOfDay;
@@ -87,6 +89,10 @@ public partial class MainWindowViewModel
     [ObservableProperty] private bool _preview3DEnableVolumetricClouds;
     [ObservableProperty] private int _preview3DVolumetricQuality = 1;
     [ObservableProperty] private double _preview3DGodRayStrength = 0.45;
+    [ObservableProperty] private double _preview3DGodRayScatterGain = 3.4;
+    [ObservableProperty] private double _preview3DGodRayExtinction = 1.15;
+    [ObservableProperty] private double _preview3DGodRayDebugDensity;
+    [ObservableProperty] private bool _preview3DGodRayStabilizeDebug = true;
 
     public string[] Preview3DVolumetricQualityOptions { get; } =
     [
@@ -159,12 +165,14 @@ public partial class MainWindowViewModel
     partial void OnPreview3DEnableParallaxAoChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DParallaxAoStrengthChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEnableIblChanged(bool value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DIblStrengthChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEnableAtmosphericSkyChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DAtmosphereTurbidityChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DAtmosphereSunIntensityChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DAtmosphereHorizonFalloffChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DAtmosphereSkyExposureChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DAtmosphereSunDiscStrengthChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DAtmosphereSunDiscSizeChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DHorizonFogStrengthChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DTimeOfDayHoursChanged(double value) => OnPreview3DTimeOfDayChanged(value);
     partial void OnPreview3DAnimateTimeOfDayChanged(bool value) => OnPreview3DGpuSettingChanged(value);
@@ -173,6 +181,10 @@ public partial class MainWindowViewModel
     partial void OnPreview3DEnableVolumetricCloudsChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DVolumetricQualityChanged(int value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DGodRayStrengthChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DGodRayScatterGainChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DGodRayExtinctionChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DGodRayDebugDensityChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DGodRayStabilizeDebugChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEnableShadowsChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DLightYawDegreesChanged(double value) => OnPreview3DLightDirectionChanged(value);
     partial void OnPreview3DLightPitchDegreesChanged(double value) => OnPreview3DLightDirectionChanged(value);
@@ -295,12 +307,14 @@ public partial class MainWindowViewModel
             EnableParallaxAo = Preview3DEnableParallaxAo,
             ParallaxAoStrength = (float)Preview3DParallaxAoStrength,
             EnableIbl = Preview3DEnableIbl,
+            IblStrength = (float)Preview3DIblStrength,
             EnableAtmosphericSky = Preview3DEnableAtmosphericSky,
             AtmosphereTurbidity = (float)Preview3DAtmosphereTurbidity,
             AtmosphereSunIntensity = (float)Preview3DAtmosphereSunIntensity,
             AtmosphereHorizonFalloff = (float)Preview3DAtmosphereHorizonFalloff,
             AtmosphereSkyExposure = (float)Preview3DAtmosphereSkyExposure,
             AtmosphereSunDiscStrength = (float)Preview3DAtmosphereSunDiscStrength,
+            AtmosphereSunDiscSize = (float)Preview3DAtmosphereSunDiscSize,
             AerialFogStrength = (float)Preview3DHorizonFogStrength,
             TimeOfDayHours = (float)Preview3DTimeOfDayHours,
             AnimateTimeOfDay = Preview3DAnimateTimeOfDay,
@@ -319,6 +333,10 @@ public partial class MainWindowViewModel
             EnableVolumetricClouds = Preview3DEnableVolumetricClouds,
             VolumetricQuality = Math.Clamp(Preview3DVolumetricQuality, 0, 2),
             GodRayStrength = (float)Preview3DGodRayStrength,
+            GodRayScatterGain = (float)Preview3DGodRayScatterGain,
+            GodRayExtinction = (float)Preview3DGodRayExtinction,
+            GodRayDebugDensity = (float)Preview3DGodRayDebugDensity,
+            GodRayStabilizeDebug = Preview3DGodRayStabilizeDebug,
             CloudQuality = PreviewVolumetricQuality.Resolve(Math.Clamp(Preview3DVolumetricQuality, 0, 2)).CloudQuality,
             LogVolumetricTiming = DebugMode
         };

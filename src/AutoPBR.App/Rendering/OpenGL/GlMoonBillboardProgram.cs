@@ -4,51 +4,54 @@ using Silk.NET.OpenGL;
 
 namespace AutoPBR.App.Rendering.OpenGL;
 
-/// <summary>Unlit additive-style sun disc for the Genesis preview; faces the camera on the light yaw/pitch ray.</summary>
-internal sealed class GlSunBillboardProgram : IDisposable
+/// <summary>Textured moon disc billboard opposite the sun light direction.</summary>
+internal sealed class GlMoonBillboardProgram : IDisposable
 {
     private const string Vert330 = """
 #version 330 core
 layout(location = 0) in vec2 aCorner;
 uniform mat4 uViewProj;
-uniform vec3 uSunCenter;
-uniform vec3 uSunRight;
-uniform vec3 uSunUp;
+uniform vec3 uMoonCenter;
+uniform vec3 uMoonRight;
+uniform vec3 uMoonUp;
 uniform float uRadius;
-uniform float uDiscStrength;
-out vec2 vDiscCoord;
+out vec2 vTexCoord;
 void main()
 {
-    vDiscCoord = aCorner;
-    vec3 worldPos = uSunCenter + uSunRight * (aCorner.x * uRadius) + uSunUp * (aCorner.y * uRadius);
+    vTexCoord = aCorner * 0.5 + 0.5;
+    vec3 worldPos = uMoonCenter + uMoonRight * (aCorner.x * uRadius) + uMoonUp * (aCorner.y * uRadius);
     gl_Position = uViewProj * vec4(worldPos, 1.0);
 }
 """;
 
     private const string Frag330 = """
 #version 330 core
-in vec2 vDiscCoord;
+in vec2 vTexCoord;
+uniform sampler2D uMoonAlbedo;
 uniform float uDiscStrength;
 out vec4 FragColor;
 void main()
 {
-    float d = length(vDiscCoord);
+    vec2 centered = vTexCoord * 2.0 - 1.0;
+    float d = length(centered);
     if (d > 1.0)
     {
         discard;
     }
 
-    float strength = max(uDiscStrength, 0.0);
-    float core = 1.0 - smoothstep(0.06, 0.48, d);
-    float halo = exp(-max(d - 0.28, 0.0) * 7.5) * 0.72;
-    vec3 rgb = vec3(1.0, 0.96, 0.84) * (core * 4.2 + halo) * max(strength, 0.35);
-    float alpha = clamp(core * 0.96 + halo * 0.42, 0.0, 1.0);
-    if (alpha < 0.004)
+    vec3 albedo = texture(uMoonAlbedo, vTexCoord).rgb;
+    float limb = 1.0 - smoothstep(0.72, 1.0, d) * 0.38;
+    albedo *= limb;
+    float strength = max(uDiscStrength, 0.35);
+    albedo *= strength;
+    float alpha = texture(uMoonAlbedo, vTexCoord).a;
+    alpha *= 1.0 - smoothstep(0.92, 1.0, d);
+    if (alpha < 0.01)
     {
         discard;
     }
 
-    FragColor = vec4(rgb, alpha);
+    FragColor = vec4(albedo, alpha);
 }
 """;
 
@@ -56,7 +59,7 @@ void main()
     private uint _program;
     private bool _disposed;
 
-    public GlSunBillboardProgram(GL gl, bool useOpenGlEs, out string? error)
+    public GlMoonBillboardProgram(GL gl, bool useOpenGlEs, out string? error)
     {
         _gl = gl;
         error = null;

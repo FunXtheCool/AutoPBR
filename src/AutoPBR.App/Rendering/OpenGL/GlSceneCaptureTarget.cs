@@ -47,14 +47,23 @@ internal sealed class GlSceneCaptureTarget(GL gl, bool useOpenGlEs) : IDisposabl
         gl.BindTexture(TextureTarget.Texture2D, _depthTexture);
         unsafe
         {
-            gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.DepthComponent24, (uint)width, (uint)height, 0,
-                PixelFormat.DepthComponent, PixelType.UnsignedInt, (void*)0);
+            if (useOpenGlEs)
+            {
+                gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Depth24Stencil8, (uint)width, (uint)height, 0,
+                    PixelFormat.DepthStencil, PixelType.UnsignedInt248, (void*)0);
+            }
+            else
+            {
+                gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.DepthComponent24, (uint)width, (uint)height, 0,
+                    PixelFormat.DepthComponent, PixelType.UnsignedInt, (void*)0);
+            }
         }
 
         gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Nearest);
         gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Nearest);
         gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
         gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureCompareMode, (int)GLEnum.None);
 
         _fbo = gl.GenFramebuffer();
         gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);
@@ -88,7 +97,20 @@ internal sealed class GlSceneCaptureTarget(GL gl, bool useOpenGlEs) : IDisposabl
         gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
     }
 
-    /// <summary>Blits the captured color buffer onto the Avalonia default FBO.</summary>
+    /// <summary>Bind capture FBO for compositing into the existing color buffer (no clear).</summary>
+    public void BindComposite(int width, int height)
+    {
+        if (!IsValid)
+        {
+            return;
+        }
+
+        gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);
+        ConfigureColorAttachment();
+        gl.Viewport(0, 0, (uint)Math.Max(1, width), (uint)Math.Max(1, height));
+    }
+
+    public uint ColorTextureHandle => _colorTexture;
     public bool BlitColorToDefault(int defaultFbo, int vpX, int vpY, int width, int height)
     {
         if (!IsValid)
@@ -117,8 +139,6 @@ internal sealed class GlSceneCaptureTarget(GL gl, bool useOpenGlEs) : IDisposabl
         gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, (uint)Math.Max(0, priorDraw));
         return err == GLEnum.NoError;
     }
-
-    public uint ColorTextureHandle => _colorTexture;
 
     private void ConfigureColorAttachment()
     {

@@ -7,6 +7,9 @@ public static class PreviewVolumetricQuality
         int FroxelDivisor,
         int FroxelMinSize,
         int FroxelSlices,
+        float FroxelDepthExp,
+        float FroxelTemporal3DWeight,
+        float CloudTemporalWeight,
         int CloudQuality,
         float VolumeIntegrateTemporalWeight,
         float UpsampleTemporalWeight)
@@ -21,11 +24,14 @@ public static class PreviewVolumetricQuality
     public static Profile Resolve(int quality) =>
         Math.Clamp(quality, 0, 2) switch
         {
-            0 => new Profile(FroxelDivisor: 8, FroxelMinSize: 24, FroxelSlices: 12, CloudQuality: 0,
+            0 => new Profile(FroxelDivisor: 8, FroxelMinSize: 24, FroxelSlices: 12, FroxelDepthExp: 0f,
+                FroxelTemporal3DWeight: 0f, CloudTemporalWeight: 0f, CloudQuality: 0,
                 VolumeIntegrateTemporalWeight: 0f, UpsampleTemporalWeight: 0f),
-            2 => new Profile(FroxelDivisor: 3, FroxelMinSize: 48, FroxelSlices: 24, CloudQuality: 2,
+            2 => new Profile(FroxelDivisor: 3, FroxelMinSize: 48, FroxelSlices: 24, FroxelDepthExp: 4.2f,
+                FroxelTemporal3DWeight: 0.38f, CloudTemporalWeight: 0.55f, CloudQuality: 2,
                 VolumeIntegrateTemporalWeight: 0.42f, UpsampleTemporalWeight: 0.55f),
-            _ => new Profile(FroxelDivisor: 4, FroxelMinSize: 32, FroxelSlices: 20, CloudQuality: 1,
+            _ => new Profile(FroxelDivisor: 4, FroxelMinSize: 32, FroxelSlices: 20, FroxelDepthExp: 2.8f,
+                FroxelTemporal3DWeight: 0.28f, CloudTemporalWeight: 0.42f, CloudQuality: 1,
                 VolumeIntegrateTemporalWeight: 0.35f, UpsampleTemporalWeight: 0.45f),
         };
 }

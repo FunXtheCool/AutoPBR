@@ -5,8 +5,9 @@
 #define GENESIS_VOLUMETRIC_MEDIUM_GLSL
 
 //!include "volumetric_clouds_density.glsl"
+//!include "volumetric_segment.glsl"
 
-// Ground-hugging mist slab in world Y (not camera-relative — avoids orbit grey dome).
+// Ground-hugging mist slab in world Y (not camera-relative - avoids orbit grey dome).
 float vmHeightFogDensity(vec3 worldPos, float groundWorldY, float fogSlabTopY, float strength)
 {
     if (strength <= 0.0)

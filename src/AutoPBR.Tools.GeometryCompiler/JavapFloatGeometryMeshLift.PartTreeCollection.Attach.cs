@@ -22,7 +22,7 @@ internal static partial class JavapFloatGeometryMeshLift
     }
 
     /// <summary>Skips blank lines and <c>pop</c> between a key instruction and the first <c>astore</c>.</summary>
-    private static bool TryFindFirstAstoreLocalSlotAfter(IReadOnlyList<string> lines, int startIdx, int minOffset,
+    private static bool TryFindFirstAstoreLocalSlotAfter(List<string> lines, int startIdx, int minOffset,
         int maxOffset, out int astoreLineIdx, out int slot)
     {
         astoreLineIdx = -1;

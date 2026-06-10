@@ -65,7 +65,7 @@ public sealed class GeometryIrLiftTreeRepairTests
 
         roots = GeometryIrLiftTreeRepair.Apply(roots);
         var body = roots[0]!["children"]![0]!.AsObject();
-        Assert.Equal(1, body["cuboids"]!.AsArray().Count);
+        Assert.Single(body["cuboids"]!.AsArray());
     }
 
     private static JsonObject ZeroPose() => new()

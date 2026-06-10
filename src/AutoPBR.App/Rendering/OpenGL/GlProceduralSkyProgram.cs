@@ -35,6 +35,7 @@ uniform float uSunCosDiscEdge;
 uniform float uMoonCosDiscEdge;
 uniform float uViewportAspect;
 uniform float uSunDiscRadiusUv;
+uniform float uSunElevation;
 out vec4 FragColor;
 
 const float SKY_PI = 3.14159265358979323846;
@@ -107,18 +108,30 @@ float miePhase(float cosTheta)
 vec3 proceduralSky(vec3 viewDir, vec3 lightPropagationDir, float sunIntensity, float turbidity, float horizonFalloff)
 {
     float mu = clamp(viewDir.y, -1.0, 1.0);
-    float cosSun = dot(viewDir, normalize(-lightPropagationDir));
-    float rayleigh = rayleighPhase(cosSun);
-    float mie = miePhase(cosSun) * clamp(turbidity * 0.35, 0.2, 4.0);
-    vec3 sunCol = vec3(1.0, 0.97, 0.92) * sunIntensity;
-    float horizon = pow(1.0 - clamp(mu, 0.0, 1.0), max(horizonFalloff, 0.1));
-    vec3 baseSky = mix(vec3(0.02, 0.04, 0.08), vec3(0.24, 0.43, 0.78), clamp(mu * 0.5 + 0.5, 0.0, 1.0));
-    vec3 betaR = vec3(5.5e-6, 13.0e-6, 22.4e-6);
-    vec3 scatter = (betaR * rayleigh * 120000.0 + vec3(mie * 0.045)) * sunCol;
-    vec3 col = baseSky * mix(0.9, 0.45, horizon) + scatter;
+    vec3 towardSun = normalize(-lightPropagationDir);
+    float cosSun = dot(viewDir, towardSun);
+    float sunElev = max(towardSun.y, 0.0);
+    float illum = 0.8 + 0.2 * smoothstep(1.0, 12.0, max(sunIntensity, 0.0));
+    vec3 zenithBlue = vec3(0.052, 0.22, 0.74);
+    vec3 horizonBlue = vec3(0.38, 0.62, 0.98);
+    float gradT = pow(1.0 - max(mu, 0.0), 2.4);
+    vec3 sky = mix(zenithBlue, horizonBlue, gradT);
+    float bandExp = mix(9.0, 3.5, clamp(horizonFalloff, 0.0, 1.0));
+    float horizonBand = pow(1.0 - max(mu, 0.0), bandExp);
+    float turbidityT = clamp((turbidity - 1.0) / 9.0, 0.0, 1.0);
+    vec3 hazeCol = mix(vec3(0.80, 0.90, 1.0), vec3(0.92, 0.88, 0.82), turbidityT);
+    sky = mix(sky, hazeCol, horizonBand * mix(0.25, 0.55, turbidityT));
+    float lowSun = 1.0 - smoothstep(0.04, 0.42, sunElev);
+    float sunBias = pow(max(cosSun, 0.0) * 0.5 + 0.5, 3.0);
+    vec3 warmCol = vec3(1.0, 0.46, 0.18);
+    sky = mix(sky, warmCol, horizonBand * lowSun * sunBias * 0.85);
+    vec3 mieTint = mix(vec3(1.0, 0.95, 0.85), warmCol, lowSun);
+    float mieAmt = miePhase(cosSun) * mix(0.05, 0.4, turbidityT);
+    sky += mieTint * mieAmt * 0.4;
+    sky = max(sky * illum, vec3(0.0));
     float dayAmt = dayFactor(lightPropagationDir, sunIntensity);
-    col = mix(nightZenith(viewDir), col, dayAmt);
-    return max(col, vec3(0.0));
+    sky = mix(nightZenith(viewDir), sky, dayAmt);
+    return max(sky, vec3(0.0));
 }
 
 vec3 horizonGlow(vec3 viewDir, float dayAmt)
@@ -126,8 +139,8 @@ vec3 horizonGlow(vec3 viewDir, float dayAmt)
     float band = exp(-abs(viewDir.y) * 9.0);
     vec3 sunTint = vec3(1.0, 0.93, 0.74);
     vec3 nightGlow = vec3(0.04, 0.05, 0.08);
-    vec3 dayGlow = sunTint * 0.35 + vec3(0.12, 0.16, 0.28);
-    return mix(nightGlow, dayGlow, dayAmt) * band * 0.55;
+    vec3 dayGlow = sunTint * 0.28 + vec3(0.28, 0.42, 0.72);
+    return mix(nightGlow, dayGlow, dayAmt) * band * 0.42;
 }
 
 vec3 belowHorizonFog(vec3 viewDir, float strength)
@@ -141,19 +154,39 @@ vec3 belowHorizonFog(vec3 viewDir, float strength)
     return vec3(0.06, 0.07, 0.09) * depth * strength;
 }
 
-float sunDiscBloom(vec3 viewDir, vec3 lightPropagationDir, float cosDiscEdge, float bloomRadiusUv, float strength)
+vec3 sunDiscAureole(vec3 viewDir, vec3 lightPropagationDir, float cosDiscEdge, float bloomRadiusUv, float strength, float turbidity)
 {
     if (strength <= 0.0)
     {
-        return 0.0;
+        return vec3(0.0);
     }
 
-    float edge = max(cosDiscEdge, 0.85);
     vec3 towardSun = normalize(-lightPropagationDir);
-    float cosAngle = dot(normalize(viewDir), towardSun);
-    float spread = (1.0 - edge) * mix(2.0, 6.0, clamp(bloomRadiusUv * 36.0, 0.0, 1.0));
-    float outerCos = clamp(edge - spread, -1.0, 1.0);
-    return smoothstep(outerCos, edge, cosAngle) * strength;
+    vec3 vd = normalize(viewDir);
+    float cosAngle = clamp(dot(vd, towardSun), -1.0, 1.0);
+    float thetaDisc = max(acos(clamp(cosDiscEdge, -1.0, 1.0)), 1e-3);
+    float r = acos(cosAngle) / thetaDisc;
+    float sunElev = max(towardSun.y, 0.0);
+    float lowSun = 1.0 - smoothstep(0.04, 0.42, sunElev);
+    float turbidityT = clamp((turbidity - 1.0) / 9.0, 0.0, 1.0);
+    float pixelElev = asin(clamp(vd.y, -1.0, 1.0)) / thetaDisc;
+    float discCut = smoothstep(-0.22, 0.1, pixelElev);
+    float glowCut = smoothstep(-3.0, 0.5, pixelElev);
+    float disc = 0.0;
+    if (r < 1.0)
+    {
+        float limb = 1.0 - 0.6 * (1.0 - sqrt(max(1.0 - r * r, 0.0)));
+        disc = limb * (1.0 - smoothstep(0.92, 1.0, r)) * discCut;
+    }
+
+    float spread = mix(2.5, 9.0, clamp(bloomRadiusUv * 36.0, 0.0, 1.0)) * (1.0 + turbidityT * 1.6);
+    float circumsolar = exp(-pow(max(r - 1.0, 0.0) / (spread * 0.4), 1.5));
+    float skirt = 1.0 / (1.0 + pow(r / spread, 2.0));
+    vec3 discCol = mix(vec3(1.0, 0.97, 0.92), vec3(1.0, 0.55, 0.22), lowSun);
+    vec3 glowCol = mix(vec3(1.0, 0.88, 0.70), vec3(0.92, 0.93, 1.0), turbidityT * 0.7);
+    glowCol = mix(glowCol, vec3(1.0, 0.48, 0.20), lowSun * 0.85);
+    vec3 glow = glowCol * (circumsolar * 1.6 + skirt * 0.35) * glowCut;
+    return (discCol * disc * 22.0 + glow) * strength;
 }
 
 vec2 moonDiscUv(vec3 viewDir, vec3 towardMoon, float cosDiscEdge)
@@ -217,21 +250,20 @@ void main()
     sky += horizonGlow(viewDir, dayAmt);
     sky += belowHorizonFog(viewDir, uHorizonFogStrength);
 
-    vec3 sunTint = vec3(1.0, 0.93, 0.74);
-    if (dayAmt > 0.12)
+    float sunVis = smoothstep(0.0, 0.06, dayAmt) * (0.35 + 0.65 * dayAmt);
+    if (sunVis > 0.001)
     {
-        sky += sunTint * sunDiscBloom(viewDir, uLightDir, uSunCosDiscEdge, uSunDiscRadiusUv, uSunDiscStrength) * dayAmt;
+        sky += sunDiscAureole(viewDir, uLightDir, uSunCosDiscEdge, uSunDiscRadiusUv, uSunDiscStrength, uTurbidity) * sunVis;
     }
 
-    float nightAmt = 1.0 - dayAmt;
-    if (nightAmt > 0.3)
+    sky *= uSkyExposure * 1.4;
+    float lum = dot(sky, vec3(0.2126, 0.7152, 0.0722));
+    if (lum > 1e-5)
     {
-        sky += moonDiscShading(viewDir, uLightDir, uMoonCosDiscEdge) * nightAmt;
+        sky *= (lum / (1.0 + lum)) / lum;
     }
 
-    sky *= uSkyExposure;
-    sky = sky / (sky + vec3(0.08));
-    FragColor = vec4(pow(clamp(sky, vec3(0.0), vec3(64.0)), vec3(1.0 / 2.2)), 1.0);
+    FragColor = vec4(pow(clamp(sky, vec3(0.0), vec3(1.0)), vec3(1.0 / 2.2)), 1.0);
 }
 """;
 

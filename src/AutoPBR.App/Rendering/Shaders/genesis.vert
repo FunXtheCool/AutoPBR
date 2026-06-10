@@ -13,7 +13,7 @@ uniform mat4 uView;
 uniform mat4 uProj;
 uniform mat4 uLightViewProj;
 
-// Bone palette only in UBO (std140 mat4[64]). Scalars are plain float uniforms — avoids std140 tail
+// Bone palette only in UBO (std140 mat4[64]). Scalars are plain float uniforms - avoids std140 tail
 // layout mismatches and GLES/ANGLE int-uniform quirks on Windows preview contexts.
 layout(std140) uniform EntitySkinningBones {
     mat4 uBoneMatrices[64];

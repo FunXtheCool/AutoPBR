@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using AutoPBR.Core.Preview;
-using AutoPBR.Tests.Shared;
+using AutoPBR.Tests.TestSupport;
 using AutoPBR.Tools.GeometryCompiler;
 
 namespace AutoPBR.GeometryCompiler.Tests;
@@ -76,7 +76,7 @@ public sealed class QuadrupedMeshLiftTests
             $"{jvm} shard must be ok");
 
         using var ir = JsonDocument.Parse(File.ReadAllText(irPath));
-        var entry = GeometryIrLiftQualityReport.AnalyzeShard(jvm, status, ir.RootElement, root);
+        var entry = GeometryIrLiftQualityReport.AnalyzeShard(jvm, status!, ir.RootElement, root);
         Assert.True(entry.ReferenceCuboidsMatch, entry.ReferenceCompareMessage ?? jvm);
     }
 

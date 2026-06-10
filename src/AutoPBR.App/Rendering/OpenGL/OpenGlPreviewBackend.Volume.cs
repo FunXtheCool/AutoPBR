@@ -16,11 +16,18 @@ public sealed partial class OpenGlPreviewBackend
     private string? _volumeInitFailureDetail;
     private string? _godRayInitFailureDetail;
     private GlVolumeFroxelTarget? _volumeFroxelTarget;
+    private GlVolumeFroxelTarget? _volumeFroxelHistory;
     private GlColorRenderTarget? _volumeCloudTarget;
     private GlColorRenderTarget? _volumeIntegrateHistory;
     private float _volumeJitter;
     private Matrix4x4 _volumePrevViewProj = Matrix4x4.Identity;
     private bool _volumeIntegrateHistoryValid;
+    private bool _volumeFroxelHistoryValid;
+    private Vector3 _volumePrevEye;
+    private Vector3 _volumePrevCamRight;
+    private Vector3 _volumePrevCamUp;
+    private Vector3 _volumePrevCamForward;
+    private Vector3 _volumePrevHalfExtent;
     private int _volumeHistoryHalfW;
     private int _volumeHistoryHalfH;
 
@@ -36,7 +43,7 @@ public sealed partial class OpenGlPreviewBackend
         _volumeInitFailureDetail = null;
         if (TryLoadVolumePrograms(gl, useOpenGlEs, lite: false))
         {
-            EmitDiagnostic("[3D preview] Volume shaders ready (gles-pack rev 4, full path).");
+            EmitDiagnostic("[3D preview] Volume shaders ready (gles-pack rev 29 (froxel march), full path).");
             return;
         }
 
@@ -45,7 +52,7 @@ public sealed partial class OpenGlPreviewBackend
         _volumeUseLiteShaders = true;
         if (TryLoadVolumePrograms(gl, useOpenGlEs, lite: true))
         {
-            EmitDiagnostic("[3D preview] Volume lite god-ray path ready (gles-pack rev 4).");
+            EmitDiagnostic("[3D preview] Volume lite god-ray path ready (gles-pack rev 29 (froxel march)).");
             return;
         }
 
@@ -87,13 +94,15 @@ public sealed partial class OpenGlPreviewBackend
     private bool TryLoadVolumePrograms(GL gl, bool useOpenGlEs, bool lite)
     {
         _volumeFroxelTarget = new GlVolumeFroxelTarget(gl, useOpenGlEs);
+        _volumeFroxelHistory = new GlVolumeFroxelTarget(gl, useOpenGlEs);
         _volumeCloudTarget = new GlColorRenderTarget(gl, useOpenGlEs);
         _volumeIntegrateHistory = new GlColorRenderTarget(gl, useOpenGlEs);
 
         var injectFile = lite ? "genesis_volume_inject_lite.frag" : "genesis_volume_inject.frag";
         var integrateFile = lite ? "genesis_volume_integrate_lite.frag" : "genesis_volume_integrate.frag";
 
-        _volumeInjectProgram = new GlShaderProgram(gl, "genesis_godrays.vert", injectFile, useOpenGlEs, out var injectErr);
+        _volumeInjectProgram = new GlShaderProgram(gl, "genesis_godrays.vert", injectFile, useOpenGlEs, out var injectErr,
+            lite ? "volume-inject-lite" : "volume-inject-full");
         if (_volumeInjectProgram is not { IsValid: true })
         {
             RecordVolumeShaderFailure(lite, "inject", injectErr);
@@ -101,7 +110,8 @@ public sealed partial class OpenGlPreviewBackend
             return false;
         }
 
-        _volumeIntegrateProgram = new GlShaderProgram(gl, "genesis_godrays.vert", integrateFile, useOpenGlEs, out var intErr);
+        _volumeIntegrateProgram = new GlShaderProgram(gl, "genesis_godrays.vert", integrateFile, useOpenGlEs, out var intErr,
+            lite ? "volume-integrate-lite" : "volume-integrate-full");
         if (_volumeIntegrateProgram is not { IsValid: true })
         {
             RecordVolumeShaderFailure(lite, "integrate", intErr);
@@ -116,6 +126,8 @@ public sealed partial class OpenGlPreviewBackend
     {
         _volumeFroxelTarget?.Dispose();
         _volumeFroxelTarget = null;
+        _volumeFroxelHistory?.Dispose();
+        _volumeFroxelHistory = null;
         _volumeCloudTarget?.Dispose();
         _volumeCloudTarget = null;
         _volumeIntegrateHistory?.Dispose();
@@ -125,6 +137,7 @@ public sealed partial class OpenGlPreviewBackend
         _volumeIntegrateProgram?.Dispose();
         _volumeIntegrateProgram = null;
         _volumeIntegrateHistoryValid = false;
+        _volumeFroxelHistoryValid = false;
         _volumeUseLiteShaders = false;
     }
 
@@ -141,8 +154,10 @@ public sealed partial class OpenGlPreviewBackend
 
     private static Vector3 ComputeFroxelHalfExtent(float fovRadians, float aspect, float forwardDistance)
     {
-        var halfY = MathF.Tan(fovRadians * 0.5f) * forwardDistance * 0.52f;
-        var halfX = halfY * aspect * 0.62f;
+        // Match the view frustum lateral extent at the far depth of the froxel box so integrate
+        // does not clip god rays at a visible vertical/horizontal seam (was 0.52/0.62).
+        var halfY = MathF.Tan(fovRadians * 0.5f) * forwardDistance * 1.05f;
+        var halfX = halfY * aspect * 1.05f;
         return new Vector3(halfX, halfY, forwardDistance * 0.5f);
     }
 
@@ -198,12 +213,15 @@ public sealed partial class OpenGlPreviewBackend
             return false;
         }
 
+        _volumeFroxelHistory?.EnsureSize(froxelW, froxelH, froxelSlices);
+
         var gl = frame.Gl;
         while (gl.GetError() != GLEnum.NoError)
         {
         }
 
         var injectSw = frame.Settings.LogVolumetricTiming ? Stopwatch.StartNew() : null;
+        var quality = PreviewVolumetricQuality.Resolve(frame.Settings.VolumetricQuality);
         ComputeCameraBasis(frame.Eye, frame.LookTarget, out var camRight, out var camUp, out var camForward);
 
         var shadowAvailable = frame.ShadowAvailable && _shadowTarget is not null;
@@ -220,6 +238,7 @@ public sealed partial class OpenGlPreviewBackend
         SetVec3OnProgram(_volumeInjectProgram, "uLightColor", frame.Scene.Light.Color);
         SetVec3OnProgram(_volumeInjectProgram, "uHalfExtent", halfExtent);
         SetIntOnProgram(_volumeInjectProgram, "uSliceCount", _volumeFroxelTarget.Slices);
+        SetFloatOnProgram(_volumeInjectProgram, "uDepthDistribution", quality.FroxelDepthExp);
         SetFloatOnProgram(_volumeInjectProgram, "uLayerHeight", layerWorldY);
         SetFloatOnProgram(_volumeInjectProgram, "uVolumeHeight", frame.Settings.CloudVolumeHeight);
         SetFloatOnProgram(_volumeInjectProgram, "uCloudDensity", frame.Settings.CloudDensity);
@@ -227,6 +246,7 @@ public sealed partial class OpenGlPreviewBackend
         SetFloatOnProgram(_volumeInjectProgram, "uGroundWorldY", PreviewStageConstants.GroundPlaneWorldY);
         SetFloatOnProgram(_volumeInjectProgram, "uFogSlabHeight", PreviewStageConstants.GroundFogSlabHeight);
         SetFloatOnProgram(_volumeInjectProgram, "uHeightFogStrength", ResolveVolumeHeightFogStrength(frame.Settings));
+        SetFloatOnProgram(_volumeInjectProgram, "uDebugDensity", Math.Max(0f, frame.Settings.GodRayDebugDensity));
         if (!_volumeUseLiteShaders)
         {
             SetMatrixOnProgram(_volumeInjectProgram, "uLightViewProj", frame.ShadowVp);
@@ -377,6 +397,10 @@ public sealed partial class OpenGlPreviewBackend
                 new Vector2(1f / _volumeFroxelTarget.Width, 1f / _volumeFroxelTarget.Height));
             SetFloatOnProgram(_volumeIntegrateProgram, "uStrength", strength);
             SetFloatOnProgram(_volumeIntegrateProgram, "uJitter", jitter);
+            SetFloatOnProgram(_volumeIntegrateProgram, "uScatterGain", frame.Settings.GodRayScatterGain);
+            SetFloatOnProgram(_volumeIntegrateProgram, "uExtinction", Math.Max(1e-3f, frame.Settings.GodRayExtinction));
+            var liteQuality = PreviewVolumetricQuality.Resolve(frame.Settings.VolumetricQuality);
+            SetFloatOnProgram(_volumeIntegrateProgram, "uDepthDistribution", liteQuality.FroxelDepthExp);
             return;
         }
 
@@ -396,8 +420,9 @@ public sealed partial class OpenGlPreviewBackend
         gl.ActiveTexture(TextureUnit.Texture1);
         gl.BindTexture(TextureTarget.Texture2D, _sceneCapture.DepthTextureHandle);
         SetIntOnProgram(_volumeIntegrateProgram, "uSceneDepth", 1);
+        var stabilize = frame.Settings.GodRayStabilizeDebug;
         gl.ActiveTexture(TextureUnit.Texture2);
-        if (_volumeIntegrateHistory is not null && _volumeIntegrateHistoryValid && outputClouds == 0)
+        if (!stabilize && _volumeIntegrateHistory is not null && _volumeIntegrateHistoryValid && outputClouds == 0)
         {
             gl.BindTexture(TextureTarget.Texture2D, _volumeIntegrateHistory.ColorTextureHandle);
             SetIntOnProgram(_volumeIntegrateProgram, "uPrevIntegrate", 2);
@@ -410,14 +435,33 @@ public sealed partial class OpenGlPreviewBackend
             SetIntOnProgram(_volumeIntegrateProgram, "uHasPrevIntegrate", 0);
         }
 
+        gl.ActiveTexture(TextureUnit.Texture3);
+        if (!stabilize && _volumeFroxelHistory is not null && _volumeFroxelHistoryValid && _volumeFroxelHistory.IsValid)
+        {
+            gl.BindTexture(TextureTarget.Texture2DArray, _volumeFroxelHistory.ArrayTextureHandle);
+            SetIntOnProgram(_volumeIntegrateProgram, "uPrevFroxelVolume", 3);
+            SetIntOnProgram(_volumeIntegrateProgram, "uHasPrevFroxel", 1);
+        }
+        else
+        {
+            gl.BindTexture(TextureTarget.Texture2DArray, _volumeFroxelTarget.ArrayTextureHandle);
+            SetIntOnProgram(_volumeIntegrateProgram, "uPrevFroxelVolume", 3);
+            SetIntOnProgram(_volumeIntegrateProgram, "uHasPrevFroxel", 0);
+        }
+
         SetMatrixOnProgram(_volumeIntegrateProgram, "uInvViewProj", invViewProj);
         SetMatrixOnProgram(_volumeIntegrateProgram, "uPrevViewProj", _volumePrevViewProj);
         SetVec3OnProgram(_volumeIntegrateProgram, "uCameraPos", frame.Eye);
+        SetVec3OnProgram(_volumeIntegrateProgram, "uPrevCameraPos", _volumePrevEye);
         SetVec3OnProgram(_volumeIntegrateProgram, "uCamRight", camRight);
         SetVec3OnProgram(_volumeIntegrateProgram, "uCamUp", camUp);
         SetVec3OnProgram(_volumeIntegrateProgram, "uCamForward", camForward);
+        SetVec3OnProgram(_volumeIntegrateProgram, "uPrevCamRight", _volumePrevCamRight);
+        SetVec3OnProgram(_volumeIntegrateProgram, "uPrevCamUp", _volumePrevCamUp);
+        SetVec3OnProgram(_volumeIntegrateProgram, "uPrevCamForward", _volumePrevCamForward);
         SetVec3OnProgram(_volumeIntegrateProgram, "uLightDir", frame.LightDir);
         SetVec3OnProgram(_volumeIntegrateProgram, "uHalfExtent", halfExtent);
+        SetVec3OnProgram(_volumeIntegrateProgram, "uPrevHalfExtent", _volumePrevHalfExtent);
         SetIntOnProgram(_volumeIntegrateProgram, "uSliceCount", _volumeFroxelTarget.Slices);
         SetVec2OnProgram(_volumeIntegrateProgram, "uFroxelTexelSize",
             new Vector2(1f / _volumeFroxelTarget.Width, 1f / _volumeFroxelTarget.Height));
@@ -425,8 +469,34 @@ public sealed partial class OpenGlPreviewBackend
         SetFloatOnProgram(_volumeIntegrateProgram, "uJitter", jitter);
         var quality = PreviewVolumetricQuality.Resolve(frame.Settings.VolumetricQuality);
         SetFloatOnProgram(_volumeIntegrateProgram, "uTemporalWeight",
-            outputClouds == 0 ? quality.VolumeIntegrateTemporalWeight : 0f);
+            stabilize || outputClouds != 0 ? 0f : quality.VolumeIntegrateTemporalWeight);
+        SetFloatOnProgram(_volumeIntegrateProgram, "uFroxelTemporalWeight",
+            stabilize || outputClouds != 0 ? 0f : quality.FroxelTemporal3DWeight);
+        SetFloatOnProgram(_volumeIntegrateProgram, "uDepthDistribution", quality.FroxelDepthExp);
+        SetFloatOnProgram(_volumeIntegrateProgram, "uScatterGain", frame.Settings.GodRayScatterGain);
+        SetFloatOnProgram(_volumeIntegrateProgram, "uExtinction", Math.Max(1e-3f, frame.Settings.GodRayExtinction));
         SetIntOnProgram(_volumeIntegrateProgram, "uOutputClouds", outputClouds);
+    }
+
+    private void CommitFroxelHistory(
+        Vector3 eye,
+        Vector3 halfExtent,
+        Vector3 camRight,
+        Vector3 camUp,
+        Vector3 camForward)
+    {
+        if (_volumeFroxelHistory is null || _volumeFroxelTarget is null)
+        {
+            return;
+        }
+
+        (_volumeFroxelTarget, _volumeFroxelHistory) = (_volumeFroxelHistory, _volumeFroxelTarget);
+        _volumePrevEye = eye;
+        _volumePrevHalfExtent = halfExtent;
+        _volumePrevCamRight = camRight;
+        _volumePrevCamUp = camUp;
+        _volumePrevCamForward = camForward;
+        _volumeFroxelHistoryValid = true;
     }
 
     private void DrawVolumeCloudComposite(ref GlRenderFrame frame, Vector3 halfExtent)
@@ -471,7 +541,7 @@ public sealed partial class OpenGlPreviewBackend
         gl.BindVertexArray(0);
     }
 
-    private bool TryIntegrateVolumeGodRaysToHalfRes(ref GlRenderFrame frame, Vector3 halfExtent)
+    private bool TryIntegrateVolumeGodRaysToHalfRes(ref GlRenderFrame frame, Vector3 halfExtent, float marchJitter)
     {
         if (_godRayHalfResTarget is null || _volumeIntegrateHistory is null ||
             _sceneCapture is not { IsValid: true } || _volumeIntegrateProgram is not { IsValid: true })
@@ -489,7 +559,7 @@ public sealed partial class OpenGlPreviewBackend
         _godRayHalfResTarget.BindDraw();
         frame.Gl.Clear(ClearBufferMask.ColorBufferBit);
         var integrateSw = frame.Settings.LogVolumetricTiming ? Stopwatch.StartNew() : null;
-        BindVolumeIntegrateUniforms(frame, halfExtent, outputClouds: 0, frame.Settings.GodRayStrength, _volumeJitter);
+        BindVolumeIntegrateUniforms(frame, halfExtent, outputClouds: 0, frame.Settings.GodRayStrength, marchJitter);
         frame.Gl.BindVertexArray(_godRayQuadVao);
         frame.Gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
         integrateSw?.Stop();
@@ -498,9 +568,13 @@ public sealed partial class OpenGlPreviewBackend
             frame.LastVolumeIntegrateMs = integrateSw.Elapsed.TotalMilliseconds;
         }
 
-        _volumeIntegrateHistory.CopyColorFrom(_godRayHalfResTarget);
-        _volumePrevViewProj = frame.Proj * frame.View;
-        _volumeIntegrateHistoryValid = true;
+        if (!frame.Settings.GodRayStabilizeDebug)
+        {
+            _volumeIntegrateHistory.CopyColorFrom(_godRayHalfResTarget);
+            _volumePrevViewProj = frame.Proj * frame.View;
+            _volumeIntegrateHistoryValid = true;
+        }
+
         return _godRayHalfResTarget.IsValid;
     }
 
@@ -521,13 +595,24 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         injectMs = frame.LastVolumeInjectMs;
-        _volumeJitter = (_volumeJitter + 0.0618f) % 1f;
-        if (!TryIntegrateVolumeGodRaysToHalfRes(ref frame, halfExtent))
+        var marchJitter = frame.Settings.GodRayStabilizeDebug ? 0f : _volumeJitter;
+        if (!frame.Settings.GodRayStabilizeDebug)
+        {
+            _volumeJitter = (_volumeJitter + 0.0618f) % 1f;
+        }
+
+        if (!TryIntegrateVolumeGodRaysToHalfRes(ref frame, halfExtent, marchJitter))
         {
             return false;
         }
 
         integrateMs = frame.LastVolumeIntegrateMs;
+        if (!frame.Settings.GodRayStabilizeDebug)
+        {
+            ComputeCameraBasis(frame.Eye, frame.LookTarget, out var camRight, out var camUp, out var camForward);
+            CommitFroxelHistory(frame.Eye, halfExtent, camRight, camUp, camForward);
+        }
+
         return true;
     }
 }

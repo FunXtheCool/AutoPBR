@@ -49,6 +49,8 @@ God rays (P2.1) already call this during screen-space march as a stepping-stone.
 
 ## ANGLE / GLES constraints
 
+See **[gles-angle-shader-guide.md](gles-angle-shader-guide.md)** for fragment-shader pitfalls (no early `return`, single `FragColor` write, sampler precisions, include splits, FBO feedback).
+
 - Prefer **RGBA16F** froxel slices; fall back to RGBA8 if unavailable
 - Limit froxel Z to 32–48 steps on ES
 - Use **fixed loop bounds** in all march/inject shaders

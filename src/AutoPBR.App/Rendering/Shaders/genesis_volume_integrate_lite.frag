@@ -1,9 +1,14 @@
 #version 330 core
-// Lite froxel integrate for GLES fallback: god rays only, no temporal or cloud output.
+// GENESIS_GLES_PACK rev29
+// Lite froxel integrate: view-ray Mie in-scatter march -> god-ray RGBA. No temporal / cloud path.
+// ANGLE-safe: texture()-based froxel sampling (no texelFetch), ASCII-only sources.
 
 //!include "common/common.glsl"
 //!include "common/atmosphere.glsl"
-//!include "common/volume_froxel.glsl"
+//!include "common/volumetric_segment.glsl"
+//!include "common/ray_reconstruct.glsl"
+//!include "common/volume_froxel_math.glsl"
+//!include "common/volume_integrate_sample.glsl"
 
 in vec2 vUv;
 uniform sampler2DArray uFroxelVolume;
@@ -19,23 +24,18 @@ uniform int uSliceCount;
 uniform vec2 uFroxelTexelSize;
 uniform float uStrength;
 uniform float uJitter;
+uniform float uDepthDistribution;
+uniform float uScatterGain;
+uniform float uExtinction;
 
 out vec4 FragColor;
 
-const int VM_STEPS = 28;
+const int VM_STEPS = 24;
+const float SKY_DEPTH_EPS = 0.9992;
 
-vec3 worldRayDir(vec2 uv, mat4 invViewProj, vec3 cameraPos)
+vec3 softKnee(vec3 x, float knee)
 {
-    vec2 ndc = vec2(uv.x * 2.0 - 1.0, uv.y * 2.0 - 1.0);
-    vec4 worldH = invViewProj * vec4(ndc, 1.0, 1.0);
-    vec3 farPt = worldH.xyz / max(worldH.w, 1e-6);
-    vec3 rd = farPt - cameraPos;
-    float len2 = dot(rd, rd);
-    if (len2 < 1e-12)
-    {
-        return vec3(0.0, 1.0, 0.0);
-    }
-    return rd * inversesqrt(len2);
+    return x / (x + vec3(knee));
 }
 
 void main()
@@ -45,9 +45,15 @@ void main()
         discard;
     }
 
-    vec3 rd = worldRayDir(vUv, uInvViewProj, uCameraPos);
+    if (texture(uSceneDepth, vUv).r >= SKY_DEPTH_EPS)
+    {
+        discard;
+    }
+
+    vec3 rd = grWorldRayDir(vUv, uInvViewProj, uCameraPos);
     vec3 sunToward = normalize(-uLightDir);
     float miePhase = atmosphereMiePhase(dot(rd, sunToward));
+
     float stepLen = uHalfExtent.z * 2.0 / float(VM_STEPS);
     vec3 accum = vec3(0.0);
     float transmittance = 1.0;
@@ -57,29 +63,32 @@ void main()
     {
         float t = jitter + (float(i) + 0.5) * stepLen;
         vec3 worldPos = uCameraPos + rd * t;
-        vec3 froxelUv = vfWorldToFroxelUv(worldPos, uCameraPos, uCamRight, uCamUp, uCamForward, uHalfExtent, uSliceCount);
-        if (froxelUv.x < 0.01 || froxelUv.x > 0.99 || froxelUv.y < 0.01 || froxelUv.y > 0.99 || froxelUv.z < 0.0)
+        vec3 froxelUv = vfWorldToFroxelUv(worldPos, uCameraPos, uCamRight, uCamUp, uCamForward,
+            uHalfExtent, uSliceCount, uDepthDistribution);
+        float edgeW = vfFroxelEdgeWeight(froxelUv);
+        if (edgeW <= 1e-5)
         {
             continue;
         }
 
-        vec4 voxel = vfSampleFroxel(uFroxelVolume, froxelUv, uSliceCount, uFroxelTexelSize);
+        vec4 voxel = viSampleFroxel(uFroxelVolume, froxelUv, uSliceCount);
         float density = voxel.r;
         if (density <= 1e-5)
         {
             continue;
         }
 
-        vec3 sunScatter = voxel.gba * miePhase;
-        accum += transmittance * sunScatter * stepLen * 3.8;
-        transmittance *= exp(-density * stepLen * 1.15);
+        vec3 sunScatter = vec3(voxel.g, voxel.b, voxel.b * 0.92) * miePhase;
+        float inscatterW = vmSegmentInscatterWeight(density, stepLen, uExtinction);
+        accum += transmittance * sunScatter * inscatterW * uScatterGain * edgeW;
+        transmittance *= mix(1.0, vmSegmentTransmittance(density, stepLen, uExtinction), edgeW);
         if (transmittance < 0.02)
         {
             break;
         }
     }
 
-    vec3 vol = (accum * uStrength) / (accum * uStrength + vec3(0.2));
+    vec3 vol = softKnee(accum * uStrength, 0.2);
     if (max(max(vol.r, vol.g), vol.b) <= 1e-6)
     {
         discard;

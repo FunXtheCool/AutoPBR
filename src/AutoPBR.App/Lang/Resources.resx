@@ -1088,7 +1088,13 @@
     <value>Environment IBL (ambient/specular)</value>
   </data>
   <data name="Preview3DEnableIblTooltip" xml:space="preserve">
-    <value>Indirect ambient and specular from the scene environment. With atmospheric sky on, samples the sky LUT and reflected sun; otherwise uses a procedural sky/ground hemisphere.</value>
+    <value>Indirect ambient and specular from the scene environment (split-sum IBL). With atmospheric sky on, samples the blurred sky LUT; punctual sun specular comes from direct lighting only.</value>
+  </data>
+  <data name="Preview3DIblStrength" xml:space="preserve">
+    <value>IBL strength</value>
+  </data>
+  <data name="Preview3DIblStrengthTooltip" xml:space="preserve">
+    <value>Intensity of the environment probe (indirect ambient + reflections). Lower if the model picks up too much sky tint; 0 falls back to flat ambient look.</value>
   </data>
   <data name="Preview3DEnableAtmosphericSky" xml:space="preserve">
     <value>Atmospheric sky (LUT)</value>
@@ -1125,6 +1131,12 @@
   </data>
   <data name="Preview3DAtmosphereSunDiscStrengthTooltip" xml:space="preserve">
     <value>Additive glare around the sun disc on top of the LUT. Lower for a softer sun; higher for a sharper bloom.</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscSize" xml:space="preserve">
+    <value>Sun size</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscSizeTooltip" xml:space="preserve">
+    <value>Sun angular-size multiplier. 1.0 = stylized default; ~0.07 matches the real sun (0.27 degrees). Also scales the aureole and god-ray cone.</value>
   </data>
   <data name="Preview3DHorizonFogStrength" xml:space="preserve">
     <value>Horizon fog</value>

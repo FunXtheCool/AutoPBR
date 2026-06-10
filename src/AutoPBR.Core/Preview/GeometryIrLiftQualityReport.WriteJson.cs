@@ -6,6 +6,8 @@ namespace AutoPBR.Core.Preview;
 /// <summary>Metrics for geometry IR shards (lift quality baseline / regression).</summary>
 public static partial class GeometryIrLiftQualityReport
 {
+    private static readonly JsonSerializerOptions WriteJsonOptions = new() { WriteIndented = true };
+
     public static void WriteJson(Document doc, string outputPath)
     {
         var entries = new List<object>();
@@ -53,6 +55,6 @@ public static partial class GeometryIrLiftQualityReport
             Directory.CreateDirectory(dir);
         }
 
-        File.WriteAllText(outputPath, JsonSerializer.Serialize(root, new JsonSerializerOptions { WriteIndented = true }));
+        File.WriteAllText(outputPath, JsonSerializer.Serialize(root, WriteJsonOptions));
     }
 }

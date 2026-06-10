@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Numerics;
 
 using AutoPBR.App.Rendering.Abstractions;
+using AutoPBR.App.Rendering.Scene;
 
 using Silk.NET.OpenGL;
 
@@ -9,6 +10,9 @@ namespace AutoPBR.App.Rendering.OpenGL;
 
 public sealed partial class OpenGlPreviewBackend
 {
+    private GlShaderProgram? _scenePresentProgram;
+    private GlShaderProgram? _screenSpaceGodRayProgram;
+    private GlShaderProgram? _shadowAwareGodRayProgram;
     private GlShaderProgram? _godRayUpsampleProgram;
     private GlShaderProgram? _godRayCompositeProgram;
     private GlSceneCaptureTarget? _sceneCapture;
@@ -18,12 +22,17 @@ public sealed partial class OpenGlPreviewBackend
     private uint _godRayQuadVao;
     private uint _godRayQuadVbo;
     private int _godRayBlitFailLogged;
+    private int _screenSpaceGodRayLogged;
+    private int _shadowAwareGodRayLogged;
     private Matrix4x4 _godRayPrevViewProj = Matrix4x4.Identity;
     private bool _godRayHistoryValid;
     private int _godRayHistoryVw;
     private int _godRayHistoryVh;
     private int _volumePathFailLogged;
     private double _lastVolumetricTimingLogMs;
+    private bool _prevEnableGodRays;
+    private bool _prevEnableVolumetricClouds;
+    private bool _prevGodRayStabilizeDebug = true;
 
     private void TryInitGodRays(GL gl, bool useOpenGlEs)
     {
@@ -33,6 +42,32 @@ public sealed partial class OpenGlPreviewBackend
         _godRayHalfResTarget = new GlColorRenderTarget(gl, useOpenGlEs);
         _godRayResolveTarget = new GlColorRenderTarget(gl, useOpenGlEs);
         _godRayHistoryTarget = new GlColorRenderTarget(gl, useOpenGlEs);
+
+        _scenePresentProgram = new GlShaderProgram(gl, "genesis_godrays.vert", "genesis_scene_present.frag", useOpenGlEs, out var presentErr);
+        if (_scenePresentProgram is not { IsValid: true })
+        {
+            _godRayInitFailureDetail = "present: " + TrimShaderDiagnostic(presentErr);
+            EmitDiagnostic("[3D preview] Scene-present shader: " + TrimShaderDiagnostic(presentErr));
+            DestroyGodRayResources();
+            return;
+        }
+
+        _screenSpaceGodRayProgram = new GlShaderProgram(gl, "genesis_godrays.vert", "genesis_godrays.frag", useOpenGlEs, out var ssErr);
+        if (_screenSpaceGodRayProgram is not { IsValid: true })
+        {
+            _godRayInitFailureDetail = "screen-space: " + TrimShaderDiagnostic(ssErr);
+            EmitDiagnostic("[3D preview] Screen-space god-ray shader: " + TrimShaderDiagnostic(ssErr));
+            DestroyGodRayResources();
+            return;
+        }
+
+        _shadowAwareGodRayProgram = new GlShaderProgram(gl, "genesis_godrays.vert", "genesis_godrays_shadow.frag", useOpenGlEs, out var shErr);
+        if (_shadowAwareGodRayProgram is not { IsValid: true })
+        {
+            EmitDiagnostic("[3D preview] Shadow-aware god-ray shader: " + TrimShaderDiagnostic(shErr));
+            _shadowAwareGodRayProgram?.Dispose();
+            _shadowAwareGodRayProgram = null;
+        }
 
         _godRayUpsampleProgram = new GlShaderProgram(gl, "genesis_godrays.vert", "genesis_godrays_upsample.frag", useOpenGlEs, out var upErr);
         if (_godRayUpsampleProgram is not { IsValid: true })
@@ -84,6 +119,12 @@ public sealed partial class OpenGlPreviewBackend
         _godRayHistoryTarget = null;
         _godRayUpsampleProgram?.Dispose();
         _godRayUpsampleProgram = null;
+        _screenSpaceGodRayProgram?.Dispose();
+        _screenSpaceGodRayProgram = null;
+        _shadowAwareGodRayProgram?.Dispose();
+        _shadowAwareGodRayProgram = null;
+        _scenePresentProgram?.Dispose();
+        _scenePresentProgram = null;
         _godRayCompositeProgram?.Dispose();
         _godRayCompositeProgram = null;
         _godRayHistoryValid = false;
@@ -110,12 +151,48 @@ public sealed partial class OpenGlPreviewBackend
     private bool CanUseGodRayCapture(in PreviewRenderSettings settings) =>
         settings.EnableGodRays &&
         _sceneCapture is not null &&
-        _godRayUpsampleProgram is { IsValid: true } &&
+        _scenePresentProgram is { IsValid: true } &&
+        _screenSpaceGodRayProgram is { IsValid: true } &&
         _godRayCompositeProgram is { IsValid: true } &&
         _godRayHalfResTarget is not null &&
         _godRayResolveTarget is not null &&
         _godRayHistoryTarget is not null &&
         _godRayQuadVao != 0;
+
+    private void SyncGodRayToggleState(in PreviewRenderSettings settings)
+    {
+        var godRaysChanged = _prevEnableGodRays != settings.EnableGodRays;
+        var stabilizeChanged = _prevGodRayStabilizeDebug != settings.GodRayStabilizeDebug;
+        if (!godRaysChanged && !stabilizeChanged)
+        {
+            return;
+        }
+
+        _prevEnableGodRays = settings.EnableGodRays;
+        _prevGodRayStabilizeDebug = settings.GodRayStabilizeDebug;
+        _godRayHistoryValid = false;
+        _volumeFroxelHistoryValid = false;
+        _volumeIntegrateHistoryValid = false;
+        _volumePathFailLogged = 0;
+        _screenSpaceGodRayLogged = 0;
+        _shadowAwareGodRayLogged = 0;
+        _godRayBlitFailLogged = 0;
+        _loggedCloudDraw = false;
+    }
+
+    private void SyncVolumetricToggleState(in PreviewRenderSettings settings)
+    {
+        if (_prevEnableVolumetricClouds == settings.EnableVolumetricClouds)
+        {
+            return;
+        }
+
+        _prevEnableVolumetricClouds = settings.EnableVolumetricClouds;
+        _loggedCloudDraw = false;
+        _godRayHistoryValid = false;
+        _volumeFroxelHistoryValid = false;
+        _cloudHistoryValid = false;
+    }
 
     private bool TryBeginGodRaySceneRender(ref GlRenderFrame frame)
     {
@@ -141,25 +218,22 @@ public sealed partial class OpenGlPreviewBackend
             return;
         }
 
-        var blitOk = _useOpenGlEs
-            ? TryCopySceneCaptureToDefault(ref frame)
-            : _sceneCapture.BlitColorToDefault(frame.DefaultFbo, frame.VpX, frame.VpY, frame.Vw, frame.Vh);
-        if (!blitOk)
+        if (!TryPresentSceneCaptureToDefault(ref frame))
         {
-            blitOk = _useOpenGlEs
-                ? _sceneCapture.BlitColorToDefault(frame.DefaultFbo, frame.VpX, frame.VpY, frame.Vw, frame.Vh)
-                : TryCopySceneCaptureToDefault(ref frame);
-            if (!blitOk)
+            TryPresentSceneCaptureToDefault(ref frame);
+            var key = frame.Vw + frame.Vh * 10000;
+            if (_godRayBlitFailLogged != key)
             {
-                var key = frame.Vw + frame.Vh * 10000;
-                if (_godRayBlitFailLogged != key)
-                {
-                    _godRayBlitFailLogged = key;
-                    EmitDiagnostic("[3D preview] God-ray blit to default FBO failed.");
-                }
+                _godRayBlitFailLogged = key;
+                EmitDiagnostic("[3D preview] God-ray scene present to default FBO failed.");
             }
         }
 
+        BindDefaultFramebuffer(ref frame);
+    }
+
+    private static void BindDefaultFramebuffer(ref GlRenderFrame frame)
+    {
         if (frame.DefaultFbo != 0)
         {
             frame.Gl.BindFramebuffer(FramebufferTarget.Framebuffer, (uint)frame.DefaultFbo);
@@ -172,33 +246,25 @@ public sealed partial class OpenGlPreviewBackend
         frame.Gl.Viewport(frame.VpX, frame.VpY, (uint)frame.Vw, (uint)frame.Vh);
     }
 
-    private bool TryCopySceneCaptureToDefault(ref GlRenderFrame frame)
+    private bool TryPresentSceneCaptureToDefault(ref GlRenderFrame frame)
     {
-        if (_sceneCapture is null || _godRayCompositeProgram is not { IsValid: true } || _godRayQuadVao == 0)
+        if (_sceneCapture is null || _scenePresentProgram is not { IsValid: true } || _godRayQuadVao == 0)
         {
             return false;
         }
 
         var gl = frame.Gl;
-        if (frame.DefaultFbo != 0)
-        {
-            gl.BindFramebuffer(FramebufferTarget.Framebuffer, (uint)frame.DefaultFbo);
-        }
-        else
-        {
-            gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-        }
+        BindDefaultFramebuffer(ref frame);
 
-        gl.Viewport(frame.VpX, frame.VpY, (uint)frame.Vw, (uint)frame.Vh);
         var priorDepthTest = gl.IsEnabled(EnableCap.DepthTest);
         var priorBlend = gl.IsEnabled(EnableCap.Blend);
         gl.Disable(EnableCap.DepthTest);
         gl.Disable(EnableCap.Blend);
         gl.BindVertexArray(_godRayQuadVao);
-        _godRayCompositeProgram.Use();
+        _scenePresentProgram.Use();
         gl.ActiveTexture(TextureUnit.Texture0);
         gl.BindTexture(TextureTarget.Texture2D, _sceneCapture.ColorTextureHandle);
-        SetIntOnProgram(_godRayCompositeProgram, "uRays", 0);
+        SetIntOnProgram(_scenePresentProgram, "uSceneColor", 0);
         gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
         gl.BindVertexArray(0);
         if (priorDepthTest)
@@ -212,6 +278,239 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         return gl.GetError() == GLEnum.NoError;
+    }
+
+    private bool TryCompositeAdditiveRays(ref GlRenderFrame frame, uint raysTexture)
+    {
+        if (_godRayCompositeProgram is not { IsValid: true } || _godRayQuadVao == 0)
+        {
+            return false;
+        }
+
+        var gl = frame.Gl;
+        BindDefaultFramebuffer(ref frame);
+        var priorDepthTest = gl.IsEnabled(EnableCap.DepthTest);
+        var priorBlend = gl.IsEnabled(EnableCap.Blend);
+        gl.Disable(EnableCap.DepthTest);
+        gl.Enable(EnableCap.Blend);
+        gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.One);
+        gl.BindVertexArray(_godRayQuadVao);
+        _godRayCompositeProgram.Use();
+        gl.ActiveTexture(TextureUnit.Texture0);
+        gl.BindTexture(TextureTarget.Texture2D, raysTexture);
+        SetIntOnProgram(_godRayCompositeProgram, "uRays", 0);
+        gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
+        gl.BindVertexArray(0);
+        if (priorDepthTest)
+        {
+            gl.Enable(EnableCap.DepthTest);
+        }
+        else
+        {
+            gl.Disable(EnableCap.DepthTest);
+        }
+
+        if (!priorBlend)
+        {
+            gl.Disable(EnableCap.Blend);
+        }
+
+        return true;
+    }
+
+    private bool TryRunScreenSpaceGodRays(ref GlRenderFrame frame)
+    {
+        if (_screenSpaceGodRayProgram is null || _sceneCapture is null || _godRayQuadVao == 0)
+        {
+            return false;
+        }
+
+        var aspect = frame.Vw / (float)Math.Max(frame.Vh, 1);
+        var coneScale = Math.Max(frame.Settings.GodRayConeScale, 0.05f);
+        var towardSun = -frame.LightDir;
+        var tls = towardSun.LengthSquared();
+        if (tls < 1e-12f)
+        {
+            return false;
+        }
+
+        towardSun /= MathF.Sqrt(tls);
+
+        Vector2 lightUv;
+        float discRadiusUv;
+        float coneRadiusUv;
+        if (towardSun.Y < 0.04f)
+        {
+            PreviewSunScreenProjection.ComputeMoon(frame.Eye, frame.LightDir, frame.View, frame.Proj, aspect,
+                out lightUv, out discRadiusUv, out _);
+            coneRadiusUv = Math.Max(discRadiusUv * PreviewSunScreenProjection.ShaftScale * coneScale,
+                PreviewSunScreenProjection.MinShaftRadiusUv * coneScale);
+        }
+        else
+        {
+            PreviewSunScreenProjection.Compute(frame.Eye, frame.LightDir, frame.View, frame.Proj, aspect, coneScale,
+                frame.Settings.AtmosphereSunDiscSize, out lightUv, out discRadiusUv, out coneRadiusUv, out _);
+        }
+
+        var gl = frame.Gl;
+        BindDefaultFramebuffer(ref frame);
+        var priorDepthTest = gl.IsEnabled(EnableCap.DepthTest);
+        var priorBlend = gl.IsEnabled(EnableCap.Blend);
+        gl.Disable(EnableCap.DepthTest);
+        gl.Enable(EnableCap.Blend);
+        gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.One);
+        gl.BindVertexArray(_godRayQuadVao);
+        _screenSpaceGodRayProgram.Use();
+        gl.ActiveTexture(TextureUnit.Texture0);
+        gl.BindTexture(TextureTarget.Texture2D, _sceneCapture.DepthTextureHandle);
+        SetIntOnProgram(_screenSpaceGodRayProgram, "uSceneDepth", 0);
+        SetVec2OnProgram(_screenSpaceGodRayProgram, "uSunUv", lightUv);
+        SetFloatOnProgram(_screenSpaceGodRayProgram, "uSunDiscRadius", discRadiusUv);
+        SetFloatOnProgram(_screenSpaceGodRayProgram, "uSunConeRadius", coneRadiusUv);
+        SetFloatOnProgram(_screenSpaceGodRayProgram, "uStrength", frame.Settings.GodRayStrength);
+        gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
+        gl.BindVertexArray(0);
+        if (priorDepthTest)
+        {
+            gl.Enable(EnableCap.DepthTest);
+        }
+        else
+        {
+            gl.Disable(EnableCap.DepthTest);
+        }
+
+        if (!priorBlend)
+        {
+            gl.Disable(EnableCap.Blend);
+        }
+
+        if (_screenSpaceGodRayLogged == 0)
+        {
+            _screenSpaceGodRayLogged = 1;
+            EmitDiagnostic("[3D preview] Screen-space god-ray fallback active.");
+        }
+
+        return true;
+    }
+
+    private bool TryRunShadowAwareGodRays(ref GlRenderFrame frame)
+    {
+        if (_shadowAwareGodRayProgram is null || _sceneCapture is null || _godRayQuadVao == 0 ||
+            !frame.ShadowAvailable || _shadowTarget is null)
+        {
+            return false;
+        }
+
+        var aspect = frame.Vw / (float)Math.Max(frame.Vh, 1);
+        var coneScale = Math.Max(frame.Settings.GodRayConeScale, 0.05f);
+        var towardSun = -frame.LightDir;
+        var tls = towardSun.LengthSquared();
+        if (tls < 1e-12f)
+        {
+            return false;
+        }
+
+        towardSun /= MathF.Sqrt(tls);
+
+        Vector2 lightUv;
+        float discRadiusUv;
+        float coneRadiusUv;
+        if (towardSun.Y < 0.04f)
+        {
+            PreviewSunScreenProjection.ComputeMoon(frame.Eye, frame.LightDir, frame.View, frame.Proj, aspect,
+                out lightUv, out discRadiusUv, out _);
+            coneRadiusUv = Math.Max(discRadiusUv * PreviewSunScreenProjection.ShaftScale * coneScale,
+                PreviewSunScreenProjection.MinShaftRadiusUv * coneScale);
+        }
+        else
+        {
+            PreviewSunScreenProjection.Compute(frame.Eye, frame.LightDir, frame.View, frame.Proj, aspect, coneScale,
+                frame.Settings.AtmosphereSunDiscSize, out lightUv, out discRadiusUv, out coneRadiusUv, out _);
+        }
+
+        var viewProj = frame.Proj * frame.View;
+        if (!Matrix4x4.Invert(viewProj, out var invViewProj))
+        {
+            return false;
+        }
+
+        var gl = frame.Gl;
+        var shadowRes = _shadowTarget.Resolution;
+        var shadowTexelSize = new Vector2(1f / shadowRes, 1f / shadowRes);
+        var layerWorldY = PreviewStageConstants.CloudLayerBaseWorldY(frame.Settings.CloudLayerHeight);
+        var cascadesActive = frame.ShadowCascadesActive;
+
+        BindDefaultFramebuffer(ref frame);
+        var priorDepthTest = gl.IsEnabled(EnableCap.DepthTest);
+        var priorBlend = gl.IsEnabled(EnableCap.Blend);
+        gl.Disable(EnableCap.DepthTest);
+        gl.Enable(EnableCap.Blend);
+        gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.One);
+        gl.BindVertexArray(_godRayQuadVao);
+        _shadowAwareGodRayProgram.Use();
+        gl.ActiveTexture(TextureUnit.Texture0);
+        gl.BindTexture(TextureTarget.Texture2D, _sceneCapture.DepthTextureHandle);
+        SetIntOnProgram(_shadowAwareGodRayProgram, "uSceneDepth", 0);
+        gl.ActiveTexture(TextureUnit.Texture1);
+        gl.BindTexture(TextureTarget.Texture2D, _shadowTarget.DepthTextureHandle);
+        SetIntOnProgram(_shadowAwareGodRayProgram, "uShadowMap", 1);
+        gl.ActiveTexture(TextureUnit.Texture2);
+        if (cascadesActive && _shadowTargetCascadeNear is not null)
+        {
+            gl.BindTexture(TextureTarget.Texture2D, _shadowTargetCascadeNear.DepthTextureHandle);
+        }
+        else
+        {
+            gl.BindTexture(TextureTarget.Texture2D, _shadowTarget.DepthTextureHandle);
+        }
+
+        SetIntOnProgram(_shadowAwareGodRayProgram, "uShadowMapNear", 2);
+        SetMatrixOnProgram(_shadowAwareGodRayProgram, "uInvViewProj", invViewProj);
+        SetMatrixOnProgram(_shadowAwareGodRayProgram, "uLightViewProj", frame.ShadowVp);
+        SetMatrixOnProgram(_shadowAwareGodRayProgram, "uLightViewProjNear", frame.ShadowVpNear);
+        SetVec3OnProgram(_shadowAwareGodRayProgram, "uCameraPos", frame.Eye);
+        SetVec2OnProgram(_shadowAwareGodRayProgram, "uSunUv", lightUv);
+        SetFloatOnProgram(_shadowAwareGodRayProgram, "uSunDiscRadius", discRadiusUv);
+        SetFloatOnProgram(_shadowAwareGodRayProgram, "uSunConeRadius", coneRadiusUv);
+        SetFloatOnProgram(_shadowAwareGodRayProgram, "uStrength", frame.Settings.GodRayStrength);
+        SetFloatOnProgram(_shadowAwareGodRayProgram, "uLayerHeight", layerWorldY);
+        SetFloatOnProgram(_shadowAwareGodRayProgram, "uVolumeHeight", frame.Settings.CloudVolumeHeight);
+        SetFloatOnProgram(_shadowAwareGodRayProgram, "uCloudDensity", frame.Settings.CloudDensity);
+        SetFloatOnProgram(_shadowAwareGodRayProgram, "uVolumeSize", frame.Settings.CloudVolumeSize);
+        SetFloatOnProgram(_shadowAwareGodRayProgram, "uGroundWorldY", PreviewStageConstants.GroundPlaneWorldY);
+        SetFloatOnProgram(_shadowAwareGodRayProgram, "uFogSlabHeight", PreviewStageConstants.GroundFogSlabHeight);
+        SetFloatOnProgram(_shadowAwareGodRayProgram, "uHeightFogStrength",
+            frame.Settings.EnableAtmosphericSky ? frame.Settings.AerialFogStrength * VolumeHeightFogScale : 0f);
+        SetVec2OnProgram(_shadowAwareGodRayProgram, "uShadowTexelSize", shadowTexelSize);
+        SetFloatOnProgram(_shadowAwareGodRayProgram, "uShadowMinBias", frame.Settings.ShadowMinBias);
+        SetIntOnProgram(_shadowAwareGodRayProgram, "uEnableShadowMap", 1);
+        SetIntOnProgram(_shadowAwareGodRayProgram, "uEnableShadowCascades", cascadesActive ? 1 : 0);
+        SetFloatOnProgram(_shadowAwareGodRayProgram, "uCascadeSplitDistance", frame.CascadeSplitWorldDistance);
+        SetIntOnProgram(_shadowAwareGodRayProgram, "uEnableCloudAttenuation",
+            frame.Settings.EnableVolumetricClouds ? 1 : 0);
+        gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
+        gl.BindVertexArray(0);
+        if (priorDepthTest)
+        {
+            gl.Enable(EnableCap.DepthTest);
+        }
+        else
+        {
+            gl.Disable(EnableCap.DepthTest);
+        }
+
+        if (!priorBlend)
+        {
+            gl.Disable(EnableCap.Blend);
+        }
+
+        if (_shadowAwareGodRayLogged == 0)
+        {
+            _shadowAwareGodRayLogged = 1;
+            EmitDiagnostic("[3D preview] Shadow-aware god-ray fallback active.");
+        }
+
+        return true;
     }
 
     private void MaybeLogVolumetricTiming(in PreviewRenderSettings settings, double injectMs, double integrateMs)
@@ -241,10 +540,11 @@ public sealed partial class OpenGlPreviewBackend
 
     private void DrawGodRayComposite(ref GlRenderFrame frame)
     {
+        SyncGodRayToggleState(frame.Settings);
+
         if (!frame.GodRayCaptureActive || _sceneCapture is null || !_sceneCapture.IsValid ||
-            _godRayUpsampleProgram is not { IsValid: true } ||
             _godRayCompositeProgram is not { IsValid: true } ||
-            _godRayHalfResTarget is null || _godRayResolveTarget is null || _godRayHistoryTarget is null ||
+            _screenSpaceGodRayProgram is not { IsValid: true } ||
             _godRayQuadVao == 0)
         {
             return;
@@ -252,11 +552,17 @@ public sealed partial class OpenGlPreviewBackend
 
         var halfW = Math.Max(1, frame.Vw / 2);
         var halfH = Math.Max(1, frame.Vh / 2);
-        if (!_godRayHalfResTarget.EnsureSize(halfW, halfH) ||
-            !_godRayResolveTarget.EnsureSize(frame.Vw, frame.Vh) ||
-            !_godRayHistoryTarget.EnsureSize(frame.Vw, frame.Vh))
+        var canVolume = CanUseVolumeGodRays(frame.Settings) &&
+                        _godRayUpsampleProgram is { IsValid: true } &&
+                        _godRayHalfResTarget is not null &&
+                        _godRayResolveTarget is not null &&
+                        _godRayHistoryTarget is not null;
+        if (canVolume &&
+            (!_godRayHalfResTarget!.EnsureSize(halfW, halfH) ||
+             !_godRayResolveTarget!.EnsureSize(frame.Vw, frame.Vh) ||
+             !_godRayHistoryTarget!.EnsureSize(frame.Vw, frame.Vh)))
         {
-            return;
+            canVolume = false;
         }
 
         if (_godRayHistoryVw != frame.Vw || _godRayHistoryVh != frame.Vh)
@@ -287,7 +593,6 @@ public sealed partial class OpenGlPreviewBackend
         var volumeSw = frame.Settings.LogVolumetricTiming ? Stopwatch.StartNew() : null;
         var injectMs = 0.0;
         var integrateMs = 0.0;
-        var canVolume = CanUseVolumeGodRays(frame.Settings);
         var usedVolumePath = canVolume && TryRunVolumeGodRayPass(ref frame, out injectMs, out integrateMs);
         if (volumeSw is not null)
         {
@@ -304,7 +609,12 @@ public sealed partial class OpenGlPreviewBackend
                 _volumePathFailLogged = 1;
                 EmitDiagnostic(!canVolume
                     ? DescribeVolumeGodRayUnavailableReason(frame.Settings)
-                    : "[3D preview] Froxel god rays inject or integrate pass failed.");
+                    : "[3D preview] Froxel god rays inject or integrate pass failed; using screen-space fallback.");
+            }
+
+            if (!TryRunShadowAwareGodRays(ref frame))
+            {
+                TryRunScreenSpaceGodRays(ref frame);
             }
 
             gl.DepthMask(priorDepthMask);
@@ -312,10 +622,18 @@ public sealed partial class OpenGlPreviewBackend
             {
                 gl.Enable(EnableCap.DepthTest);
             }
+            else
+            {
+                gl.Disable(EnableCap.DepthTest);
+            }
 
             if (priorCullFace)
             {
                 gl.Enable(EnableCap.CullFace);
+            }
+            else
+            {
+                gl.Disable(EnableCap.CullFace);
             }
 
             if (!priorBlend)
@@ -328,47 +646,35 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         // Full-res bilateral upsample + temporal reprojection.
-        _godRayResolveTarget.BindDraw();
+        _godRayResolveTarget!.BindDraw();
         gl.Clear(ClearBufferMask.ColorBufferBit);
-        _godRayUpsampleProgram.Use();
+        _godRayUpsampleProgram!.Use();
         gl.ActiveTexture(TextureUnit.Texture0);
-        gl.BindTexture(TextureTarget.Texture2D, _godRayHalfResTarget.ColorTextureHandle);
-        SetIntOnProgram(_godRayUpsampleProgram, "uHalfResRays", 0);
+        gl.BindTexture(TextureTarget.Texture2D, _godRayHalfResTarget!.ColorTextureHandle);
+        SetIntOnProgram(_godRayUpsampleProgram!, "uHalfResRays", 0);
         gl.ActiveTexture(TextureUnit.Texture1);
-        gl.BindTexture(TextureTarget.Texture2D, _sceneCapture.DepthTextureHandle);
-        SetIntOnProgram(_godRayUpsampleProgram, "uSceneDepth", 1);
+        gl.BindTexture(TextureTarget.Texture2D, _sceneCapture!.DepthTextureHandle);
+        SetIntOnProgram(_godRayUpsampleProgram!, "uSceneDepth", 1);
         gl.ActiveTexture(TextureUnit.Texture2);
-        gl.BindTexture(TextureTarget.Texture2D, _godRayHistoryTarget.ColorTextureHandle);
-        SetIntOnProgram(_godRayUpsampleProgram, "uHistory", 2);
-        SetMatrixOnProgram(_godRayUpsampleProgram, "uInvViewProj", invViewProj);
-        SetMatrixOnProgram(_godRayUpsampleProgram, "uPrevViewProj", _godRayPrevViewProj);
+        gl.BindTexture(TextureTarget.Texture2D, _godRayHistoryTarget!.ColorTextureHandle);
+        SetIntOnProgram(_godRayUpsampleProgram!, "uHistory", 2);
+        SetMatrixOnProgram(_godRayUpsampleProgram!, "uInvViewProj", invViewProj);
+        SetMatrixOnProgram(_godRayUpsampleProgram!, "uPrevViewProj", _godRayPrevViewProj);
         SetVec2OnProgram(_godRayUpsampleProgram, "uHalfResTexelSize", new Vector2(1f / halfW, 1f / halfH));
-        SetFloatOnProgram(_godRayUpsampleProgram, "uTemporalWeight", quality.UpsampleTemporalWeight);
+        var upsampleTemporal = frame.Settings.GodRayStabilizeDebug ? 0f : quality.UpsampleTemporalWeight;
+        SetFloatOnProgram(_godRayUpsampleProgram, "uTemporalWeight", upsampleTemporal);
         SetIntOnProgram(_godRayUpsampleProgram, "uHasHistory",
-            _godRayHistoryValid && quality.UpsampleTemporalWeight > 0f ? 1 : 0);
+            !frame.Settings.GodRayStabilizeDebug && _godRayHistoryValid && upsampleTemporal > 0f ? 1 : 0);
         gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
 
-        _godRayHistoryTarget.CopyColorFrom(_godRayResolveTarget);
-        _godRayPrevViewProj = viewProj;
-        _godRayHistoryValid = true;
-
-        if (frame.DefaultFbo != 0)
+        if (!frame.Settings.GodRayStabilizeDebug)
         {
-            gl.BindFramebuffer(FramebufferTarget.Framebuffer, (uint)frame.DefaultFbo);
-        }
-        else
-        {
-            gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            _godRayHistoryTarget.CopyColorFrom(_godRayResolveTarget);
+            _godRayPrevViewProj = viewProj;
+            _godRayHistoryValid = true;
         }
 
-        gl.Viewport(frame.VpX, frame.VpY, (uint)frame.Vw, (uint)frame.Vh);
-        gl.Enable(EnableCap.Blend);
-        gl.BlendFunc(BlendingFactor.One, BlendingFactor.One);
-        _godRayCompositeProgram.Use();
-        gl.ActiveTexture(TextureUnit.Texture0);
-        gl.BindTexture(TextureTarget.Texture2D, _godRayResolveTarget.ColorTextureHandle);
-        SetIntOnProgram(_godRayCompositeProgram, "uRays", 0);
-        gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
+        TryCompositeAdditiveRays(ref frame, _godRayResolveTarget.ColorTextureHandle);
         gl.BindVertexArray(0);
 
         gl.DepthMask(priorDepthMask);

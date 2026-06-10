@@ -298,6 +298,8 @@ public sealed class LocalizedStrings
     public static string Preview3DEnableSssTooltip => Resources.Preview3DEnableSssTooltip;
     public static string Preview3DEnableIbl => Resources.Preview3DEnableIbl;
     public static string Preview3DEnableIblTooltip => Resources.Preview3DEnableIblTooltip;
+    public static string Preview3DIblStrength => Resources.Preview3DIblStrength;
+    public static string Preview3DIblStrengthTooltip => Resources.Preview3DIblStrengthTooltip;
     public static string Preview3DEnableAtmosphericSky => Resources.Preview3DEnableAtmosphericSky;
     public static string Preview3DEnableAtmosphericSkyTooltip => Resources.Preview3DEnableAtmosphericSkyTooltip;
     public static string Preview3DAtmosphereTurbidity => Resources.Preview3DAtmosphereTurbidity;
@@ -310,6 +312,8 @@ public sealed class LocalizedStrings
     public static string Preview3DAtmosphereSkyExposureTooltip => Resources.Preview3DAtmosphereSkyExposureTooltip;
     public static string Preview3DAtmosphereSunDiscStrength => Resources.Preview3DAtmosphereSunDiscStrength;
     public static string Preview3DAtmosphereSunDiscStrengthTooltip => Resources.Preview3DAtmosphereSunDiscStrengthTooltip;
+    public static string Preview3DAtmosphereSunDiscSize => Resources.Preview3DAtmosphereSunDiscSize;
+    public static string Preview3DAtmosphereSunDiscSizeTooltip => Resources.Preview3DAtmosphereSunDiscSizeTooltip;
     public static string Preview3DHorizonFogStrength => Resources.Preview3DHorizonFogStrength;
     public static string Preview3DHorizonFogStrengthTooltip => Resources.Preview3DHorizonFogStrengthTooltip;
     public static string Preview3DVolumetricSection => Resources.Preview3DVolumetricSection;

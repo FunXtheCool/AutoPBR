@@ -5,5 +5,11 @@ out vec4 FragColor;
 
 void main()
 {
-    FragColor = texture(uRays, vUv);
+    vec4 rays = texture(uRays, vUv);
+    if (rays.a <= 1e-5)
+    {
+        discard;
+    }
+
+    FragColor = rays;
 }

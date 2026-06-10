@@ -395,7 +395,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         return FinishGeometryIrMeshLivingEntityRendererBasis(built, plan);
     }
 
-    private static IReadOnlyDictionary<string, string>? BuildGeometryIrTextureRefs(JsonElement geometryRoot, string texRef)
+    private static Dictionary<string, string>? BuildGeometryIrTextureRefs(JsonElement geometryRoot, string texRef)
     {
         var refs = new Dictionary<string, string>(StringComparer.Ordinal);
         if (!geometryRoot.TryGetProperty("roots", out var roots) || roots.ValueKind != JsonValueKind.Array)

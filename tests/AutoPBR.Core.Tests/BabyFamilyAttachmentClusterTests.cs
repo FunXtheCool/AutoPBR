@@ -181,7 +181,7 @@ public sealed class BabyFamilyAttachmentClusterTests
     private static Vector3? ComputeGpuPlacedPartPreviewCentroid(
         MergedJavaBlockModel mesh,
         float[] verts,
-        IReadOnlyList<string> partIds,
+        List<string> partIds,
         Func<string, bool> match)
     {
         var sum = Vector3.Zero;
@@ -312,7 +312,7 @@ public sealed class BabyFamilyAttachmentClusterTests
 
     private static Vector3? ComputePartPreviewCentroid(
         MergedJavaBlockModel mesh,
-        IReadOnlyList<string> partIds,
+        List<string> partIds,
         Func<string, bool> match)
     {
         var sum = Vector3.Zero;
@@ -334,7 +334,7 @@ public sealed class BabyFamilyAttachmentClusterTests
     private static Vector3? ComputeBakedPartPreviewCentroid(
         MergedJavaBlockModel mesh,
         float[] verts,
-        IReadOnlyList<string> partIds,
+        List<string> partIds,
         Func<string, bool> match)
     {
         var sum = Vector3.Zero;

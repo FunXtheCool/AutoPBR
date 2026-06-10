@@ -57,6 +57,9 @@ internal static class UserSettingsSynchronizer
             ? 1.0
             : Math.Clamp(settings.Preview3DParallaxAoStrength, 0.0, 2.0);
         vm.Preview3DEnableIbl = settings.Preview3DEnableIbl;
+        vm.Preview3DIblStrength = settings.Preview3DIblStrength <= 0
+            ? 0.6
+            : Math.Clamp(settings.Preview3DIblStrength, 0.0, 2.0);
         vm.Preview3DEnableAtmosphericSky = settings.Preview3DEnableAtmosphericSky;
         vm.Preview3DAtmosphereTurbidity = settings.Preview3DAtmosphereTurbidity <= 0
             ? 2.6
@@ -73,6 +76,9 @@ internal static class UserSettingsSynchronizer
         vm.Preview3DAtmosphereSunDiscStrength = settings.Preview3DAtmosphereSunDiscStrength < 0
             ? 0.35
             : Math.Clamp(settings.Preview3DAtmosphereSunDiscStrength, 0.0, 2.0);
+        vm.Preview3DAtmosphereSunDiscSize = settings.Preview3DAtmosphereSunDiscSize <= 0
+            ? 1.0
+            : Math.Clamp(settings.Preview3DAtmosphereSunDiscSize, 0.05, 2.0);
         vm.Preview3DEnableShadows = settings.Preview3DEnableShadows;
         vm.Preview3DLightYawDegrees = Math.Clamp(settings.Preview3DLightYawDegrees, -180.0, 180.0);
         vm.Preview3DLightPitchDegrees = Math.Clamp(settings.Preview3DLightPitchDegrees, -89.0, 89.0);
@@ -94,6 +100,14 @@ internal static class UserSettingsSynchronizer
         vm.Preview3DGodRayStrength = settings.Preview3DGodRayStrength <= 0
             ? 0.45
             : Math.Clamp(settings.Preview3DGodRayStrength, 0.0, 2.0);
+        vm.Preview3DGodRayScatterGain = settings.Preview3DGodRayScatterGain <= 0
+            ? 3.4
+            : Math.Clamp(settings.Preview3DGodRayScatterGain, 0.0, 20.0);
+        vm.Preview3DGodRayExtinction = settings.Preview3DGodRayExtinction <= 0
+            ? 1.15
+            : Math.Clamp(settings.Preview3DGodRayExtinction, 0.01, 8.0);
+        vm.Preview3DGodRayDebugDensity = Math.Clamp(settings.Preview3DGodRayDebugDensity, 0.0, 2.0);
+        vm.Preview3DGodRayStabilizeDebug = settings.Preview3DGodRayStabilizeDebug;
         vm.Preview3DEnableShadowCascades = settings.Preview3DEnableShadowCascades;
         vm.Preview3DSpritePlaneCount = settings.Preview3DSpritePlaneCount <= 0
             ? 2
@@ -269,12 +283,14 @@ internal static class UserSettingsSynchronizer
         settings.Preview3DEnableParallaxAo = vm.Preview3DEnableParallaxAo;
         settings.Preview3DParallaxAoStrength = Math.Clamp(vm.Preview3DParallaxAoStrength, 0.0, 2.0);
         settings.Preview3DEnableIbl = vm.Preview3DEnableIbl;
+        settings.Preview3DIblStrength = Math.Clamp(vm.Preview3DIblStrength, 0.0, 2.0);
         settings.Preview3DEnableAtmosphericSky = vm.Preview3DEnableAtmosphericSky;
         settings.Preview3DAtmosphereTurbidity = Math.Clamp(vm.Preview3DAtmosphereTurbidity, 1.2, 10.0);
         settings.Preview3DAtmosphereSunIntensity = Math.Clamp(vm.Preview3DAtmosphereSunIntensity, 0.2, 64.0);
         settings.Preview3DAtmosphereHorizonFalloff = Math.Clamp(vm.Preview3DAtmosphereHorizonFalloff, 0.25, 4.0);
         settings.Preview3DAtmosphereSkyExposure = Math.Clamp(vm.Preview3DAtmosphereSkyExposure, 0.1, 3.0);
         settings.Preview3DAtmosphereSunDiscStrength = Math.Clamp(vm.Preview3DAtmosphereSunDiscStrength, 0.0, 2.0);
+        settings.Preview3DAtmosphereSunDiscSize = Math.Clamp(vm.Preview3DAtmosphereSunDiscSize, 0.05, 2.0);
         settings.Preview3DTimeOfDayHours = Math.Clamp(vm.Preview3DTimeOfDayHours, 0.0, 24.0);
         settings.Preview3DAnimateTimeOfDay = vm.Preview3DAnimateTimeOfDay;
         settings.Preview3DTimeOfDaySpeed = Math.Clamp(vm.Preview3DTimeOfDaySpeed, 0.1, 4.0);
@@ -283,6 +299,10 @@ internal static class UserSettingsSynchronizer
         settings.Preview3DEnableVolumetricClouds = vm.Preview3DEnableVolumetricClouds;
         settings.Preview3DVolumetricQuality = Math.Clamp(vm.Preview3DVolumetricQuality, 0, 2);
         settings.Preview3DGodRayStrength = Math.Clamp(vm.Preview3DGodRayStrength, 0.0, 2.0);
+        settings.Preview3DGodRayScatterGain = Math.Clamp(vm.Preview3DGodRayScatterGain, 0.0, 20.0);
+        settings.Preview3DGodRayExtinction = Math.Clamp(vm.Preview3DGodRayExtinction, 0.01, 8.0);
+        settings.Preview3DGodRayDebugDensity = Math.Clamp(vm.Preview3DGodRayDebugDensity, 0.0, 2.0);
+        settings.Preview3DGodRayStabilizeDebug = vm.Preview3DGodRayStabilizeDebug;
         settings.Preview3DEnableShadows = vm.Preview3DEnableShadows;
         settings.Preview3DLightYawDegrees = Math.Clamp(vm.Preview3DLightYawDegrees, -180.0, 180.0);
         settings.Preview3DLightPitchDegrees = Math.Clamp(vm.Preview3DLightPitchDegrees, -89.0, 89.0);

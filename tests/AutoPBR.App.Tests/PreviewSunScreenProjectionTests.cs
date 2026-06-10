@@ -18,7 +18,7 @@ public sealed class PreviewSunScreenProjectionTests
         var proj = PreviewGlMatrices.CreatePerspectiveFieldOfViewOpenGl(
             45f * (MathF.PI / 180f), 16f / 9f, 0.1f, 500f);
 
-        PreviewSunScreenProjection.Compute(eye, lightDir, view, proj, 16f / 9f, 1f,
+        PreviewSunScreenProjection.Compute(eye, lightDir, view, proj, 16f / 9f, 1f, 1f,
             out var sunUv, out var discRadiusUv, out var coneRadiusUv, out var cosDiscEdge);
 
         Assert.InRange(sunUv.X, 0f, 1f);
@@ -39,7 +39,7 @@ public sealed class PreviewSunScreenProjectionTests
         var proj = PreviewGlMatrices.CreatePerspectiveFieldOfViewOpenGl(
             50f * (MathF.PI / 180f), aspect, 0.05f, 400f);
 
-        PreviewSunScreenProjection.Compute(eye, lightDir, view, proj, aspect, 1f,
+        PreviewSunScreenProjection.Compute(eye, lightDir, view, proj, aspect, 1f, 1f,
             out var sunUv, out var discRadiusUv, out _, out _);
 
         // Golden values captured from PreviewSunScreenProjection.Compute with the inputs above.
@@ -59,9 +59,9 @@ public sealed class PreviewSunScreenProjectionTests
         var proj = PreviewGlMatrices.CreatePerspectiveFieldOfViewOpenGl(
             45f * (MathF.PI / 180f), aspect, 0.1f, 500f);
 
-        PreviewSunScreenProjection.Compute(eye, lightDir, view, proj, aspect, 0.5f,
+        PreviewSunScreenProjection.Compute(eye, lightDir, view, proj, aspect, 0.5f, 1f,
             out _, out _, out var narrow, out _);
-        PreviewSunScreenProjection.Compute(eye, lightDir, view, proj, aspect, 1.5f,
+        PreviewSunScreenProjection.Compute(eye, lightDir, view, proj, aspect, 1.5f, 1f,
             out _, out _, out var wide, out _);
 
         Assert.True(wide > narrow);
@@ -73,7 +73,7 @@ public sealed class PreviewSunScreenProjectionTests
         var pose = PreviewVolumetricRegressionFixtures.All.First(p => p.Id == "midnight-0h");
         var (view, proj) = pose.BuildMatrices();
 
-        PreviewSunScreenProjection.Compute(pose.Eye, pose.LightDir, view, proj, pose.Aspect, pose.ConeScale,
+        PreviewSunScreenProjection.Compute(pose.Eye, pose.LightDir, view, proj, pose.Aspect, pose.ConeScale, 1f,
             out _, out _, out _, out var sunCosDiscEdge);
         PreviewSunScreenProjection.ComputeMoon(pose.Eye, pose.LightDir, view, proj, pose.Aspect,
             out _, out _, out var moonCosDiscEdge);

@@ -131,7 +131,7 @@ internal static partial class JavapFloatGeometryMeshLift
     }
 
     private static bool TryResolveCubeDeformationExtendInflate(List<string> lines, int astoreLineIdx,
-        IReadOnlyDictionary<int, double> map, MojangMappingsParser? maps, out double inflate)
+        Dictionary<int, double> map, MojangMappingsParser? maps, out double inflate)
     {
         inflate = 0;
         for (var d = 1; d <= 8 && astoreLineIdx - d >= 0; d++)

@@ -79,7 +79,7 @@ public sealed partial class OpenGlPreviewBackend
         var aspect = frame.Vw / (float)Math.Max(frame.Vh, 1);
         var coneScale = Math.Max(frame.Settings.GodRayConeScale, 0.05f);
         PreviewSunScreenProjection.Compute(frame.Eye, frame.LightDir, frame.View, frame.Proj, aspect, coneScale,
-            out var sunUv, out var sunDiscRadiusUv, out _, out _);
+            frame.Settings.AtmosphereSunDiscSize, out var sunUv, out var sunDiscRadiusUv, out _, out _);
         PreviewSunScreenProjection.ComputeMoon(frame.Eye, frame.LightDir, frame.View, frame.Proj, aspect,
             out var moonUv, out var moonDiscRadiusUv, out _);
 

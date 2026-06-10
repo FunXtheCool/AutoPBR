@@ -311,14 +311,14 @@ public static class ResourcePackConverter
                                 mergedModel.Elements.Count);
                             EntityPreviewPlacement.TryMeasureMergedModelPartCentroidsY(
                                 mergedModel,
-                                emulatedRebake.ElementPartIds,
+                                emulatedRebake.ElementPartIds!,
                                 out var bindBodyY,
                                 out var bindHeadY,
                                 out var bindLegY);
                             var placement = EntityPreviewPlacement.ApplyToPreviewVertices(
                                 verts,
                                 MinecraftModelBaker.FloatsPerVertex,
-                                emulatedRebake.ElementPartIds);
+                                emulatedRebake.ElementPartIds!);
                             anchorOffset = placement.AnchorOffset;
                             placementApplied = true;
                             emulatedRebake.LastGroundContactY = placement.GroundContactY;

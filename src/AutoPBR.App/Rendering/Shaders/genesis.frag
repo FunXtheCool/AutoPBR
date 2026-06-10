@@ -227,9 +227,8 @@ void main()
         vec3 iblDiff = fakeIblAmbientDiffuse(N, uSkyTint, uGroundTint, uEnableAtmosphericSky, uAtmoSkyViewLut);
         // Only dielectric (1 - metallic) gets diffuse indirect; metals are reflection-only.
         indirect += iblDiff * albedoLinear * (1.0 - mat.metallic) * uIblStrength;
-        indirect += fakeIblSpecular(N, V, mat.f0, mat.roughness, uSkyTint, uGroundTint, uEnableAtmosphericSky,
-                           uAtmoSkyViewLut, uLightDir, uLightColor, uAtmosphereSunIntensity)
-                       * uIblStrength;
+        indirect += fakeIblSpecular(N, V, mat.f0, mat.roughness, mat.metallic, uSkyTint, uGroundTint,
+                           uEnableAtmosphericSky, uAtmoSkyViewLut) * uIblStrength;
     }
     else
     {

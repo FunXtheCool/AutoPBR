@@ -2,7 +2,7 @@ using System.Numerics;
 using System.Text.Json;
 using AutoPBR.Core.Preview;
 using AutoPBR.Core.Models;
-using AutoPBR.Tests.Shared;
+using AutoPBR.Tests.TestSupport;
 
 GeometryIrParityPolicy.ResetForTests();
 var runtime = new CleanRoomEntityModelRuntime();

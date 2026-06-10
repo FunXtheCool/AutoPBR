@@ -4,7 +4,7 @@ using System.Text.Json.Nodes;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
-[Collection(nameof(GeometryLiftSerialCollection))]
+[Collection(nameof(GeometryLiftSerialDefinition))]
 public sealed class HeuristicStatusFixTests
 {
     private static readonly string[] FormerHeuristicModels =

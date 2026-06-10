@@ -9,31 +9,38 @@ namespace AutoPBR.App.Rendering.OpenGL;
 /// <summary>OpenGL implementation of <see cref="IRenderPreviewBackend"/>; GPU entry points must run on the OpenGL thread (Avalonia <see cref="AutoPBR.App.Controls.GlPbrPreviewControl"/> callbacks).</summary>
 public sealed partial class OpenGlPreviewBackend
 {
-    private void TryInitSunBillboard(GL gl, bool useOpenGlEs)
+    private void TryInitMoonBillboard(GL gl, bool useOpenGlEs)
     {
-        DestroySunBillboard();
-        _sunProgram = new GlSunBillboardProgram(gl, useOpenGlEs, out var sunErr);
-        if (_sunProgram is not { IsValid: true })
+        DestroyMoonBillboard();
+        _moonProgram = new GlMoonBillboardProgram(gl, useOpenGlEs, out var moonErr);
+        if (_moonProgram is not { IsValid: true })
         {
-            _sunProgram?.Dispose();
-            _sunProgram = null;
-            if (!string.IsNullOrWhiteSpace(sunErr))
+            _moonProgram?.Dispose();
+            _moonProgram = null;
+            if (!string.IsNullOrWhiteSpace(moonErr))
             {
-                EmitDiagnostic("[3D preview] Sun billboard shader: " + sunErr);
+                EmitDiagnostic("[3D preview] Moon billboard shader: " + moonErr);
             }
 
             return;
         }
+
+        _moonAlbedo = new GlTexture2D(gl, nearestFilter: false);
+        _moonAlbedo.UploadRgba(
+            PreviewMoonDiscTextureGenerator.Size,
+            PreviewMoonDiscTextureGenerator.Size,
+            PreviewMoonDiscTextureGenerator.GenerateRgba8(),
+            nearestFilter: false);
 
         Span<float> quad =
         [
             -1f, -1f, 1f, -1f, 1f, 1f,
             -1f, -1f, -1f, 1f, 1f, 1f
         ];
-        _sunVao = gl.GenVertexArray();
-        _sunVbo = gl.GenBuffer();
-        gl.BindVertexArray(_sunVao);
-        gl.BindBuffer(BufferTargetARB.ArrayBuffer, _sunVbo);
+        _moonVao = gl.GenVertexArray();
+        _moonVbo = gl.GenBuffer();
+        gl.BindVertexArray(_moonVao);
+        gl.BindBuffer(BufferTargetARB.ArrayBuffer, _moonVbo);
         gl.BufferData<float>(GLEnum.ArrayBuffer, quad, GLEnum.StaticDraw);
         unsafe
         {
@@ -44,93 +51,115 @@ public sealed partial class OpenGlPreviewBackend
         gl.BindVertexArray(0);
     }
 
-    private void DestroySunBillboard()
+    private void DestroyMoonBillboard()
     {
         var gl = _gl;
         if (gl is null)
         {
-            _sunProgram?.Dispose();
-            _sunProgram = null;
-            _sunVao = _sunVbo = 0;
+            _moonProgram?.Dispose();
+            _moonProgram = null;
+            _moonAlbedo?.Dispose();
+            _moonAlbedo = null;
+            _moonVao = _moonVbo = 0;
             return;
         }
 
-        if (_sunVbo != 0)
+        if (_moonVbo != 0)
         {
-            gl.DeleteBuffer(_sunVbo);
-            _sunVbo = 0;
+            gl.DeleteBuffer(_moonVbo);
+            _moonVbo = 0;
         }
 
-        if (_sunVao != 0)
+        if (_moonVao != 0)
         {
-            gl.DeleteVertexArray(_sunVao);
-            _sunVao = 0;
+            gl.DeleteVertexArray(_moonVao);
+            _moonVao = 0;
         }
 
-        _sunProgram?.Dispose();
-        _sunProgram = null;
+        _moonAlbedo?.Dispose();
+        _moonAlbedo = null;
+        _moonProgram?.Dispose();
+        _moonProgram = null;
     }
 
     /// <summary>
-    /// Visual sun along <c>-lightPropagationDir</c> (matches <see cref="PreviewLightMath"/> / Genesis <c>uLightDir</c>).
+    /// Textured moon disc along <c>lightPropagationDir</c> (antipodal to the sun).
     /// </summary>
-    private void DrawSunBillboard(GL gl, Matrix4x4 proj, Matrix4x4 view, Vector3 eye, Vector3 lightPropagationDir,
+    private void DrawMoonBillboard(GL gl, Matrix4x4 proj, Matrix4x4 view, Vector3 eye, Vector3 lightPropagationDir,
         float discStrength, bool restoreSolidBackFaceCull)
     {
-        if (_sunProgram is null || !_sunProgram.IsValid || _sunVao == 0)
+        if (_moonProgram is null || !_moonProgram.IsValid || _moonVao == 0 || _moonAlbedo is null)
         {
             return;
         }
+
+        var towardMoon = lightPropagationDir;
+        var tlm = towardMoon.LengthSquared();
+        if (tlm < 1e-12f)
+        {
+            return;
+        }
+
+        towardMoon /= MathF.Sqrt(tlm);
 
         var towardSun = -lightPropagationDir;
-        var tls = towardSun.LengthSquared();
-        if (tls < 1e-12f)
+        if (towardSun.LengthSquared() > 1e-12f)
+        {
+            towardSun = Vector3.Normalize(towardSun);
+            if (towardSun.Y > 0.04f)
+            {
+                return;
+            }
+        }
+
+        if (towardMoon.Y < -0.03f)
         {
             return;
         }
 
-        towardSun /= MathF.Sqrt(tls);
-
-        if (towardSun.Y < -0.03f)
-        {
-            return;
-        }
-
-        const float sunDist = 85f;
-        const float sunRadius = 5.5f;
-        var sunCenter = eye + towardSun * sunDist;
+        var moonDist = PreviewSunScreenProjection.SunDistance;
+        var moonRadius = PreviewSunScreenProjection.MoonRadius;
+        var moonCenter = eye + towardMoon * moonDist;
 
         var worldUp = Vector3.UnitY;
-        var right = Vector3.Normalize(Vector3.Cross(worldUp, towardSun));
+        var right = Vector3.Normalize(Vector3.Cross(worldUp, towardMoon));
         if (right.LengthSquared() < 1e-10f)
         {
-            right = Vector3.Normalize(Vector3.Cross(Vector3.UnitZ, towardSun));
+            right = Vector3.Normalize(Vector3.Cross(Vector3.UnitZ, towardMoon));
         }
 
-        var sunBillboardUp = Vector3.Normalize(Vector3.Cross(towardSun, right));
+        var moonBillboardUp = Vector3.Normalize(Vector3.Cross(towardMoon, right));
 
         var viewProj = proj * view;
-        _sunProgram.Use();
-        var vpLoc = _sunProgram.GetUniformLocation("uViewProj");
+        _moonProgram.Use();
+        var vpLoc = _moonProgram.GetUniformLocation("uViewProj");
         if (vpLoc >= 0)
         {
             var vpT = Matrix4x4.Transpose(viewProj);
             gl.UniformMatrix4(vpLoc, 1, false, in vpT.M11);
         }
 
-        SetSunVec3(gl, "uSunCenter", sunCenter);
-        SetSunVec3(gl, "uSunRight", right);
-        SetSunVec3(gl, "uSunUp", sunBillboardUp);
-        var rLoc = _sunProgram.GetUniformLocation("uRadius");
+        SetMoonVec3(gl, "uMoonCenter", moonCenter);
+        SetMoonVec3(gl, "uMoonRight", right);
+        SetMoonVec3(gl, "uMoonUp", moonBillboardUp);
+        var rLoc = _moonProgram.GetUniformLocation("uRadius");
         if (rLoc >= 0)
         {
-            gl.Uniform1(rLoc, sunRadius);
+            gl.Uniform1(rLoc, moonRadius);
         }
 
-        var strengthLoc = _sunProgram.GetUniformLocation("uDiscStrength");
+        var strengthLoc = _moonProgram.GetUniformLocation("uDiscStrength");
         if (strengthLoc >= 0)
         {
             gl.Uniform1(strengthLoc, Math.Max(discStrength, 0f));
+        }
+
+        gl.ActiveTexture(TextureUnit.Texture0);
+        _moonAlbedo.Bind(0);
+        var texLoc = _moonProgram.GetUniformLocation("uMoonAlbedo");
+        if (texLoc >= 0)
+        {
+            gl.Uniform1(texLoc, 0);
         }
 
         var blendWasEnabled = gl.IsEnabled(EnableCap.Blend);
@@ -141,7 +170,7 @@ public sealed partial class OpenGlPreviewBackend
         gl.DepthMask(false);
         gl.Disable(EnableCap.CullFace);
 
-        gl.BindVertexArray(_sunVao);
+        gl.BindVertexArray(_moonVao);
         gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
         gl.BindVertexArray(0);
 
@@ -151,8 +180,6 @@ public sealed partial class OpenGlPreviewBackend
             gl.Disable(EnableCap.Blend);
         }
 
-        // Keep depth test enabled for the opaque mesh pass that follows.
-
         if (restoreSolidBackFaceCull)
         {
             gl.Enable(EnableCap.CullFace);
@@ -161,14 +188,14 @@ public sealed partial class OpenGlPreviewBackend
         }
     }
 
-    private void SetSunVec3(GL gl, string name, Vector3 v)
+    private void SetMoonVec3(GL gl, string name, Vector3 v)
     {
-        if (_sunProgram is null || !_sunProgram.IsValid)
+        if (_moonProgram is null || !_moonProgram.IsValid)
         {
             return;
         }
 
-        var loc = _sunProgram.GetUniformLocation(name);
+        var loc = _moonProgram.GetUniformLocation(name);
         if (loc >= 0)
         {
             gl.Uniform3(loc, v.X, v.Y, v.Z);
@@ -470,7 +497,8 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         PreviewSunScreenProjection.Compute(frame.Eye, frame.LightDir, frame.View, frame.Proj, aspect,
-            frame.Settings.GodRayConeScale, out _, out var sunDiscRadiusUv, out _, out var sunCosDiscEdge);
+            frame.Settings.GodRayConeScale, frame.Settings.AtmosphereSunDiscSize,
+            out _, out var sunDiscRadiusUv, out _, out var sunCosDiscEdge);
         PreviewSunScreenProjection.ComputeMoon(frame.Eye, frame.LightDir, frame.View, frame.Proj, aspect,
             out _, out _, out var moonCosDiscEdge);
 
@@ -531,6 +559,10 @@ public sealed partial class OpenGlPreviewBackend
             SetFloatOnProgram(_proceduralSkyProgram, "uMoonCosDiscEdge", moonCosDiscEdge);
             SetFloatOnProgram(_proceduralSkyProgram, "uViewportAspect", aspect);
             SetFloatOnProgram(_proceduralSkyProgram, "uSunDiscRadiusUv", sunDiscRadiusUv);
+            var sunElev = frame.LightDir.LengthSquared() > 1e-12f
+                ? Math.Max(Vector3.Normalize(-frame.LightDir).Y, 0f)
+                : 0f;
+            SetFloatOnProgram(_proceduralSkyProgram, "uSunElevation", sunElev);
             gl.BindVertexArray(_atmoQuadVao);
             gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
             gl.BindVertexArray(0);
