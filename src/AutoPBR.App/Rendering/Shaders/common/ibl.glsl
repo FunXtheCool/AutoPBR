@@ -14,36 +14,35 @@ vec3 fakeIblSky(vec3 dir, vec3 skyTint, vec3 groundTint)
     return mix(groundTint, skyTint, smoothstep(0.0, 1.0, t));
 }
 
-// Inverse of atmo_skyview.frag direction reconstruction:
-//   sinTheta = sin(vUv.y * PI); dir ~ normalize(vec3(sinTheta * (vUv.x*2-1), cos(vUv.y*PI), sinTheta))
+// Inverse of skyViewLutUv in sky_dome.glsl (keep in sync).
 vec2 atmoSkyViewUvFromWorldDir(vec3 dirRaw)
 {
     vec3 d = normalize(dirRaw);
-    float vy = 0.5;
-    if (length(vec2(d.y, d.z)) > 1e-6)
-    {
-        vy = atan(d.z, d.y) / GEN_PI;
-    }
-
-    vy = clamp(vy, 0.0, 1.0);
-
-    float vx = 0.5;
-    if (abs(d.z) > 1e-5)
-    {
-        vx = clamp(d.x / d.z * 0.5 + 0.5, 0.0, 1.0);
-    }
-    else if (abs(d.x) > 1e-5)
-    {
-        vx = clamp(sign(d.x) * 0.49 + 0.5, 0.0, 1.0);
-    }
-
-    return vec2(vx, vy);
+    float viewZenith = acos(clamp(d.y, -1.0, 1.0)) / GEN_PI;
+    float u = atan(d.x, d.z) / (2.0 * GEN_PI) + 0.5;
+    return vec2(u, viewZenith);
 }
 
 vec3 sampleAtmoSkyViewRadianceLinear(vec3 dirWorld, sampler2D atmoSkyViewLut)
 {
     vec2 uv = atmoSkyViewUvFromWorldDir(dirWorld);
-    return srgbToLinear(texture(atmoSkyViewLut, uv).rgb);
+    float u = uv.x;
+    float v = clamp(uv.y, 0.0, 1.0);
+    const float lutWidth = 192.0;
+    float texelU = 1.0 / lutWidth;
+    vec3 c0 = texture(atmoSkyViewLut, vec2(u, v)).rgb;
+    if (u < texelU)
+    {
+        vec3 c1 = texture(atmoSkyViewLut, vec2(u + 1.0, v)).rgb;
+        c0 = mix(c1, c0, u / texelU);
+    }
+    else if (u > 1.0 - texelU)
+    {
+        vec3 c1 = texture(atmoSkyViewLut, vec2(u - 1.0, v)).rgb;
+        c0 = mix(c0, c1, (u - (1.0 - texelU)) / texelU);
+    }
+
+    return srgbToLinear(c0);
 }
 
 // GI-probe style irradiance. A diffuse probe shifts ambient *energy* with only a gentle

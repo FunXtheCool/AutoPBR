@@ -1,0 +1,147 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AutoPBR.App.ViewModels"
+        x:Class="AutoPBR.App.Views.Preview3DCameraHelpWindow"
+        x:Name="HelpRoot"
+        x:DataType="vm:Preview3DCameraHelpWindowViewModel"
+        Width="520"
+        Height="560"
+        MinWidth="400"
+        MinHeight="360"
+        WindowStartupLocation="CenterOwner"
+        Background="Transparent"
+        SystemDecorations="None"
+        ExtendClientAreaToDecorationsHint="True"
+        TransparencyLevelHint="None">
+    <Border Background="{Binding WindowBackground}"
+            BorderBrush="{Binding CardBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="8"
+            Padding="1">
+        <Grid RowDefinitions="Auto,*">
+            <Border Grid.Row="0"
+                    Height="40"
+                    Background="{Binding WindowBackground}"
+                    BorderBrush="{Binding CardBorderBrush}"
+                    BorderThickness="0,0,0,1"
+                    PointerPressed="TitleBarDragRegion_PointerPressed">
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="{Binding HeaderTitle}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Foreground="{Binding ForegroundBrush}" />
+                    <Button Grid.Column="1"
+                            Width="36"
+                            Height="28"
+                            Margin="0,6,6,6"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Foreground="{Binding ForegroundBrush}"
+                            Content="✕"
+                            Click="CloseWindow_Click" />
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="1"
+                    Margin="12"
+                    Padding="0"
+                    Background="{Binding CardBackground}"
+                    BorderBrush="{Binding CardBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="6">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="14" Spacing="2">
+                        <TextBlock Text="{Binding OrbitPanSection}"
+                                   FontWeight="SemiBold"
+                                   FontSize="14"
+                                   Margin="0,0,0,6"
+                                   Foreground="{Binding ForegroundBrush}" />
+                        <ItemsControl ItemsSource="{Binding OrbitPanItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:Preview3DCameraHelpItem">
+                                    <Grid ColumnDefinitions="Auto,*"
+                                          ColumnSpacing="14"
+                                          Margin="0,5">
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding Input}"
+                                                   FontWeight="SemiBold"
+                                                   MinWidth="200"
+                                                   VerticalAlignment="Top"
+                                                   Foreground="{Binding DataContext.ForegroundBrush, ElementName=HelpRoot}" />
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding Description}"
+                                                   Opacity="0.88"
+                                                   TextWrapping="Wrap"
+                                                   VerticalAlignment="Top"
+                                                   Foreground="{Binding DataContext.ForegroundBrush, ElementName=HelpRoot}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="{Binding FlySection}"
+                                   FontWeight="SemiBold"
+                                   FontSize="14"
+                                   Margin="0,12,0,6"
+                                   Foreground="{Binding ForegroundBrush}" />
+                        <ItemsControl ItemsSource="{Binding FlyItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:Preview3DCameraHelpItem">
+                                    <Grid ColumnDefinitions="Auto,*"
+                                          ColumnSpacing="14"
+                                          Margin="0,5">
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding Input}"
+                                                   FontWeight="SemiBold"
+                                                   MinWidth="200"
+                                                   VerticalAlignment="Top"
+                                                   Foreground="{Binding DataContext.ForegroundBrush, ElementName=HelpRoot}" />
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding Description}"
+                                                   Opacity="0.88"
+                                                   TextWrapping="Wrap"
+                                                   VerticalAlignment="Top"
+                                                   Foreground="{Binding DataContext.ForegroundBrush, ElementName=HelpRoot}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="{Binding FramingSection}"
+                                   FontWeight="SemiBold"
+                                   FontSize="14"
+                                   Margin="0,12,0,6"
+                                   Foreground="{Binding ForegroundBrush}" />
+                        <ItemsControl ItemsSource="{Binding FramingItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:Preview3DCameraHelpItem">
+                                    <Grid ColumnDefinitions="Auto,*"
+                                          ColumnSpacing="14"
+                                          Margin="0,5">
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding Input}"
+                                                   FontWeight="SemiBold"
+                                                   MinWidth="200"
+                                                   VerticalAlignment="Top"
+                                                   Foreground="{Binding DataContext.ForegroundBrush, ElementName=HelpRoot}" />
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding Description}"
+                                                   Opacity="0.88"
+                                                   TextWrapping="Wrap"
+                                                   VerticalAlignment="Top"
+                                                   Foreground="{Binding DataContext.ForegroundBrush, ElementName=HelpRoot}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

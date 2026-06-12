@@ -41,11 +41,6 @@ public partial class MainWindowViewModel
     {
         Strings = LocalizationService.ApplyCulture(cultureCode);
         OnPropertyChanged(nameof(Strings));
-        foreach (var t in BackgroundTasks)
-        {
-            t.Label = ResolveBackgroundTaskLabel(t.Id);
-        }
-
         RefreshFoliageModeOptions();
         RefreshMlSpecularBlendModeOptions();
         RefreshMlSpecularBlendMathOptions();

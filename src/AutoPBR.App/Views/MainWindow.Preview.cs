@@ -15,6 +15,7 @@ public partial class MainWindow : Window
     private DateTime _lastLogScrollUtc = DateTime.MinValue;
     private UvDebugWindow? _uvDebugWindow;
     private EntityPreviewDebugWindow? _entityPreviewDebugWindow;
+    private Preview3DCameraHelpWindow? _preview3DCameraHelpWindow;
     private void OnLoaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (DataContext is MainWindowViewModel vm && LogScrollViewer is { } scroll)
@@ -123,6 +124,28 @@ public partial class MainWindow : Window
         };
         window.Closed += (_, _) => _entityPreviewDebugWindow = null;
         _entityPreviewDebugWindow = window;
+        window.Show(this);
+    }
+
+    private void OpenPreview3DCameraHelpWindow_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm)
+        {
+            return;
+        }
+
+        if (_preview3DCameraHelpWindow is { IsVisible: true })
+        {
+            _preview3DCameraHelpWindow.Activate();
+            return;
+        }
+
+        var window = new Preview3DCameraHelpWindow
+        {
+            DataContext = new Preview3DCameraHelpWindowViewModel(vm)
+        };
+        window.Closed += (_, _) => _preview3DCameraHelpWindow = null;
+        _preview3DCameraHelpWindow = window;
         window.Show(this);
     }
 }

@@ -39,10 +39,25 @@
             <Setter Property="MaxWidth" Value="10000" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
         </Style>
+        <Style Selector="Button.preview-help-btn">
+            <Setter Property="Width" Value="28" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Button.preview-help-btn:pointerover /template/ ContentPresenter">
+            <Setter Property="Opacity" Value="0.92" />
+        </Style>
+        <Style Selector="Button.preview-help-btn:pressed">
+            <Setter Property="Opacity" Value="0.78" />
+        </Style>
     </Window.Styles>
     <Window.Resources>
         <appConv:ConditionValueOptionsConverter x:Key="ConditionValueOptionsConverter" />
         <appConv:ActionValueOptionsConverter x:Key="ActionValueOptionsConverter" />
+        <StreamGeometry x:Key="PreviewCameraHelpIcon">M8,1.33333333 C4.318,1.33333333 1.33333333,4.318 1.33333333,8 C1.33333333,11.682 4.318,14.6666667 8,14.6666667 C11.682,14.6666667 14.6666667,11.682 14.6666667,8 C14.6666667,4.318 11.682,1.33333333 8,1.33333333 Z M8.33333333,11.6666667 C8.33333333,12.2186667 7.88533333,12.6666667 7.33333333,12.6666667 C6.78133333,12.6666667 6.33333333,12.2186667 6.33333333,11.6666667 C6.33333333,11.1146667 6.78133333,10.6666667 7.33333333,10.6666667 C7.88533333,10.6666667 8.33333333,11.1146667 8.33333333,11.6666667 Z M9.16666667,6.11333333 C8.94761117,5.44971417 8.3582405,4.9664335 7.66666667,4.96666667 C6.74619083,4.96666667 6,5.7128575 6,6.63333333 L6.96666667,6.63333333 C6.96666667,6.24652333 7.27985683,5.93333333 7.66666667,5.93333333 C8.0534765,5.93333333 8.36666667,6.24652333 8.36666667,6.63333333 C8.36666667,6.930215 8.18204833,7.19117167 7.91122667,7.30318 C7.538535,7.45799833 7.26666667,7.83007 7.26666667,8.25466667 L7.26666667,8.63333333 L8.23333333,8.63333333 L8.23333333,8.25466667 C8.23333333,7.99381 8.37773833,7.75453 8.60958,7.63518 C9.090465,7.385425 9.4,6.87922833 9.4,6.32333333 C9.4,6.24548 9.39189667,6.16988833 9.37664667,6.09711 L9.16666667,6.11333333 Z</StreamGeometry>
     </Window.Resources>
 
     <Grid>
@@ -1568,6 +1583,129 @@
                                                               SelectedIndex="{Binding Preview3DVolumetricQuality, Mode=TwoWay}"
                                                               ToolTip.Tip="{Binding Strings.Preview3DVolumetricQualityTooltip}" />
                                                 </Grid>
+                                                <CheckBox IsChecked="{Binding Preview3DEnablePreviewTaa, Mode=TwoWay}"
+                                                          ToolTip.Tip="{Binding Strings.Preview3DEnablePreviewTaaTooltip}">
+                                                    <TextBlock Text="{Binding Strings.Preview3DEnablePreviewTaa}" TextWrapping="Wrap" />
+                                                </CheckBox>
+
+                                                <TextBlock FontWeight="SemiBold"
+                                                           Margin="0,4,0,0"
+                                                           Text="{Binding Strings.Preview3DCloudSection}" />
+                                                <StackPanel Spacing="10" IsEnabled="{Binding Preview3DEnableVolumetricClouds}">
+                                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" MinWidth="0">
+                                                        <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                                                   Text="{Binding Strings.Preview3DCloudDensity}" TextWrapping="Wrap"
+                                                                   ToolTip.Tip="{Binding Strings.Preview3DCloudDensityTooltip}" />
+                                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                            <Slider Width="220" Minimum="0" Maximum="2" SmallChange="0.02" LargeChange="0.1"
+                                                                    Value="{Binding Preview3DCloudDensity, Mode=TwoWay}"
+                                                                    ToolTip.Tip="{Binding Strings.Preview3DCloudDensityTooltip}" />
+                                                            <NumericUpDown Minimum="0" Maximum="2" Increment="0.02" FormatString="F2"
+                                                                           MinWidth="92" MaxWidth="120" ShowButtonSpinner="False" AllowSpin="False"
+                                                                           Value="{Binding Preview3DCloudDensity, Mode=TwoWay}"
+                                                                           ToolTip.Tip="{Binding Strings.Preview3DCloudDensityTooltip}" />
+                                                        </StackPanel>
+                                                    </Grid>
+                                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" MinWidth="0">
+                                                        <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                                                   Text="{Binding Strings.Preview3DCloudCoverageScale}" TextWrapping="Wrap"
+                                                                   ToolTip.Tip="{Binding Strings.Preview3DCloudCoverageScaleTooltip}" />
+                                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                            <Slider Width="220" Minimum="0" Maximum="2" SmallChange="0.02" LargeChange="0.1"
+                                                                    Value="{Binding Preview3DCloudCoverageScale, Mode=TwoWay}"
+                                                                    ToolTip.Tip="{Binding Strings.Preview3DCloudCoverageScaleTooltip}" />
+                                                            <NumericUpDown Minimum="0" Maximum="2" Increment="0.02" FormatString="F2"
+                                                                           MinWidth="92" MaxWidth="120" ShowButtonSpinner="False" AllowSpin="False"
+                                                                           Value="{Binding Preview3DCloudCoverageScale, Mode=TwoWay}"
+                                                                           ToolTip.Tip="{Binding Strings.Preview3DCloudCoverageScaleTooltip}" />
+                                                        </StackPanel>
+                                                    </Grid>
+                                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" MinWidth="0">
+                                                        <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                                                   Text="{Binding Strings.Preview3DCloudLayerHeight}" TextWrapping="Wrap"
+                                                                   ToolTip.Tip="{Binding Strings.Preview3DCloudLayerHeightTooltip}" />
+                                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                            <Slider Width="220" Minimum="-12" Maximum="48" SmallChange="0.5" LargeChange="4"
+                                                                    Value="{Binding Preview3DCloudLayerHeight, Mode=TwoWay}"
+                                                                    ToolTip.Tip="{Binding Strings.Preview3DCloudLayerHeightTooltip}" />
+                                                            <NumericUpDown Minimum="-12" Maximum="48" Increment="0.5" FormatString="F1"
+                                                                           MinWidth="92" MaxWidth="120" ShowButtonSpinner="False" AllowSpin="False"
+                                                                           Value="{Binding Preview3DCloudLayerHeight, Mode=TwoWay}"
+                                                                           ToolTip.Tip="{Binding Strings.Preview3DCloudLayerHeightTooltip}" />
+                                                        </StackPanel>
+                                                    </Grid>
+                                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" MinWidth="0">
+                                                        <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                                                   Text="{Binding Strings.Preview3DCloudVolumeHeight}" TextWrapping="Wrap"
+                                                                   ToolTip.Tip="{Binding Strings.Preview3DCloudVolumeHeightTooltip}" />
+                                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                            <Slider Width="220" Minimum="4" Maximum="96" SmallChange="1" LargeChange="8"
+                                                                    Value="{Binding Preview3DCloudVolumeHeight, Mode=TwoWay}"
+                                                                    ToolTip.Tip="{Binding Strings.Preview3DCloudVolumeHeightTooltip}" />
+                                                            <NumericUpDown Minimum="4" Maximum="96" Increment="1" FormatString="F0"
+                                                                           MinWidth="92" MaxWidth="120" ShowButtonSpinner="False" AllowSpin="False"
+                                                                           Value="{Binding Preview3DCloudVolumeHeight, Mode=TwoWay}"
+                                                                           ToolTip.Tip="{Binding Strings.Preview3DCloudVolumeHeightTooltip}" />
+                                                        </StackPanel>
+                                                    </Grid>
+                                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" MinWidth="0">
+                                                        <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                                                   Text="{Binding Strings.Preview3DCloudVolumeSize}" TextWrapping="Wrap"
+                                                                   ToolTip.Tip="{Binding Strings.Preview3DCloudVolumeSizeTooltip}" />
+                                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                            <Slider Width="220" Minimum="8" Maximum="256" SmallChange="4" LargeChange="32"
+                                                                    Value="{Binding Preview3DCloudVolumeSize, Mode=TwoWay}"
+                                                                    ToolTip.Tip="{Binding Strings.Preview3DCloudVolumeSizeTooltip}" />
+                                                            <NumericUpDown Minimum="8" Maximum="256" Increment="4" FormatString="F0"
+                                                                           MinWidth="92" MaxWidth="120" ShowButtonSpinner="False" AllowSpin="False"
+                                                                           Value="{Binding Preview3DCloudVolumeSize, Mode=TwoWay}"
+                                                                           ToolTip.Tip="{Binding Strings.Preview3DCloudVolumeSizeTooltip}" />
+                                                        </StackPanel>
+                                                    </Grid>
+                                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" MinWidth="0">
+                                                        <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                                                   Text="{Binding Strings.Preview3DCloudWindSpeed}" TextWrapping="Wrap"
+                                                                   ToolTip.Tip="{Binding Strings.Preview3DCloudWindSpeedTooltip}" />
+                                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                            <Slider Width="220" Minimum="0" Maximum="12" SmallChange="0.1" LargeChange="1"
+                                                                    Value="{Binding Preview3DCloudWindSpeed, Mode=TwoWay}"
+                                                                    ToolTip.Tip="{Binding Strings.Preview3DCloudWindSpeedTooltip}" />
+                                                            <NumericUpDown Minimum="0" Maximum="12" Increment="0.1" FormatString="F1"
+                                                                           MinWidth="92" MaxWidth="120" ShowButtonSpinner="False" AllowSpin="False"
+                                                                           Value="{Binding Preview3DCloudWindSpeed, Mode=TwoWay}"
+                                                                           ToolTip.Tip="{Binding Strings.Preview3DCloudWindSpeedTooltip}" />
+                                                        </StackPanel>
+                                                    </Grid>
+                                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" MinWidth="0">
+                                                        <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                                                   Text="{Binding Strings.Preview3DCloudWindHeading}" TextWrapping="Wrap"
+                                                                   ToolTip.Tip="{Binding Strings.Preview3DCloudWindHeadingTooltip}" />
+                                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                            <Slider Width="220" Minimum="-180" Maximum="180" SmallChange="1" LargeChange="15"
+                                                                    Value="{Binding Preview3DCloudWindHeadingDegrees, Mode=TwoWay}"
+                                                                    ToolTip.Tip="{Binding Strings.Preview3DCloudWindHeadingTooltip}" />
+                                                            <NumericUpDown Minimum="-180" Maximum="180" Increment="1" FormatString="F0"
+                                                                           MinWidth="92" MaxWidth="120" ShowButtonSpinner="False" AllowSpin="False"
+                                                                           Value="{Binding Preview3DCloudWindHeadingDegrees, Mode=TwoWay}"
+                                                                           ToolTip.Tip="{Binding Strings.Preview3DCloudWindHeadingTooltip}" />
+                                                        </StackPanel>
+                                                    </Grid>
+                                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" MinWidth="0">
+                                                        <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                                                   Text="{Binding Strings.Preview3DCloudCirrusStrength}" TextWrapping="Wrap"
+                                                                   ToolTip.Tip="{Binding Strings.Preview3DCloudCirrusStrengthTooltip}" />
+                                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                            <Slider Width="220" Minimum="0" Maximum="2" SmallChange="0.02" LargeChange="0.1"
+                                                                    Value="{Binding Preview3DCloudCirrusStrength, Mode=TwoWay}"
+                                                                    ToolTip.Tip="{Binding Strings.Preview3DCloudCirrusStrengthTooltip}" />
+                                                            <NumericUpDown Minimum="0" Maximum="2" Increment="0.02" FormatString="F2"
+                                                                           MinWidth="92" MaxWidth="120" ShowButtonSpinner="False" AllowSpin="False"
+                                                                           Value="{Binding Preview3DCloudCirrusStrength, Mode=TwoWay}"
+                                                                           ToolTip.Tip="{Binding Strings.Preview3DCloudCirrusStrengthTooltip}" />
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </StackPanel>
+
                                                 <Grid ColumnDefinitions="Auto,*"
                                                       ColumnSpacing="10"
                                                       MinWidth="0">
@@ -1699,6 +1837,40 @@
                                                                        Value="{Binding Preview3DGodRayExtinction, Mode=TwoWay}" />
                                                     </StackPanel>
                                                 </Grid>
+
+                                                <Expander Header="{Binding Strings.Preview3DCloudDebugSection}"
+                                                          Margin="0,4,0,0"
+                                                          IsEnabled="{Binding Preview3DEnableVolumetricClouds}">
+                                                    <StackPanel Spacing="10" Margin="0,8,0,0">
+                                                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" MinWidth="0">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                                                       Text="{Binding Strings.Preview3DCloudDebugView}" TextWrapping="Wrap"
+                                                                       ToolTip.Tip="{Binding Strings.Preview3DCloudDebugViewTooltip}" />
+                                                            <ComboBox Grid.Column="1" MinWidth="160" HorizontalAlignment="Left"
+                                                                      ItemsSource="{Binding Preview3DCloudDebugViewOptions}"
+                                                                      SelectedIndex="{Binding Preview3DCloudDebugView, Mode=TwoWay}"
+                                                                      ToolTip.Tip="{Binding Strings.Preview3DCloudDebugViewTooltip}" />
+                                                        </Grid>
+                                                        <CheckBox IsChecked="{Binding Preview3DCloudDisableTemporal, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DCloudDisableTemporalTooltip}">
+                                                            <TextBlock Text="{Binding Strings.Preview3DCloudDisableTemporal}" TextWrapping="Wrap" />
+                                                        </CheckBox>
+                                                        <CheckBox IsChecked="{Binding Preview3DCloudFreezeWind, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DCloudFreezeWindTooltip}">
+                                                            <TextBlock Text="{Binding Strings.Preview3DCloudFreezeWind}" TextWrapping="Wrap" />
+                                                        </CheckBox>
+                                                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" MinWidth="0">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                                                       Text="{Binding Strings.Preview3DCloudMarchSteps}" TextWrapping="Wrap"
+                                                                       ToolTip.Tip="{Binding Strings.Preview3DCloudMarchStepsTooltip}" />
+                                                            <NumericUpDown Grid.Column="1" Minimum="0" Maximum="64" Increment="1" FormatString="F0"
+                                                                           HorizontalAlignment="Left" MinWidth="92" MaxWidth="120"
+                                                                           ShowButtonSpinner="False" AllowSpin="False"
+                                                                           Value="{Binding Preview3DCloudMarchStepOverride, Mode=TwoWay}"
+                                                                           ToolTip.Tip="{Binding Strings.Preview3DCloudMarchStepsTooltip}" />
+                                                        </Grid>
+                                                    </StackPanel>
+                                                </Expander>
                                             </StackPanel>
                                         </Border>
 
@@ -2134,6 +2306,12 @@
                                                   OffContent=""
                                                   IsChecked="{Binding DebugMode, Mode=TwoWay}" />
                                 </StackPanel>
+
+                                <Button HorizontalAlignment="Left"
+                                        Command="{Binding ForceInvalidateShaderCacheCommand}"
+                                        ToolTip.Tip="{Binding Strings.ForceShaderCacheInvalidationTooltip}">
+                                    <TextBlock Text="{Binding Strings.ForceShaderCacheInvalidation}" TextWrapping="Wrap" />
+                                </Button>
                             </StackPanel>
                         </Border>
 
@@ -2176,6 +2354,29 @@
                                     <TextBlock Grid.Column="2" VerticalAlignment="Center" MinWidth="52"
                                                Text="{Binding Preview3DCameraOrbitBoomDistance, StringFormat={}{0:0.00}}" />
                                 </Grid>
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" MinWidth="0">
+                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DCameraFlyLookSensitivity}" TextWrapping="Wrap" />
+                                    <Slider Grid.Column="1" Minimum="0.001" Maximum="0.04" SmallChange="0.0005" LargeChange="0.002"
+                                            Value="{Binding Preview3DCameraFlyLookSensitivity, Mode=TwoWay}" />
+                                    <TextBlock Grid.Column="2" VerticalAlignment="Center" MinWidth="52"
+                                               Text="{Binding Preview3DCameraFlyLookSensitivity, StringFormat={}{0:0.0000}}" />
+                                </Grid>
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" MinWidth="0">
+                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DCameraFlyMoveSpeed}"
+                                               TextWrapping="Wrap"
+                                               ToolTip.Tip="{Binding Strings.Preview3DCameraFlyMoveSpeedTooltip}" />
+                                    <Slider Grid.Column="1" Minimum="0.25" Maximum="4" SmallChange="0.05" LargeChange="0.25"
+                                            Value="{Binding Preview3DCameraFlyMoveSpeed, Mode=TwoWay}"
+                                            ToolTip.Tip="{Binding Strings.Preview3DCameraFlyMoveSpeedTooltip}" />
+                                    <TextBlock Grid.Column="2" VerticalAlignment="Center" MinWidth="52"
+                                               Text="{Binding Preview3DCameraFlyMoveSpeed, StringFormat={}{0:0.00}}" />
+                                </Grid>
+                                <CheckBox Content="{Binding Strings.Preview3DCameraInvertLookY}"
+                                          IsChecked="{Binding Preview3DCameraInvertLookY, Mode=TwoWay}"
+                                          ToolTip.Tip="{Binding Strings.Preview3DCameraInvertLookYTooltip}" />
+                                <CheckBox Content="{Binding Strings.Preview3DCameraFlySmoothAcceleration}"
+                                          IsChecked="{Binding Preview3DCameraFlySmoothAcceleration, Mode=TwoWay}"
+                                          ToolTip.Tip="{Binding Strings.Preview3DCameraFlySmoothAccelerationTooltip}" />
                                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" MinWidth="0">
                                     <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DCameraResetKey}" TextWrapping="Wrap" />
                                     <ComboBox Grid.Column="1" MinWidth="140" HorizontalAlignment="Left"
@@ -2371,55 +2572,6 @@
                 </TabItem>
             </TabControl>
 
-            <!-- Always visible above tab content (right); rows appear when work is active. -->
-            <StackPanel HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
-                        Margin="0,10,28,0"
-                        MaxWidth="260"
-                        Spacing="6"
-                        IsHitTestVisible="False"
-                        ZIndex="10">
-                <TextBlock Text="{Binding Strings.BackgroundTasksHeader}"
-                           FontSize="10.5"
-                           FontWeight="SemiBold"
-                           Opacity="0.72"
-                           HorizontalAlignment="Right"
-                           Foreground="{Binding ((vm:MainWindowViewModel)DataContext).ForegroundBrush, ElementName=MainTabControl, FallbackValue={x:Null}, TargetNullValue={x:Null}}" />
-                <ItemsControl ItemsSource="{Binding BackgroundTasks}"
-                              MinHeight="4">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Spacing="5" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="m:BackgroundTaskItem">
-                            <StackPanel Spacing="3">
-                                <TextBlock Text="{Binding Label}"
-                                           FontSize="10.5"
-                                           Opacity="0.88"
-                                           HorizontalAlignment="Right"
-                                           TextTrimming="CharacterEllipsis"
-                                           TextAlignment="Right"
-                                           MaxWidth="240"
-                                           Foreground="{Binding ((vm:MainWindowViewModel)DataContext).ForegroundBrush, ElementName=MainTabControl, FallbackValue={x:Null}, TargetNullValue={x:Null}}" />
-                                <ProgressBar Height="3"
-                                             MinWidth="120"
-                                             MaxWidth="220"
-                                             HorizontalAlignment="Right"
-                                             IsIndeterminate="{Binding IsIndeterminate}"
-                                             Minimum="0"
-                                             Maximum="1"
-                                             Value="{Binding Progress}"
-                                             Foreground="{Binding ((vm:MainWindowViewModel)DataContext).AccentBrush, ElementName=MainTabControl, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
-                                             Background="Transparent"
-                                             BorderThickness="0" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
-
                 <Button x:Name="JumpToTopButton"
                         Width="42" Height="42"
                         HorizontalAlignment="Center"
@@ -2465,26 +2617,45 @@
                                    TextTrimming="CharacterEllipsis"
                                    TextWrapping="NoWrap"
                                    Opacity="0.9" />
-                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding Strings.PreviewModeLabel}"
-                                       VerticalAlignment="Center"
-                                       Foreground="{Binding ForegroundBrush}"
-                                       Opacity="0.85" />
-                            <ComboBox Width="200"
-                                      SelectedIndex="{Binding PreviewDisplayMode}"
-                                      VerticalAlignment="Center">
-                                <ComboBoxItem Content="{Binding Strings.PreviewMode2D}" />
-                                <ComboBoxItem Content="{Binding Strings.PreviewMode3D}" />
-                            </ComboBox>
-                            <Button Content="UV Debug"
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" VerticalAlignment="Center">
+                            <StackPanel Grid.Column="0"
+                                        Orientation="Horizontal"
+                                        Spacing="8"
+                                        VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Strings.PreviewModeLabel}"
+                                           VerticalAlignment="Center"
+                                           Foreground="{Binding ForegroundBrush}"
+                                           Opacity="0.85" />
+                                <ComboBox Width="200"
+                                          SelectedIndex="{Binding PreviewDisplayMode}"
+                                          VerticalAlignment="Center">
+                                    <ComboBoxItem Content="{Binding Strings.PreviewMode2D}" />
+                                    <ComboBoxItem Content="{Binding Strings.PreviewMode3D}" />
+                                </ComboBox>
+                                <Button Content="UV Debug"
+                                        VerticalAlignment="Center"
+                                        Padding="10,2"
+                                        Click="OpenUvDebugWindow_Click" />
+                                <Button Content="Entity Debug"
+                                        VerticalAlignment="Center"
+                                        Padding="10,2"
+                                        Click="OpenEntityPreviewDebugWindow_Click" />
+                            </StackPanel>
+                            <Button Grid.Column="1"
+                                    Classes="preview-help-btn"
                                     VerticalAlignment="Center"
-                                    Padding="10,2"
-                                    Click="OpenUvDebugWindow_Click" />
-                            <Button Content="Entity Debug"
-                                    VerticalAlignment="Center"
-                                    Padding="10,2"
-                                    Click="OpenEntityPreviewDebugWindow_Click" />
-                        </StackPanel>
+                                    IsVisible="{Binding IsPreview3D}"
+                                    Background="{Binding CardBackground}"
+                                    BorderBrush="{Binding CardBorderBrush}"
+                                    BorderThickness="1"
+                                    ToolTip.Tip="{Binding Strings.Preview3DCameraSection}"
+                                    Click="OpenPreview3DCameraHelpWindow_Click">
+                                <PathIcon Width="15"
+                                          Height="15"
+                                          Foreground="{Binding ForegroundBrush}"
+                                          Data="{StaticResource PreviewCameraHelpIcon}" />
+                            </Button>
+                        </Grid>
                         <Border IsVisible="{Binding PreviewBrickProbeDebug}"
                                 CornerRadius="4"
                                 BorderBrush="{Binding CardBorderBrush}"
@@ -2510,25 +2681,39 @@
                                                    HorizontalAlignment="Stretch"
                                                    VerticalAlignment="Stretch"
                                                    MinHeight="120" />
-                        <StackPanel IsVisible="{Binding IsPreview3D}"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Top"
-                                    Margin="8"
-                                    ZIndex="2">
-                            <TextBlock FontFamily="Consolas"
-                                       FontSize="11"
-                                       Foreground="#E8FFFFFF"
-                                       Text="{Binding Preview3DCameraDebugText}"
-                                       TextWrapping="Wrap"
-                                       MaxWidth="520" />
-                            <TextBlock Margin="0,6,0,0"
-                                       FontSize="10"
-                                       Opacity="0.82"
-                                       Foreground="{Binding ForegroundBrush}"
-                                       Text="{Binding Strings.Preview3DCameraDebugFlyHint}"
-                                       TextWrapping="Wrap"
-                                       MaxWidth="520" />
-                        </StackPanel>
+                        <Border IsVisible="{Binding Preview3DGpuInitOverlayVisible}"
+                                Background="#AA101018"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                ZIndex="3">
+                            <StackPanel VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        Spacing="8">
+                                <TextBlock FontSize="13"
+                                           Foreground="#F0FFFFFF"
+                                           HorizontalAlignment="Center"
+                                           Text="{Binding Preview3DGpuInitOverlayText}" />
+                                <ProgressBar Width="220"
+                                             Height="6"
+                                             Minimum="0"
+                                             Maximum="1"
+                                             Value="{Binding Preview3DGpuInitProgressFraction}"
+                                             IsIndeterminate="{Binding Preview3DGpuInitProgressIndeterminate}"
+                                             Foreground="#88FFFFFF"
+                                             Background="#33FFFFFF" />
+                            </StackPanel>
+                        </Border>
+                        <TextBlock IsVisible="{Binding IsPreview3D}"
+                                   HorizontalAlignment="Left"
+                                   VerticalAlignment="Top"
+                                   Margin="8"
+                                   ZIndex="2"
+                                   FontFamily="Consolas"
+                                   FontSize="11"
+                                   Foreground="#E8FFFFFF"
+                                   Text="{Binding Preview3DCameraDebugText}"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="520" />
                     </Grid>
                     <Grid Grid.Row="2" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="6" MinWidth="0" MinHeight="0">
                         <TextBlock Text="{Binding ConversionScanDebugText}"

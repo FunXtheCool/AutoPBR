@@ -200,11 +200,13 @@ Shader-side: soft knee compression before sRGB encode on LUT build and sky draw.
 
 ## Quality presets (P4 — performance & cleanup)
 
-| Preset | Froxel divisor | Slices | Cloud quality | Temporal |
-|--------|----------------|--------|---------------|----------|
-| Low | 8 (min 24 px) | 12 | 0 | off |
-| Medium (default) | 4 (min 32 px) | 20 | 1 | volume 0.35 / upsample 0.45 |
-| High | 3 (min 48 px) | 24 | 2 | volume 0.42 / upsample 0.55 |
+| Preset | Froxel divisor | Slices | Cloud quality | Pass temporal (base) | Preview TAA |
+|--------|----------------|--------|---------------|----------------------|-------------|
+| Low | 8 (min 24 px) | 12 | 0 | off | off |
+| Medium (default) | 4 (min 32 px) | 20 | 1 | volume 0.35 / upsample 0.45 / cloud 0.42 | 0.55 |
+| High | 3 (min 48 px) | 24 | 2 | volume 0.42 / upsample 0.55 / cloud 0.55 | 0.72 |
+
+When **Preview TAA** is enabled, per-pass temporal weights are multiplied by **0.5** so froxel/cloud/god-ray histories do not double-smear noise the final TAA pass already stabilizes. With god rays on, TAA uses scene depth for motion rejection (screen velocity from reprojection).
 
 **UI:** Render tab → Volumetric effects — god rays toggle, clouds toggle, quality combo, strength slider.
 
@@ -212,11 +214,47 @@ Shader-side: soft knee compression before sRGB encode on LUT build and sky draw.
 
 Legacy screen-space radial blur (`genesis_godrays.frag`) removed; volume path is the only god-ray implementation.
 
+## Screen-space volumetric clouds (preview)
+
+Froxels own fog and god rays only; clouds are ray-marched in `genesis_clouds.frag` against the sky depth buffer.
+
+| Layer | Model |
+|-------|--------|
+| Cumulus slab | Weather-map coverage → Perlin-Worley shape atlas → detail erosion; bell height profile |
+| Cirrus | Single-plane procedural sample above the slab; independent wind drift |
+| Lighting | Multi-scatter sun + sky-LUT ambient; exposure matched to `atmo_sky.frag` |
+| Integration | Half-res march + depth-aware upsample; cloud-distance temporal; shared `temporal_reproject.glsl`; optional final preview TAA |
+| Compositing | God rays additive, then clouds alpha-blended; no shared temporal masks between passes |
+
+**Temporal ownership (independent histories)**
+
+| System | When active | Reprojection anchor | Disabled when |
+|--------|-------------|---------------------|---------------|
+| Cloud shader | Clouds only (no god rays) | Cloud slab world distance | God rays on, or Cloud debug “Disable temporal” |
+| God-ray upsample | God rays on, stabilize off | Scene geometry depth | God-ray stabilize debug |
+| Preview TAA | Preview TAA on, Medium+ | Scene geometry depth only (sky passthrough) | Low quality, toggle off |
+
+When **god rays + clouds** are both on, cloud in-shader temporal is off by design; preview TAA does not accumulate sky pixels (far-plane depth). God rays never sample cloud alpha for attenuation.
+
+**Render tab → Cloud layer:** density, coverage, layer height/thickness, feature scale, wind, cirrus strength. **Cloud debug** expander: coverage/density overlays, temporal off, march step override, freeze wind.
+
+**Tuning tips**
+
+- **Coverage ~0.5–0.8** for broken cumulus; **density ~0.25–0.4** at noon.
+- **Cirrus 0–0.5** — upper wisps; set 0 to hide the high layer.
+- Restart the preview (or reload GPU resources) after shader/noise-bake changes so procedural textures regenerate.
+
+**Horizon / gaps (Phase 6)**
+
+- `cloudHorizonLifetime` fades density and alpha by elevation, grazing angle, and distance to the slab so clouds do not stack on the horizon line.
+- Skylight fill along clear ray segments keeps gaps between puffs bright in daylight instead of reading as night void.
+- Stars fade with `dayAmt` in `atmo_sky.frag` so clear sky gaps at dusk do not show a full star field.
+
 ## Recommended defaults for preview
 
 - Atmospheric sky on; **sky exposure ~0.85**, **sun intensity ~10**, **sun disc ~0.35**.
 - God rays on (medium quality); **strength ~0.45** with sun behind or beside the subject.
-- Enable clouds for occlusion; lower cloud density if rays compete with cloud brightness.
+- Enable clouds for occlusion; **coverage ~0.7**, **density ~0.3**, **cirrus ~0.35** as a starting point; lower density if rays compete with cloud brightness.
 
 ## Polish (P5)
 

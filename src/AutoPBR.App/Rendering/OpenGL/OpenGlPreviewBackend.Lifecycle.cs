@@ -487,103 +487,12 @@ public sealed partial class OpenGlPreviewBackend
                 versionStr = p is null ? "(unknown)" : Marshal.PtrToStringUTF8((nint)p) ?? "(unknown)";
             }
 
-            var useOpenGlEs = versionStr.Contains("OpenGL ES", StringComparison.OrdinalIgnoreCase);
-            _useOpenGlEs = useOpenGlEs;
-            _program = new GlShaderProgram(gl, "genesis.vert", "genesis.frag", useOpenGlEs, out var err);
-            if (!_program.IsValid)
-            {
-                _lastError = err ?? "Shader link failed.";
-                EmitDiagnostic("[3D preview] " + _lastError);
-                _program.Dispose();
-                _program = null;
-                return;
-            }
-
-            EmitDiagnostic(useOpenGlEs
-                ? $"[3D preview] Context: {versionStr} (Genesis shader path, GLSL ES 3.0)."
-                : $"[3D preview] Context: {versionStr} (Genesis shader path, GLSL 330 core).");
-            _mainEntityUniformLocs = ResolveEntitySkinningUniformLocs(_program);
-
-            // Genesis Shadows Phase 2: depth-only program + FBO shadow target. If either fails we keep
-            // the main path running and just disable shadow sampling at draw time.
-            // PHASE3-CSM hook: when cascades arrive, allocate N targets here (or one array texture).
-            _shadowProgram = new GlShaderProgram(gl, "genesis_shadow.vert", "genesis_shadow.frag", useOpenGlEs,
-                out var shadowErr);
-            if (!_shadowProgram.IsValid)
-            {
-                EmitDiagnostic("[3D preview] Shadow program: " + (shadowErr ?? "link failed"));
-                _shadowProgram.Dispose();
-                _shadowProgram = null;
-            }
-            else
-            {
-                _shadowEntityUniformLocs = ResolveEntitySkinningUniformLocs(_shadowProgram);
-            }
-
-            InitEntitySkinningBoneUbo(gl);
-            LogEntityShaderInitDiagnosticsOnce();
-
-            var shadowResolution = Math.Clamp(_settings.ShadowMapResolution, 256, 4096);
-            try
-            {
-                _shadowTarget = new GlShadowMapTarget(gl, shadowResolution, useOpenGlEs);
-                _shadowTargetCascadeNear = new GlShadowMapTarget(gl, shadowResolution, useOpenGlEs);
-                EmitDiagnostic(
-                    $"[3D preview] Shadow map: {shadowResolution}x{shadowResolution} (near cascade ready)");
-            }
-            catch (Exception ex)
-            {
-                _shadowTarget = null;
-                _shadowTargetCascadeNear = null;
-                EmitDiagnostic("[3D preview] Shadow target init failed: " + ex.Message);
-            }
-
-            var nearest = true;
-            _albedo = new GlTexture2D(gl, nearest);
-            _normal = new GlTexture2D(gl, nearest);
-            _spec = new GlTexture2D(gl, nearest);
-            _height = new GlTexture2D(gl, nearest);
-            _mesh = new GlMeshBuffer(gl);
-            _groundMesh = new GlMeshBuffer(gl);
-            var groundGeom = PreviewMeshFactory.CreatePreviewGroundPlane();
-            _groundMesh.Upload(groundGeom.InterleavedVertices, groundGeom.Indices);
-
-            _neutralNormal = new GlTexture2D(gl, nearest);
-            _neutralNormal.UploadRgba(1, 1, [128, 128, 255, 255], nearest);
-            _neutralSpec = new GlTexture2D(gl, nearest);
-            _neutralSpec.UploadRgba(1, 1, [120, 60, 40, 255], nearest);
-            _neutralHeight = new GlTexture2D(gl, nearest);
-            _neutralHeight.UploadRgba(1, 1, [128, 128, 128, 255], nearest);
-
-            _grassGroundAlbedo = new GlTexture2D(gl, nearest);
-            _grassGroundReady = TryUploadGrassGroundTexture(gl);
-
-            TryInitLineOverlay(gl, useOpenGlEs);
-            TryInitMoonBillboard(gl, useOpenGlEs);
-            TryInitAtmosphere(gl, useOpenGlEs);
-            TryInitGodRays(gl, useOpenGlEs);
-            TryInitVolume(gl, useOpenGlEs);
-            TryInitVolumetricClouds(gl, useOpenGlEs);
-            EmitDiagnostic(
-                "[3D preview] Feature init: " +
-                $"sky={(_atmoSkyProgram is { IsValid: true } ? "lut" : _proceduralSkyProgram is { IsValid: true } ? "procedural" : "off")}, " +
-                $"atmoLut={(_atmoTransProgram is { IsValid: true } && _atmoSkyViewProgram is { IsValid: true } ? "yes" : "no")}, " +
-                $"volume={(_volumeInjectProgram is { IsValid: true } && _volumeIntegrateProgram is { IsValid: true } ? (_volumeUseLiteShaders ? "lite" : "full") : "off")}, " +
-                $"godRays={(_godRayCompositeProgram is { IsValid: true } ? "yes" : "no")}.");
-            _gpuAlive = true;
-            _materialDirty = true;
-            _meshDirty = true;
-
-            // Context init can complete after SetScene; re-derive orbit from the current scene so updated
-            // PreviewCamera defaults (or first scene push) always match the GPU path.
-            if (_scene is not null)
-            {
-                SyncOrbitFromSceneLocked(_scene);
-                _orbitSyncedKey = ResolveOrbitSyncKey(_scene, _blockModelSubject);
-            }
-
-            _loggedMeshReady = false;
-            _loggedZeroIndex = false;
+            _glVersionString = versionStr;
+            _useOpenGlEs = versionStr.Contains("OpenGL ES", StringComparison.OrdinalIgnoreCase);
+            _gpuInitStopwatch.Restart();
+            PreviewShaderPrewarm.EnsureStarted();
+            _gpuBootstrap = new GpuBootstrapRunner();
+            RaiseGpuInitProgress("Preparing GPU preview…", _settings);
         }
     }
 
@@ -627,9 +536,16 @@ public sealed partial class OpenGlPreviewBackend
             DestroyGodRayResources();
             DestroyVolumeResources();
             DestroyVolumetricCloudResources();
+            DestroyPreviewTaaResources();
             DestroyMoonBillboard();
             DestroyLineOverlay();
             DestroySunDebugOverlay();
+            _shaderCtx = null;
+            _gpuInitTier = PreviewGpuInitTier.None;
+            _shadowAwareGodRayInitAttempted = false;
+            _gpuInitProgress = PreviewGpuInitProgress.Starting;
+            _gpuBootstrap = null;
+            _pendingShaderReload = false;
             if (_entityBoneUbo != 0)
             {
                 _gl?.DeleteBuffer(_entityBoneUbo);

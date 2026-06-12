@@ -38,22 +38,12 @@ void main()
     vec3 viewDir = grWorldRayDir(vUv, uInvViewProj, uCameraPos);
     float dayAmt = skyDayFactor(uLightDir, uSunIntensity);
 
-    vec3 lutSky;
-    if (uLutValid > 0)
-    {
-        vec2 lutUv = skyViewLutUv(viewDir);
-        lutSky = srgbToLinear(texture(uSkyViewLut, lutUv).rgb);
-        if (dot(lutSky, vec3(0.333333)) < 1e-4)
-        {
-            lutSky = skyProceduralFromSun(viewDir, uLightDir, uSunIntensity);
-        }
-    }
-    else
-    {
-        lutSky = skyProceduralFromSun(viewDir, uLightDir, uSunIntensity);
-    }
+    // Procedural radiance is continuous in view direction; the 2D sky-view LUT has an azimuth
+    // seam on the -Z meridian that shows as a fixed world-space line when sampled per pixel.
+    vec3 lutSky = skyProceduralFromSun(viewDir, uLightDir, uSunIntensity);
 
-    vec3 nightSky = skyNightZenith(viewDir) + skyStars(viewDir, uRenderTime);
+    float starAmt = 1.0 - smoothstep(0.22, 0.62, dayAmt);
+    vec3 nightSky = skyNightZenith(viewDir) + skyStars(viewDir, uRenderTime) * starAmt;
     float sunElev = max(normalize(-uLightDir).y, 0.0);
     // Bounded tint: glow hue follows sun warmth but must not scale with raw sun
     // intensity, or the horizon glow whitewashes the blue sky at high intensities.

@@ -7,26 +7,50 @@ public sealed partial class OpenGlPreviewBackend
 {
     private void GlRenderPassPost(ref GlRenderFrame frame)
     {
-        // Clouds before god rays on the default FBO; depth is read from the capture texture (no same-FBO feedback).
-        if (frame.Settings.EnableVolumetricClouds &&
-            frame.GodRayCaptureActive &&
-            CanDrawVolumetricClouds(frame.Settings))
+        var cloudsActive = frame.Settings.EnableVolumetricClouds && CanDrawVolumetricClouds(frame.Settings);
+        var godRaysActive = frame.GodRayCaptureActive && _sceneCapture is { IsValid: true };
+        var bothVolumetrics = cloudsActive && godRaysActive;
+        var cloudWarmupDirect = bothVolumetrics && _cloudTierReadyWarmupDraws > 0;
+        var useDeferredCloudComposite = bothVolumetrics && !cloudWarmupDirect;
+        var cloudShaderTemporal = ShouldUseCloudShaderTemporal(frame.Settings, godRaysActive);
+        var cloudRenderedOffscreen = false;
+
+        if (cloudWarmupDirect)
         {
-            DrawVolumetricClouds(ref frame, gateSkyDepth: true);
+            DrawGodRayComposite(ref frame);
+            var drewDirect = DrawVolumetricClouds(
+                ref frame,
+                gateSkyDepth: false,
+                deferComposite: false,
+                forceTemporal: false);
+            NoteCloudTierWarmupDirectDrawCompleted(drewDirect);
         }
-
-        DrawGodRayComposite(ref frame);
-
-        if (frame.Settings.EnableVolumetricClouds)
+        else
         {
-            if (CanUseUnifiedVolumetrics(frame.Settings) && frame.VolumeFroxelsReady)
+            if (cloudsActive)
             {
-                var halfExtent = ResolveVolumeHalfExtent(ref frame);
-                DrawVolumeCloudComposite(ref frame, halfExtent);
+                cloudRenderedOffscreen = DrawVolumetricClouds(
+                    ref frame,
+                    gateSkyDepth: useDeferredCloudComposite,
+                    deferComposite: useDeferredCloudComposite,
+                    forceTemporal: cloudShaderTemporal ? null : false);
             }
-            else if (!frame.GodRayCaptureActive)
+
+            if (godRaysActive)
             {
-                DrawVolumetricClouds(ref frame, gateSkyDepth: false);
+                DrawGodRayComposite(ref frame);
+            }
+
+            if (useDeferredCloudComposite && cloudRenderedOffscreen)
+            {
+                CompositeCloudRenderTargetToDefault(ref frame);
+            }
+            else if (useDeferredCloudComposite && _loggedCloudDeferredCompositeMiss != frame.Vw + frame.Vh * 10000)
+            {
+                _loggedCloudDeferredCompositeMiss = frame.Vw + frame.Vh * 10000;
+                EmitDiagnostic(
+                    "[3D preview] Deferred cloud composite skipped (offscreen target not ready; " +
+                    $"retriesLeft={_cloudDeferredCompositeRetries}).");
             }
         }
 

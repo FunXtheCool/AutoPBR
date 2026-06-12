@@ -64,16 +64,8 @@ public partial class MainWindowViewModel
                 SetStatus("Status_LoadedTextures", data.FileCount);
                 AddLogLine(Resources.GetStatusString("Log_ArchiveContentsLoaded", data.FileCount));
             });
-            ((IBackgroundTaskSink)this).BeginTask(BackgroundTaskIds.ExploreCache);
-            try
-            {
-                await Task.Run(() => _exploreController.PrewarmFolderVisibilityCache(scanToken), scanToken)
-                    .ConfigureAwait(false);
-            }
-            finally
-            {
-                ((IBackgroundTaskSink)this).EndTask(BackgroundTaskIds.ExploreCache);
-            }
+            await Task.Run(() => _exploreController.PrewarmFolderVisibilityCache(scanToken), scanToken)
+                .ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -174,16 +166,8 @@ public partial class MainWindowViewModel
                 SetStatus("Status_BatchScanDone", packCount, data.FileCount);
                 AddLogLine(Resources.GetStatusString("Log_BatchScanDone", packCount, data.FileCount));
             });
-            ((IBackgroundTaskSink)this).BeginTask(BackgroundTaskIds.ExploreCache);
-            try
-            {
-                await Task.Run(() => _exploreController.PrewarmFolderVisibilityCache(scanToken), scanToken)
-                    .ConfigureAwait(false);
-            }
-            finally
-            {
-                ((IBackgroundTaskSink)this).EndTask(BackgroundTaskIds.ExploreCache);
-            }
+            await Task.Run(() => _exploreController.PrewarmFolderVisibilityCache(scanToken), scanToken)
+                .ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {

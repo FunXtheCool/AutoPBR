@@ -31,32 +31,82 @@ public sealed partial class OpenGlPreviewBackend
         double renderTime;
         Vector3 orbitBaseTarget;
         Vector3 orbitPan;
-        Vector3 debugFlyWorldOffset;
+        bool flyCamActive;
+        Vector3 flyPosition;
+        float flyYaw;
+        float flyPitch;
         float orbitYaw;
         float orbitPitch;
         float orbitDistance;
+        var drawBootstrapOnly = false;
         lock (_sync)
         {
-            if (!_gpuAlive || _gl is null || _program is null || !_program.IsValid || _albedo is null ||
-                _normal is null || _spec is null || _height is null || _mesh is null || _groundMesh is null ||
-                _neutralNormal is null || _neutralSpec is null || _neutralHeight is null)
+            if (_gl is null)
             {
                 return;
             }
 
             settings = CloneSettings(_settings);
-            scene = _scene;
-            material = _material;
-            blockModel = _blockModelSubject;
-            blockSlots = _blockModelSlots;
-            rotation = _rotationAccum;
-            renderTime = _renderTimeAccum;
-            orbitBaseTarget = _orbitBaseTarget;
-            orbitPan = _orbitPan;
-            debugFlyWorldOffset = _debugFlyWorldOffset;
-            orbitYaw = _orbitYaw;
-            orbitPitch = _orbitPitch;
-            orbitDistance = _orbitDistance;
+
+            HandlePendingShaderReloadLocked();
+            if (_gpuBootstrap is not null)
+            {
+                if (!_gpuBootstrap.IsComplete)
+                {
+                    _gpuBootstrap.Advance(this, 14.0);
+                }
+
+                var phase = _gpuBootstrap.IsComplete ? "Core preview ready" : _gpuBootstrap.Phase;
+                RaiseGpuInitProgress(phase, settings);
+                if (_gpuBootstrap.IsComplete)
+                {
+                    _gpuBootstrap = null;
+                }
+            }
+
+            drawBootstrapOnly = !_gpuAlive || _gpuBootstrap is not null;
+            if (drawBootstrapOnly)
+            {
+                scene = _scene;
+                material = null;
+                blockModel = null;
+                blockSlots = null;
+                rotation = 0;
+                renderTime = _renderTimeAccum;
+                orbitBaseTarget = default;
+                orbitPan = default;
+                flyCamActive = false;
+                flyPosition = default;
+                flyYaw = 0;
+                flyPitch = 0;
+                orbitYaw = 0;
+                orbitPitch = 0;
+                orbitDistance = 0;
+            }
+            else if (_program is null || !_program.IsValid || _albedo is null ||
+                     _normal is null || _spec is null || _height is null || _mesh is null || _groundMesh is null ||
+                     _neutralNormal is null || _neutralSpec is null || _neutralHeight is null)
+            {
+                return;
+            }
+            else
+            {
+                scene = _scene;
+                material = _material;
+                blockModel = _blockModelSubject;
+                blockSlots = _blockModelSlots;
+                rotation = _rotationAccum;
+                renderTime = _renderTimeAccum;
+                orbitBaseTarget = _orbitBaseTarget;
+                orbitPan = _orbitPan;
+                flyCamActive = _debugFlyRmbHeld && _flyEngaged;
+                flyPosition = _flyPosition;
+                flyYaw = _flyYaw;
+                flyPitch = _flyPitch;
+                orbitYaw = _orbitYaw;
+                orbitPitch = _orbitPitch;
+                orbitDistance = _orbitDistance;
+            }
         }
 
         var gl = _gl!;
@@ -65,6 +115,11 @@ public sealed partial class OpenGlPreviewBackend
         var vpY = 0;
         var vw = Math.Max(1, pixelWidth);
         var vh = Math.Max(1, pixelHeight);
+        lock (_sync)
+        {
+            _previewPixelWidth = vw;
+            _previewPixelHeight = vh;
+        }
 
         if (defaultFbo != 0)
         {
@@ -77,6 +132,15 @@ public sealed partial class OpenGlPreviewBackend
 
         gl.Viewport(vpX, vpY, (uint)vw, (uint)vh);
         gl.Disable(EnableCap.ScissorTest);
+
+        if (drawBootstrapOnly)
+        {
+            gl.ClearColor(0.01f, 0.012f, 0.02f, 1f);
+            gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            return;
+        }
+
+        EnsureGpuTier(settings);
 
         if (scene is null)
         {
@@ -110,7 +174,10 @@ public sealed partial class OpenGlPreviewBackend
             RenderTime = renderTime,
             OrbitBaseTarget = orbitBaseTarget,
             OrbitPan = orbitPan,
-            DebugFlyWorldOffset = debugFlyWorldOffset,
+            FlyCamActive = flyCamActive,
+            FlyPosition = flyPosition,
+            FlyYaw = flyYaw,
+            FlyPitch = flyPitch,
             OrbitYaw = orbitYaw,
             OrbitPitch = orbitPitch,
             OrbitDistance = orbitDistance,

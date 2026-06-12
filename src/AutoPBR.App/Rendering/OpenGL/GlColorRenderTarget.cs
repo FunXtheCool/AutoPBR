@@ -90,6 +90,26 @@ internal sealed class GlColorRenderTarget(GL gl, bool useOpenGlEs) : IDisposable
         return err == GLEnum.NoError;
     }
 
+    public bool CopyColorFromFramebuffer(uint readFramebuffer, int width, int height)
+    {
+        if (!IsValid || width != _width || height != _height)
+        {
+            return false;
+        }
+
+        var priorRead = gl.GetInteger(GetPName.ReadFramebufferBinding);
+        var priorDraw = gl.GetInteger(GetPName.DrawFramebufferBinding);
+        gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, readFramebuffer);
+        gl.ReadBuffer(ReadBufferMode.ColorAttachment0);
+        gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, _fbo);
+        gl.BlitFramebuffer(0, 0, width, height, 0, 0, width, height,
+            ClearBufferMask.ColorBufferBit, GLEnum.Nearest);
+        var err = gl.GetError();
+        gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, (uint)Math.Max(0, priorRead));
+        gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, (uint)Math.Max(0, priorDraw));
+        return err == GLEnum.NoError;
+    }
+
     private void ConfigureColorAttachment()
     {
         if (useOpenGlEs)

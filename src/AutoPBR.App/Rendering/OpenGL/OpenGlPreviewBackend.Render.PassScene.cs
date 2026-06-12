@@ -18,6 +18,7 @@ public sealed partial class OpenGlPreviewBackend
 
                 SyncGodRayToggleState(frame.Settings);
                 SyncVolumetricToggleState(frame.Settings);
+
                 frame.GodRayCaptureActive = TryBeginGodRaySceneRender(ref frame);
 
                 // Restore main-pass framebuffer + viewport (BeginShadowPass snapshots & EndShadowPass restores
@@ -52,8 +53,15 @@ public sealed partial class OpenGlPreviewBackend
 
                 // Camera must exist before sky / sun projection / froxel placement.
                 var cam = frame.Scene.Camera;
-                ComposeOrbitEye(frame.OrbitBaseTarget, frame.OrbitPan, frame.DebugFlyWorldOffset, frame.OrbitYaw, frame.OrbitPitch, frame.OrbitDistance,
-                    out frame.Eye, out frame.LookTarget);
+                if (frame.FlyCamActive)
+                {
+                    ComposeFlyEye(frame.FlyPosition, frame.FlyYaw, frame.FlyPitch, out frame.Eye, out frame.LookTarget);
+                }
+                else
+                {
+                    ComposeOrbitEye(frame.OrbitBaseTarget, frame.OrbitPan, frame.OrbitYaw, frame.OrbitPitch, frame.OrbitDistance,
+                        out frame.Eye, out frame.LookTarget);
+                }
                 var aspect = frame.Vw / (float)Math.Max(frame.Vh, 1);
                 frame.Proj = PreviewGlMatrices.CreatePerspectiveFieldOfViewOpenGl(
                     cam.FieldOfViewDegrees * (MathF.PI / 180f),

@@ -13,6 +13,9 @@
   <Target Name="GenerateAppIcon" BeforeTargets="BeforeBuild" Condition="Exists('$(ProjectDir)Assets\AutoPBR-logo.png')">
     <Exec Command="dotnet run --project &quot;$(ProjectDir)..\AutoPBR.Tools.GenerateIcon\AutoPBR.Tools.GenerateIcon.csproj&quot; -- &quot;$(ProjectDir)Assets\AutoPBR-logo.png&quot; &quot;$(ProjectDir)Assets\AutoPBR-logo.ico&quot;" IgnoreExitCode="true" />
   </Target>
+  <Target Name="GeneratePreviewCloudAssets" BeforeTargets="BeforeBuild" Condition="!Exists('$(ProjectDir)Assets\Preview\cloud_noise_shape_128.bin')">
+    <Exec Command="dotnet run --project &quot;$(ProjectDir)..\AutoPBR.Tools.GeneratePreviewCloudAssets\AutoPBR.Tools.GeneratePreviewCloudAssets.csproj&quot; -- &quot;$(ProjectDir)Assets\Preview&quot;" />
+  </Target>
 
   <ItemGroup>
     <Folder Include="Models\" />
@@ -72,6 +75,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AutoPBR.Core\AutoPBR.Core.csproj" />
+    <ProjectReference Include="..\AutoPBR.PreviewGpuAssets\AutoPBR.PreviewGpuAssets.csproj" />
   </ItemGroup>
 
   <ItemGroup>

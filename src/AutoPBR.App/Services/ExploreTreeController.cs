@@ -31,7 +31,6 @@ internal sealed partial class ExploreTreeController : IArchiveNodeHost, IDisposa
     private string? _exploreTagFilterId;
     private Func<IReadOnlyList<TagRule>>? _tagRulesProvider;
     private Func<MaterialTagSemanticOptions?>? _materialTagSemanticOptionsProvider;
-    private IBackgroundTaskSink? _backgroundTaskSink;
     private Action<string>? _debugSink;
 
     /// <summary>Maps texture storage key → effective tag ids for &quot;Show tag&quot; filtering (avoids re-running ML/keywords per node on every filter pass).</summary>
@@ -62,8 +61,6 @@ internal sealed partial class ExploreTreeController : IArchiveNodeHost, IDisposa
     public ArchiveNode? Root { get; private set; }
     public ScannedArchiveData? Data { get; private set; }
 
-    /// <summary>Optional UI progress for background tag work (dictionary + ML per texture).</summary>
-    public void SetBackgroundTaskSink(IBackgroundTaskSink? sink) => _backgroundTaskSink = sink;
     public void SetDebugSink(Action<string>? sink) => _debugSink = sink;
 
     public void Dispose()

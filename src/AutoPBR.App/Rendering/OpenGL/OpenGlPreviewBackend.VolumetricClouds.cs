@@ -5,14 +5,18 @@ using AutoPBR.App.Rendering.Scene;
 
 using Silk.NET.OpenGL;
 
+using AutoPBR.PreviewGpuAssets;
+
 namespace AutoPBR.App.Rendering.OpenGL;
 
 public sealed partial class OpenGlPreviewBackend
 {
     private GlShaderProgram? _cloudProgram;
+    private GlShaderProgram? _cloudUpsampleProgram;
     private uint _cloudQuadVao;
     private uint _cloudQuadVbo;
     private GlTexture3D? _cloudNoiseTex;
+    private GlTexture3D? _cloudDetailTex;
     private GlTexture2D? _cloudCoverageTex;
     private GlColorRenderTarget? _cloudRenderTarget;
     private GlColorRenderTarget? _cloudHistoryTarget;
@@ -22,11 +26,14 @@ public sealed partial class OpenGlPreviewBackend
     private int _cloudHistoryW;
     private int _cloudHistoryH;
     private bool _loggedCloudDraw;
+    private int _cloudDeferredCompositeRetries;
+    private int _loggedCloudDeferredCompositeMiss;
+    private int _cloudTierReadyWarmupDraws;
 
     private void TryInitVolumetricClouds(GL gl, bool useOpenGlEs)
     {
         DestroyVolumetricCloudResources();
-        _cloudProgram = new GlShaderProgram(gl, "genesis_godrays.vert", "genesis_clouds.frag", useOpenGlEs, out var err);
+        _cloudProgram = CreatePreviewProgram("genesis_godrays.vert", "genesis_clouds.frag", out var err);
         if (_cloudProgram is not { IsValid: true })
         {
             EmitDiagnostic("[3D preview] Volumetric cloud shader: " + (err ?? "link failed"));
@@ -35,21 +42,49 @@ public sealed partial class OpenGlPreviewBackend
             return;
         }
 
-        _cloudNoiseTex = new GlTexture3D(gl);
-        _cloudNoiseTex.UploadRgba(PreviewCloudNoiseTextureGenerator.Size, PreviewCloudNoiseTextureGenerator.GenerateRgba8());
-        _cloudCoverageTex = new GlTexture2D(gl, nearestFilter: false);
-        var coverage = PreviewCloudCoverageMapGenerator.GenerateR8();
-        var covRgba = new byte[coverage.Length * 4];
-        for (var i = 0; i < coverage.Length; i++)
+        // Depth-aware half-res upsample; non-fatal, falls back to the god-ray composite blit.
+        _cloudUpsampleProgram = CreatePreviewProgram("genesis_godrays.vert", "genesis_clouds_upsample.frag",
+            out var upErr, "clouds-upsample");
+        if (_cloudUpsampleProgram is not { IsValid: true })
         {
-            covRgba[i * 4] = coverage[i];
-            covRgba[i * 4 + 1] = coverage[i];
-            covRgba[i * 4 + 2] = coverage[i];
-            covRgba[i * 4 + 3] = 255;
+            EmitDiagnostic("[3D preview] Cloud upsample shader: " + (upErr ?? "link failed"));
+            _cloudUpsampleProgram?.Dispose();
+            _cloudUpsampleProgram = null;
         }
 
-        _cloudCoverageTex.UploadRgba(PreviewCloudCoverageMapGenerator.Size, PreviewCloudCoverageMapGenerator.Size,
-            covRgba, nearestFilter: false);
+        _cloudNoiseTex = new GlTexture3D(gl);
+        if (PreviewCloudBakedAssetLoader.TryLoadShapeNoise(out var shapeRgba))
+        {
+            _cloudNoiseTex.UploadRgba(PreviewCloudNoiseTextureGenerator.Size, shapeRgba);
+        }
+        else
+        {
+            _cloudNoiseTex.UploadRgba(PreviewCloudNoiseTextureGenerator.Size,
+                PreviewCloudNoiseTextureGenerator.GenerateRgba8());
+        }
+
+        _cloudDetailTex = new GlTexture3D(gl);
+        if (PreviewCloudBakedAssetLoader.TryLoadDetailNoise(out var detailRgba))
+        {
+            _cloudDetailTex.UploadRgba(PreviewCloudNoiseTextureGenerator.DetailSize, detailRgba);
+        }
+        else
+        {
+            _cloudDetailTex.UploadRgba(PreviewCloudNoiseTextureGenerator.DetailSize,
+                PreviewCloudNoiseTextureGenerator.GenerateDetailRgba8());
+        }
+
+        _cloudCoverageTex = new GlTexture2D(gl, nearestFilter: false);
+        if (PreviewCloudBakedAssetLoader.TryLoadCoverageMap(out var coverageRgba))
+        {
+            _cloudCoverageTex.UploadRgba(PreviewCloudCoverageMapGenerator.Size, PreviewCloudCoverageMapGenerator.Size,
+                coverageRgba, nearestFilter: false);
+        }
+        else
+        {
+            _cloudCoverageTex.UploadRgba(PreviewCloudCoverageMapGenerator.Size, PreviewCloudCoverageMapGenerator.Size,
+                PreviewCloudCoverageMapGenerator.GenerateRgba8(), nearestFilter: false);
+        }
         _cloudRenderTarget = new GlColorRenderTarget(gl, useOpenGlEs);
         _cloudHistoryTarget = new GlColorRenderTarget(gl, useOpenGlEs);
 
@@ -72,13 +107,35 @@ public sealed partial class OpenGlPreviewBackend
         gl.BindVertexArray(0);
     }
 
+    private void TryWarmCloudOffscreenTargets(int fullWidth, int fullHeight)
+    {
+        var w = Math.Max(1, fullWidth / 2);
+        var h = Math.Max(1, fullHeight / 2);
+        _cloudHistoryW = w;
+        _cloudHistoryH = h;
+        _cloudHistoryValid = false;
+        if (_cloudRenderTarget is not null)
+        {
+            _ = _cloudRenderTarget.EnsureSize(w, h);
+        }
+
+        if (_cloudHistoryTarget is not null)
+        {
+            _ = _cloudHistoryTarget.EnsureSize(w, h);
+        }
+    }
+
     private void DestroyVolumetricCloudResources()
     {
         var gl = _gl;
         _cloudProgram?.Dispose();
         _cloudProgram = null;
+        _cloudUpsampleProgram?.Dispose();
+        _cloudUpsampleProgram = null;
         _cloudNoiseTex?.Dispose();
         _cloudNoiseTex = null;
+        _cloudDetailTex?.Dispose();
+        _cloudDetailTex = null;
         _cloudCoverageTex?.Dispose();
         _cloudCoverageTex = null;
         _cloudRenderTarget?.Dispose();
@@ -87,6 +144,9 @@ public sealed partial class OpenGlPreviewBackend
         _cloudHistoryTarget = null;
         _cloudHistoryValid = false;
         _loggedCloudDraw = false;
+        _cloudDeferredCompositeRetries = 0;
+        _loggedCloudDeferredCompositeMiss = 0;
+        _cloudTierReadyWarmupDraws = 0;
 
         if (gl is null)
         {
@@ -112,34 +172,69 @@ public sealed partial class OpenGlPreviewBackend
         _cloudProgram is { IsValid: true } &&
         _cloudQuadVao != 0;
 
-    private void DrawVolumetricClouds(ref GlRenderFrame frame, bool gateSkyDepth)
+    private bool DrawVolumetricClouds(
+        ref GlRenderFrame frame,
+        bool gateSkyDepth,
+        bool deferComposite = false,
+        bool? forceTemporal = null,
+        bool updateHistory = true)
     {
         if (!CanDrawVolumetricClouds(frame.Settings))
         {
-            return;
+            return false;
         }
 
         BindDefaultFramebuffer(ref frame);
-        DrawVolumetricCloudsInternal(ref frame, gateSkyDepth);
+        return DrawVolumetricCloudsInternal(ref frame, gateSkyDepth, deferComposite, forceTemporal, updateHistory);
     }
 
-    private void DrawVolumetricCloudsInternal(ref GlRenderFrame frame, bool gateSkyDepth)
+    /// <summary>
+    /// Cloud in-shader temporal uses slab-distance reprojection and is independent of scene depth gating.
+    /// Disabled when god rays are active: god-ray history + preview TAA already stabilize the composited
+    /// frame; stacking cloud history caused a visible frustum over the sky layer.
+    /// </summary>
+    private static bool ShouldUseCloudShaderTemporal(in PreviewRenderSettings settings, bool godRaysActive)
+    {
+        if (godRaysActive || settings.CloudDisableTemporal ||
+            settings.CloudDebugView != PreviewCloudDebugView.Off)
+        {
+            return false;
+        }
+
+        var profile = PreviewVolumetricQuality.Resolve(settings.VolumetricQuality);
+        return profile.CloudTemporalWeight > 0f;
+    }
+
+    private static bool CanUseCloudTemporalReproject(in PreviewRenderSettings settings)
+    {
+        return ShouldUseCloudShaderTemporal(settings, godRaysActive: false);
+    }
+
+    private bool DrawVolumetricCloudsInternal(
+        ref GlRenderFrame frame,
+        bool gateSkyDepth,
+        bool deferComposite = false,
+        bool? forceTemporal = null,
+        bool updateHistory = true)
     {
         var settings = frame.Settings;
         var viewProj = frame.Proj * frame.View;
         if (!Matrix4x4.Invert(viewProj, out var invViewProj))
         {
-            return;
+            return false;
         }
 
         var gl = frame.Gl;
         var profile = PreviewVolumetricQuality.Resolve(settings.VolumetricQuality);
         var layerWorldY = PreviewStageConstants.CloudLayerBaseWorldY(settings.CloudLayerHeight);
         var useDepthGate = gateSkyDepth && _sceneCapture is { IsValid: true };
-        var useTemporal = useDepthGate && profile.CloudTemporalWeight > 0f &&
-                          _cloudRenderTarget is not null && _cloudHistoryTarget is not null;
+        var useTemporalReproject = forceTemporal ??
+            (CanUseCloudTemporalReproject(settings) &&
+             _cloudRenderTarget is not null && _cloudHistoryTarget is not null);
+        var useOffscreen = deferComposite || useTemporalReproject;
+        var wantedOffscreen = useOffscreen;
 
-        if (useTemporal)
+        if (useOffscreen)
         {
             var w = Math.Max(1, frame.Vw / 2);
             var h = Math.Max(1, frame.Vh / 2);
@@ -150,22 +245,40 @@ public sealed partial class OpenGlPreviewBackend
                 _cloudHistoryH = h;
             }
 
-            if (!_cloudRenderTarget!.EnsureSize(w, h))
+            if (_cloudRenderTarget is null || !_cloudRenderTarget.EnsureSize(w, h))
             {
-                useTemporal = false;
+                if (deferComposite)
+                {
+                    if (_cloudDeferredCompositeRetries > 0)
+                    {
+                        _cloudDeferredCompositeRetries--;
+                    }
+
+                    return false;
+                }
+
+                useOffscreen = false;
+                useTemporalReproject = false;
+            }
+            else if (deferComposite)
+            {
+                _cloudDeferredCompositeRetries = 0;
             }
         }
 
-        if (useTemporal)
+        if (useOffscreen)
         {
             _cloudRenderTarget!.BindDraw();
+            // Transparent black, not the scene clear color: discarded pixels must stay
+            // alpha 0 or the composite stamps opaque near-black over the sky between clouds.
+            gl.ClearColor(0f, 0f, 0f, 0f);
             gl.Clear(ClearBufferMask.ColorBufferBit);
         }
 
-        BindCloudShaderUniforms(frame, invViewProj, viewProj, layerWorldY, profile, useDepthGate, useTemporal);
+        BindCloudShaderUniforms(frame, invViewProj, viewProj, layerWorldY, profile, useDepthGate, useTemporalReproject);
 
         var priorBlend = gl.IsEnabled(EnableCap.Blend);
-        if (!useTemporal)
+        if (!useOffscreen)
         {
             gl.Enable(EnableCap.Blend);
             gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
@@ -179,20 +292,27 @@ public sealed partial class OpenGlPreviewBackend
         gl.DepthMask(true);
         gl.Enable(EnableCap.DepthTest);
 
-        if (useTemporal)
+        if (useOffscreen)
         {
-            CompositeCloudRenderTargetToDefault(ref frame);
-            _cloudHistoryTarget!.CopyColorFrom(_cloudRenderTarget!);
-            _cloudPrevViewProj = viewProj;
-            _cloudHistoryValid = true;
-            _cloudFramePhase += 0.071f;
-            if (_cloudFramePhase > 1f)
+            if (!deferComposite)
             {
-                _cloudFramePhase -= 1f;
+                CompositeCloudRenderTargetToDefault(ref frame);
+            }
+
+            if (useTemporalReproject && updateHistory)
+            {
+                _cloudHistoryTarget!.CopyColorFrom(_cloudRenderTarget!);
+                _cloudPrevViewProj = viewProj;
+                _cloudHistoryValid = true;
+                _cloudFramePhase += 0.071f;
+                if (_cloudFramePhase > 1f)
+                {
+                    _cloudFramePhase -= 1f;
+                }
             }
         }
 
-        if (!priorBlend && !useTemporal)
+        if (!priorBlend && !useOffscreen)
         {
             gl.Disable(EnableCap.Blend);
         }
@@ -200,8 +320,14 @@ public sealed partial class OpenGlPreviewBackend
         if (!_loggedCloudDraw)
         {
             _loggedCloudDraw = true;
-            EmitDiagnostic("[3D preview] Screen-space volumetric clouds active (Beer–Powder + coverage map).");
+            var godRays = frame.GodRayCaptureActive && _sceneCapture is { IsValid: true };
+            EmitDiagnostic($"[3D preview] Screen-space volumetric clouds active (depthGate={useDepthGate}, " +
+                $"shaderTemporal={useTemporalReproject}, godRays={godRays}, " +
+                $"previewTaa={frame.Settings.EnablePreviewTaa}, warmupDraws={_cloudTierReadyWarmupDraws}, " +
+                $"noiseTex={_cloudNoiseTex is not null}, coverageMap={_cloudCoverageTex is not null}).");
         }
+
+        return wantedOffscreen ? useOffscreen : true;
     }
 
     private void BindCloudShaderUniforms(
@@ -211,7 +337,7 @@ public sealed partial class OpenGlPreviewBackend
         float layerWorldY,
         PreviewVolumetricQuality.Profile profile,
         bool useDepthGate,
-        bool useTemporal)
+        bool useTemporalReproject)
     {
         var gl = frame.Gl;
         var settings = frame.Settings;
@@ -220,20 +346,32 @@ public sealed partial class OpenGlPreviewBackend
         SetMatrixOnProgram(_cloudProgram, "uPrevViewProj", _cloudPrevViewProj);
         SetVec3OnProgram(_cloudProgram, "uCameraPos", frame.Eye);
         SetVec3OnProgram(_cloudProgram, "uSunDir", frame.LightDir);
-        SetVec3OnProgram(_cloudProgram, "uSunColor", frame.Scene.Light.Color);
+        SetFloatOnProgram(_cloudProgram, "uSunIntensity", settings.AtmosphereSunIntensity);
+        SetFloatOnProgram(_cloudProgram, "uSkyExposure", settings.AtmosphereSkyExposure);
         SetFloatOnProgram(_cloudProgram, "uLayerHeight", layerWorldY);
         SetFloatOnProgram(_cloudProgram, "uVolumeHeight", settings.CloudVolumeHeight);
         SetFloatOnProgram(_cloudProgram, "uDensity", settings.CloudDensity);
+        SetFloatOnProgram(_cloudProgram, "uCoverageScale", settings.CloudCoverageScale);
         SetFloatOnProgram(_cloudProgram, "uVolumeSize", settings.CloudVolumeSize);
+        var windTime = settings.CloudFreezeWind ? 0.0 : frame.RenderTime;
+        SetVec3OnProgram(_cloudProgram, "uWindOffset", ComputeCloudWindOffset(windTime, settings));
+        SetFloatOnProgram(_cloudProgram, "uCirrusStrength", settings.CloudCirrusStrength);
+        SetVec2OnProgram(_cloudProgram, "uCirrusWindOffset", ComputeCirrusWindOffset(windTime, settings));
         SetIntOnProgram(_cloudProgram, "uQuality", profile.CloudQuality);
+        SetIntOnProgram(_cloudProgram, "uMarchSteps", Math.Clamp(settings.CloudMarchStepOverride, 0, 64));
+        SetIntOnProgram(_cloudProgram, "uDebugView", (int)settings.CloudDebugView);
         SetIntOnProgram(_cloudProgram, "uGateSkyDepth", useDepthGate ? 1 : 0);
-        SetFloatOnProgram(_cloudProgram, "uTemporalWeight", useTemporal ? profile.CloudTemporalWeight : 0f);
+        SetFloatOnProgram(_cloudProgram, "uTemporalWeight",
+            useTemporalReproject
+                ? PreviewVolumetricQuality.EffectivePassTemporalWeight(profile.CloudTemporalWeight, settings)
+                : 0f);
         SetFloatOnProgram(_cloudProgram, "uFramePhase", _cloudFramePhase);
         SetIntOnProgram(_cloudProgram, "uHasCloudNoise", _cloudNoiseTex is not null ? 1 : 0);
+        SetIntOnProgram(_cloudProgram, "uHasDetailNoise", _cloudDetailTex is not null ? 1 : 0);
         SetIntOnProgram(_cloudProgram, "uHasCoverageMap", _cloudCoverageTex is not null ? 1 : 0);
         SetIntOnProgram(_cloudProgram, "uHasSkyLut", _atmoLutsValid && _atmoSkyViewTex != 0 ? 1 : 0);
         SetIntOnProgram(_cloudProgram, "uHasPrevClouds",
-            useTemporal && _cloudHistoryValid ? 1 : 0);
+            useTemporalReproject && _cloudHistoryValid ? 1 : 0);
 
         if (_cloudNoiseTex is not null)
         {
@@ -247,6 +385,12 @@ public sealed partial class OpenGlPreviewBackend
             gl.ActiveTexture(TextureUnit.Texture1);
             _cloudCoverageTex.Bind(1);
             SetIntOnProgram(_cloudProgram, "uCoverageMap", 1);
+        }
+
+        if (_cloudDetailTex is not null)
+        {
+            _cloudDetailTex.Bind(3);
+            SetIntOnProgram(_cloudProgram, "uDetailNoise", 3);
         }
 
         if (_atmoLutsValid && _atmoSkyViewTex != 0)
@@ -263,7 +407,7 @@ public sealed partial class OpenGlPreviewBackend
             SetIntOnProgram(_cloudProgram, "uSceneDepth", 5);
         }
 
-        if (useTemporal && _cloudHistoryTarget is not null && _cloudHistoryValid)
+        if (useTemporalReproject && _cloudHistoryTarget is not null && _cloudHistoryValid)
         {
             gl.ActiveTexture(TextureUnit.Texture6);
             gl.BindTexture(TextureTarget.Texture2D, _cloudHistoryTarget.ColorTextureHandle);
@@ -271,9 +415,38 @@ public sealed partial class OpenGlPreviewBackend
         }
     }
 
+    /// <summary>
+    /// World-space wind drift for the cloud field. Components wrap at the weather-map period
+    /// (volumeSize * 4); the shape (×2) and detail (×1 in offset space) periods divide it evenly,
+    /// so the wrap never produces a visible snap, and floats stay small over long sessions.
+    /// </summary>
+    private static Vector3 ComputeCloudWindOffset(double renderTime, in PreviewRenderSettings settings)
+    {
+        var period = Math.Max(settings.CloudVolumeSize, 8f) * 4f;
+        var heading = settings.CloudWindHeadingDegrees * (MathF.PI / 180f);
+        var travel = renderTime * settings.CloudWindSpeed;
+        var wx = (float)((MathF.Cos(heading) * travel) % period);
+        var wz = (float)((MathF.Sin(heading) * travel) % period);
+        return new Vector3(wx, 0f, wz);
+    }
+
+    /// <summary>
+    /// High-altitude wind for the cirrus sheet: faster than the cumulus layer and slightly
+    /// veered, as real upper winds are. The cirrus noise is procedural (non-tiling), so the
+    /// offset stays unwrapped; float precision is ample for multi-hour preview sessions.
+    /// </summary>
+    private static Vector2 ComputeCirrusWindOffset(double renderTime, in PreviewRenderSettings settings)
+    {
+        var heading = (settings.CloudWindHeadingDegrees + 18f) * (MathF.PI / 180f);
+        var travel = (float)(renderTime * settings.CloudWindSpeed * 2.4);
+        return new Vector2(MathF.Cos(heading) * travel, MathF.Sin(heading) * travel);
+    }
+
     private void CompositeCloudRenderTargetToDefault(ref GlRenderFrame frame)
     {
-        if (_cloudRenderTarget is null || _godRayCompositeProgram is not { IsValid: true } || _godRayQuadVao == 0)
+        var useUpsample = _cloudUpsampleProgram is { IsValid: true };
+        var program = useUpsample ? _cloudUpsampleProgram : _godRayCompositeProgram;
+        if (_cloudRenderTarget is null || program is not { IsValid: true } || _godRayQuadVao == 0)
         {
             BindDefaultFramebuffer(ref frame);
             return;
@@ -286,10 +459,29 @@ public sealed partial class OpenGlPreviewBackend
         gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
         gl.Disable(EnableCap.DepthTest);
         gl.BindVertexArray(_godRayQuadVao);
-        _godRayCompositeProgram.Use();
+        program.Use();
         gl.ActiveTexture(TextureUnit.Texture0);
         gl.BindTexture(TextureTarget.Texture2D, _cloudRenderTarget.ColorTextureHandle);
-        SetIntOnProgram(_godRayCompositeProgram, "uRays", 0);
+        if (useUpsample)
+        {
+            SetIntOnProgram(program, "uClouds", 0);
+            SetVec2OnProgram(program, "uCloudTexelSize", new Vector2(
+                1f / Math.Max(_cloudRenderTarget.Width, 1),
+                1f / Math.Max(_cloudRenderTarget.Height, 1)));
+            var hasDepth = _sceneCapture is { IsValid: true };
+            SetIntOnProgram(program, "uHasSceneDepth", hasDepth ? 1 : 0);
+            if (hasDepth)
+            {
+                gl.ActiveTexture(TextureUnit.Texture1);
+                gl.BindTexture(TextureTarget.Texture2D, _sceneCapture!.DepthTextureHandle);
+                SetIntOnProgram(program, "uSceneDepth", 1);
+            }
+        }
+        else
+        {
+            SetIntOnProgram(program, "uRays", 0);
+        }
+
         gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
         gl.BindVertexArray(0);
         gl.Enable(EnableCap.DepthTest);

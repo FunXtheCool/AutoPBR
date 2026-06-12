@@ -22,6 +22,8 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private GlShadowMapTarget? _shadowTarget;
     private GlShadowMapTarget? _shadowTargetCascadeNear;
     private double _lastPreviewFingerprintLogMs;
+    private int _previewPixelWidth = 1;
+    private int _previewPixelHeight = 1;
     private GlTexture2D? _albedo;
     private GlTexture2D? _normal;
     private GlTexture2D? _spec;
@@ -124,13 +126,25 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private float _orbitPitch;
     private float _orbitDistance = 4f;
     private Vector3 _orbitPan;
-    /// <summary>Debug fly: world-space offset applied to the eye only (orbit pivot stays base+pan). Cleared on scene reseed and camera reset.</summary>
-    private Vector3 _debugFlyWorldOffset;
+    private bool _flyEngaged;
+    private Vector3 _flyPosition;
+    private float _flyYaw;
+    private float _flyPitch;
     private bool _debugFlyRmbHeld;
     private bool _flyKeyW;
     private bool _flyKeyA;
     private bool _flyKeyS;
     private bool _flyKeyD;
+    private bool _flyKeyQ;
+    private bool _flyKeyE;
+    private bool _flySpeedBoost;
+    private bool _flySpeedSlow;
+    private float _flySpeedSessionMultiplier = 1f;
+    private Vector3 _flyMoveVelocity;
+    private float _camFlyLookRadPerPx = 0.006f;
+    private float _flyMoveSpeed = 1f;
+    private bool _flySmoothAcceleration = true;
+    private bool _invertLookY;
     private float _orbitYawDefault;
     private float _orbitPitchDefault;
     private float _orbitDistanceDefault;
@@ -141,6 +155,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     /// <summary>Pivot-to-eye distance used when seeding orbit and when applying boom from settings (wheel zoom changes <see cref="_orbitDistance"/> temporarily).</summary>
     private float _orbitBoomArmDistance = DefaultOrbitBoomArmDistance;
     private bool _userCameraDragging;
+    private bool _shaderPrewarmProgressHooked;
 
     public string BackendName => "OpenGL";
     public bool IsInitialized => _gpuAlive && _program?.IsValid == true;
@@ -152,6 +167,31 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         lock (_sync)
         {
             _ = options.MsaaSamples;
+        }
+
+        if (!_shaderPrewarmProgressHooked)
+        {
+            PreviewShaderPrewarm.ProgressChanged += OnShaderPrewarmProgress;
+            _shaderPrewarmProgressHooked = true;
+        }
+
+        PreviewShaderPrewarm.EnsureStarted();
+    }
+
+    private void OnShaderPrewarmProgress()
+    {
+        lock (_sync)
+        {
+            if (_gl is null)
+            {
+                return;
+            }
+
+            RaiseGpuInitProgress(
+                PreviewShaderPrewarm.IsComplete
+                    ? (_gpuBootstrap is not null ? _gpuBootstrap.Phase : "Preparing GPU preview…")
+                    : "Preparing shader sources…",
+                _settings);
         }
     }
 
@@ -179,7 +219,8 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     {
         lock (_sync)
         {
-            _ = (Math.Max(1, width), Math.Max(1, height));
+            _previewPixelWidth = Math.Max(1, width);
+            _previewPixelHeight = Math.Max(1, height);
         }
     }
 
@@ -394,50 +435,13 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
                 _rotationAccum += elapsed.TotalSeconds * 0.65;
             }
 
-            if (_debugFlyRmbHeld && (_flyKeyW || _flyKeyA || _flyKeyS || _flyKeyD))
+            if (_debugFlyRmbHeld && _flyEngaged)
             {
-                ComposeOrbitEye(_orbitBaseTarget, _orbitPan, _debugFlyWorldOffset, _orbitYaw, _orbitPitch,
-                    _orbitDistance, out var eye0, out var look0);
-                var forward = look0 - eye0;
-                var fl = forward.Length();
-                if (fl > 1e-5f)
-                {
-                    forward /= fl;
-                    var worldUp = Vector3.UnitY;
-                    var right = Vector3.Normalize(Vector3.Cross(forward, worldUp));
-                    if (right.LengthSquared() < 1e-8f)
-                    {
-                        right = Vector3.Normalize(Vector3.Cross(forward, Vector3.UnitZ));
-                    }
-
-                    var move = Vector3.Zero;
-                    if (_flyKeyW)
-                    {
-                        move += forward;
-                    }
-
-                    if (_flyKeyS)
-                    {
-                        move -= forward;
-                    }
-
-                    if (_flyKeyD)
-                    {
-                        move += right;
-                    }
-
-                    if (_flyKeyA)
-                    {
-                        move -= right;
-                    }
-
-                    if (move.LengthSquared() > 1e-8f)
-                    {
-                        var speed = 5f * (float)elapsed.TotalSeconds *
-                                    MathF.Max(0.35f, _orbitDistance * 0.15f);
-                        _debugFlyWorldOffset += Vector3.Normalize(move) * speed;
-                    }
-                }
+                TickFlyMovementLocked(elapsed);
+            }
+            else if (!_debugFlyRmbHeld)
+            {
+                _flyMoveVelocity = Vector3.Zero;
             }
         }
     }
@@ -454,33 +458,59 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
                 return false;
             }
 
-            ComposeOrbitEye(_orbitBaseTarget, _orbitPan, _debugFlyWorldOffset, _orbitYaw, _orbitPitch, _orbitDistance,
-                out eye, out lookTarget);
+            if (_debugFlyRmbHeld && _flyEngaged)
+            {
+                ComposeFlyEye(_flyPosition, _flyYaw, _flyPitch, out eye, out lookTarget);
+            }
+            else
+            {
+                ComposeOrbitEye(_orbitBaseTarget, _orbitPan, _orbitYaw, _orbitPitch, _orbitDistance,
+                    out eye, out lookTarget);
+            }
             return true;
         }
     }
 
     /// <inheritdoc />
-    public void SetDebugFlyInput(bool rightMouseHeld, bool keyW, bool keyA, bool keyS, bool keyD)
+    public void SetDebugFlyInput(bool rightMouseHeld, bool keyW, bool keyA, bool keyS, bool keyD, bool keyQ, bool keyE,
+        bool speedBoost, bool speedSlow)
     {
         lock (_sync)
         {
+            if (rightMouseHeld && !_debugFlyRmbHeld)
+            {
+                BeginFlyFromCurrentPoseLocked();
+            }
+            else if (!rightMouseHeld && _debugFlyRmbHeld && _flyEngaged)
+            {
+                CommitFlyToOrbitLocked();
+            }
+
             _debugFlyRmbHeld = rightMouseHeld;
             _flyKeyW = keyW;
             _flyKeyA = keyA;
             _flyKeyS = keyS;
             _flyKeyD = keyD;
+            _flyKeyQ = keyQ;
+            _flyKeyE = keyE;
+            _flySpeedBoost = speedBoost;
+            _flySpeedSlow = speedSlow;
         }
     }
 
     /// <summary>Orbit (rad/pixel), pan (world scale per pixel, scaled by distance in <see cref="ApplyCameraPanPixels"/>), zoom (step strength per wheel notch).</summary>
-    public void SetCameraSensitivities(float orbitRadPerPx, float panPerPixel, float zoomPerWheelStep)
+    public void SetCameraSensitivities(float orbitRadPerPx, float panPerPixel, float zoomPerWheelStep,
+        float flyLookRadPerPx, bool invertLookY, float flyMoveSpeed, bool flySmoothAcceleration)
     {
         lock (_sync)
         {
             _camOrbitRadPerPx = Math.Clamp(orbitRadPerPx, 0.0008f, 0.04f);
             _camPanPerPx = Math.Clamp(panPerPixel, 0.0003f, 0.02f);
             _camZoomPerWheelStep = Math.Clamp(zoomPerWheelStep, 0.02f, 0.5f);
+            _camFlyLookRadPerPx = Math.Clamp(flyLookRadPerPx, 0.0008f, 0.04f);
+            _invertLookY = invertLookY;
+            _flyMoveSpeed = Math.Clamp(flyMoveSpeed, 0.25f, 4f);
+            _flySmoothAcceleration = flySmoothAcceleration;
         }
     }
 
@@ -511,7 +541,41 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
             _orbitPitch = _orbitPitchDefault;
             _orbitDistance = _orbitDistanceDefault;
             _orbitPan = _orbitPanDefault;
-            _debugFlyWorldOffset = Vector3.Zero;
+            _flyEngaged = false;
+            _flyMoveVelocity = Vector3.Zero;
+            _flySpeedSessionMultiplier = 1f;
+        }
+    }
+
+    public void FocusOrbitOnSubject()
+    {
+        lock (_sync)
+        {
+            _flyEngaged = false;
+            _flyMoveVelocity = Vector3.Zero;
+            if (!TryGetSubjectBoundsLocked(out var min, out var max))
+            {
+                return;
+            }
+
+            var center = (min + max) * 0.5f;
+            _orbitPan = center - _orbitBaseTarget;
+            var extents = max - min;
+            var radius = MathF.Max(extents.X, MathF.Max(extents.Y, extents.Z)) * 0.5f;
+            _orbitDistance = Math.Clamp(MathF.Max(radius * 2.8f, 1.05f), 1.05f, 120f);
+        }
+    }
+
+    public void ApplyFlyLookPixels(float dx, float dy)
+    {
+        lock (_sync)
+        {
+            if (!_flyEngaged)
+            {
+                BeginFlyFromCurrentPoseLocked();
+            }
+
+            ApplyLookDeltaLocked(ref _flyYaw, ref _flyPitch, dx, dy, _camFlyLookRadPerPx);
         }
     }
 
@@ -519,8 +583,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     {
         lock (_sync)
         {
-            _orbitYaw -= dx * _camOrbitRadPerPx;
-            _orbitPitch = Math.Clamp(_orbitPitch - dy * _camOrbitRadPerPx, -1.55f, 1.55f);
+            ApplyLookDeltaLocked(ref _orbitYaw, ref _orbitPitch, dx, dy, _camOrbitRadPerPx);
         }
     }
 
@@ -528,7 +591,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     {
         lock (_sync)
         {
-            ComposeOrbitEye(_orbitBaseTarget, _orbitPan, _debugFlyWorldOffset, _orbitYaw, _orbitPitch, _orbitDistance,
+            ComposeOrbitEye(_orbitBaseTarget, _orbitPan, _orbitYaw, _orbitPitch, _orbitDistance,
                 out var eye, out var look);
             var forward = look - eye;
             var fl = forward.Length();
@@ -556,9 +619,16 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     {
         lock (_sync)
         {
-            var f = MathF.Exp(-wheelNotches * _camZoomPerWheelStep * 0.18f);
+            if (_debugFlyRmbHeld && _flyEngaged)
+            {
+                var f = MathF.Exp(wheelNotches * _camZoomPerWheelStep * 0.35f);
+                _flySpeedSessionMultiplier = Math.Clamp(_flySpeedSessionMultiplier * f, 0.15f, 8f);
+                return;
+            }
+
+            var zoomF = MathF.Exp(-wheelNotches * _camZoomPerWheelStep * 0.18f);
             // Stay outside the unit cube (~0.5 extent) with margin so near-plane clipping does not shear faces.
-            _orbitDistance = Math.Clamp(_orbitDistance * f, 1.05f, 120f);
+            _orbitDistance = Math.Clamp(_orbitDistance * zoomF, 1.05f, 120f);
         }
     }
 
@@ -582,29 +652,207 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
 
         _orbitDistance = Math.Clamp(_orbitBoomArmDistance, 1.05f, 120f);
         _orbitPan = Vector3.Zero;
-        _debugFlyWorldOffset = Vector3.Zero;
+        _flyEngaged = false;
         _orbitYawDefault = _orbitYaw;
         _orbitPitchDefault = _orbitPitch;
         _orbitDistanceDefault = _orbitDistance;
         _orbitPanDefault = _orbitPan;
     }
 
-    /// <summary>
-    /// Places the eye on a sphere of radius <paramref name="distance"/> around pivot <paramref name="baseTarget"/> +
-    /// <paramref name="pan"/> using yaw/pitch (orbit drag updates those angles). <paramref name="debugFlyWorld"/>
-    /// shifts the eye only so WASD changes viewpoint relative to that orbit geometry (moving the pivot with the same
-    /// delta preserved radius and kills parallax until clipping).
-    /// </summary>
-    private static void ComposeOrbitEye(Vector3 baseTarget, Vector3 pan, Vector3 debugFlyWorld, float yaw, float pitch,
-        float distance, out Vector3 eye, out Vector3 lookTarget)
+    private void BeginFlyFromCurrentPoseLocked()
     {
-        lookTarget = baseTarget + pan;
+        ComposeOrbitEye(_orbitBaseTarget, _orbitPan, _orbitYaw, _orbitPitch, _orbitDistance,
+            out var eye, out var lookTarget);
+        _flyPosition = eye;
+        var viewDir = lookTarget - eye;
+        if (viewDir.LengthSquared() > 1e-8f)
+        {
+            YawPitchFromForward(Vector3.Normalize(viewDir), out _flyYaw, out _flyPitch);
+        }
+        else
+        {
+            _flyYaw = _orbitYaw;
+            _flyPitch = _orbitPitch;
+        }
+
+        _flySpeedSessionMultiplier = 1f;
+        _flyMoveVelocity = Vector3.Zero;
+        _flyEngaged = true;
+    }
+
+    private void CommitFlyToOrbitLocked()
+    {
+        var forward = ForwardFromYawPitch(_flyYaw, _flyPitch);
+        var pivot = _flyPosition + forward * _orbitDistance;
+        _orbitPan = pivot - _orbitBaseTarget;
+        YawPitchFromForward(-forward, out _orbitYaw, out _orbitPitch);
+        _flyEngaged = false;
+        _flyMoveVelocity = Vector3.Zero;
+        _flySpeedSessionMultiplier = 1f;
+    }
+
+    private void ApplyLookDeltaLocked(ref float yaw, ref float pitch, float dx, float dy, float radPerPx)
+    {
+        yaw -= dx * radPerPx;
+        var pitchDelta = dy * radPerPx;
+        if (_invertLookY)
+        {
+            pitchDelta = -pitchDelta;
+        }
+
+        pitch = Math.Clamp(pitch - pitchDelta, -1.55f, 1.55f);
+    }
+
+    private void TickFlyMovementLocked(TimeSpan elapsed)
+    {
+        var dt = (float)elapsed.TotalSeconds;
+        if (dt <= 0f)
+        {
+            return;
+        }
+
+        var forward = ForwardFromYawPitch(_flyYaw, _flyPitch);
+        var worldUp = Vector3.UnitY;
+        var right = Vector3.Normalize(Vector3.Cross(forward, worldUp));
+        if (right.LengthSquared() < 1e-8f)
+        {
+            right = Vector3.Normalize(Vector3.Cross(forward, Vector3.UnitZ));
+        }
+
+        var moveIntent = Vector3.Zero;
+        if (_flyKeyW)
+        {
+            moveIntent += forward;
+        }
+
+        if (_flyKeyS)
+        {
+            moveIntent -= forward;
+        }
+
+        if (_flyKeyD)
+        {
+            moveIntent += right;
+        }
+
+        if (_flyKeyA)
+        {
+            moveIntent -= right;
+        }
+
+        if (_flyKeyE)
+        {
+            moveIntent += worldUp;
+        }
+
+        if (_flyKeyQ)
+        {
+            moveIntent -= worldUp;
+        }
+
+        var speedScale = _flySpeedBoost ? 2.5f : _flySpeedSlow ? 0.35f : 1f;
+        var maxSpeed = 5f * _flyMoveSpeed * _flySpeedSessionMultiplier * speedScale *
+                       MathF.Max(0.35f, _orbitDistance * 0.15f);
+
+        if (_flySmoothAcceleration)
+        {
+            var targetVelocity = moveIntent.LengthSquared() > 1e-8f
+                ? Vector3.Normalize(moveIntent) * maxSpeed
+                : Vector3.Zero;
+            var blend = targetVelocity.LengthSquared() > 1e-8f ? 1f - MathF.Exp(-9f * dt) : 1f - MathF.Exp(-14f * dt);
+            _flyMoveVelocity = Vector3.Lerp(_flyMoveVelocity, targetVelocity, blend);
+            if (_flyMoveVelocity.LengthSquared() > 1e-10f)
+            {
+                _flyPosition += _flyMoveVelocity * dt;
+            }
+        }
+        else if (moveIntent.LengthSquared() > 1e-8f)
+        {
+            _flyPosition += Vector3.Normalize(moveIntent) * maxSpeed * dt;
+        }
+    }
+
+    private bool TryGetSubjectBoundsLocked(out Vector3 min, out Vector3 max)
+    {
+        ReadOnlySpan<float> verts;
+        int stride;
+        if (_blockModelSubject?.InterleavedVertices is { Length: > 0 } subjectVerts)
+        {
+            verts = subjectVerts;
+            stride = _blockModelSubject.VertexStrideFloats > 0
+                ? _blockModelSubject.VertexStrideFloats
+                : PreviewMesh.FloatsPerVertex;
+        }
+        else if (_scene?.Meshes is { Count: > 0 } meshes &&
+                 meshes[0].InterleavedVertices is { Length: > 0 } sceneVerts)
+        {
+            verts = sceneVerts;
+            stride = PreviewMesh.FloatsPerVertex;
+        }
+        else
+        {
+            min = default;
+            max = default;
+            return false;
+        }
+
+        return TryComputeVertexBounds(verts, stride, out min, out max);
+    }
+
+    private static bool TryComputeVertexBounds(ReadOnlySpan<float> interleavedVertices, int vertexStrideFloats,
+        out Vector3 min, out Vector3 max)
+    {
+        min = new Vector3(float.PositiveInfinity);
+        max = new Vector3(float.NegativeInfinity);
+        if (vertexStrideFloats < 3 || interleavedVertices.Length < vertexStrideFloats)
+        {
+            return false;
+        }
+
+        for (var i = 0; i + 2 < interleavedVertices.Length; i += vertexStrideFloats)
+        {
+            var x = interleavedVertices[i];
+            var y = interleavedVertices[i + 1];
+            var z = interleavedVertices[i + 2];
+            min = Vector3.Min(min, new Vector3(x, y, z));
+            max = Vector3.Max(max, new Vector3(x, y, z));
+        }
+
+        return float.IsFinite(min.X);
+    }
+
+    private static Vector3 ForwardFromYawPitch(float yaw, float pitch)
+    {
         var cp = MathF.Cos(pitch);
         var sp = MathF.Sin(pitch);
         var sy = MathF.Sin(yaw);
         var cy = MathF.Cos(yaw);
-        var offset = new Vector3(cp * sy, sp, cp * cy) * distance;
-        eye = lookTarget + offset + debugFlyWorld;
+        return new Vector3(cp * sy, sp, cp * cy);
+    }
+
+    private static void YawPitchFromForward(Vector3 forward, out float yaw, out float pitch)
+    {
+        forward = Vector3.Normalize(forward);
+        pitch = MathF.Asin(Math.Clamp(forward.Y, -1f, 1f));
+        yaw = MathF.Atan2(forward.X, forward.Z);
+    }
+
+    /// <summary>
+    /// Places the eye on a sphere of radius <paramref name="distance"/> around pivot <paramref name="baseTarget"/> +
+    /// <paramref name="pan"/> using yaw/pitch (orbit drag updates those angles).
+    /// </summary>
+    private static void ComposeOrbitEye(Vector3 baseTarget, Vector3 pan, float yaw, float pitch,
+        float distance, out Vector3 eye, out Vector3 lookTarget)
+    {
+        lookTarget = baseTarget + pan;
+        var offset = ForwardFromYawPitch(yaw, pitch) * distance;
+        eye = lookTarget + offset;
+    }
+
+    private static void ComposeFlyEye(Vector3 position, float yaw, float pitch, out Vector3 eye, out Vector3 lookTarget)
+    {
+        eye = position;
+        lookTarget = position + ForwardFromYawPitch(yaw, pitch);
     }
 
     private static PreviewRenderSettings CloneSettings(PreviewRenderSettings s) => new()
@@ -678,6 +926,15 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         CloudLayerHeight = s.CloudLayerHeight,
         CloudVolumeHeight = s.CloudVolumeHeight,
         CloudQuality = s.CloudQuality,
+        CloudCoverageScale = s.CloudCoverageScale,
+        CloudWindSpeed = s.CloudWindSpeed,
+        CloudWindHeadingDegrees = s.CloudWindHeadingDegrees,
+        CloudCirrusStrength = s.CloudCirrusStrength,
+        CloudDebugView = s.CloudDebugView,
+        CloudDisableTemporal = s.CloudDisableTemporal,
+        CloudMarchStepOverride = s.CloudMarchStepOverride,
+        CloudFreezeWind = s.CloudFreezeWind,
+        EnablePreviewTaa = s.EnablePreviewTaa,
         LogVolumetricTiming = s.LogVolumetricTiming,
         ShowSunProjectionDebug = s.ShowSunProjectionDebug
     };

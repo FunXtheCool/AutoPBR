@@ -1,5 +1,13 @@
 namespace AutoPBR.App.Rendering.Abstractions;
 
+/// <summary>Debug visualization modes for the screen-space cloud pass (preview only).</summary>
+public enum PreviewCloudDebugView
+{
+    Off = 0,
+    CoverageMap = 1,
+    DensitySlice = 2
+}
+
 public sealed class PreviewRenderSettings
 {
     public float NormalStrength { get; init; } = 1f;
@@ -184,8 +192,35 @@ public sealed class PreviewRenderSettings
     public float CloudVolumeHeight { get; init; } = 24f;
     public int CloudQuality { get; init; } = 1;
 
+    /// <summary>Scales weather-map coverage before the density remap (0 = clear sky, 1 = map as baked).</summary>
+    public float CloudCoverageScale { get; init; } = 1f;
+
+    /// <summary>Cloud field drift speed in world units per second.</summary>
+    public float CloudWindSpeed { get; init; } = 1.5f;
+
+    /// <summary>Wind heading in degrees on the XZ plane (0 = +X).</summary>
+    public float CloudWindHeadingDegrees { get; init; } = 35f;
+
+    /// <summary>Opacity of the high thin cirrus sheet above the main cloud layer (0 = disabled).</summary>
+    public float CloudCirrusStrength { get; init; } = 0.45f;
+
+    /// <summary>Debug overlay replacing the lit cloud composite (coverage map or mid-layer density slice).</summary>
+    public PreviewCloudDebugView CloudDebugView { get; init; }
+
+    /// <summary>Debug: disable cloud temporal reprojection even when the quality preset enables it.</summary>
+    public bool CloudDisableTemporal { get; init; }
+
+    /// <summary>Debug: override ray-march step count (0 = follow quality preset).</summary>
+    public int CloudMarchStepOverride { get; init; }
+
+    /// <summary>Debug: hold wind advection at time zero so cloud shapes stay fixed while tuning.</summary>
+    public bool CloudFreezeWind { get; init; }
+
     /// <summary>When true, log froxel inject/integrate timings that exceed the documented budget.</summary>
     public bool LogVolumetricTiming { get; init; }
+
+    /// <summary>Final full-res TAA on the composited preview frame (uses shared temporal reprojection).</summary>
+    public bool EnablePreviewTaa { get; init; } = true;
 
     /// <summary>Debug overlay: sun projection frustum lines in the preview viewport.</summary>
     public bool ShowSunProjectionDebug { get; init; }

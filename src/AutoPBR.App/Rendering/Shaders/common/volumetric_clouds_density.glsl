@@ -60,9 +60,10 @@ float vcCloudDensityRaw(vec3 worldPos, float layerBase, float layerTop, float de
 
     float sizeScale = max(volumeSize, 8.0);
     vec3 samplePos = worldPos / sizeScale;
-    float base = vcFbm(samplePos * 0.52 + vec3(0.0, h * 1.8, 0.0));
-    float detail = 1.0 - vcFbm(samplePos * 1.75 + vec3(41.0, 17.0, 9.0));
-    float coverage = saturate1((base * 0.62 + detail * 0.38 - 0.15) * 3.8 * densityMul);
+    float base = vcFbm(samplePos * 2.0 + vec3(0.0, h * 1.8, 0.0));
+    float detail = 1.0 - vcFbm(samplePos * 6.0 + vec3(41.0, 17.0, 9.0));
+    // Threshold above the noise mean so the field breaks into distinct clouds (matches vcCloudDensityEx).
+    float coverage = saturate1((base * 0.62 + detail * 0.38 - 0.38) * 4.2 * densityMul * 2.8);
     return coverage * heightFade;
 }
 

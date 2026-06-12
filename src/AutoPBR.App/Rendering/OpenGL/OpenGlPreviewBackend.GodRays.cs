@@ -33,9 +33,11 @@ public sealed partial class OpenGlPreviewBackend
     private bool _prevEnableGodRays;
     private bool _prevEnableVolumetricClouds;
     private bool _prevGodRayStabilizeDebug = true;
+    private bool _prevCloudDisableTemporal;
 
-    private void TryInitGodRays(GL gl, bool useOpenGlEs)
+    private void TryInitGodRaysCore(GL gl, bool useOpenGlEs)
     {
+        _ = useOpenGlEs;
         DestroyGodRayResources();
         _godRayInitFailureDetail = null;
         _sceneCapture = new GlSceneCaptureTarget(gl, useOpenGlEs);
@@ -43,7 +45,7 @@ public sealed partial class OpenGlPreviewBackend
         _godRayResolveTarget = new GlColorRenderTarget(gl, useOpenGlEs);
         _godRayHistoryTarget = new GlColorRenderTarget(gl, useOpenGlEs);
 
-        _scenePresentProgram = new GlShaderProgram(gl, "genesis_godrays.vert", "genesis_scene_present.frag", useOpenGlEs, out var presentErr);
+        _scenePresentProgram = CreatePreviewProgram("genesis_godrays.vert", "genesis_scene_present.frag", out var presentErr);
         if (_scenePresentProgram is not { IsValid: true })
         {
             _godRayInitFailureDetail = "present: " + TrimShaderDiagnostic(presentErr);
@@ -52,7 +54,7 @@ public sealed partial class OpenGlPreviewBackend
             return;
         }
 
-        _screenSpaceGodRayProgram = new GlShaderProgram(gl, "genesis_godrays.vert", "genesis_godrays.frag", useOpenGlEs, out var ssErr);
+        _screenSpaceGodRayProgram = CreatePreviewProgram("genesis_godrays.vert", "genesis_godrays.frag", out var ssErr);
         if (_screenSpaceGodRayProgram is not { IsValid: true })
         {
             _godRayInitFailureDetail = "screen-space: " + TrimShaderDiagnostic(ssErr);
@@ -61,15 +63,7 @@ public sealed partial class OpenGlPreviewBackend
             return;
         }
 
-        _shadowAwareGodRayProgram = new GlShaderProgram(gl, "genesis_godrays.vert", "genesis_godrays_shadow.frag", useOpenGlEs, out var shErr);
-        if (_shadowAwareGodRayProgram is not { IsValid: true })
-        {
-            EmitDiagnostic("[3D preview] Shadow-aware god-ray shader: " + TrimShaderDiagnostic(shErr));
-            _shadowAwareGodRayProgram?.Dispose();
-            _shadowAwareGodRayProgram = null;
-        }
-
-        _godRayUpsampleProgram = new GlShaderProgram(gl, "genesis_godrays.vert", "genesis_godrays_upsample.frag", useOpenGlEs, out var upErr);
+        _godRayUpsampleProgram = CreatePreviewProgram("genesis_godrays.vert", "genesis_godrays_upsample.frag", out var upErr);
         if (_godRayUpsampleProgram is not { IsValid: true })
         {
             _godRayInitFailureDetail = "upsample: " + TrimShaderDiagnostic(upErr);
@@ -78,7 +72,7 @@ public sealed partial class OpenGlPreviewBackend
             return;
         }
 
-        _godRayCompositeProgram = new GlShaderProgram(gl, "genesis_godrays.vert", "genesis_godrays_composite.frag", useOpenGlEs, out var compErr);
+        _godRayCompositeProgram = CreatePreviewProgram("genesis_godrays.vert", "genesis_godrays_composite.frag", out var compErr);
         if (_godRayCompositeProgram is not { IsValid: true })
         {
             _godRayInitFailureDetail = "composite: " + TrimShaderDiagnostic(compErr);
@@ -178,20 +172,26 @@ public sealed partial class OpenGlPreviewBackend
         _shadowAwareGodRayLogged = 0;
         _godRayBlitFailLogged = 0;
         _loggedCloudDraw = false;
+        _cloudHistoryValid = false;
+        _taaHistoryValid = false;
     }
 
     private void SyncVolumetricToggleState(in PreviewRenderSettings settings)
     {
-        if (_prevEnableVolumetricClouds == settings.EnableVolumetricClouds)
+        var cloudsChanged = _prevEnableVolumetricClouds != settings.EnableVolumetricClouds;
+        var temporalChanged = _prevCloudDisableTemporal != settings.CloudDisableTemporal;
+        if (!cloudsChanged && !temporalChanged)
         {
             return;
         }
 
         _prevEnableVolumetricClouds = settings.EnableVolumetricClouds;
+        _prevCloudDisableTemporal = settings.CloudDisableTemporal;
         _loggedCloudDraw = false;
         _godRayHistoryValid = false;
         _volumeFroxelHistoryValid = false;
         _cloudHistoryValid = false;
+        _taaHistoryValid = false;
     }
 
     private bool TryBeginGodRaySceneRender(ref GlRenderFrame frame)
@@ -280,7 +280,7 @@ public sealed partial class OpenGlPreviewBackend
         return gl.GetError() == GLEnum.NoError;
     }
 
-    private bool TryCompositeAdditiveRays(ref GlRenderFrame frame, uint raysTexture)
+    private bool TryCompositeAdditiveRays(ref GlRenderFrame frame, uint raysTexture, uint cloudMaskTexture = 0)
     {
         if (_godRayCompositeProgram is not { IsValid: true } || _godRayQuadVao == 0)
         {
@@ -299,6 +299,15 @@ public sealed partial class OpenGlPreviewBackend
         gl.ActiveTexture(TextureUnit.Texture0);
         gl.BindTexture(TextureTarget.Texture2D, raysTexture);
         SetIntOnProgram(_godRayCompositeProgram, "uRays", 0);
+        var hasCloudMask = cloudMaskTexture != 0;
+        SetIntOnProgram(_godRayCompositeProgram, "uHasCloudMask", hasCloudMask ? 1 : 0);
+        if (hasCloudMask)
+        {
+            gl.ActiveTexture(TextureUnit.Texture1);
+            gl.BindTexture(TextureTarget.Texture2D, cloudMaskTexture);
+            SetIntOnProgram(_godRayCompositeProgram, "uCloudMask", 1);
+        }
+
         gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
         gl.BindVertexArray(0);
         if (priorDepthTest)
@@ -395,6 +404,7 @@ public sealed partial class OpenGlPreviewBackend
 
     private bool TryRunShadowAwareGodRays(ref GlRenderFrame frame)
     {
+        TryEnsureShadowAwareGodRayProgram();
         if (_shadowAwareGodRayProgram is null || _sceneCapture is null || _godRayQuadVao == 0 ||
             !frame.ShadowAvailable || _shadowTarget is null)
         {
@@ -661,10 +671,14 @@ public sealed partial class OpenGlPreviewBackend
         SetMatrixOnProgram(_godRayUpsampleProgram!, "uInvViewProj", invViewProj);
         SetMatrixOnProgram(_godRayUpsampleProgram!, "uPrevViewProj", _godRayPrevViewProj);
         SetVec2OnProgram(_godRayUpsampleProgram, "uHalfResTexelSize", new Vector2(1f / halfW, 1f / halfH));
-        var upsampleTemporal = frame.Settings.GodRayStabilizeDebug ? 0f : quality.UpsampleTemporalWeight;
+        var upsampleTemporal = frame.Settings.GodRayStabilizeDebug
+            ? 0f
+            : PreviewVolumetricQuality.EffectivePassTemporalWeight(
+                quality.UpsampleTemporalWeight, frame.Settings);
         SetFloatOnProgram(_godRayUpsampleProgram, "uTemporalWeight", upsampleTemporal);
         SetIntOnProgram(_godRayUpsampleProgram, "uHasHistory",
-            !frame.Settings.GodRayStabilizeDebug && _godRayHistoryValid && upsampleTemporal > 0f ? 1 : 0);
+            !frame.Settings.GodRayStabilizeDebug &&
+            _godRayHistoryValid && upsampleTemporal > 0f ? 1 : 0);
         gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
 
         if (!frame.Settings.GodRayStabilizeDebug)

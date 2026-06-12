@@ -5,9 +5,9 @@ namespace AutoPBR.App.Tests;
 public sealed class PreviewVolumetricQualityTests
 {
     [Theory]
-    [InlineData(0, 8, 24, 12, 0f, 0f, 0f, 0f, 0f, 0f)]
-    [InlineData(1, 4, 32, 20, 2.8f, 0.28f, 0.42f, 1, 0.35f, 0.45f)]
-    [InlineData(2, 3, 48, 24, 4.2f, 0.38f, 0.55f, 2, 0.42f, 0.55f)]
+    [InlineData(0, 8, 24, 12, 0f, 0f, 0f, 0f, 0f, 0f, 0f)]
+    [InlineData(1, 4, 32, 20, 2.8f, 0.28f, 0.42f, 1, 0.35f, 0.45f, 0.55f)]
+    [InlineData(2, 3, 48, 24, 4.2f, 0.38f, 0.55f, 2, 0.42f, 0.55f, 0.72f)]
     public void Resolve_ReturnsExpectedProfile(
         int quality,
         int divisor,
@@ -18,7 +18,8 @@ public sealed class PreviewVolumetricQualityTests
         float cloudTemporal,
         int cloudQuality,
         float volumeTemporal,
-        float upsampleTemporal)
+        float upsampleTemporal,
+        float previewTaa)
     {
         var profile = PreviewVolumetricQuality.Resolve(quality);
 
@@ -31,6 +32,7 @@ public sealed class PreviewVolumetricQualityTests
         Assert.Equal(cloudQuality, profile.CloudQuality);
         Assert.Equal(volumeTemporal, profile.VolumeIntegrateTemporalWeight);
         Assert.Equal(upsampleTemporal, profile.UpsampleTemporalWeight);
+        Assert.Equal(previewTaa, profile.PreviewTaaWeight);
     }
 
     [Theory]
@@ -49,5 +51,25 @@ public sealed class PreviewVolumetricQualityTests
         Assert.Equal(25, profile.ResolveFroxelWidth(200));
         Assert.Equal(24, profile.ResolveFroxelHeight(100));
         Assert.Equal(24, profile.ResolveFroxelWidth(120));
+    }
+
+    [Theory]
+    [InlineData(0.55f, true, 1, 0.275f)]
+    [InlineData(0.55f, true, 0, 0.55f)]
+    [InlineData(0.55f, false, 1, 0.55f)]
+    [InlineData(0f, true, 2, 0f)]
+    public void EffectivePassTemporalWeight_HalvesWhenPreviewTaaActive(
+        float passWeight,
+        bool enableTaa,
+        int quality,
+        float expected)
+    {
+        var settings = new PreviewRenderSettings
+        {
+            EnablePreviewTaa = enableTaa,
+            VolumetricQuality = quality,
+        };
+
+        Assert.Equal(expected, PreviewVolumetricQuality.EffectivePassTemporalWeight(passWeight, settings));
     }
 }

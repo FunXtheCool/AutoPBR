@@ -122,7 +122,8 @@ vec3 proceduralSky(vec3 viewDir, vec3 lightPropagationDir, float sunIntensity, f
     vec3 hazeCol = mix(vec3(0.80, 0.90, 1.0), vec3(0.92, 0.88, 0.82), turbidityT);
     sky = mix(sky, hazeCol, horizonBand * mix(0.25, 0.55, turbidityT));
     float lowSun = 1.0 - smoothstep(0.04, 0.42, sunElev);
-    float sunBias = pow(max(cosSun, 0.0) * 0.5 + 0.5, 3.0);
+    float sunFacing = clamp(cosSun * 0.5 + 0.5, 0.0, 1.0);
+    float sunBias = pow(sunFacing, 3.0);
     vec3 warmCol = vec3(1.0, 0.46, 0.18);
     sky = mix(sky, warmCol, horizonBand * lowSun * sunBias * 0.85);
     vec3 mieTint = mix(vec3(1.0, 0.95, 0.85), warmCol, lowSun);

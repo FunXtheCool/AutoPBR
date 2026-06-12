@@ -13,10 +13,7 @@ out vec4 FragColor;
 
 void main()
 {
-    float viewZenith = vUv.y;
-    float azimuth = vUv.x * 2.0 - 1.0;
-    float sinTheta = sin(viewZenith * ATM_PI);
-    vec3 viewDir = normalize(vec3(sinTheta * azimuth, cos(viewZenith * ATM_PI), sinTheta));
+    vec3 viewDir = skyViewDirFromLutUv(vUv);
 
     vec3 trans = srgbToLinear(texture(uTransmittanceLut, vec2(vUv.x, clamp(vUv.y, 0.0, 1.0))).rgb);
     vec3 col = skyDayRadiance(viewDir, uSunDir, uSunIntensity, uTurbidity, uHorizonFalloff);

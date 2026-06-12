@@ -52,8 +52,11 @@ vec3 skyDayRadiance(vec3 viewDir, vec3 lightPropagationDir, float sunIntensity, 
     sky = mix(sky, hazeCol, horizonBand * mix(0.25, 0.55, turbidityT));
 
     // Warm sunrise/sunset band: strongest at low sun, biased toward the sun azimuth.
+    // Use a smooth sun-facing weight (never max(cosSun,0)): a hard hemisphere cut leaves a
+    // C1 crease on the sky dome that tracks the sun as a visible world-space line.
     float lowSun = 1.0 - smoothstep(0.04, 0.42, sunElev);
-    float sunBias = pow(max(cosSun, 0.0) * 0.5 + 0.5, 3.0);
+    float sunFacing = clamp(cosSun * 0.5 + 0.5, 0.0, 1.0);
+    float sunBias = pow(sunFacing, 3.0);
     vec3 warmCol = vec3(1.0, 0.46, 0.18);
     sky = mix(sky, warmCol, horizonBand * lowSun * sunBias * 0.85);
 
@@ -225,12 +228,56 @@ vec3 skyMoonDiscShading(vec3 viewDir, vec3 lightPropagationDir, float cosDiscEdg
     return moonCol * disc;
 }
 
-// Map a world-space view direction to sky-view LUT UV (matches atmo_skyview.frag).
+// Must match OpenGlPreviewBackend.Lighting.cs sky-view LUT width (192).
+const float SKY_VIEW_LUT_WIDTH = 192.0;
+
+// Reconstruct a unit view direction from sky-view LUT UV (matches atmo_skyview.frag).
+// Edge columns share azimuth = π so texel 0 and texel W-1 bake identical radiance for Repeat.
+vec3 skyViewDirFromLutUv(vec2 uv)
+{
+    float viewZenith = uv.y;
+    float u = uv.x;
+    float azimuth = ATM_PI;
+    if (u > 1.0 / SKY_VIEW_LUT_WIDTH && u < 1.0 - 1.0 / SKY_VIEW_LUT_WIDTH)
+    {
+        azimuth = (u - 0.5) * 2.0 * ATM_PI;
+    }
+
+    float sinTheta = sin(viewZenith * ATM_PI);
+    float cosTheta = cos(viewZenith * ATM_PI);
+    return normalize(vec3(sinTheta * sin(azimuth), cosTheta, sinTheta * cos(azimuth)));
+}
+
+// Map a world-space view direction to sky-view LUT UV. Azimuth wraps at u=0/1 on the -Z meridian
+// (Repeat on S); never use a [0,2π) remap that parks the atan branch cut at u=0.5 in texture space.
 vec2 skyViewLutUv(vec3 viewDir)
 {
-    float viewZenith = acos(clamp(viewDir.y, -1.0, 1.0)) / SKY_PI;
-    float azimuth = atan(viewDir.x, viewDir.z) / SKY_PI;
-    return vec2(azimuth * 0.5 + 0.5, viewZenith);
+    vec3 d = normalize(viewDir);
+    float viewZenith = acos(clamp(d.y, -1.0, 1.0)) / SKY_PI;
+    float u = atan(d.x, d.z) / (2.0 * SKY_PI) + 0.5;
+    return vec2(u, viewZenith);
+}
+
+// Bilinear sample with explicit azimuth wrap (Repeat alone can still leak a meridian seam on ANGLE).
+vec3 sampleSkyViewLutSrgb(sampler2D lut, vec3 viewDir)
+{
+    vec2 uv = skyViewLutUv(viewDir);
+    float u = uv.x;
+    float v = clamp(uv.y, 0.0, 1.0);
+    float texelU = 1.0 / SKY_VIEW_LUT_WIDTH;
+    vec3 c0 = texture(lut, vec2(u, v)).rgb;
+    if (u < texelU)
+    {
+        vec3 c1 = texture(lut, vec2(u + 1.0, v)).rgb;
+        c0 = mix(c1, c0, u / texelU);
+    }
+    else if (u > 1.0 - texelU)
+    {
+        vec3 c1 = texture(lut, vec2(u - 1.0, v)).rgb;
+        c0 = mix(c0, c1, (u - (1.0 - texelU)) / texelU);
+    }
+
+    return c0;
 }
 
 vec3 skySoftKnee(vec3 x, float knee)

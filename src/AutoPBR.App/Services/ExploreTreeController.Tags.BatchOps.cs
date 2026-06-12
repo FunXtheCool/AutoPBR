@@ -277,13 +277,10 @@ internal sealed partial class ExploreTreeController
         Interlocked.Increment(ref _tagAsyncWorkPending);
         try
         {
-            var sink = _backgroundTaskSink;
-            sink?.BeginTask(BackgroundTaskIds.MaterialTags);
             try
             {
                 await Task.Run(() =>
                 {
-                    var total = paths.Count;
                     for (var i = 0; i < paths.Count; i++)
                     {
                         cts.Token.ThrowIfCancellationRequested();
@@ -292,17 +289,12 @@ internal sealed partial class ExploreTreeController
                         var tags = ComputeEffectiveTags(path, includeDictionaryEvidence: true, deferSemanticMl: false);
                         _effectiveTagCache[path] = tags;
                         _finalSemanticTagPaths[path] = 0;
-                        sink?.ReportTask(BackgroundTaskIds.MaterialTags, (double)(i + 1) / total);
                     }
                 }, cts.Token).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {
                 return;
-            }
-            finally
-            {
-                sink?.EndTask(BackgroundTaskIds.MaterialTags);
             }
 
             if (cts.Token.IsCancellationRequested)

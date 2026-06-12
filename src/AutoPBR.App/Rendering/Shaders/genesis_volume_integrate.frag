@@ -1,13 +1,14 @@
 #version 330 core
 // GENESIS_GLES_PACK rev29
-// Full froxel integrate: view-ray Mie in-scatter march with froxel-space + screen-space temporal reuse,
-// plus a cloud-output mode for the volumetric cloud composite.
+// Full froxel integrate: view-ray Mie in-scatter march with froxel-space + screen-space temporal reuse.
+// God rays / fog only; volumetric clouds are owned by the screen-space march (genesis_clouds.frag).
 // ANGLE-safe: texture()-based froxel sampling (no texelFetch), ASCII-only sources, single FragColor write.
 
 //!include "common/common.glsl"
 //!include "common/atmosphere.glsl"
 //!include "common/volumetric_segment.glsl"
 //!include "common/ray_reconstruct.glsl"
+//!include "common/temporal_reproject.glsl"
 //!include "common/volume_froxel_math.glsl"
 //!include "common/volume_integrate_sample.glsl"
 
@@ -38,7 +39,6 @@ uniform float uFroxelTemporalWeight;
 uniform float uDepthDistribution;
 uniform float uScatterGain;
 uniform float uExtinction;
-uniform int uOutputClouds;
 uniform int uHasPrevIntegrate;
 uniform int uHasPrevFroxel;
 
@@ -52,19 +52,6 @@ vec3 softKnee(vec3 x, float knee)
     return x / (x + vec3(knee));
 }
 
-vec2 viReprojectUv(vec2 uv, float depth, mat4 invViewProj, mat4 prevViewProj)
-{
-    vec3 worldPos = grWorldPosFromUvDepth(uv, depth, invViewProj);
-    vec4 prevClip = prevViewProj * vec4(worldPos, 1.0);
-    if (prevClip.w <= 1e-6)
-    {
-        return vec2(-1.0);
-    }
-
-    vec2 prevNdc = prevClip.xy / prevClip.w;
-    return prevNdc * 0.5 + 0.5;
-}
-
 void main()
 {
     if (uStrength <= 0.0)
@@ -75,12 +62,7 @@ void main()
     vec3 rd = grWorldRayDir(vUv, uInvViewProj, uCameraPos);
     float receiverDepth = texture(uSceneDepth, vUv).r;
 
-    if (uOutputClouds > 0 && (receiverDepth < SKY_DEPTH_EPS || rd.y < 0.04))
-    {
-        discard;
-    }
-
-    if (uOutputClouds == 0 && receiverDepth >= SKY_DEPTH_EPS)
+    if (receiverDepth >= SKY_DEPTH_EPS)
     {
         discard;
     }
@@ -136,39 +118,23 @@ void main()
 
     vec3 vol = softKnee(accum * uStrength, 0.2);
 
-    if (uOutputClouds == 0 && uHasPrevIntegrate > 0 && uTemporalWeight > 0.0)
+    if (uHasPrevIntegrate > 0 && uTemporalWeight > 0.0)
     {
-        vec2 prevUv = viReprojectUv(vUv, receiverDepth, uInvViewProj, uPrevViewProj);
-        if (prevUv.x >= 0.0 && prevUv.x <= 1.0 && prevUv.y >= 0.0 && prevUv.y <= 1.0)
+        vec2 prevUv = trReprojectUvFromDepth(vUv, receiverDepth, uInvViewProj, uPrevViewProj);
+        if (trPrevUvOnScreen(prevUv))
         {
             vec3 history = texture(uPrevIntegrate, prevUv).rgb;
             float histDepth = texture(uSceneDepth, prevUv).r;
-            float depthValid = 1.0 - smoothstep(0.002, 0.02, abs(histDepth - receiverDepth));
+            float depthValid = trDepthDisocclusionWeight(receiverDepth, histDepth, 0.002, 0.02);
             vol = mix(vol, history, uTemporalWeight * depthValid);
         }
     }
 
     float luma = max(max(vol.r, vol.g), vol.b);
-    vec4 outColor;
-    if (uOutputClouds > 0)
+    if (luma <= 1e-6)
     {
-        float alpha = saturate1(luma * 1.45);
-        if (alpha <= 0.02)
-        {
-            discard;
-        }
-
-        outColor = vec4(linearToSrgb(vol), alpha);
-    }
-    else
-    {
-        if (luma <= 1e-6)
-        {
-            discard;
-        }
-
-        outColor = vec4(vol, 1.0);
+        discard;
     }
 
-    FragColor = outColor;
+    FragColor = vec4(vol, 1.0);
 }

@@ -86,6 +86,23 @@ public sealed class PreviewVolumeInjectShaderEsTests
     }
 
     [Fact]
+    public void GenesisClouds_DefinesDensityFunctionsBeforeUse()
+    {
+        // Regression: the flattened TU once referenced vcCloudDensityRaw from the light-march helper
+        // before any density include appeared, so the cloud program silently failed to compile and
+        // the clouds toggle had no visible effect.
+        var adapted = ResolveAndAdapt("genesis_clouds.frag");
+        var densityEx = adapted.IndexOf("float vcCloudDensityEx(", StringComparison.Ordinal);
+        var lightMarch = adapted.IndexOf("float vcLightOpticalDepth(", StringComparison.Ordinal);
+        var marchUse = adapted.IndexOf("vcLightOpticalDepth(worldPos", StringComparison.Ordinal);
+        Assert.True(densityEx >= 0, "vcCloudDensityEx definition missing from flattened genesis_clouds.frag");
+        Assert.True(lightMarch >= 0, "vcLightOpticalDepth definition missing from flattened genesis_clouds.frag");
+        Assert.True(marchUse > lightMarch, "main() must call vcLightOpticalDepth after its definition");
+        Assert.True(densityEx < lightMarch,
+            "cloud density functions must be defined before the sun light march that samples them");
+    }
+
+    [Fact]
     public void DumpAdaptedVolumeShaders_ForAngleDebug()
     {
         var outDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "agent-tools"));

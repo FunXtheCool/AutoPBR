@@ -35,7 +35,15 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
     private bool _flyKeyA;
     private bool _flyKeyS;
     private bool _flyKeyD;
+    private bool _flyKeyQ;
+    private bool _flyKeyE;
+    private bool _flySpeedBoost;
+    private bool _flySpeedSlow;
     private Point _cameraDragLast;
+    private DateTime _lastLeftClickUtc = DateTime.MinValue;
+    private Point _lastLeftClickPos;
+    private const int DoubleClickMs = 400;
+    private const double DoubleClickMaxDist = 8;
 
     public GlPbrPreviewControl()
     {
@@ -59,12 +67,16 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
     /// <summary>Routes shader and GL init messages into the main app log (invoked from the GL thread).</summary>
     public void SetRendererLog(Action<string>? log) => _backend.SetDiagnosticLog(log);
 
+    public void InvalidateShaderCaches() => _backend.InvalidateShaderCachesAndReload();
+
     /// <summary>Updates orbit boom arm length, orbit/pan/zoom sensitivities, and the reset-camera key.</summary>
     public void SetCameraInteractionFromSettings(float orbitRadPerPx, float panPerPixel, float zoomPerWheelStep,
+        float flyLookRadPerPx, bool invertLookY, float flyMoveSpeed, bool flySmoothAcceleration,
         Key resetKey, float orbitBoomArmDistanceWorld)
     {
         _cameraResetKey = resetKey;
-        _backend.SetCameraSensitivities(orbitRadPerPx, panPerPixel, zoomPerWheelStep);
+        _backend.SetCameraSensitivities(orbitRadPerPx, panPerPixel, zoomPerWheelStep, flyLookRadPerPx, invertLookY,
+            flyMoveSpeed, flySmoothAcceleration);
         _backend.SetOrbitBoomArmDistance(orbitBoomArmDistanceWorld);
     }
 
@@ -153,7 +165,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         var now = Stopwatch.GetTimestamp();
         var dt = TimeSpan.FromTicks(now - _lastTicks);
         _lastTicks = now;
-        _backend.SetDebugFlyInput(_debugFlyRmbLook, _flyKeyW, _flyKeyA, _flyKeyS, _flyKeyD);
+        PushDebugFlyInput();
         _backend.RenderFrame(dt);
         var scale = TopLevel.GetTopLevel(this)?.RenderScaling ?? 1.0;
         var w = Math.Max(1, (int)Math.Ceiling(Bounds.Width * scale));
@@ -205,6 +217,24 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
                     _flyKeyD = true;
                     e.Handled = true;
                     break;
+                case Key.Q:
+                    _flyKeyQ = true;
+                    e.Handled = true;
+                    break;
+                case Key.E:
+                    _flyKeyE = true;
+                    e.Handled = true;
+                    break;
+                case Key.LeftShift:
+                case Key.RightShift:
+                    _flySpeedBoost = true;
+                    e.Handled = true;
+                    break;
+                case Key.LeftCtrl:
+                case Key.RightCtrl:
+                    _flySpeedSlow = true;
+                    e.Handled = true;
+                    break;
             }
         }
 
@@ -236,6 +266,24 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
                 _flyKeyD = false;
                 e.Handled = true;
                 break;
+            case Key.Q:
+                _flyKeyQ = false;
+                e.Handled = true;
+                break;
+            case Key.E:
+                _flyKeyE = false;
+                e.Handled = true;
+                break;
+            case Key.LeftShift:
+            case Key.RightShift:
+                _flySpeedBoost = false;
+                e.Handled = true;
+                break;
+            case Key.LeftCtrl:
+            case Key.RightCtrl:
+                _flySpeedSlow = false;
+                e.Handled = true;
+                break;
         }
 
         if (e.Handled)
@@ -250,9 +298,13 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
     {
         _cameraDrag = false;
         _debugFlyRmbLook = false;
-        _backend.SetDebugFlyInput(false, _flyKeyW, _flyKeyA, _flyKeyS, _flyKeyD);
+        PushDebugFlyInput();
         _backend.SetUserCameraDragging(false);
     }
+
+    private void PushDebugFlyInput() =>
+        _backend.SetDebugFlyInput(_debugFlyRmbLook, _flyKeyW, _flyKeyA, _flyKeyS, _flyKeyD, _flyKeyQ, _flyKeyE,
+            _flySpeedBoost, _flySpeedSlow);
 
     private void OnPreviewPointerEntered(object? sender, PointerEventArgs e)
     {
@@ -281,7 +333,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         {
             _debugFlyRmbLook = true;
             _cameraDragLast = e.GetPosition(this);
-            _backend.SetDebugFlyInput(true, _flyKeyW, _flyKeyA, _flyKeyS, _flyKeyD);
+            PushDebugFlyInput();
             _backend.SetUserCameraDragging(true);
             e.Pointer.Capture(this);
             e.Handled = true;
@@ -292,6 +344,27 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         if (!IsOrbitPanDragStart(pt, e.KeyModifiers, out var orbit))
         {
             return;
+        }
+
+        var pressPos = e.GetPosition(this);
+        var now = DateTime.UtcNow;
+        var clickDx = pressPos.X - _lastLeftClickPos.X;
+        var clickDy = pressPos.Y - _lastLeftClickPos.Y;
+        if (pt.Properties.IsLeftButtonPressed &&
+            (now - _lastLeftClickUtc).TotalMilliseconds <= DoubleClickMs &&
+            clickDx * clickDx + clickDy * clickDy <= DoubleClickMaxDist * DoubleClickMaxDist)
+        {
+            _backend.FocusOrbitOnSubject();
+            _lastLeftClickUtc = DateTime.MinValue;
+            e.Handled = true;
+            RequestNextFrameRendering();
+            return;
+        }
+
+        if (pt.Properties.IsLeftButtonPressed)
+        {
+            _lastLeftClickUtc = now;
+            _lastLeftClickPos = pressPos;
         }
 
         _cameraDrag = true;
@@ -311,7 +384,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
             var dx = (float)(cur.X - _cameraDragLast.X);
             var dy = (float)(cur.Y - _cameraDragLast.Y);
             _cameraDragLast = cur;
-            _backend.ApplyCameraOrbitPixels(dx, dy);
+            _backend.ApplyFlyLookPixels(dx, dy);
             e.Handled = true;
             RequestNextFrameRendering();
             return;
@@ -344,7 +417,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         if (e.InitialPressMouseButton == MouseButton.Right)
         {
             _debugFlyRmbLook = false;
-            _backend.SetDebugFlyInput(false, _flyKeyW, _flyKeyA, _flyKeyS, _flyKeyD);
+            PushDebugFlyInput();
             _backend.SetUserCameraDragging(false);
             e.Pointer.Capture(null);
             e.Handled = true;

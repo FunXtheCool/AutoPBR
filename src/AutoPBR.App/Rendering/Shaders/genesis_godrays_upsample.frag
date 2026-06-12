@@ -2,6 +2,7 @@
 // Full-res bilateral upsample of half-res god rays + temporal reprojection (P1).
 
 //!include "common/common.glsl"
+//!include "common/temporal_reproject.glsl"
 
 in vec2 vUv;
 uniform sampler2D uHalfResRays;
@@ -14,6 +15,8 @@ uniform float uTemporalWeight;
 uniform int uHasHistory;
 
 out vec4 FragColor;
+
+const float SKY_DEPTH_EPS = 0.9992;
 
 vec3 bilateralUpsample(vec2 uv, float centerDepth)
 {
@@ -37,40 +40,38 @@ vec3 bilateralUpsample(vec2 uv, float centerDepth)
     return accum / max(wSum, 1e-4);
 }
 
-vec2 reprojectUv(vec2 uv, float depth, mat4 invViewProj, mat4 prevViewProj)
-{
-    vec2 ndc = vec2(uv.x * 2.0 - 1.0, uv.y * 2.0 - 1.0);
-    float z = depth * 2.0 - 1.0;
-    vec4 worldH = invViewProj * vec4(ndc, z, 1.0);
-    vec3 worldPos = worldH.xyz / max(worldH.w, 1e-6);
-    vec4 prevClip = prevViewProj * vec4(worldPos, 1.0);
-    if (prevClip.w <= 1e-6)
-    {
-        return vec2(-1.0);
-    }
-
-    vec2 prevNdc = prevClip.xy / prevClip.w;
-    return prevNdc * 0.5 + 0.5;
-}
-
 void main()
 {
     float depth = texture(uSceneDepth, vUv).r;
+    // Froxel integrate only marches receiver geometry; sky pixels must stay empty here.
+    // Bilateral/temporal upsample otherwise bleeds shafts into the dome, and the cloud mask
+    // then strips them unevenly (dark rectangular frustum over the cloud layer).
+    if (depth >= SKY_DEPTH_EPS)
+    {
+        discard;
+    }
+
     vec3 current = bilateralUpsample(vUv, depth);
     vec3 finalRays = current;
 
     if (uHasHistory > 0)
     {
-        vec2 prevUv = reprojectUv(vUv, depth, uInvViewProj, uPrevViewProj);
-        if (prevUv.x >= 0.0 && prevUv.x <= 1.0 && prevUv.y >= 0.0 && prevUv.y <= 1.0)
+        vec2 prevUv = trReprojectUvFromDepth(vUv, depth, uInvViewProj, uPrevViewProj);
+        if (trPrevUvOnScreen(prevUv))
         {
             vec3 history = texture(uHistory, prevUv).rgb;
             float histDepth = texture(uSceneDepth, prevUv).r;
-            float depthValid = 1.0 - smoothstep(0.002, 0.02, abs(histDepth - depth));
+            float depthValid = trDepthDisocclusionWeight(depth, histDepth, 0.002, 0.02);
             float blend = uTemporalWeight * depthValid;
             finalRays = mix(current, history, blend);
         }
     }
 
-    FragColor = vec4(finalRays, 1.0);
+    float luma = max(max(finalRays.r, finalRays.g), finalRays.b);
+    if (luma <= 1e-6)
+    {
+        discard;
+    }
+
+    FragColor = vec4(finalRays, luma);
 }

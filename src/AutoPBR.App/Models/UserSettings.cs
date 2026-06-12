@@ -285,6 +285,38 @@ public sealed class UserSettings
     /// <summary>Debug: disable temporal god-ray reuse and freeze march jitter (reduces pulsing).</summary>
     public bool Preview3DGodRayStabilizeDebug { get; set; } = true;
 
+    public double Preview3DCloudDensity { get; set; } = 0.35;
+
+    /// <summary>0 = clear sky, 1 = weather map as baked.</summary>
+    public double Preview3DCloudCoverageScale { get; set; } = 1.0;
+
+    /// <summary>Added to the default cloud slab base height (world Y).</summary>
+    public double Preview3DCloudLayerHeight { get; set; }
+
+    public double Preview3DCloudVolumeHeight { get; set; } = 24.0;
+
+    public double Preview3DCloudVolumeSize { get; set; } = 48.0;
+
+    public double Preview3DCloudWindSpeed { get; set; } = 1.5;
+
+    public double Preview3DCloudWindHeadingDegrees { get; set; } = 35.0;
+
+    /// <summary>High thin cirrus sheet opacity (0 = off).</summary>
+    public double Preview3DCloudCirrusStrength { get; set; } = 0.45;
+
+    /// <summary>0 = off, 1 = coverage map, 2 = mid-layer density slice.</summary>
+    public int Preview3DCloudDebugView { get; set; }
+
+    public bool Preview3DCloudDisableTemporal { get; set; }
+
+    /// <summary>Ray-march step override (0 = quality preset).</summary>
+    public double Preview3DCloudMarchStepOverride { get; set; }
+
+    public bool Preview3DCloudFreezeWind { get; set; }
+
+    /// <summary>Final preview TAA on the composited RGB frame.</summary>
+    public bool Preview3DEnablePreviewTaa { get; set; } = true;
+
     /// <summary>Genesis Shadows Phase 2: master toggle for the directional shadow map pass.</summary>
     public bool Preview3DEnableShadows { get; set; } = true;
 
@@ -315,6 +347,18 @@ public sealed class UserSettings
 
     /// <summary>3D preview: keyboard key name to reset camera (Avalonia Key enum name, e.g. R, Home, Escape).</summary>
     public string Preview3DCameraResetKey { get; set; } = "R";
+
+    /// <summary>3D preview: fly-camera look sensitivity in radians per pixel (right-drag while flying).</summary>
+    public double Preview3DCameraFlyLookSensitivity { get; set; } = 0.006;
+
+    /// <summary>3D preview: invert vertical look for orbit and fly cameras.</summary>
+    public bool Preview3DCameraInvertLookY { get; set; }
+
+    /// <summary>3D preview: fly move speed multiplier (WASD while right mouse held).</summary>
+    public double Preview3DCameraFlyMoveSpeed { get; set; } = 1.0;
+
+    /// <summary>3D preview: ease WASD fly movement in/out instead of instant starts and stops.</summary>
+    public bool Preview3DCameraFlySmoothAcceleration { get; set; } = true;
 
     private static string SettingsDirectory =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AutoPBR");

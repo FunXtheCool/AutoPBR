@@ -22,7 +22,7 @@ using AutoPBR.Core.Models;
 
 namespace AutoPBR.App.ViewModels;
 
-public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, IDisposable
+public partial class MainWindowViewModel : ViewModelBase, IDisposable
 {
     private CancellationTokenSource? _cts;
     private CancellationTokenSource? _scanCts;
@@ -274,9 +274,6 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
 
     public ObservableCollection<string> LogLines { get; } = new();
 
-    /// <summary>Mini progress rows (tab strip, right); updated from background threads via <see cref="IBackgroundTaskSink"/>.</summary>
-    public ObservableCollection<BackgroundTaskItem> BackgroundTasks { get; } = new();
-
     /// <summary>Persist the current in-memory log to a file (delegates to <see cref="LogService"/>).</summary>
     private void SaveLogToFile() => LogService.SaveToFile(LogLines);
 
@@ -339,7 +336,6 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
             var lang = string.IsNullOrWhiteSpace(_settings.Language) ? "en" : _settings.Language;
             Strings = LocalizationService.ApplyCulture(lang);
             OnPropertyChanged(nameof(Strings));
-            _exploreController.SetBackgroundTaskSink(this);
             _exploreController.SetDebugSink(msg => Dispatcher.UIThread.Post(() => { ExploreMlDebugText = msg; }));
             SelectedLanguage = SupportedLanguages.FirstOrDefault(x =>
                                    string.Equals(x.CultureCode, _settings.Language,
@@ -355,6 +351,7 @@ public partial class MainWindowViewModel : ViewModelBase, IBackgroundTaskSink, I
             RefreshNormalDerivativeOptions();
             RefreshColorSchemeOptions();
             SetStatus("Status_SelectPack");
+            InitPreviewShaderPrewarm();
         }
         finally
         {

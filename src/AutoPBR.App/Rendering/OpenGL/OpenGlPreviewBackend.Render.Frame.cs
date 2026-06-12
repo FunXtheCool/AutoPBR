@@ -26,7 +26,10 @@ public sealed partial class OpenGlPreviewBackend
         public double RenderTime;
         public Vector3 OrbitBaseTarget;
         public Vector3 OrbitPan;
-        public Vector3 DebugFlyWorldOffset;
+        public bool FlyCamActive;
+        public Vector3 FlyPosition;
+        public float FlyYaw;
+        public float FlyPitch;
         public float OrbitYaw;
         public float OrbitPitch;
         public float OrbitDistance;

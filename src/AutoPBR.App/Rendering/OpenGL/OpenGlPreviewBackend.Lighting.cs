@@ -207,29 +207,19 @@ public sealed partial class OpenGlPreviewBackend
         DestroyAtmosphereResources();
         EnsureAtmoQuadBuffer(gl);
 
-        _atmoSkyProgram = new GlShaderProgram(gl, "atmo_sky.vert", "atmo_sky.frag", useOpenGlEs, out var skyErr);
+        _atmoSkyProgram = CreatePreviewProgram("atmo_sky.vert", "atmo_sky.frag", out var skyErr);
         if (_atmoSkyProgram is not { IsValid: true })
         {
             EmitDiagnostic("[3D preview] Atmosphere sky shader: " + (skyErr ?? "link failed"));
             _atmoSkyProgram?.Dispose();
             _atmoSkyProgram = null;
-            _proceduralSkyProgram = new GlProceduralSkyProgram(gl, useOpenGlEs, out var procErr);
-            if (_proceduralSkyProgram is not { IsValid: true })
+            if (!TryEnsureProceduralSkyProgram())
             {
-                EmitDiagnostic("[3D preview] Procedural sky fallback: " + (procErr ?? "link failed"));
-                _proceduralSkyProgram?.Dispose();
-                _proceduralSkyProgram = null;
                 return;
             }
-
-            EmitDiagnostic("[3D preview] Using embedded procedural sky (LUT sky shader unavailable).");
-        }
-        else
-        {
-            _proceduralSkyProgram = new GlProceduralSkyProgram(gl, useOpenGlEs, out _);
         }
 
-        _atmoTransProgram = new GlShaderProgram(gl, "atmo_lut.vert", "atmo_transmittance.frag", useOpenGlEs, out var transErr);
+        _atmoTransProgram = CreatePreviewProgram("atmo_lut.vert", "atmo_transmittance.frag", out var transErr);
         if (_atmoTransProgram is not { IsValid: true })
         {
             EmitDiagnostic("[3D preview] Atmosphere transmittance shader: " + (transErr ?? "link failed"));
@@ -237,7 +227,7 @@ public sealed partial class OpenGlPreviewBackend
             _atmoTransProgram = null;
         }
 
-        _atmoSkyViewProgram = new GlShaderProgram(gl, "atmo_lut.vert", "atmo_skyview.frag", useOpenGlEs, out var skyViewErr);
+        _atmoSkyViewProgram = CreatePreviewProgram("atmo_lut.vert", "atmo_skyview.frag", out var skyViewErr);
         if (_atmoSkyViewProgram is not { IsValid: true })
         {
             EmitDiagnostic("[3D preview] Atmosphere sky-view shader: " + (skyViewErr ?? "link failed"));
@@ -315,7 +305,8 @@ public sealed partial class OpenGlPreviewBackend
         }
         gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
         gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
-        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
+        // Repeat on S: azimuth wraps at u=0/1 (back meridian); ClampToEdge caused a visible vertical seam.
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.Repeat);
         gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
 
         var fboOk = true;
@@ -504,6 +495,10 @@ public sealed partial class OpenGlPreviewBackend
 
         if (_atmoSkyProgram is { IsValid: true })
         {
+            while (gl.GetError() != GLEnum.NoError)
+            {
+            }
+
             _atmoSkyProgram.Use();
             if (lutSkyReady && _atmoSkyViewTex != 0)
             {
@@ -541,9 +536,9 @@ public sealed partial class OpenGlPreviewBackend
             return;
         }
 
-        if (_proceduralSkyProgram is { IsValid: true })
+        if (TryEnsureProceduralSkyProgram())
         {
-            _proceduralSkyProgram.Use();
+            _proceduralSkyProgram!.Use();
             SetMatrixOnProgram(_proceduralSkyProgram, "uInvViewProj", invViewProj);
             SetVec3OnProgram(_proceduralSkyProgram, "uCameraPos", frame.Eye);
             SetVec3OnProgram(_proceduralSkyProgram, "uLightDir", frame.LightDir);
