@@ -342,6 +342,23 @@ public sealed partial class OpenGlPreviewBackend
         var gl = frame.Gl;
         var settings = frame.Settings;
         _cloudProgram!.Use();
+
+        // GLES/ANGLE: sampler uniforms default to texture unit 0, and draw validation
+        // rejects a program whose samplers of different types (sampler3D uCloudNoise vs
+        // the sampler2D uniforms) reference the same unit — the whole cloud quad is then
+        // silently dropped with GL_INVALID_OPERATION. On cold start with god rays active,
+        // uPrevClouds (and uSceneDepth on the warmup path) were never assigned and sat on
+        // unit 0 alongside uCloudNoise, so clouds never rendered until a god-ray retoggle
+        // happened to route through the clouds-only path that assigns them. Pin every
+        // sampler to its own unit unconditionally; the uHas*/uGateSkyDepth flags keep
+        // unbound units from being sampled.
+        SetIntOnProgram(_cloudProgram, "uCloudNoise", 0);
+        SetIntOnProgram(_cloudProgram, "uCoverageMap", 1);
+        SetIntOnProgram(_cloudProgram, "uSkyViewLut", 2);
+        SetIntOnProgram(_cloudProgram, "uDetailNoise", 3);
+        SetIntOnProgram(_cloudProgram, "uSceneDepth", 5);
+        SetIntOnProgram(_cloudProgram, "uPrevClouds", 6);
+
         SetMatrixOnProgram(_cloudProgram, "uInvViewProj", invViewProj);
         SetMatrixOnProgram(_cloudProgram, "uPrevViewProj", _cloudPrevViewProj);
         SetVec3OnProgram(_cloudProgram, "uCameraPos", frame.Eye);
@@ -375,43 +392,35 @@ public sealed partial class OpenGlPreviewBackend
 
         if (_cloudNoiseTex is not null)
         {
-            gl.ActiveTexture(TextureUnit.Texture0);
             _cloudNoiseTex.Bind(0);
-            SetIntOnProgram(_cloudProgram, "uCloudNoise", 0);
         }
 
         if (_cloudCoverageTex is not null)
         {
-            gl.ActiveTexture(TextureUnit.Texture1);
             _cloudCoverageTex.Bind(1);
-            SetIntOnProgram(_cloudProgram, "uCoverageMap", 1);
         }
 
         if (_cloudDetailTex is not null)
         {
             _cloudDetailTex.Bind(3);
-            SetIntOnProgram(_cloudProgram, "uDetailNoise", 3);
         }
 
         if (_atmoLutsValid && _atmoSkyViewTex != 0)
         {
             gl.ActiveTexture(TextureUnit.Texture2);
             gl.BindTexture(TextureTarget.Texture2D, _atmoSkyViewTex);
-            SetIntOnProgram(_cloudProgram, "uSkyViewLut", 2);
         }
 
         if (useDepthGate && _sceneCapture is not null)
         {
             gl.ActiveTexture(TextureUnit.Texture5);
             gl.BindTexture(TextureTarget.Texture2D, _sceneCapture.DepthTextureHandle);
-            SetIntOnProgram(_cloudProgram, "uSceneDepth", 5);
         }
 
         if (useTemporalReproject && _cloudHistoryTarget is not null && _cloudHistoryValid)
         {
             gl.ActiveTexture(TextureUnit.Texture6);
             gl.BindTexture(TextureTarget.Texture2D, _cloudHistoryTarget.ColorTextureHandle);
-            SetIntOnProgram(_cloudProgram, "uPrevClouds", 6);
         }
     }
 
