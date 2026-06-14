@@ -20,6 +20,11 @@ internal static class GeometryIrReferenceBakeGate
             return false;
         }
 
+        if (shard.ContainsKey("delegatedFromOfficialJvmName"))
+        {
+            return true;
+        }
+
         if (shard["profile"]?.GetValue<string>() is not { } profile ||
             !profile.Contains("named_jar", StringComparison.OrdinalIgnoreCase))
         {

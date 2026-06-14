@@ -118,8 +118,9 @@ public static partial class GeometryIrLiftQualityReport
                     $"suspectedFlatNestedPartCount={flatNested} with body/legs still root siblings (reference unavailable)");
             }
 
+            JsonObject? shardDoc = JsonNode.Parse(shardRoot.GetRawText()) as JsonObject;
             if (!TryGetFirstRootChildren(shardRoot, out var irRootKids) ||
-                !GeometryIrPartTreeRepair.UsesVanillaFlatQuadrupedLegBake(irRootKids))
+                !GeometryIrPartTreeRepair.UsesVanillaFlatQuadrupedLegBake(irRootKids, shardDoc))
             {
                 return (false,
                     $"suspectedFlatNestedPartCount={flatNested} with body/legs still root siblings (not vanilla flat quadruped layout)");

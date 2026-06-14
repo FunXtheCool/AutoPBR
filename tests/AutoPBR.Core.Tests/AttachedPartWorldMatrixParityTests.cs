@@ -31,7 +31,7 @@ public sealed class AttachedPartWorldMatrixParityTests
         }
 
         using var reference = JsonDocument.Parse(File.ReadAllText(referencePath));
-        var refMatrices = ReferencePartWorldMatrixIndex.Build(reference.RootElement);
+        var refMatrices = ReferencePartWorldMatrixIndex.Build(reference.RootElement, jvm);
         var shardPath = Path.Combine(root, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
         using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
@@ -68,6 +68,133 @@ public sealed class AttachedPartWorldMatrixParityTests
     }
 
     [Theory]
+    [InlineData("net.minecraft.client.model.animal.dolphin.DolphinModel", 64, 64, "left_fin", "right_fin", "back_fin")]
+    public void Dolphin_catalog_mesh_part_affine_matches_reference_java_model_space(
+        string jvm,
+        int atlasW,
+        int atlasH,
+        params string[] partIds)
+    {
+        var root = GeometryIrTestTierSupport.FindRepoRoot();
+        var referencePath = Path.Combine(root, "tools", "MinecraftGeometryReference", "reference-output", $"{jvm}.json");
+        if (!File.Exists(referencePath))
+        {
+            return;
+        }
+
+        using var reference = JsonDocument.Parse(File.ReadAllText(referencePath));
+        var refMatrices = ReferencePartWorldMatrixIndex.Build(reference.RootElement, jvm);
+        var shardPath = Path.Combine(root, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
+        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
+            !string.Equals(status, "ok", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
+        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrModelSpaceParityMeshForTests(
+            "assets/minecraft/textures/entity/dolphin/dolphin.png",
+            jvm,
+            atlasW,
+            atlasH,
+            repaired,
+            out var err);
+        Assert.NotNull(mesh);
+        Assert.Null(err);
+
+        var emitOptions = GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH) with
+        {
+            OfficialJvmName = jvm,
+            UseColumnTranslationTimesRotationPartPose = true,
+        };
+        var elementPartIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(repaired, emitOptions);
+
+        foreach (var partId in partIds)
+        {
+            Assert.True(refMatrices.TryGetValue(partId, out var refWorld), $"missing reference_java matrix for '{partId}'");
+            Matrix4x4? meshWorld = null;
+            for (var i = 0; i < mesh!.Elements.Count; i++)
+            {
+                if (string.Equals(elementPartIds[i], partId, StringComparison.Ordinal))
+                {
+                    meshWorld = mesh.Elements[i].LocalToParent;
+                    break;
+                }
+            }
+
+            Assert.NotNull(meshWorld);
+            AssertMatrixNear(refWorld, meshWorld.Value, 0.08f, partId);
+            AssertProbePointsNear(refWorld, meshWorld.Value, 0.08f, partId);
+        }
+    }
+
+    [Theory]
+    [InlineData("net.minecraft.client.model.animal.dolphin.DolphinModel", 64, 64, "left_fin", "right_fin", "back_fin")]
+    public void Dolphin_catalog_mesh_part_affine_matches_hand_builder_model_space(
+        string jvm,
+        int atlasW,
+        int atlasH,
+        params string[] partIds)
+    {
+        var root = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(root, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
+        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
+            !string.Equals(status, "ok", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(
+            "assets/minecraft/textures/entity/dolphin/dolphin.png",
+            Profile26,
+            0f,
+            0f,
+            out var mesh,
+            out _,
+            applyGeometryIrSetupAnimMotion: false));
+
+        var hand = CleanRoomEntityModelRuntime.BuildDolphinHandMeshForTests(
+            "assets/minecraft/textures/entity/dolphin/dolphin.png",
+            Profile26);
+        var handPartOrder = new[] { "body", "back_fin", "left_fin", "right_fin", "tail", "tail_fin", "head", "nose" };
+        var handIdxByPart = new Dictionary<string, int>(StringComparer.Ordinal);
+        for (var i = 0; i < handPartOrder.Length && i < hand.Elements.Count; i++)
+        {
+            handIdxByPart[handPartOrder[i]] = i;
+        }
+
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
+        var elementPartIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
+            repaired,
+            GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH) with
+            {
+                OfficialJvmName = jvm,
+                UseColumnTranslationTimesRotationPartPose = true,
+            });
+
+        foreach (var partId in partIds)
+        {
+            Assert.True(handIdxByPart.TryGetValue(partId, out var handIdx), partId);
+            var handWorld = hand.Elements[handIdx].LocalToParent;
+            Matrix4x4? meshWorld = null;
+            for (var i = 0; i < mesh!.Elements.Count; i++)
+            {
+                if (string.Equals(elementPartIds[i], partId, StringComparison.Ordinal))
+                {
+                    meshWorld = mesh.Elements[i].LocalToParent;
+                    break;
+                }
+            }
+
+            Assert.NotNull(meshWorld);
+            AssertProbePointsNear(handWorld, meshWorld.Value, 0.05f, partId);
+        }
+    }
+
+    [Theory]
     [InlineData("assets/minecraft/textures/entity/cow/cow_cold.png", "net.minecraft.client.model.animal.cow.ColdCowModel", 64, 64, "right_horn")]
     [InlineData("assets/minecraft/textures/entity/bear/polarbear.png", "net.minecraft.client.model.animal.polarbear.PolarBearModel", 128, 64, "body")]
     public void Explore_catalog_static_mesh_attached_part_preview_points_match_reference(
@@ -85,7 +212,7 @@ public sealed class AttachedPartWorldMatrixParityTests
         }
 
         using var reference = JsonDocument.Parse(File.ReadAllText(referencePath));
-        var refMatrices = ReferencePartWorldMatrixIndex.Build(reference.RootElement);
+        var refMatrices = ReferencePartWorldMatrixIndex.Build(reference.RootElement, jvm);
         Assert.True(refMatrices.TryGetValue(partId, out var refModelWorld));
 
         var runtime = new CleanRoomEntityModelRuntime();
@@ -150,7 +277,7 @@ public sealed class AttachedPartWorldMatrixParityTests
     /// <summary>Reference tree walk using production <see cref="CleanRoomEntityModelRuntime.TryComposePartPosePublic"/>.</summary>
     private static class ReferencePartWorldMatrixIndex
     {
-        public static Dictionary<string, Matrix4x4> Build(JsonElement referenceRoot)
+        public static Dictionary<string, Matrix4x4> Build(JsonElement referenceRoot, string? officialJvmName = null)
         {
             var map = new Dictionary<string, Matrix4x4>(StringComparer.Ordinal);
             if (!referenceRoot.TryGetProperty("roots", out var roots))
@@ -160,19 +287,30 @@ public sealed class AttachedPartWorldMatrixParityTests
 
             foreach (var root in roots.EnumerateArray())
             {
-                Visit(root, Matrix4x4.Identity, map);
+                Visit(root, Matrix4x4.Identity, map, officialJvmName);
             }
 
             return map;
         }
 
-        private static void Visit(JsonElement part, Matrix4x4 parentWorld, Dictionary<string, Matrix4x4> sink)
+        private static void Visit(
+            JsonElement part,
+            Matrix4x4 parentWorld,
+            Dictionary<string, Matrix4x4> sink,
+            string? officialJvmName)
         {
             var world = parentWorld;
-            if (part.TryGetProperty("pose", out var poseEl) &&
-                CleanRoomEntityModelRuntime.TryComposePartPosePublic(poseEl, parentWorld, out var worldTexel))
+            if (part.TryGetProperty("pose", out var poseEl))
             {
-                world = worldTexel;
+                if (GeometryIrMeshEmitOptions.UsesColumnTranslationTimesRotationPartPoseJvm(officialJvmName) &&
+                    CleanRoomEntityModelRuntime.TryComposeColumnPartPose(poseEl, parentWorld, out var worldColumn, out _))
+                {
+                    world = worldColumn;
+                }
+                else if (CleanRoomEntityModelRuntime.TryComposePartPosePublic(poseEl, parentWorld, out var worldTexel))
+                {
+                    world = worldTexel;
+                }
             }
 
             if (part.TryGetProperty("id", out var idEl))
@@ -188,7 +326,7 @@ public sealed class AttachedPartWorldMatrixParityTests
             {
                 foreach (var ch in children.EnumerateArray())
                 {
-                    Visit(ch, world, sink);
+                    Visit(ch, world, sink, officialJvmName);
                 }
             }
         }

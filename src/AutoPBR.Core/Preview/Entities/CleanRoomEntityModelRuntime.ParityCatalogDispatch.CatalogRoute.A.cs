@@ -345,7 +345,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
-                merged = BuildIllager(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, IllagerPreviewArmPoseKind.Crossed);
+                merged = BuildIllager(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, EntityIllagerPreviewArmPose.Crossed);
 
 
 
@@ -363,7 +363,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
-                merged = BuildIllager(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, IllagerPreviewArmPoseKind.CrossbowHold);
+                merged = BuildIllager(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, EntityIllagerPreviewArmPose.CrossbowHold);
 
 
 

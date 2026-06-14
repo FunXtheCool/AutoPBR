@@ -23,7 +23,8 @@ internal static class PreviewRenderStateSynthesis
             ["ageScale"] = 1f,
             ["xRot"] = headPitchDegrees,
             ["yRot"] = headYawDegrees,
-            ["ageInTicks"] = animationTimeSeconds * 20f
+            ["ageInTicks"] = animationTimeSeconds * 20f,
+            ["isMoving"] = walkSpeed > 0.08f ? 1f : 0f,
         };
     }
 

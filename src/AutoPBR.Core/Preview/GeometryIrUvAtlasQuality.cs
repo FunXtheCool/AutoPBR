@@ -244,6 +244,25 @@ public static class GeometryIrUvAtlasQuality
         return r < 0 ? r + modulus : r;
     }
 
+    private static bool IsNorthSouthFaceMaskOnly(IReadOnlyList<string> faceMask)
+    {
+        if (faceMask.Count == 0)
+        {
+            return false;
+        }
+
+        foreach (var name in faceMask)
+        {
+            if (!string.Equals(name, "north", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(name, "south", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private static IEnumerable<(int U, int V)> EnumerateFaceMaskUvCorners(
         int u,
         int v,
@@ -259,6 +278,10 @@ public static class GeometryIrUvAtlasQuality
             var (u0, v0, u1, v1) = face switch
             {
                 "west" => (u, v + d, u + d, v + d + h),
+                "north" when IsNorthSouthFaceMaskOnly(faceMask) && w > 0 && h > 0 && d == 0 =>
+                    (u, v, u + w, v + h),
+                "south" when IsNorthSouthFaceMaskOnly(faceMask) && w > 0 && h > 0 && d == 0 =>
+                    (u + w + 2, v, u + w + 2 + w, v + h),
                 "north" => (u + d, v + d, u + d + w, v + d + h),
                 "east" => (u + d + w, v + d, u + d + w + d, v + d + h),
                 "south" => (u + d + w + d, v + d, u + d + w + d + w, v + d + h),

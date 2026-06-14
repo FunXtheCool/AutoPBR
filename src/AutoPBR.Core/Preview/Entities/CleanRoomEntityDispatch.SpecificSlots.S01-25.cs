@@ -190,7 +190,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             if (stem.Contains("illusioner", StringComparison.OrdinalIgnoreCase))
             {
-                merged = BuildIllager(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, IllagerPreviewArmPoseKind.Crossed);
+                merged = BuildIllager(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, EntityIllagerPreviewArmPose.Crossed);
                 specificRouteSlotHit = gpuBoneDispatchSlot;
                 return true;
             }
@@ -208,8 +208,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 stem.Contains("illager", StringComparison.OrdinalIgnoreCase))
             {
                 var illagerPose = stem.Contains("pillager", StringComparison.OrdinalIgnoreCase)
-                    ? IllagerPreviewArmPoseKind.CrossbowHold
-                    : IllagerPreviewArmPoseKind.Crossed;
+                    ? EntityIllagerPreviewArmPose.CrossbowHold
+                    : EntityIllagerPreviewArmPose.Crossed;
                 merged = BuildIllager(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, illagerPose);
                 specificRouteSlotHit = gpuBoneDispatchSlot;
                 return true;

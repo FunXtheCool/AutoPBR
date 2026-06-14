@@ -16,7 +16,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
     {
 
-        public static Dictionary<string, Matrix4x4> Build(JsonElement geometryRoot)
+        public static Dictionary<string, Matrix4x4> Build(JsonElement geometryRoot, in GeometryIrMeshEmitOptions? emitOptions = null)
 
         {
 
@@ -30,13 +30,13 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
             }
 
-
+            var useColumn = emitOptions?.ResolveUseColumnTranslationTimesRotationPartPose() == true;
 
             foreach (var rootPart in roots.EnumerateArray())
 
             {
 
-                VisitPart(rootPart, Matrix4x4.Identity, map);
+                VisitPart(rootPart, Matrix4x4.Identity, map, useColumn);
 
             }
 
@@ -46,18 +46,62 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         }
 
+        /// <summary>Maps each part <c>id</c> to its parent part <c>id</c> (model root children use <c>null</c> parent).</summary>
+        public static Dictionary<string, string?> BuildParentMap(JsonElement geometryRoot)
+        {
+            var map = new Dictionary<string, string?>(StringComparer.Ordinal);
+            if (!geometryRoot.TryGetProperty("roots", out var roots) || roots.ValueKind != JsonValueKind.Array)
+            {
+                return map;
+            }
+
+            foreach (var rootPart in roots.EnumerateArray())
+            {
+                VisitParents(rootPart, parentId: null, map);
+            }
+
+            return map;
+        }
+
+        private static void VisitParents(JsonElement part, string? parentId, Dictionary<string, string?> sink)
+        {
+            var partId = part.TryGetProperty("id", out var idEl) ? idEl.GetString() ?? "" : "";
+            if (partId.Length > 0)
+            {
+                sink[partId] = parentId;
+            }
+
+            if (!part.TryGetProperty("children", out var children) || children.ValueKind != JsonValueKind.Array)
+            {
+                return;
+            }
+
+            foreach (var child in children.EnumerateArray())
+            {
+                VisitParents(child, partId.Length > 0 ? partId : parentId, sink);
+            }
+        }
 
 
-        private static void VisitPart(JsonElement part, Matrix4x4 parentWorld, Dictionary<string, Matrix4x4> sink)
+
+        private static void VisitPart(JsonElement part, Matrix4x4 parentWorld, Dictionary<string, Matrix4x4> sink, bool useColumnPose)
 
         {
 
             var world = parentWorld;
 
-            if (part.TryGetProperty("pose", out var poseEl) &&
-                TryComposePartPosePublic(poseEl, parentWorld, out var worldTexel))
+            if (part.TryGetProperty("pose", out var poseEl))
             {
-                world = worldTexel;
+                if (useColumnPose)
+                {
+                    if (TryComposeColumnPartPose(poseEl, parentWorld, out world, out _))
+                    {
+                    }
+                }
+                else if (TryComposePartPosePublic(poseEl, parentWorld, out var worldTexel))
+                {
+                    world = worldTexel;
+                }
             }
 
 
@@ -88,7 +132,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
             {
 
-                VisitPart(child, world, sink);
+                VisitPart(child, world, sink, useColumnPose);
 
             }
 
@@ -129,16 +173,28 @@ internal sealed partial class CleanRoomEntityModelRuntime
         }
 
         var baselineParts = BuildSetupAnimBaselineParts(geometryRoot);
-
-        for (var i = 0; i < merged.Elements.Count; i++)
+        var partDeltas = new Dictionary<string, Matrix4x4>(StringComparer.Ordinal);
+        foreach (var partId in partIds.Distinct(StringComparer.Ordinal))
         {
-            var partId = partIds[i];
-            if (!TryGetSetupAnimPartPose(partId, pose, out var partPose))
+            if (!TryGetSetupAnimPartPose(partId, pose, out var partPose) ||
+                !TryBuildSetupAnimPartWorldDelta(partId, partPose, partOriginWorld, baselineParts, out var deltaWorld))
             {
                 continue;
             }
 
-            if (!TryBuildSetupAnimPartWorldDelta(partId, partPose, partOriginWorld, baselineParts, out var deltaWorld))
+            partDeltas[partId] = deltaWorld;
+        }
+
+        if (partDeltas.Count == 0)
+        {
+            return false;
+        }
+
+        var parentMap = GeometryIrPartWorldPoseIndex.BuildParentMap(geometryRoot);
+        for (var i = 0; i < merged.Elements.Count; i++)
+        {
+            var partId = partIds[i];
+            if (!TryComposeSetupAnimAncestorDeltas(partId, parentMap, partDeltas, out var composedDelta))
             {
                 continue;
             }
@@ -149,10 +205,51 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 From = e.From,
                 To = e.To,
                 Faces = e.Faces,
-                LocalToParent = EntityParityTemplate.Mul(deltaWorld, e.LocalToParent),
+                LocalToParent = EntityParityTemplate.Mul(composedDelta, e.LocalToParent),
             };
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Root-to-part chain: multiply each animated ancestor delta so child cuboids inherit parent setupAnim motion
+    /// (e.g. dolphin pectoral fins under a pitching <c>body</c>).
+    /// </summary>
+    private static bool TryComposeSetupAnimAncestorDeltas(
+        string partId,
+        IReadOnlyDictionary<string, string?> parentMap,
+        IReadOnlyDictionary<string, Matrix4x4> partDeltas,
+        out Matrix4x4 composedDelta)
+    {
+        composedDelta = Matrix4x4.Identity;
+        var chain = new List<string>();
+        var current = partId;
+        while (parentMap.TryGetValue(current, out var parent) && parent is not null)
+        {
+            chain.Add(parent);
+            current = parent;
+        }
+
+        chain.Reverse();
+        var any = false;
+        foreach (var ancestorId in chain)
+        {
+            if (!partDeltas.TryGetValue(ancestorId, out var delta))
+            {
+                continue;
+            }
+
+            composedDelta = EntityParityTemplate.Mul(delta, composedDelta);
+            any = true;
+        }
+
+        if (partDeltas.TryGetValue(partId, out var selfDelta))
+        {
+            composedDelta = EntityParityTemplate.Mul(selfDelta, composedDelta);
+            any = true;
+        }
+
+        return any;
     }
 }

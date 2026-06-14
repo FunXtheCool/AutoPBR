@@ -23,137 +23,37 @@ internal sealed partial class CleanRoomEntityModelRuntime
         float idlePhase01,
         float animationTimeSeconds,
         float wave,
-        IllagerPreviewArmPoseKind armPose)
+        EntityIllagerPreviewArmPose armPose)
     {
         var p = UsesPostBabyModelUpdate(profile)
             ? (isBaby ? BabyProfile.VanillaUniformBaby : BabyProfile.Adult)
             : (isBaby ? new BabyProfile(0.80f, 1.12f, 0.84f) : BabyProfile.Adult);
 
-        const float k6662 = 0.6662f;
         const float degToRad = 0.017453292f;
-        var (walkPos, walkSpeed) = ComputePreviewEntityWalkCycle(animationTimeSeconds, idlePhase01, wave);
         var headYawRad = (wave * 8f + idlePhase01 * 6f) * degToRad;
         var headPitchRad = (idlePhase01 * 10f + wave * 4f) * degToRad;
-        var ageInTicks = animationTimeSeconds * 20f;
-        var isRiding = false;
-        var showFoldedArms = armPose == IllagerPreviewArmPoseKind.Crossed;
+        var showFoldedArms = armPose == EntityIllagerPreviewArmPose.Crossed;
         var showSeparateArms = !showFoldedArms;
-        var attachVindicatorAxe = armPose == IllagerPreviewArmPoseKind.AttackingWeapon;
+        var attachVindicatorAxe = armPose == EntityIllagerPreviewArmPose.AttackingWeapon;
 
-        float rlX;
-        float rlY;
-        float rlZ;
-        float llX;
-        float llY;
-        float llZ;
-        float raX;
-        float raY;
-        float raZ;
-        float laX;
-        float laY;
-        float laZ;
-        if (isRiding)
-        {
-            raX = laX = -0.62831855f;
-            raY = laY = raZ = laZ = 0f;
-            rlX = llX = -1.4137167f;
-            rlY = 0.31415927f;
-            llY = -0.31415927f;
-            rlZ = 0.07853982f;
-            llZ = -0.07853982f;
-        }
-        else
-        {
-            rlX = MathF.Cos(walkPos * k6662) * 1.4f * walkSpeed * 0.5f;
-            llX = MathF.Cos(walkPos * k6662 + MathF.PI) * 1.4f * walkSpeed * 0.5f;
-            rlY = rlZ = llY = llZ = 0f;
-            if (showFoldedArms)
-            {
-                raX = raY = raZ = laX = laY = laZ = 0f;
-            }
-            else
-            {
-                raX = MathF.Cos(walkPos * k6662 + MathF.PI) * 2f * walkSpeed * 0.5f;
-                laX = MathF.Cos(walkPos * k6662) * 2f * walkSpeed * 0.5f;
-                raY = raZ = laY = laZ = 0f;
-            }
-        }
-
-        switch (armPose)
-        {
-            case IllagerPreviewArmPoseKind.Crossed:
-                break;
-            case IllagerPreviewArmPoseKind.AttackingEmptyHands:
-                {
-                    var attackT = Math.Clamp(0.35f + idlePhase01 * 0.45f + wave * 0.2f, 0f, 1f);
-                    IllagerAnimateZombieArms(
-                        ref laX,
-                        ref laY,
-                        ref laZ,
-                        ref raX,
-                        ref raY,
-                        ref raZ,
-                        useFifteenDivisor: true,
-                        swingIsStab: false,
-                        attackTime: attackT,
-                        ageInTicks: ageInTicks);
-                    break;
-                }
-            case IllagerPreviewArmPoseKind.AttackingWeapon:
-                {
-                    raX = raY = raZ = laX = laY = laZ = 0f;
-                    var attackAnim = Math.Clamp(0.2f + idlePhase01 * 0.55f + wave * 0.25f, 0f, 1f);
-                    IllagerSwingWeaponDown(ref raX, ref raY, ref raZ, ref laX, ref laY, ref laZ, mainHandIsRight: true, attackAnim, ageInTicks);
-                    break;
-                }
-            case IllagerPreviewArmPoseKind.Spellcasting:
-                {
-                    var sc = MathF.Cos(ageInTicks * k6662);
-                    raX = sc * 0.25f;
-                    laX = sc * 0.25f;
-                    raZ = 2.3561945f;
-                    laZ = -2.3561945f;
-                    raY = laY = 0f;
-                    break;
-                }
-            case IllagerPreviewArmPoseKind.BowAndArrow:
-                {
-                    raY = -0.1f + headYawRad;
-                    raX = -1.5707964f + headPitchRad;
-                    laX = -0.9424779f + headPitchRad;
-                    laY = headYawRad - 0.4f;
-                    laZ = 1.5707964f;
-                    raZ = 0f;
-                    break;
-                }
-            case IllagerPreviewArmPoseKind.CrossbowHold:
-                IllagerAnimateCrossbowHold(ref raX, ref raY, ref raZ, ref laX, ref laY, ref laZ, headYawRad, headPitchRad, rightHanded: true);
-                break;
-            case IllagerPreviewArmPoseKind.CrossbowCharge:
-                IllagerAnimateCrossbowCharge(
-                    ref raX,
-                    ref raY,
-                    ref raZ,
-                    ref laX,
-                    ref laY,
-                    ref laZ,
-                    maxCrossbowChargeDuration: 25f,
-                    ticksUsingItem: (animationTimeSeconds * 20f) % 26f,
-                    rightHanded: true);
-                break;
-            case IllagerPreviewArmPoseKind.Celebrating:
-                {
-                    var cc = MathF.Cos(ageInTicks * k6662);
-                    raX = cc * 0.05f;
-                    laX = cc * 0.05f;
-                    raZ = 2.670354f;
-                    laZ = -2.3561945f;
-                    raY = laY = 0f;
-                    break;
-                }
-            default:
-                break;
-        }
+        IllagerPreviewPoseSupport.ComputeIllagerPreviewArmRotations(
+            armPose,
+            idlePhase01,
+            animationTimeSeconds,
+            wave,
+            isRiding: false,
+            out var rlX,
+            out var rlY,
+            out var rlZ,
+            out var llX,
+            out var llY,
+            out var llZ,
+            out var raX,
+            out var raY,
+            out var raZ,
+            out var laX,
+            out var laY,
+            out var laZ);
 
         var b = new RigBuilder(64, 64);
         var headWorld = Matrix4x4.Multiply(Matrix4x4.CreateTranslation(8f, 32f, 8f), EntityParityTemplate.Er(headPitchRad, headYawRad, 0f));
@@ -261,7 +161,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         float idlePhase01,
         float animationTimeSeconds,
         float wave) =>
-        BuildIllager(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, IllagerPreviewArmPoseKind.Spellcasting);
+        BuildIllager(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, EntityIllagerPreviewArmPose.Spellcasting);
 
 
     private static MergedJavaBlockModel BuildVindicator(
@@ -271,6 +171,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
         float idlePhase01,
         float animationTimeSeconds,
         float wave) =>
-        BuildIllager(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, IllagerPreviewArmPoseKind.AttackingWeapon);
+        BuildIllager(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, EntityIllagerPreviewArmPose.AttackingWeapon);
 
 }

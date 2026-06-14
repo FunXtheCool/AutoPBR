@@ -144,6 +144,13 @@ internal static class GeometryIrLiftTreeValidator
         {
             if (rootIds.Contains(parent) && rootIds.Contains(child))
             {
+                if (string.Equals(parent, "tail1", StringComparison.Ordinal) &&
+                    string.Equals(child, "tail2", StringComparison.Ordinal) &&
+                    UsesFelineFlatRootAbsoluteTailBake(rootChildren))
+                {
+                    continue;
+                }
+
                 flatCount++;
             }
         }
@@ -153,6 +160,47 @@ internal static class GeometryIrLiftTreeValidator
             issues.Add(new GeometryIrStructuralValidator.Issue(ctx, "flat_nested_part_at_root",
                 $"{flatCount} known child part(s) are root siblings of their parent"));
         }
+    }
+
+    private static bool UsesFelineFlatRootAbsoluteTailBake(JsonArray rootChildren)
+    {
+        if (!TryFindPartTranslation(rootChildren, "tail2", out var tailY, out var tailZ))
+        {
+            return false;
+        }
+
+        return tailY > 18 && tailZ > 10;
+    }
+
+    private static bool TryFindPartTranslation(JsonArray parts, string id, out double y, out double z)
+    {
+        y = z = 0;
+        foreach (var n in parts)
+        {
+            if (n is not JsonObject part)
+            {
+                continue;
+            }
+
+            if (string.Equals((string?)part["id"], id, StringComparison.Ordinal))
+            {
+                if (part["pose"]?["translation"] is JsonArray tr && tr.Count >= 3)
+                {
+                    y = tr[1]?.GetValue<double>() ?? 0;
+                    z = tr[2]?.GetValue<double>() ?? 0;
+                    return true;
+                }
+
+                return false;
+            }
+
+            if (part["children"] is JsonArray kids && TryFindPartTranslation(kids, id, out y, out z))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>

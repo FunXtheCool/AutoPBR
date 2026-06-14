@@ -104,19 +104,34 @@ public sealed class SetupAnimGeometryIrPreviewTests
     {
         var rest = PreviewRenderStateSynthesis.ForLivingWalk(0f, 0.3f, 0.2f);
         var swim = PreviewRenderStateSynthesis.ForLivingWalk(2.5f, 0.3f, 0.2f);
-        Assert.True(VanillaSetupAnimRuntime.TryEvaluate(
-            "net.minecraft.client.model.animal.dolphin.DolphinModel",
-            rest,
-            0f,
-            out var atRest));
-        Assert.True(VanillaSetupAnimRuntime.TryEvaluate(
-            "net.minecraft.client.model.animal.dolphin.DolphinModel",
-            swim,
-            2.5f,
-            out var animated));
-        Assert.True(atRest.Parts.TryGetValue("body", out var restBody));
-        Assert.True(animated.Parts.TryGetValue("body", out var swimBody));
+        var restPose = new VanillaSetupAnimRuntime.PoseResult();
+        var swimPose = new VanillaSetupAnimRuntime.PoseResult();
+        GeometryIrEmitPolicy.ApplyDolphinSetupAnimPose(rest, restPose);
+        GeometryIrEmitPolicy.ApplyDolphinSetupAnimPose(swim, swimPose);
+        Assert.True(restPose.Parts.TryGetValue("body", out var restBody));
+        Assert.True(swimPose.Parts.TryGetValue("body", out var swimBody));
         Assert.True(MathF.Abs(restBody.XRot - swimBody.XRot) > 1e-5f, "dolphin body pitch should vary with preview clock");
+    }
+
+    [Fact]
+    public void Dolphin_setup_anim_swim_channels_require_is_moving_per_javap()
+    {
+        var state = new Dictionary<string, float>(PreviewRenderStateSynthesis.ForLivingWalk(2.5f, 0.3f, 0.2f), StringComparer.Ordinal)
+        {
+            ["isMoving"] = 0f,
+        };
+        var pose = new VanillaSetupAnimRuntime.PoseResult();
+        GeometryIrEmitPolicy.ApplyDolphinSetupAnimPose(state, pose);
+        Assert.True(pose.Parts.TryGetValue("body", out _));
+        Assert.False(pose.Parts.ContainsKey("tail"));
+        Assert.False(pose.Parts.ContainsKey("tailFin"));
+
+        state["isMoving"] = 1f;
+        GeometryIrEmitPolicy.ApplyDolphinSetupAnimPose(state, pose);
+        Assert.True(pose.Parts.TryGetValue("tail", out var tail));
+        Assert.True(pose.Parts.TryGetValue("tailFin", out var tailFin));
+        Assert.True(MathF.Abs(tail.XRot) > 1e-5f);
+        Assert.True(MathF.Abs(tailFin.XRot) > 1e-5f);
     }
 
     [Fact]

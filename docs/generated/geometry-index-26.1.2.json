@@ -423,7 +423,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.animal.feline.AdultCatModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.animal.feline.AdultCatModel",
-      "extractionStatus": "skipped",
+      "extractionStatus": "ok",
       "classSha256Hex": "7350637fd64bc97a34bb3130cb8a1a9f451bf1ec8a9b86523fef1346bc3b8dfd",
       "jarPath": "net/minecraft/client/model/animal/feline/AdultCatModel.class"
     },
@@ -441,7 +441,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.animal.feline.AdultOcelotModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.animal.feline.AdultOcelotModel",
-      "extractionStatus": "skipped",
+      "extractionStatus": "ok",
       "classSha256Hex": "91c64c848ac7e300d9ff981055bf4b72e8f19e295e39018e6e257fbfeb507360",
       "jarPath": "net/minecraft/client/model/animal/feline/AdultOcelotModel.class"
     },
@@ -450,7 +450,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.animal.feline.BabyCatModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.animal.feline.BabyCatModel",
-      "extractionStatus": "skipped",
+      "extractionStatus": "ok",
       "classSha256Hex": "b1ca8a71647ff89d4dd51d36e4599c1d171ed452afb180a85436570945e2e939",
       "jarPath": "net/minecraft/client/model/animal/feline/BabyCatModel.class"
     },
@@ -468,7 +468,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.animal.feline.BabyOcelotModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.animal.feline.BabyOcelotModel",
-      "extractionStatus": "skipped",
+      "extractionStatus": "ok",
       "classSha256Hex": "ca3f2aa1c9e551110631dc56fae03b61b2da5285bb471b4e05a61ff0967bdf29",
       "jarPath": "net/minecraft/client/model/animal/feline/BabyOcelotModel.class"
     },

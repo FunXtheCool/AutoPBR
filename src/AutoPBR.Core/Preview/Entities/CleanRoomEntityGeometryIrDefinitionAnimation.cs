@@ -36,7 +36,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             merged,
             geometryRoot,
             pose,
-            GeometryIrPartWorldPoseIndex.Build(geometryRoot),
+            GeometryIrPartWorldPoseIndex.Build(geometryRoot, emitOptions),
             emitOptions);
     }
 

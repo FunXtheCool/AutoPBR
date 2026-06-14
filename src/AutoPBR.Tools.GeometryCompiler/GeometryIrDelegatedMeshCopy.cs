@@ -22,6 +22,18 @@ internal static class GeometryIrDelegatedMeshCopy
             ["net.minecraft.client.model.animal.rabbit.RabbitModel"] = (
                 "net.minecraft.client.model.animal.rabbit.AdultRabbitModel",
                 "RabbitModel is setupAnim-only at runtime; IR delegated from AdultRabbitModel.createBodyLayer."),
+            ["net.minecraft.client.model.animal.feline.AdultCatModel"] = (
+                "net.minecraft.client.model.animal.feline.AdultFelineModel",
+                "AdultCatModel is setupAnim-only at runtime; IR delegated from AdultFelineModel.createBodyMesh."),
+            ["net.minecraft.client.model.animal.feline.BabyCatModel"] = (
+                "net.minecraft.client.model.animal.feline.BabyFelineModel",
+                "BabyCatModel is setupAnim-only at runtime; IR delegated from BabyFelineModel.createBodyLayer."),
+            ["net.minecraft.client.model.animal.feline.AdultOcelotModel"] = (
+                "net.minecraft.client.model.animal.feline.AdultFelineModel",
+                "AdultOcelotModel is setupAnim-only at runtime; IR delegated from AdultFelineModel.createBodyMesh."),
+            ["net.minecraft.client.model.animal.feline.BabyOcelotModel"] = (
+                "net.minecraft.client.model.animal.feline.BabyFelineModel",
+                "BabyOcelotModel is setupAnim-only at runtime; IR delegated from BabyFelineModel.createBodyLayer."),
         };
 
     public static bool HasDelegate(string officialJvmName) =>

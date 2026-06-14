@@ -63,10 +63,13 @@ public static class EntityEmulatedPreviewRebaker
                 rebake.IdlePhase01,
                 animationTimeSeconds,
                 out var merged,
+                out var meshProvenance,
                 applyGeometryIrSetupAnimMotion))
         {
             return false;
         }
+
+        rebake.MeshProvenance = meshProvenance;
 
         var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(merged, rebake.ModelDefaultNamespace);
         if (ordered.Count != rebake.OrderedTextureZipPaths.Length)
@@ -183,10 +186,13 @@ public static class EntityEmulatedPreviewRebaker
                 rebake.IdlePhase01,
                 0f,
                 out var mergedBind,
+                out var meshProvenance,
                 applyGeometryIrSetupAnimMotion: false))
         {
             return false;
         }
+
+        rebake.MeshProvenance = meshProvenance;
 
         EntityPreviewPlacement.TryPopulateRebakeElementPartIds(rebake, profile, mergedBind.Elements.Count);
 

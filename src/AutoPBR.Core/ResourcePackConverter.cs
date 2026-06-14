@@ -327,6 +327,10 @@ public static class ResourcePackConverter
                             emulatedRebake.LastBodyCentroidY = bindBodyY != 0f ? bindBodyY + placementYOffset : placement.BodyCentroidY;
                             emulatedRebake.LastHeadCentroidY = bindHeadY != 0f ? bindHeadY + placementYOffset : placement.HeadCentroidY;
                             emulatedRebake.LastLegCentroidY = bindLegY != 0f ? bindLegY + placementYOffset : placement.LegCentroidY;
+                            emulatedRebake.PackConverterCpuMeshFingerprint =
+                                PreviewMeshGeometryFingerprint.ComputeCpuPreviewMesh(
+                                    verts,
+                                    MinecraftModelBaker.FloatsPerVertex);
                         }
 
                         var subject = new PreviewModelSubject

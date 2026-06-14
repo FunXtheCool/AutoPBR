@@ -62,7 +62,7 @@ public sealed class GeometryIrQuadrupedReferenceWorldPoseTests
         Assert.NotNull(mesh);
         Assert.Null(err);
 
-        var emitOptions = GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH) with { OfficialJvmName = jvm };
+        var emitOptions = GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH).WithOfficialJvmPoseComposeDefaults(jvm);
         var lerCmp = GeometryIrReferenceComparer.CompareReferenceJavaPreviewWorldToParityMesh(
             reference.RootElement,
             repaired,
@@ -86,7 +86,7 @@ public sealed class GeometryIrQuadrupedReferenceWorldPoseTests
         }
 
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, ir.RootElement);
-        var emitOptions = GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH) with { OfficialJvmName = jvm };
+        var emitOptions = GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH).WithOfficialJvmPoseComposeDefaults(jvm);
         var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrModelSpaceParityMeshForTests(
             "entity/test",
             jvm,
@@ -178,7 +178,7 @@ public sealed class GeometryIrQuadrupedReferenceWorldPoseTests
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(shardJvm, shard.RootElement);
         var (atlasW, atlasH) = ResolveParityAtlasDimensions(jvm, texturePath);
 
-        var emitOptions = GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH) with { OfficialJvmName = shardJvm };
+        var emitOptions = GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH).WithOfficialJvmPoseComposeDefaults(shardJvm);
         var lerCmp = GeometryIrReferenceComparer.CompareReferenceJavaPreviewWorldToParityMesh(
             reference.RootElement,
             repaired,

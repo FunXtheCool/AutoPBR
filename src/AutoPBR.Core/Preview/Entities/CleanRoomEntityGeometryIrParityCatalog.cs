@@ -73,12 +73,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
             geometryIrOfficialJvm = parityRule.GeometryIrOfficialJvm ?? parityRule.DeobfuscatedModelClass ?? "";
         }
 
-        // Hand BuildColdChicken matches javap Er×T body pose; lifted IR keeps template beak/wattle and T×Er reference compose.
-        if (string.Equals(stem, "chicken_cold", StringComparison.OrdinalIgnoreCase) && !isBaby)
-        {
-            return false;
-        }
-
         var officialJvm = geometryIrOfficialJvm;
         geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(officialJvm, geometryRoot);
 
@@ -128,9 +122,14 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 atlasW,
                 atlasH,
                 idlePhase01,
-                applyGeometryIrSetupAnimMotion ? wave : 0f) with { OfficialJvmName = officialJvm },
+                applyGeometryIrSetupAnimMotion ? wave : 0f,
+                normalizedAssetPath: norm,
+                animationTimeSeconds)
+                .WithOfficialJvmPoseComposeDefaults(officialJvm)
+                with { OfficialJvmName = officialJvm },
             lerPlan);
-        if (!applyGeometryIrSetupAnimMotion)
+        if (!applyGeometryIrSetupAnimMotion &&
+            !EntityPreviewPoseCatalog.IsIllagerBuilderMethod(parityRule.BuilderMethod))
         {
             emitOptions = emitOptions with { TryGetPartPoseOverride = null };
         }
@@ -260,11 +259,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
         out string irFailureReason)
     {
         irFailureReason = "";
-        if (string.Equals(stem, "chicken_cold", StringComparison.OrdinalIgnoreCase) && !isBaby)
-        {
-            return false;
-        }
-
         if (!GeometryIrParityJvmResolver.TryResolveLiftedRoot(
                 profile, rule, normalizedAssetPath, stem, isBaby, out _, out _))
         {

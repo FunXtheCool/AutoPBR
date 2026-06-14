@@ -237,6 +237,11 @@ internal static class GeometryLiftForestMerge
 
         foreach (var (childId, parentId) in KnownNestedChildToParent)
         {
+            if (ShouldSkipFelineFlatTailRelocate(childId, parentId, index))
+            {
+                continue;
+            }
+
             if (!index.TryGetOccurrences(childId, out var hits) || hits.Count == 0)
             {
                 continue;
@@ -262,6 +267,26 @@ internal static class GeometryLiftForestMerge
         {
             AttachPartUnderParent(parentObj, node, childId);
         }
+    }
+
+    private static bool ShouldSkipFelineFlatTailRelocate(string childId, string parentId, PartForestIndex index)
+    {
+        if (!string.Equals(childId, "tail2", StringComparison.Ordinal) ||
+            !string.Equals(parentId, "tail1", StringComparison.Ordinal) ||
+            !index.TryGetFirst("tail2", out var tail2) ||
+            tail2 is null)
+        {
+            return false;
+        }
+
+        if (tail2["pose"]?["translation"] is not JsonArray tailTr || tailTr.Count < 3)
+        {
+            return false;
+        }
+
+        var tailY = tailTr[1]?.GetValue<double>() ?? 0;
+        var tailZ = tailTr[2]?.GetValue<double>() ?? 0;
+        return tailY > 18 && tailZ > 10;
     }
 
     private static bool RemoveDuplicateOverlayPartIds(PartForestIndex index)

@@ -80,8 +80,14 @@ internal sealed partial class CleanRoomEntityModelRuntime
         JsonElement pose,
         Matrix4x4 parentWorld,
         out Matrix4x4 matrix,
-        out string? failureReason)
+        out string? failureReason,
+        bool useColumnTranslationTimesRotation = false)
     {
+        if (useColumnTranslationTimesRotation)
+        {
+            return TryComposeColumnPartPose(pose, parentWorld, out matrix, out failureReason);
+        }
+
         if (EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose)
         {
             return TryComposeLegacyPartPoseTexel(pose, out matrix, out failureReason);
@@ -95,6 +101,34 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         var parentBlock = TexelRowAffineToBlock(parentWorld);
         matrix = BlockRowAffineToTexel(Matrix4x4.Multiply(localBlock, parentBlock));
+        return true;
+    }
+
+    /// <summary>
+    /// Hand-builder / <c>PartPose.offsetAndRotation</c> column chain: <c>parent × (T × Er)</c> in texel space.
+    /// </summary>
+    internal static bool TryComposeColumnPartPose(
+        JsonElement pose,
+        Matrix4x4 parentWorldTexel,
+        out Matrix4x4 worldTexel,
+        out string? failureReason)
+    {
+        worldTexel = parentWorldTexel;
+        failureReason = null;
+        if (!pose.ValueKind.Equals(JsonValueKind.Object))
+        {
+            return true;
+        }
+
+        if (!TryReadPose(pose, out var tx, out var ty, out var tz, out var rx, out var ry, out var rz, out var order, out failureReason))
+        {
+            return false;
+        }
+
+        var local = EntityParityTemplate.Mul(
+            EntityParityTemplate.T(tx, ty, tz),
+            EntityParityTemplate.ComposeEuler(order, rx, ry, rz));
+        worldTexel = EntityParityTemplate.Mul(parentWorldTexel, local);
         return true;
     }
 
@@ -205,13 +239,22 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var inflate = GeometryIrCuboidMetadata.ApplyCubeDeformationInflateIfNonParity(
             cuboid, options.Fidelity, ref x0, ref y0, ref z0, ref x1, ref y1, ref z1);
 
-        if (options.Fidelity != GeometryIrEmitFidelity.Parity &&
-            options.PreviewDegenerateAxisThickness > 0f)
+        _ = options.PreviewDegenerateAxisThickness > 0f &&
+            GeometryIrEmitPolicy.TryExpandAxolotlGillCuboidZExtents(
+                options.OfficialJvmName, partId, ref z0, ref z1);
+
+        if (options.PreviewDegenerateAxisThickness > 0f)
         {
             ApplyPreviewDegenerateAxisThickness(
                 ref x0, ref y0, ref z0, ref x1, ref y1, ref z1,
                 options.PreviewDegenerateAxisThickness);
         }
+
+        GeometryIrEmitPolicy.TryReorientGhastFamilyTentacleCuboidYForModelSpace(
+            options.OfficialJvmName,
+            partId,
+            ref y0,
+            ref y1);
 
         var texU = uv[0].GetInt32();
         var texV = uv[1].GetInt32();
@@ -260,6 +303,9 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 ud = logicalD;
             }
         }
+
+        _ = GeometryIrEmitPolicy.TryApplyGhastFamilyCuboidUvFootprint(
+            options.OfficialJvmName, partId, y0, y1, ref uw, ref uh, ref ud);
 
         string[]? faceMaskArray = null;
         if (GeometryIrCuboidMetadata.TryGetFaceMask(cuboid, out var faceMask))
@@ -524,8 +570,9 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 AtlasHeight = atlasHeight,
                 Fidelity = GeometryIrEmitFidelity.Parity,
                 PreviewDegenerateAxisThickness = 0f,
-                OfficialJvmName = officialJvmName,
-            },
+            }
+                .WithOfficialJvmPoseComposeDefaults(officialJvmName)
+                with { OfficialJvmName = officialJvmName },
             lerPlan);
         if (geometryRootOverride is { } overrideRoot)
         {

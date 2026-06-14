@@ -19,6 +19,7 @@ using AutoPBR.App.ViewModels.Rulesets;
 using AutoPBR.Core;
 using AutoPBR.Core.Embeddings;
 using AutoPBR.Core.Models;
+using AutoPBR.Core.Preview;
 
 namespace AutoPBR.App.ViewModels;
 
@@ -514,6 +515,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
                 null,
                 manualPreview,
                 PreviewBrickProbeDebug);
+            using var previewPoseScope = EntityPreviewBuildContext.UsePose(SelectedPreviewPoseId);
             var previewResult = await PreviewService.RenderPreviewDetailedAsync(diskPack, entryPath, options, ct)
                 .ConfigureAwait(false);
 

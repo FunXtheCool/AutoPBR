@@ -26,7 +26,9 @@ public sealed partial class OpenGlPreviewBackend
             return;
         }
 
-        var lerBasis = rebake.MeshProvenance?.Detail ?? "unknown";
+        var lerBasis = subject.MeshProvenance?.Detail
+            ?? rebake.MeshProvenance?.Detail
+            ?? "unknown";
         var dedupeKey =
             $"{norm}|gpu={(gpuSkinning ? 1 : 0)}|motion={(setupAnimMotion ? 1 : 0)}|lift={subject.EntityGpuMeshSpaceLiftY:0.####}|ler={lerBasis}";
         if (string.Equals(dedupeKey, _parityPlacementDiagKey, StringComparison.Ordinal))

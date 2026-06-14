@@ -15,6 +15,7 @@ public sealed class GeometryIrParityJvmResolverTests
     [InlineData("assets/minecraft/textures/entity/chicken/chicken_cold.png", false, "net.minecraft.client.model.animal.chicken.ColdChickenModel")]
     [InlineData("assets/minecraft/textures/entity/pig/pig_cold.png", false, "net.minecraft.client.model.animal.pig.ColdPigModel")]
     [InlineData("assets/minecraft/textures/entity/cat/cat_red_baby.png", true, "net.minecraft.client.model.animal.feline.BabyFelineModel")]
+    [InlineData("assets/minecraft/textures/entity/cat/cat_tabby.png", false, "net.minecraft.client.model.animal.feline.AdultCatModel")]
     [InlineData("assets/minecraft/textures/entity/cat/ocelot_baby.png", true, "net.minecraft.client.model.animal.feline.BabyOcelotModel")]
     [InlineData("assets/minecraft/textures/entity/fox/fox_baby.png", true, "net.minecraft.client.model.animal.fox.BabyFoxModel")]
     [InlineData("assets/minecraft/textures/entity/wolf/wolf_baby.png", true, "net.minecraft.client.model.animal.wolf.BabyWolfModel")]

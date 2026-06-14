@@ -86,6 +86,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
             "tail" => "tail",
 
+            "tail_fin" => "tailFin",
+
             "tail1" => "tail1",
 
             "tail2" => "tail2",

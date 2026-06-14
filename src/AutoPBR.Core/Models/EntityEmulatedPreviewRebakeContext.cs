@@ -78,4 +78,10 @@ public sealed class EntityEmulatedPreviewRebakeContext
     public float LastHeadCentroidY { get; set; }
 
     public float LastLegCentroidY { get; set; }
+
+    /// <summary>Fingerprint of the latest pack-converter 12-float CPU preview mesh for this asset.</summary>
+    public ulong PackConverterCpuMeshFingerprint { get; set; }
+
+    /// <summary>Fingerprint of the CPU mesh used for the last successful GPU bind VBO upload (null = never bound).</summary>
+    public ulong? GpuBoundCpuMeshFingerprint { get; set; }
 }

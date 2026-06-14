@@ -6,6 +6,74 @@ namespace AutoPBR.Core.Preview;
 /// <summary>Repairs known flat IR trees before parity emit (lift ordering gaps).</summary>
 internal static partial class GeometryIrPartTreeRepair
 {
+    /// <summary>
+    /// Feline <c>createBodyMesh</c> binds <c>tail1</c> and <c>tail2</c> on <c>getRoot()</c> with entity-space
+    /// <c>PartPose.offset</c> (reference_java flat siblings). Reparenting without pose rebase doubles tail2 world offset.
+    /// </summary>
+    private static bool ShouldSkipFelineFlatTailReparent(
+        string childId,
+        string parentId,
+        JsonArray rootChildren,
+        string? officialJvmName)
+    {
+        if (!string.Equals(childId, "tail2", StringComparison.Ordinal) ||
+            !string.Equals(parentId, "tail1", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(officialJvmName) &&
+            officialJvmName.Contains(".animal.feline.", StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        return UsesFelineFlatRootAbsoluteTailBake(rootChildren);
+    }
+
+    private static bool UsesFelineFlatRootAbsoluteTailBake(JsonArray rootChildren)
+    {
+        if (!TryFindPartById(rootChildren, "tail2", out var tail2) || tail2 is null ||
+            tail2["pose"]?["translation"] is not JsonArray tailTr ||
+            tailTr.Count < 3)
+        {
+            return false;
+        }
+
+        var tailY = tailTr[1]?.GetValue<double>() ?? 0;
+        var tailZ = tailTr[2]?.GetValue<double>() ?? 0;
+        return tailY > 18 && tailZ > 10;
+    }
+
+    private static void HoistFelineFlatTail2ToRoot(JsonArray rootChildren)
+    {
+        if (!TryFindPartById(rootChildren, "tail1", out var tail1) || tail1 is null ||
+            tail1["children"] is not JsonArray tail1Kids)
+        {
+            return;
+        }
+
+        JsonObject? tail2 = null;
+        var tail2Idx = -1;
+        for (var i = 0; i < tail1Kids.Count; i++)
+        {
+            if (tail1Kids[i] is JsonObject o && string.Equals((string?)o["id"], "tail2", StringComparison.Ordinal))
+            {
+                tail2 = o;
+                tail2Idx = i;
+                break;
+            }
+        }
+
+        if (tail2 is null || tail2Idx < 0 || !UsesFelineFlatRootAbsoluteTailBake(rootChildren))
+        {
+            return;
+        }
+
+        rootChildren.Add(tail2.DeepClone());
+        tail1Kids.RemoveAt(tail2Idx);
+    }
+
     private static void CollapseInnerBodyUnderBody(JsonArray rootChildren)
 
     {
@@ -489,6 +557,41 @@ internal static partial class GeometryIrPartTreeRepair
     }
 
     /// <summary>
+    /// Java <c>createBodyLayer</c> for camel and armadillo keeps legs on <c>getRoot()</c> with entity-space
+    /// <c>PartPose.offset</c> (leg pose Y matches body) while head/tail nest under <c>body</c>.
+    /// </summary>
+    private static bool IsEntitySpaceFlatRootLegMeshFamily(string? officialJvmName)
+    {
+        if (string.IsNullOrWhiteSpace(officialJvmName))
+        {
+            return false;
+        }
+
+        return officialJvmName.Contains(".animal.camel.", StringComparison.Ordinal) ||
+               officialJvmName.Contains(".animal.armadillo.", StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Quadruped factories that bind legs under <c>body</c> in Java (nested hierarchy pilots). When the lifter or
+    /// compiler hoist leaves them as flat root siblings, preview repair must renest — not skip like creeper flat bake.
+    /// </summary>
+    private static bool IsNestedBodyLegQuadrupedMeshFamily(string? officialJvmName)
+    {
+        if (string.IsNullOrWhiteSpace(officialJvmName))
+        {
+            return false;
+        }
+
+        return officialJvmName.Contains(".animal.axolotl.", StringComparison.Ordinal) ||
+               officialJvmName.Contains(".animal.rabbit.", StringComparison.Ordinal) ||
+               officialJvmName.Contains(".animal.sniffer.", StringComparison.Ordinal) ||
+               officialJvmName.Contains(".animal.wolf.", StringComparison.Ordinal) ||
+               officialJvmName.Contains(".animal.llama.", StringComparison.Ordinal) ||
+               officialJvmName.Contains(".animal.equine.BabyDonkey", StringComparison.Ordinal) ||
+               officialJvmName.Contains(".monster.dragon.EnderDragon", StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// When the head stack lives under <c>body</c> but legs are still root siblings, the lifter emitted
     /// body-relative leg offsets at root (see <c>BabyDonkeyModel</c>). Reparent legs under body; do not treat as flat quadruped bake.
     /// Documented: runtime-ir-preview-plan § Baby JVM family; vanilla-preview-parity § Baby equine pass 3.
@@ -509,6 +612,19 @@ internal static partial class GeometryIrPartTreeRepair
                 {
                     return true;
                 }
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsFlatRootSibling(JsonArray rootChildren, string partId)
+    {
+        foreach (var n in rootChildren)
+        {
+            if (n is JsonObject o && string.Equals((string?)o["id"], partId, StringComparison.Ordinal))
+            {
+                return true;
             }
         }
 

@@ -62,7 +62,7 @@ internal static class BytecodeGeometryMeshLift
             return false;
         }
 
-        roots = GeometryIrLiftTreeRepair.Apply(roots);
+        roots = GeometryIrLiftTreeRepair.Apply(roots, hoistStandardQuadrupedLegsToRoot: false);
         notes.Insert(0, "Lifted via bytecode disassembly + segment parser (exact pool constants).");
         return CountCuboidsInRoots(roots) > 0;
     }

@@ -85,11 +85,14 @@ internal sealed partial class CleanRoomEntityModelRuntime
             var uw = Math.Max(1, (int)MathF.Round(extentX));
             var uh = Math.Max(1, (int)MathF.Round(extentY));
             var ud = Math.Max(1, (int)MathF.Round(extentZ));
-            if (uvSizeW > 0 && uvSizeH > 0 && uvSizeD > 0)
+            if (uvSizeW > 0 && uvSizeH > 0)
             {
                 uw = uvSizeW;
                 uh = uvSizeH;
-                ud = uvSizeD;
+                if (uvSizeD > 0)
+                {
+                    ud = uvSizeD;
+                }
             }
 
             var cx = (x0 + x1) * 0.5f;
@@ -127,7 +130,22 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 return;
             }
 
-            var uv = BuildCubeUvLayout(texU, texV, uw, uh, ud, mirrorCuboidUv);
+            var useNorthSouthUvSpan =
+                uvSizeW > 0 &&
+                uvSizeH > 0 &&
+                faceMask is { Length: > 0 } &&
+                IsNorthSouthFaceMaskOnly(faceMask);
+
+            (float[] North, float[] South, float[] West, float[] East, float[] Up, float[] Down) uv;
+            if (useNorthSouthUvSpan)
+            {
+                uv = BuildNorthSouthUvSpanLayout(texU, texV, uvSizeW, uvSizeH, mirrorCuboidUv);
+            }
+            else
+            {
+                uv = BuildCubeUvLayout(texU, texV, uw, uh, ud, mirrorCuboidUv);
+            }
+
             var allFaces = new Dictionary<string, ModelFace>(StringComparer.OrdinalIgnoreCase)
             {
                 ["north"] = new() { TextureKey = texKey, Uv = uv.North, RotationDegrees = 0 },
@@ -259,6 +277,42 @@ internal sealed partial class CleanRoomEntityModelRuntime
             }
 
             return (north, south, west, east, up, down);
+        }
+
+        /// <summary>
+        /// Direction-mask / <c>uvSpan</c> north–south sheets: <c>uvOrigin</c> is the first face corner (no full-box
+        /// <c>+d</c> padding). Opposite face is offset by <c>w + TemplateDepthGap</c> on U (vanilla template depth 2).
+        /// </summary>
+        private const int NorthSouthUvSpanTemplateDepthGap = 2;
+
+        private static bool IsNorthSouthFaceMaskOnly(string[] faceMask)
+        {
+            foreach (var name in faceMask)
+            {
+                if (!string.Equals(name, "north", StringComparison.OrdinalIgnoreCase) &&
+                    !string.Equals(name, "south", StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+            }
+
+            return faceMask.Length > 0;
+        }
+
+        private static (float[] North, float[] South, float[] West, float[] East, float[] Up, float[] Down)
+            BuildNorthSouthUvSpanLayout(int u, int v, int w, int h, bool mirrorCuboidUv = false)
+        {
+            var north = new float[] { u, v, u + w, v + h };
+            var southU0 = u + w + NorthSouthUvSpanTemplateDepthGap;
+            var south = new float[] { southU0, v, southU0 + w, v + h };
+            if (mirrorCuboidUv)
+            {
+                MirrorFaceU(north);
+                MirrorFaceU(south);
+            }
+
+            var empty = Array.Empty<float>();
+            return (north, south, empty, empty, empty, empty);
         }
 
         public MergedJavaBlockModel Build(

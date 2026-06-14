@@ -88,7 +88,13 @@ internal sealed partial class GeometryCompilerHost
 
         GeometryBytecodeMerge.ApplyProbe(json, sha, floats, probeOk);
 
-        if (GeometryLiftPipeline.TryLiftWithJavapFallback(_javap, _clientJar, _maps, officialJvmName, factoryMethod,
+        if (GeometryIrDelegatedMeshCopy.HasDelegate(officialJvmName) &&
+            GeometryIrDelegatedMeshCopy.TryApply(_outDir, _versionLabel, officialJvmName, json, out _))
+        {
+            json["schemaVersion"] = 2;
+            liftSucceeded = true;
+        }
+        else if (GeometryLiftPipeline.TryLiftWithJavapFallback(_javap, _clientJar, _maps, officialJvmName, factoryMethod,
                 preferAsm: _useAsmLift && hasAsmMesh, out var liftAttempt) &&
             CountAllCuboids(liftAttempt.Roots) > 0)
         {

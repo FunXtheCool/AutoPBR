@@ -135,7 +135,7 @@ internal static partial class GeometryIrPartTreeRepair
 
 
 
-            var skipQuadrupedLegReparent = UsesVanillaFlatQuadrupedLegBake(rootKids, doc);
+            var skipQuadrupedLegReparent = UsesVanillaFlatQuadrupedLegBake(rootKids, doc, officialJvmName);
             if (EntityPreviewDebugSettings.RepairForceLegReparentOnFlatBake)
             {
                 skipQuadrupedLegReparent = false;
@@ -151,8 +151,15 @@ internal static partial class GeometryIrPartTreeRepair
 
             if (EntityPreviewDebugSettings.RepairGlobalReparentRules)
             {
+                HoistFelineFlatTail2ToRoot(rootKids);
+
                 foreach (var (childId, parentId) in GlobalReparentRules)
                 {
+                    if (ShouldSkipFelineFlatTailReparent(childId, parentId, rootKids, officialJvmName))
+                    {
+                        continue;
+                    }
+
                     ReparentFlatPart(rootKids, childId, parentId);
                 }
             }
@@ -163,6 +170,12 @@ internal static partial class GeometryIrPartTreeRepair
             {
                 foreach (var (childId, parentId) in QuadrupedLegReparentRules)
                 {
+                    // Rabbit/axolotl bind legs under frontlegs/backlegs/body in Java; only renest mis-hoisted flat root siblings.
+                    if (!IsFlatRootSibling(rootKids, childId))
+                    {
+                        continue;
+                    }
+
                     ReparentFlatPart(rootKids, childId, parentId);
                 }
             }
@@ -202,14 +215,18 @@ internal static partial class GeometryIrPartTreeRepair
     /// True when Java factory keeps <c>body</c> and leg parts as flat <c>root</c> siblings (no addChild hierarchy).
     /// Matches <see cref="GeometryIrLiftQualityReport"/> flat-nested / legs-at-root detection for pilot quadrupeds.
     /// When true, skip <see cref="QuadrupedLegReparentRules"/> — runtime-ir-preview-plan § Quadruped body placement regression
-    /// and § Baby JVM family (fox, cow, chicken, <c>BabyHorseModel</c>, …). Exception: <see cref="HeadStackNestedUnderBody"/>.
+    /// and § Baby JVM family (fox, cow, chicken, <c>BabyHorseModel</c>, …). Exception: <see cref="HeadStackNestedUnderBody"/>
+    /// (baby equine mis-lift). Camel also nests head under body but keeps entity-space flat root legs.
     /// </summary>
 
-    internal static bool UsesVanillaFlatQuadrupedLegBake(JsonArray rootChildren, JsonObject? shardDoc = null)
+    internal static bool UsesVanillaFlatQuadrupedLegBake(
+        JsonArray rootChildren,
+        JsonObject? shardDoc = null,
+        string? officialJvmName = null)
 
     {
 
-        _ = shardDoc;
+        officialJvmName ??= shardDoc?["officialJvmName"]?.GetValue<string>();
 
 
 
@@ -252,7 +269,18 @@ internal static partial class GeometryIrPartTreeRepair
 
 
         // Nested head stack (baby donkey class): flat leg siblings are body-relative offsets mis-lifted to root.
+        // Camel/armadillo bind legs on getRoot() with entity-space offsets while head/tail nest on body.
         if (HeadStackNestedUnderBody(rootChildren))
+
+        {
+
+            return IsEntitySpaceFlatRootLegMeshFamily(officialJvmName);
+
+        }
+
+        // Java nests standard legs on body (axolotl, rabbit, wolf, sniffer, …). Compiler hoist can leave
+        // body-relative poses as flat root siblings — renest under body; do not treat as creeper-class flat bake.
+        if (IsNestedBodyLegQuadrupedMeshFamily(officialJvmName))
 
         {
 

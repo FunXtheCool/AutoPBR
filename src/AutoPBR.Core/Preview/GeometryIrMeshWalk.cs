@@ -184,6 +184,7 @@ internal static class GeometryIrMeshWalk
     private static bool TryComposePartWorldFromParent(
         JsonElement poseEl,
         Matrix4x4 parentWorldBlock,
+        in GeometryIrMeshEmitOptions options,
         out Matrix4x4 worldBlock,
         out Matrix4x4 worldTexel,
         out string? failureReason)
@@ -199,15 +200,25 @@ internal static class GeometryIrMeshWalk
             return true;
         }
 
+        if (options.ResolveUseColumnTranslationTimesRotationPartPose())
+        {
+            if (!CleanRoomEntityModelRuntime.TryComposeColumnPartPose(poseEl, worldTexel, out worldTexel, out failureReason))
+            {
+                return false;
+            }
+
+            worldBlock = CleanRoomEntityModelRuntime.TexelRowAffineToBlock(worldTexel);
+            return true;
+        }
+
         if (EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose)
         {
-            if (!CleanRoomEntityModelRuntime.TryComposePartPosePublic(poseEl, out var localTexel))
+            if (!CleanRoomEntityModelRuntime.TryComposePartPosePublic(poseEl, parentWorldBlock, out worldTexel))
             {
                 failureReason = "compose part pose failed";
                 return false;
             }
 
-            worldTexel = Matrix4x4.Multiply(parentWorldBlock, localTexel);
             worldBlock = worldTexel;
             return true;
         }
@@ -233,6 +244,7 @@ internal static class GeometryIrMeshWalk
         if (!TryComposePartWorldFromParent(
                 part.TryGetProperty("pose", out var poseEl) ? poseEl : default,
                 parentWorldBlock,
+                options,
                 out var worldBlock,
                 out var worldTexel,
                 out failureReason))

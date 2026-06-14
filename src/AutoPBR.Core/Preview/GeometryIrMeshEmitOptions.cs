@@ -48,6 +48,20 @@ internal readonly struct GeometryIrMeshEmitOptions
     /// <summary>Override lifted cuboid <c>textureKey</c> by part id (e.g. main Breeze diffuse maps wind tiers to <c>#wind</c>).</summary>
     public Func<string, string?>? ResolvePartTextureKey { get; init; }
 
+    /// <summary>
+    /// Compose child poses as <c>parent × (T × Er)</c> in texel/column space (hand <c>BuildDolphin</c> / vanilla
+    /// <c>PartPose.offsetAndRotation</c> chains). Default IR walk uses separated translate+rotate row blocks.
+    /// </summary>
+    public bool UseColumnTranslationTimesRotationPartPose { get; init; }
+
+    /// <summary>
+    /// Dolphin fins (and similar <c>PartPose.offsetAndRotation</c> chains) require column compose even when
+    /// callers omit <see cref="UseColumnTranslationTimesRotationPartPose"/> on <see cref="GeometryIrMeshEmitOptions"/>.
+    /// </summary>
+    internal bool ResolveUseColumnTranslationTimesRotationPartPose() =>
+        UseColumnTranslationTimesRotationPartPose ||
+        GeometryIrEmitPolicy.UsesColumnTranslationTimesRotationPartPoseJvm(OfficialJvmName);
+
     public static GeometryIrMeshEmitOptions Default => ForViewport();
 
     public static GeometryIrMeshEmitOptions ForViewport() => new()
@@ -69,4 +83,23 @@ internal readonly struct GeometryIrMeshEmitOptions
         PreviewDegenerateAxisThickness = 0f,
         Fidelity = GeometryIrEmitFidelity.Parity
     };
+
+    public GeometryIrMeshEmitOptions WithOfficialJvmPoseComposeDefaults(string? officialJvmName)
+    {
+        if (string.IsNullOrWhiteSpace(officialJvmName))
+        {
+            return this;
+        }
+
+        return GeometryIrEmitPolicy.UsesColumnTranslationTimesRotationPartPoseJvm(officialJvmName)
+            ? this with
+            {
+                OfficialJvmName = officialJvmName,
+                UseColumnTranslationTimesRotationPartPose = true,
+            }
+            : this with { OfficialJvmName = officialJvmName };
+    }
+
+    internal static bool UsesColumnTranslationTimesRotationPartPoseJvm(string? officialJvmName) =>
+        GeometryIrEmitPolicy.UsesColumnTranslationTimesRotationPartPoseJvm(officialJvmName);
 }

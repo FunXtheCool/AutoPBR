@@ -21,12 +21,13 @@ uniform float uTurbidity;
 uniform float uHorizonFalloff;
 uniform int uLutValid;
 uniform float uSunDiscRadiusUv;
+uniform float uGroundWorldY;
 out vec4 FragColor;
 
 // Matches atmo_skyview.frag (linear RGB) when the LUT bake is unavailable on GLES.
-vec3 skyProceduralFromSun(vec3 viewDir, vec3 lightPropagationDir, float sunIntensity)
+vec3 skyProceduralFromSun(vec3 viewDir, vec3 lightPropagationDir, float sunIntensity, float horizonBandScale)
 {
-    vec3 col = skyDayRadiance(viewDir, lightPropagationDir, sunIntensity, uTurbidity, uHorizonFalloff);
+    vec3 col = skyDayRadiance(viewDir, lightPropagationDir, sunIntensity, uTurbidity, uHorizonFalloff, horizonBandScale);
     float dayAmt = skyDayFactor(lightPropagationDir, sunIntensity);
     vec3 nightSky = skyNightZenith(viewDir);
     col = mix(nightSky, col, dayAmt);
@@ -37,10 +38,11 @@ void main()
 {
     vec3 viewDir = grWorldRayDir(vUv, uInvViewProj, uCameraPos);
     float dayAmt = skyDayFactor(uLightDir, uSunIntensity);
+    float horizonBandScale = skyHorizonAltitudeFade(uCameraPos.y, uGroundWorldY);
 
     // Procedural radiance is continuous in view direction; the 2D sky-view LUT has an azimuth
     // seam on the -Z meridian that shows as a fixed world-space line when sampled per pixel.
-    vec3 lutSky = skyProceduralFromSun(viewDir, uLightDir, uSunIntensity);
+    vec3 lutSky = skyProceduralFromSun(viewDir, uLightDir, uSunIntensity, horizonBandScale);
 
     float starAmt = 1.0 - smoothstep(0.22, 0.62, dayAmt);
     vec3 nightSky = skyNightZenith(viewDir) + skyStars(viewDir, uRenderTime) * starAmt;
@@ -51,8 +53,8 @@ void main()
     vec3 sunTint = atmosphereSunWarmColor(glowIllum, sunElev);
 
     vec3 sky = mix(nightSky, lutSky, dayAmt);
-    sky += skyHorizonGlow(viewDir, dayAmt, sunTint);
-    sky += skyBelowHorizonFog(viewDir, uHorizonFogStrength);
+    sky += skyHorizonGlow(viewDir, dayAmt, sunTint, horizonBandScale);
+    sky += skyBelowHorizonFog(viewDir, uHorizonFogStrength, horizonBandScale);
 
     // Keep the half-set sun vivid (per-pixel horizon cut handles the geometry);
     // a hard dayAmt gate here made the disc pop out while still above the horizon.

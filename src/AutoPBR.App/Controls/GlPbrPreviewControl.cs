@@ -115,12 +115,15 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
                 var orbitTarget = displaySubject.EmulatedRebake is not null
                     ? EntityPreviewPlacement.ComputeEntityOrbitTarget(displaySubject.InterleavedVertices, stride)
                     : (Vector3?)null;
-                var mesh = new PreviewMesh
-                {
-                    Name = "java_block_model",
-                    InterleavedVertices = displaySubject.InterleavedVertices,
-                    Indices = displaySubject.Indices
-                };
+                // Emulated entities upload geometry only via OpenGL TryRebakeMesh commit — never from scene mesh.
+                var mesh = displaySubject.EmulatedRebake is not null
+                    ? PreviewMeshFactory.CreateEmptySubjectPlaceholder("entity_rebake_pending")
+                    : new PreviewMesh
+                    {
+                        Name = "java_block_model",
+                        InterleavedVertices = displaySubject.InterleavedVertices,
+                        Indices = displaySubject.Indices
+                    };
                 scene = BlockModelPreviewSceneFactory.Create(settings, mesh, orbitTarget);
                 javaBlockModel = displaySubject;
             }

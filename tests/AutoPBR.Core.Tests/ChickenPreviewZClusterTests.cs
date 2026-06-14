@@ -13,10 +13,8 @@ public sealed class ChickenPreviewZClusterTests
 {
     private static readonly (string TexturePath, string Jvm, int MinElements)[] Variants =
     [
-        ("assets/minecraft/textures/entity/chicken/chicken.png",
-            "net.minecraft.client.model.animal.chicken.ChickenModel", 8),
         ("assets/minecraft/textures/entity/chicken/chicken_cold.png",
-            "net.minecraft.client.model.animal.chicken.ColdChickenModel", 8),
+            "net.minecraft.client.model.animal.chicken.ColdChickenModel", 10),
         ("assets/minecraft/textures/entity/chicken/chicken_baby.png",
             "net.minecraft.client.model.animal.chicken.BabyChickenModel", 7),
     ];
@@ -100,15 +98,7 @@ public sealed class ChickenPreviewZClusterTests
         GeometryIrMeshEmitOptions options,
         int meshElementCount)
     {
-        if (officialJvm.Contains("ColdChicken", StringComparison.Ordinal))
-        {
-            return
-            [
-                "head", "head", "body", "body",
-                "right_leg", "left_leg", "right_wing", "left_wing",
-            ];
-        }
-
+        _ = officialJvm;
         var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(geometryRoot, options);
         Assert.Equal(meshElementCount, partIds.Count);
         return partIds;

@@ -24,11 +24,22 @@ float skyDayFactor(vec3 lightPropagationDir, float sunIntensity)
     return clamp(dayFromSun * dayFromIntensity, 0.0, 1.0);
 }
 
+// View-anchored horizon haze is correct at ground level but washes the lower viewport
+// when the camera climbs; fade it with altitude above the ground plane.
+float skyHorizonAltitudeFade(float camY, float groundY)
+{
+    float alt = max(camY - groundY, 0.0);
+    return 1.0 - smoothstep(8.0, 56.0, alt);
+}
+
 // Daytime sky: saturated Rayleigh blue gradient + warm horizon band near the sun.
 // Output is normalized linear RGB (~0..1.3); tone-map with skyTonemapLum, never a
 // per-channel x/(x+k) knee (that compresses every channel toward 1 = grey/white sky).
-vec3 skyDayRadiance(vec3 viewDir, vec3 lightPropagationDir, float sunIntensity, float turbidity, float horizonFalloff)
+// horizonBandScale: 1 at ground level, 0 high above (see skyHorizonAltitudeFade).
+vec3 skyDayRadiance(vec3 viewDir, vec3 lightPropagationDir, float sunIntensity, float turbidity, float horizonFalloff,
+    float horizonBandScale)
 {
+    float bandScale = clamp(horizonBandScale, 0.0, 1.0);
     float mu = clamp(viewDir.y, -1.0, 1.0);
     vec3 towardSun = normalize(-lightPropagationDir);
     float cosSun = dot(viewDir, towardSun);
@@ -41,7 +52,7 @@ vec3 skyDayRadiance(vec3 viewDir, vec3 lightPropagationDir, float sunIntensity, 
     vec3 zenithBlue = vec3(0.052, 0.22, 0.74);
     vec3 horizonBlue = vec3(0.38, 0.62, 0.98);
     float gradT = pow(1.0 - max(mu, 0.0), 2.4);
-    vec3 sky = mix(zenithBlue, horizonBlue, gradT);
+    vec3 sky = mix(zenithBlue, horizonBlue, gradT * mix(0.7, 1.0, bandScale));
 
     // Haze band hugging the horizon only (high exponent = tight band).
     float bandExp = mix(9.0, 3.5, clamp(horizonFalloff, 0.0, 1.0));
@@ -49,7 +60,7 @@ vec3 skyDayRadiance(vec3 viewDir, vec3 lightPropagationDir, float sunIntensity, 
 
     float turbidityT = clamp((turbidity - 1.0) / 9.0, 0.0, 1.0);
     vec3 hazeCol = mix(vec3(0.80, 0.90, 1.0), vec3(0.92, 0.88, 0.82), turbidityT);
-    sky = mix(sky, hazeCol, horizonBand * mix(0.25, 0.55, turbidityT));
+    sky = mix(sky, hazeCol, horizonBand * mix(0.25, 0.55, turbidityT) * bandScale);
 
     // Warm sunrise/sunset band: strongest at low sun, biased toward the sun azimuth.
     // Use a smooth sun-facing weight (never max(cosSun,0)): a hard hemisphere cut leaves a
@@ -58,7 +69,7 @@ vec3 skyDayRadiance(vec3 viewDir, vec3 lightPropagationDir, float sunIntensity, 
     float sunFacing = clamp(cosSun * 0.5 + 0.5, 0.0, 1.0);
     float sunBias = pow(sunFacing, 3.0);
     vec3 warmCol = vec3(1.0, 0.46, 0.18);
-    sky = mix(sky, warmCol, horizonBand * lowSun * sunBias * 0.85);
+    sky = mix(sky, warmCol, horizonBand * lowSun * sunBias * 0.85 * bandScale);
 
     // Forward Mie halo around the sun (warmer when the sun is low).
     vec3 mieTint = mix(vec3(1.0, 0.95, 0.85), warmCol, lowSun);
@@ -155,15 +166,15 @@ vec3 skyStars(vec3 viewDir, float timeSec)
     return vec3(star * 0.95);
 }
 
-vec3 skyHorizonGlow(vec3 viewDir, float dayAmt, vec3 sunTint)
+vec3 skyHorizonGlow(vec3 viewDir, float dayAmt, vec3 sunTint, float horizonBandScale)
 {
     float band = exp(-abs(viewDir.y) * 9.0);
     vec3 nightGlow = vec3(0.04, 0.05, 0.08);
     vec3 dayGlow = sunTint * 0.28 + vec3(0.28, 0.42, 0.72);
-    return mix(nightGlow, dayGlow, dayAmt) * band * 0.42;
+    return mix(nightGlow, dayGlow, dayAmt) * band * 0.42 * clamp(horizonBandScale, 0.0, 1.0);
 }
 
-vec3 skyBelowHorizonFog(vec3 viewDir, float strength)
+vec3 skyBelowHorizonFog(vec3 viewDir, float strength, float horizonBandScale)
 {
     if (viewDir.y >= 0.0 || strength <= 0.0)
     {
@@ -172,7 +183,7 @@ vec3 skyBelowHorizonFog(vec3 viewDir, float strength)
 
     float depth = smoothstep(0.0, -0.55, viewDir.y);
     vec3 fogCol = vec3(0.06, 0.07, 0.09);
-    return fogCol * depth * strength;
+    return fogCol * depth * strength * clamp(horizonBandScale, 0.0, 1.0);
 }
 
 vec2 skyMoonDiscUv(vec3 viewDir, vec3 towardMoon, float cosDiscEdge)

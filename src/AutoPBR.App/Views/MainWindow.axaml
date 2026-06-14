@@ -2609,7 +2609,7 @@
                     BorderBrush="{Binding CardBorderBrush}"
                     BorderThickness="1,0,0,0"
                     Padding="12">
-                <Grid RowDefinitions="Auto,2*,1*" RowSpacing="8" MinWidth="0" MinHeight="0" ClipToBounds="True">
+                <Grid RowDefinitions="Auto,2*,Auto,1*" RowSpacing="8" MinWidth="0" MinHeight="0" ClipToBounds="True">
                     <StackPanel Orientation="Vertical" Spacing="4" MinWidth="0">
                         <TextBlock Text="{Binding Strings.PreviewPanelTitle}" FontWeight="SemiBold" Foreground="{Binding ForegroundBrush}" TextWrapping="Wrap" />
                         <TextBlock Text="{Binding PreviewTextureName}"
@@ -2715,7 +2715,23 @@
                                    TextWrapping="Wrap"
                                    MaxWidth="520" />
                     </Grid>
-                    <Grid Grid.Row="2" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="6" MinWidth="0" MinHeight="0">
+                    <StackPanel Grid.Row="2"
+                                Orientation="Horizontal"
+                                Spacing="8"
+                                VerticalAlignment="Center"
+                                IsVisible="{Binding IsPreviewPoseSelectorVisible}">
+                        <TextBlock Text="Pose"
+                                   VerticalAlignment="Center"
+                                   Foreground="{Binding ForegroundBrush}"
+                                   Opacity="0.85" />
+                        <ComboBox MinWidth="220"
+                                  ItemsSource="{Binding PreviewPoseOptions}"
+                                  SelectedValue="{Binding SelectedPreviewPoseId, Mode=TwoWay}"
+                                  SelectedValueBinding="{Binding Id}"
+                                  DisplayMemberBinding="{Binding DisplayName}"
+                                  VerticalAlignment="Center" />
+                    </StackPanel>
+                    <Grid Grid.Row="3" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="6" MinWidth="0" MinHeight="0">
                         <TextBlock Text="{Binding ConversionScanDebugText}"
                                    Foreground="{Binding ForegroundBrush}"
                                    Opacity="0.78"

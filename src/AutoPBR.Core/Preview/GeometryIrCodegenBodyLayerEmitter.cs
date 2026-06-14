@@ -55,7 +55,12 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var world = parentWorld;
         if (part.TryGetProperty("pose", out var poseEl))
         {
-            if (!TryComposePartPose(poseEl, parentWorld, out world, out failureReason))
+            if (!TryComposePartPose(
+                    poseEl,
+                    parentWorld,
+                    out world,
+                    out failureReason,
+                    options.ResolveUseColumnTranslationTimesRotationPartPose()))
             {
                 return false;
             }
@@ -90,7 +95,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
                     return false;
                 }
 
-                var entityCuboid = ApplyCodegenEmitOptions(codegenCuboids[cuboidIndex], cuboidEl, options);
+                var entityCuboid = ApplyCodegenEmitOptions(codegenCuboids[cuboidIndex], cuboidEl, partId, options);
                 entityCuboid.Emit(builder, world, partScale);
                 cuboidIndex++;
             }
@@ -113,6 +118,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
     private static EntityCuboid ApplyCodegenEmitOptions(
         EntityCuboid tableCuboid,
         JsonElement cuboidEl,
+        string partId,
         in GeometryIrMeshEmitOptions options)
     {
         var x0 = tableCuboid.X0;
@@ -125,13 +131,18 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var inflate = GeometryIrCuboidMetadata.ApplyCubeDeformationInflateIfNonParity(
             cuboidEl, options.Fidelity, ref x0, ref y0, ref z0, ref x1, ref y1, ref z1);
 
-        if (options.Fidelity != GeometryIrEmitFidelity.Parity &&
-            options.PreviewDegenerateAxisThickness > 0f)
+        if (options.PreviewDegenerateAxisThickness > 0f)
         {
             ApplyPreviewDegenerateAxisThickness(
                 ref x0, ref y0, ref z0, ref x1, ref y1, ref z1,
                 options.PreviewDegenerateAxisThickness);
         }
+
+        GeometryIrEmitPolicy.TryReorientGhastFamilyTentacleCuboidYForModelSpace(
+            options.OfficialJvmName,
+            partId,
+            ref y0,
+            ref y1);
 
         var texU = tableCuboid.TexU;
         var texV = tableCuboid.TexV;
@@ -161,6 +172,9 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 ud = logicalD;
             }
         }
+
+        _ = GeometryIrEmitPolicy.TryApplyGhastFamilyCuboidUvFootprint(
+            options.OfficialJvmName, partId, y0, y1, ref uw, ref uh, ref ud);
 
         string[]? faceMask = null;
         if (GeometryIrCuboidMetadata.TryGetFaceMask(cuboidEl, out var faceMaskFromIr))

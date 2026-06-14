@@ -58,7 +58,8 @@ public static class EntityPreviewGrounding
             atlasH = thi;
         }
 
-        var options = GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH) with { OfficialJvmName = jvm };
+        var options = GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH)
+            .WithOfficialJvmPoseComposeDefaults(jvm);
         var collected = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(geometryRoot, options);
         if (collected.Count != elementCount)
         {

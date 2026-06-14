@@ -25,7 +25,9 @@ internal sealed partial class CleanRoomEntityModelRuntime
             int atlasW,
             int atlasH,
             float idlePhase01,
-            float wave)
+            float wave,
+            string? normalizedAssetPath = null,
+            float animationTimeSeconds = 0f)
         {
             _ = idlePhase01;
             var p = ParityCatalogDefaultBabyProfile(profile, isBaby, resolvedOfficialJvm);
@@ -52,6 +54,34 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 {
                     TryGetPartPoseOverride = (partId, world) => ApplyEquinePreviewPoseOverride(partId, world, neckBend, wave)
                 };
+            }
+
+            // Vanilla axolotl legs/gills use zero-thickness sheets (faceMask); hand BuildAxolotl used thin solids
+            // for stable preview UVs. IR parity emit keeps exact bytecode boxes — thicken degenerate axes only.
+            if (string.Equals(builderMethod, "Axolotl", StringComparison.OrdinalIgnoreCase))
+            {
+                return opts with { PreviewDegenerateAxisThickness = 1f };
+            }
+
+            if (EntityPreviewPoseCatalog.IsIllagerBuilderMethod(builderMethod))
+            {
+                return IllagerPreviewPoseSupport.CreateIllagerParityEmitOptions(
+                    opts,
+                    normalizedAssetPath,
+                    builderMethod,
+                    idlePhase01,
+                    animationTimeSeconds,
+                    wave);
+            }
+
+            if (string.Equals(builderMethod, "Dolphin", StringComparison.OrdinalIgnoreCase))
+            {
+                return opts with { UseColumnTranslationTimesRotationPartPose = true };
+            }
+
+            if (GeometryIrMeshEmitOptions.UsesColumnTranslationTimesRotationPartPoseJvm(resolvedOfficialJvm))
+            {
+                return opts with { UseColumnTranslationTimesRotationPartPose = true };
             }
 
             return opts;

@@ -206,6 +206,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
             Fidelity = GeometryIrEmitFidelity.Parity,
             PreviewDegenerateAxisThickness = 0f,
             OfficialJvmName = officialJvmName,
+            UseColumnTranslationTimesRotationPartPose =
+                GeometryIrMeshEmitOptions.UsesColumnTranslationTimesRotationPartPoseJvm(officialJvmName),
         };
         if (!TryEmitGeometryIrBodyLayer(b, geometryRootOverride, options, out failureReason))
         {

@@ -1,6 +1,7 @@
 using System.Numerics;
 
 using AutoPBR.App.Rendering.Abstractions;
+using AutoPBR.App.Rendering.Scene;
 
 using Silk.NET.OpenGL;
 
@@ -516,6 +517,7 @@ public sealed partial class OpenGlPreviewBackend
             SetFloatOnProgram(_atmoSkyProgram, "uSunIntensity", frame.Settings.AtmosphereSunIntensity);
             SetFloatOnProgram(_atmoSkyProgram, "uHorizonFogStrength",
                 frame.Settings.EnableAtmosphericSky ? frame.Settings.AerialFogStrength : 0f);
+            SetFloatOnProgram(_atmoSkyProgram, "uGroundWorldY", PreviewStageConstants.GroundPlaneWorldY);
             SetFloatOnProgram(_atmoSkyProgram, "uSkyExposure", frame.Settings.AtmosphereSkyExposure);
             SetFloatOnProgram(_atmoSkyProgram, "uSunDiscStrength", frame.Settings.AtmosphereSunDiscStrength);
             SetFloatOnProgram(_atmoSkyProgram, "uSunCosDiscEdge", sunCosDiscEdge);
@@ -549,6 +551,7 @@ public sealed partial class OpenGlPreviewBackend
             SetFloatOnProgram(_proceduralSkyProgram, "uHorizonFalloff", frame.Settings.AtmosphereHorizonFalloff);
             SetFloatOnProgram(_proceduralSkyProgram, "uHorizonFogStrength",
                 frame.Settings.EnableAtmosphericSky ? frame.Settings.AerialFogStrength : 0f);
+            SetFloatOnProgram(_proceduralSkyProgram, "uGroundWorldY", PreviewStageConstants.GroundPlaneWorldY);
             SetFloatOnProgram(_proceduralSkyProgram, "uSunDiscStrength", frame.Settings.AtmosphereSunDiscStrength);
             SetFloatOnProgram(_proceduralSkyProgram, "uSunCosDiscEdge", sunCosDiscEdge);
             SetFloatOnProgram(_proceduralSkyProgram, "uMoonCosDiscEdge", moonCosDiscEdge);

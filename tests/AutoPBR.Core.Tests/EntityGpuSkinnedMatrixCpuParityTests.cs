@@ -111,11 +111,13 @@ public sealed class EntityGpuSkinnedMatrixCpuParityTests
     [InlineData("assets/minecraft/textures/entity/goat/goat_baby.png", 0f, 0f)]
     [InlineData("assets/minecraft/textures/entity/bear/polarbear_baby.png", 0f, 2.5f)]
     [InlineData("assets/minecraft/textures/entity/horse/donkey.png", 0.2f, 3.1f)]
+    [InlineData("assets/minecraft/textures/entity/dolphin/dolphin.png", 0.3f, 2.5f)]
     public void Skinned_bind_pose_vertices_with_M_anim_inv_then_component_W_match_cpu_bake(string assetPath, float idle, float anim)
     {
         var setupAnim = assetPath.Contains("/camel/", StringComparison.OrdinalIgnoreCase) ||
             assetPath.Contains("/cow/", StringComparison.OrdinalIgnoreCase) ||
-            assetPath.Contains("/panda/", StringComparison.OrdinalIgnoreCase);
+            assetPath.Contains("/panda/", StringComparison.OrdinalIgnoreCase) ||
+            assetPath.Contains("/dolphin/", StringComparison.OrdinalIgnoreCase);
         BakeCpuAndGpuBind(assetPath, idle, anim, out var cpuVerts, out var gpuVerts, out var invBind, out var mergedAnim, setupAnim);
         const int cpuStride = MinecraftModelBaker.FloatsPerVertex;
         const int gpuStride = MinecraftModelBaker.FloatsPerSkinnedVertex;
@@ -144,6 +146,7 @@ public sealed class EntityGpuSkinnedMatrixCpuParityTests
     [InlineData("assets/minecraft/textures/entity/cow/cow_temperate.png", 0.2f, 1.1f, false)]
     [InlineData("assets/minecraft/textures/entity/cow/cow_temperate.png", 0.2f, 1.1f, true)]
     [InlineData("assets/minecraft/textures/entity/panda/panda.png", 0.15f, 0.9f, false)]
+    [InlineData("assets/minecraft/textures/entity/dolphin/dolphin.png", 0.3f, 2.5f, true)]
     public void Parity_catalog_gpu_bones_respect_setup_anim_motion_flag(
         string path,
         float idle,

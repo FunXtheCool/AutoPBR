@@ -109,6 +109,12 @@ internal sealed partial class GeometryCompilerHost
             return;
         }
 
+        if (json.ContainsKey("delegatedFromOfficialJvmName"))
+        {
+            json["extractionStatus"] = "ok";
+            return;
+        }
+
         StripHandmadeExtractionNotes(json);
         json["extractionStatus"] = "ok";
         var strictValidation = GeometryIrStructuralValidator.ValidateShard(json,

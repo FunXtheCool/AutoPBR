@@ -45,6 +45,11 @@ internal static class GeometryIrLiftTreeRepair
                 RemoveDegenerateCuboidsFromForest(rootKids);
                 foreach (var (childId, parentId) in ReparentRules)
                 {
+                    if (ShouldSkipFelineFlatTailReparent(childId, parentId, rootKids))
+                    {
+                        continue;
+                    }
+
                     ReparentFlatPart(rootKids, childId, parentId);
                 }
 
@@ -54,6 +59,7 @@ internal static class GeometryIrLiftTreeRepair
                 CollapseInnerBodyUnderBody(rootKids);
                 RemoveOptionalSaddleHarnessParts(rootKids);
                 RemovePlayerMeshInternalParts(rootKids);
+                HoistFelineFlatTail2ToRoot(rootKids);
                 if (hoistStandardQuadrupedLegsToRoot)
                 {
                     HoistStandardQuadrupedLegsFromBody(rootKids);
@@ -304,6 +310,60 @@ internal static class GeometryIrLiftTreeRepair
         }
 
         return hasRight && hasLeft;
+    }
+
+    private static bool ShouldSkipFelineFlatTailReparent(string childId, string parentId, JsonArray rootChildren)
+    {
+        if (!string.Equals(childId, "tail2", StringComparison.Ordinal) ||
+            !string.Equals(parentId, "tail1", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        return UsesFelineFlatRootAbsoluteTailBake(rootChildren);
+    }
+
+    private static bool UsesFelineFlatRootAbsoluteTailBake(JsonArray rootChildren)
+    {
+        if (!TryFindPartById(rootChildren, "tail2", out var tail2) || tail2 is null ||
+            tail2["pose"]?["translation"] is not JsonArray tailTr ||
+            tailTr.Count < 3)
+        {
+            return false;
+        }
+
+        var tailY = tailTr[1]?.GetValue<double>() ?? 0;
+        var tailZ = tailTr[2]?.GetValue<double>() ?? 0;
+        return tailY > 18 && tailZ > 10;
+    }
+
+    private static void HoistFelineFlatTail2ToRoot(JsonArray rootChildren)
+    {
+        if (!TryFindPartById(rootChildren, "tail1", out var tail1) || tail1 is null ||
+            tail1["children"] is not JsonArray tail1Kids)
+        {
+            return;
+        }
+
+        JsonObject? tail2 = null;
+        var tail2Idx = -1;
+        for (var i = 0; i < tail1Kids.Count; i++)
+        {
+            if (tail1Kids[i] is JsonObject o && string.Equals((string?)o["id"], "tail2", StringComparison.Ordinal))
+            {
+                tail2 = o;
+                tail2Idx = i;
+                break;
+            }
+        }
+
+        if (tail2 is null || tail2Idx < 0 || !UsesFelineFlatRootAbsoluteTailBake(rootChildren))
+        {
+            return;
+        }
+
+        rootChildren.Add(tail2.DeepClone());
+        tail1Kids.RemoveAt(tail2Idx);
     }
 
     private static void ReparentFlatPart(JsonArray rootChildren, string childId, string parentId)

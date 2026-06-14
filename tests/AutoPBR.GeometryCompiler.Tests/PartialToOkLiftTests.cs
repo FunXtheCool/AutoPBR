@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using AutoPBR.Tests.TestSupport;
@@ -172,8 +173,43 @@ public sealed class PartialToOkLiftTests(ITestOutputHelper output)
         Assert.True(CountCuboids(attempt.Roots) > 0);
         var tail2 = FindPartById(attempt.Roots, "tail2");
         Assert.NotNull(tail2);
-        Assert.NotNull(FindPartById(attempt.Roots, "tail1")?["children"]?.AsArray()
+        Assert.Null(FindPartById(attempt.Roots, "tail1")?["children"]?.AsArray()
             ?.FirstOrDefault(n => n is JsonObject o && string.Equals((string?)o["id"], "tail2", StringComparison.Ordinal)));
+        Assert.NotNull(FindPartById(attempt.Roots, "tail2"));
+    }
+
+    [Fact]
+    public void Feline_setupAnim_wrappers_delegate_mesh_from_feline_hosts()
+    {
+        var root = Program.FindRepoRoot();
+        foreach (var (wrapper, source, expectedBodyY) in new[]
+                 {
+                     ("net.minecraft.client.model.animal.feline.AdultCatModel",
+                         "net.minecraft.client.model.animal.feline.AdultFelineModel",
+                         12f),
+                     ("net.minecraft.client.model.animal.feline.AdultOcelotModel",
+                         "net.minecraft.client.model.animal.feline.AdultFelineModel",
+                         12f),
+                     ("net.minecraft.client.model.animal.feline.BabyCatModel",
+                         "net.minecraft.client.model.animal.feline.BabyFelineModel",
+                         20.5f),
+                     ("net.minecraft.client.model.animal.feline.BabyOcelotModel",
+                         "net.minecraft.client.model.animal.feline.BabyFelineModel",
+                         20.5f),
+                 })
+        {
+            var path = Path.Combine(root, "docs", "generated", "geometry", "26.1.2", $"{wrapper}.json");
+            Assert.True(File.Exists(path), $"missing shard: {wrapper}");
+            using var doc = JsonDocument.Parse(File.ReadAllText(path));
+            var shard = doc.RootElement;
+            Assert.Equal("ok", shard.GetProperty("extractionStatus").GetString());
+            Assert.Equal(source, shard.GetProperty("delegatedFromOfficialJvmName").GetString());
+            var rootsNode = JsonNode.Parse(shard.GetProperty("roots").GetRawText())!.AsArray();
+            var body = FindPartById(rootsNode, "body");
+            Assert.NotNull(body);
+            var ty = body!["pose"]!["translation"]![1]!.GetValue<double>();
+            Assert.True(Math.Abs(ty - expectedBodyY) < 0.01, $"{wrapper}: body Y={ty}, expected {expectedBodyY}");
+        }
     }
 
     [Fact]

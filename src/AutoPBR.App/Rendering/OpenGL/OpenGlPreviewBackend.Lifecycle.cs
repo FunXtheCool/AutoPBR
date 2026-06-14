@@ -410,6 +410,18 @@ public sealed partial class OpenGlPreviewBackend
         gpuSkinning = 0;
         boneCount = 0;
         liftY = 0f;
+        if (model is
+            {
+                GpuEntityBoneSkinning: false,
+                EntityPreviewPlacementApplied: true,
+                InterleavedVertices.Length: > 0
+            })
+        {
+            // CPU-baked preview vertices (placement lift already in aPos). Never route through bind-mesh W()+lift.
+            previewSpaceVerts = 1f;
+            return true;
+        }
+
         if (model is not { GpuEntityBoneSkinning: true, EmulatedRebake.GpuPreparedBoneCount: > 0 and var preparedCount })
         {
             return false;

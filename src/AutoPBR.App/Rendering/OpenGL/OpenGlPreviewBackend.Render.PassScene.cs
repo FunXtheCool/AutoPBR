@@ -231,12 +231,13 @@ public sealed partial class OpenGlPreviewBackend
                 {
                     if (!_loggedMeshReady)
                     {
+                        var subjectTag = frame.BlockModel.EmulatedRebake is not null
+                            ? frame.BlockModel.EntityGpuVerticesInPreviewSpace ? "parity-cpu-rebake" : "entity"
+                            : "block-model";
                         EmitDiagnostic(
-                            $"[3D preview] Draw ready: indexCount={_mesh.IndexCount}, frame.Scene={frame.Scene.SceneKind}, lightYaw={frame.Settings.LightYawDegrees:F1}, lightPitch={frame.Settings.LightPitchDegrees:F1}.");
+                            $"[3D preview] Draw ready: indexCount={_mesh.IndexCount}, subject={subjectTag}, frame.Scene={frame.Scene.SceneKind}, lightYaw={frame.Settings.LightYawDegrees:F1}, lightPitch={frame.Settings.LightPitchDegrees:F1}.");
                         _loggedMeshReady = true;
                     }
-
-                    SetInt("uEntityAlphaMode", frame.EntityAlphaModeUniform);
                     var blendWasEnabled = false;
                     if (frame.EntityBlendDraw)
                     {

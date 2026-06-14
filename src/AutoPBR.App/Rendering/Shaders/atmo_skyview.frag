@@ -16,7 +16,7 @@ void main()
     vec3 viewDir = skyViewDirFromLutUv(vUv);
 
     vec3 trans = srgbToLinear(texture(uTransmittanceLut, vec2(vUv.x, clamp(vUv.y, 0.0, 1.0))).rgb);
-    vec3 col = skyDayRadiance(viewDir, uSunDir, uSunIntensity, uTurbidity, uHorizonFalloff);
+    vec3 col = skyDayRadiance(viewDir, uSunDir, uSunIntensity, uTurbidity, uHorizonFalloff, 1.0);
     col *= mix(vec3(1.0), trans + vec3(0.06), 0.35);
 
     float dayAmt = skyDayFactor(uSunDir, uSunIntensity);

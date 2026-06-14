@@ -116,6 +116,19 @@ public sealed partial class ChickenPartPoseIrVersusCleanRoomTests
     /// Stripped matrices for head/body cuboids match IR part poses at bind; legs/wings include preview idle drivers.
     /// </summary>
     [Fact]
+    public void Chicken_cold_catalog_uses_runtime_geometry_ir()
+    {
+        GeometryIrParityPolicy.ResetForTests();
+        var runtime = EntityModelRuntimeFactory.Create();
+        const string path = "assets/minecraft/textures/entity/chicken/chicken_cold.png";
+        var profile = new MinecraftNativeProfile("26.1.2", TestEnvironmentPaths.AbsentNativeRoot, new Version(26, 1, 2));
+        Assert.True(runtime.TryBuildStaticMesh(path, profile, idlePhase01: 0f, animationTimeSeconds: 0f, out var mesh, out var provenance));
+        Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
+        Assert.Contains("ColdChickenModel", provenance.Detail, StringComparison.Ordinal);
+        Assert.Equal(10, mesh.Elements.Count);
+    }
+
+    [Fact]
     public void Cold_chicken_bind_pose_stripped_head_body_match_cold_ir()
     {
         GeometryIrParityPolicy.ResetForTests();

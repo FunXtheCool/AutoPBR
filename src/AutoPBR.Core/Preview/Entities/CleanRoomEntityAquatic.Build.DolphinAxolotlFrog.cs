@@ -58,6 +58,10 @@ internal sealed partial class CleanRoomEntityModelRuntime
         return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef));
     }
 
+    /// <summary>Bind-pose hand builder for parity tests (no swim sway).</summary>
+    internal static MergedJavaBlockModel BuildDolphinHandMeshForTests(string texRef, MinecraftNativeProfile profile, bool isBaby = false) =>
+        BuildDolphin(texRef, profile, isBaby, swimSway: 0f);
+
 
     /// <summary>
     /// Legacy hand-tuned mesh used only when parity-catalog geometry IR emit fails and no <c>ok</c> shard exists.
@@ -115,6 +119,10 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef));
     }
+
+    /// <summary>Bind-pose hand builder for axolotl parity tests (no leg animation).</summary>
+    internal static MergedJavaBlockModel BuildAxolotlHandMeshForTests(string texRef, MinecraftNativeProfile profile, bool isBaby = false) =>
+        BuildAxolotl(texRef, profile, isBaby, idleBob: 0f, rightHindLegPitchRad: 0f, leftHindLegPitchRad: 0f, rightFrontLegPitchRad: 0f, leftFrontLegPitchRad: 0f);
 
 
     private static MergedJavaBlockModel BuildFrog(

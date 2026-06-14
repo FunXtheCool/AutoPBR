@@ -92,7 +92,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             merged,
             geometryRoot,
             pose,
-            GeometryIrPartWorldPoseIndex.Build(geometryRoot),
+            GeometryIrPartWorldPoseIndex.Build(geometryRoot, emitOptions),
             emitOptions);
 
     }
@@ -110,6 +110,32 @@ internal sealed partial class CleanRoomEntityModelRuntime
         float wave,
         GeometryIrMeshEmitOptions emitOptions)
     {
+        if (string.Equals(parityRule.BuilderMethod, "Ghast", StringComparison.Ordinal) ||
+            string.Equals(parityRule.BuilderMethod, "HappyGhast", StringComparison.Ordinal))
+        {
+            ApplyGhastFamilyAnimateTentaclesGeometryIrPreviewPass(
+                merged,
+                geometryRoot,
+                animationTimeSeconds,
+                emitOptions);
+            return true;
+        }
+
+        if (string.Equals(parityRule.BuilderMethod, "Dolphin", StringComparison.Ordinal))
+        {
+            ApplyDolphinGeometryIrSetupAnimPreviewPass(
+                merged,
+                geometryRoot,
+                parityRule,
+                geometryIrOfficialJvm,
+                isBaby,
+                animationTimeSeconds,
+                idlePhase01,
+                wave,
+                emitOptions);
+            return true;
+        }
+
         var modelJvm = SetupAnimParityResolver.ResolveModelJvmForPreview(
             parityRule.BuilderMethod,
             parityRule.DeobfuscatedModelClass,
@@ -140,7 +166,64 @@ internal sealed partial class CleanRoomEntityModelRuntime
             merged,
             geometryRoot,
             pose,
-            GeometryIrPartWorldPoseIndex.Build(geometryRoot),
+            GeometryIrPartWorldPoseIndex.Build(geometryRoot, emitOptions),
+            emitOptions);
+    }
+
+    /// <summary>
+    /// <c>GhastModel.setupAnim</c> only calls <c>animateTentacles</c> (setup-anim IR assignments are empty).
+    /// </summary>
+    private static void ApplyGhastFamilyAnimateTentaclesGeometryIrPreviewPass(
+        MergedJavaBlockModel merged,
+        JsonElement geometryRoot,
+        float animationTimeSeconds,
+        GeometryIrMeshEmitOptions emitOptions)
+    {
+        var pose = new VanillaSetupAnimRuntime.PoseResult();
+        for (var i = 0; i < 9; i++)
+        {
+            pose.Parts[$"tentacle{i}"] = new VanillaSetupAnimRuntime.PartPose
+            {
+                XRot = GeometryIrEmitPolicy.ComputeGhastAnimateTentaclesXRot(i, animationTimeSeconds),
+                Assigned = VanillaSetupAnimRuntime.PartPoseChannel.XRot,
+            };
+        }
+
+        _ = ApplySetupAnimToGeometryIrMesh(
+            merged,
+            geometryRoot,
+            pose,
+            GeometryIrPartWorldPoseIndex.Build(geometryRoot, emitOptions),
+            emitOptions);
+    }
+
+    /// <summary>
+    /// Lifted dolphin setup-anim IR omits the <c>if (isMoving)</c> guard from javap; apply swim channels only when moving.
+    /// </summary>
+    private static void ApplyDolphinGeometryIrSetupAnimPreviewPass(
+        MergedJavaBlockModel merged,
+        JsonElement geometryRoot,
+        EntityTextureParityRule parityRule,
+        string geometryIrOfficialJvm,
+        bool isBaby,
+        float animationTimeSeconds,
+        float idlePhase01,
+        float wave,
+        GeometryIrMeshEmitOptions emitOptions)
+    {
+        var modelJvm = SetupAnimParityResolver.ResolveModelJvmForPreview(
+            parityRule.BuilderMethod,
+            parityRule.DeobfuscatedModelClass,
+            isBaby,
+            geometryIrOfficialJvm);
+        var state = ResolveSetupAnimPreviewState(modelJvm, animationTimeSeconds, idlePhase01, wave, out _);
+        var pose = new VanillaSetupAnimRuntime.PoseResult();
+        GeometryIrEmitPolicy.ApplyDolphinSetupAnimPose(state, pose);
+        _ = ApplySetupAnimToGeometryIrMesh(
+            merged,
+            geometryRoot,
+            pose,
+            GeometryIrPartWorldPoseIndex.Build(geometryRoot, emitOptions),
             emitOptions);
     }
 
