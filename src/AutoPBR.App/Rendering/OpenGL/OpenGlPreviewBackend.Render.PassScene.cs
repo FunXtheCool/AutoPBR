@@ -209,7 +209,7 @@ public sealed partial class OpenGlPreviewBackend
                 SetInt("uEnableNormalMap", frame.EnableNormalMapEff ? 1 : 0);
                 SetInt("uEnableSpecularMap", frame.EnableSpecularMapEff ? 1 : 0);
                 SetInt("uSceneKind", frame.Scene.SceneKind == PreviewSceneKind.ItemPlane ? 1 : 0);
-                SetInt("uEntityAlphaMode", 0);
+                SetInt("uEntityAlphaMode", frame.EntityEmulatedPreview ? frame.EntityAlphaModeUniform : 0);
                 if (_atmoSkyViewTex != 0)
                 {
                     frame.Gl.ActiveTexture(TextureUnit.Texture5);
