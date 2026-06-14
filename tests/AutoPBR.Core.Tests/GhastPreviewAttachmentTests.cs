@@ -206,6 +206,254 @@ public sealed class GhastPreviewAttachmentTests
         Assert.True(hullGap < 0.15f, $"gpu tentacles should hang from body (gap={hullGap:F3})");
     }
 
+    [Fact]
+    public void Monster_ghast_bind_pose_emits_exactly_ten_body_and_tentacle_cuboids()
+    {
+        if (!TryBuildGhastBindPose(MonsterTexturePath, MonsterJvm, 64, 32, out var bind, out var partIds))
+        {
+            return;
+        }
+
+        AssertGhastVisibleCuboidCounts(partIds, bind.Elements.Count);
+    }
+
+    [Fact]
+    public void Happy_ghast_bind_pose_emits_exactly_ten_cuboids_without_equipment_parts()
+    {
+        if (!TryBuildGhastBindPose(HappyTexturePath, HappyJvm, 64, 64, out var bind, out var partIds))
+        {
+            return;
+        }
+
+        AssertGhastVisibleCuboidCounts(partIds, bind.Elements.Count);
+        foreach (var id in partIds)
+        {
+            Assert.False(id.Contains("inner_body", StringComparison.OrdinalIgnoreCase), id);
+            Assert.False(id.Contains("harness", StringComparison.OrdinalIgnoreCase), id);
+            Assert.False(id.Contains("goggle", StringComparison.OrdinalIgnoreCase), id);
+            Assert.False(id.Contains("rope", StringComparison.OrdinalIgnoreCase), id);
+        }
+    }
+
+    [Fact]
+    public void Ghast_family_body_and_tentacle_elements_emit_all_six_faces()
+    {
+        foreach (var (path, jvm, atlasW, atlasH) in new[]
+                 {
+                     (MonsterTexturePath, MonsterJvm, 64, 32),
+                     (HappyTexturePath, HappyJvm, 64, 64),
+                 })
+        {
+            if (!TryBuildGhastBindPose(path, jvm, atlasW, atlasH, out var bind, out var partIds))
+            {
+                continue;
+            }
+
+            for (var i = 0; i < bind.Elements.Count; i++)
+            {
+                var id = partIds[i];
+                if (!IsGhastBodyOrTentaclePart(id))
+                {
+                    continue;
+                }
+
+                Assert.True(
+                    CountFaces(bind.Elements[i]) == 6,
+                    $"{path} {id} should emit all six faces");
+            }
+        }
+    }
+
+    [Fact]
+    public void Ghast_family_baked_uvs_stay_within_expected_atlas()
+    {
+        foreach (var (path, jvm, atlasW, atlasH) in new[]
+                 {
+                     (MonsterTexturePath, MonsterJvm, 64, 32),
+                     ("assets/minecraft/textures/entity/ghast/ghast_shooting.png", MonsterJvm, 64, 32),
+                     (HappyTexturePath, HappyJvm, 64, 64),
+                 })
+        {
+            if (!TryBuildGhastBindPose(path, jvm, atlasW, atlasH, out var bind, out var partIds))
+            {
+                continue;
+            }
+
+            var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase) { [path] = 0 };
+            var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase) { [path] = (atlasW, atlasH) };
+            Assert.True(MinecraftModelBaker.TryBake(bind, "minecraft", pathToIdx, texSizes, out var verts, out _, out _));
+
+            AssertGhastBodyTentacleUvsWithinAtlas(verts!, bind, partIds, path);
+        }
+    }
+
+    [Fact]
+    public void Ghast_family_tentacle_local_y_extents_hang_below_attachment_pivot()
+    {
+        foreach (var (path, jvm, atlasW, atlasH) in new[]
+                 {
+                     (MonsterTexturePath, MonsterJvm, 64, 32),
+                     (HappyTexturePath, HappyJvm, 64, 64),
+                 })
+        {
+            if (!TryBuildGhastBindPose(path, jvm, atlasW, atlasH, out var bind, out var partIds))
+            {
+                continue;
+            }
+
+            for (var i = 0; i < bind.Elements.Count; i++)
+            {
+                if (!partIds[i].StartsWith("tentacle", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                var el = bind.Elements[i];
+                var localMinY = MathF.Min(el.From[1], el.To[1]);
+                var localMaxY = MathF.Max(el.From[1], el.To[1]);
+                _output.WriteLine($"{path} {partIds[i]} localY=[{localMinY:F3},{localMaxY:F3}]");
+                Assert.True(localMaxY <= 1e-4f, $"{partIds[i]} top should sit at attachment pivot (y=0)");
+                Assert.True(localMinY < -1e-4f, $"{partIds[i]} should extend below attachment pivot");
+            }
+        }
+    }
+
+    [Fact]
+    public void Ghast_family_setup_anim_keeps_tentacles_attached_to_body()
+    {
+        const float anim = 2.5f;
+        foreach (var (path, jvm, atlasW, atlasH) in new[]
+                 {
+                     (MonsterTexturePath, MonsterJvm, 64, 32),
+                     (HappyTexturePath, HappyJvm, 64, 64),
+                 })
+        {
+            var runtime = EntityModelRuntimeFactory.Create();
+            if (!runtime.TryBuildStaticMesh(
+                    path,
+                    Profile26,
+                    idlePhase01: 0.3f,
+                    animationTimeSeconds: anim,
+                    out var mesh,
+                    out _,
+                    applyGeometryIrSetupAnimMotion: true))
+            {
+                continue;
+            }
+
+            var repo = GeometryIrTestTierSupport.FindRepoRoot();
+            var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
+            if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
+                !string.Equals(status, "ok", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+            var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
+            var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
+                repaired,
+                GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH) with { OfficialJvmName = jvm });
+            var (_, _, hullGap) = MeasureBodyTentacleHullGap(mesh, partIds);
+            _output.WriteLine($"{path} anim hullGap={hullGap:F4}");
+            Assert.True(hullGap < 0.35f, $"{path} tentacles detached under setupAnim (gap={hullGap:F3})");
+        }
+    }
+
+    private static bool TryBuildGhastBindPose(
+        string texturePath,
+        string jvm,
+        int atlasW,
+        int atlasH,
+        out MergedJavaBlockModel bind,
+        out List<string> partIds)
+    {
+        bind = null!;
+        partIds = [];
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
+        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
+            !string.Equals(status, "ok", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        var runtime = EntityModelRuntimeFactory.Create();
+        if (!runtime.TryBuildStaticMesh(
+                texturePath,
+                Profile26,
+                idlePhase01: 0f,
+                animationTimeSeconds: 0f,
+                out bind,
+                out _,
+                applyGeometryIrSetupAnimMotion: false))
+        {
+            return false;
+        }
+
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
+        partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
+            repaired,
+            GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH) with { OfficialJvmName = jvm });
+        return true;
+    }
+
+    private static void AssertGhastVisibleCuboidCounts(IReadOnlyList<string> partIds, int elementCount)
+    {
+        var bodyCount = partIds.Count(id => string.Equals(id, "body", StringComparison.OrdinalIgnoreCase));
+        var tentacleCount = partIds.Count(id => id.StartsWith("tentacle", StringComparison.OrdinalIgnoreCase));
+        Assert.Equal(1, bodyCount);
+        Assert.Equal(9, tentacleCount);
+        Assert.Equal(10, elementCount);
+        Assert.Equal(10, partIds.Count);
+    }
+
+    private static bool IsGhastBodyOrTentaclePart(string id) =>
+        string.Equals(id, "body", StringComparison.OrdinalIgnoreCase) ||
+        id.StartsWith("tentacle", StringComparison.OrdinalIgnoreCase);
+
+    private static void AssertGhastBodyTentacleUvsWithinAtlas(
+        float[] verts,
+        MergedJavaBlockModel mesh,
+        IReadOnlyList<string> partIds,
+        string label)
+    {
+        const int stride = MinecraftModelBaker.FloatsPerVertex;
+        var vertexBase = 0;
+        for (var e = 0; e < mesh.Elements.Count; e++)
+        {
+            var vertCount = CountFaces(mesh.Elements[e]) * 4;
+            if (IsGhastBodyOrTentaclePart(partIds[e]))
+            {
+                for (var v = 0; v < vertCount; v++)
+                {
+                    var i = (vertexBase + v) * stride;
+                    var u = verts[i + 6];
+                    var vv = verts[i + 7];
+                    Assert.True(u >= -1e-4f && u <= 1f + 1e-4f, $"{label} {partIds[e]} u={u}");
+                    Assert.True(vv >= -1e-4f && vv <= 1f + 1e-4f, $"{label} {partIds[e]} v={vv}");
+                }
+            }
+
+            vertexBase += vertCount;
+        }
+    }
+
+    private static int CountFaces(ModelElement el)
+    {
+        var n = 0;
+        foreach (var name in new[] { "north", "south", "west", "east", "up", "down" })
+        {
+            if (el.Faces.ContainsKey(name))
+            {
+                n++;
+            }
+        }
+
+        return n;
+    }
+
     private static (float BodyMaxY, float TentacleMinY, float HullGap) MeasureBodyTentaclePreviewHullGap(
         ReadOnlySpan<float> gpuVerts,
         IReadOnlyList<string> partIds)

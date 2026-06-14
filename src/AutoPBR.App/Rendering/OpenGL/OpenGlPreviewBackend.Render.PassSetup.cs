@@ -134,6 +134,7 @@ public sealed partial class OpenGlPreviewBackend
                     frame.EntityRebakeCtx is not null &&
                     !frame.Settings.EnableEntityAnimation &&
                     needsBindPoseMesh &&
+                    !IsParityCatalogEmulatedAsset(frame.EntityRebakeCtx.AssetArchivePath) &&
                     EntityEmulatedPreviewRebaker.TryPrepareGpuSkinnedEmulatedMesh(
                         frame.EntityRebakeCtx,
                         frame.BlockModel.Materials,
@@ -211,6 +212,7 @@ public sealed partial class OpenGlPreviewBackend
                     frame.EntityRebakeCtx is not null &&
                     !frame.Settings.EnableEntityAnimation &&
                     needsBindPoseMesh &&
+                    !IsParityCatalogEmulatedAsset(frame.EntityRebakeCtx.AssetArchivePath) &&
                     EntityEmulatedPreviewRebaker.TryRebakeMesh(
                         frame.EntityRebakeCtx,
                         frame.BlockModel.Materials,

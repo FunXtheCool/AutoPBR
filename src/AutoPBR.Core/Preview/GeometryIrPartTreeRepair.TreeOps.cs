@@ -74,24 +74,50 @@ internal static partial class GeometryIrPartTreeRepair
         tail1Kids.RemoveAt(tail2Idx);
     }
 
+    /// <summary>
+    /// HappyGhastModel lift keeps a nested <c>inner_body</c> under <c>body</c> and a duplicate fleece cuboid at
+    /// <c>uvOrigin[1]=32</c>. Java reference bakes omit both — trim only when that exact pattern is present.
+    /// </summary>
     private static void CollapseInnerBodyUnderBody(JsonArray rootChildren)
-
     {
-
-        foreach (var n in rootChildren)
-
+        if (!BodyContainsInnerBodyChild(rootChildren))
         {
-
-            if (n is JsonObject part)
-
-            {
-
-                CollapseInnerBodyRecursive(part);
-
-            }
-
+            return;
         }
 
+        foreach (var n in rootChildren)
+        {
+            if (n is JsonObject part)
+            {
+                CollapseInnerBodyRecursive(part);
+            }
+        }
+    }
+
+    private static bool BodyContainsInnerBodyChild(JsonArray siblings)
+    {
+        foreach (var n in siblings)
+        {
+            if (n is not JsonObject o)
+            {
+                continue;
+            }
+
+            if (string.Equals((string?)o["id"], "body", StringComparison.Ordinal) &&
+                o["children"] is JsonArray kids &&
+                kids.Any(ch => ch is JsonObject co &&
+                               string.Equals((string?)co["id"], "inner_body", StringComparison.Ordinal)))
+            {
+                return true;
+            }
+
+            if (o["children"] is JsonArray nested && BodyContainsInnerBodyChild(nested))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 

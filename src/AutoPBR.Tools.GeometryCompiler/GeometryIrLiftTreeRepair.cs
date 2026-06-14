@@ -141,10 +141,16 @@ internal static class GeometryIrLiftTreeRepair
     }
 
     /// <summary>
-    /// Java reference bakes omit <c>inner_body</c> under <c>body</c> (HappyGhast); bytecode lift keeps it. Hoist cuboids into body.
+    /// HappyGhastModel lift keeps nested <c>inner_body</c> under <c>body</c> and a duplicate fleece cuboid at
+    /// <c>uvOrigin[1]=32</c>. Java reference bakes omit both — never hoist inner_body cuboids into visible output.
     /// </summary>
     private static void CollapseInnerBodyUnderBody(JsonArray rootChildren)
     {
+        if (!BodyContainsInnerBodyChild(rootChildren))
+        {
+            return;
+        }
+
         foreach (var n in rootChildren)
         {
             if (n is not JsonObject part)
@@ -154,11 +160,32 @@ internal static class GeometryIrLiftTreeRepair
 
             CollapseInnerBodyRecursive(part);
         }
+    }
 
-        if (TryFindPartById(rootChildren, "body", out _))
+    private static bool BodyContainsInnerBodyChild(JsonArray siblings)
+    {
+        foreach (var n in siblings)
         {
-            RemovePartIdsFromForest(rootChildren, ["inner_body"]);
+            if (n is not JsonObject o)
+            {
+                continue;
+            }
+
+            if (string.Equals((string?)o["id"], "body", StringComparison.Ordinal) &&
+                o["children"] is JsonArray kids &&
+                kids.Any(ch => ch is JsonObject co &&
+                               string.Equals((string?)co["id"], "inner_body", StringComparison.Ordinal)))
+            {
+                return true;
+            }
+
+            if (o["children"] is JsonArray nested && BodyContainsInnerBodyChild(nested))
+            {
+                return true;
+            }
         }
+
+        return false;
     }
 
     private static void CollapseInnerBodyRecursive(JsonObject part)
@@ -189,30 +216,21 @@ internal static class GeometryIrLiftTreeRepair
             return;
         }
 
-        var hasInnerBody = false;
-        foreach (var child in bodyKids)
-        {
-            if (child is JsonObject ch &&
-                string.Equals((string?)ch["id"], "inner_body", StringComparison.Ordinal))
-            {
-                hasInnerBody = true;
-                break;
-            }
-        }
-
-        if (hasInnerBody)
-        {
-            TrimInnerBodyFleeceCuboidFromBody(bodyPart);
-        }
-
+        var removedInnerBodyChild = false;
         for (var i = bodyKids.Count - 1; i >= 0; i--)
         {
             if (bodyKids[i] is JsonObject ch &&
                 string.Equals((string?)ch["id"], "inner_body", StringComparison.Ordinal))
             {
                 bodyKids.RemoveAt(i);
+                removedInnerBodyChild = true;
                 break;
             }
+        }
+
+        if (removedInnerBodyChild)
+        {
+            TrimInnerBodyFleeceCuboidFromBody(bodyPart);
         }
     }
 
