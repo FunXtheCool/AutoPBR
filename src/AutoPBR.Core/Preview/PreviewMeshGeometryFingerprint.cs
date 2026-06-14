@@ -6,7 +6,7 @@ namespace AutoPBR.Core.Preview;
 public static class PreviewMeshGeometryFingerprint
 {
     /// <summary>Bump when geometry emit / pose-compose logic changes (invalidates cached GPU bind meshes).</summary>
-    public const int PipelineRevision = 3;
+    public const int PipelineRevision = 6;
 
     public static ulong ComputeCpuPreviewMesh(ReadOnlySpan<float> interleavedVertices, int vertexStrideFloats)
     {

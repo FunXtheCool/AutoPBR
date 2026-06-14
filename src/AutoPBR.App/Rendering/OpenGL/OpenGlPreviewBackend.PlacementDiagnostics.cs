@@ -30,7 +30,7 @@ public sealed partial class OpenGlPreviewBackend
             ?? rebake.MeshProvenance?.Detail
             ?? "unknown";
         var dedupeKey =
-            $"{norm}|gpu={(gpuSkinning ? 1 : 0)}|motion={(setupAnimMotion ? 1 : 0)}|lift={subject.EntityGpuMeshSpaceLiftY:0.####}|ler={lerBasis}";
+            $"{norm}|gpu={(gpuSkinning ? 1 : 0)}|motion={(setupAnimMotion ? 1 : 0)}|lift={subject.EntityGpuMeshSpaceLiftY:0.####}|ler={lerBasis}|profile={rebake.NativeProfileName}|stride={_lastMeshUploadStride}|rev={PreviewMeshGeometryFingerprint.PipelineRevision}";
         if (string.Equals(dedupeKey, _parityPlacementDiagKey, StringComparison.Ordinal))
         {
             return;
@@ -48,5 +48,15 @@ public sealed partial class OpenGlPreviewBackend
             rebake.LastBodyCentroidY,
             rebake.LastHeadCentroidY,
             rebake.LastLegCentroidY));
+        EmitDiagnostic(
+            $"[3D preview] Parity state: path={norm} profile={rebake.NativeProfileName} parsed={rebake.NativeParsedVersion ?? "?"} " +
+            $"source={lerBasis} columnPose={(IsDolphinColumnPoseSource(lerBasis) ? 1 : 0)} " +
+            $"legacyPose={(EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose ? 1 : 0)} lerOverride={EntityPreviewDebugSettings.LerBasisOverride} " +
+            $"uploadStride={_lastMeshUploadStride} pipelineRev={PreviewMeshGeometryFingerprint.PipelineRevision} " +
+            $"subjectPreview={(subject.EntityGpuVerticesInPreviewSpace ? 1 : 0)} placed={(subject.EntityPreviewPlacementApplied ? 1 : 0)}");
     }
+
+    private static bool IsDolphinColumnPoseSource(string source) =>
+        string.Equals(source, "net.minecraft.client.model.animal.dolphin.DolphinModel", StringComparison.Ordinal) ||
+        string.Equals(source, "net.minecraft.client.model.animal.dolphin.BabyDolphinModel", StringComparison.Ordinal);
 }

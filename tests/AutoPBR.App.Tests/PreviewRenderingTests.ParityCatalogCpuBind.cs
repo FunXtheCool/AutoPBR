@@ -59,6 +59,53 @@ public sealed partial class PreviewRenderingTests
     }
 
     [Fact]
+    public void Material_refresh_preserves_committed_parity_cpu_subject_before_ui_repush()
+    {
+        var backend = new OpenGlPreviewBackend();
+        var textureMaps = CreateDolphinTextureMaps();
+        var slotMaterials = CreateDolphinSlotMaterials(textureMaps);
+        var rebake = CreateDolphinRebakeContext(packFingerprint: 1101UL);
+
+        var committedVerts = CreatePreviewVerts(192, seed: 21);
+        var packVerts = CreatePreviewVerts(192, seed: 22);
+        var indices = CreatePreviewIndices(288);
+
+        var committedSubject = CreateDolphinSubject(
+            committedVerts,
+            indices,
+            textureMaps,
+            rebake,
+            entityGpuVerticesInPreviewSpace: true,
+            entityPreviewPlacementApplied: true);
+
+        backend.TestSimulateParityCatalogCpuBindCommit(committedSubject);
+
+        // GlPbrPreviewControl.UpdatePreview3D refreshes the primary material before it re-pushes
+        // the Java/entity subject. Keep the committed TryRebakeMesh subject alive across that step.
+        backend.SetMaterial(slotMaterials[0]);
+
+        var packSubject = CreateDolphinSubject(
+            packVerts,
+            indices,
+            textureMaps,
+            CreateDolphinRebakeContext(packFingerprint: 1101UL),
+            entityGpuVerticesInPreviewSpace: false,
+            entityPreviewPlacementApplied: false);
+
+        backend.SetBlockModelPreview(packSubject, slotMaterials);
+
+        var stored = backend.TestBlockModelSubject;
+        Assert.NotNull(stored);
+        Assert.Same(committedVerts, stored!.InterleavedVertices);
+        Assert.True(stored.EntityGpuVerticesInPreviewSpace);
+        Assert.True(stored.EntityPreviewPlacementApplied);
+        Assert.False(backend.TestMeshDirty);
+        Assert.Equal(
+            OpenGlPreviewBackend.TestBuildParityCatalogCpuBindCommitKey(rebake),
+            backend.TestEntityBindPoseCommittedKey);
+    }
+
+    [Fact]
     public void SetBlockModelPreview_invalidates_parity_commit_only_when_pack_fingerprint_changes()
     {
         var backend = new OpenGlPreviewBackend();

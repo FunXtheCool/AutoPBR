@@ -261,8 +261,6 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     {
         lock (_sync)
         {
-            _blockModelSubject = null;
-            _blockModelSlots = null;
             _material = material;
             _materialDirty = true;
         }
@@ -362,7 +360,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         RecordMeshUpload(strideFloats);
     }
 
-    /// <summary>Multi-material Java block model preview. Cleared by <see cref="SetMaterial"/>.</summary>
+    /// <summary>Multi-material Java block model preview. Pass <c>null</c> to clear it.</summary>
     public void SetBlockModelPreview(PreviewModelSubject? subject, PreviewMaterial[]? slotMaterials)
     {
         lock (_sync)
@@ -433,8 +431,8 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
                 {
                     _entityBindPoseCommittedKey = null;
                     _parityCatalogCpuBindDiagKey = null;
-                _parityCatalogCpuBindFailDiagKey = null;
-                _entityMeshUploadDeferredDiagKey = null;
+                    _parityCatalogCpuBindFailDiagKey = null;
+                    _entityMeshUploadDeferredDiagKey = null;
                     _meshDirty = true;
                 }
 

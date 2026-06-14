@@ -52,6 +52,41 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 _ => Er(xRad, yRad, zRad)
             };
 
+        /// <summary>
+        /// Vanilla <c>ModelPart.translateAndRotate</c> bind rotation: JOML <c>Quaternionf.rotationZYX(z, y, x)</c> in row-matrix form.
+        /// </summary>
+        public static Matrix4x4 ModelPartRotationZyx(float xRad, float yRad, float zRad) =>
+            Mul(Mul(Rx(xRad), Ry(yRad)), Rz(zRad));
+
+        /// <summary>
+        /// Vanilla bind <c>translateAndRotate</c> local delta in block space (bind translation row + rotation upper 3×3).
+        /// </summary>
+        public static Matrix4x4 ModelPartRenderLocalBlock(
+            float txTexel,
+            float tyTexel,
+            float tzTexel,
+            float xRad = 0f,
+            float yRad = 0f,
+            float zRad = 0f)
+        {
+            var translation = T(txTexel / 16f, tyTexel / 16f, tzTexel / 16f);
+            var rotation = ModelPartRotationZyx(xRad, yRad, zRad);
+            return new Matrix4x4(
+                rotation.M11, rotation.M12, rotation.M13, rotation.M14,
+                rotation.M21, rotation.M22, rotation.M23, rotation.M24,
+                rotation.M31, rotation.M32, rotation.M33, rotation.M34,
+                translation.M41, translation.M42, translation.M43, translation.M44);
+        }
+
+        /// <summary>
+        /// Row-matrix representation of Java <c>PartPose.offsetAndRotation</c>: full <c>Er × T</c> matrix product in texel space.
+        /// </summary>
+        public static Matrix4x4 PartPose(float x, float y, float z, float xRad = 0f, float yRad = 0f, float zRad = 0f, string? order = "XYZ") =>
+            Mul(ComposeEuler(order, xRad, yRad, zRad), T(x, y, z));
+
+        /// <summary>Attach a local part pose under its parent in row-matrix storage (<c>local * parent</c>).</summary>
+        public static Matrix4x4 Child(Matrix4x4 parent, Matrix4x4 localPartPose) => Mul(localPartPose, parent);
+
         public static void AssertFinitePose(in Matrix4x4 pose, string label)
         {
             static bool IsFinite(float v) => !float.IsNaN(v) && !float.IsInfinity(v);

@@ -65,15 +65,23 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return false;
         }
 
-        var translation = EntityParityTemplate.T(tx / 16f, ty / 16f, tz / 16f);
-        var rotation = EntityParityTemplate.ComposeEuler(order, rx, ry, rz);
-        // ModelPart.translateAndRotate: bind translation row + Euler upper 3×3 (not Er×T matrix product).
-        localBlock = new Matrix4x4(
-            rotation.M11, rotation.M12, rotation.M13, rotation.M14,
-            rotation.M21, rotation.M22, rotation.M23, rotation.M24,
-            rotation.M31, rotation.M32, rotation.M33, rotation.M34,
-            translation.M41, translation.M42, translation.M43, translation.M44);
+        _ = order;
+        localBlock = EntityParityTemplate.ModelPartRenderLocalBlock(tx, ty, tz, rx, ry, rz);
         return true;
+    }
+
+    internal static Matrix4x4 ModelPartRenderChildTexel(
+        Matrix4x4 parentWorldTexel,
+        float txTexel,
+        float tyTexel,
+        float tzTexel,
+        float xRad = 0f,
+        float yRad = 0f,
+        float zRad = 0f)
+    {
+        var parentBlock = TexelRowAffineToBlock(parentWorldTexel);
+        var localBlock = EntityParityTemplate.ModelPartRenderLocalBlock(txTexel, tyTexel, tzTexel, xRad, yRad, zRad);
+        return BlockRowAffineToTexel(Matrix4x4.Multiply(localBlock, parentBlock));
     }
 
     private static bool TryComposePartPose(
@@ -105,7 +113,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
     }
 
     /// <summary>
-    /// Hand-builder / <c>PartPose.offsetAndRotation</c> column chain: <c>parent × (T × Er)</c> in texel space.
+    /// Java <c>PartPose.offsetAndRotation</c> chain in texel space. PoseStack stores the equivalent column chain as
+    /// <c>parent * T * R</c>; with <see cref="Matrix4x4"/> row-vector transforms this must be <c>(R * T) * parent</c>.
     /// </summary>
     internal static bool TryComposeColumnPartPose(
         JsonElement pose,
@@ -125,10 +134,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return false;
         }
 
-        var local = EntityParityTemplate.Mul(
-            EntityParityTemplate.T(tx, ty, tz),
-            EntityParityTemplate.ComposeEuler(order, rx, ry, rz));
-        worldTexel = EntityParityTemplate.Mul(parentWorldTexel, local);
+        var local = EntityParityTemplate.PartPose(tx, ty, tz, rx, ry, rz, order);
+        worldTexel = EntityParityTemplate.Child(parentWorldTexel, local);
         return true;
     }
 

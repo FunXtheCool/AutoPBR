@@ -49,18 +49,14 @@ internal readonly struct GeometryIrMeshEmitOptions
     public Func<string, string?>? ResolvePartTextureKey { get; init; }
 
     /// <summary>
-    /// Compose child poses as <c>parent × (T × Er)</c> in texel/column space (hand <c>BuildDolphin</c> / vanilla
-    /// <c>PartPose.offsetAndRotation</c> chains). Default IR walk uses separated translate+rotate row blocks.
+    /// Compose child poses from Java <c>PartPose.offsetAndRotation</c> in texel space. The source PoseStack is
+    /// <c>parent * T * R</c>; row-vector <see cref="Matrix4x4"/> storage emits the equivalent <c>(R * T) * parent</c>.
+    /// Production preview emit uses ModelPart block-stack compose instead unless this flag is set explicitly.
     /// </summary>
     public bool UseColumnTranslationTimesRotationPartPose { get; init; }
 
-    /// <summary>
-    /// Dolphin fins (and similar <c>PartPose.offsetAndRotation</c> chains) require column compose even when
-    /// callers omit <see cref="UseColumnTranslationTimesRotationPartPose"/> on <see cref="GeometryIrMeshEmitOptions"/>.
-    /// </summary>
     internal bool ResolveUseColumnTranslationTimesRotationPartPose() =>
-        UseColumnTranslationTimesRotationPartPose ||
-        GeometryIrEmitPolicy.UsesColumnTranslationTimesRotationPartPoseJvm(OfficialJvmName);
+        UseColumnTranslationTimesRotationPartPose;
 
     public static GeometryIrMeshEmitOptions Default => ForViewport();
 
@@ -84,22 +80,8 @@ internal readonly struct GeometryIrMeshEmitOptions
         Fidelity = GeometryIrEmitFidelity.Parity
     };
 
-    public GeometryIrMeshEmitOptions WithOfficialJvmPoseComposeDefaults(string? officialJvmName)
-    {
-        if (string.IsNullOrWhiteSpace(officialJvmName))
-        {
-            return this;
-        }
-
-        return GeometryIrEmitPolicy.UsesColumnTranslationTimesRotationPartPoseJvm(officialJvmName)
-            ? this with
-            {
-                OfficialJvmName = officialJvmName,
-                UseColumnTranslationTimesRotationPartPose = true,
-            }
+    public GeometryIrMeshEmitOptions WithOfficialJvmPoseComposeDefaults(string? officialJvmName) =>
+        string.IsNullOrWhiteSpace(officialJvmName)
+            ? this
             : this with { OfficialJvmName = officialJvmName };
-    }
-
-    internal static bool UsesColumnTranslationTimesRotationPartPoseJvm(string? officialJvmName) =>
-        GeometryIrEmitPolicy.UsesColumnTranslationTimesRotationPartPoseJvm(officialJvmName);
 }

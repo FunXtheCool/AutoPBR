@@ -98,7 +98,7 @@ public final class GeometryReferenceBake {
               "extractionStatus": "reference_java",
               "factoryMethod": "%s",
               "meshHostJvmName": "%s",
-              "roots": [%s]%s
+              "roots": [%s],%s
             }
             """.formatted(VERSION_LABEL, fqn, resolved.factoryMethod(), resolved.host().getName(),
                 String.join(",", roots), renderCenters);

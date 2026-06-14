@@ -74,16 +74,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
                     wave);
             }
 
-            if (string.Equals(builderMethod, "Dolphin", StringComparison.OrdinalIgnoreCase))
-            {
-                return opts with { UseColumnTranslationTimesRotationPartPose = true };
-            }
-
-            if (GeometryIrMeshEmitOptions.UsesColumnTranslationTimesRotationPartPoseJvm(resolvedOfficialJvm))
-            {
-                return opts with { UseColumnTranslationTimesRotationPartPose = true };
-            }
-
             return opts;
         }
 

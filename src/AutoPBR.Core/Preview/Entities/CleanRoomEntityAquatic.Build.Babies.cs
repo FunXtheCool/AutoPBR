@@ -88,38 +88,30 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var p = BabyProfile.Adult;
         var b = new RigBuilder(64, 64);
         var root = Matrix4x4.Identity;
-        var bodyPose = EntityParityTemplate.Mul(root, EntityParityTemplate.T(0f, 21.5f, 0f));
+        var bodyPose = ModelPartRenderChildTexel(root, 0f, 21.5f, 0f);
 
         new EntityCuboid(-2.5f, -4f, 6f - 0.01f, 2.5f, 4f, 6f + 0.01f, 20, 0, UvSizeW: 5, UvSizeH: 8, UvSizeD: 1).Emit(b, bodyPose, p.BodyScale);
 
-        var headPose = EntityParityTemplate.Mul(bodyPose, EntityParityTemplate.T(0f, 1f, -4f));
+        var headPose = ModelPartRenderChildTexel(bodyPose, 0f, 1f, -4f);
         new EntityCuboid(-3.5f, -4f, 6f - 0.01f, 1.5f, 0f, 6f + 0.01f, 0, 0, UvSizeW: 5, UvSizeH: 4, UvSizeD: 1).Emit(b, headPose, p.HeadScale);
 
-        var nosePose = EntityParityTemplate.Mul(bodyPose, EntityParityTemplate.T(0f, 0.5f, -4f));
+        var nosePose = ModelPartRenderChildTexel(bodyPose, 0f, 0.5f, -4f);
         new EntityCuboid(-1f, -2f, 2f - 0.01f, 1f, 0f, 2f + 0.01f, 0, 9, UvSizeW: 2, UvSizeH: 2, UvSizeD: 1).Emit(b, nosePose, p.HeadScale);
 
-        var leftFinPose = EntityParityTemplate.Mul(
-            bodyPose,
-            EntityParityTemplate.Mul(EntityParityTemplate.T(1.8f, 0.85f, -2.6f), EntityParityTemplate.Er(0.87266463f, 0f, 2.0943952f)));
+        var leftFinPose = ModelPartRenderChildTexel(bodyPose, 1.8f, 0.85f, -2.6f, 0.87266463f, 0f, 2.0943952f);
         new EntityCuboid(-1.5f, -0.5f, 1f - 0.01f, 1.5f, 5.5f, 1f + 0.01f, 34, 18, UvSizeW: 3, UvSizeH: 6, UvSizeD: 1, MirrorUv: true).Emit(b, leftFinPose, p.BodyScale);
 
-        var rightFinPose = EntityParityTemplate.Mul(
-            bodyPose,
-            EntityParityTemplate.Mul(EntityParityTemplate.T(-1.8f, 0.85f, -2.6f), EntityParityTemplate.Er(0.87266463f, 0f, -1.701696f)));
+        var rightFinPose = ModelPartRenderChildTexel(bodyPose, -1.8f, 0.85f, -2.6f, 0.87266463f, 0f, -1.701696f);
         new EntityCuboid(-1.5f, -0.5f, 1f - 0.01f, 1.5f, 5.5f, 1f + 0.01f, 48, 18, UvSizeW: 3, UvSizeH: 6, UvSizeD: 1).Emit(b, rightFinPose, p.BodyScale);
 
         var tailPitch = -0.10471976f - swimSway * 0.2f;
-        var tailPose = EntityParityTemplate.Mul(
-            bodyPose,
-            EntityParityTemplate.Mul(EntityParityTemplate.T(0f, 1f, 4f), EntityParityTemplate.Er(tailPitch, 0f, 0f)));
+        var tailPose = ModelPartRenderChildTexel(bodyPose, 0f, 1f, 4f, tailPitch);
         new EntityCuboid(-1.5f, 0f, 4f - 0.01f, 1.5f, 7f, 4f + 0.01f, 0, 13, UvSizeW: 3, UvSizeH: 7, UvSizeD: 1).Emit(b, tailPose, p.LegScale);
 
-        var tailFinPose = EntityParityTemplate.Mul(tailPose, EntityParityTemplate.T(0f, 0f, 6f));
+        var tailFinPose = ModelPartRenderChildTexel(tailPose, 0f, 0f, 6f);
         new EntityCuboid(-0.5f, -1f, 8f - 0.01f, 0.5f, 3f, 8f + 0.01f, 22, 13, UvSizeW: 1, UvSizeH: 4, UvSizeD: 1).Emit(b, tailFinPose, p.LegScale);
 
-        var backFinPose = EntityParityTemplate.Mul(
-            bodyPose,
-            EntityParityTemplate.Mul(EntityParityTemplate.T(0f, -1f, -2.7f), EntityParityTemplate.Rx(0.87266463f)));
+        var backFinPose = ModelPartRenderChildTexel(bodyPose, 0f, -1f, -2.7f, 0.87266463f);
         new EntityCuboid(-1f, 1f, 1f - 0.01f, 2f, 5f, 1f + 0.01f, 42, 0, UvSizeW: 3, UvSizeH: 4, UvSizeD: 1).Emit(b, backFinPose, p.BodyScale);
 
         return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef));

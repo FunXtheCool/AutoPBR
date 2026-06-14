@@ -33,20 +33,20 @@ internal static class GeometryIrDocumentLoader
         string officialJvmName,
         out JsonElement root)
     {
-        if (TryLoadLiftedOkForParity(profile, officialJvmName, out root))
+        root = default;
+        foreach (var ver in NativeIrVersionLabels.ForGeometryIrShardLookup(profile))
         {
+            if (!TryLoadShard(ver, officialJvmName, requireExtractionOk: false, out var candidate) ||
+                GeometryIrLiftPolicy.EvaluateDocument(candidate) == GeometryIrLiftPolicyDecision.RejectForParity)
+            {
+                continue;
+            }
+
+            root = candidate;
             return true;
         }
 
-        if (!TryLoad(profile, officialJvmName, out root) ||
-            !root.TryGetProperty("extractionStatus", out var status) ||
-            !string.Equals(status.GetString(), "partial", StringComparison.Ordinal))
-        {
-            root = default;
-            return false;
-        }
-
-        return GeometryIrLiftPolicy.EvaluateDocument(root) != GeometryIrLiftPolicyDecision.RejectForParity;
+        return false;
     }
 
     private static bool TryLoad(

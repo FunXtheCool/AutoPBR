@@ -298,14 +298,10 @@ public static class GeometryIrEmitPolicy
 
 
     /// <summary>
-    /// Javap <c>DolphinModel.createBodyLayer</c> (26.1.2): pectorals use
-    /// <c>PartPose.offsetAndRotation</c>, dorsal uses <c>PartPose.rotation</c>, tail uses
-    /// <c>offsetAndRotation</c>. Preview emit must compose as <c>parent × (T × Er)</c> in texel space.
+    /// Bind pose must stay on ModelPart block-stack even when
+    /// <see cref="EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose"/> is enabled for A/B elsewhere.
     /// </summary>
-    internal static bool IsDolphinFamilyJvm(string? officialJvmName) =>
-        UsesColumnTranslationTimesRotationPartPoseJvm(officialJvmName);
-
-    internal static bool UsesColumnTranslationTimesRotationPartPoseJvm(string? officialJvmName) =>
+    internal static bool IgnoresLegacyPartPoseDebugSwitch(string? officialJvmName) =>
         string.Equals(officialJvmName, "net.minecraft.client.model.animal.dolphin.DolphinModel", StringComparison.Ordinal) ||
         string.Equals(officialJvmName, "net.minecraft.client.model.animal.dolphin.BabyDolphinModel", StringComparison.Ordinal);
 

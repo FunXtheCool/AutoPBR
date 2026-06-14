@@ -103,11 +103,7 @@ public sealed class AttachedPartWorldMatrixParityTests
         Assert.NotNull(mesh);
         Assert.Null(err);
 
-        var emitOptions = GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH) with
-        {
-            OfficialJvmName = jvm,
-            UseColumnTranslationTimesRotationPartPose = true,
-        };
+        var emitOptions = GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH) with { OfficialJvmName = jvm };
         var elementPartIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(repaired, emitOptions);
 
         foreach (var partId in partIds)
@@ -169,11 +165,7 @@ public sealed class AttachedPartWorldMatrixParityTests
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
         var elementPartIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
             repaired,
-            GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH) with
-            {
-                OfficialJvmName = jvm,
-                UseColumnTranslationTimesRotationPartPose = true,
-            });
+            GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH) with { OfficialJvmName = jvm });
 
         foreach (var partId in partIds)
         {
@@ -302,12 +294,11 @@ public sealed class AttachedPartWorldMatrixParityTests
             var world = parentWorld;
             if (part.TryGetProperty("pose", out var poseEl))
             {
-                if (GeometryIrMeshEmitOptions.UsesColumnTranslationTimesRotationPartPoseJvm(officialJvmName) &&
-                    CleanRoomEntityModelRuntime.TryComposeColumnPartPose(poseEl, parentWorld, out var worldColumn, out _))
+                if (!CleanRoomEntityModelRuntime.TryComposePartPosePublic(poseEl, parentWorld, out var worldTexel))
                 {
-                    world = worldColumn;
+                    world = parentWorld;
                 }
-                else if (CleanRoomEntityModelRuntime.TryComposePartPosePublic(poseEl, parentWorld, out var worldTexel))
+                else
                 {
                     world = worldTexel;
                 }

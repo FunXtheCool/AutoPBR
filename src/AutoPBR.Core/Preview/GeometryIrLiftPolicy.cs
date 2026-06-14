@@ -27,6 +27,11 @@ public static class GeometryIrLiftPolicy
             return GeometryIrLiftPolicyDecision.RejectForParity;
         }
 
+        if (IsKnownParityUnsafeDocument(geometryRoot))
+        {
+            return GeometryIrLiftPolicyDecision.RejectForParity;
+        }
+
         var hasCaveat = false;
         foreach (var part in roots.EnumerateArray())
         {
@@ -80,5 +85,84 @@ public static class GeometryIrLiftPolicy
         }
 
         return true;
+    }
+
+    private static bool IsKnownParityUnsafeDocument(JsonElement geometryRoot)
+    {
+        var jvm = geometryRoot.TryGetProperty("officialJvmName", out var jvmEl)
+            ? jvmEl.GetString()
+            : null;
+        var version = geometryRoot.TryGetProperty("versionLabel", out var versionEl)
+            ? versionEl.GetString()
+            : null;
+
+        return string.Equals(version, MinecraftPreviewVersionGate.LegacyNativeProfileLabel, StringComparison.Ordinal) &&
+               string.Equals(jvm, "net.minecraft.client.model.animal.dolphin.DolphinModel", StringComparison.Ordinal) &&
+               LooksLikeLegacyDolphinPoseLiftCorruption(geometryRoot);
+    }
+
+    private static bool LooksLikeLegacyDolphinPoseLiftCorruption(JsonElement geometryRoot)
+    {
+        if (!TryFindPart(geometryRoot, "back_fin", out var backFin) ||
+            !backFin.TryGetProperty("pose", out var pose) ||
+            !pose.TryGetProperty("translation", out var translation) ||
+            !pose.TryGetProperty("rotationEulerRad", out var rotation) ||
+            translation.ValueKind != JsonValueKind.Array ||
+            rotation.ValueKind != JsonValueKind.Array ||
+            translation.GetArrayLength() < 3 ||
+            rotation.GetArrayLength() < 3)
+        {
+            return false;
+        }
+
+        var tx = translation[0].GetDouble();
+        var rx = rotation[0].GetDouble();
+        return Math.Abs(tx - Math.PI / 3.0) < 1e-4 &&
+               Math.Abs(rx) < 1e-6;
+    }
+
+    private static bool TryFindPart(JsonElement root, string partId, out JsonElement part)
+    {
+        part = default;
+        if (!root.TryGetProperty("roots", out var roots) || roots.ValueKind != JsonValueKind.Array)
+        {
+            return false;
+        }
+
+        foreach (var rootPart in roots.EnumerateArray())
+        {
+            if (TryFindPartRecursive(rootPart, partId, out part))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool TryFindPartRecursive(JsonElement candidate, string partId, out JsonElement part)
+    {
+        part = default;
+        if (candidate.TryGetProperty("id", out var idEl) &&
+            string.Equals(idEl.GetString(), partId, StringComparison.Ordinal))
+        {
+            part = candidate;
+            return true;
+        }
+
+        if (!candidate.TryGetProperty("children", out var children) || children.ValueKind != JsonValueKind.Array)
+        {
+            return false;
+        }
+
+        foreach (var child in children.EnumerateArray())
+        {
+            if (TryFindPartRecursive(child, partId, out part))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

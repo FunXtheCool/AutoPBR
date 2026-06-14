@@ -1,5 +1,6 @@
 using System.Numerics;
 
+using AutoPBR.App.Rendering.Abstractions;
 using AutoPBR.Core.Models;
 using AutoPBR.Core.Preview;
 
@@ -143,7 +144,7 @@ public sealed partial class OpenGlPreviewBackend
         bool bonePaletteUploaded,
         bool resolveOk)
     {
-        if (subject is not { GpuEntityBoneSkinning: true, EmulatedRebake: { } rebake })
+        if (subject is not { EmulatedRebake: { } rebake })
         {
             return;
         }
@@ -151,6 +152,40 @@ public sealed partial class OpenGlPreviewBackend
         var norm = rebake.AssetArchivePath.Replace('\\', '/').TrimStart('/');
         if (!EntityTextureParityCatalog.IsCatalogued(norm))
         {
+            return;
+        }
+
+        if (!subject.GpuEntityBoneSkinning)
+        {
+            var cpuWarn = _lastUploadedPreviewSpaceVerts == 1 &&
+                          _lastUploadedBindMesh == 0 &&
+                          _lastUploadedGpuSkinning == 0 &&
+                          _lastMeshUploadStride == PreviewMesh.FloatsPerVertex
+                ? ""
+                : " WARN";
+            if (!EntityPreviewDebugSettings.LogDrawContractEveryFrame &&
+                !string.Equals(passLabel, "main", StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            var subjectStride = subject.VertexStrideFloats > 0 ? subject.VertexStrideFloats : PreviewMesh.FloatsPerVertex;
+            var cpuKey =
+                $"{passLabel}|{norm}|cpu=1|anim={(setupAnimMotion ? 1 : 0)}|resolve={(resolveOk ? 1 : 0)}|" +
+                $"preview={_lastUploadedPreviewSpaceVerts}|bind={_lastUploadedBindMesh}|skin={_lastUploadedGpuSkinning}|" +
+                $"uploadStride={_lastMeshUploadStride}|subjectStride={subjectStride}|locs={(locs.IsComplete ? 1 : 0)}";
+            if (!EntityPreviewDebugSettings.LogDrawContractEveryFrame &&
+                string.Equals(cpuKey, _entityDrawContractDiagKey, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            _entityDrawContractDiagKey = cpuKey;
+            EmitDiagnostic(
+                $"[3D preview] Entity draw contract{cpuWarn} [{passLabel}]: path={norm} gpuSubject=0 setupAnim={(setupAnimMotion ? 1 : 0)} " +
+                $"resolve={(resolveOk ? 1 : 0)} previewVerts={_lastUploadedPreviewSpaceVerts} bindMesh={_lastUploadedBindMesh} " +
+                $"gpuSkinning={_lastUploadedGpuSkinning} boneCount={_lastUploadedBoneCount} uploadStride={_lastMeshUploadStride} " +
+                $"subjectStride={subjectStride} locs={(locs.IsComplete ? 1 : 0)}");
             return;
         }
 

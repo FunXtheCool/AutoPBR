@@ -108,6 +108,85 @@ public sealed class DolphinPreviewAttachmentTests
     }
 
     [Fact]
+    public void Runtime_cpu_rebake_preview_vbo_fin_vertices_match_hand_builder()
+    {
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{Jvm}.json");
+        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
+            !string.Equals(status, "ok", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(
+            TexturePath,
+            Profile26,
+            idlePhase01: 0f,
+            animationTimeSeconds: 0f,
+            out var runtimeMesh,
+            out var provenance,
+            applyGeometryIrSetupAnimMotion: false));
+        Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
+
+        var rebake = CreateDolphinRebakeContext(idlePhase01: 0f);
+        Assert.True(EntityEmulatedPreviewRebaker.TryRebakeMesh(
+            rebake,
+            CreateDolphinMaterialSet(),
+            animationTimeSeconds: 0f,
+            out var runtimeVerts,
+            out _,
+            out _,
+            applyGeometryIrSetupAnimMotion: false));
+        Assert.NotNull(rebake.ElementPartIds);
+
+        var runtimeBounds = MeasureCpuPreviewBoundsByPart(
+            runtimeVerts!,
+            MinecraftModelBaker.FloatsPerVertex,
+            runtimeMesh!,
+            rebake.ElementPartIds!);
+
+        var hand = CleanRoomEntityModelRuntime.BuildDolphinHandMeshForTests("entity/dolphin/dolphin", Profile26);
+        var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase) { [TexturePath] = 0 };
+        var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase) { [TexturePath] = (64, 64) };
+        Assert.True(MinecraftModelBaker.TryBake(hand, "minecraft", pathToIdx, texSizes, out var handVerts, out _, out _));
+
+        var handPartIds = DolphinHandPartIds();
+        EntityPreviewPlacement.ApplyToPreviewVertices(
+            handVerts,
+            MinecraftModelBaker.FloatsPerVertex,
+            handPartIds);
+        var handBounds = MeasureCpuPreviewBoundsByPart(
+            handVerts,
+            MinecraftModelBaker.FloatsPerVertex,
+            hand,
+            handPartIds);
+
+        foreach (var finId in new[] { "back_fin", "left_fin", "right_fin" })
+        {
+            Assert.True(runtimeBounds.TryGetValue(finId, out var runtimeFin), $"runtime missing {finId}");
+            Assert.True(handBounds.TryGetValue(finId, out var handFin), $"hand missing {finId}");
+            Assert.True(runtimeBounds.TryGetValue("body", out var runtimeBody), "runtime missing body");
+            Assert.True(handBounds.TryGetValue("body", out var handBody), "hand missing body");
+
+            var centerGap = Vector3.Distance(runtimeFin.Center, handFin.Center);
+            var runtimeBodyGap = PartPreviewBounds.SeparatedDistance(runtimeBody, runtimeFin);
+            var handBodyGap = PartPreviewBounds.SeparatedDistance(handBody, handFin);
+            _output.WriteLine(
+                $"{finId}: runtimeCenter={runtimeFin.Center} handCenter={handFin.Center} " +
+                $"centerGap={centerGap:F4} runtimeBodyGap={runtimeBodyGap:F4} handBodyGap={handBodyGap:F4}");
+
+            Assert.True(centerGap <= 0.08f, $"{finId} CPU preview VBO center diverged from hand builder (gap={centerGap:F3})");
+            Assert.True(runtimeBodyGap <= 0.05f,
+                $"{finId} CPU preview VBO should touch the body hull (gap={runtimeBodyGap:F3})");
+            Assert.True(handBodyGap <= 0.05f,
+                $"{finId} hand preview VBO should touch the body hull (gap={handBodyGap:F3})");
+            Assert.True(Math.Abs(runtimeBodyGap - handBodyGap) <= 0.08f,
+                $"{finId} CPU preview VBO body separation diverged from hand builder (runtime={runtimeBodyGap:F3}, hand={handBodyGap:F3})");
+        }
+    }
+
+    [Fact]
     public void Runtime_mesh_fin_preview_affine_matches_hand_builder()
     {
         var repo = GeometryIrTestTierSupport.FindRepoRoot();
@@ -133,7 +212,7 @@ public sealed class DolphinPreviewAttachmentTests
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(Jvm, shard.RootElement);
         var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
             repaired,
-            GeometryIrMeshEmitOptions.ForParity(64, 64) with { OfficialJvmName = Jvm, UseColumnTranslationTimesRotationPartPose = true });
+            GeometryIrMeshEmitOptions.ForParity(64, 64) with { OfficialJvmName = Jvm });
 
         var hand = CleanRoomEntityModelRuntime.BuildDolphinHandMeshForTests(TexturePath, Profile26);
         var handPartOrder = new[] { "body", "back_fin", "left_fin", "right_fin", "tail", "tail_fin", "head", "nose" };
@@ -235,7 +314,7 @@ public sealed class DolphinPreviewAttachmentTests
         var hand = CleanRoomEntityModelRuntime.BuildDolphinHandMeshForTests(TexturePath, Profile26);
         var ler = CleanRoomEntityModelRuntime.LivingEntityRendererPreviewRootScale;
         var irPartIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
-            repaired, GeometryIrMeshEmitOptions.ForParity(64, 64) with { OfficialJvmName = Jvm, UseColumnTranslationTimesRotationPartPose = true });
+            repaired, GeometryIrMeshEmitOptions.ForParity(64, 64) with { OfficialJvmName = Jvm });
 
         // Hand BuildDolphin emit order: body, back_fin, left_fin, right_fin, tail, tail_fin, head, nose.
         var handPartOrder = new[] { "body", "back_fin", "left_fin", "right_fin", "tail", "tail_fin", "head", "nose" };
@@ -284,7 +363,7 @@ public sealed class DolphinPreviewAttachmentTests
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(Jvm, shard.RootElement);
         var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
             repaired,
-            GeometryIrMeshEmitOptions.ForParity(64, 64) with { OfficialJvmName = Jvm, UseColumnTranslationTimesRotationPartPose = true });
+            GeometryIrMeshEmitOptions.ForParity(64, 64) with { OfficialJvmName = Jvm });
 
         for (var i = 0; i < handPartOrder.Length; i++)
         {
@@ -303,18 +382,17 @@ public sealed class DolphinPreviewAttachmentTests
     }
 
     [Fact]
-    public void Dolphin_jvm_enables_column_translation_times_rotation_pose_compose()
+    public void Dolphin_emit_uses_model_part_block_stack_not_column_part_pose()
     {
-        Assert.True(GeometryIrMeshEmitOptions.UsesColumnTranslationTimesRotationPartPoseJvm(
-            "net.minecraft.client.model.animal.dolphin.DolphinModel"));
-        Assert.True(GeometryIrMeshEmitOptions.UsesColumnTranslationTimesRotationPartPoseJvm(
-            "net.minecraft.client.model.animal.dolphin.BabyDolphinModel"));
-        Assert.False(GeometryIrMeshEmitOptions.UsesColumnTranslationTimesRotationPartPoseJvm(
-            "net.minecraft.client.model.animal.rabbit.AdultRabbitModel"));
+        var opts = GeometryIrMeshEmitOptions.ForParity(64, 64) with
+        {
+            OfficialJvmName = "net.minecraft.client.model.animal.dolphin.DolphinModel",
+        };
+        Assert.False(opts.ResolveUseColumnTranslationTimesRotationPartPose());
     }
 
     [Fact]
-    public void Dolphin_jvm_auto_column_compose_attaches_fins_without_explicit_flag()
+    public void Dolphin_block_stack_compose_attaches_fins_to_hand_builder()
     {
         var repo = GeometryIrTestTierSupport.FindRepoRoot();
         var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{Jvm}.json");
@@ -360,7 +438,86 @@ public sealed class DolphinPreviewAttachmentTests
             var meshOrigin = Vector3.Transform(Vector3.Zero, meshWorld.Value);
             var gap = Vector3.Distance(handOrigin, meshOrigin);
             _output.WriteLine($"{finId}: hand={handOrigin} mesh={meshOrigin} gap={gap:F3}");
-            Assert.True(gap <= 0.08f, $"{finId} JVM auto column compose should match hand builder (gap={gap:F3})");
+            Assert.True(gap <= 0.08f, $"{finId} block-stack compose should match hand builder (gap={gap:F3})");
+        }
+    }
+
+    [Fact]
+    public void Legacy_dolphin_pose_lift_corruption_is_rejected_for_parity_catalog_lookup()
+    {
+        var legacyProfile = new MinecraftNativeProfile("1.21.11", "unused", new Version(1, 21, 11));
+        Assert.True(GeometryIrDocumentLoader.TryLoadLiftedOkForParity(legacyProfile, Jvm, out var legacyRoot));
+        Assert.Equal(
+            GeometryIrLiftPolicyDecision.RejectForParity,
+            GeometryIrLiftPolicy.EvaluateDocument(legacyRoot));
+
+        Assert.True(GeometryIrDocumentLoader.TryLoadLiftedForParityCatalog(legacyProfile, Jvm, out var resolvedRoot));
+        Assert.Equal("26.1.2", resolvedRoot.GetProperty("versionLabel").GetString());
+    }
+
+    [Fact]
+    public void Runtime_mesh_fin_pose_ignores_global_legacy_pose_debug_switch()
+    {
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{Jvm}.json");
+        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
+            !string.Equals(status, "ok", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        var oldLegacy = EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose;
+        try
+        {
+            EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose = true;
+            var runtime = EntityModelRuntimeFactory.Create();
+            Assert.True(runtime.TryBuildStaticMesh(
+                TexturePath,
+                Profile26,
+                idlePhase01: 0f,
+                animationTimeSeconds: 0f,
+                out var mesh,
+                out var provenance,
+                applyGeometryIrSetupAnimMotion: false));
+            Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
+
+            using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+            var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(Jvm, shard.RootElement);
+            var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
+                repaired,
+                GeometryIrMeshEmitOptions.ForParity(64, 64) with { OfficialJvmName = Jvm });
+            var hand = CleanRoomEntityModelRuntime.BuildDolphinHandMeshForTests(TexturePath, Profile26);
+            var handPartOrder = new[] { "body", "back_fin", "left_fin", "right_fin", "tail", "tail_fin", "head", "nose" };
+            var handIdxByPart = new Dictionary<string, int>(StringComparer.Ordinal);
+            for (var i = 0; i < handPartOrder.Length && i < hand.Elements.Count; i++)
+            {
+                handIdxByPart[handPartOrder[i]] = i;
+            }
+
+            foreach (var finId in new[] { "left_fin", "right_fin", "back_fin" })
+            {
+                Assert.True(handIdxByPart.TryGetValue(finId, out var handIdx), finId);
+                Matrix4x4? meshWorld = null;
+                for (var i = 0; i < mesh!.Elements.Count; i++)
+                {
+                    if (string.Equals(partIds[i], finId, StringComparison.Ordinal))
+                    {
+                        meshWorld = mesh.Elements[i].LocalToParent;
+                        break;
+                    }
+                }
+
+                Assert.NotNull(meshWorld);
+                var handOrigin = Vector3.Transform(Vector3.Zero, hand.Elements[handIdx].LocalToParent);
+                var meshOrigin = Vector3.Transform(Vector3.Zero, meshWorld.Value);
+                var gap = Vector3.Distance(handOrigin, meshOrigin);
+                _output.WriteLine($"{finId}: hand={handOrigin} mesh={meshOrigin} gap={gap:F3}");
+                Assert.True(gap <= 0.08f, $"{finId} should ignore global legacy pose debug switch (gap={gap:F3})");
+            }
+        }
+        finally
+        {
+            EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose = oldLegacy;
         }
     }
 
@@ -392,6 +549,93 @@ public sealed class DolphinPreviewAttachmentTests
 
     private static bool AllClose(in Matrix4x4 a, in Matrix4x4 b, float eps = 2e-4f) =>
         Math.Abs(a.M41 - b.M41) <= eps && Math.Abs(a.M42 - b.M42) <= eps && Math.Abs(a.M43 - b.M43) <= eps;
+
+    private static EntityEmulatedPreviewRebakeContext CreateDolphinRebakeContext(float idlePhase01) =>
+        new()
+        {
+            PackZipPath = "test.zip",
+            AssetArchivePath = TexturePath,
+            NativeRootDirectory = AppContext.BaseDirectory,
+            NativeProfileName = Profile26.Name,
+            NativeParsedVersion = Profile26.ParsedVersion?.ToString(),
+            ModelDefaultNamespace = "minecraft",
+            IdlePhase01 = idlePhase01,
+            OrderedTextureZipPaths = [TexturePath],
+        };
+
+    private static PreviewTextureMaps[] CreateDolphinMaterialSet() =>
+        [
+            new PreviewTextureMaps
+            {
+                Width = 64,
+                Height = 64,
+                DiffuseRgba = new byte[64 * 64 * 4],
+                NormalRgba = new byte[64 * 64 * 4],
+                SpecularRgba = new byte[64 * 64 * 4],
+                HeightRgba = new byte[64 * 64 * 4],
+            }
+        ];
+
+    private static string[] DolphinHandPartIds() =>
+        ["body", "back_fin", "left_fin", "right_fin", "tail", "tail_fin", "head", "nose"];
+
+    private readonly record struct PartPreviewBounds(Vector3 Min, Vector3 Max)
+    {
+        public Vector3 Center => (Min + Max) * 0.5f;
+
+        public static PartPreviewBounds FromPoint(Vector3 p) => new(p, p);
+
+        public PartPreviewBounds Include(Vector3 p) => new(Vector3.Min(Min, p), Vector3.Max(Max, p));
+
+        public PartPreviewBounds Union(PartPreviewBounds other) =>
+            new(Vector3.Min(Min, other.Min), Vector3.Max(Max, other.Max));
+
+        public static float SeparatedDistance(PartPreviewBounds a, PartPreviewBounds b)
+        {
+            var dx = MathF.Max(0f, MathF.Max(a.Min.X - b.Max.X, b.Min.X - a.Max.X));
+            var dy = MathF.Max(0f, MathF.Max(a.Min.Y - b.Max.Y, b.Min.Y - a.Max.Y));
+            var dz = MathF.Max(0f, MathF.Max(a.Min.Z - b.Max.Z, b.Min.Z - a.Max.Z));
+            return MathF.Sqrt(dx * dx + dy * dy + dz * dz);
+        }
+    }
+
+    private static Dictionary<string, PartPreviewBounds> MeasureCpuPreviewBoundsByPart(
+        ReadOnlySpan<float> vertices,
+        int stride,
+        MergedJavaBlockModel model,
+        string[] partIds)
+    {
+        var result = new Dictionary<string, PartPreviewBounds>(StringComparer.Ordinal);
+        var floatOffset = 0;
+        var elementCount = Math.Min(model.Elements.Count, partIds.Length);
+        for (var ei = 0; ei < elementCount; ei++)
+        {
+            var vertexCount = model.Elements[ei].Faces.Count * 4;
+            if (vertexCount <= 0)
+            {
+                continue;
+            }
+
+            PartPreviewBounds? bounds = null;
+            for (var vi = 0; vi < vertexCount && floatOffset + stride - 1 < vertices.Length; vi++, floatOffset += stride)
+            {
+                var p = new Vector3(vertices[floatOffset], vertices[floatOffset + 1], vertices[floatOffset + 2]);
+                bounds = bounds is { } existing ? existing.Include(p) : PartPreviewBounds.FromPoint(p);
+            }
+
+            if (bounds is not { } measured)
+            {
+                continue;
+            }
+
+            var id = partIds[ei];
+            result[id] = result.TryGetValue(id, out var aggregate)
+                ? aggregate.Union(measured)
+                : measured;
+        }
+
+        return result;
+    }
 
     private static Dictionary<string, Matrix4x4> BuildReferencePartWorldMatrices(JsonElement referenceRoot)
     {
