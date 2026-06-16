@@ -325,15 +325,17 @@ public static class EntityPreviewPlacement
         MinecraftNativeProfile profile,
         int elementCount)
     {
-        if (rebake.ElementPartIds is { Length: > 0 })
+        if (rebake.ElementPartIds is { Length: > 0 } existing && existing.Length == elementCount)
         {
             return;
         }
 
+        rebake.ElementPartIds = null;
         if (EntityPreviewGrounding.TryResolveCatalogElementPartIds(
                 rebake.AssetArchivePath,
                 profile,
                 elementCount,
+                rebake.PreviewPoseId,
                 out var partIds))
         {
             rebake.ElementPartIds = partIds;

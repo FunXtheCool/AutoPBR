@@ -1,6 +1,9 @@
 using System.Numerics;
 
 using AutoPBR.App.Rendering.Abstractions;
+using AutoPBR.App.Rendering.Scene;
+using AutoPBR.Core.Models;
+using AutoPBR.Core.Preview;
 
 using Silk.NET.OpenGL;
 
@@ -63,11 +66,29 @@ public sealed partial class OpenGlPreviewBackend
                         out frame.Eye, out frame.LookTarget);
                 }
                 var aspect = frame.Vw / (float)Math.Max(frame.Vh, 1);
+                var nearPlane = cam.NearPlane;
+                var farPlane = cam.FarPlane;
+                if (!frame.FlyCamActive &&
+                    frame.Scene.SceneKind != PreviewSceneKind.ItemPlane &&
+                    TryGetSubjectBoundsLocked(out var subjectMin, out var subjectMax))
+                {
+                    var envHalf = frame.Settings is { ShowBackgroundGrid: false, ShowGroundMesh: false }
+                        ? 0f
+                        : PreviewStageConstants.GridHalfExtent;
+                    (nearPlane, farPlane) = PreviewCameraDepthRange.ForOrbitPreview(
+                        subjectMin,
+                        subjectMax,
+                        frame.OrbitDistance,
+                        frame.Eye,
+                        environmentHalfExtent: envHalf,
+                        environmentFloorY: PreviewStageConstants.GridWorldY);
+                }
+
                 frame.Proj = PreviewGlMatrices.CreatePerspectiveFieldOfViewOpenGl(
                     cam.FieldOfViewDegrees * (MathF.PI / 180f),
                     aspect,
-                    cam.NearPlane,
-                    cam.FarPlane);
+                    nearPlane,
+                    farPlane);
                 frame.View = PreviewGlMatrices.CreateLookAtRhOpenGlRowStorage(frame.Eye, frame.LookTarget, Vector3.UnitY);
 
                 frame.LightDir = frame.WorldLightDir;
@@ -135,6 +156,8 @@ public sealed partial class OpenGlPreviewBackend
                 SetFloat("uAlphaCutoff", frame.Settings.AlphaCutoff);
                 SetInt("uItemAlphaBlend", frame.Settings.ItemUseAlphaBlend ? 1 : 0);
                 SetInt("uEntityAlphaMode", 0);
+                SetInt("uPreviewDepthLayerDebug", EntityPreviewDebugSettings.ShowDepthLayerDebug ? 1 : 0);
+                SetVec3("uPreviewLayerDebugTint", Vector3.One);
 
                 // Genesis-specific uniforms.
                 SetInt("uEnableSss", frame.Settings.EnableSss ? 1 : 0);
@@ -237,6 +260,7 @@ public sealed partial class OpenGlPreviewBackend
                         EmitDiagnostic(
                             $"[3D preview] Draw ready: indexCount={_mesh.IndexCount}, subject={subjectTag}, frame.Scene={frame.Scene.SceneKind}, lightYaw={frame.Settings.LightYawDegrees:F1}, lightPitch={frame.Settings.LightPitchDegrees:F1}.");
                         _loggedMeshReady = true;
+                        EmitDepthLayerDiagnostic(frame.BlockModel, nearPlane, farPlane, frame.Gl);
                     }
                     var blendWasEnabled = false;
                     if (frame.EntityBlendDraw)
@@ -279,7 +303,17 @@ public sealed partial class OpenGlPreviewBackend
                             frame.Settings.EnableEntityAnimation,
                             frame.EntityBonePaletteUploaded,
                             "main");
-                        _mesh.DrawRange(batch.FirstIndex, batch.IndexCount);
+                        using (OpenGlPreviewLayerDepthState.Apply(frame.Gl, batch.LayerPolicy))
+                        {
+                            if (EntityPreviewDebugSettings.ShowDepthLayerDebug)
+                            {
+                                SetVec3(
+                                    "uPreviewLayerDebugTint",
+                                    PreviewDrawLayerPolicy.GetDebugTint(batch.LayerPolicy.Kind));
+                            }
+
+                            _mesh.DrawRange(batch.FirstIndex, batch.IndexCount);
+                        }
                     }
 
                     if (frame.EntityBlendDraw && !blendWasEnabled)

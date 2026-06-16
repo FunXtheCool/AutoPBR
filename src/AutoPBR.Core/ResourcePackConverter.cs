@@ -303,6 +303,7 @@ public static class ResourcePackConverter
                                 NativeParsedVersion = prof.ParsedVersion?.ToString(),
                                 ModelDefaultNamespace = modelDefaultNs,
                                 IdlePhase01 = idlePh,
+                                PreviewPoseId = EntityPreviewBuildContext.CurrentPoseId,
                                 OrderedTextureZipPaths = orderedModelTextures.ToArray()
                             };
                             EntityPreviewPlacement.TryPopulateRebakeElementPartIds(

@@ -32,7 +32,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             if (stem.Contains("giant", StringComparison.OrdinalIgnoreCase))
             {
-                merged = BuildHumanoid(texRef, profile, isBaby, armLift: 0.35f + idlePhase01 * 0.25f + wave * 0.1f);
+                merged = BuildHumanoid(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, "HumanoidGeneric");
                 specificRouteSlotHit = gpuBoneDispatchSlot;
                 return true;
             }
@@ -214,7 +214,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             if (normalizedAssetPath.Contains("/textures/entity/player/", StringComparison.OrdinalIgnoreCase) &&
                 normalizedAssetPath.Contains("/textures/entity/player/slim/", StringComparison.OrdinalIgnoreCase))
             {
-                merged = BuildPlayerSlim(texRef, profile, isBaby, armLift: 0.18f + idlePhase01 * 0.25f + wave * 0.08f);
+                merged = BuildPlayerSlim(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave);
                 specificRouteSlotHit = gpuBoneDispatchSlot;
                 return true;
             }
@@ -230,7 +230,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             if (normalizedAssetPath.Contains("/textures/entity/player/", StringComparison.OrdinalIgnoreCase))
             {
-                merged = BuildPlayerWide(texRef, profile, isBaby, armLift: 0.18f + idlePhase01 * 0.25f + wave * 0.08f);
+                merged = BuildPlayerWide(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave);
                 specificRouteSlotHit = gpuBoneDispatchSlot;
                 return true;
             }

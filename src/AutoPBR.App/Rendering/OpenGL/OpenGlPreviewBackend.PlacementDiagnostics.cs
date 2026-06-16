@@ -1,12 +1,16 @@
 using AutoPBR.Core.Models;
 using AutoPBR.Core.Preview;
 
+using Silk.NET.OpenGL;
+
 namespace AutoPBR.App.Rendering.OpenGL;
 
 public sealed partial class OpenGlPreviewBackend
 {
     private string? _parityPlacementDiagKey;
     private string? _entityCpuRebakeDiagKey;
+    private string? _depthLayerDiagKey;
+    private bool _loggedDepthBits;
 
     private void EmitParityCatalogPlacementDiagnostic(
         PreviewModelSubject? subject,
@@ -59,4 +63,55 @@ public sealed partial class OpenGlPreviewBackend
     private static bool IsDolphinColumnPoseSource(string source) =>
         string.Equals(source, "net.minecraft.client.model.animal.dolphin.DolphinModel", StringComparison.Ordinal) ||
         string.Equals(source, "net.minecraft.client.model.animal.dolphin.BabyDolphinModel", StringComparison.Ordinal);
+
+    private void EmitDepthLayerDiagnostic(
+        PreviewModelSubject? subject,
+        float nearPlane,
+        float farPlane,
+        GL gl)
+    {
+        if (subject is null || subject.DrawBatches is not { Length: > 0 } batches)
+        {
+            return;
+        }
+
+        var key =
+            $"{subject.MeshProvenance?.Detail ?? "mesh"}|batches={batches.Length}|near={nearPlane:0.###}|far={farPlane:0.###}";
+        if (string.Equals(key, _depthLayerDiagKey, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _depthLayerDiagKey = key;
+        if (!_loggedDepthBits)
+        {
+            _loggedDepthBits = true;
+            if (TryQueryBoundFramebufferDepthBits(gl, out var depthBits))
+            {
+                EmitDiagnostic($"[3D preview] GL_DEPTH_BITS={depthBits}");
+            }
+        }
+
+        EmitDiagnostic(
+            $"[3D preview] Depth layers: near={nearPlane:0.###} far={farPlane:0.###} ratio={farPlane / Math.Max(nearPlane, 1e-6f):0.###}");
+        EmitDiagnostic($"[3D preview] {PreviewDrawBatchDiagnostics.FormatBatchSummary(batches, subject.Materials.Length)}");
+    }
+
+    private static bool TryQueryBoundFramebufferDepthBits(GL gl, out int depthBits)
+    {
+        Span<int> size = stackalloc int[1];
+        gl.GetFramebufferAttachmentParameter(
+            FramebufferTarget.Framebuffer,
+            FramebufferAttachment.DepthAttachment,
+            FramebufferAttachmentParameterName.DepthSize,
+            size);
+        if (gl.GetError() != GLEnum.NoError)
+        {
+            depthBits = 0;
+            return false;
+        }
+
+        depthBits = size[0];
+        return depthBits > 0;
+    }
 }

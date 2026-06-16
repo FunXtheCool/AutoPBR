@@ -150,6 +150,12 @@
 
                                   ToolTip.Tip="Watch bodyY/headY/legY in the preview log while toggling fixes." />
 
+                        <CheckBox Content="Layer debug false-color (depth batches)"
+
+                                  IsChecked="{Binding ShowDepthLayerDebug, Mode=TwoWay}"
+
+                                  ToolTip.Tip="Tint each draw batch by PreviewDepthLayerKind (base gray, cutout cyan, cosmetic magenta, emissive yellow)." />
+
 
 
                         <TextBlock Text="Part pose compose (rebakes mesh)"

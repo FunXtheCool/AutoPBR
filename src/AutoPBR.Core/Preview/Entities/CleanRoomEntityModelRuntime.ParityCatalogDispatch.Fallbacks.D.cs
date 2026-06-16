@@ -373,7 +373,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
-                merged = BuildZombieVillager(texRef, profile, isBaby, armLift: 1.15f + idlePhase01 * 0.55f + wave * 0.18f);
+                merged = BuildZombieVillager(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave);
 
 
 

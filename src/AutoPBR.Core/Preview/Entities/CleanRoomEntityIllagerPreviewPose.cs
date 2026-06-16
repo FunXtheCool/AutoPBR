@@ -1,4 +1,6 @@
 using System.Numerics;
+using System.Text.Json;
+using AutoPBR.Core.Models;
 
 // ReSharper disable CheckNamespace
 
@@ -98,6 +100,120 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return world;
         }
 
+        public static void StripSetupAnimArmChannels(VanillaSetupAnimRuntime.PoseResult pose)
+        {
+            pose.Parts.Remove("rightArm");
+            pose.Parts.Remove("leftArm");
+            pose.Parts.Remove("arms");
+            pose.Parts.Remove("right_arm");
+            pose.Parts.Remove("left_arm");
+        }
+
+        public static bool TryApplyArmPoseToGeometryIrMesh(
+            MergedJavaBlockModel merged,
+            JsonElement geometryRoot,
+            GeometryIrMeshEmitOptions emitOptions,
+            EntityIllagerPreviewArmPose armPose,
+            float idlePhase01,
+            float animationTimeSeconds,
+            float wave)
+        {
+            if (armPose == EntityIllagerPreviewArmPose.Crossed)
+            {
+                return true;
+            }
+
+            ComputeIllagerPreviewArmRotations(
+                armPose,
+                idlePhase01,
+                animationTimeSeconds,
+                wave,
+                isRiding: false,
+                out _,
+                out _,
+                out _,
+                out _,
+                out _,
+                out _,
+                out var raX,
+                out var raY,
+                out var raZ,
+                out var laX,
+                out var laY,
+                out var laZ);
+
+            var partOriginWorld = GeometryIrPartWorldPoseIndex.Build(geometryRoot, emitOptions);
+            var baselineParts = BuildSetupAnimBaselineParts(geometryRoot);
+            var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(geometryRoot, emitOptions);
+            if (partIds.Count != merged.Elements.Count)
+            {
+                return false;
+            }
+
+            var partDeltas = new Dictionary<string, Matrix4x4>(StringComparer.Ordinal);
+            if (TryBuildIllagerArmRotationDelta("right_arm", raX, raY, raZ, partOriginWorld, baselineParts, out var rightDelta))
+            {
+                partDeltas["right_arm"] = rightDelta;
+            }
+
+            if (TryBuildIllagerArmRotationDelta("left_arm", laX, laY, laZ, partOriginWorld, baselineParts, out var leftDelta))
+            {
+                partDeltas["left_arm"] = leftDelta;
+            }
+
+            if (partDeltas.Count == 0)
+            {
+                return false;
+            }
+
+            var parentMap = GeometryIrPartWorldPoseIndex.BuildParentMap(geometryRoot);
+            for (var i = 0; i < merged.Elements.Count; i++)
+            {
+                var partId = partIds[i];
+                if (!TryComposeSetupAnimAncestorDeltas(partId, parentMap, partDeltas, out var composedDelta))
+                {
+                    continue;
+                }
+
+                var e = merged.Elements[i];
+                merged.Elements[i] = new ModelElement
+                {
+                    From = e.From,
+                    To = e.To,
+                    Faces = e.Faces,
+                    LocalToParent = EntityParityTemplate.Mul(composedDelta, e.LocalToParent),
+                };
+            }
+
+            return true;
+        }
+
+        private static bool TryBuildIllagerArmRotationDelta(
+            string partId,
+            float xRot,
+            float yRot,
+            float zRot,
+            IReadOnlyDictionary<string, Matrix4x4> partOriginWorld,
+            IReadOnlyDictionary<string, VanillaSetupAnimRuntime.PartPose> baselineParts,
+            out Matrix4x4 deltaWorld)
+        {
+            deltaWorld = Matrix4x4.Identity;
+            if (!partOriginWorld.TryGetValue(partId, out var partWorld) ||
+                !Matrix4x4.Invert(partWorld, out var partInv))
+            {
+                return false;
+            }
+
+            _ = TryGetBaselinePartPose(partId, baselineParts, out var baseline);
+            var baselineRot = EntityParityTemplate.Er(baseline.XRot, baseline.YRot, baseline.ZRot);
+            var targetRot = EntityParityTemplate.Er(xRot, yRot, zRot);
+            var rotDelta = Matrix4x4.Invert(baselineRot, out var baselineRotInv)
+                ? EntityParityTemplate.Mul(targetRot, baselineRotInv)
+                : targetRot;
+            deltaWorld = EntityParityTemplate.Mul(EntityParityTemplate.Mul(partWorld, rotDelta), partInv);
+            return true;
+        }
+
         public static void ComputeIllagerPreviewArmRotations(
             EntityIllagerPreviewArmPose armPose,
             float idlePhase01,
@@ -154,6 +270,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
             switch (armPose)
             {
+                case EntityIllagerPreviewArmPose.ArmsAtSide:
                 case EntityIllagerPreviewArmPose.Crossed:
                     break;
                 case EntityIllagerPreviewArmPose.AttackingEmptyHands:

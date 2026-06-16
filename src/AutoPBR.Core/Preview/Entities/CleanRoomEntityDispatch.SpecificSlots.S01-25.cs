@@ -158,7 +158,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             if (stem.Contains("evoker", StringComparison.OrdinalIgnoreCase) &&
                 !stem.Contains("fang", StringComparison.OrdinalIgnoreCase))
             {
-                merged = BuildEvoker(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave);
+                merged = BuildEvoker(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, normalizedAssetPath);
                 specificRouteSlotHit = gpuBoneDispatchSlot;
                 return true;
             }
@@ -174,7 +174,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             if (stem.Contains("vindicator", StringComparison.OrdinalIgnoreCase))
             {
-                merged = BuildVindicator(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave);
+                merged = BuildVindicator(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, normalizedAssetPath);
                 specificRouteSlotHit = gpuBoneDispatchSlot;
                 return true;
             }
@@ -190,7 +190,17 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             if (stem.Contains("illusioner", StringComparison.OrdinalIgnoreCase))
             {
-                merged = BuildIllager(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, EntityIllagerPreviewArmPose.Crossed);
+                merged = BuildIllager(
+                    texRef,
+                    profile,
+                    isBaby,
+                    idlePhase01,
+                    animationTimeSeconds,
+                    wave,
+                    EntityPreviewPoseCatalog.ResolveEffectiveIllagerArmPose(
+                        normalizedAssetPath,
+                        "Illager",
+                        EntityPreviewBuildContext.CurrentPoseId));
                 specificRouteSlotHit = gpuBoneDispatchSlot;
                 return true;
             }
@@ -207,9 +217,10 @@ internal sealed partial class CleanRoomEntityModelRuntime
             if (stem.Contains("pillager", StringComparison.OrdinalIgnoreCase) ||
                 stem.Contains("illager", StringComparison.OrdinalIgnoreCase))
             {
-                var illagerPose = stem.Contains("pillager", StringComparison.OrdinalIgnoreCase)
-                    ? EntityIllagerPreviewArmPose.CrossbowHold
-                    : EntityIllagerPreviewArmPose.Crossed;
+                var illagerPose = EntityPreviewPoseCatalog.ResolveEffectiveIllagerArmPose(
+                    normalizedAssetPath,
+                    stem.Contains("pillager", StringComparison.OrdinalIgnoreCase) ? "Pillager" : "Illager",
+                    EntityPreviewBuildContext.CurrentPoseId);
                 merged = BuildIllager(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, illagerPose);
                 specificRouteSlotHit = gpuBoneDispatchSlot;
                 return true;

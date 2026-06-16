@@ -18,6 +18,7 @@ public partial class EntityPreviewDebugWindowViewModel : ViewModelBase
 
         _forceCpuSkinning = _main.Preview3DForceEntityCpuSkinning;
         _logDrawContractEveryFrame = EntityPreviewDebugSettings.LogDrawContractEveryFrame;
+        _showDepthLayerDebug = EntityPreviewDebugSettings.ShowDepthLayerDebug;
         _lerBasisOverrideMode = (int)EntityPreviewDebugSettings.LerBasisOverride;
         _useLegacyTranslationTimesRotationPartPose = EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose;
         _skipAllPartTreeRepair = EntityPreviewDebugSettings.SkipAllPartTreeRepair;
@@ -45,6 +46,7 @@ public partial class EntityPreviewDebugWindowViewModel : ViewModelBase
 
     [ObservableProperty] private bool _forceCpuSkinning;
     [ObservableProperty] private bool _logDrawContractEveryFrame;
+    [ObservableProperty] private bool _showDepthLayerDebug;
     [ObservableProperty] private int _lerBasisOverrideMode;
     [ObservableProperty] private bool _useLegacyTranslationTimesRotationPartPose;
     [ObservableProperty] private bool _skipAllPartTreeRepair;
@@ -147,6 +149,12 @@ public partial class EntityPreviewDebugWindowViewModel : ViewModelBase
     partial void OnLogDrawContractEveryFrameChanged(bool value)
     {
         EntityPreviewDebugSettings.LogDrawContractEveryFrame = value;
+        _main.TriggerPreviewRefreshForDebug();
+    }
+
+    partial void OnShowDepthLayerDebugChanged(bool value)
+    {
+        EntityPreviewDebugSettings.ShowDepthLayerDebug = value;
         _main.TriggerPreviewRefreshForDebug();
     }
 

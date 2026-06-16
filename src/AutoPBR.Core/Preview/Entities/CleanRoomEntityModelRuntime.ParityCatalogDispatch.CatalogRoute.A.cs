@@ -309,7 +309,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
-                merged = BuildEvoker(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave);
+                merged = BuildEvoker(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, normalizedAssetPath);
 
 
 
@@ -327,7 +327,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
-                merged = BuildVindicator(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave);
+                merged = BuildVindicator(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, normalizedAssetPath);
 
 
 
@@ -345,7 +345,17 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
-                merged = BuildIllager(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, EntityIllagerPreviewArmPose.Crossed);
+                merged = BuildIllager(
+                    texRef,
+                    profile,
+                    isBaby,
+                    idlePhase01,
+                    animationTimeSeconds,
+                    wave,
+                    EntityPreviewPoseCatalog.ResolveEffectiveIllagerArmPose(
+                        normalizedAssetPath,
+                        "Illager",
+                        EntityPreviewBuildContext.CurrentPoseId));
 
 
 
@@ -363,7 +373,17 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
-                merged = BuildIllager(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, EntityIllagerPreviewArmPose.CrossbowHold);
+                merged = BuildIllager(
+                    texRef,
+                    profile,
+                    isBaby,
+                    idlePhase01,
+                    animationTimeSeconds,
+                    wave,
+                    EntityPreviewPoseCatalog.ResolveEffectiveIllagerArmPose(
+                        normalizedAssetPath,
+                        "Pillager",
+                        EntityPreviewBuildContext.CurrentPoseId));
 
 
 

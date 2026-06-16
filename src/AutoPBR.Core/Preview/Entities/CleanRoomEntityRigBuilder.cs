@@ -1,4 +1,5 @@
 using System.Numerics;
+using AutoPBR.Core.Models;
 // ReSharper disable CheckNamespace
 
 
@@ -74,7 +75,10 @@ internal sealed partial class CleanRoomEntityModelRuntime
             int uvSizeH = -1,
             int uvSizeD = -1,
             bool mirrorCuboidUv = false,
-            string[]? faceMask = null)
+            string[]? faceMask = null,
+            PreviewDepthLayerKind depthLayerKind = PreviewDepthLayerKind.Base,
+            int layerOrdinal = 0,
+            bool castsShadow = false)
         {
             var extentX = MathF.Abs(x1 - x0);
             var extentY = MathF.Abs(y1 - y0);
@@ -183,7 +187,10 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 From = [centerX - hx, centerY - hy, centerZ - hz],
                 To = [centerX + hx, centerY + hy, centerZ + hz],
                 LocalToParent = meshLocal,
-                Faces = faces
+                Faces = faces,
+                DepthLayerKind = depthLayerKind,
+                LayerOrdinal = layerOrdinal,
+                CastsShadow = castsShadow,
             });
         }
 

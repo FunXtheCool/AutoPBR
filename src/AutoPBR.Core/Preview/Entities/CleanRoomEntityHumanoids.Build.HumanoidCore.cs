@@ -14,8 +14,58 @@ internal sealed partial class CleanRoomEntityModelRuntime
         string texRef,
         MinecraftNativeProfile profile,
         bool isBaby,
-        float armLift)
+        float armLift) =>
+        BuildHumanoid(
+            texRef,
+            profile,
+            isBaby,
+            idlePhase01: 0f,
+            animationTimeSeconds: 0f,
+            wave: 0f,
+            poseBuilderMethod: null,
+            armLiftFallback: armLift);
+
+    private static MergedJavaBlockModel BuildHumanoid(
+        string texRef,
+        MinecraftNativeProfile profile,
+        bool isBaby,
+        float idlePhase01,
+        float animationTimeSeconds,
+        float wave,
+        string poseBuilderMethod) =>
+        BuildHumanoid(
+            texRef,
+            profile,
+            isBaby,
+            idlePhase01,
+            animationTimeSeconds,
+            wave,
+            poseBuilderMethod,
+            armLiftFallback: 0f);
+
+    private static MergedJavaBlockModel BuildHumanoid(
+        string texRef,
+        MinecraftNativeProfile profile,
+        bool isBaby,
+        float idlePhase01,
+        float animationTimeSeconds,
+        float wave,
+        string? poseBuilderMethod,
+        float armLiftFallback)
     {
+        ResolveHumanoidPreviewArmRotations(
+            poseBuilderMethod,
+            idlePhase01,
+            animationTimeSeconds,
+            wave,
+            armLiftFallback,
+            out var raX,
+            out var raY,
+            out var raZ,
+            out var laX,
+            out var laY,
+            out var laZ);
+
         var p = UsesPostBabyModelUpdate(profile)
             ? (isBaby ? new BabyProfile(0.74f, 1.22f, 0.75f) : BabyProfile.Adult)
             : (isBaby ? new BabyProfile(0.78f, 1.12f, 0.82f) : BabyProfile.Adult);
@@ -24,11 +74,48 @@ internal sealed partial class CleanRoomEntityModelRuntime
         // Canonical biped baseline: body 8x12x4, head 8x8x8, arms/legs 4x12x4.
         new EntityCuboid(4, 12, 6, 12, 24, 10, 16, 16, OffsetX: 0, OffsetY: 0, OffsetZ: 0).Emit(b, Matrix4x4.Identity, p.BodyScale); // torso
         new EntityCuboid(4, 24, 4, 12, 32, 12, 0, 0, OffsetX: 0, OffsetY: 0, OffsetZ: 0).Emit(b, Matrix4x4.Identity, p.HeadScale); // head
-        new EntityCuboid(0, 12, 6, 4, 24, 10, 40, 16, OffsetX: 0, OffsetY: 0, OffsetZ: 0, XRot: armLift, YRot: 0f, ZRot: 0f) { RotationPivot = new Vector3(2f, 24f, 8f) }.Emit(b, Matrix4x4.Identity, p.BodyScale); // arm l
-        new EntityCuboid(12, 12, 6, 16, 24, 10, 40, 16, OffsetX: 0, OffsetY: 0, OffsetZ: 0, XRot: armLift, YRot: 0f, ZRot: 0f) { RotationPivot = new Vector3(14f, 24f, 8f) }.Emit(b, Matrix4x4.Identity, p.BodyScale); // arm r
+        new EntityCuboid(0, 12, 6, 4, 24, 10, 40, 16, OffsetX: 0, OffsetY: 0, OffsetZ: 0, XRot: laX, YRot: laY, ZRot: laZ) { RotationPivot = new Vector3(2f, 24f, 8f) }.Emit(b, Matrix4x4.Identity, p.BodyScale); // arm l
+        new EntityCuboid(12, 12, 6, 16, 24, 10, 40, 16, OffsetX: 0, OffsetY: 0, OffsetZ: 0, XRot: raX, YRot: raY, ZRot: raZ) { RotationPivot = new Vector3(14f, 24f, 8f) }.Emit(b, Matrix4x4.Identity, p.BodyScale); // arm r
         new EntityCuboid(4, 0, 6, 8, 12, 10, 0, 16, OffsetX: 0, OffsetY: 0, OffsetZ: 0).Emit(b, Matrix4x4.Identity, p.LegScale); // leg l
         new EntityCuboid(8, 0, 6, 12, 12, 10, 0, 16, OffsetX: 0, OffsetY: 0, OffsetZ: 0).Emit(b, Matrix4x4.Identity, p.LegScale); // leg r
         return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef));
+    }
+
+    private static void ResolveHumanoidPreviewArmRotations(
+        string? poseBuilderMethod,
+        float idlePhase01,
+        float animationTimeSeconds,
+        float wave,
+        float armLiftFallback,
+        out float raX,
+        out float raY,
+        out float raZ,
+        out float laX,
+        out float laY,
+        out float laZ)
+    {
+        if (poseBuilderMethod is not null &&
+            EntityPreviewPoseCatalog.IsHumanoidPoseBuilderMethod(poseBuilderMethod))
+        {
+            var armPose = EntityPreviewPoseCatalog.ResolveEffectiveHumanoidArmPose(
+                poseBuilderMethod,
+                EntityPreviewBuildContext.CurrentPoseId);
+            HumanoidPreviewPoseSupport.ComputeHumanoidPreviewArmRotations(
+                armPose,
+                idlePhase01,
+                animationTimeSeconds,
+                wave,
+                out raX,
+                out raY,
+                out raZ,
+                out laX,
+                out laY,
+                out laZ);
+            return;
+        }
+
+        raX = laX = armLiftFallback;
+        raY = laY = raZ = laZ = 0f;
     }
 
     /// <summary>
@@ -231,8 +318,23 @@ internal sealed partial class CleanRoomEntityModelRuntime
         string texRef,
         MinecraftNativeProfile profile,
         bool isBaby,
-        float armLift)
+        float idlePhase01,
+        float animationTimeSeconds,
+        float wave)
     {
+        ResolveHumanoidPreviewArmRotations(
+            "PlayerWide",
+            idlePhase01,
+            animationTimeSeconds,
+            wave,
+            armLiftFallback: 0.18f + idlePhase01 * 0.25f + wave * 0.08f,
+            out var raX,
+            out var raY,
+            out var raZ,
+            out var laX,
+            out var laY,
+            out var laZ);
+
         var p = UsesPostBabyModelUpdate(profile)
             ? (isBaby ? BabyProfile.VanillaUniformBaby : BabyProfile.Adult)
             : (isBaby ? new BabyProfile(0.78f, 1.12f, 0.82f) : BabyProfile.Adult);
@@ -241,8 +343,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
         // Steve geometry: canonical 4px arms, but player UV channels differ from generic humanoid (left arm/left leg use 2nd sheet columns).
         new EntityCuboid(4, 12, 6, 12, 24, 10, 16, 16, OffsetX: 0, OffsetY: 0, OffsetZ: 0).Emit(b, Matrix4x4.Identity, p.BodyScale); // torso
         new EntityCuboid(4, 24, 4, 12, 32, 12, 0, 0, OffsetX: 0, OffsetY: 0, OffsetZ: 0).Emit(b, Matrix4x4.Identity, p.HeadScale); // head
-        new EntityCuboid(0, 12, 6, 4, 24, 10, 32, 48, OffsetX: 0, OffsetY: 0, OffsetZ: 0, XRot: armLift, YRot: 0f, ZRot: 0f) { RotationPivot = new Vector3(2f, 24f, 8f) }.Emit(b, Matrix4x4.Identity, p.BodyScale); // left arm
-        new EntityCuboid(12, 12, 6, 16, 24, 10, 40, 16, OffsetX: 0, OffsetY: 0, OffsetZ: 0, XRot: armLift, YRot: 0f, ZRot: 0f) { RotationPivot = new Vector3(14f, 24f, 8f) }.Emit(b, Matrix4x4.Identity, p.BodyScale); // right arm
+        new EntityCuboid(0, 12, 6, 4, 24, 10, 32, 48, OffsetX: 0, OffsetY: 0, OffsetZ: 0, XRot: laX, YRot: laY, ZRot: laZ) { RotationPivot = new Vector3(2f, 24f, 8f) }.Emit(b, Matrix4x4.Identity, p.BodyScale); // left arm
+        new EntityCuboid(12, 12, 6, 16, 24, 10, 40, 16, OffsetX: 0, OffsetY: 0, OffsetZ: 0, XRot: raX, YRot: raY, ZRot: raZ) { RotationPivot = new Vector3(14f, 24f, 8f) }.Emit(b, Matrix4x4.Identity, p.BodyScale); // right arm
         new EntityCuboid(4, 0, 6, 8, 12, 10, 16, 48, OffsetX: 0, OffsetY: 0, OffsetZ: 0).Emit(b, Matrix4x4.Identity, p.LegScale); // left leg
         new EntityCuboid(8, 0, 6, 12, 12, 10, 0, 16, OffsetX: 0, OffsetY: 0, OffsetZ: 0).Emit(b, Matrix4x4.Identity, p.LegScale); // right leg
         return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef));
@@ -253,8 +355,23 @@ internal sealed partial class CleanRoomEntityModelRuntime
         string texRef,
         MinecraftNativeProfile profile,
         bool isBaby,
-        float armLift)
+        float idlePhase01,
+        float animationTimeSeconds,
+        float wave)
     {
+        ResolveHumanoidPreviewArmRotations(
+            "PlayerSlim",
+            idlePhase01,
+            animationTimeSeconds,
+            wave,
+            armLiftFallback: 0.18f + idlePhase01 * 0.25f + wave * 0.08f,
+            out var raX,
+            out var raY,
+            out var raZ,
+            out var laX,
+            out var laY,
+            out var laZ);
+
         var p = UsesPostBabyModelUpdate(profile)
             ? (isBaby ? BabyProfile.VanillaUniformBaby : BabyProfile.Adult)
             : (isBaby ? new BabyProfile(0.78f, 1.12f, 0.82f) : BabyProfile.Adult);
@@ -263,8 +380,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
         // Alex geometry: torso/head/legs match humanoid; arms are 3x12x4 instead of 4x12x4.
         new EntityCuboid(4, 12, 6, 12, 24, 10, 16, 16, OffsetX: 0, OffsetY: 0, OffsetZ: 0).Emit(b, Matrix4x4.Identity, p.BodyScale); // torso
         new EntityCuboid(4, 24, 4, 12, 32, 12, 0, 0, OffsetX: 0, OffsetY: 0, OffsetZ: 0).Emit(b, Matrix4x4.Identity, p.HeadScale); // head
-        new EntityCuboid(1, 12, 6, 4, 24, 10, 32, 48, OffsetX: 0, OffsetY: 0, OffsetZ: 0, XRot: armLift, YRot: 0f, ZRot: 0f) { RotationPivot = new Vector3(2.5f, 24f, 8f) }.Emit(b, Matrix4x4.Identity, p.BodyScale); // arm l slim
-        new EntityCuboid(12, 12, 6, 15, 24, 10, 40, 16, OffsetX: 0, OffsetY: 0, OffsetZ: 0, XRot: armLift, YRot: 0f, ZRot: 0f) { RotationPivot = new Vector3(13.5f, 24f, 8f) }.Emit(b, Matrix4x4.Identity, p.BodyScale); // arm r slim
+        new EntityCuboid(1, 12, 6, 4, 24, 10, 32, 48, OffsetX: 0, OffsetY: 0, OffsetZ: 0, XRot: laX, YRot: laY, ZRot: laZ) { RotationPivot = new Vector3(2.5f, 24f, 8f) }.Emit(b, Matrix4x4.Identity, p.BodyScale); // arm l slim
+        new EntityCuboid(12, 12, 6, 15, 24, 10, 40, 16, OffsetX: 0, OffsetY: 0, OffsetZ: 0, XRot: raX, YRot: raY, ZRot: raZ) { RotationPivot = new Vector3(13.5f, 24f, 8f) }.Emit(b, Matrix4x4.Identity, p.BodyScale); // arm r slim
         new EntityCuboid(4, 0, 6, 8, 12, 10, 16, 48, OffsetX: 0, OffsetY: 0, OffsetZ: 0).Emit(b, Matrix4x4.Identity, p.LegScale); // leg l
         new EntityCuboid(8, 0, 6, 12, 12, 10, 0, 16, OffsetX: 0, OffsetY: 0, OffsetZ: 0).Emit(b, Matrix4x4.Identity, p.LegScale); // leg r
         return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef));
@@ -303,12 +420,35 @@ internal sealed partial class CleanRoomEntityModelRuntime
         string texRef,
         MinecraftNativeProfile profile,
         bool isBaby,
-        float armLift)
+        float idlePhase01,
+        float animationTimeSeconds,
+        float wave)
     {
         if (UsesPostBabyModelUpdate(profile) && isBaby)
         {
-            return BuildBabyZombieVillager(texRef, armLift);
+            return BuildBabyZombieVillager(
+                texRef,
+                HumanoidPreviewPoseSupport.ResolveHumanoidArmLiftRad(
+                    EntityPreviewPoseCatalog.ResolveEffectiveHumanoidArmPose(
+                        "HumanoidZombieVillager",
+                        EntityPreviewBuildContext.CurrentPoseId),
+                    idlePhase01,
+                    animationTimeSeconds,
+                    wave));
         }
+
+        ResolveHumanoidPreviewArmRotations(
+            "HumanoidZombieVillager",
+            idlePhase01,
+            animationTimeSeconds,
+            wave,
+            armLiftFallback: 1.15f + idlePhase01 * 0.55f + wave * 0.18f,
+            out var raX,
+            out var raY,
+            out var raZ,
+            out var laX,
+            out var laY,
+            out var laZ);
 
         var p = UsesPostBabyModelUpdate(profile)
             ? (isBaby ? new BabyProfile(0.74f, 1.22f, 0.75f) : BabyProfile.Adult)
@@ -319,8 +459,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
         new EntityCuboid(4f, 12f, 6f, 12f, 24f, 10f, 16, 16).Emit(b, Matrix4x4.Identity, p.BodyScale); // torso
         new EntityCuboid(4f, 24f, 4f, 12f, 32f, 12f, 0, 0).Emit(b, Matrix4x4.Identity, p.HeadScale); // head
         new EntityCuboid(7f, 28f, 12f, 9f, 32f, 14f, 24, 0).Emit(b, Matrix4x4.Identity, p.HeadScale); // nose
-        new EntityCuboid(0f, 12f, 6f, 4f, 24f, 10f, 40, 16, XRot: armLift, YRot: 0f, ZRot: 0f) { RotationPivot = new Vector3(2f, 24f, 8f) }.Emit(b, Matrix4x4.Identity, p.BodyScale); // arm l
-        new EntityCuboid(12f, 12f, 6f, 16f, 24f, 10f, 40, 16, XRot: armLift, YRot: 0f, ZRot: 0f) { RotationPivot = new Vector3(14f, 24f, 8f) }.Emit(b, Matrix4x4.Identity, p.BodyScale); // arm r
+        new EntityCuboid(0f, 12f, 6f, 4f, 24f, 10f, 40, 16, XRot: laX, YRot: laY, ZRot: laZ) { RotationPivot = new Vector3(2f, 24f, 8f) }.Emit(b, Matrix4x4.Identity, p.BodyScale); // arm l
+        new EntityCuboid(12f, 12f, 6f, 16f, 24f, 10f, 40, 16, XRot: raX, YRot: raY, ZRot: raZ) { RotationPivot = new Vector3(14f, 24f, 8f) }.Emit(b, Matrix4x4.Identity, p.BodyScale); // arm r
         new EntityCuboid(4f, 0f, 6f, 8f, 12f, 10f, 0, 16).Emit(b, Matrix4x4.Identity, p.LegScale); // leg l
         new EntityCuboid(8f, 0f, 6f, 12f, 12f, 10f, 0, 16).Emit(b, Matrix4x4.Identity, p.LegScale); // leg r
         return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef));

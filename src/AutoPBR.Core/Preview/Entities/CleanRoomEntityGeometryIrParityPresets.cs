@@ -31,13 +31,12 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             _ = idlePhase01;
             var p = ParityCatalogDefaultBabyProfile(profile, isBaby, resolvedOfficialJvm);
-            var geometryScale = string.Equals(builderMethod, "GuardianElder", StringComparison.OrdinalIgnoreCase)
-                ? 2.35f
-                : 1f;
+            var geometryScale = ResolveParityGeometryScale(builderMethod, normalizedAssetPath);
             var opts = GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH) with
             {
                 DefaultPartScale = p.BodyScale * geometryScale,
                 ResolvePartScale = partId => ResolveDefaultPartScale(partId, p) * geometryScale,
+                PreviewApplyCubeDeformationInflate = true,
             };
 
             if (string.Equals(builderMethod, "EquipmentHumanoidLeggings", StringComparison.OrdinalIgnoreCase))
@@ -68,6 +67,16 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 return IllagerPreviewPoseSupport.CreateIllagerParityEmitOptions(
                     opts,
                     normalizedAssetPath,
+                    builderMethod,
+                    idlePhase01,
+                    animationTimeSeconds,
+                    wave);
+            }
+
+            if (EntityPreviewPoseCatalog.IsHumanoidPoseBuilderMethod(builderMethod))
+            {
+                return HumanoidPreviewPoseSupport.CreateHumanoidParityEmitOptions(
+                    opts,
                     builderMethod,
                     idlePhase01,
                     animationTimeSeconds,
@@ -110,6 +119,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 ResolvePartScale = partId => ResolveDefaultPartScale(partId, p),
                 ResolvePartAtlasDimensions = partId =>
                     IsBreezeWindPartId(partId) ? (128, 128) : (32, 32),
+                PreviewApplyCubeDeformationInflate = true,
             };
 
             if (isEyesTexturePath)
@@ -166,5 +176,53 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         private static bool IsBreezeWindPartId(string partId) =>
             partId.StartsWith("wind", StringComparison.OrdinalIgnoreCase);
+
+        private static float ResolveParityGeometryScale(string builderMethod, string? normalizedAssetPath)
+        {
+            if (string.Equals(builderMethod, "GuardianElder", StringComparison.OrdinalIgnoreCase))
+            {
+                return 2.35f;
+            }
+
+            var path = normalizedAssetPath?.Replace('\\', '/');
+            if (!string.IsNullOrEmpty(path) &&
+                path.Contains("/textures/entity/skeleton/wither_skeleton", StringComparison.OrdinalIgnoreCase))
+            {
+                return 1.2f;
+            }
+
+            return 1f;
+        }
+    }
+
+    /// <summary>
+    /// Pose-aware parity emit options for cuboid-owner part id walks (rebake placement, grounding).
+    /// </summary>
+    internal static GeometryIrMeshEmitOptions CreateParityCatalogPartIdResolveEmitOptions(
+        string builderMethod,
+        MinecraftNativeProfile profile,
+        bool isBaby,
+        string officialJvm,
+        int atlasW,
+        int atlasH,
+        string normalizedAssetPath,
+        string? previewPoseId)
+    {
+        using var poseScope = string.IsNullOrWhiteSpace(previewPoseId)
+            ? null
+            : EntityPreviewBuildContext.UsePose(previewPoseId);
+
+        return GeometryIrParityEmitPresetRegistry.CreateEmitOptions(
+                builderMethod,
+                profile,
+                isBaby,
+                officialJvm,
+                atlasW,
+                atlasH,
+                idlePhase01: 0f,
+                wave: 0f,
+                normalizedAssetPath: normalizedAssetPath,
+                animationTimeSeconds: 0f)
+            .WithOfficialJvmPoseComposeDefaults(officialJvm);
     }
 }

@@ -1,4 +1,5 @@
 using System.Numerics;
+using AutoPBR.Core.Models;
 
 namespace AutoPBR.Core.Preview;
 
@@ -14,11 +15,22 @@ internal sealed class ModelElement
     public required float[] To { get; init; }
     public required Dictionary<string, ModelFace> Faces { get; init; }
 
-    /// <summary>
-    /// Maps this element's axis-aligned <see cref="From"/>/<see cref="To"/> space into preview model space
+    /// <summary>Maps this element's axis-aligned <see cref="From"/>/<see cref="To"/> space into preview model space
     /// (Minecraft entity <c>PartPose</c> / cuboid hierarchy). Identity for block models and axis-aligned rigs.
     /// </summary>
     public Matrix4x4 LocalToParent { get; init; } = Matrix4x4.Identity;
+
+    /// <summary>Explicit preview depth layer; <see cref="PreviewDepthLayerKind.Base"/> uses texture-path heuristics at bake.</summary>
+    public PreviewDepthLayerKind DepthLayerKind { get; init; } = PreviewDepthLayerKind.Base;
+
+    /// <summary>Ordinal within overlay layers of the same kind (draw order and polygon-offset step).</summary>
+    public int LayerOrdinal { get; init; } = 0;
+
+    /// <summary>When true, element casts into shadow maps even if overlay kind normally skips.</summary>
+    public bool CastsShadow { get; init; } = false;
+
+    /// <summary>Optional shell inflation in entity texel space for parity geometry shells.</summary>
+    public float ShellInflateTexels { get; init; } = 0f;
 }
 
 internal sealed class ModelFace

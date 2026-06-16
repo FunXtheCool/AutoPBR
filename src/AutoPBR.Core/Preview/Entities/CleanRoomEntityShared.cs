@@ -127,6 +127,12 @@ internal sealed partial class CleanRoomEntityModelRuntime
     {
         public Vector3? RotationPivot { get; init; }
 
+        public PreviewDepthLayerKind DepthLayerKind { get; init; } = PreviewDepthLayerKind.Base;
+
+        public int LayerOrdinal { get; init; } = 0;
+
+        public bool CastsShadow { get; init; } = false;
+
         public void Emit(RigBuilder builder, Matrix4x4 parentPose, float partScale, string texKey = "#skin")
         {
             var key = TextureKey ?? texKey;
@@ -149,7 +155,10 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 UvSizeH,
                 UvSizeD,
                 MirrorUv,
-                FaceMask);
+                FaceMask,
+                DepthLayerKind,
+                LayerOrdinal,
+                CastsShadow);
         }
     }
 

@@ -109,19 +109,28 @@ internal sealed partial class CleanRoomEntityModelRuntime : IEntityModelRuntime
         var texRef = ToTextureRef(norm);
         var stem = Path.GetFileNameWithoutExtension(norm).ToLowerInvariant();
         var isBaby = LooksLikeBabyTexture(stem, norm);
-        return TryDispatchEntityStaticMeshBuild(
-            norm,
-            stem,
-            texRef,
-            profile,
-            isBaby,
-            idlePhase01,
-            animationTimeSeconds,
-            routeCache: null,
-            applyGeometryIrSetupAnimMotion,
-            out _,
-            out mergedModel,
-            out meshProvenance);
+        if (!TryDispatchEntityStaticMeshBuild(
+                norm,
+                stem,
+                texRef,
+                profile,
+                isBaby,
+                idlePhase01,
+                animationTimeSeconds,
+                routeCache: null,
+                applyGeometryIrSetupAnimMotion,
+                out _,
+                out mergedModel,
+                out meshProvenance))
+        {
+            return false;
+        }
+
+        var parityRule = EntityTextureParityCatalog.ResolveRule(norm, stem);
+        PreviewDepthLayerResolver.EnrichMergedModel(
+            mergedModel,
+            parityRule?.GeometryIrOfficialJvm ?? parityRule?.DeobfuscatedModelClass);
+        return true;
     }
 
     /// <summary>

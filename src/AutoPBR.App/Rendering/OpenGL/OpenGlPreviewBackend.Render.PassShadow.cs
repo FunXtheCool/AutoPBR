@@ -1,6 +1,7 @@
 using System.Numerics;
 
 using AutoPBR.App.Rendering.Abstractions;
+using AutoPBR.Core.Models;
 
 using Silk.NET.OpenGL;
 
@@ -150,6 +151,11 @@ public sealed partial class OpenGlPreviewBackend
                 foreach (var batch in frame.BlockModel.DrawBatches)
                 {
                     if ((uint)batch.MaterialIndex >= (uint)frame.BlockSlots.Length)
+                    {
+                        continue;
+                    }
+
+                    if (batch.LayerPolicy.ShadowMode == PreviewDrawLayerShadowMode.Skip)
                     {
                         continue;
                     }

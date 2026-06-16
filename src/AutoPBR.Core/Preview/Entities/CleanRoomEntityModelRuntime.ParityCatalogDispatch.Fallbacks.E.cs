@@ -29,7 +29,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
-                merged = BuildHumanoid(texRef, profile, isBaby, armLift: 0.18f + idlePhase01 * 0.25f + wave * 0.08f);
+                merged = BuildHumanoid(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, "PlayerHumanoid");
 
 
 
@@ -47,7 +47,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
-                merged = BuildPlayerSlim(texRef, profile, isBaby, armLift: 0.18f + idlePhase01 * 0.25f + wave * 0.08f);
+                merged = BuildPlayerSlim(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave);
 
 
 
@@ -65,7 +65,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
-                merged = BuildPlayerWide(texRef, profile, isBaby, armLift: 0.18f + idlePhase01 * 0.25f + wave * 0.08f);
+                merged = BuildPlayerWide(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave);
 
 
 
@@ -83,7 +83,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
-                merged = BuildHumanoid(texRef, profile, isBaby, armLift: idlePhase01 * 0.4f + wave * 0.1f);
+                merged = BuildHumanoid(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, "HumanoidGeneric");
 
 
 

@@ -75,6 +75,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         var officialJvm = geometryIrOfficialJvm;
         geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(officialJvm, geometryRoot);
+        geometryRoot = GeometryIrPlayerArmVariant.ApplySlimArmsIfNeeded(parityRule.BuilderMethod, geometryRoot);
 
         if (!TryResolveParityCatalogGeometryIrAtlasDimensions(
                 geometryRoot,
@@ -129,7 +130,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 with { OfficialJvmName = officialJvm },
             lerPlan);
         if (!applyGeometryIrSetupAnimMotion &&
-            !EntityPreviewPoseCatalog.IsIllagerBuilderMethod(parityRule.BuilderMethod))
+            !EntityPreviewPoseCatalog.IsIllagerBuilderMethod(parityRule.BuilderMethod) &&
+            !EntityPreviewPoseCatalog.IsHumanoidPoseBuilderMethod(parityRule.BuilderMethod))
         {
             emitOptions = emitOptions with { TryGetPartPoseOverride = null };
         }
@@ -182,7 +184,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
                     animationTimeSeconds,
                     idlePhase01,
                     wave,
-                    emitOptions);
+                    emitOptions,
+                    norm);
             }
         }
 

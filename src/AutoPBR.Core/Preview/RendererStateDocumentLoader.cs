@@ -1,5 +1,7 @@
 using System.Collections.Concurrent;
 using System.Text.Json.Nodes;
+using AutoPBR.Core.Models;
+using AutoPBR.Core.Preview;
 
 namespace AutoPBR.Core.Preview;
 
@@ -128,5 +130,50 @@ internal static class RendererStateDocumentLoader
         }
 
         _modelIndexBuilt = true;
+    }
+
+    public static bool TryGetModelLayerByTextureKey(
+        string officialModelJvmName,
+        string textureKey,
+        out PreviewDepthLayerKind kind)
+    {
+        kind = PreviewDepthLayerKind.Base;
+        if (string.IsNullOrWhiteSpace(officialModelJvmName) || string.IsNullOrWhiteSpace(textureKey))
+        {
+            return false;
+        }
+
+        if (!TryLoadForModel(officialModelJvmName, out var doc) ||
+            doc["modelLayers"] is not JsonArray layers)
+        {
+            return false;
+        }
+
+        var normalizedKey = textureKey.StartsWith("#", StringComparison.Ordinal) ? textureKey : "#" + textureKey;
+        foreach (var node in layers)
+        {
+            if (node is not JsonObject layer)
+            {
+                continue;
+            }
+
+            var layerKey = (string?)layer["textureKey"];
+            if (string.IsNullOrWhiteSpace(layerKey))
+            {
+                continue;
+            }
+
+            var candidate = layerKey.StartsWith("#", StringComparison.Ordinal) ? layerKey : "#" + layerKey;
+            if (!string.Equals(candidate, normalizedKey, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            return GeometryIrCuboidMetadata.TryParsePreviewDepthLayerName(
+                (string?)layer["previewDepthLayer"],
+                out kind);
+        }
+
+        return false;
     }
 }

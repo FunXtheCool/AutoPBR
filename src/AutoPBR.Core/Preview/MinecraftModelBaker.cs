@@ -33,17 +33,19 @@ internal static partial class MinecraftModelBaker
 
         var currentBatchStart = 0;
         int? currentMat = null;
+        PreviewDrawLayerPolicy currentPolicy = PreviewDrawLayerPolicy.DefaultBase;
 
-        void CloseBatchIfNeeded(int newMat)
+        void CloseBatchIfNeeded(int newMat, PreviewDrawLayerPolicy newPolicy)
         {
             if (currentMat is null)
             {
                 currentMat = newMat;
+                currentPolicy = newPolicy;
                 currentBatchStart = idx.Count;
                 return;
             }
 
-            if (newMat == currentMat.Value)
+            if (newMat == currentMat.Value && newPolicy.Equals(currentPolicy))
             {
                 return;
             }
@@ -51,10 +53,11 @@ internal static partial class MinecraftModelBaker
             var count = idx.Count - currentBatchStart;
             if (count > 0)
             {
-                batchList.Add(new PreviewDrawBatch(currentBatchStart, count, currentMat.Value));
+                batchList.Add(new PreviewDrawBatch(currentBatchStart, count, currentMat.Value) { LayerPolicy = currentPolicy });
             }
 
             currentMat = newMat;
+            currentPolicy = newPolicy;
             currentBatchStart = idx.Count;
         }
 
@@ -68,7 +71,7 @@ internal static partial class MinecraftModelBaker
             var count = idx.Count - currentBatchStart;
             if (count > 0)
             {
-                batchList.Add(new PreviewDrawBatch(currentBatchStart, count, currentMat.Value));
+                batchList.Add(new PreviewDrawBatch(currentBatchStart, count, currentMat.Value) { LayerPolicy = currentPolicy });
             }
         }
 
@@ -105,7 +108,7 @@ internal static partial class MinecraftModelBaker
                     continue;
                 }
 
-                CloseBatchIfNeeded(matIdx);
+                CloseBatchIfNeeded(matIdx, ResolveElementLayerPolicy(el, texZip, model.Textures));
 
                 _ = TryEmitFace(effectiveFaceName, fx, fy, fz, tx, ty, tz, face, wh.w, wh.h, el.LocalToParent, v, idx,
                     appendBoneIndex: false, boneElementIndex: 0, skipPreviewCuboidScale: false);
@@ -113,6 +116,7 @@ internal static partial class MinecraftModelBaker
         }
 
         FlushFinalBatch();
+        PreviewDrawBatchOrdering.Sort(batchList);
 
         batches = batchList;
         if (v.Count == 0 || idx.Count == 0 || batchList.Count == 0)
@@ -150,17 +154,19 @@ internal static partial class MinecraftModelBaker
 
         var currentBatchStart = 0;
         int? currentMat = null;
+        PreviewDrawLayerPolicy currentPolicy = PreviewDrawLayerPolicy.DefaultBase;
 
-        void CloseBatchIfNeeded(int newMat)
+        void CloseBatchIfNeeded(int newMat, PreviewDrawLayerPolicy newPolicy)
         {
             if (currentMat is null)
             {
                 currentMat = newMat;
+                currentPolicy = newPolicy;
                 currentBatchStart = idx.Count;
                 return;
             }
 
-            if (newMat == currentMat.Value)
+            if (newMat == currentMat.Value && newPolicy.Equals(currentPolicy))
             {
                 return;
             }
@@ -168,10 +174,11 @@ internal static partial class MinecraftModelBaker
             var count = idx.Count - currentBatchStart;
             if (count > 0)
             {
-                batchList.Add(new PreviewDrawBatch(currentBatchStart, count, currentMat.Value));
+                batchList.Add(new PreviewDrawBatch(currentBatchStart, count, currentMat.Value) { LayerPolicy = currentPolicy });
             }
 
             currentMat = newMat;
+            currentPolicy = newPolicy;
             currentBatchStart = idx.Count;
         }
 
@@ -185,7 +192,7 @@ internal static partial class MinecraftModelBaker
             var count = idx.Count - currentBatchStart;
             if (count > 0)
             {
-                batchList.Add(new PreviewDrawBatch(currentBatchStart, count, currentMat.Value));
+                batchList.Add(new PreviewDrawBatch(currentBatchStart, count, currentMat.Value) { LayerPolicy = currentPolicy });
             }
         }
 
@@ -223,7 +230,7 @@ internal static partial class MinecraftModelBaker
                     continue;
                 }
 
-                CloseBatchIfNeeded(matIdx);
+                CloseBatchIfNeeded(matIdx, ResolveElementLayerPolicy(el, texZip, model.Textures));
 
                 _ = TryEmitFace(effectiveFaceName, fx, fy, fz, tx, ty, tz, face, wh.w, wh.h, el.LocalToParent, v, idx,
                     appendBoneIndex: true, boneElementIndex: elementIndex, skipPreviewCuboidScale: true);
@@ -233,6 +240,7 @@ internal static partial class MinecraftModelBaker
         }
 
         FlushFinalBatch();
+        PreviewDrawBatchOrdering.Sort(batchList);
 
         batches = batchList;
         if (v.Count == 0 || idx.Count == 0 || batchList.Count == 0)

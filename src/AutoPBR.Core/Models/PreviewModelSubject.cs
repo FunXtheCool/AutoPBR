@@ -2,8 +2,13 @@ using System.Numerics;
 
 namespace AutoPBR.Core.Models;
 
-/// <summary>One contiguous index range in <see cref="PreviewModelSubject.Indices"/> drawn with one material slot.</summary>
-public readonly record struct PreviewDrawBatch(int FirstIndex, int IndexCount, int MaterialIndex);
+/// <summary>
+/// One contiguous index range in <see cref="PreviewModelSubject.Indices"/> drawn with one material slot and depth layer policy.
+/// </summary>
+public readonly record struct PreviewDrawBatch(int FirstIndex, int IndexCount, int MaterialIndex)
+{
+    public PreviewDrawLayerPolicy LayerPolicy { get; init; } = PreviewDrawLayerPolicy.DefaultBase;
+}
 
 /// <summary>
 /// Baked Java-style block/item model for 3D preview: one interleaved mesh and multiple PBR material slots

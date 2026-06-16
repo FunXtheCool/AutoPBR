@@ -50,6 +50,8 @@ uniform float uAlphaCutoff;
 uniform int   uItemAlphaBlend;
 // 0 = off, 1 = cutout, 2 = blend - only applied for batched previews that opt in (entity emulated rigs).
 uniform int   uEntityAlphaMode;
+uniform int   uPreviewDepthLayerDebug;
+uniform vec3  uPreviewLayerDebugTint;
 
 // Genesis-specific.
 uniform int   uEnableSss;
@@ -135,6 +137,10 @@ void main()
     }
 
     vec3 albedoLinear = srgbToLinear(alb.rgb);
+    if (uPreviewDepthLayerDebug != 0)
+    {
+        albedoLinear = uPreviewLayerDebugTint;
+    }
 
     // Surface normal.
     vec3 N = sampleNormal(uv, Nw, Tw, Bw);

@@ -12,6 +12,11 @@ file static class EntityEmulatedBoneFillScratch
 /// <summary>Rebuilds emulated entity preview geometry for a new animation clock (same pipeline as initial bake, without temp extraction).</summary>
 public static class EntityEmulatedPreviewRebaker
 {
+    private static IDisposable? EnterPreviewPoseScope(EntityEmulatedPreviewRebakeContext rebake) =>
+        string.IsNullOrWhiteSpace(rebake.PreviewPoseId)
+            ? null
+            : EntityPreviewBuildContext.UsePose(rebake.PreviewPoseId);
+
     /// <summary>
     /// Recomputes interleaved vertices, indices, and draw batches for an emulated entity subject.
     /// </summary>
@@ -57,6 +62,7 @@ public static class EntityEmulatedPreviewRebaker
             parsed);
 
         var runtime = EntityModelRuntimeFactory.Create();
+        using var previewPoseScope = EnterPreviewPoseScope(rebake);
         if (!runtime.TryBuildStaticMesh(
                 rebake.AssetArchivePath,
                 profile,
@@ -94,6 +100,9 @@ public static class EntityEmulatedPreviewRebaker
             texSizes[p] = (materialsInBakeOrder[i].Width, materialsInBakeOrder[i].Height);
         }
 
+        var profileForParts = profile;
+        EntityPreviewPlacement.TryPopulateRebakeElementPartIds(rebake, profileForParts, merged.Elements.Count);
+
         if (!MinecraftModelBaker.TryBake(
                 merged,
                 rebake.ModelDefaultNamespace,
@@ -106,8 +115,6 @@ public static class EntityEmulatedPreviewRebaker
             return false;
         }
 
-        var profileForParts = profile;
-        EntityPreviewPlacement.TryPopulateRebakeElementPartIds(rebake, profileForParts, merged.Elements.Count);
         EntityPreviewPlacement.TryMeasureMergedModelPartCentroidsY(
             merged,
             rebake.ElementPartIds!,
@@ -180,6 +187,7 @@ public static class EntityEmulatedPreviewRebaker
             parsed);
 
         var runtime = EntityModelRuntimeFactory.Create();
+        using var previewPoseScope = EnterPreviewPoseScope(rebake);
         if (!runtime.TryBuildStaticMesh(
                 rebake.AssetArchivePath,
                 profile,
@@ -303,6 +311,7 @@ public static class EntityEmulatedPreviewRebaker
         var runtime = EntityModelRuntimeFactory.Create();
         var animTime = applyGeometryIrSetupAnimMotion ? animationTimeSeconds : 0f;
         var useFullMeshExtract = EntityGpuBoneFillPolicy.RequiresFullMeshBoneExtract(rebake.AssetArchivePath);
+        using var previewPoseScope = EnterPreviewPoseScope(rebake);
         if (useFullMeshExtract)
         {
             if (!runtime.TryBuildStaticMesh(

@@ -267,7 +267,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     }
 
     private static string BuildEntityGpuBindRebakeKey(EntityEmulatedPreviewRebakeContext ctx) =>
-        $"{ctx.PackZipPath}\u001f{ctx.AssetArchivePath}\u001f{ctx.PackConverterCpuMeshFingerprint}";
+        $"{ctx.PackZipPath}\u001f{ctx.AssetArchivePath}\u001f{ctx.PackConverterCpuMeshFingerprint}\u001f{ctx.PreviewPoseId ?? ""}";
 
     /// <summary>
     /// Stable parity-catalog animation-off CPU bind key. Do not include mesh fingerprint — TryRebakeMesh updates
@@ -275,7 +275,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     /// invalidate the GL-committed subject on every UI re-push.
     /// </summary>
     private static string BuildParityCatalogCpuBindCommitKey(EntityEmulatedPreviewRebakeContext ctx) =>
-        $"{ctx.PackZipPath}\u001f{ctx.AssetArchivePath}\u001fparity-cpu-v{PreviewMeshGeometryFingerprint.PipelineRevision}";
+        $"{ctx.PackZipPath}\u001f{ctx.AssetArchivePath}\u001fparity-cpu-v{PreviewMeshGeometryFingerprint.PipelineRevision}\u001f{ctx.PreviewPoseId ?? ""}";
 
     private static bool IsParityCatalogEmulatedAsset(string? assetArchivePath)
     {
@@ -330,6 +330,44 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
                    StringComparison.OrdinalIgnoreCase);
     }
 
+    private static bool SameEntityPreviewPose(PreviewModelSubject? a, PreviewModelSubject? b) =>
+        string.Equals(
+            a?.EmulatedRebake?.PreviewPoseId,
+            b?.EmulatedRebake?.PreviewPoseId,
+            StringComparison.Ordinal);
+
+    private void InvalidateParityCatalogBindCommitState()
+    {
+        _entityBindPoseCommittedKey = null;
+        _parityCatalogCpuBindDiagKey = null;
+        _parityCatalogCpuBindFailDiagKey = null;
+        _entityMeshUploadDeferredDiagKey = null;
+        _lastParityCatalogIncomingPackFingerprint = 0;
+        _meshDirty = true;
+    }
+
+    private void InvalidateEntityAssetBindState(EntityEmulatedPreviewRebakeContext rebake)
+    {
+        rebake.GpuPreparedBoneCount = null;
+        rebake.GpuBindPoseInverseLocalToParent = null;
+        rebake.GpuBindPoseBonePalette = null;
+        rebake.GpuBindPoseInterleavedVertices = null;
+        rebake.GpuBoundCpuMeshFingerprint = null;
+        rebake.GpuBoneDispatchRoute = null;
+        rebake.ElementPartIds = null;
+        _emulatedGpuSkinPrepFailedKey = null;
+        _emulatedRebakeSubjectKey = null;
+        _entityBindPoseCommittedKey = null;
+        _entityBindPosePrepDiagKey = null;
+        _parityPlacementDiagKey = null;
+        _entityCpuRebakeDiagKey = null;
+        _parityCatalogCpuBindDiagKey = null;
+        _parityCatalogCpuBindFailDiagKey = null;
+        _entityMeshUploadDeferredDiagKey = null;
+        _lastParityCatalogIncomingPackFingerprint = 0;
+        ResetEntityGpuRuntimeDiagState();
+    }
+
     private static bool BlockModelGeometryChanged(PreviewModelSubject? prev, PreviewModelSubject? next)
     {
         if (ReferenceEquals(prev, next))
@@ -368,26 +406,11 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
             var prev = _blockModelSubject;
             var prevPath = prev?.EmulatedRebake?.AssetArchivePath;
             var nextPath = subject?.EmulatedRebake?.AssetArchivePath;
-            if (!string.Equals(prevPath, nextPath, StringComparison.OrdinalIgnoreCase) &&
+            var previewPoseChanged = SameEntityPreviewAsset(prev, subject) && !SameEntityPreviewPose(prev, subject);
+            if ((!string.Equals(prevPath, nextPath, StringComparison.OrdinalIgnoreCase) || previewPoseChanged) &&
                 subject?.EmulatedRebake is { } rebake)
             {
-                rebake.GpuPreparedBoneCount = null;
-                rebake.GpuBindPoseInverseLocalToParent = null;
-                rebake.GpuBindPoseBonePalette = null;
-                rebake.GpuBindPoseInterleavedVertices = null;
-                rebake.GpuBoundCpuMeshFingerprint = null;
-                rebake.GpuBoneDispatchRoute = null;
-                _emulatedGpuSkinPrepFailedKey = null;
-                _emulatedRebakeSubjectKey = null;
-                _entityBindPoseCommittedKey = null;
-                _entityBindPosePrepDiagKey = null;
-                _parityPlacementDiagKey = null;
-                _entityCpuRebakeDiagKey = null;
-                _parityCatalogCpuBindDiagKey = null;
-                _parityCatalogCpuBindFailDiagKey = null;
-                _entityMeshUploadDeferredDiagKey = null;
-                _lastParityCatalogIncomingPackFingerprint = 0;
-                ResetEntityGpuRuntimeDiagState();
+                InvalidateEntityAssetBindState(rebake);
             }
 
             // UI re-pushes pack-converter CPU mesh every settings tick; keep the GPU bind VBO subject instead,
@@ -425,15 +448,12 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
                 SameEntityPreviewAsset(prev, subject))
             {
                 var incomingFp = subject.EmulatedRebake?.PackConverterCpuMeshFingerprint ?? 0;
-                if (_lastParityCatalogIncomingPackFingerprint != 0 &&
-                    incomingFp != 0 &&
-                    incomingFp != _lastParityCatalogIncomingPackFingerprint)
+                if (previewPoseChanged ||
+                    (_lastParityCatalogIncomingPackFingerprint != 0 &&
+                     incomingFp != 0 &&
+                     incomingFp != _lastParityCatalogIncomingPackFingerprint))
                 {
-                    _entityBindPoseCommittedKey = null;
-                    _parityCatalogCpuBindDiagKey = null;
-                    _parityCatalogCpuBindFailDiagKey = null;
-                    _entityMeshUploadDeferredDiagKey = null;
-                    _meshDirty = true;
+                    InvalidateParityCatalogBindCommitState();
                 }
 
                 if (incomingFp != 0)
@@ -442,6 +462,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
                 }
 
                 if (_entityBindPoseCommittedKey is not null &&
+                    subject.EmulatedRebake is { } incomingRebake &&
                     prev is
                     {
                         GpuEntityBoneSkinning: false,
@@ -452,7 +473,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
                     } &&
                     string.Equals(
                         _entityBindPoseCommittedKey,
-                        BuildParityCatalogCpuBindCommitKey(prev.EmulatedRebake),
+                        BuildParityCatalogCpuBindCommitKey(incomingRebake),
                         StringComparison.Ordinal))
                 {
                     subject = new PreviewModelSubject
@@ -504,7 +525,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
                     var sameParityGeometry = IsParityCatalogEmulatedAsset(nextPath) &&
                                              incomingFp != 0 &&
                                              incomingFp == prevFp;
-                    if (!sameParityGeometry)
+                    if (!sameParityGeometry || previewPoseChanged)
                     {
                         _meshDirty = true;
                     }

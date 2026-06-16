@@ -60,6 +60,12 @@ public static class EntityPreviewDebugSettings
 
 
 
+    /// <summary>False-color preview draw batches by <see cref="PreviewDepthLayerKind"/> (Explore 3D debug).</summary>
+
+    public static bool ShowDepthLayerDebug { get; set; }
+
+
+
     /// <summary>Ears, head→head_parts, goat horns, breeze wind stack, etc.</summary>
 
     public static bool RepairGlobalReparentRules { get; set; } = true;

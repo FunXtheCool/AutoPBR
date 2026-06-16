@@ -6,6 +6,8 @@ namespace AutoPBR.Core.Preview;
 /// </summary>
 public enum EntityIllagerPreviewArmPose
 {
+    /// <summary>Separate arms at bind pose (pillager default — no folded-arm UV sheet).</summary>
+    ArmsAtSide,
     Crossed,
     AttackingEmptyHands,
     AttackingWeapon,

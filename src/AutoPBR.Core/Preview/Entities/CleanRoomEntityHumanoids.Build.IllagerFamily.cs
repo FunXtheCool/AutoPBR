@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using AutoPBR.Core.Models;
 // ReSharper disable CheckNamespace
 
 
@@ -160,8 +161,19 @@ internal sealed partial class CleanRoomEntityModelRuntime
         bool isBaby,
         float idlePhase01,
         float animationTimeSeconds,
-        float wave) =>
-        BuildIllager(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, EntityIllagerPreviewArmPose.Spellcasting);
+        float wave,
+        string normalizedAssetPath) =>
+        BuildIllager(
+            texRef,
+            profile,
+            isBaby,
+            idlePhase01,
+            animationTimeSeconds,
+            wave,
+            EntityPreviewPoseCatalog.ResolveEffectiveIllagerArmPose(
+                normalizedAssetPath,
+                "Evoker",
+                EntityPreviewBuildContext.CurrentPoseId));
 
 
     private static MergedJavaBlockModel BuildVindicator(
@@ -170,7 +182,18 @@ internal sealed partial class CleanRoomEntityModelRuntime
         bool isBaby,
         float idlePhase01,
         float animationTimeSeconds,
-        float wave) =>
-        BuildIllager(texRef, profile, isBaby, idlePhase01, animationTimeSeconds, wave, EntityIllagerPreviewArmPose.AttackingWeapon);
+        float wave,
+        string normalizedAssetPath) =>
+        BuildIllager(
+            texRef,
+            profile,
+            isBaby,
+            idlePhase01,
+            animationTimeSeconds,
+            wave,
+            EntityPreviewPoseCatalog.ResolveEffectiveIllagerArmPose(
+                normalizedAssetPath,
+                "Vindicator",
+                EntityPreviewBuildContext.CurrentPoseId));
 
 }

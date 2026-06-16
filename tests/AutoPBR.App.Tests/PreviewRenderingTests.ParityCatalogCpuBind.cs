@@ -12,6 +12,50 @@ public sealed partial class PreviewRenderingTests
     private const string DolphinTexturePath = "assets/minecraft/textures/entity/dolphin/dolphin.png";
 
     [Fact]
+    public void SetBlockModelPreview_does_not_reuse_committed_parity_cpu_when_preview_pose_changes()
+    {
+        var backend = new OpenGlPreviewBackend();
+        var textureMaps = CreateDolphinTextureMaps();
+        var slotMaterials = CreateDolphinSlotMaterials(textureMaps);
+        var rebakeCrossed = CreateDolphinRebakeContext(
+            packFingerprint: 1201UL,
+            previewPoseId: EntityPreviewPoseCatalog.IllagerCrossed);
+        var rebakeSpell = CreateDolphinRebakeContext(
+            packFingerprint: 1201UL,
+            previewPoseId: EntityPreviewPoseCatalog.IllagerSpellcasting);
+
+        var committedVerts = CreatePreviewVerts(192, seed: 31);
+        var incomingVerts = CreatePreviewVerts(192, seed: 32);
+        var indices = CreatePreviewIndices(288);
+
+        var committedSubject = CreateDolphinSubject(
+            committedVerts,
+            indices,
+            textureMaps,
+            rebakeCrossed,
+            entityGpuVerticesInPreviewSpace: true,
+            entityPreviewPlacementApplied: true);
+
+        backend.TestSimulateParityCatalogCpuBindCommit(committedSubject);
+
+        var incomingSubject = CreateDolphinSubject(
+            incomingVerts,
+            indices,
+            textureMaps,
+            rebakeSpell,
+            entityGpuVerticesInPreviewSpace: false,
+            entityPreviewPlacementApplied: false);
+
+        backend.SetBlockModelPreview(incomingSubject, slotMaterials);
+
+        var stored = backend.TestBlockModelSubject;
+        Assert.NotNull(stored);
+        Assert.Same(incomingVerts, stored!.InterleavedVertices);
+        Assert.Equal(EntityPreviewPoseCatalog.IllagerSpellcasting, stored.EmulatedRebake?.PreviewPoseId);
+        Assert.True(backend.TestMeshDirty);
+    }
+
+    [Fact]
     public void SetBlockModelPreview_reuses_committed_parity_cpu_subject_on_ui_repush()
     {
         var backend = new OpenGlPreviewBackend();
@@ -196,7 +240,9 @@ public sealed partial class PreviewRenderingTests
     private static PreviewMaterial[] CreateDolphinSlotMaterials(PreviewTextureMaps[] textureMaps) =>
         textureMaps.Select(PreviewMaterialMapper.FromCoreMaps).ToArray();
 
-    private static EntityEmulatedPreviewRebakeContext CreateDolphinRebakeContext(ulong packFingerprint) =>
+    private static EntityEmulatedPreviewRebakeContext CreateDolphinRebakeContext(
+        ulong packFingerprint,
+        string? previewPoseId = null) =>
         new()
         {
             PackZipPath = "minecraft-26.1.2-client.jar",
@@ -206,6 +252,7 @@ public sealed partial class PreviewRenderingTests
             NativeParsedVersion = "26.1.2",
             ModelDefaultNamespace = "minecraft",
             IdlePhase01 = 0.3f,
+            PreviewPoseId = previewPoseId,
             OrderedTextureZipPaths = [DolphinTexturePath],
             PackConverterCpuMeshFingerprint = packFingerprint,
         };

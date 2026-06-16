@@ -24,6 +24,7 @@ public static class EntityPreviewGrounding
         string normalizedAssetPath,
         MinecraftNativeProfile profile,
         int elementCount,
+        string? previewPoseId,
         out string[] partIds)
     {
         partIds = [];
@@ -58,8 +59,15 @@ public static class EntityPreviewGrounding
             atlasH = thi;
         }
 
-        var options = GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH)
-            .WithOfficialJvmPoseComposeDefaults(jvm);
+        var options = CleanRoomEntityModelRuntime.CreateParityCatalogPartIdResolveEmitOptions(
+            rule.BuilderMethod,
+            profile,
+            isBaby,
+            jvm,
+            atlasW,
+            atlasH,
+            norm,
+            previewPoseId);
         var collected = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(geometryRoot, options);
         if (collected.Count != elementCount)
         {

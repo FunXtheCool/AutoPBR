@@ -28,6 +28,12 @@ public sealed class EntityEmulatedPreviewRebakeContext
     /// <summary>Deterministic idle phase in 0..1 (matches initial bake).</summary>
     public float IdlePhase01 { get; init; }
 
+    /// <summary>
+    /// Explore pose selector id captured at initial bake (e.g. <see cref="EntityPreviewPoseCatalog.IllagerCrossed"/>).
+    /// Rebakes and GPU bone fills must reuse this so illager arm visibility stays consistent across threads.
+    /// </summary>
+    public string? PreviewPoseId { get; init; }
+
     /// <summary>Texture zip paths in merged-model bake order (same as the initial preview pipeline).</summary>
     public required string[] OrderedTextureZipPaths { get; init; }
 

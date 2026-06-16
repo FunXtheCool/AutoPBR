@@ -108,7 +108,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
         float animationTimeSeconds,
         float idlePhase01,
         float wave,
-        GeometryIrMeshEmitOptions emitOptions)
+        GeometryIrMeshEmitOptions emitOptions,
+        string? normalizedAssetPath = null)
     {
         if (string.Equals(parityRule.BuilderMethod, "Ghast", StringComparison.Ordinal) ||
             string.Equals(parityRule.BuilderMethod, "HappyGhast", StringComparison.Ordinal))
@@ -134,6 +135,39 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 wave,
                 emitOptions);
             return true;
+        }
+
+        if (EntityPreviewPoseCatalog.IsIllagerBuilderMethod(parityRule.BuilderMethod) &&
+            !string.IsNullOrWhiteSpace(normalizedAssetPath))
+        {
+            return ApplyIllagerGeometryIrSetupAnimPreviewPass(
+                parityRule,
+                geometryIrOfficialJvm,
+                merged,
+                geometryRoot,
+                isBaby,
+                animationTimeSeconds,
+                idlePhase01,
+                wave,
+                emitOptions,
+                normalizedAssetPath);
+        }
+
+        if (EntityPreviewPoseCatalog.IsHumanoidPoseBuilderMethod(parityRule.BuilderMethod) ||
+            GeometryIrHumanoidLayerMeshPreviewPolicy.UsesHumanoidArmPosePreviewPass(
+                parityRule.BuilderMethod,
+                geometryIrOfficialJvm))
+        {
+            return ApplyHumanoidGeometryIrSetupAnimPreviewPass(
+                parityRule,
+                geometryIrOfficialJvm,
+                merged,
+                geometryRoot,
+                isBaby,
+                animationTimeSeconds,
+                idlePhase01,
+                wave,
+                emitOptions);
         }
 
         var modelJvm = SetupAnimParityResolver.ResolveModelJvmForPreview(
@@ -168,6 +202,116 @@ internal sealed partial class CleanRoomEntityModelRuntime
             pose,
             GeometryIrPartWorldPoseIndex.Build(geometryRoot, emitOptions),
             emitOptions);
+    }
+
+    private static bool ApplyIllagerGeometryIrSetupAnimPreviewPass(
+        EntityTextureParityRule parityRule,
+        string geometryIrOfficialJvm,
+        MergedJavaBlockModel merged,
+        JsonElement geometryRoot,
+        bool isBaby,
+        float animationTimeSeconds,
+        float idlePhase01,
+        float wave,
+        GeometryIrMeshEmitOptions emitOptions,
+        string normalizedAssetPath)
+    {
+        var modelJvm = SetupAnimParityResolver.ResolveModelJvmForPreview(
+            parityRule.BuilderMethod,
+            parityRule.DeobfuscatedModelClass,
+            isBaby,
+            geometryIrOfficialJvm);
+        var baselineParts = BuildSetupAnimBaselineParts(geometryRoot);
+        var state = ResolveSetupAnimPreviewState(modelJvm, animationTimeSeconds, idlePhase01, wave, out _);
+        if (SetupAnimDocumentLoader.TryLoad(modelJvm, out _) &&
+            VanillaSetupAnimRuntime.TryEvaluate(
+                modelJvm,
+                state,
+                animationTimeSeconds,
+                out var pose,
+                parityRule.BuilderMethod,
+                isBaby,
+                baselineParts))
+        {
+            IllagerPreviewPoseSupport.StripSetupAnimArmChannels(pose);
+            _ = ApplySetupAnimToGeometryIrMesh(
+                merged,
+                geometryRoot,
+                pose,
+                GeometryIrPartWorldPoseIndex.Build(geometryRoot, emitOptions),
+                emitOptions);
+        }
+
+        var norm = normalizedAssetPath.Replace('\\', '/').TrimStart('/');
+        var armPose = EntityPreviewPoseCatalog.ResolveEffectiveIllagerArmPose(
+            norm,
+            parityRule.BuilderMethod,
+            EntityPreviewBuildContext.CurrentPoseId);
+        return IllagerPreviewPoseSupport.TryApplyArmPoseToGeometryIrMesh(
+            merged,
+            geometryRoot,
+            emitOptions,
+            armPose,
+            idlePhase01,
+            animationTimeSeconds,
+            wave);
+    }
+
+    private static bool ApplyHumanoidGeometryIrSetupAnimPreviewPass(
+        EntityTextureParityRule parityRule,
+        string geometryIrOfficialJvm,
+        MergedJavaBlockModel merged,
+        JsonElement geometryRoot,
+        bool isBaby,
+        float animationTimeSeconds,
+        float idlePhase01,
+        float wave,
+        GeometryIrMeshEmitOptions emitOptions)
+    {
+        var modelJvm = SetupAnimParityResolver.ResolveModelJvmForPreview(
+            parityRule.BuilderMethod,
+            parityRule.DeobfuscatedModelClass,
+            isBaby,
+            geometryIrOfficialJvm);
+        var baselineParts = BuildSetupAnimBaselineParts(geometryRoot);
+        var state = ResolveSetupAnimPreviewState(modelJvm, animationTimeSeconds, idlePhase01, wave, out _);
+        if (SetupAnimDocumentLoader.TryLoad(modelJvm, out _) &&
+            VanillaSetupAnimRuntime.TryEvaluate(
+                modelJvm,
+                state,
+                animationTimeSeconds,
+                out var pose,
+                parityRule.BuilderMethod,
+                isBaby,
+                baselineParts))
+        {
+            HumanoidPreviewPoseSupport.StripSetupAnimArmChannels(pose);
+            if (GeometryIrHumanoidLayerMeshPreviewPolicy.ShouldStripSetupAnimBodyLegHeadChannels(
+                    parityRule.BuilderMethod,
+                    geometryIrOfficialJvm))
+            {
+                HumanoidPreviewPoseSupport.StripSetupAnimBodyLegChannels(pose);
+            }
+
+            _ = ApplySetupAnimToGeometryIrMesh(
+                merged,
+                geometryRoot,
+                pose,
+                GeometryIrPartWorldPoseIndex.Build(geometryRoot, emitOptions),
+                emitOptions);
+        }
+
+        var armPose = EntityPreviewPoseCatalog.ResolveEffectiveHumanoidArmPose(
+            parityRule.BuilderMethod,
+            EntityPreviewBuildContext.CurrentPoseId);
+        return HumanoidPreviewPoseSupport.TryApplyArmPoseToGeometryIrMesh(
+            merged,
+            geometryRoot,
+            emitOptions,
+            armPose,
+            idlePhase01,
+            animationTimeSeconds,
+            wave);
     }
 
     /// <summary>
