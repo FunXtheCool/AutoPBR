@@ -24,6 +24,57 @@ public sealed class MaterialTagSemanticResolutionTests
         Assert.DoesNotContain("unknown", ids, StringComparer.OrdinalIgnoreCase);
     }
 
+    [Theory]
+    [InlineData("steve", @"\minecraft\textures\entity\player\wide\steve")]
+    [InlineData("alex", @"\minecraft\textures\entity\player\slim\alex")]
+    [InlineData("makena", @"\minecraft\textures\entity\player\wide\makena")]
+    [InlineData("sunny", @"\minecraft\textures\entity\player\slim\sunny")]
+    [InlineData("steve_baby", @"\minecraft\textures\entity\player\wide\steve_baby")]
+    public void ResolveMaterialTagsVanillaPlayerEntityForcesOrganicUnweighted(string textureName, string ruleRelativeKey)
+    {
+        var rules = TagRulePresets.Default;
+        var ids = MaterialTagSemanticResolution.ResolveMaterialTags(
+            textureName,
+            ruleRelativeKey,
+            rules,
+            sem: null,
+            deferSemanticMl: false,
+            includeDictionaryEvidence: false,
+            out var usedSemanticMl);
+
+        Assert.False(usedSemanticMl);
+        Assert.Contains("organic", ids, StringComparer.OrdinalIgnoreCase);
+        Assert.DoesNotContain("unknown", ids, StringComparer.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void ResolveMaterialTagsVanillaPlayerEntitySkipsSemanticMlWhenEnabled()
+    {
+        var matcher = MaterialTagSemanticMatcher.TryCreate();
+        if (matcher is null)
+        {
+            return;
+        }
+
+        var rules = TagRulePresets.Default;
+        var ids = MaterialTagSemanticResolution.ResolveMaterialTags(
+            "alex",
+            @"\minecraft\textures\entity\player\slim\alex",
+            rules,
+            sem: new MaterialTagSemanticOptions
+            {
+                Enabled = true,
+                Matcher = matcher,
+                DictionaryEvidenceEnabled = true,
+            },
+            deferSemanticMl: false,
+            includeDictionaryEvidence: true,
+            out var usedSemanticMl);
+
+        Assert.False(usedSemanticMl);
+        Assert.Contains("organic", ids, StringComparer.OrdinalIgnoreCase);
+    }
+
     [Fact]
     public void AppendWeightedUnweightedFlagsSemanticDisabledAddsUnweighted()
     {

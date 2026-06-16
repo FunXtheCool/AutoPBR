@@ -81,6 +81,17 @@ public static class MaterialTagSemanticResolution
                 sem is { Enabled: true, Matcher: not null } ? sem.MaxTags : null);
         }
 
+        if (IsVanillaPlayerEntityTexture(ruleRelativeKey))
+        {
+            // Explicit unweighted override: player skins (wide/slim) should be organic; skip name-based dictionary ML.
+            return MaterialTagMlPostProcessor.Apply(
+                textureName,
+                ruleRelativeKey,
+                ["organic"],
+                materialRules,
+                sem is { Enabled: true, Matcher: not null } ? sem.MaxTags : null);
+        }
+
         if (sem is not { Enabled: true, Matcher: { } matcher } || deferSemanticMl)
         {
             var ids = TagRulePresets.GetMatchingMaterialTagIds(textureName, ruleRelativeKey, allRules).ToList();
@@ -221,6 +232,22 @@ public static class MaterialTagSemanticResolution
         }
 
         return false;
+    }
+
+    private static bool IsVanillaPlayerEntityTexture(string ruleRelativeKey)
+    {
+        if (string.IsNullOrWhiteSpace(ruleRelativeKey))
+        {
+            return false;
+        }
+
+        if (!ruleRelativeKey.StartsWith("\\minecraft\\", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return ruleRelativeKey.Contains("\\entity\\player\\wide\\", StringComparison.OrdinalIgnoreCase) ||
+               ruleRelativeKey.Contains("\\entity\\player\\slim\\", StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool IsVanillaEntityBedColorTexture(string textureName, string ruleRelativeKey)
