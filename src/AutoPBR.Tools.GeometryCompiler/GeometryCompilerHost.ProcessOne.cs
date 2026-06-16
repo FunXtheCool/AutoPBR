@@ -8,6 +8,13 @@ internal sealed partial class GeometryCompilerHost
 {
     private int ProcessOne(string officialJvmName, string factoryMethod, bool writeIndex)
     {
+        var outputOfficialJvmName = officialJvmName;
+        if (GeometryIrVariantLiftMap.TryGet(officialJvmName, out var variant))
+        {
+            officialJvmName = variant.SourceOfficialJvmName;
+            factoryMethod = variant.FactoryMethod;
+        }
+
         if (IsPackageInfoStub(officialJvmName))
         {
             LogLine($"Skipping (Java package-info, not a mesh model): {officialJvmName}");
@@ -64,15 +71,15 @@ internal sealed partial class GeometryCompilerHost
             }
         }
 
-        var outputShardPath = Path.Combine(_outDir, "geometry", _versionLabel, $"{officialJvmName}.json");
-        var useHandTemplate = !_useAsmLift && ShouldUseExistingShardAsMergeTemplate(classBytes, officialJvmName);
+        var outputShardPath = Path.Combine(_outDir, "geometry", _versionLabel, $"{outputOfficialJvmName}.json");
+        var useHandTemplate = !_useAsmLift && ShouldUseExistingShardAsMergeTemplate(classBytes, outputOfficialJvmName);
         var templatePath = useHandTemplate ? TryPickShardTemplateFile(outputShardPath) : null;
         var json = templatePath is not null
             ? JsonNode.Parse(File.ReadAllText(templatePath))!.AsObject()
-            : CreateSyntheticShard(officialJvmName, mappingKind);
+            : CreateSyntheticShard(outputOfficialJvmName, mappingKind);
         var liftSucceeded = false;
 
-        json["officialJvmName"] = officialJvmName;
+        json["officialJvmName"] = outputOfficialJvmName;
         json["versionLabel"] = _versionLabel;
         json["profile"] = mappingKind == "named_jar" ? $"named_jar_{_versionLabel}" : $"proguard_{_versionLabel}";
         json["factoryMethod"] = factoryMethod;
@@ -108,16 +115,21 @@ internal sealed partial class GeometryCompilerHost
                 json["textureWidth"] = texW;
                 json["textureHeight"] = texH;
             }
+            else if (LayerDefinitionMeshHostMap.TryGet(officialJvmName, out var layerAtlas))
+            {
+                json["textureWidth"] = layerAtlas.TextureWidth;
+                json["textureHeight"] = layerAtlas.TextureHeight;
+            }
 
             json["liftSummary"] = GeometryIrLiftSummaryBuilder.BuildFromRoots(liftAttempt.Roots, delegationDepth);
             json["extractionStatus"] = "ok";
             var strictValidation = GeometryIrStructuralValidator.ValidateShard(json,
-                officialJvmName,
+                outputOfficialJvmName,
                 new GeometryIrStructuralValidator.Options(Strict: true));
-            var treeValidation = GeometryIrLiftTreeValidator.ValidateRoots(liftAttempt.Roots, officialJvmName);
+            var treeValidation = GeometryIrLiftTreeValidator.ValidateRoots(liftAttempt.Roots, outputOfficialJvmName);
             var allLiftIssues = strictValidation.Issues.Concat(treeValidation.Issues).ToList();
             liftSucceeded = strictValidation.IsValid && treeValidation.IsValid;
-            liftSucceeded = GeometryIrReferenceBakeGate.Apply(officialJvmName, json, liftSucceeded, allLiftIssues);
+            liftSucceeded = GeometryIrReferenceBakeGate.Apply(outputOfficialJvmName, json, liftSucceeded, allLiftIssues);
             json["extractionStatus"] = liftSucceeded ? "ok" : "partial";
 
             var liftNotesArr = new JsonArray
@@ -140,7 +152,7 @@ internal sealed partial class GeometryCompilerHost
             json["extractionNotes"] = liftNotesArr;
         }
 
-        ApplyNonMeshShardFinalization(json, classBytes, officialJvmName, liftSucceeded, _maps, factoryMethod);
+        ApplyNonMeshShardFinalization(json, classBytes, outputOfficialJvmName, liftSucceeded, _maps, factoryMethod);
 
         var dir = Path.GetDirectoryName(outputShardPath);
         if (!string.IsNullOrEmpty(dir))
@@ -154,12 +166,12 @@ internal sealed partial class GeometryCompilerHost
             GeometryIrV2Migration.ApplyToShard(json);
         }
 
-        FinalizeShardExtractionStatus(json, officialJvmName);
+        FinalizeShardExtractionStatus(json, outputOfficialJvmName);
 
         File.WriteAllText(outputShardPath, json.ToJsonString(WriteIndentedJson));
         if (writeIndex)
         {
-            UpsertIndexEntry(mappingKind, officialJvmName, jarRel.Replace('\\', '/'), sha,
+            UpsertIndexEntry(mappingKind, outputOfficialJvmName, jarRel.Replace('\\', '/'), sha,
                 (string?)json["extractionStatus"] ?? "partial");
         }
 

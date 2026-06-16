@@ -133,6 +133,19 @@ internal static partial class JavapFloatGeometryMeshLift
         line.Contains("// Method", StringComparison.Ordinal) &&
         Regex.IsMatch(line, @"//\s*Method\s+\w+\.\w+:\(\)L\w+;", RegexOptions.CultureInvariant);
 
+    /// <summary>
+    /// <c>ZombieVillagerModel.createBodyLayer</c> builds the villager head via <c>new CubeListBuilder</c> + <c>&lt;init&gt;</c>
+    /// instead of <c>CubeListBuilder.create()</c>.
+    /// </summary>
+    private static bool IsCubeListBuilderNewInstanceLine(string line) =>
+        line.Contains(" new ", StringComparison.Ordinal) &&
+        line.Contains("CubeListBuilder", StringComparison.Ordinal);
+
+    private static bool IsCubeListBuilderConstructionLine(string line) =>
+        line.Contains("CubeListBuilder.create", StringComparison.Ordinal) ||
+        IsObfuscatedCubeListBuilderCreateLine(line) ||
+        IsCubeListBuilderNewInstanceLine(line);
+
     private static void SkipBooleanStackOperandBackward(List<string> lines, ref int j, int minIdx)
     {
         if (j < minIdx)

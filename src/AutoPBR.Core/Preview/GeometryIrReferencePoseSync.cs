@@ -21,6 +21,30 @@ internal static class GeometryIrReferencePoseSync
         return irShardRoot;
     }
 
+    /// <summary>
+    /// Full reference parity for preview emit: topology, poses, and cuboid bounds.
+    /// </summary>
+    public static JsonElement ApplyForParityPreview(JsonElement referenceRoot, JsonElement irShardRoot)
+    {
+        var topologyAligned = GeometryIrReferenceTopologyAlign.ApplyForWorldPoseCompare(referenceRoot, irShardRoot);
+        var node = JsonNode.Parse(topologyAligned.GetRawText());
+        if (node is not JsonObject doc)
+        {
+            return topologyAligned;
+        }
+
+        SyncIntoShard(referenceRoot, doc);
+        SyncCuboidsIntoShard(referenceRoot, doc);
+        if (GeometryIrHumanoidLayerMeshPreviewPolicy.IsHumanoidLayerMeshJvm(
+                irShardRoot.TryGetProperty("officialJvmName", out var jvmEl) ? jvmEl.GetString() : null) &&
+            doc["roots"]?[0]?["children"] is JsonArray rootKids)
+        {
+            GeometryIrHumanoidLayerMeshParityRepair.ApplyCanonicalHumanoidUv(rootKids);
+        }
+
+        return JsonDocument.Parse(doc.ToJsonString()).RootElement;
+    }
+
     public static void SyncIntoShard(JsonElement referenceRoot, JsonObject irShard)
     {
         if (!referenceRoot.TryGetProperty("roots", out var refRoots) ||
@@ -46,6 +70,103 @@ internal static class GeometryIrReferencePoseSync
         var refPoses = new Dictionary<string, JsonObject>(StringComparer.Ordinal);
         CollectReferencePosesByPartId(refOuter, refPoses);
         ApplyPosesToTree(irOuter, refPoses);
+    }
+
+    public static void SyncCuboidsIntoShard(JsonElement referenceRoot, JsonObject irShard)
+    {
+        if (!referenceRoot.TryGetProperty("roots", out var refRoots) ||
+            refRoots.ValueKind != JsonValueKind.Array ||
+            refRoots.GetArrayLength() == 0)
+        {
+            return;
+        }
+
+        if (irShard["roots"] is not JsonArray irRoots || irRoots.Count == 0 || irRoots[0] is not JsonObject irOuter)
+        {
+            return;
+        }
+
+        var refCuboids = new Dictionary<string, JsonArray>(StringComparer.Ordinal);
+        CollectReferenceCuboidsByPartId(refRoots[0], refCuboids);
+        ApplyCuboidsToTree(irOuter, refCuboids);
+    }
+
+    private static void CollectReferenceCuboidsByPartId(JsonElement part, Dictionary<string, JsonArray> byId)
+    {
+        if (part.TryGetProperty("id", out var idEl) &&
+            part.TryGetProperty("cuboids", out var cuboids) &&
+            cuboids.ValueKind == JsonValueKind.Array)
+        {
+            var id = idEl.GetString();
+            if (!string.IsNullOrEmpty(id))
+            {
+                byId[id] = JsonNode.Parse(cuboids.GetRawText())!.AsArray();
+            }
+        }
+
+        if (part.TryGetProperty("children", out var children) && children.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var ch in children.EnumerateArray())
+            {
+                CollectReferenceCuboidsByPartId(ch, byId);
+            }
+        }
+    }
+
+    private static void ApplyCuboidsToTree(JsonObject part, IReadOnlyDictionary<string, JsonArray> refCuboids)
+    {
+        if (part["id"]?.GetValue<string>() is { } id && refCuboids.TryGetValue(id, out var refArr) && refArr.Count > 0)
+        {
+            var synced = new JsonArray();
+            var existing = part["cuboids"]?.AsArray();
+            for (var i = 0; i < refArr.Count; i++)
+            {
+                if (refArr[i] is not JsonObject refCuboid)
+                {
+                    continue;
+                }
+
+                var clone = refCuboid.DeepClone().AsObject();
+                clone["liftKind"] = "exact";
+                if (existing is not null && i < existing.Count && existing[i] is JsonObject prior)
+                {
+                    if (prior["textureKey"] is JsonNode textureKey)
+                    {
+                        clone["textureKey"] = textureKey.DeepClone();
+                    }
+
+                    if (prior["uvOrigin"] is JsonArray uvOrigin)
+                    {
+                        clone["uvOrigin"] = uvOrigin.DeepClone();
+                    }
+
+                    if (prior["mirrorU"] is JsonValue mirrorU)
+                    {
+                        clone["mirrorU"] = mirrorU.DeepClone();
+                    }
+                }
+
+                synced.Add(clone);
+            }
+
+            if (synced.Count > 0)
+            {
+                part["cuboids"] = synced;
+            }
+        }
+
+        if (part["children"] is not JsonArray kids)
+        {
+            return;
+        }
+
+        foreach (var n in kids)
+        {
+            if (n is JsonObject child)
+            {
+                ApplyCuboidsToTree(child, refCuboids);
+            }
+        }
     }
 
     private static void ApplyNestedRootTranslation(JsonElement referenceOuterRoot, JsonObject irOuterRoot)

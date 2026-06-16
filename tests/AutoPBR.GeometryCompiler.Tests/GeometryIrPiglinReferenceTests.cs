@@ -12,6 +12,7 @@ public sealed class GeometryIrPiglinReferenceTests
     private static readonly (string Jvm, int RefPartCount, bool StrictReference)[] PilotPiglins =
     [
         ("net.minecraft.client.model.monster.piglin.AdultPiglinModel", 15, true),
+        ("net.minecraft.client.model.monster.piglin.AdultZombifiedPiglinModel", 15, true),
         ("net.minecraft.client.model.monster.piglin.BabyPiglinModel", 12, true),
         ("net.minecraft.client.model.monster.piglin.BabyZombifiedPiglinModel", 12, true),
     ];

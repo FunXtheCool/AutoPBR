@@ -1,14 +1,14 @@
 {
   "schemaVersion": 2,
   "versionLabel": "26.1.2",
-  "officialJvmName": "net.minecraft.client.model.monster.zombie.GiantZombieModel",
+  "officialJvmName": "net.minecraft.client.model.monster.skeleton.SkeletonModel.createSingleModelDualBodyLayer",
   "profile": "named_jar_26.1.2",
   "extractionStatus": "ok",
   "extractionNotes": [
-    "GiantZombieModel is a ModelPart wrapper; IR delegated from ZombieModel (HumanoidModel.createMesh layer).",
-    "Delegated mesh copy from net.minecraft.client.model.monster.zombie.ZombieModel."
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.monster.skeleton.SkeletonModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
   ],
-  "factoryMethod": "createMesh",
+  "factoryMethod": "createSingleModelDualBodyLayer",
   "roots": [
     {
       "id": "root",
@@ -28,11 +28,98 @@
       "cuboids": [],
       "children": [
         {
+          "id": "right_leg",
+          "pose": {
+            "translation": [
+              -2,
+              12,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              -2,
+              12,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1,
+                0,
+                -1
+              ],
+              "to": [
+                1,
+                12,
+                1
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left_leg",
+          "pose": {
+            "translation": [
+              2,
+              12,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              2,
+              12,
+              0
+            ]
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1,
+                0,
+                -1
+              ],
+              "to": [
+                1,
+                12,
+                1
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "mirrorU": true
+            }
+          ],
+          "children": []
+        },
+        {
           "id": "head",
           "pose": {
             "translation": [
               0,
-              15,
+              0,
               0
             ],
             "rotationEulerRad": [
@@ -43,21 +130,21 @@
             "eulerOrder": "XYZ",
             "setupAnimPivot": [
               0,
-              15,
+              0,
               0
             ]
           },
           "cuboids": [
             {
               "from": [
-                -4.5,
-                -7,
-                -4.5
+                -4,
+                -8,
+                -4
               ],
               "to": [
-                4.5,
-                1,
-                3.5
+                4,
+                0,
+                4
               ],
               "uvOrigin": [
                 0,
@@ -120,7 +207,7 @@
           "pose": {
             "translation": [
               0,
-              18,
+              0,
               0
             ],
             "rotationEulerRad": [
@@ -131,25 +218,25 @@
             "eulerOrder": "XYZ",
             "setupAnimPivot": [
               0,
-              18,
+              0,
               0
             ]
           },
           "cuboids": [
             {
               "from": [
-                -3,
-                -3,
-                -1.5
+                -4,
+                0,
+                -2
               ],
               "to": [
-                3,
-                2,
-                1.5
+                4,
+                12,
+                2
               ],
               "uvOrigin": [
-                0,
-                17
+                16,
+                16
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
@@ -162,8 +249,8 @@
           "id": "right_arm",
           "pose": {
             "translation": [
-              0,
-              0,
+              -5,
+              2,
               0
             ],
             "rotationEulerRad": [
@@ -173,8 +260,8 @@
             ],
             "eulerOrder": "XYZ",
             "setupAnimPivot": [
-              0,
-              0,
+              -5,
+              2,
               0
             ]
           },
@@ -182,17 +269,17 @@
             {
               "from": [
                 -1,
-                0,
-                -1.52999997
+                -2,
+                -1
               ],
               "to": [
                 1,
-                5,
-                1.47000003
+                10,
+                1
               ],
               "uvOrigin": [
-                30,
-                25
+                40,
+                16
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
@@ -205,8 +292,8 @@
           "id": "left_arm",
           "pose": {
             "translation": [
-              0,
-              0,
+              5,
+              2,
               0
             ],
             "rotationEulerRad": [
@@ -216,8 +303,8 @@
             ],
             "eulerOrder": "XYZ",
             "setupAnimPivot": [
-              0,
-              0,
+              5,
+              2,
               0
             ]
           },
@@ -225,102 +312,16 @@
             {
               "from": [
                 -1,
-                0,
-                -1.52999997
+                -2,
+                -1
               ],
               "to": [
                 1,
-                5,
-                1.47000003
+                10,
+                1
               ],
               "uvOrigin": [
-                30,
-                17
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "right_leg",
-          "pose": {
-            "translation": [
-              -1.5,
-              20,
-              0.5
-            ],
-            "rotationEulerRad": [
-              0,
-              0,
-              0
-            ],
-            "eulerOrder": "XYZ",
-            "setupAnimPivot": [
-              -1.5,
-              20,
-              0.5
-            ]
-          },
-          "cuboids": [
-            {
-              "from": [
-                -2,
-                0,
-                -2
-              ],
-              "to": [
-                2,
-                12,
-                2
-              ],
-              "uvOrigin": [
-                0,
-                16
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "left_leg",
-          "pose": {
-            "translation": [
-              1.5,
-              20,
-              0.5
-            ],
-            "rotationEulerRad": [
-              0,
-              0,
-              0
-            ],
-            "eulerOrder": "XYZ",
-            "setupAnimPivot": [
-              1.5,
-              20,
-              0.5
-            ]
-          },
-          "cuboids": [
-            {
-              "from": [
-                -2,
-                0,
-                -2
-              ],
-              "to": [
-                2,
-                12,
-                2
-              ],
-              "uvOrigin": [
-                0,
+                40,
                 16
               ],
               "textureKey": "#skin",
@@ -334,9 +335,25 @@
       ]
     }
   ],
-  "jarPath": "net/minecraft/client/model/monster/zombie/GiantZombieModel.class",
-  "classSha256Hex": "6c249fea598ac62ea9c2f4d6fc1ed436a65488ddfcbed45c4ae7000a97fc36be",
+  "jarPath": "net/minecraft/client/model/monster/skeleton/SkeletonModel.class",
+  "classSha256Hex": "df41c8df18ec57ab3f012eca9e8244e5370cbb67db1182a640d132d1e17ed9fa",
   "bytecodeFloatProbe": [
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -0.1,
+    -1.9,
+    12,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -0.1,
+    1.9,
+    12,
     -4,
     -8,
     -4,
@@ -383,280 +400,116 @@
     4,
     1.9,
     12,
-    -4.5,
-    -7,
-    -4.5,
-    9,
-    8,
-    8,
-    15,
-    -3,
-    -3,
-    -1.5,
-    6,
-    5,
-    3,
-    18,
-    -3,
-    -1.2,
-    -1.49,
-    5.9,
-    2.9,
-    -0.1,
-    19,
     -1,
-    -1.53,
-    5,
-    3,
-    -3.5,
-    15.5,
+    -2,
     -1,
-    -1.53,
-    5,
-    3,
-    3.5,
-    15.5,
-    -3,
-    -3,
-    -1.5,
-    6,
-    5,
-    3,
-    18,
-    -2,
-    -0.2,
-    -2,
-    3,
-    4,
-    3,
-    -0.1,
-    1.5,
-    20,
-    0.5,
-    -1,
-    -0.2,
-    -2,
-    3,
-    4,
-    3,
-    -0.1,
-    -1.5,
-    20,
-    0.5,
-    -2,
-    2.9,
-    -2,
-    3,
-    3,
-    -1,
-    2.9,
-    -2,
-    3,
-    3,
-    -4,
-    -8,
-    -4,
-    8,
-    8,
-    8,
-    -4,
-    -8,
-    -4,
-    8,
-    8,
-    8,
-    0.5,
-    -4,
-    -2,
-    8,
     12,
-    4,
-    -3,
-    -2,
-    -2,
-    4,
-    12,
-    4,
     -5,
     -1,
     -2,
-    -2,
-    4,
+    -1,
     12,
-    4,
     5,
-    -2,
-    -2,
-    4,
-    12,
-    4,
-    -1.9,
+    -1,
+    -1,
     12,
     -2,
+    12,
+    -1,
+    -1,
+    12,
+    12,
+    -4,
     -2,
-    4,
+    8,
     12,
     4,
-    1.9,
-    12,
+    -4,
+    10,
     -2,
+    8,
+    4,
+    -4,
     -2,
-    4,
+    8,
     12,
     4,
-    -0.1,
-    -1.9,
-    12,
-    -2,
-    -2,
-    4,
-    12,
-    4,
-    -0.1,
-    1.9,
-    12,
-    -4.5,
-    -7,
-    -4.5,
-    9,
+    0.025,
+    -4,
+    -8,
+    -4,
     8,
     8,
-    15,
-    -3,
-    -3,
-    -1.5,
-    6,
-    5,
-    3,
-    18,
-    -3,
-    -1.2,
-    -1.49,
-    5.9,
-    2.9,
-    -0.1,
-    19,
-    -1,
-    -1.53,
-    5,
-    3,
-    -3.5,
-    15.5,
-    -1,
-    -1.53,
-    5,
-    3,
-    3.5,
-    15.5,
-    -3,
-    -3,
-    -1.5,
-    6,
-    5,
-    3,
-    18,
-    -2,
-    -0.2,
-    -2,
-    3,
-    4,
-    3,
-    -0.1,
-    1.5,
-    20,
-    0.5,
-    -1,
-    -0.2,
-    -2,
-    3,
-    4,
-    3,
-    -0.1,
-    -1.5,
-    20,
-    0.5,
-    -2,
-    2.9,
-    -2,
-    3,
-    3,
-    -1,
-    2.9,
-    -2,
-    3,
-    3,
-    -4.5,
-    -7,
-    -4.5,
-    9,
+    8,
+    -4,
+    -8,
+    -4,
     8,
     8,
-    15,
-    -3,
-    -3,
+    8,
+    0.2,
+    -1,
+    -2,
+    -1,
+    12,
+    -1.55,
+    -2.025,
     -1.5,
-    6,
-    5,
     3,
-    18,
-    -3,
-    -1.2,
-    -1.49,
-    5.9,
-    2.9,
-    -0.1,
-    19,
+    12,
+    3,
+    -5.5,
     -1,
-    -1.53,
-    5,
-    3,
-    -3.5,
-    15.5,
+    -2,
     -1,
-    -1.53,
-    5,
-    3,
-    3.5,
-    15.5,
-    -3,
-    -3,
+    12,
+    -1.45,
+    -2.025,
     -1.5,
-    6,
-    5,
     3,
-    18,
-    -2,
-    -0.2,
-    -2,
+    12,
     3,
-    4,
-    3,
-    -0.1,
-    1.5,
-    20,
-    0.5,
+    5.5,
     -1,
-    -0.2,
-    -2,
-    3,
-    4,
-    3,
-    -0.1,
+    -1,
+    12,
     -1.5,
-    20,
-    0.5,
-    -2,
-    2.9,
-    -2,
+    -0,
+    -1.5,
     3,
+    12,
     3,
+    -2,
+    12,
     -1,
-    2.9,
-    -2,
+    -1,
+    12,
+    -1.5,
+    -1.5,
     3,
-    3
+    12,
+    3,
+    12,
+    -1,
+    -2,
+    -1,
+    12,
+    -5,
+    -1,
+    -2,
+    -1,
+    12,
+    5,
+    -1,
+    -1,
+    12,
+    -2,
+    12,
+    -1,
+    -1,
+    12,
+    12
   ],
-  "delegatedFromOfficialJvmName": "net.minecraft.client.model.monster.zombie.ZombieModel",
   "textureWidth": 64,
   "textureHeight": 64,
   "liftSummary": {

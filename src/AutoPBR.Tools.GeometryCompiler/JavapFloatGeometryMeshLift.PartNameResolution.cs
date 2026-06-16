@@ -321,6 +321,11 @@ internal static partial class JavapFloatGeometryMeshLift
             {
                 if (seg[j].Contains("PartPose", StringComparison.Ordinal) ||
                     seg[j].Contains("invokestatic", StringComparison.Ordinal) ||
+                    seg[j].Contains("invokespecial", StringComparison.Ordinal) ||
+                    seg[j].Contains("addBox", StringComparison.Ordinal) ||
+                    seg[j].Contains("texOffs", StringComparison.Ordinal) ||
+                    seg[j].Contains("mirror", StringComparison.Ordinal) ||
+                    IsCubeListBuilderConstructionLine(seg[j]) ||
                     JavapBytecodeStreamAnalyzer.TryParseAloadLocalSlot(seg[j], out _) ||
                     JavapBytecodeStreamAnalyzer.TryParseFloatLine(seg[j], out _) ||
                     JavapBytecodeStreamAnalyzer.TryParseIntLine(seg[j], out _))
@@ -348,8 +353,7 @@ internal static partial class JavapFloatGeometryMeshLift
         name = null;
         for (var j = maxLineIdx - 1; j >= 0; j--)
         {
-            if (!seg[j].Contains("CubeListBuilder.create", StringComparison.Ordinal) &&
-                !IsObfuscatedCubeListBuilderCreateLine(seg[j]))
+            if (!IsCubeListBuilderConstructionLine(seg[j]))
             {
                 continue;
             }
@@ -374,8 +378,7 @@ internal static partial class JavapFloatGeometryMeshLift
     {
         for (var i = 0; i < seg.Count; i++)
         {
-            if (!seg[i].Contains("CubeListBuilder.create", StringComparison.Ordinal) &&
-                !IsObfuscatedCubeListBuilderCreateLine(seg[i]))
+            if (!IsCubeListBuilderConstructionLine(seg[i]))
             {
                 continue;
             }

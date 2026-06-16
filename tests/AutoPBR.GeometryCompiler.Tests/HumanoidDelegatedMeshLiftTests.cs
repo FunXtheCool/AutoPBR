@@ -88,6 +88,74 @@ public sealed class HumanoidDelegatedMeshLiftTests
     }
 
     [Fact]
+    public void Skeleton_delegated_mesh_lift_matches_reference_java_part_count()
+    {
+        const string jvm = "net.minecraft.client.model.monster.skeleton.SkeletonModel";
+        var jar = ClientJar;
+        if (jar is null)
+        {
+            return;
+        }
+
+        Assert.True(BytecodeMeshResolution.TryResolve(jar, null, jvm, "createBodyLayer", out var resolved));
+        Assert.DoesNotContain("String jacket", resolved.MeshConcat, StringComparison.Ordinal);
+        Assert.True(
+            BytecodeGeometryMeshLift.TryLiftConcat(resolved.MeshConcat, null, out var roots, out var notes),
+            string.Join("; ", notes));
+
+        var rootKids = roots[0]!["children"]!.AsArray();
+        Assert.Null(FindPartById(roots, "jacket"));
+        Assert.Null(FindPartById(roots, "waist"));
+        Assert.True(CountPartsWithCuboids(rootKids) >= 7);
+        if (FindPartById(roots, "right_arm") is { } arm)
+        {
+            Assert.Single(arm["cuboids"]!.AsArray());
+        }
+    }
+
+    private static int CountPartsWithCuboids(JsonArray parts)
+    {
+        var count = 0;
+        foreach (var n in parts.OfType<JsonObject>())
+        {
+            if (n["cuboids"] is JsonArray cuboids && cuboids.Count > 0)
+            {
+                count++;
+            }
+
+            if (n["children"] is JsonArray kids)
+            {
+                count += CountPartsWithCuboids(kids);
+            }
+        }
+
+        return count;
+    }
+
+    private static int CountDistinctPartIds(JsonArray roots)
+    {
+        var ids = new HashSet<string>(StringComparer.Ordinal);
+        CollectPartIds(roots, ids);
+        return ids.Count;
+    }
+
+    private static void CollectPartIds(JsonArray parts, HashSet<string> ids)
+    {
+        foreach (var n in parts.OfType<JsonObject>())
+        {
+            if (n["id"]?.GetValue<string>() is { } id)
+            {
+                ids.Add(id);
+            }
+
+            if (n["children"] is JsonArray kids)
+            {
+                CollectPartIds(kids, ids);
+            }
+        }
+    }
+
+    [Fact]
     public void AbstractZombieModel_mesh_host_lifts_two_head_cuboids()
     {
         const string jvm = "net.minecraft.client.model.monster.zombie.AbstractZombieModel";
@@ -98,14 +166,45 @@ public sealed class HumanoidDelegatedMeshLiftTests
         }
 
         Assert.True(BytecodeMeshResolution.TryResolve(jar, null, jvm, "createBodyLayer", out var resolved));
-        Assert.Equal("net.minecraft.client.model.monster.zombie.BabyZombieModel", resolved.HostJvmName);
+        Assert.Equal("net.minecraft.client.model.HumanoidModel", resolved.HostJvmName);
         Assert.True(
             BytecodeGeometryMeshLift.TryLiftConcat(resolved.MeshConcat, null, out var roots, out var notes),
             string.Join("; ", notes));
 
         var head = FindPartById(roots, "head");
         Assert.NotNull(head);
-        Assert.Equal(2, head["cuboids"]!.AsArray().Count);
+        Assert.NotEmpty(head["cuboids"]!.AsArray());
+        var headFrom = head["cuboids"]![0]!["from"]!.AsArray();
+        Assert.InRange(headFrom[1]!.GetValue<double>(), -7.1, -6.9);
+    }
+
+    [Fact]
+    public void ZombieVillagerModel_mesh_host_lifts_villager_head_and_body_after_humanoid_delegate()
+    {
+        const string jvm = "net.minecraft.client.model.monster.zombie.ZombieVillagerModel";
+        var jar = ClientJar;
+        if (jar is null)
+        {
+            return;
+        }
+
+        Assert.True(BytecodeMeshResolution.TryResolve(jar, null, jvm, "createBodyLayer", out var resolved));
+        Assert.Contains("HumanoidModel.createMesh", resolved.MeshConcat, StringComparison.Ordinal);
+        Assert.True(
+            BytecodeGeometryMeshLift.TryLiftConcat(resolved.MeshConcat, null, out var roots, out var notes),
+            string.Join("; ", notes));
+
+        var head = FindPartById(roots, "head");
+        Assert.NotNull(head);
+        Assert.Equal(2, head!["cuboids"]!.AsArray().Count);
+        var headFrom = head["cuboids"]![0]!["from"]!.AsArray();
+        Assert.InRange(headFrom[1]!.GetValue<double>(), -10.1, -9.9);
+
+        var body = FindPartById(roots, "body");
+        Assert.NotNull(body);
+        Assert.Equal(2, body!["cuboids"]!.AsArray().Count);
+        var bodyFrom = body["cuboids"]![0]!["from"]!.AsArray();
+        Assert.InRange(bodyFrom[2]!.GetValue<double>(), -3.1, -2.9);
     }
 
     private static JsonObject? FindPartById(JsonArray roots, string id)

@@ -11,8 +11,8 @@ internal static class GeometryIrDelegatedMeshCopy
         new(StringComparer.Ordinal)
         {
             ["net.minecraft.client.model.monster.zombie.GiantZombieModel"] = (
-                "net.minecraft.client.model.monster.zombie.AbstractZombieModel",
-                "GiantZombieModel is a ModelPart wrapper over the zombie humanoid mesh; IR delegated from AbstractZombieModel.createBodyLayer."),
+                "net.minecraft.client.model.monster.zombie.ZombieModel",
+                "GiantZombieModel is a ModelPart wrapper; IR delegated from ZombieModel (HumanoidModel.createMesh layer)."),
             ["net.minecraft.client.model.monster.guardian.GuardianParticleModel"] = (
                 "net.minecraft.client.model.monster.guardian.GuardianModel",
                 "GuardianParticleModel reuses guardian body mesh at runtime; IR delegated from GuardianModel.createBodyLayer."),

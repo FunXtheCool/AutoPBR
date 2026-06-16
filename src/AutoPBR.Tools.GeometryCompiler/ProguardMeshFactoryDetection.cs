@@ -92,7 +92,8 @@ internal static class ProguardMeshFactoryDetection
                 continue;
             }
 
-            if (IsLayerDefinitionFactoryDescriptor(desc, maps))
+            if (IsLayerDefinitionFactoryDescriptor(desc, maps) ||
+                IsStaticMeshDefinitionFactoryDescriptor(desc, maps))
             {
                 hasBodyFactory = true;
             }
@@ -104,6 +105,14 @@ internal static class ProguardMeshFactoryDetection
 
         return hasApply && !hasBodyFactory;
     }
+
+    /// <summary>
+    /// <c>createMesh</c> / <c>createBodyMesh</c> factories return <c>MeshDefinition</c> but are not
+    /// <c>apply(MeshDefinition)</c> transformers (<c>PlayerModel</c>, <c>HumanoidModel</c>, …).
+    /// </summary>
+    private static bool IsStaticMeshDefinitionFactoryDescriptor(string descriptor, MojangMappingsParser? maps) =>
+        JvmClassFileParser.IsMeshFactoryDescriptor(descriptor, maps) &&
+        !IsMeshDefinitionApplyDescriptor(descriptor, maps);
 
     private static bool IsLayerDefinitionFactoryDescriptor(string descriptor, MojangMappingsParser? maps)
     {

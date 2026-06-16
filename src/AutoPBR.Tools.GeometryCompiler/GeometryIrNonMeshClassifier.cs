@@ -81,5 +81,7 @@ internal static class GeometryIrNonMeshClassifier
         officialJvmName.EndsWith("$UseParams", StringComparison.Ordinal);
 
     private static bool IsRuntimeModelPartWrapper(string officialJvmName) =>
-        GeometryIrDelegatedMeshCopy.HasDelegate(officialJvmName);
+        GeometryIrDelegatedMeshCopy.HasDelegate(officialJvmName) ||
+        LayerDefinitionMeshHostMap.TryGet(officialJvmName, out _) ||
+        GeometryIrVariantLiftMap.TryGet(officialJvmName, out _);
 }

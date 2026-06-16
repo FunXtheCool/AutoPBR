@@ -50,6 +50,8 @@ internal static class GeometryLiftJsonMerge
         var preferIncomingCuboids = ShouldPreferIncomingCuboidsOverUnion(merged, incomingCuboids);
         var preferEarlierHumanoidArmCuboids = ShouldPreferEarlierHumanoidArmCuboids(
             (string?)incoming["id"], earlierCuboids, incomingCuboids);
+        var preferIncomingThinHumanoidLimbCuboids = ShouldPreferIncomingThinHumanoidLimbCuboids(
+            (string?)incoming["id"], incomingCuboids);
         var dropHumanoidHatForPiglinEars = incoming["children"] is JsonArray incomingKidsForHat &&
             (ContainsChildPartId(incomingKidsForHat, "left_ear") ||
              ContainsChildPartId(incomingKidsForHat, "right_ear") ||
@@ -71,13 +73,20 @@ internal static class GeometryLiftJsonMerge
             {
                 merged["cuboids"] = JsonNode.Parse(incomingCuboids.ToJsonString())!.AsArray();
             }
+            else if (preferIncomingThinHumanoidLimbCuboids)
+            {
+                merged["cuboids"] = JsonNode.Parse(incomingCuboids.ToJsonString())!.AsArray();
+            }
             else if (preferEarlierHumanoidArmCuboids)
             {
                 merged["cuboids"] = JsonNode.Parse(earlierCuboids.ToJsonString())!.AsArray();
             }
             else if (incomingCuboids.Count > earlierCuboids.Count)
             {
-                merged["cuboids"] = MergeCuboidArraysUnionByFingerprint(earlierCuboids, incomingCuboids);
+                merged["cuboids"] = ShouldReplaceEarlierCuboidsWithIncoming(
+                    (string?)incoming["id"], earlierCuboids, incomingCuboids)
+                    ? JsonNode.Parse(incomingCuboids.ToJsonString())!.AsArray()
+                    : MergeCuboidArraysUnionByFingerprint(earlierCuboids, incomingCuboids);
             }
             else if (incomingCuboids.Count < earlierCuboids.Count)
             {
@@ -91,7 +100,8 @@ internal static class GeometryLiftJsonMerge
 
         var earlierKids = earlier["children"] as JsonArray ?? new JsonArray();
         var incomingKids = merged["children"] as JsonArray ?? new JsonArray();
-        merged["children"] = MergeNestedChildrenPreferIncoming(earlierKids, incomingKids, dropHumanoidHatForPiglinEars);
+        merged["children"] = MergeNestedChildrenPreferIncoming(
+            earlierKids, incomingKids, dropHumanoidHatForPiglinEars, (string?)incoming["id"]);
         return merged;
     }
 
@@ -179,7 +189,7 @@ internal static class GeometryLiftJsonMerge
     /// When <paramref name="incomingKids"/> is empty, earlier nested parts are copied verbatim (wrapper islands).
     /// </summary>
     public static JsonArray MergeNestedChildrenPreferIncoming(JsonArray earlierKids, JsonArray incomingKids,
-        bool dropHumanoidHatWhenIncomingHasPiglinEars = false)
+        bool dropHumanoidHatWhenIncomingHasPiglinEars = false, string? incomingParentPartId = null)
     {
         if (incomingKids.Count == 0)
         {
@@ -246,6 +256,11 @@ internal static class GeometryLiftJsonMerge
                 continue;
             }
 
+            if (IsHumanoidLimbPartId(incomingParentPartId) && IsHumanoidLimbOverlayChildId(eid))
+            {
+                continue;
+            }
+
             if (dropHumanoidHatWhenIncomingHasPiglinEars &&
                 string.Equals(eid, "hat", StringComparison.Ordinal))
             {
@@ -259,6 +274,26 @@ internal static class GeometryLiftJsonMerge
         }
 
         return merged;
+    }
+
+    /// <summary>
+    /// <c>createDefaultSkeletonMesh</c> and similar void helpers replace HumanoidModel limbs with thin shells;
+    /// do not union the wider template cuboid from the delegated prelude island.
+    /// </summary>
+    private static bool ShouldPreferIncomingThinHumanoidLimbCuboids(string? partId, JsonArray incomingCuboids)
+    {
+        if (!IsHumanoidLimbPartId(partId) || incomingCuboids.Count != 1 ||
+            incomingCuboids[0] is not JsonObject incoming ||
+            incoming["from"] is not JsonArray from ||
+            incoming["to"] is not JsonArray to ||
+            from.Count < 1 ||
+            to.Count < 1)
+        {
+            return false;
+        }
+
+        var spanX = Math.Abs(to[0]!.GetValue<double>() - from[0]!.GetValue<double>());
+        return spanX <= 2.5;
     }
 
     /// <summary>
@@ -279,11 +314,21 @@ internal static class GeometryLiftJsonMerge
         return CuboidYSpan(earlierCuboids[0] as JsonObject) > CuboidYSpan(incomingCuboids[0] as JsonObject) + 1e-3;
     }
 
-    private static bool IsHumanoidArmPartId(string? partId) =>
+    private static bool IsHumanoidArmPartId(string? partId) => IsHumanoidLimbPartId(partId);
+
+    private static bool IsHumanoidLimbPartId(string? partId) =>
         string.Equals(partId, "left_arm", StringComparison.Ordinal) ||
         string.Equals(partId, "right_arm", StringComparison.Ordinal) ||
         string.Equals(partId, "left_leg", StringComparison.Ordinal) ||
         string.Equals(partId, "right_leg", StringComparison.Ordinal);
+
+    private static bool IsHumanoidLimbOverlayChildId(string? partId) =>
+        string.Equals(partId, "left_sleeve", StringComparison.Ordinal) ||
+        string.Equals(partId, "right_sleeve", StringComparison.Ordinal) ||
+        string.Equals(partId, "left_pants", StringComparison.Ordinal) ||
+        string.Equals(partId, "right_pants", StringComparison.Ordinal) ||
+        string.Equals(partId, "left_foot", StringComparison.Ordinal) ||
+        string.Equals(partId, "right_foot", StringComparison.Ordinal);
 
     private static double CuboidYSpan(JsonObject? cuboid)
     {
@@ -297,6 +342,24 @@ internal static class GeometryLiftJsonMerge
         }
 
         return to[1]!.GetValue<double>() - from[1]!.GetValue<double>();
+    }
+
+    /// <summary>
+    /// Host <c>createBodyLayer</c> <c>addOrReplaceChild</c> after <c>HumanoidModel.createMesh</c> (e.g. zombie villager head/body)
+    /// replaces the delegated template — do not union villager robe/head cuboids with humanoid defaults.
+    /// </summary>
+    private static bool ShouldReplaceEarlierCuboidsWithIncoming(
+        string? partId,
+        JsonArray earlierCuboids,
+        JsonArray incomingCuboids)
+    {
+        if (incomingCuboids.Count == 0 || earlierCuboids.Count == 0 || incomingCuboids.Count <= earlierCuboids.Count)
+        {
+            return false;
+        }
+
+        return string.Equals(partId, "head", StringComparison.Ordinal) ||
+               string.Equals(partId, "body", StringComparison.Ordinal);
     }
 
     private static bool ShouldPreferIncomingCuboidsOverUnion(

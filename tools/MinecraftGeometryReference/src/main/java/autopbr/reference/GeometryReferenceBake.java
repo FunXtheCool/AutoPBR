@@ -35,6 +35,7 @@ public final class GeometryReferenceBake {
             "createBaseChickenModel",
             "createBodyMesh",
             "createSingleBodyLayer",
+            "createSingleModelDualBodyLayer",
             "createDoubleBodyRightLayer",
             "createDoubleBodyLeftLayer",
             "createHeadLayer",
@@ -112,6 +113,11 @@ public final class GeometryReferenceBake {
 
     private static MeshHostResolution resolveMeshHostWithFactory(Class<?> modelClass, String requestedFactoryMethod)
             throws ClassNotFoundException {
+        var layerHost = tryLayerDefinitionMeshHost(modelClass);
+        if (layerHost != null) {
+            return layerHost;
+        }
+
         var methods = factoryMethodsToTry(requestedFactoryMethod);
         for (var candidate : enumerateMeshHostCandidates(modelClass)) {
             for (var method : methods) {
@@ -154,6 +160,26 @@ public final class GeometryReferenceBake {
         }
 
         return false;
+    }
+
+    /**
+     * Runtime <c>ModelLayers</c> wrappers with no factory on the entity class (mirrors AutoPBR
+     * <c>LayerDefinitionMeshHostMap</c>).
+     */
+    private static MeshHostResolution tryLayerDefinitionMeshHost(Class<?> modelClass) throws ClassNotFoundException {
+        var name = modelClass.getName();
+        if (!name.equals("net.minecraft.client.model.monster.zombie.AbstractZombieModel")
+                && !name.equals("net.minecraft.client.model.monster.zombie.ZombieModel")
+                && !name.equals("net.minecraft.client.model.monster.zombie.GiantZombieModel")) {
+            return null;
+        }
+
+        var host = Class.forName("net.minecraft.client.model.HumanoidModel");
+        if (!hasMeshFactory(host, "createMesh")) {
+            return null;
+        }
+
+        return new MeshHostResolution(host, "createMesh");
     }
 
     /** Mirrors AutoPBR MeshHostClassCandidates.Enumerate for reference bakes. */

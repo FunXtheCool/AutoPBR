@@ -92,9 +92,7 @@ internal static partial class JavapFloatGeometryMeshLift
             var sliceStart = segStart;
             var rawSlice = lines.GetRange(sliceStart, segEnd - sliceStart + 1);
             if (!rawSlice.Any(l => JavapMeshBytecodeProfiles.IsNamedOrObfuscatedFloatAddBoxLine(l, out _)) &&
-                !rawSlice.Any(static l =>
-                    l.Contains("CubeListBuilder.create", StringComparison.Ordinal) ||
-                    IsObfuscatedCubeListBuilderCreateLine(l)))
+                !rawSlice.Any(IsCubeListBuilderConstructionLine))
             {
                 _ = TryExpandSliceForReusedCubeListBuilder(lines, segEnd, ref sliceStart);
             }

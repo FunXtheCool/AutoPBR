@@ -153,7 +153,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var uh = tableCuboid.UvSizeH;
         var ud = tableCuboid.UvSizeD;
 
-        if (uw < 0 && uh < 0 && ud < 0 && inflate > 0f)
+        if (uw < 0 && uh < 0 && ud < 0 && inflate != 0f)
         {
             var footprint = GeometryIrEmitPolicy.GetInflateUvFootprint(options.OfficialJvmName);
             var logicalW = Math.Max(1, (int)MathF.Round(MathF.Abs(tableCuboid.X1 - tableCuboid.X0)));

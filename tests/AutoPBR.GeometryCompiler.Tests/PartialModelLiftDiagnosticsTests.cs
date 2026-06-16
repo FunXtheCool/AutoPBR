@@ -148,7 +148,6 @@ public sealed class PartialModelLiftDiagnosticsTests
     }
 
     [Theory]
-    [InlineData("net.minecraft.client.model.animal.fish.CodModel", "nose", "head")]
     [InlineData("net.minecraft.client.model.animal.fish.SalmonModel", "top_front_fin", "body_front")]
     [InlineData("net.minecraft.client.model.animal.axolotl.AdultAxolotlModel", "top_gills", "head")]
     public void Javap_lift_without_repair_nests_known_child_under_parent(

@@ -2294,12 +2294,13 @@
     },
     {
       "path_prefix": "assets/minecraft/textures/entity/skeleton/wither_skeleton",
-      "builder_method": "Wither",
-      "deobf_model_class": "net.minecraft.client.model.monster.wither.WitherBossModel",
-      "deobf_model_class_pre_restructure": "net.minecraft.client.model.WitherBossModel",
-      "notes": "",
+      "builder_method": "Skeleton",
+      "deobf_model_class": "net.minecraft.client.model.monster.skeleton.SkeletonModel",
+      "deobf_model_class_pre_restructure": "net.minecraft.client.model.SkeletonModel",
+      "notes": "ModelLayers.WITHER_SKELETON = SkeletonModel.createBodyLayer + MeshTransformer.scaling(1.2f).",
+      "geometry_ir_official_jvm": "net.minecraft.client.model.monster.skeleton.SkeletonModel",
       "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64
+      "geometry_ir_texture_height": 32
     },
     {
       "path_prefix": "assets/minecraft/textures/entity/rabbit/rabbit_caerbannog",
@@ -4244,6 +4245,7 @@
       "deobf_model_class": "net.minecraft.client.model.monster.zombie.ZombieModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.ZombieModel",
       "notes": "",
+      "geometry_ir_official_jvm_baby": "net.minecraft.client.model.monster.zombie.BabyDrownedModel",
       "geometry_ir_texture_width": 64,
       "geometry_ir_texture_height": 64
     },
@@ -4325,6 +4327,7 @@
       "deobf_model_class": "net.minecraft.client.model.monster.zombie.ZombieModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.ZombieModel",
       "notes": "",
+      "geometry_ir_official_jvm_baby": "net.minecraft.client.model.monster.zombie.BabyZombieModel",
       "geometry_ir_texture_width": 64,
       "geometry_ir_texture_height": 64
     },
@@ -5054,7 +5057,8 @@
       "builder_method": "Skeleton",
       "deobf_model_class": "net.minecraft.client.model.monster.skeleton.SkeletonModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.SkeletonModel",
-      "notes": "",
+      "notes": "ModelLayers.PARCHED = SkeletonModel.createSingleModelDualBodyLayer.",
+      "geometry_ir_official_jvm": "net.minecraft.client.model.monster.skeleton.SkeletonModel.createSingleModelDualBodyLayer",
       "geometry_ir_texture_width": 64,
       "geometry_ir_texture_height": 32
     },
@@ -5172,6 +5176,7 @@
       "deobf_model_class": "net.minecraft.client.model.monster.zombie.ZombieModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.ZombieModel",
       "notes": "",
+      "geometry_ir_official_jvm_baby": "net.minecraft.client.model.monster.zombie.BabyZombieModel",
       "geometry_ir_texture_width": 64,
       "geometry_ir_texture_height": 64
     },
@@ -5765,6 +5770,7 @@
       "deobf_model_class": "net.minecraft.client.model.monster.zombie.ZombieModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.ZombieModel",
       "notes": "",
+      "geometry_ir_official_jvm": "net.minecraft.client.model.monster.zombie.DrownedModel",
       "geometry_ir_texture_width": 64,
       "geometry_ir_texture_height": 64
     },
@@ -5792,6 +5798,7 @@
       "deobf_model_class": "net.minecraft.client.model.monster.zombie.ZombieModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.ZombieModel",
       "notes": "",
+      "geometry_ir_official_jvm": "net.minecraft.client.model.monster.zombie.ZombieModel",
       "geometry_ir_texture_width": 64,
       "geometry_ir_texture_height": 64
     },
@@ -6408,6 +6415,7 @@
       "deobf_model_class": "net.minecraft.client.model.monster.zombie.ZombieModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.ZombieModel",
       "notes": "",
+      "geometry_ir_official_jvm": "net.minecraft.client.model.monster.zombie.ZombieModel",
       "geometry_ir_texture_width": 64,
       "geometry_ir_texture_height": 64
     },

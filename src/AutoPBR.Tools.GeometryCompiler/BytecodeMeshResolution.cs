@@ -88,6 +88,12 @@ internal static partial class BytecodeMeshResolution
         out Result result)
     {
         result = default!;
+        if (LayerDefinitionMeshHostMap.TryGet(officialJvmName, out var layerHost) &&
+            TryResolveLayerDefinitionMeshHost(clientJar, maps, officialJvmName, layerHost, out result))
+        {
+            return true;
+        }
+
         string? bestHost = null;
         string? bestConcat = null;
         byte[]? bestBytes = null;
@@ -127,6 +133,33 @@ internal static partial class BytecodeMeshResolution
         }
 
         result = new Result(bestHost, bestConcat, bestBytes);
+        return true;
+    }
+
+    private static bool TryResolveLayerDefinitionMeshHost(
+        string clientJar,
+        MojangMappingsParser? maps,
+        string officialJvmName,
+        LayerDefinitionMeshHostMap.MeshHostSpec layerHost,
+        out Result result)
+    {
+        result = default!;
+        string? obh = null;
+        _ = maps?.TryGetObfuscated(layerHost.HostOfficialJvmName, out obh);
+        if (!ClientJarIO.TryResolveJarEntry(clientJar, layerHost.HostOfficialJvmName, obh, out _, out var hostBytes))
+        {
+            return false;
+        }
+
+        var concat = BuildMeshConcatDeep(clientJar, maps, layerHost.HostOfficialJvmName, hostBytes, layerHost.FactoryMethod);
+        if (string.IsNullOrEmpty(concat) ||
+            !JavapMeshBytecodeProfiles.ContainsMeshSignals(concat) ||
+            !ContainsLiftableMeshBindingLines(concat))
+        {
+            return false;
+        }
+
+        result = new Result(layerHost.HostOfficialJvmName, concat, hostBytes);
         return true;
     }
 

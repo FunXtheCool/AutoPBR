@@ -25,6 +25,16 @@ internal static class GeometryIrReferenceBakeGate
             return true;
         }
 
+        if (LayerDefinitionMeshHostMap.TryGet(officialJvmName, out _))
+        {
+            return true;
+        }
+
+        if (GeometryIrVariantLiftMap.TryGet(officialJvmName, out _))
+        {
+            return true;
+        }
+
         if (shard["profile"]?.GetValue<string>() is not { } profile ||
             !profile.Contains("named_jar", StringComparison.OrdinalIgnoreCase))
         {

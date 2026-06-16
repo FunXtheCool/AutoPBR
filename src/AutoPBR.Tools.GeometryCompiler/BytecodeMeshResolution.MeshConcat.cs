@@ -105,8 +105,17 @@ internal static partial class BytecodeMeshResolution
             var ok = false;
             if (!string.Equals(owner, hostOfficialJvmName, StringComparison.Ordinal))
             {
-                nested = BuildMeshConcatDeep(clientJar, maps, owner, remoteBytes, meth);
-                ok = nested.Length > 0;
+                // HumanoidModel.createMesh is a single-method prelude; deep concat pulls armor/lambda islands
+                // that reference_java bakes never include (skeleton, drowned, stray, bogged, …).
+                if (UseShallowDelegatedMeshPrelude(owner, meth))
+                {
+                    nested = BytecodeGeometryMeshLift.BuildSyntheticMeshConcat(remoteBytes, [meth], out ok);
+                }
+                else
+                {
+                    nested = BuildMeshConcatDeep(clientJar, maps, owner, remoteBytes, meth);
+                    ok = nested.Length > 0;
+                }
             }
 
             if (!ok)
@@ -508,6 +517,10 @@ internal static partial class BytecodeMeshResolution
         AppendVoidMeshHelperTargets(sb.ToString(), insertIslandBoundaryBeforeNested: true);
 
         return NormalizeMeshIslandBoundaries(sb.ToString());
+
+        static bool UseShallowDelegatedMeshPrelude(string ownerOfficial, string methodName) =>
+            string.Equals(methodName, "createMesh", StringComparison.Ordinal) &&
+            string.Equals(ownerOfficial, "net.minecraft.client.model.HumanoidModel", StringComparison.Ordinal);
 
         void AppendMeshTransformerLambdaIslands()
         {

@@ -20,7 +20,6 @@ public sealed class GeometryIrBatch3ReferencePilotTests
         "net.minecraft.client.model.monster.enderman.EndermanModel",
         "net.minecraft.client.model.monster.skeleton.SkeletonModel",
         "net.minecraft.client.model.monster.skeleton.BoggedModel",
-        "net.minecraft.client.model.monster.zombie.AbstractZombieModel",
     ];
 
     public static IEnumerable<object[]> HumanoidDelegatePilotCases() =>

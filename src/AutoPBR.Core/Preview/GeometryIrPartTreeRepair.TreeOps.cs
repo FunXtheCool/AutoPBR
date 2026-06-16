@@ -31,6 +31,71 @@ internal static partial class GeometryIrPartTreeRepair
         return UsesFelineFlatRootAbsoluteTailBake(rootChildren);
     }
 
+    /// <summary>
+    /// Skip global reparent rules when the flat root bind is already correct: entity-space siblings share a Y anchor,
+    /// or <c>reference_java</c> binds the child elsewhere (e.g. Cod <c>nose</c> on mesh root, not under <c>head</c>).
+    /// </summary>
+    private static bool ShouldSkipGlobalReparentRule(
+        string childId,
+        string parentId,
+        JsonArray rootChildren,
+        string? officialJvmName)
+    {
+        if (ShouldSkipFelineFlatTailReparent(childId, parentId, rootChildren, officialJvmName))
+        {
+            return true;
+        }
+
+        if (!IsFlatRootSibling(rootChildren, childId) || !IsFlatRootSibling(rootChildren, parentId))
+        {
+            return false;
+        }
+
+        if (UsesEntitySpaceFlatRootSiblingBind(rootChildren, childId, parentId))
+        {
+            return true;
+        }
+
+        if (GeometryIrReferenceHierarchy.TryGetExpectedParentId(officialJvmName, childId, out var refParent))
+        {
+            return !string.Equals(refParent, parentId, StringComparison.Ordinal);
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Both parts are flat mesh-root siblings whose <c>PartPose.offset</c> Y matches — entity-space bind (Cod, creeper-class).
+    /// Reparenting without pose rebase stacks anchors and breaks preview.
+    /// </summary>
+    private static bool UsesEntitySpaceFlatRootSiblingBind(
+        JsonArray rootChildren,
+        string childId,
+        string parentId)
+    {
+        if (!TryFindPartById(rootChildren, childId, out var childNode) || childNode is null ||
+            !TryFindPartById(rootChildren, parentId, out var parentNode) || parentNode is null ||
+            !TryReadPoseTranslationY(childNode, out var childY) ||
+            !TryReadPoseTranslationY(parentNode, out var parentY))
+        {
+            return false;
+        }
+
+        return Math.Abs(childY - parentY) < 0.05;
+    }
+
+    private static bool TryReadPoseTranslationY(JsonObject part, out double y)
+    {
+        y = 0;
+        if (part["pose"]?["translation"] is not JsonArray tr || tr.Count < 2)
+        {
+            return false;
+        }
+
+        y = tr[1]?.GetValue<double>() ?? 0;
+        return true;
+    }
+
     private static bool UsesFelineFlatRootAbsoluteTailBake(JsonArray rootChildren)
     {
         if (!TryFindPartById(rootChildren, "tail2", out var tail2) || tail2 is null ||
@@ -611,7 +676,6 @@ internal static partial class GeometryIrPartTreeRepair
         return officialJvmName.Contains(".animal.axolotl.", StringComparison.Ordinal) ||
                officialJvmName.Contains(".animal.rabbit.", StringComparison.Ordinal) ||
                officialJvmName.Contains(".animal.sniffer.", StringComparison.Ordinal) ||
-               officialJvmName.Contains(".animal.wolf.", StringComparison.Ordinal) ||
                officialJvmName.Contains(".animal.llama.", StringComparison.Ordinal) ||
                officialJvmName.Contains(".animal.equine.BabyDonkey", StringComparison.Ordinal) ||
                officialJvmName.Contains(".monster.dragon.EnderDragon", StringComparison.Ordinal);

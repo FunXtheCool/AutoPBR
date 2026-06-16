@@ -13,6 +13,30 @@ public sealed class GeometryIrPartTreeRepairTests
 {
     private const string CreeperJvm = "net.minecraft.client.model.monster.creeper.CreeperModel";
     private const string ChickenJvm = "net.minecraft.client.model.animal.chicken.ChickenModel";
+    private const string CodJvm = "net.minecraft.client.model.animal.fish.CodModel";
+
+    [Fact]
+    public void Cod_repair_skips_nose_reparent_for_entity_space_flat_root_bind()
+    {
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{CodJvm}.json");
+        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
+            !string.Equals(status, "ok", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var raw = shard.RootElement;
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(CodJvm, raw);
+
+        var cmp = GeometryIrReferenceComparer.CompareReferenceWorldPartOrigins(raw, repaired, tolerance: 0.05);
+        Assert.True(cmp.IsMatch, cmp.Message);
+        Assert.False(PartNestedUnder(repaired, "nose", "head"));
+        Assert.True(
+            GeometryIrReferenceHierarchy.TryGetExpectedParentId(CodJvm, "nose", out var refParent));
+        Assert.Equal("", refParent);
+    }
 
     [Fact]
     public void Creeper_flat_bake_repair_preserves_world_part_origins()
@@ -236,6 +260,30 @@ public sealed class GeometryIrPartTreeRepairTests
         Assert.True(cmp.IsMatch, cmp.Message);
     }
 
+    [Theory]
+    [InlineData("net.minecraft.client.model.animal.wolf.AdultWolfModel")]
+    [InlineData("net.minecraft.client.model.animal.wolf.BabyWolfModel")]
+    public void Wolf_repair_preserves_flat_root_leg_world_origins(string jvm)
+    {
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
+        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
+            !string.Equals(status, "ok", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var raw = shard.RootElement;
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, raw);
+
+        Assert.False(PartNestedUnder(repaired, "left_hind_leg", "body"));
+        Assert.False(PartNestedUnder(repaired, "right_front_leg", "body"));
+
+        var cmp = GeometryIrReferenceComparer.CompareReferenceWorldPartOrigins(raw, repaired, tolerance: 0.05);
+        Assert.True(cmp.IsMatch, cmp.Message);
+    }
+
     [Fact]
     public void Camel_repair_preserves_flat_root_leg_world_origins()
     {
@@ -339,6 +387,185 @@ public sealed class GeometryIrPartTreeRepairTests
         using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
         Assert.False(PartNestedUnder(repaired, "left_front_leg", "body"));
+    }
+
+    [Fact]
+    public void PlayerModel_repair_reparents_sleeves_and_mirrors_right_arm_offset()
+    {
+        const string jvm = "net.minecraft.client.model.player.PlayerModel";
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
+        if (!File.Exists(shardPath))
+        {
+            return;
+        }
+
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        if (!shard.RootElement.TryGetProperty("extractionStatus", out var statusEl) ||
+            statusEl.GetString() is not ("ok" or "partial"))
+        {
+            return;
+        }
+
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
+        Assert.True(PartNestedUnder(repaired, "right_sleeve", "right_arm"));
+        Assert.True(PartNestedUnder(repaired, "left_sleeve", "left_arm"));
+        Assert.False(PartTreeContainsPartId(repaired, "waist"));
+        Assert.False(PartTreeContainsPartId(repaired, "inner_body"));
+
+        var rightArm = FindPart(repaired, "right_arm");
+        Assert.NotNull(rightArm);
+        var tr = rightArm!["pose"]?["translation"]?.AsArray();
+        Assert.NotNull(tr);
+        Assert.True(tr![0]!.GetValue<double>() < -4.5);
+        Assert.InRange(tr[1]!.GetValue<double>(), 1.5, 2.5);
+    }
+
+    [Fact]
+    public void PlayerModel_repair_resets_mis_lifted_head_body_poses_and_legs()
+    {
+        const string jvm = "net.minecraft.client.model.player.PlayerModel";
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
+        if (!File.Exists(shardPath))
+        {
+            return;
+        }
+
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
+        var head = FindPart(repaired, "head");
+        var body = FindPart(repaired, "body");
+        var rightLeg = FindPart(repaired, "right_leg");
+        Assert.NotNull(head);
+        Assert.NotNull(body);
+        Assert.NotNull(rightLeg);
+        Assert.InRange(head!["pose"]!["translation"]![1]!.GetValue<double>(), -0.05, 0.05);
+        Assert.InRange(body!["pose"]!["translation"]![1]!.GetValue<double>(), -0.05, 0.05);
+        Assert.InRange(rightLeg!["pose"]!["translation"]![1]!.GetValue<double>(), 11.5, 12.5);
+
+        var headCuboid = head!["cuboids"]![0]!;
+        Assert.InRange(headCuboid["from"]![1]!.GetValue<double>(), -8.5, -7.5);
+        Assert.InRange(headCuboid["to"]![1]!.GetValue<double>(), -0.5, 0.5);
+        Assert.Equal(16, body!["cuboids"]![0]!["uvOrigin"]![0]!.GetValue<int>());
+        Assert.Equal(16, body["cuboids"]![0]!["uvOrigin"]![1]!.GetValue<int>());
+    }
+
+    [Fact]
+    public void AdultPiglin_repair_reparents_player_wide_overlay_kit_for_brute_preview()
+    {
+        const string jvm = "net.minecraft.client.model.monster.piglin.AdultPiglinModel";
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
+        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
+            !string.Equals(status, "ok", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
+        Assert.True(PartNestedUnder(repaired, "right_pants", "right_leg"));
+        Assert.True(PartNestedUnder(repaired, "left_pants", "left_leg"));
+        Assert.True(PartNestedUnder(repaired, "jacket", "body"));
+        Assert.True(PartNestedUnder(repaired, "right_sleeve", "right_arm"));
+        Assert.False(PartNestedUnder(repaired, "jacket", "right_pants"));
+        Assert.False(PartTreeContainsPartId(repaired, "waist"));
+    }
+
+    [Fact]
+    public void PlayerSlim_variant_narrows_arm_cuboids()
+    {
+        const string jvm = "net.minecraft.client.model.player.PlayerModel";
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
+        if (!File.Exists(shardPath))
+        {
+            return;
+        }
+
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
+        var slim = GeometryIrPlayerArmVariant.ApplySlimArmsIfNeeded("PlayerSlim", repaired);
+        var leftArm = FindPart(slim, "left_arm");
+        Assert.NotNull(leftArm);
+        var to = leftArm!["cuboids"]![0]!["to"]!.AsArray();
+        Assert.InRange(to[0]!.GetValue<double>(), 1.9, 2.1);
+
+        var leftSleeve = FindPart(slim, "left_sleeve");
+        var rightSleeve = FindPart(slim, "right_sleeve");
+        Assert.NotNull(leftSleeve);
+        Assert.NotNull(rightSleeve);
+        Assert.InRange(leftSleeve!["cuboids"]![0]!["to"]![0]!.GetValue<double>(), 1.9, 2.1);
+        Assert.InRange(rightSleeve!["cuboids"]![0]!["from"]![0]!.GetValue<double>(), -2.1, -1.9);
+    }
+
+    [Fact]
+    public void ZombieModel_reference_repair_flattens_head_and_arm_poses_for_preview()
+    {
+        const string jvm = "net.minecraft.client.model.monster.zombie.ZombieModel";
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
+        var referencePath = Path.Combine(
+            repo,
+            "tools",
+            "MinecraftGeometryReference",
+            "reference-output",
+            $"{jvm}.json");
+        if (!File.Exists(shardPath) || !File.Exists(referencePath))
+        {
+            return;
+        }
+
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        using var reference = JsonDocument.Parse(File.ReadAllText(referencePath));
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
+        var cmp = GeometryIrReferenceComparer.CompareReferenceWorldPartOrigins(
+            reference.RootElement,
+            repaired,
+            tolerance: 0.08);
+        Assert.True(cmp.IsMatch, cmp.Message);
+
+        var rightArm = FindPart(repaired, "right_arm");
+        Assert.NotNull(rightArm);
+        var armTy = rightArm!["pose"]!["translation"]![1]!.GetValue<double>();
+        Assert.InRange(armTy, 1.5, 2.5);
+    }
+
+    private static bool PartTreeContainsPartId(JsonElement root, string partId) => FindPart(root, partId) is not null;
+
+    private static JsonObject? FindPart(JsonElement geometryRoot, string partId)
+    {
+        var node = JsonNode.Parse(geometryRoot.GetRawText());
+        if (node?["roots"]?[0]?["children"] is not JsonArray kids)
+        {
+            return null;
+        }
+
+        return FindPartObject(kids, partId);
+    }
+
+    private static JsonObject? FindPartObject(JsonArray parts, string partId)
+    {
+        foreach (var n in parts)
+        {
+            if (n is not JsonObject o)
+            {
+                continue;
+            }
+
+            if (string.Equals((string?)o["id"], partId, StringComparison.Ordinal))
+            {
+                return o;
+            }
+
+            if (o["children"] is JsonArray kids && FindPartObject(kids, partId) is { } nested)
+            {
+                return nested;
+            }
+        }
+
+        return null;
     }
 
     private static JsonElement HoistQuadrupedLegsToMeshRoot(JsonElement geometryRoot)

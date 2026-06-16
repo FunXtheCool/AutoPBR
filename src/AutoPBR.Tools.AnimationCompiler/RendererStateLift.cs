@@ -1,5 +1,7 @@
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
+using AutoPBR.Core.Models;
+using AutoPBR.Core.Preview;
 
 namespace AutoPBR.Tools.AnimationCompiler;
 
@@ -78,6 +80,11 @@ internal static class RendererStateLift
         shard["animationStateFields"] = ToAnimationFieldArray(animationFields);
         shard["scalarRenderStateFields"] = ToScalarFieldArray(scalarFields);
         shard["livingEntityFields"] = ToJsonArray(LivingEntityFields.Order(StringComparer.Ordinal));
+        var modelLayers = ResolveModelLayers(javapOutput);
+        if (modelLayers is not null)
+        {
+            shard["modelLayers"] = modelLayers;
+        }
         if (animationFields.Length > 0)
         {
             shard["previewDriver"] = $"{driverStem}_clip_cycle";
@@ -198,5 +205,34 @@ internal static class RendererStateLift
         }
 
         return new string(chars.ToArray());
+    }
+
+    private static readonly (string FactoryMethod, string TextureKey, PreviewDepthLayerKind Layer)[] SupplementaryLayerFactories =
+    [
+        ("createWindLayer", "#wind", PreviewDepthLayerKind.CutoutOverlay),
+        ("createEyesLayer", "#eyes", PreviewDepthLayerKind.CosmeticOverlay),
+        ("createOuterLayer", "#outer", PreviewDepthLayerKind.CutoutOverlay),
+        ("createEmissiveLayer", "#emissive", PreviewDepthLayerKind.EmissiveOverlay),
+    ];
+
+    private static JsonArray? ResolveModelLayers(string javapOutput)
+    {
+        var array = new JsonArray();
+        foreach (var (factoryMethod, textureKey, layer) in SupplementaryLayerFactories)
+        {
+            if (!javapOutput.Contains(factoryMethod, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            array.Add(new JsonObject
+            {
+                ["factoryMethod"] = factoryMethod,
+                ["textureKey"] = textureKey,
+                ["previewDepthLayer"] = GeometryIrCuboidMetadata.ToPreviewDepthLayerJsonName(layer),
+            });
+        }
+
+        return array.Count > 0 ? array : null;
     }
 }

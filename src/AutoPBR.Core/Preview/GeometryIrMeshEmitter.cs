@@ -36,6 +36,19 @@ internal sealed partial class CleanRoomEntityModelRuntime
                     return false;
                 }
 
+                var (layerKind, layerOrdinal, castsShadow) = PreviewDepthLayerClassifier.ClassifyIrCuboid(
+                    ctx.PartId,
+                    emitOptions.OfficialJvmName,
+                    ctx.Cuboid,
+                    ctx.CuboidIndexOnPart,
+                    ctx.CuboidCountOnPart);
+                entityCuboid = entityCuboid with
+                {
+                    DepthLayerKind = layerKind,
+                    LayerOrdinal = layerOrdinal,
+                    CastsShadow = castsShadow,
+                };
+
                 entityCuboid.Emit(builder, ctx.PartWorld, ctx.PartScale);
                 return true;
             },
@@ -243,8 +256,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var y1 = (float)to[1].GetDouble();
         var z1 = (float)to[2].GetDouble();
 
-        var inflate = GeometryIrCuboidMetadata.ApplyCubeDeformationInflateIfNonParity(
-            cuboid, options.Fidelity, ref x0, ref y0, ref z0, ref x1, ref y1, ref z1);
+        var inflate = GeometryIrCuboidMetadata.ApplyCubeDeformationInflateForEmit(
+            cuboid, options, ref x0, ref y0, ref z0, ref x1, ref y1, ref z1);
 
         _ = options.PreviewDegenerateAxisThickness > 0f &&
             GeometryIrEmitPolicy.TryExpandAxolotlGillCuboidZExtents(
@@ -291,7 +304,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             uh = spanH;
             ud = spanD >= 0 ? spanD : -1;
         }
-        else if (inflate > 0f)
+        else if (inflate != 0f)
         {
             var logicalW = Math.Max(1, (int)MathF.Round(MathF.Abs((float)to[0].GetDouble() - (float)from[0].GetDouble())));
             var logicalH = Math.Max(1, (int)MathF.Round(MathF.Abs((float)to[1].GetDouble() - (float)from[1].GetDouble())));

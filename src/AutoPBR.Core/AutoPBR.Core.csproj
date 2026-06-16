@@ -99,6 +99,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>Data\minecraft-native\geometry\1.21.11\%(Filename)%(Extension)</Link>
     </Content>
+    <Content Include="Data\minecraft-native\reference-geometry\26.1.2\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Data\ONNX-AI\DeepBump\*.onnx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

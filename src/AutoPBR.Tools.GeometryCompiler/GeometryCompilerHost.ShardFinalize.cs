@@ -162,6 +162,11 @@ internal sealed partial class GeometryCompilerHost
     private string ResolveFactoryMethodFromMeshHosts(string officialJvmName, string requested,
         ReadOnlySpan<byte> classBytes)
     {
+        if (LayerDefinitionMeshHostMap.TryGet(officialJvmName, out var layerHost))
+        {
+            return layerHost.FactoryMethod;
+        }
+
         var resolved = MeshFactoryMethodResolver.Resolve(_maps, officialJvmName, requested, classBytes);
         foreach (var host in MeshHostClassCandidates.Enumerate(officialJvmName))
         {

@@ -3,37 +3,621 @@
   "versionLabel": "26.1.2",
   "officialJvmName": "net.minecraft.client.model.monster.zombie.ZombieModel",
   "profile": "named_jar_26.1.2",
-  "extractionStatus": "skipped",
-  "skipKind": "no_mesh_factory",
+  "extractionStatus": "ok",
   "extractionNotes": [
-    "No static mesh factory on net.minecraft.client.model.monster.zombie.ZombieModel; structural lift skipped (interface, inner class, or non-mesh type)."
+    "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.HumanoidModel).",
+    "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
   ],
-  "factoryMethod": "createBodyLayer",
+  "factoryMethod": "createMesh",
   "roots": [
     {
       "id": "root",
       "pose": {
         "translation": [
-          0,
-          0,
-          0
+          0.000000000,
+          0.000000000,
+          0.000000000
         ],
         "rotationEulerRad": [
-          0,
-          0,
-          0
+          0.000000000,
+          0.000000000,
+          0.000000000
         ],
         "eulerOrder": "XYZ"
       },
       "cuboids": [],
-      "children": []
+      "children": [
+        {
+          "id": "head",
+          "pose": {
+            "translation": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -4.000000000,
+                -8.000000000,
+                -4.000000000
+              ],
+              "to": [
+                4.000000000,
+                0.000000000,
+                4.000000000
+              ],
+              "uvOrigin": [
+                0,
+                0
+              ],
+              "liftKind": "exact",
+              "textureKey": "#skin"
+            }
+          ],
+          "children": [
+            {
+              "id": "hat",
+              "pose": {
+                "translation": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -4.000000000,
+                    -8.000000000,
+                    -4.000000000
+                  ],
+                  "to": [
+                    4.000000000,
+                    0.000000000,
+                    4.000000000
+                  ],
+                  "uvOrigin": [
+                    32,
+                    0
+                  ],
+                  "liftKind": "exact",
+                  "textureKey": "#skin"
+                }
+              ],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "right_arm",
+          "pose": {
+            "translation": [
+              -5.000000000,
+              2.000000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -3.000000000,
+                -2.000000000,
+                -2.000000000
+              ],
+              "to": [
+                1.000000000,
+                10.00000000,
+                2.000000000
+              ],
+              "uvOrigin": [
+                40,
+                16
+              ],
+              "liftKind": "exact",
+              "textureKey": "#skin"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left_leg",
+          "pose": {
+            "translation": [
+              1.899999976,
+              12.00000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -2.000000000,
+                0.000000000,
+                -2.000000000
+              ],
+              "to": [
+                2.000000000,
+                12.00000000,
+                2.000000000
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "liftKind": "exact",
+              "textureKey": "#skin",
+              "mirrorU": true
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left_arm",
+          "pose": {
+            "translation": [
+              5.000000000,
+              2.000000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -1.000000000,
+                -2.000000000,
+                -2.000000000
+              ],
+              "to": [
+                3.000000000,
+                10.00000000,
+                2.000000000
+              ],
+              "uvOrigin": [
+                40,
+                16
+              ],
+              "liftKind": "exact",
+              "textureKey": "#skin"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right_leg",
+          "pose": {
+            "translation": [
+              -1.899999976,
+              12.00000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -2.000000000,
+                0.000000000,
+                -2.000000000
+              ],
+              "to": [
+                2.000000000,
+                12.00000000,
+                2.000000000
+              ],
+              "uvOrigin": [
+                0,
+                16
+              ],
+              "liftKind": "exact",
+              "textureKey": "#skin"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "body",
+          "pose": {
+            "translation": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "rotationEulerRad": [
+              0.000000000,
+              0.000000000,
+              0.000000000
+            ],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [
+                -4.000000000,
+                0.000000000,
+                -2.000000000
+              ],
+              "to": [
+                4.000000000,
+                12.00000000,
+                2.000000000
+              ],
+              "uvOrigin": [
+                16,
+                16
+              ],
+              "liftKind": "exact",
+              "textureKey": "#skin"
+            }
+          ],
+          "children": []
+        }
+      ]
     }
   ],
+  "jarPath": "net/minecraft/client/model/monster/zombie/ZombieModel.class",
+  "classSha256Hex": "9d75ec510bb5305e6c13ab3cf61416a648f2062523f6014e37ce795f2aeee21e",
+  "bytecodeFloatProbe": [
+    -4,
+    -8,
+    -4,
+    8,
+    8,
+    8,
+    -4,
+    -8,
+    -4,
+    8,
+    8,
+    8,
+    0.5,
+    -4,
+    -2,
+    8,
+    12,
+    4,
+    -3,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -5,
+    -1,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    5,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -1.9,
+    12,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    1.9,
+    12,
+    -4.5,
+    -7,
+    -4.5,
+    9,
+    8,
+    8,
+    15,
+    -3,
+    -3,
+    -1.5,
+    6,
+    5,
+    3,
+    18,
+    -3,
+    -1.2,
+    -1.49,
+    5.9,
+    2.9,
+    -0.1,
+    19,
+    -1,
+    -1.53,
+    5,
+    3,
+    -3.5,
+    15.5,
+    -1,
+    -1.53,
+    5,
+    3,
+    3.5,
+    15.5,
+    -3,
+    -3,
+    -1.5,
+    6,
+    5,
+    3,
+    18,
+    -2,
+    -0.2,
+    -2,
+    3,
+    4,
+    3,
+    -0.1,
+    1.5,
+    20,
+    0.5,
+    -1,
+    -0.2,
+    -2,
+    3,
+    4,
+    3,
+    -0.1,
+    -1.5,
+    20,
+    0.5,
+    -2,
+    2.9,
+    -2,
+    3,
+    3,
+    -1,
+    2.9,
+    -2,
+    3,
+    3,
+    -4,
+    -8,
+    -4,
+    8,
+    8,
+    8,
+    -4,
+    -8,
+    -4,
+    8,
+    8,
+    8,
+    0.5,
+    -4,
+    -2,
+    8,
+    12,
+    4,
+    -3,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -5,
+    -1,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    5,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -1.9,
+    12,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    1.9,
+    12,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -0.1,
+    -1.9,
+    12,
+    -2,
+    -2,
+    4,
+    12,
+    4,
+    -0.1,
+    1.9,
+    12,
+    -4.5,
+    -7,
+    -4.5,
+    9,
+    8,
+    8,
+    15,
+    -3,
+    -3,
+    -1.5,
+    6,
+    5,
+    3,
+    18,
+    -3,
+    -1.2,
+    -1.49,
+    5.9,
+    2.9,
+    -0.1,
+    19,
+    -1,
+    -1.53,
+    5,
+    3,
+    -3.5,
+    15.5,
+    -1,
+    -1.53,
+    5,
+    3,
+    3.5,
+    15.5,
+    -3,
+    -3,
+    -1.5,
+    6,
+    5,
+    3,
+    18,
+    -2,
+    -0.2,
+    -2,
+    3,
+    4,
+    3,
+    -0.1,
+    1.5,
+    20,
+    0.5,
+    -1,
+    -0.2,
+    -2,
+    3,
+    4,
+    3,
+    -0.1,
+    -1.5,
+    20,
+    0.5,
+    -2,
+    2.9,
+    -2,
+    3,
+    3,
+    -1,
+    2.9,
+    -2,
+    3,
+    3,
+    -4.5,
+    -7,
+    -4.5,
+    9,
+    8,
+    8,
+    15,
+    -3,
+    -3,
+    -1.5,
+    6,
+    5,
+    3,
+    18,
+    -3,
+    -1.2,
+    -1.49,
+    5.9,
+    2.9,
+    -0.1,
+    19,
+    -1,
+    -1.53,
+    5,
+    3,
+    -3.5,
+    15.5,
+    -1,
+    -1.53,
+    5,
+    3,
+    3.5,
+    15.5,
+    -3,
+    -3,
+    -1.5,
+    6,
+    5,
+    3,
+    18,
+    -2,
+    -0.2,
+    -2,
+    3,
+    4,
+    3,
+    -0.1,
+    1.5,
+    20,
+    0.5,
+    -1,
+    -0.2,
+    -2,
+    3,
+    4,
+    3,
+    -0.1,
+    -1.5,
+    20,
+    0.5,
+    -2,
+    2.9,
+    -2,
+    3,
+    3,
+    -1,
+    2.9,
+    -2,
+    3,
+    3
+  ],
+  "textureWidth": 64,
+  "textureHeight": 64,
   "liftSummary": {
     "cuboidApproxCount": 0,
     "poseApproxCount": 0,
     "delegationDepth": 0
-  },
-  "jarPath": "net/minecraft/client/model/monster/zombie/ZombieModel.class",
-  "classSha256Hex": "9d75ec510bb5305e6c13ab3cf61416a648f2062523f6014e37ce795f2aeee21e"
+  }
 }

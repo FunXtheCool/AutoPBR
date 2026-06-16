@@ -137,7 +137,7 @@ internal static class GeometryLiftPipeline
                 roots = asmRoots;
                 notes = asmNotes;
                 liftProfile = "bytecode_asm";
-                ApplyDeferredMeshFactoryPostProcessing(roots, meshText, officialJvmName);
+                ApplyLiftedMeshPostProcessing(roots, meshText, officialJvmName);
                 return true;
             }
 
@@ -159,7 +159,7 @@ internal static class GeometryLiftPipeline
             roots = javapRoots;
             notes = javapNotes;
             liftProfile = maps is null ? "javap_mesh_named_26_1_2" : "javap_mesh_proguard_obf";
-            ApplyDeferredMeshFactoryPostProcessing(roots, meshText, officialJvmName);
+            ApplyLiftedMeshPostProcessing(roots, meshText, officialJvmName);
             return true;
         }
 
@@ -173,6 +173,13 @@ internal static class GeometryLiftPipeline
         MojangMappingsParser? maps,
         string officialJvmName)
     {
+        if (LayerDefinitionMeshHostMap.TryGet(officialJvmName, out var layerHost) &&
+            TryResolveLayerDefinitionMeshDisassembly(javapExe, clientJar, maps, officialJvmName, layerHost,
+                out var layerDisasm))
+        {
+            return layerDisasm;
+        }
+
         foreach (var host in MeshHostClassCandidates.Enumerate(officialJvmName))
         {
             string? obh = null;
@@ -201,6 +208,39 @@ internal static class GeometryLiftPipeline
         }
 
         return null;
+    }
+
+    private static bool TryResolveLayerDefinitionMeshDisassembly(
+        string? javapExe,
+        string clientJar,
+        MojangMappingsParser? maps,
+        string officialJvmName,
+        LayerDefinitionMeshHostMap.MeshHostSpec layerHost,
+        out MeshDisassemblyResolution resolution)
+    {
+        resolution = default;
+        if (!BytecodeMeshResolution.TryResolve(clientJar, maps, officialJvmName, layerHost.FactoryMethod, out var mesh))
+        {
+            return false;
+        }
+
+        string? obh = null;
+        _ = maps?.TryGetObfuscated(mesh.HostJvmName, out obh);
+        var arg = obh is null ? mesh.HostJvmName : MojangMappingsParser.GetJavapClassArgForObfuscated(obh);
+        if (!JavapClassDisassembly.TryDisassemble(javapExe, clientJar, arg, out var stdout, out _))
+        {
+            stdout = string.Empty;
+        }
+
+        resolution = new MeshDisassemblyResolution(stdout, mesh.HostJvmName, arg, mesh.MeshConcat);
+        return true;
+    }
+
+    private static void ApplyLiftedMeshPostProcessing(JsonArray roots, string meshConcat, string officialJvmName)
+    {
+        ApplyDeferredMeshFactoryPostProcessing(roots, meshConcat, officialJvmName);
+        LayerDefinitionRetainAtlasStamp.ApplyToLiftedRoots(roots, meshConcat);
+        PreviewDepthLayerIrStamp.ApplyToLiftedRoots(roots, officialJvmName);
     }
 
     private static void ApplyDeferredMeshFactoryPostProcessing(JsonArray roots, string meshConcat, string officialJvmName)
@@ -281,6 +321,7 @@ internal static class GeometryLiftPipeline
 
     private static bool ShouldApplyClearRecursivelyMeshPass(string meshConcat, string officialJvmName, out int passStartIdx)
     {
+        passStartIdx = 0;
         if (string.Equals(officialJvmName, "net.minecraft.client.model.player.PlayerCapeModel", StringComparison.Ordinal))
         {
             passStartIdx = meshConcat.IndexOf("clearRecursively", StringComparison.Ordinal);
@@ -297,8 +338,13 @@ internal static class GeometryLiftPipeline
             return true;
         }
 
+        // HumanoidModel / PlayerModel call clearRecursively inside createMesh (hat/jacket shells).
+        // Only run the post-lift overlay pass when clearRecursively lives in a later mesh island
+        // (e.g. createBodyLayer delegates createMesh, then strips parts before rebinding).
+        var boundary = JavapClassDisassembly.GeometryMeshIslandBoundaryMarker;
+        var boundaryIdx = meshConcat.IndexOf(boundary, StringComparison.Ordinal);
         passStartIdx = meshConcat.IndexOf("clearRecursively", StringComparison.Ordinal);
-        return passStartIdx >= 0;
+        return passStartIdx >= 0 && boundaryIdx >= 0 && passStartIdx > boundaryIdx;
     }
 
     private static HashSet<string> CollectBindingPartIdsFromJavapTail(string tailJavap)

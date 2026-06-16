@@ -1,4 +1,5 @@
 using System.Text.Json;
+using AutoPBR.Core.Models;
 
 namespace AutoPBR.Core.Preview;
 
@@ -35,11 +36,12 @@ public static class GeometryIrCuboidMetadata
 
     /// <summary>
     /// Expands cuboid corners for <c>CubeDeformation</c> when emitting viewport meshes.
-    /// Parity emit skips inflate because <c>reference_java</c> bakes store pre-inflate corners.
+    /// Parity emit skips inflate because <c>reference_java</c> bakes store pre-inflate corners unless
+    /// <see cref="GeometryIrMeshEmitOptions.PreviewApplyCubeDeformationInflate"/> is set.
     /// </summary>
-    public static float ApplyCubeDeformationInflateIfNonParity(
+    internal static float ApplyCubeDeformationInflateForEmit(
         JsonElement cuboid,
-        GeometryIrEmitFidelity fidelity,
+        GeometryIrMeshEmitOptions options,
         ref float x0,
         ref float y0,
         ref float z0,
@@ -47,10 +49,27 @@ public static class GeometryIrCuboidMetadata
         ref float y1,
         ref float z1)
     {
-        var inflate = 0f;
-        if (fidelity == GeometryIrEmitFidelity.Parity ||
-            !TryGetInflate(cuboid, out inflate) ||
-            inflate == 0f)
+        if (options.Fidelity == GeometryIrEmitFidelity.Parity && !options.PreviewApplyCubeDeformationInflate)
+        {
+            return 0f;
+        }
+
+        return ApplyCubeDeformationInflate(cuboid, ref x0, ref y0, ref z0, ref x1, ref y1, ref z1);
+    }
+
+    /// <summary>
+    /// Expands cuboid corners for <c>CubeDeformation</c> when present in IR (many shards omit it).
+    /// </summary>
+    public static float ApplyCubeDeformationInflate(
+        JsonElement cuboid,
+        ref float x0,
+        ref float y0,
+        ref float z0,
+        ref float x1,
+        ref float y1,
+        ref float z1)
+    {
+        if (!TryGetInflate(cuboid, out var inflate) || inflate == 0f)
         {
             return 0f;
         }
@@ -62,6 +81,25 @@ public static class GeometryIrCuboidMetadata
         y1 += inflate;
         z1 += inflate;
         return inflate;
+    }
+
+    /// <summary>Legacy parity fidelity gate.</summary>
+    public static float ApplyCubeDeformationInflateIfNonParity(
+        JsonElement cuboid,
+        GeometryIrEmitFidelity fidelity,
+        ref float x0,
+        ref float y0,
+        ref float z0,
+        ref float x1,
+        ref float y1,
+        ref float z1)
+    {
+        if (fidelity == GeometryIrEmitFidelity.Parity)
+        {
+            return 0f;
+        }
+
+        return ApplyCubeDeformationInflate(cuboid, ref x0, ref y0, ref z0, ref x1, ref y1, ref z1);
     }
 
     /// <summary>Optional UV footprint from texCrop-style <c>addBox</c> lifts (<c>uvSpan</c>: <c>[w,h]</c> or <c>[w,h,d]</c>).</summary>
@@ -187,4 +225,31 @@ public static class GeometryIrCuboidMetadata
         textureKey = s.StartsWith('#') ? s : "#" + s;
         return true;
     }
+
+    public static bool TryGetPreviewDepthLayer(JsonElement cuboid, out PreviewDepthLayerKind kind)
+    {
+        kind = PreviewDepthLayerKind.Base;
+        if (cuboid.ValueKind != JsonValueKind.Object ||
+            !cuboid.TryGetProperty("previewDepthLayer", out var layer) ||
+            layer.ValueKind != JsonValueKind.String)
+        {
+            return false;
+        }
+
+        return TryParsePreviewDepthLayerName(layer.GetString(), out kind);
+    }
+
+    public static bool TryParsePreviewDepthLayerName(string? name, out PreviewDepthLayerKind kind)
+    {
+        kind = PreviewDepthLayerKind.Base;
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return false;
+        }
+
+        return Enum.TryParse(name, ignoreCase: true, out kind);
+    }
+
+    public static string ToPreviewDepthLayerJsonName(PreviewDepthLayerKind kind) =>
+        char.ToLowerInvariant(kind.ToString()[0]) + kind.ToString()[1..];
 }

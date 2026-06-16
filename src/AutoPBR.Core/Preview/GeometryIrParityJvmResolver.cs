@@ -26,13 +26,19 @@ internal static class GeometryIrParityJvmResolver
         {
             if (ParityCatalogHandLiftGeometryIrCatalog.TryGetOkRoot(candidate, out geometryRoot))
             {
+                if (IsMisLiftedAdultZombieBabyMesh(isBaby, normalizedAssetPath, candidate, geometryRoot))
+                {
+                    continue;
+                }
+
                 officialJvmName = candidate;
                 return true;
             }
 
             if (GeometryIrDocumentLoader.TryLoadLiftedForParityCatalog(profile, candidate, out geometryRoot) &&
                 !IsMisLiftedAdultEquineHorseModelShard(candidate, geometryRoot) &&
-                !IsAdultEquineJvmRejectedForBaby(isBaby, candidate))
+                !IsAdultEquineJvmRejectedForBaby(isBaby, candidate) &&
+                !IsMisLiftedAdultZombieBabyMesh(isBaby, normalizedAssetPath, candidate, geometryRoot))
             {
                 officialJvmName = candidate;
                 return true;
@@ -339,6 +345,56 @@ internal static class GeometryIrParityJvmResolver
 
         return false;
     }
+
+    /// <summary>
+    /// Adult <c>ModelLayers.ZOMBIE</c> bakes <c>HumanoidModel.createMesh</c>; do not bind baby <c>BabyZombieModel</c> IR on adult skins.
+    /// </summary>
+    private static bool IsMisLiftedAdultZombieBabyMesh(
+        bool isBaby,
+        string normalizedAssetPath,
+        string candidate,
+        JsonElement geometryRoot)
+    {
+        if (isBaby || !candidate.Contains(".monster.zombie.", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        var path = normalizedAssetPath.Replace('\\', '/');
+        if (!IsAdultCataloguedZombieFamilyTexture(path))
+        {
+            return false;
+        }
+
+        if (GeometryIrParityJvmResolver.SimpleClassNameContainsBaby(candidate))
+        {
+            return true;
+        }
+
+        if (!candidate.Contains("ZombieModel", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        if (!geometryRoot.TryGetProperty("roots", out var roots) || roots.ValueKind != JsonValueKind.Array)
+        {
+            return false;
+        }
+
+        foreach (var root in roots.EnumerateArray())
+        {
+            if (TryFindPartBodyTranslationY(root, out var bodyY) && bodyY > 11.75f)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsAdultCataloguedZombieFamilyTexture(string path) =>
+        path.Contains("/textures/entity/zombie/", StringComparison.OrdinalIgnoreCase) &&
+        !path.Contains("_baby", StringComparison.OrdinalIgnoreCase);
 
     private static bool PathImpliesClimate(string normalizedAssetPath, string stem, string token)
     {

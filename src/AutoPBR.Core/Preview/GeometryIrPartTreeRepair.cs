@@ -54,6 +54,16 @@ internal static partial class GeometryIrPartTreeRepair
 
         ("wind_top", "wind_mid"),
 
+        ("right_sleeve", "right_arm"),
+
+        ("left_sleeve", "left_arm"),
+
+        ("jacket", "body"),
+
+        ("left_pants", "left_leg"),
+
+        ("right_pants", "right_leg"),
+
     ];
 
 
@@ -155,7 +165,7 @@ internal static partial class GeometryIrPartTreeRepair
 
                 foreach (var (childId, parentId) in GlobalReparentRules)
                 {
-                    if (ShouldSkipFelineFlatTailReparent(childId, parentId, rootKids, officialJvmName))
+                    if (ShouldSkipGlobalReparentRule(childId, parentId, rootKids, officialJvmName))
                     {
                         continue;
                     }
@@ -197,6 +207,12 @@ internal static partial class GeometryIrPartTreeRepair
                 DeduplicateNestedPartIds(ro);
             }
 
+            if (ShouldApplyPlayerWideMeshParityRepair(officialJvmName, rootKids))
+            {
+                RemovePlayerMeshInternalParts(rootKids);
+                GeometryIrPlayerMeshParityRepair.Apply(rootKids);
+            }
+
             if (EntityPreviewDebugSettings.RepairZeroEquineRootOffset &&
                 ShouldZeroEquineCreateBodyLayerRootOffset(officialJvmName, doc, ro))
             {
@@ -207,8 +223,105 @@ internal static partial class GeometryIrPartTreeRepair
 
 
 
+        if (ShouldApplyPlayerWideMeshParityRepair(officialJvmName, roots) ||
+            ShouldApplyHumanoidLayerMeshReferenceRepair(officialJvmName))
+        {
+            var repaired = JsonDocument.Parse(doc.ToJsonString()).RootElement;
+            if (LoadReferenceRootForTopologyAlign(officialJvmName!) is { } referenceRoot)
+            {
+                return ShouldApplyHumanoidLayerMeshReferenceRepair(officialJvmName)
+                    ? GeometryIrReferencePoseSync.ApplyForParityPreview(referenceRoot, repaired)
+                    : GeometryIrReferencePoseSync.ApplyForComparisons(
+                        referenceRoot,
+                        GeometryIrReferenceTopologyAlign.ApplyForWorldPoseCompare(referenceRoot, repaired));
+            }
+
+            return repaired;
+        }
+
         return JsonDocument.Parse(doc.ToJsonString()).RootElement;
 
+    }
+
+    /// <summary>
+    /// <c>ModelLayers.ZOMBIE</c> / <c>HUSK</c> bake <c>HumanoidModel.createMesh</c> on wrapper classes; bytecode lift keeps
+    /// stacked PartPose islands while Java reference bakes flatten to root-sibling offsets (same as drowned-style preview).
+    /// </summary>
+    private static bool ShouldApplyHumanoidLayerMeshReferenceRepair(string? officialJvmName) =>
+        GeometryIrHumanoidLayerMeshPreviewPolicy.IsHumanoidLayerMeshJvm(officialJvmName);
+
+    private static bool IsPlayerMeshFamily(string? officialJvmName) =>
+        string.Equals(officialJvmName, "net.minecraft.client.model.player.PlayerModel", StringComparison.Ordinal) ||
+        string.Equals(officialJvmName, "net.minecraft.client.model.HumanoidModel", StringComparison.Ordinal);
+
+    /// <summary>
+    /// <c>PlayerModel.createMesh</c> wide overlay kit (jacket/pants/sleeves) is reused by piglin and other humanoid delegates.
+    /// </summary>
+    private static bool ShouldApplyPlayerWideMeshParityRepair(string? officialJvmName, JsonArray roots)
+    {
+        if (IsPlayerMeshFamily(officialJvmName))
+        {
+            return true;
+        }
+
+        foreach (var root in roots)
+        {
+            if (root is JsonObject ro &&
+                ro["children"] is JsonArray rootKids &&
+                UsesPlayerWideMeshOverlayKit(rootKids))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool UsesPlayerWideMeshOverlayKit(JsonArray rootChildren) =>
+        TryFindPartById(rootChildren, "jacket", out _) &&
+        TryFindPartById(rootChildren, "left_pants", out _);
+
+    private static JsonElement? LoadReferenceRootForTopologyAlign(string officialJvmName) =>
+        GeometryIrReferenceBakePaths.TryLoadReferenceRoot(officialJvmName, out var root)
+            ? root
+            : null;
+
+    /// <summary>
+    /// <c>PlayerModel.createMesh</c> bytecode keeps waist/feet/inner_body parts that Java reference bakes omit.
+    /// </summary>
+    private static void RemovePlayerMeshInternalParts(JsonArray rootChildren)
+    {
+        if (!TryFindPartById(rootChildren, "jacket", out _) ||
+            !TryFindPartById(rootChildren, "left_pants", out _))
+        {
+            return;
+        }
+
+        RemovePartIdsFromForest(rootChildren, ["waist", "inner_body", "left_foot", "right_foot"]);
+    }
+
+    private static void RemovePartIdsFromForest(JsonArray parts, IReadOnlyList<string> idsToRemove)
+    {
+        for (var i = parts.Count - 1; i >= 0; i--)
+        {
+            if (parts[i] is not JsonObject part)
+            {
+                continue;
+            }
+
+            var id = (string?)part["id"];
+            if (!string.IsNullOrEmpty(id) &&
+                idsToRemove.Any(removeId => string.Equals(id, removeId, StringComparison.Ordinal)))
+            {
+                parts.RemoveAt(i);
+                continue;
+            }
+
+            if (part["children"] is JsonArray kids)
+            {
+                RemovePartIdsFromForest(kids, idsToRemove);
+            }
+        }
     }
 
     /// <summary>
@@ -278,7 +391,7 @@ internal static partial class GeometryIrPartTreeRepair
 
         }
 
-        // Java nests standard legs on body (axolotl, rabbit, wolf, sniffer, …). Compiler hoist can leave
+        // Java nests standard legs on body (axolotl, rabbit, sniffer, …). Compiler hoist can leave
         // body-relative poses as flat root siblings — renest under body; do not treat as creeper-class flat bake.
         if (IsNestedBodyLegQuadrupedMeshFamily(officialJvmName))
 

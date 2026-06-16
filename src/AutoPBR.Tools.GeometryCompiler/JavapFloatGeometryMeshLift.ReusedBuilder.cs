@@ -27,8 +27,7 @@ internal static partial class JavapFloatGeometryMeshLift
                 break;
             }
 
-            if (lines[j].Contains("CubeListBuilder.create", StringComparison.Ordinal) ||
-                IsObfuscatedCubeListBuilderCreateLine(lines[j]))
+            if (IsCubeListBuilderConstructionLine(lines[j]))
             {
                 templateStart = j;
                 break;
@@ -187,8 +186,7 @@ internal static partial class JavapFloatGeometryMeshLift
                 return true;
             }
 
-            if (seg[j].Contains("CubeListBuilder.create", StringComparison.Ordinal) ||
-                IsObfuscatedCubeListBuilderCreateLine(seg[j]))
+            if (IsCubeListBuilderConstructionLine(seg[j]))
             {
                 return false;
             }
@@ -237,8 +235,7 @@ internal static partial class JavapFloatGeometryMeshLift
 
         for (var j = aloadLine + 1; j < bindingIdx; j++)
         {
-            if (seg[j].Contains("CubeListBuilder.create", StringComparison.Ordinal) ||
-                IsObfuscatedCubeListBuilderCreateLine(seg[j]))
+            if (IsCubeListBuilderConstructionLine(seg[j]))
             {
                 return true;
             }

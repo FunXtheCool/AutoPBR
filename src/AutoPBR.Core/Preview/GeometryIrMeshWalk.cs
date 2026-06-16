@@ -15,6 +15,8 @@ internal static class GeometryIrMeshWalk
         public required Matrix4x4 PartWorld { get; init; }
         public required float PartScale { get; init; }
         public required JsonElement Cuboid { get; init; }
+        public int CuboidIndexOnPart { get; init; }
+        public int CuboidCountOnPart { get; init; }
     }
 
     public static bool WalkRoots(
@@ -294,6 +296,18 @@ internal static class GeometryIrMeshWalk
             cuboids.ValueKind == JsonValueKind.Array &&
             onCuboid is not null)
         {
+            var cuboidCount = 0;
+            foreach (var cuboidEl in cuboids.EnumerateArray())
+            {
+                if (GeometryIrCuboidMetadata.TryGetFaceMask(cuboidEl, out var emptyMask) && emptyMask.Length == 0)
+                {
+                    continue;
+                }
+
+                cuboidCount++;
+            }
+
+            var cuboidIndex = 0;
             foreach (var cuboidEl in cuboids.EnumerateArray())
             {
                 if (GeometryIrCuboidMetadata.TryGetFaceMask(cuboidEl, out var emptyMask) && emptyMask.Length == 0)
@@ -306,11 +320,15 @@ internal static class GeometryIrMeshWalk
                         PartId = partId,
                         PartWorld = worldTexel,
                         PartScale = partScale,
-                        Cuboid = cuboidEl
+                        Cuboid = cuboidEl,
+                        CuboidIndexOnPart = cuboidIndex,
+                        CuboidCountOnPart = cuboidCount,
                     }))
                 {
                     return false;
                 }
+
+                cuboidIndex++;
             }
         }
 

@@ -108,6 +108,11 @@
         },
         "mirrorU": { "type": "boolean" },
         "inflate": { "type": "number" },
+        "previewDepthLayer": {
+          "type": "string",
+          "enum": ["base", "cutoutOverlay", "cosmeticOverlay", "emissiveOverlay", "debugOnly"],
+          "description": "Explicit preview depth layer intent stamped at geometry lift or authored in IR."
+        },
         "uvSpan": {
           "type": "array",
           "minItems": 2,

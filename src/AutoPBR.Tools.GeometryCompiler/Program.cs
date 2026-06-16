@@ -25,6 +25,11 @@ internal static class Program
             return ScoreLiftShardCommand.Run(args.Skip(1).ToArray());
         }
 
+        if (string.Equals(args[0], "repair-parity-shard", StringComparison.OrdinalIgnoreCase))
+        {
+            return RepairParityShardCommand.Run(args.Skip(1).ToArray());
+        }
+
         if (string.Equals(args[0], "codegen-entity-cuboids", StringComparison.OrdinalIgnoreCase))
         {
             return GeometryIrCodegenHost.RunCodegenEntityCuboids(args.Skip(1).ToArray());

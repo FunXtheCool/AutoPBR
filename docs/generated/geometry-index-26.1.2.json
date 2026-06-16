@@ -63,7 +63,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.HumanoidModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.HumanoidModel",
-      "extractionStatus": "ok",
+      "extractionStatus": "partial",
       "classSha256Hex": "6515b4f45ed64339d52bcb652ffdc7ebc60332e4876472989176410f1325cfe5",
       "jarPath": "net/minecraft/client/model/HumanoidModel.class"
     },
@@ -1107,7 +1107,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.monster.piglin.AdultPiglinModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.monster.piglin.AdultPiglinModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "62902f5d32c221647d57e210614854cef60f0e16048048bb3e33dbe4de84882c",
       "jarPath": "net/minecraft/client/model/monster/piglin/AdultPiglinModel.class"
     },
@@ -1116,7 +1116,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.monster.piglin.AdultZombifiedPiglinModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.monster.piglin.AdultZombifiedPiglinModel",
-      "extractionStatus": "partial",
+      "extractionStatus": "ok",
       "classSha256Hex": "ad909b3e608f0ae1c15f1a76f7ec34b304064b0fa2dcd2a33812332fd076a2ce",
       "jarPath": "net/minecraft/client/model/monster/piglin/AdultZombifiedPiglinModel.class"
     },
@@ -1296,7 +1296,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.monster.zombie.AbstractZombieModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.monster.zombie.AbstractZombieModel",
-      "extractionStatus": "skipped",
+      "extractionStatus": "ok",
       "classSha256Hex": "d3b462f785f618b811727a0cd8fa39f285e39f472dca938694a4010cf4fa0d27",
       "jarPath": "net/minecraft/client/model/monster/zombie/AbstractZombieModel.class"
     },
@@ -1341,7 +1341,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.monster.zombie.GiantZombieModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.monster.zombie.GiantZombieModel",
-      "extractionStatus": "skipped",
+      "extractionStatus": "ok",
       "classSha256Hex": "6c249fea598ac62ea9c2f4d6fc1ed436a65488ddfcbed45c4ae7000a97fc36be",
       "jarPath": "net/minecraft/client/model/monster/zombie/GiantZombieModel.class"
     },
@@ -1350,7 +1350,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.monster.zombie.ZombieModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.monster.zombie.ZombieModel",
-      "extractionStatus": "skipped",
+      "extractionStatus": "ok",
       "classSha256Hex": "9d75ec510bb5305e6c13ab3cf61416a648f2062523f6014e37ce795f2aeee21e",
       "jarPath": "net/minecraft/client/model/monster/zombie/ZombieModel.class"
     },
@@ -1656,9 +1656,18 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.player.PlayerModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.player.PlayerModel",
-      "extractionStatus": "ok",
+      "extractionStatus": "partial",
       "classSha256Hex": "2b079f3f2f1ec200bfd080b5eac968c057f67b955374ec5c567a8765fed83981",
       "jarPath": "net/minecraft/client/model/player/PlayerModel.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.skeleton.SkeletonModel.createSingleModelDualBodyLayer",
+      "jarPath": "net/minecraft/client/model/monster/skeleton/SkeletonModel.class",
+      "classSha256Hex": "df41c8df18ec57ab3f012eca9e8244e5370cbb67db1182a640d132d1e17ed9fa",
+      "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.monster.skeleton.SkeletonModel.createSingleModelDualBodyLayer.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "ok",
+      "modelIndexJvmName": "net.minecraft.client.model.monster.skeleton.SkeletonModel.createSingleModelDualBodyLayer"
     }
   ]
 }

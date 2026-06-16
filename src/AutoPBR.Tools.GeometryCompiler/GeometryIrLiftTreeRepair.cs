@@ -1,4 +1,5 @@
 using System.Text.Json.Nodes;
+using AutoPBR.Core.Preview;
 
 namespace AutoPBR.Tools.GeometryCompiler;
 
@@ -24,6 +25,11 @@ internal static class GeometryIrLiftTreeRepair
         ("wind_bottom", "wind_body"),
         ("wind_mid", "wind_bottom"),
         ("wind_top", "wind_mid"),
+        ("right_sleeve", "right_arm"),
+        ("left_sleeve", "left_arm"),
+        ("jacket", "body"),
+        ("left_pants", "left_leg"),
+        ("right_pants", "right_leg"),
     ];
 
     /// <param name="hoistStandardQuadrupedLegsToRoot">
@@ -59,6 +65,8 @@ internal static class GeometryIrLiftTreeRepair
                 CollapseInnerBodyUnderBody(rootKids);
                 RemoveOptionalSaddleHarnessParts(rootKids);
                 RemovePlayerMeshInternalParts(rootKids);
+                GeometryIrPlayerMeshParityRepair.Apply(rootKids);
+                TrimHumanoidDelegateOverlayCuboids(rootKids);
                 HoistFelineFlatTail2ToRoot(rootKids);
                 if (hoistStandardQuadrupedLegsToRoot)
                 {
@@ -103,17 +111,275 @@ internal static class GeometryIrLiftTreeRepair
 
     /// <summary>
     /// <c>PlayerModel.createMesh</c> bytecode keeps waist/feet/inner_body parts that Java reference bakes omit
-    /// (piglin, player, drowned, …). Frog feet are real parts and are kept (no jacket/pants overlay kit).
+    /// (piglin, player, drowned, …). Delegated <c>HumanoidModel.createMesh</c> hosts can also retain a full player
+    /// overlay kit from deep concat pollution — drop it unless arms are player-scale (4px wide).
+    /// Frog feet are real parts and are kept (no jacket/pants overlay kit).
     /// </summary>
     private static void RemovePlayerMeshInternalParts(JsonArray rootChildren)
     {
-        if (!TryFindPartById(rootChildren, "jacket", out _) ||
-            !TryFindPartById(rootChildren, "left_pants", out _))
+        var hasJacket = TryFindPartById(rootChildren, "jacket", out _);
+        var hasWaist = TryFindPartById(rootChildren, "waist", out _);
+        var hasInnerBody = TryFindPartById(rootChildren, "inner_body", out _);
+        if (!hasJacket && !hasWaist && !hasInnerBody)
+        {
+            RemoveLimbOverlayChildren(rootChildren);
+            return;
+        }
+
+        if (hasJacket && UsesPlayerScaleHumanoidArms(rootChildren))
+        {
+            RemovePartIdsFromForest(rootChildren, ["waist", "inner_body", "left_foot", "right_foot"]);
+            return;
+        }
+
+        RemovePartIdsFromForest(rootChildren,
+        [
+            "jacket",
+            "waist",
+            "inner_body",
+            "left_pants",
+            "right_pants",
+            "left_sleeve",
+            "right_sleeve",
+            "left_foot",
+            "right_foot",
+        ]);
+        RemoveLimbOverlayChildren(rootChildren);
+    }
+
+    private static bool UsesPlayerScaleHumanoidArms(JsonArray rootChildren)
+    {
+        foreach (var armId in new[] { "left_arm", "right_arm" })
+        {
+            if (!TryFindPartById(rootChildren, armId, out var arm) || arm is null ||
+                arm["cuboids"] is not JsonArray cuboids ||
+                cuboids.Count == 0 ||
+                cuboids[0] is not JsonObject cuboid ||
+                cuboid["from"] is not JsonArray from ||
+                cuboid["to"] is not JsonArray to ||
+                from.Count < 1 ||
+                to.Count < 1)
+            {
+                continue;
+            }
+
+            var spanX = Math.Abs(to[0]!.GetValue<double>() - from[0]!.GetValue<double>());
+            if (spanX >= 3.5)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static void RemoveLimbOverlayChildren(JsonArray parts)
+    {
+        foreach (var n in parts)
+        {
+            if (n is not JsonObject part)
+            {
+                continue;
+            }
+
+            if (part["children"] is JsonArray kids)
+            {
+                for (var i = kids.Count - 1; i >= 0; i--)
+                {
+                    if (kids[i] is JsonObject child &&
+                        child["id"]?.GetValue<string>() is { } childId &&
+                        IsHumanoidLimbOverlayChildId(childId))
+                    {
+                        kids.RemoveAt(i);
+                    }
+                }
+
+                RemoveLimbOverlayChildren(kids);
+            }
+        }
+    }
+
+    private static bool IsHumanoidLimbOverlayChildId(string id) =>
+        id is "left_sleeve" or "right_sleeve" or "left_pants" or "right_pants" or "left_foot" or "right_foot";
+
+    /// <summary>
+    /// Thin-limb humanoid delegates (skeleton/stray/bogged) keep one head/body cuboid in reference_java; shallow
+    /// <c>HumanoidModel.createMesh</c> can still union hat/jacket overlay boxes onto those parts.
+    /// </summary>
+    private static void TrimHumanoidDelegateOverlayCuboids(JsonArray rootChildren)
+    {
+        if (!UsesThinHumanoidLimbs(rootChildren))
         {
             return;
         }
 
-        RemovePartIdsFromForest(rootChildren, ["waist", "inner_body", "left_foot", "right_foot"]);
+        TrimDelegateHeadOverlayCuboids(rootChildren);
+        TrimDelegateBodyOverlayCuboids(rootChildren);
+        TrimDelegateLimbOverlayCuboids(rootChildren);
+    }
+
+    private static bool UsesThinHumanoidLimbs(JsonArray rootChildren)
+    {
+        foreach (var armId in new[] { "left_arm", "right_arm" })
+        {
+            if (!TryFindPartById(rootChildren, armId, out var arm) || arm is null ||
+                arm["cuboids"] is not JsonArray cuboids ||
+                cuboids.Count == 0 ||
+                cuboids[0] is not JsonObject cuboid ||
+                cuboid["from"] is not JsonArray from ||
+                cuboid["to"] is not JsonArray to ||
+                from.Count < 1 ||
+                to.Count < 1)
+            {
+                continue;
+            }
+
+            var spanX = Math.Abs(to[0]!.GetValue<double>() - from[0]!.GetValue<double>());
+            if (spanX <= 2.5)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static void TrimDelegateHeadOverlayCuboids(JsonArray rootChildren)
+    {
+        if (!TryFindPartById(rootChildren, "head", out var head) || head is null ||
+            head["cuboids"] is not JsonArray headCuboids ||
+            headCuboids.Count <= 1)
+        {
+            return;
+        }
+
+        var hatHasCuboids = HeadHasHatWithCuboids(head);
+        if (!hatHasCuboids)
+        {
+            return;
+        }
+
+        for (var i = headCuboids.Count - 1; i >= 0; i--)
+        {
+            if (headCuboids[i] is not JsonObject cub)
+            {
+                continue;
+            }
+
+            if (cub["inflate"] is not null)
+            {
+                headCuboids.RemoveAt(i);
+                continue;
+            }
+
+            if (cub["uvOrigin"] is JsonArray uv && uv.Count >= 2 &&
+                Math.Abs(uv[1]!.GetValue<double>() - 32) < 0.01)
+            {
+                headCuboids.RemoveAt(i);
+            }
+        }
+    }
+
+    private static bool HeadHasHatWithCuboids(JsonObject head)
+    {
+        if (head["children"] is not JsonArray headKids)
+        {
+            return false;
+        }
+
+        foreach (var kid in headKids)
+        {
+            if (kid is JsonObject hat &&
+                string.Equals((string?)hat["id"], "hat", StringComparison.Ordinal) &&
+                hat["cuboids"] is JsonArray hatCuboids &&
+                hatCuboids.Count > 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static void TrimDelegateBodyOverlayCuboids(JsonArray rootChildren)
+    {
+        if (!TryFindPartById(rootChildren, "body", out var body) || body is null ||
+            body["cuboids"] is not JsonArray bodyCuboids ||
+            bodyCuboids.Count <= 1)
+        {
+            return;
+        }
+
+        JsonObject? keep = null;
+        var keepSpan = 0.0;
+        foreach (var cubNode in bodyCuboids)
+        {
+            if (cubNode is not JsonObject cub || cub["inflate"] is not null)
+            {
+                continue;
+            }
+
+            var span = CuboidAxisSpan(cub, 1);
+            if (span > keepSpan)
+            {
+                keepSpan = span;
+                keep = cub;
+            }
+        }
+
+        if (keep is null)
+        {
+            return;
+        }
+
+        body["cuboids"] = new JsonArray { JsonNode.Parse(keep.ToJsonString())! };
+    }
+
+    private static void TrimDelegateLimbOverlayCuboids(JsonArray rootChildren)
+    {
+        foreach (var limbId in new[] { "left_arm", "right_arm", "left_leg", "right_leg" })
+        {
+            if (!TryFindPartById(rootChildren, limbId, out var limb) || limb is null ||
+                limb["cuboids"] is not JsonArray cuboids ||
+                cuboids.Count <= 1)
+            {
+                continue;
+            }
+
+            JsonObject? keep = null;
+            foreach (var cubNode in cuboids)
+            {
+                if (cubNode is not JsonObject cub || cub["inflate"] is not null)
+                {
+                    continue;
+                }
+
+                if (CuboidAxisSpan(cub, 0) <= 2.5)
+                {
+                    keep = cub;
+                    break;
+                }
+            }
+
+            keep ??= cuboids[0] as JsonObject;
+            if (keep is not null)
+            {
+                limb["cuboids"] = new JsonArray { JsonNode.Parse(keep.ToJsonString())! };
+            }
+        }
+    }
+
+    private static double CuboidAxisSpan(JsonObject cuboid, int axis)
+    {
+        if (cuboid["from"] is not JsonArray from ||
+            cuboid["to"] is not JsonArray to ||
+            from.Count <= axis ||
+            to.Count <= axis)
+        {
+            return 0;
+        }
+
+        return Math.Abs(to[axis]!.GetValue<double>() - from[axis]!.GetValue<double>());
     }
 
     private static void RemovePartIdsFromForest(JsonArray parts, IReadOnlyList<string> idsToRemove)

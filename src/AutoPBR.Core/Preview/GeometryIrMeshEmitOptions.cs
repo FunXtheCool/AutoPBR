@@ -55,6 +55,12 @@ internal readonly struct GeometryIrMeshEmitOptions
     /// </summary>
     public bool UseColumnTranslationTimesRotationPartPose { get; init; }
 
+    /// <summary>
+    /// When true with <see cref="GeometryIrEmitFidelity.Parity"/>, apply IR <c>inflate</c> for interactive preview shells
+    /// (parity golden tests keep inflate off via <see cref="ForParity"/> without this flag).
+    /// </summary>
+    public bool PreviewApplyCubeDeformationInflate { get; init; }
+
     internal bool ResolveUseColumnTranslationTimesRotationPartPose() =>
         UseColumnTranslationTimesRotationPartPose;
 

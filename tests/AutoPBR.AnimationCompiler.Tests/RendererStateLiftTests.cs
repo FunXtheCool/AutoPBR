@@ -53,4 +53,29 @@ public sealed class RendererStateLiftTests
         Assert.Equal("static_scalar_state", (string?)shard["previewDriver"]);
         Assert.Contains("flapSpeed", shard["scalarDefaults"]!.ToJsonString(), StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void TryLift_extracts_supplementary_model_layers_from_renderer_javap()
+    {
+        const string javap = """
+                             public void render(net.minecraft.client.renderer.entity.state.BreezeRenderState, float, float, float, float, float);
+                               Code:
+                                  0: invokevirtual #12 // Method net/minecraft/client/model/monster/breeze/BreezeModel.createWindLayer:()Lnet/minecraft/client/model/geom/builders/LayerDefinition;
+                                  4: invokevirtual #13 // Method net/minecraft/client/model/monster/breeze/BreezeModel.createEyesLayer:()Lnet/minecraft/client/model/geom/builders/LayerDefinition;
+                             """;
+
+        Assert.True(RendererStateLift.TryLift(
+            javap,
+            "net.minecraft.client.renderer.entity.BreezeRenderer",
+            out var shard,
+            out _), string.Empty);
+
+        var layers = shard["modelLayers"]!.ToJsonString();
+        Assert.Contains("createWindLayer", layers, StringComparison.Ordinal);
+        Assert.Contains("#wind", layers, StringComparison.Ordinal);
+        Assert.Contains("cutoutOverlay", layers, StringComparison.Ordinal);
+        Assert.Contains("createEyesLayer", layers, StringComparison.Ordinal);
+        Assert.Contains("#eyes", layers, StringComparison.Ordinal);
+        Assert.Contains("cosmeticOverlay", layers, StringComparison.Ordinal);
+    }
 }
