@@ -59,10 +59,14 @@
                     <TextBlock Text="Global UV Debug Controls"
                                Foreground="{Binding ForegroundBrush}"
                                FontWeight="SemiBold" />
-                    <TextBlock Text="These apply to all baked previews (blocks/items/entities)."
+                    <TextBlock Text="These override production UV bake policy when toggled. Entity cuboids use baked-in Java parity by default."
                                Foreground="{Binding ForegroundBrush}"
                                Opacity="0.8"
                                FontSize="12" />
+
+                    <Button Content="Reset overrides (production defaults)"
+                            HorizontalAlignment="Left"
+                            Click="ResetOverrides_Click" />
 
                     <CheckBox Content="Flip U (swap u0/u1)"
                               IsChecked="{Binding FlipU, Mode=TwoWay}" />

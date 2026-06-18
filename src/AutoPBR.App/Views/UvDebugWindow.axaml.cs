@@ -23,6 +23,14 @@ public partial class UvDebugWindow : Window
 
     private void CloseWindow_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => Close();
 
+    private void ResetOverrides_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is UvDebugWindowViewModel vm)
+        {
+            vm.ResetOverridesFromBaseline();
+        }
+    }
+
     private void TitleBarDragRegion_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)

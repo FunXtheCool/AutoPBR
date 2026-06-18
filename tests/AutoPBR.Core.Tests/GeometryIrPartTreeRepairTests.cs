@@ -284,6 +284,30 @@ public sealed class GeometryIrPartTreeRepairTests
         Assert.True(cmp.IsMatch, cmp.Message);
     }
 
+    [Theory]
+    [InlineData("net.minecraft.client.model.animal.llama.LlamaModel")]
+    [InlineData("net.minecraft.client.model.animal.llama.BabyLlamaModel")]
+    public void Llama_flat_bake_repair_preserves_flat_root_leg_world_origins(string jvm)
+    {
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
+        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
+            !string.Equals(status, "ok", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var raw = shard.RootElement;
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, raw);
+
+        Assert.False(PartNestedUnder(repaired, "left_hind_leg", "body"));
+        Assert.False(PartNestedUnder(repaired, "right_front_leg", "body"));
+
+        var cmp = GeometryIrReferenceComparer.CompareReferenceWorldPartOrigins(raw, repaired, tolerance: 0.05);
+        Assert.True(cmp.IsMatch, cmp.Message);
+    }
+
     [Fact]
     public void Camel_repair_preserves_flat_root_leg_world_origins()
     {

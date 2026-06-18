@@ -665,6 +665,7 @@ internal static partial class GeometryIrPartTreeRepair
     /// <summary>
     /// Quadruped factories that bind legs under <c>body</c> in Java (nested hierarchy pilots). When the lifter or
     /// compiler hoist leaves them as flat root siblings, preview repair must renest — not skip like creeper flat bake.
+    /// Llama is excluded: committed geometry IR keeps entity-space flat root legs; reparent stacks body Y and breaks preview.
     /// </summary>
     private static bool IsNestedBodyLegQuadrupedMeshFamily(string? officialJvmName)
     {
@@ -676,7 +677,6 @@ internal static partial class GeometryIrPartTreeRepair
         return officialJvmName.Contains(".animal.axolotl.", StringComparison.Ordinal) ||
                officialJvmName.Contains(".animal.rabbit.", StringComparison.Ordinal) ||
                officialJvmName.Contains(".animal.sniffer.", StringComparison.Ordinal) ||
-               officialJvmName.Contains(".animal.llama.", StringComparison.Ordinal) ||
                officialJvmName.Contains(".animal.equine.BabyDonkey", StringComparison.Ordinal) ||
                officialJvmName.Contains(".monster.dragon.EnderDragon", StringComparison.Ordinal);
     }

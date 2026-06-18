@@ -146,7 +146,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         var texU = tableCuboid.TexU;
         var texV = tableCuboid.TexV;
-        NormalizeAtlasUv(options.AtlasWidth, options.AtlasHeight, ref texU, ref texV);
 
         var mirror = GeometryIrCuboidMetadata.GetMirrorCuboidUv(cuboidEl) || tableCuboid.MirrorUv;
         var uw = tableCuboid.UvSizeW;
@@ -181,6 +180,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             faceMask = faceMaskFromIr;
         }
+
+        ApplyNegativeUHorizontalUpOnlySheetUvFix(ref texU, uw, uh, ud, faceMask);
 
         string? textureKey = null;
         if (GeometryIrCuboidMetadata.TryGetTextureKey(cuboidEl, out var tk))

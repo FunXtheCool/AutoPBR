@@ -62,6 +62,18 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 return opts with { PreviewDegenerateAxisThickness = 1f };
             }
 
+            if (string.Equals(builderMethod, "EnderDragon", StringComparison.OrdinalIgnoreCase))
+            {
+                return opts with { PreviewDegenerateAxisThickness = 1f };
+            }
+
+            if (string.Equals(builderMethod, "Camel", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(builderMethod, "AdultCamel", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(builderMethod, "BabyCamel", StringComparison.OrdinalIgnoreCase))
+            {
+                return opts with { PreviewDegenerateAxisThickness = 0.08f };
+            }
+
             if (EntityPreviewPoseCatalog.IsIllagerBuilderMethod(builderMethod))
             {
                 return IllagerPreviewPoseSupport.CreateIllagerParityEmitOptions(

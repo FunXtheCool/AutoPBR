@@ -164,6 +164,11 @@ internal sealed partial class CleanRoomEntityModelRuntime
                     To = e.To,
                     Faces = e.Faces,
                     LocalToParent = EntityParityTemplate.Mul(composedDelta, e.LocalToParent),
+                    DepthLayerKind = e.DepthLayerKind,
+                    LayerOrdinal = e.LayerOrdinal,
+                    CastsShadow = e.CastsShadow,
+                    ShellInflateTexels = e.ShellInflateTexels,
+                    MirrorCuboidUv = e.MirrorCuboidUv,
                 };
             }
 

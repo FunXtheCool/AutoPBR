@@ -89,10 +89,19 @@ internal sealed partial class CleanRoomEntityModelRuntime
             var uw = Math.Max(1, (int)MathF.Round(extentX));
             var uh = Math.Max(1, (int)MathF.Round(extentY));
             var ud = Math.Max(1, (int)MathF.Round(extentZ));
-            if (uvSizeW > 0 && uvSizeH > 0)
+            if (uvSizeW > 0)
             {
                 uw = uvSizeW;
-                uh = uvSizeH;
+                if (uvSizeH > 0)
+                {
+                    uh = uvSizeH;
+                }
+                else if (uvSizeD > 0)
+                {
+                    // [w,0,d] horizontal sheets (Ender Dragon wing membranes).
+                    uh = 0;
+                }
+
                 if (uvSizeD > 0)
                 {
                     ud = uvSizeD;
@@ -105,7 +114,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
             var hx = extentX * 0.5f * scale;
             var hy = extentY * 0.5f * scale;
             var hz = extentZ * 0.5f * scale;
-            if (texU < 0 || texV < 0)
+            // Only auto-pack when texOffs were omitted (-1,-1). Negative Java origins are valid.
+            if (texU < 0 && texV < 0)
             {
                 AllocateUvBox(uw, uh, ud, out texU, out texV);
             }
@@ -172,6 +182,23 @@ internal sealed partial class CleanRoomEntityModelRuntime
                     }
                 }
 
+                // Zero-height horizontal sheets (dragon wing membranes): vanilla only masks "up" but
+                // preview must be double-sided so the membrane is visible from below.
+                if (uh == 0 &&
+                    uvSizeW > 0 &&
+                    uvSizeD > 0 &&
+                    faceMask.Length == 1 &&
+                    faceMask[0].Equals("up", StringComparison.OrdinalIgnoreCase) &&
+                    allFaces.TryGetValue("up", out var upFace))
+                {
+                    faces["down"] = new ModelFace
+                    {
+                        TextureKey = upFace.TextureKey,
+                        Uv = upFace.Uv,
+                        RotationDegrees = upFace.RotationDegrees,
+                    };
+                }
+
                 if (faces.Count == 0)
                 {
                     return;
@@ -191,6 +218,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 DepthLayerKind = depthLayerKind,
                 LayerOrdinal = layerOrdinal,
                 CastsShadow = castsShadow,
+                MirrorCuboidUv = mirrorCuboidUv,
             });
         }
 
@@ -258,30 +286,19 @@ internal sealed partial class CleanRoomEntityModelRuntime
             _packRowHeight = Math.Max(_packRowHeight, boxH);
         }
 
-        private static void MirrorFaceU(float[] faceUv)
-        {
-            (faceUv[0], faceUv[2]) = (faceUv[2], faceUv[0]);
-        }
-
         private static (float[] North, float[] South, float[] West, float[] East, float[] Up, float[] Down)
             BuildCubeUvLayout(int u, int v, int w, int h, int d, bool mirrorCuboidUv = false)
         {
+            _ = mirrorCuboidUv;
             // Minecraft-style unfolded cube layout from texOffs(u, v) + addBox(w, h, d).
             var west = new float[] { u, v + d, u + d, v + d + h };
             var north = new float[] { u + d, v + d, u + d + w, v + d + h };
             var east = new float[] { u + d + w, v + d, u + d + w + d, v + d + h };
             var south = new float[] { u + d + w + d, v + d, u + d + w + d + w, v + d + h };
-            var up = new float[] { u + d, v, u + d + w, v + d };
-            var down = new float[] { u + d + w, v, u + d + w + w, v + d };
-            if (mirrorCuboidUv)
-            {
-                MirrorFaceU(west);
-                MirrorFaceU(north);
-                MirrorFaceU(east);
-                MirrorFaceU(south);
-                MirrorFaceU(up);
-                MirrorFaceU(down);
-            }
+            // Java Direction.DOWN / UP rectangles (26.1.2 ModelPart.Cube javap); keys match physical face names.
+            // UP is intentionally passed with reversed V bounds: (u+d+w, v+d) to (u+d+2w, v).
+            var down = new float[] { u + d, v, u + d + w, v + d };
+            var up = new float[] { u + d + w, v + d, u + d + w + w, v };
 
             return (north, south, west, east, up, down);
         }
@@ -309,14 +326,10 @@ internal sealed partial class CleanRoomEntityModelRuntime
         private static (float[] North, float[] South, float[] West, float[] East, float[] Up, float[] Down)
             BuildNorthSouthUvSpanLayout(int u, int v, int w, int h, bool mirrorCuboidUv = false)
         {
+            _ = mirrorCuboidUv;
             var north = new float[] { u, v, u + w, v + h };
             var southU0 = u + w + NorthSouthUvSpanTemplateDepthGap;
             var south = new float[] { southU0, v, southU0 + w, v + h };
-            if (mirrorCuboidUv)
-            {
-                MirrorFaceU(north);
-                MirrorFaceU(south);
-            }
 
             var empty = Array.Empty<float>();
             return (north, south, empty, empty, empty, empty);

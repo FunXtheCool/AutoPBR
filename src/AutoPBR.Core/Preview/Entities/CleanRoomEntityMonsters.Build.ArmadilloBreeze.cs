@@ -197,6 +197,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             Elements = elements,
             Textures = textures,
+            UsesLivingEntityRendererColumnYFlip = a.UsesLivingEntityRendererColumnYFlip ||
+                                                   b.UsesLivingEntityRendererColumnYFlip,
         };
     }
 

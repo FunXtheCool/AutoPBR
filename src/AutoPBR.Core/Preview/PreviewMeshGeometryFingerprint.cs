@@ -5,8 +5,8 @@ namespace AutoPBR.Core.Preview;
 /// </summary>
 public static class PreviewMeshGeometryFingerprint
 {
-    /// <summary>Bump when geometry emit / pose-compose logic changes (invalidates cached GPU bind meshes).</summary>
-    public const int PipelineRevision = 6;
+    /// <summary>Bump when geometry emit / pose-compose / UV layout logic changes (invalidates cached GPU bind meshes).</summary>
+    public const int PipelineRevision = 7;
 
     public static ulong ComputeCpuPreviewMesh(ReadOnlySpan<float> interleavedVertices, int vertexStrideFloats)
     {
@@ -16,13 +16,15 @@ public static class PreviewMeshGeometryFingerprint
         }
 
         ulong hash = (ulong)PipelineRevision;
+        hash = Mix(hash, unchecked((uint)vertexStrideFloats));
         var vertexCount = interleavedVertices.Length / vertexStrideFloats;
         for (var v = 0; v < vertexCount; v++)
         {
             var baseIndex = v * vertexStrideFloats;
-            hash = Mix(hash, unchecked((uint)BitConverter.SingleToInt32Bits(interleavedVertices[baseIndex])));
-            hash = Mix(hash, unchecked((uint)BitConverter.SingleToInt32Bits(interleavedVertices[baseIndex + 1])));
-            hash = Mix(hash, unchecked((uint)BitConverter.SingleToInt32Bits(interleavedVertices[baseIndex + 2])));
+            for (var c = 0; c < vertexStrideFloats; c++)
+            {
+                hash = Mix(hash, unchecked((uint)BitConverter.SingleToInt32Bits(interleavedVertices[baseIndex + c])));
+            }
         }
 
         return hash;

@@ -21,125 +21,49 @@ internal static partial class MinecraftModelBaker
         IReadOnlyDictionary<string, (int w, int h)> textureSizeByZipPath,
         out float[] vertices,
         out uint[] indices,
-        out List<PreviewDrawBatch> batches)
-    {
-        vertices = [];
-        indices = [];
-        var batchList = new List<PreviewDrawBatch>();
+        out List<PreviewDrawBatch> batches) =>
+        TryBakeWithUvPolicy(
+            model,
+            textureNamespace,
+            textureZipPathToMaterialIndex,
+            textureSizeByZipPath,
+            PreviewUvBakePolicy.Resolve(model),
+            appendBoneIndex: false,
+            skipPreviewCuboidScale: false,
+            out vertices,
+            out indices,
+            out batches);
 
-        var v = new List<float>(256 * FloatsPerVertex);
-        var idx = new List<uint>(384);
-        var faceOrder = new[] { "north", "south", "west", "east", "up", "down" };
-
-        var currentBatchStart = 0;
-        int? currentMat = null;
-        PreviewDrawLayerPolicy currentPolicy = PreviewDrawLayerPolicy.DefaultBase;
-
-        void CloseBatchIfNeeded(int newMat, PreviewDrawLayerPolicy newPolicy)
-        {
-            if (currentMat is null)
-            {
-                currentMat = newMat;
-                currentPolicy = newPolicy;
-                currentBatchStart = idx.Count;
-                return;
-            }
-
-            if (newMat == currentMat.Value && newPolicy.Equals(currentPolicy))
-            {
-                return;
-            }
-
-            var count = idx.Count - currentBatchStart;
-            if (count > 0)
-            {
-                batchList.Add(new PreviewDrawBatch(currentBatchStart, count, currentMat.Value) { LayerPolicy = currentPolicy });
-            }
-
-            currentMat = newMat;
-            currentPolicy = newPolicy;
-            currentBatchStart = idx.Count;
-        }
-
-        void FlushFinalBatch()
-        {
-            if (currentMat is null)
-            {
-                return;
-            }
-
-            var count = idx.Count - currentBatchStart;
-            if (count > 0)
-            {
-                batchList.Add(new PreviewDrawBatch(currentBatchStart, count, currentMat.Value) { LayerPolicy = currentPolicy });
-            }
-        }
-
-        foreach (var el in model.Elements)
-        {
-            var fx = el.From[0];
-            var fy = el.From[1];
-            var fz = el.From[2];
-            var tx = el.To[0];
-            var ty = el.To[1];
-            var tz = el.To[2];
-
-            foreach (var faceName in faceOrder)
-            {
-                if (!el.Faces.TryGetValue(faceName, out var face))
-                {
-                    continue;
-                }
-
-                var effectiveFaceName = ApplyFaceSemanticDebugRouting(faceName);
-
-                if (!TryResolveTextureZipPath(face.TextureKey, model.Textures, textureNamespace, out var texZip))
-                {
-                    continue;
-                }
-
-                if (!textureZipPathToMaterialIndex.TryGetValue(texZip, out var matIdx))
-                {
-                    continue;
-                }
-
-                if (!textureSizeByZipPath.TryGetValue(texZip, out var wh))
-                {
-                    continue;
-                }
-
-                CloseBatchIfNeeded(matIdx, ResolveElementLayerPolicy(el, texZip, model.Textures));
-
-                _ = TryEmitFace(effectiveFaceName, fx, fy, fz, tx, ty, tz, face, wh.w, wh.h, el.LocalToParent, v, idx,
-                    appendBoneIndex: false, boneElementIndex: 0, skipPreviewCuboidScale: false);
-            }
-        }
-
-        FlushFinalBatch();
-        PreviewDrawBatchOrdering.Sort(batchList);
-
-        batches = batchList;
-        if (v.Count == 0 || idx.Count == 0 || batchList.Count == 0)
-        {
-            return false;
-        }
-
-        vertices = v.ToArray();
-        indices = idx.ToArray();
-        return true;
-    }
-
-    /// <summary>
-    /// Emits vertices in per-element space <b>after</b> <see cref="ModelElement.LocalToParent"/> (same as CPU baker before the
-    /// <c>x/16−½</c> cuboid preview scale), with a bone index per vertex. GPU uniforms store row <c>M_bind⁻¹ · M_anim</c> so
-    /// <c>r · M_bind · bone = r · M_anim</c> and <c>W</c> matches the CPU path (cuboid scale is applied in the GL vertex shader after skinning).
-    /// Element index matches <see cref="MergedJavaBlockModel.Elements"/> order.
-    /// </summary>
-    public static bool TryBakeBindPoseForGpuSkinning(
+    /// <summary>Test / Phase C hook: bake with an explicit UV policy instead of <see cref="PreviewUvBakePolicy.Resolve"/>.</summary>
+    internal static bool TryBakeWithUvPolicy(
         MergedJavaBlockModel model,
         string textureNamespace,
         IReadOnlyDictionary<string, int> textureZipPathToMaterialIndex,
         IReadOnlyDictionary<string, (int w, int h)> textureSizeByZipPath,
+        in PreviewUvBakePolicy uvPolicy,
+        out float[] vertices,
+        out uint[] indices,
+        out List<PreviewDrawBatch> batches) =>
+        TryBakeWithUvPolicy(
+            model,
+            textureNamespace,
+            textureZipPathToMaterialIndex,
+            textureSizeByZipPath,
+            in uvPolicy,
+            appendBoneIndex: false,
+            skipPreviewCuboidScale: false,
+            out vertices,
+            out indices,
+            out batches);
+
+    private static bool TryBakeWithUvPolicy(
+        MergedJavaBlockModel model,
+        string textureNamespace,
+        IReadOnlyDictionary<string, int> textureZipPathToMaterialIndex,
+        IReadOnlyDictionary<string, (int w, int h)> textureSizeByZipPath,
+        in PreviewUvBakePolicy uvPolicy,
+        bool appendBoneIndex,
+        bool skipPreviewCuboidScale,
         out float[] vertices,
         out uint[] indices,
         out List<PreviewDrawBatch> batches)
@@ -148,7 +72,8 @@ internal static partial class MinecraftModelBaker
         indices = [];
         var batchList = new List<PreviewDrawBatch>();
 
-        var v = new List<float>(256 * FloatsPerSkinnedVertex);
+        var stride = appendBoneIndex ? FloatsPerSkinnedVertex : FloatsPerVertex;
+        var v = new List<float>(256 * stride);
         var idx = new List<uint>(384);
         var faceOrder = new[] { "north", "south", "west", "east", "up", "down" };
 
@@ -213,7 +138,7 @@ internal static partial class MinecraftModelBaker
                     continue;
                 }
 
-                var effectiveFaceName = ApplyFaceSemanticDebugRouting(faceName);
+                var effectiveFaceName = ApplyFaceSemanticRouting(faceName, in uvPolicy);
 
                 if (!TryResolveTextureZipPath(face.TextureKey, model.Textures, textureNamespace, out var texZip))
                 {
@@ -233,7 +158,7 @@ internal static partial class MinecraftModelBaker
                 CloseBatchIfNeeded(matIdx, ResolveElementLayerPolicy(el, texZip, model.Textures));
 
                 _ = TryEmitFace(effectiveFaceName, fx, fy, fz, tx, ty, tz, face, wh.w, wh.h, el.LocalToParent, v, idx,
-                    appendBoneIndex: true, boneElementIndex: elementIndex, skipPreviewCuboidScale: true);
+                    appendBoneIndex, appendBoneIndex ? elementIndex : 0, skipPreviewCuboidScale, in uvPolicy, el.MirrorCuboidUv);
             }
 
             elementIndex++;
@@ -252,4 +177,30 @@ internal static partial class MinecraftModelBaker
         indices = idx.ToArray();
         return true;
     }
+
+    /// <summary>
+    /// Emits vertices in per-element space <b>after</b> <see cref="ModelElement.LocalToParent"/> (same as CPU baker before the
+    /// <c>x/16−½</c> cuboid preview scale), with a bone index per vertex. GPU uniforms store row <c>M_bind⁻¹ · M_anim</c> so
+    /// <c>r · M_bind · bone = r · M_anim</c> and <c>W</c> matches the CPU path (cuboid scale is applied in the GL vertex shader after skinning).
+    /// Element index matches <see cref="MergedJavaBlockModel.Elements"/> order.
+    /// </summary>
+    public static bool TryBakeBindPoseForGpuSkinning(
+        MergedJavaBlockModel model,
+        string textureNamespace,
+        IReadOnlyDictionary<string, int> textureZipPathToMaterialIndex,
+        IReadOnlyDictionary<string, (int w, int h)> textureSizeByZipPath,
+        out float[] vertices,
+        out uint[] indices,
+        out List<PreviewDrawBatch> batches) =>
+        TryBakeWithUvPolicy(
+            model,
+            textureNamespace,
+            textureZipPathToMaterialIndex,
+            textureSizeByZipPath,
+            PreviewUvBakePolicy.Resolve(model),
+            appendBoneIndex: true,
+            skipPreviewCuboidScale: true,
+            out vertices,
+            out indices,
+            out batches);
 }

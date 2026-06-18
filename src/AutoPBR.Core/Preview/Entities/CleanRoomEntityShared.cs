@@ -279,6 +279,11 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 To = e.To,
                 Faces = e.Faces,
                 LocalToParent = m,
+                DepthLayerKind = e.DepthLayerKind,
+                LayerOrdinal = e.LayerOrdinal,
+                CastsShadow = e.CastsShadow,
+                ShellInflateTexels = e.ShellInflateTexels,
+                MirrorCuboidUv = e.MirrorCuboidUv,
             });
         }
 
@@ -286,6 +291,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             Elements = transformed,
             Textures = model.Textures,
+            UsesLivingEntityRendererColumnYFlip = model.UsesLivingEntityRendererColumnYFlip,
         };
     }
 
@@ -305,6 +311,11 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 To = e.To,
                 Faces = e.Faces,
                 LocalToParent = m,
+                DepthLayerKind = e.DepthLayerKind,
+                LayerOrdinal = e.LayerOrdinal,
+                CastsShadow = e.CastsShadow,
+                ShellInflateTexels = e.ShellInflateTexels,
+                MirrorCuboidUv = e.MirrorCuboidUv,
             });
         }
 
@@ -312,6 +323,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             Elements = transformed,
             Textures = model.Textures,
+            UsesLivingEntityRendererColumnYFlip = model.UsesLivingEntityRendererColumnYFlip,
         };
     }
 
@@ -350,6 +362,11 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 To = e.To,
                 Faces = e.Faces,
                 LocalToParent = ApplyLivingEntityRendererColumnRootScale(e.LocalToParent),
+                DepthLayerKind = e.DepthLayerKind,
+                LayerOrdinal = e.LayerOrdinal,
+                CastsShadow = e.CastsShadow,
+                ShellInflateTexels = e.ShellInflateTexels,
+                MirrorCuboidUv = e.MirrorCuboidUv,
             });
         }
 
@@ -357,6 +374,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             Elements = transformed,
             Textures = model.Textures,
+            UsesLivingEntityRendererColumnYFlip = true,
         };
     }
 
@@ -373,10 +391,21 @@ internal sealed partial class CleanRoomEntityModelRuntime
     /// </remarks>
     private static MergedJavaBlockModel ApplyLivingEntityRendererPreviewBasis(
         MergedJavaBlockModel model,
-        bool lerMirrorRightComposeLocalChain = false) =>
-        lerMirrorRightComposeLocalChain
-            ? ApplyGlobalTransform(model, Matrix4x4.CreateScale(-1f, -1f, 1f))
-            : ApplyLivingEntityRendererColumnRootScale(model);
+        bool lerMirrorRightComposeLocalChain = false)
+    {
+        if (lerMirrorRightComposeLocalChain)
+        {
+            var transformed = ApplyGlobalTransform(model, Matrix4x4.CreateScale(-1f, -1f, 1f));
+            return new MergedJavaBlockModel
+            {
+                Elements = transformed.Elements,
+                Textures = transformed.Textures,
+                UsesLivingEntityRendererColumnYFlip = true,
+            };
+        }
+
+        return ApplyLivingEntityRendererColumnRootScale(model);
+    }
 
     private static MergedJavaBlockModel ApplyLivingEntityRendererPreviewBasis(
         MergedJavaBlockModel model,

@@ -55,16 +55,19 @@ public readonly struct PreviewDrawLayerPolicy : IEquatable<PreviewDrawLayerPolic
             _ => new Vector3(0.75f, 0.75f, 0.75f),
         };
 
+    private const int MaxDepthBiasStep = 8;
+
     public static PreviewDrawLayerPolicy ForKind(PreviewDepthLayerKind kind, int layerOrdinal = 0)
     {
+        var biasStep = Math.Min(MaxDepthBiasStep, 1 + layerOrdinal);
         switch (kind)
         {
             case PreviewDepthLayerKind.CutoutOverlay:
                 return new PreviewDrawLayerPolicy
                 {
                     Kind = kind,
-                    DrawOrder = 100 + layerOrdinal,
-                    DepthBiasStep = 1 + layerOrdinal,
+                    DrawOrder = 100 + Math.Min(layerOrdinal, MaxDepthBiasStep),
+                    DepthBiasStep = biasStep,
                     // Write biased depth so post volumetrics (cloud composite depth gate) and later
                     // passes occlude the outer shell; depth-write-off left far-plane depth on overlays.
                     DepthWrite = true,
@@ -74,8 +77,8 @@ public readonly struct PreviewDrawLayerPolicy : IEquatable<PreviewDrawLayerPolic
                 return new PreviewDrawLayerPolicy
                 {
                     Kind = kind,
-                    DrawOrder = 200 + layerOrdinal,
-                    DepthBiasStep = 1 + layerOrdinal,
+                    DrawOrder = 200 + Math.Min(layerOrdinal, MaxDepthBiasStep),
+                    DepthBiasStep = biasStep,
                     DepthWrite = true,
                     ShadowMode = PreviewDrawLayerShadowMode.Skip,
                 };

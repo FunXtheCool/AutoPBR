@@ -1,4 +1,5 @@
 using AutoPBR.Core.Models;
+using AutoPBR.Core.Preview;
 
 using Avalonia.Media;
 
@@ -9,23 +10,25 @@ namespace AutoPBR.App.ViewModels;
 public partial class UvDebugWindowViewModel : ViewModelBase
 {
     private readonly MainWindowViewModel _main;
+    private bool _suppressDebugWrites;
 
     public UvDebugWindowViewModel(MainWindowViewModel main)
     {
         _main = main;
         _main.PropertyChanged += MainOnPropertyChanged;
 
-        _flipU = UvDebugSettings.FlipU;
-        _flipV = UvDebugSettings.FlipV;
-        _offsetUPixels = UvDebugSettings.OffsetUPixels;
-        _offsetVPixels = UvDebugSettings.OffsetVPixels;
-        _globalFaceRotationDegrees = UvDebugSettings.GlobalFaceRotationDegrees;
-        _swapFaceNorthSouth = UvDebugSettings.SwapFaceNorthSouth;
-        _swapFaceEastWest = UvDebugSettings.SwapFaceEastWest;
-        _swapFaceUpDown = UvDebugSettings.SwapFaceUpDown;
-        _preserveDirectionalBounds = UvDebugSettings.PreserveDirectionalBounds;
-        _useBottomLeftUvOrigin = UvDebugSettings.UseBottomLeftUvOrigin;
-        _uvCornerOrderMode = UvDebugSettings.UvCornerOrderMode;
+        var baseline = PreviewUvBakePolicy.EntityCuboidBaseline;
+        _flipU = UvDebugSettings.TryGetFlipUOverride(out var flipU) ? flipU : baseline.FlipU;
+        _flipV = UvDebugSettings.TryGetFlipVOverride(out var flipV) ? flipV : baseline.FlipV;
+        _offsetUPixels = UvDebugSettings.TryGetOffsetUPixelsOverride(out var offsetU) ? offsetU : 0;
+        _offsetVPixels = UvDebugSettings.TryGetOffsetVPixelsOverride(out var offsetV) ? offsetV : 0;
+        _globalFaceRotationDegrees = UvDebugSettings.TryGetGlobalFaceRotationDegreesOverride(out var rotation) ? rotation : 0;
+        _swapFaceNorthSouth = UvDebugSettings.TryGetSwapFaceNorthSouthOverride(out var swapNs) ? swapNs : baseline.SwapFaceNorthSouth;
+        _swapFaceEastWest = UvDebugSettings.TryGetSwapFaceEastWestOverride(out var swapEw) ? swapEw : baseline.SwapFaceEastWest;
+        _swapFaceUpDown = UvDebugSettings.TryGetSwapFaceUpDownOverride(out var swapUd) ? swapUd : baseline.SwapFaceUpDown;
+        _preserveDirectionalBounds = UvDebugSettings.TryGetPreserveDirectionalBoundsOverride(out var preserve) ? preserve : baseline.PreserveDirectionalBounds;
+        _useBottomLeftUvOrigin = UvDebugSettings.TryGetUseBottomLeftUvOriginOverride(out var bottomLeft) ? bottomLeft : baseline.UseBottomLeftUvOrigin;
+        _uvCornerOrderMode = UvDebugSettings.TryGetUvCornerOrderModeOverride(out var cornerMode) ? cornerMode : 0;
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage(
@@ -162,32 +165,77 @@ public partial class UvDebugWindowViewModel : ViewModelBase
 
     public void Detach() => _main.PropertyChanged -= MainOnPropertyChanged;
 
+    public void ResetOverridesFromBaseline()
+    {
+        UvDebugSettings.ResetAllOverrides();
+        _suppressDebugWrites = true;
+        var baseline = PreviewUvBakePolicy.EntityCuboidBaseline;
+        FlipU = baseline.FlipU;
+        FlipV = baseline.FlipV;
+        OffsetUPixels = 0;
+        OffsetVPixels = 0;
+        GlobalFaceRotationDegrees = 0;
+        SwapFaceNorthSouth = baseline.SwapFaceNorthSouth;
+        SwapFaceEastWest = baseline.SwapFaceEastWest;
+        SwapFaceUpDown = baseline.SwapFaceUpDown;
+        PreserveDirectionalBounds = baseline.PreserveDirectionalBounds;
+        UseBottomLeftUvOrigin = baseline.UseBottomLeftUvOrigin;
+        UvCornerOrderMode = 0;
+        _suppressDebugWrites = false;
+        _main.TriggerPreviewRefreshForDebug();
+    }
+
     partial void OnFlipUChanged(bool value)
     {
-        UvDebugSettings.FlipU = value;
+        if (_suppressDebugWrites)
+        {
+            return;
+        }
+
+        UvDebugSettings.SetFlipU(value);
         _main.TriggerPreviewRefreshForDebug();
     }
 
     partial void OnFlipVChanged(bool value)
     {
-        UvDebugSettings.FlipV = value;
+        if (_suppressDebugWrites)
+        {
+            return;
+        }
+
+        UvDebugSettings.SetFlipV(value);
         _main.TriggerPreviewRefreshForDebug();
     }
 
     partial void OnOffsetUPixelsChanged(double value)
     {
-        UvDebugSettings.OffsetUPixels = value;
+        if (_suppressDebugWrites)
+        {
+            return;
+        }
+
+        UvDebugSettings.SetOffsetUPixels(value);
         _main.TriggerPreviewRefreshForDebug();
     }
 
     partial void OnOffsetVPixelsChanged(double value)
     {
-        UvDebugSettings.OffsetVPixels = value;
+        if (_suppressDebugWrites)
+        {
+            return;
+        }
+
+        UvDebugSettings.SetOffsetVPixels(value);
         _main.TriggerPreviewRefreshForDebug();
     }
 
     partial void OnGlobalFaceRotationDegreesChanged(int value)
     {
+        if (_suppressDebugWrites)
+        {
+            return;
+        }
+
         var snapped = NormalizeRotation(value);
         if (snapped != value)
         {
@@ -195,7 +243,7 @@ public partial class UvDebugWindowViewModel : ViewModelBase
             return;
         }
 
-        UvDebugSettings.GlobalFaceRotationDegrees = snapped;
+        UvDebugSettings.SetGlobalFaceRotationDegrees(snapped);
         OnPropertyChanged(nameof(Rotation0));
         OnPropertyChanged(nameof(Rotation90));
         OnPropertyChanged(nameof(Rotation180));
@@ -205,36 +253,66 @@ public partial class UvDebugWindowViewModel : ViewModelBase
 
     partial void OnSwapFaceNorthSouthChanged(bool value)
     {
-        UvDebugSettings.SwapFaceNorthSouth = value;
+        if (_suppressDebugWrites)
+        {
+            return;
+        }
+
+        UvDebugSettings.SetSwapFaceNorthSouth(value);
         _main.TriggerPreviewRefreshForDebug();
     }
 
     partial void OnSwapFaceEastWestChanged(bool value)
     {
-        UvDebugSettings.SwapFaceEastWest = value;
+        if (_suppressDebugWrites)
+        {
+            return;
+        }
+
+        UvDebugSettings.SetSwapFaceEastWest(value);
         _main.TriggerPreviewRefreshForDebug();
     }
 
     partial void OnSwapFaceUpDownChanged(bool value)
     {
-        UvDebugSettings.SwapFaceUpDown = value;
+        if (_suppressDebugWrites)
+        {
+            return;
+        }
+
+        UvDebugSettings.SetSwapFaceUpDown(value);
         _main.TriggerPreviewRefreshForDebug();
     }
 
     partial void OnPreserveDirectionalBoundsChanged(bool value)
     {
-        UvDebugSettings.PreserveDirectionalBounds = value;
+        if (_suppressDebugWrites)
+        {
+            return;
+        }
+
+        UvDebugSettings.SetPreserveDirectionalBounds(value);
         _main.TriggerPreviewRefreshForDebug();
     }
 
     partial void OnUseBottomLeftUvOriginChanged(bool value)
     {
-        UvDebugSettings.UseBottomLeftUvOrigin = value;
+        if (_suppressDebugWrites)
+        {
+            return;
+        }
+
+        UvDebugSettings.SetUseBottomLeftUvOrigin(value);
         _main.TriggerPreviewRefreshForDebug();
     }
 
     partial void OnUvCornerOrderModeChanged(int value)
     {
+        if (_suppressDebugWrites)
+        {
+            return;
+        }
+
         var clamped = Math.Clamp(value, 0, 4);
         if (clamped != value)
         {
@@ -242,7 +320,7 @@ public partial class UvDebugWindowViewModel : ViewModelBase
             return;
         }
 
-        UvDebugSettings.UvCornerOrderMode = clamped;
+        UvDebugSettings.SetUvCornerOrderMode(clamped);
         OnPropertyChanged(nameof(CornerOrderDefault));
         OnPropertyChanged(nameof(CornerOrderRotate90));
         OnPropertyChanged(nameof(CornerOrderRotate180));

@@ -292,8 +292,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
             atlasH = partAtlas.Height;
         }
 
-        NormalizeAtlasUv(atlasW, atlasH, ref texU, ref texV);
-
         var mirror = GeometryIrCuboidMetadata.GetMirrorCuboidUv(cuboid);
         var uw = -1;
         var uh = -1;
@@ -332,6 +330,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             faceMaskArray = faceMask;
         }
+
+        ApplyNegativeUHorizontalUpOnlySheetUvFix(ref texU, uw, uh, ud, faceMaskArray);
 
         string? textureKey = null;
         if (GeometryIrCuboidMetadata.TryGetTextureKey(cuboid, out var tk))
@@ -381,6 +381,28 @@ internal sealed partial class CleanRoomEntityModelRuntime
             RotationPivot = rotationPivot
         };
         return true;
+    }
+
+    private static void ApplyNegativeUHorizontalUpOnlySheetUvFix(
+        ref int texU,
+        int uvSizeW,
+        int uvSizeH,
+        int uvSizeD,
+        string[]? faceMask)
+    {
+        if (texU >= 0 ||
+            uvSizeW <= 0 ||
+            uvSizeH != 0 ||
+            uvSizeD <= 0 ||
+            faceMask is not { Length: 1 } ||
+            !faceMask[0].Equals("up", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        // Ender Dragon wing membranes are lifted as texOffs(-56, *) + [w,0,d] + faceMask:["up"].
+        // Pre-shift the IR origin so the normal Java UP slot lands on the visible U 0..w artwork.
+        texU -= uvSizeW;
     }
 
     private static void ApplyPreviewDegenerateAxisThickness(

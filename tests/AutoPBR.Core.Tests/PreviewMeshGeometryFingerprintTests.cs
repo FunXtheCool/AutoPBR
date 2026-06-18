@@ -16,6 +16,16 @@ public sealed class PreviewMeshGeometryFingerprintTests
     }
 
     [Fact]
+    public void Fingerprint_changes_when_only_uvs_change()
+    {
+        var a = new float[] { 0f, 0f, 0f, 0f, 1f, 0f, 0.25f, 0.5f, 1f, 0f, 0f, 0f };
+        var b = new float[] { 0f, 0f, 0f, 0f, 1f, 0f, 0.5f, 0.25f, 1f, 0f, 0f, 0f };
+        var fa = PreviewMeshGeometryFingerprint.ComputeCpuPreviewMesh(a, 12);
+        var fb = PreviewMeshGeometryFingerprint.ComputeCpuPreviewMesh(b, 12);
+        Assert.NotEqual(fa, fb);
+    }
+
+    [Fact]
     public void Fingerprint_is_stable_for_identical_cpu_mesh()
     {
         const string path = "assets/minecraft/textures/entity/dolphin/dolphin.png";

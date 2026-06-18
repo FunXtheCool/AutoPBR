@@ -71,12 +71,25 @@ internal static partial class MinecraftModelBaker
         List<uint> idx,
         bool appendBoneIndex,
         int boneElementIndex,
-        bool skipPreviewCuboidScale = false)
+        bool skipPreviewCuboidScale,
+        in PreviewUvBakePolicy uvPolicy,
+        bool mirrorCuboidUv)
     {
+        mirrorCuboidUv &= uvPolicy.MapJavaCuboidFaceCorners;
+        if (mirrorCuboidUv)
+        {
+            (fx, tx) = (tx, fx);
+        }
+
         if (!TryGetFacePlaneRaw(faceName, fx, fy, fz, tx, ty, tz, out var n, out var tang, out var wSign, out var r0,
                 out var r1, out var r2, out var r3))
         {
             return false;
+        }
+
+        if (uvPolicy.MapJavaCuboidFaceCorners)
+        {
+            ApplyJavaCuboidPolygonCornerOrder(ref r0, ref r1, ref r2, ref r3);
         }
 
         if (!localToMesh.IsIdentity)
@@ -110,17 +123,29 @@ internal static partial class MinecraftModelBaker
             v1 = 16;
         }
 
-        ApplyGlobalUvDebugSettings(ref u0, ref v0, ref u1, ref v1, ref face);
+        ApplyPolicyUvSettings(ref u0, ref v0, ref u1, ref v1, ref face, in uvPolicy);
 
-        // Minecraft texture space: origin top-left, v increases downward. Map to GL bottom-left origin.
-        float Nu(float px) => px / texW;
-        float Nv(float py) => UvDebugSettings.UseBottomLeftUvOrigin ? 1f - py / texH : py / texH;
+        var useBottomLeftOrigin = uvPolicy.UseBottomLeftUvOrigin;
+        var preserveDirectionalBounds = uvPolicy.PreserveDirectionalBounds;
+        var mapJavaCorners = uvPolicy.MapJavaCuboidFaceCorners;
+        float Nu(float px) => NormalizeAtlasTexel(px, texW) / texW;
+        float Nv(float py) => useBottomLeftOrigin
+            ? 1f - NormalizeAtlasTexel(py, texH) / texH
+            : NormalizeAtlasTexel(py, texH) / texH;
 
         Vector2 uvA;
         Vector2 uvB;
         Vector2 uvC;
         Vector2 uvD;
-        if (UvDebugSettings.PreserveDirectionalBounds)
+        if (mapJavaCorners)
+        {
+            // ModelPart.Cube polygon order maps c1,c0,c3,c2 to (u0,v0),(u1,v0),(u1,v1),(u0,v1).
+            uvB = new Vector2(Nu(u0), Nv(v0));
+            uvA = new Vector2(Nu(u1), Nv(v0));
+            uvD = new Vector2(Nu(u1), Nv(v1));
+            uvC = new Vector2(Nu(u0), Nv(v1));
+        }
+        else if (preserveDirectionalBounds)
         {
             // Preserve directional UV bounds (u0/u1 and v0/v1) instead of min/max canonicalization.
             uvA = new Vector2(Nu(u0), Nv(v1));
@@ -136,8 +161,17 @@ internal static partial class MinecraftModelBaker
             uvD = new Vector2(Nu(Math.Min(u0, u1)), Nv(Math.Min(v0, v1)));
         }
 
-        ApplyUvCornerOrderMode(UvDebugSettings.UvCornerOrderMode, ref uvA, ref uvB, ref uvC, ref uvD);
+        ApplyUvCornerOrderMode(uvPolicy.UvCornerOrderMode, ref uvA, ref uvB, ref uvC, ref uvD);
         ApplyFaceUvRotation(face.RotationDegrees, ref uvA, ref uvB, ref uvC, ref uvD);
+
+        if (mirrorCuboidUv)
+        {
+            ApplyJavaMirroredPolygonVertexOrder(ref c0, ref c1, ref c2, ref c3, ref uvA, ref uvB, ref uvC, ref uvD);
+            if (IsXAxisFace(faceName))
+            {
+                n = -n;
+            }
+        }
 
         var stride = appendBoneIndex ? FloatsPerSkinnedVertex : FloatsPerVertex;
         var baseIndex = (uint)(v.Count / stride);
@@ -153,6 +187,38 @@ internal static partial class MinecraftModelBaker
         idx.Add(baseIndex + 2);
         idx.Add(baseIndex + 3);
         return true;
+    }
+
+    /// <summary>
+    /// Java texel corners may be negative or slightly past the atlas edge (template gap); map into
+    /// <c>[0, atlasSize]</c> before UV normalization. Inclusive <c>atlasSize</c> is UV 1.0.
+    /// Naive modulo collapses <c>64→0</c> on a 64px sheet and scrambles cuboids; modulo on overflow
+    /// (e.g. camel tail south <c>u=130</c> on 128px) smears thin membranes.
+    /// </summary>
+    internal static float NormalizeAtlasTexel(float px, int atlasSize)
+    {
+        if (atlasSize <= 0)
+        {
+            return px;
+        }
+
+        if (px >= 0f && px <= atlasSize)
+        {
+            return px;
+        }
+
+        if (px < 0f)
+        {
+            var wrapped = px % atlasSize;
+            if (wrapped < 0f)
+            {
+                wrapped += atlasSize;
+            }
+
+            return wrapped;
+        }
+
+        return atlasSize;
     }
 
     private static void AddVert(List<float> v, Vector3 p, Vector3 n, Vector2 uv, Vector3 t, float wSign,
@@ -177,29 +243,33 @@ internal static partial class MinecraftModelBaker
         }
     }
 
-    private static void ApplyGlobalUvDebugSettings(ref float u0, ref float v0, ref float u1, ref float v1, ref ModelFace face)
+    private static void ApplyPolicyUvSettings(
+        ref float u0,
+        ref float v0,
+        ref float u1,
+        ref float v1,
+        ref ModelFace face,
+        in PreviewUvBakePolicy policy)
     {
-        if (UvDebugSettings.FlipU)
+        if (policy.FlipU)
         {
             (u0, u1) = (u1, u0);
         }
 
-        if (UvDebugSettings.FlipV)
+        if (policy.FlipV)
         {
             (v0, v1) = (v1, v0);
         }
 
-        var offsetU = (float)UvDebugSettings.OffsetUPixels;
-        var offsetV = (float)UvDebugSettings.OffsetVPixels;
-        if (offsetU != 0f || offsetV != 0f)
+        if (policy.OffsetUPixels != 0f || policy.OffsetVPixels != 0f)
         {
-            u0 += offsetU;
-            u1 += offsetU;
-            v0 += offsetV;
-            v1 += offsetV;
+            u0 += policy.OffsetUPixels;
+            u1 += policy.OffsetUPixels;
+            v0 += policy.OffsetVPixels;
+            v1 += policy.OffsetVPixels;
         }
 
-        var globalRotation = NormalizeRotation90(UvDebugSettings.GlobalFaceRotationDegrees);
+        var globalRotation = NormalizeRotation90(policy.GlobalFaceRotationDegrees);
         if (globalRotation != 0)
         {
             face = new ModelFace
@@ -211,10 +281,10 @@ internal static partial class MinecraftModelBaker
         }
     }
 
-    private static string ApplyFaceSemanticDebugRouting(string faceName)
+    internal static string ApplyFaceSemanticRouting(string faceName, in PreviewUvBakePolicy policy)
     {
         var mapped = faceName;
-        if (UvDebugSettings.SwapFaceNorthSouth)
+        if (policy.SwapFaceNorthSouth)
         {
             mapped = mapped.Equals("north", StringComparison.OrdinalIgnoreCase)
                 ? "south"
@@ -223,7 +293,7 @@ internal static partial class MinecraftModelBaker
                     : mapped;
         }
 
-        if (UvDebugSettings.SwapFaceEastWest)
+        if (policy.SwapFaceEastWest)
         {
             mapped = mapped.Equals("east", StringComparison.OrdinalIgnoreCase)
                 ? "west"
@@ -232,7 +302,7 @@ internal static partial class MinecraftModelBaker
                     : mapped;
         }
 
-        if (UvDebugSettings.SwapFaceUpDown)
+        if (policy.SwapFaceUpDown)
         {
             mapped = mapped.Equals("up", StringComparison.OrdinalIgnoreCase)
                 ? "down"
@@ -243,6 +313,9 @@ internal static partial class MinecraftModelBaker
 
         return mapped;
     }
+
+    private static string ApplyFaceSemanticDebugRouting(string faceName) =>
+        ApplyFaceSemanticRouting(faceName, PreviewUvBakePolicy.EntityCuboidBaseline.WithDebugOverrides());
 
     private static void ApplyUvCornerOrderMode(int mode, ref Vector2 uvA, ref Vector2 uvB, ref Vector2 uvC, ref Vector2 uvD)
     {
@@ -281,6 +354,35 @@ internal static partial class MinecraftModelBaker
         }
     }
 
+    private static void ApplyJavaCuboidPolygonCornerOrder(
+        ref Vector3 c0,
+        ref Vector3 c1,
+        ref Vector3 c2,
+        ref Vector3 c3)
+    {
+        // ModelPart.Cube constructs every face polygon as raw corners [c1,c0,c3,c2].
+        (c0, c1, c2, c3) = (c1, c0, c3, c2);
+    }
+
+    private static void ApplyJavaMirroredPolygonVertexOrder(
+        ref Vector3 c0,
+        ref Vector3 c1,
+        ref Vector3 c2,
+        ref Vector3 c3,
+        ref Vector2 uv0,
+        ref Vector2 uv1,
+        ref Vector2 uv2,
+        ref Vector2 uv3)
+    {
+        // ModelPart.Polygon reverses the vertex array after UV remap when CubeListBuilder.mirror() is active.
+        (c0, c1, c2, c3) = (c3, c2, c1, c0);
+        (uv0, uv1, uv2, uv3) = (uv3, uv2, uv1, uv0);
+    }
+
+    private static bool IsXAxisFace(string faceName) =>
+        faceName.Equals("west", StringComparison.OrdinalIgnoreCase) ||
+        faceName.Equals("east", StringComparison.OrdinalIgnoreCase);
+
     private static int NormalizeRotation90(int rotationDegrees)
     {
         var normalized = ((rotationDegrees % 360) + 360) % 360;
@@ -295,6 +397,32 @@ internal static partial class MinecraftModelBaker
     }
 
     private static Vector3 W(float x, float y, float z) => new(x / 16f - 0.5f, y / 16f - 0.5f, z / 16f - 0.5f);
+
+    /// <summary>Exposes cuboid face corners for Java <c>ModelPart.Cube</c> parity audits (tests only).</summary>
+    internal static bool TryGetFaceCornerBoundsForAudit(
+        string faceName,
+        float fx,
+        float fy,
+        float fz,
+        float tx,
+        float ty,
+        float tz,
+        out float minY,
+        out float maxY,
+        out Vector3 normal)
+    {
+        minY = maxY = 0;
+        normal = default;
+        if (!TryGetFacePlaneRaw(faceName, fx, fy, fz, tx, ty, tz, out normal, out _, out _, out var c0, out var c1, out var c2,
+                out var c3))
+        {
+            return false;
+        }
+
+        minY = MathF.Min(MathF.Min(c0.Y, c1.Y), MathF.Min(c2.Y, c3.Y));
+        maxY = MathF.Max(MathF.Max(c0.Y, c1.Y), MathF.Max(c2.Y, c3.Y));
+        return true;
+    }
 
     /// <summary>Face corners in Minecraft model texels (before <see cref="W"/> preview scaling).</summary>
     private static bool TryGetFacePlaneRaw(

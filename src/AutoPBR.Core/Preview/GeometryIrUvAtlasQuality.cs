@@ -285,8 +285,8 @@ public static class GeometryIrUvAtlasQuality
                 "north" => (u + d, v + d, u + d + w, v + d + h),
                 "east" => (u + d + w, v + d, u + d + w + d, v + d + h),
                 "south" => (u + d + w + d, v + d, u + d + w + d + w, v + d + h),
-                "up" => (u + d, v, u + d + w, v + d),
-                "down" => (u + d + w, v, u + d + w + w, v + d),
+                "up" => (u + d + w, v + d, u + d + w + w, v),
+                "down" => (u + d, v, u + d + w, v + d),
                 _ => (0, 0, 0, 0)
             };
 
