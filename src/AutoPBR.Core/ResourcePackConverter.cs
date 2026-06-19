@@ -67,8 +67,8 @@ public static class ResourcePackConverter
             cancellationToken.ThrowIfCancellationRequested();
 
             // Normals/height before specular so brick mortar probe can cache invert specular R (TextureOverrides.BrickProbeAppliedGlobalInvert).
-            await NormalHeightGenerator.GenerateAsync(textures, options, progress, cancellationToken).ConfigureAwait(false);
-            await SpecularGenerator.GenerateAsync(textures, options, progress, cancellationToken).ConfigureAwait(false);
+            await TextureConversionPipeline.GenerateNormalsAndSpecularAsync(textures, options, progress, cancellationToken)
+                .ConfigureAwait(false);
 
             cancellationToken.ThrowIfCancellationRequested();
 

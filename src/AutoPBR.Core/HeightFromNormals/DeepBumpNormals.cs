@@ -60,7 +60,7 @@ public sealed partial class DeepBumpNormalsGenerator : IDisposable
                               preferOnnxTensorRtExecutionProvider,
                               out var provider,
                               out _) ??
-                          new InferenceSession(modelPath);
+                          CreateCpuSession(modelPath);
             var useGpu = provider is "CUDA" or "TensorRT";
             if (useGpu)
             {
@@ -304,7 +304,7 @@ public sealed partial class DeepBumpNormalsGenerator : IDisposable
             try
             {
                 return OnnxRuntimeWindowsNative.TryCreateGpuSession(_modelPath, _preferOnnxTensorRt, out _, out _) ??
-                       new InferenceSession(_modelPath);
+                       CreateCpuSession(_modelPath);
             }
             catch
             {
@@ -312,7 +312,13 @@ public sealed partial class DeepBumpNormalsGenerator : IDisposable
             }
         }
 
-        return new InferenceSession(_modelPath);
+        return CreateCpuSession(_modelPath);
+    }
+
+    private static InferenceSession CreateCpuSession(string modelPath)
+    {
+        using var options = OnnxRuntimeSessionOptions.CreateCpuSingleThreaded();
+        return new InferenceSession(modelPath, options);
     }
 
     public void Dispose()

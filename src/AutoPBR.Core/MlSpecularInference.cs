@@ -207,13 +207,13 @@ internal static class MlSpecularInference
                                   out executionProvider,
                                   out _)
                               ??
-                              new InferenceSession(modelPath);
+                              CreateCpuSession(modelPath);
                 }
                 catch (Exception exGpu)
                 {
                     try
                     {
-                        session = new InferenceSession(modelPath);
+                        session = CreateCpuSession(modelPath);
                         executionProvider = "CPU";
                     }
                     catch (Exception exCpu)
@@ -272,6 +272,12 @@ internal static class MlSpecularInference
                 diagnostic = $"Specular ONNX load error: {ex.Message}";
                 return null;
             }
+        }
+
+        private static InferenceSession CreateCpuSession(string modelPath)
+        {
+            using var options = OnnxRuntimeSessionOptions.CreateCpuSingleThreaded();
+            return new InferenceSession(modelPath, options);
         }
 
         public bool Predict(

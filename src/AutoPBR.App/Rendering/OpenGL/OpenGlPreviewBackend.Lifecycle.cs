@@ -575,6 +575,12 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         _disposed = true;
+        if (_shaderPrewarmProgressHooked)
+        {
+            PreviewShaderPrewarm.ProgressChanged -= OnShaderPrewarmProgress;
+            _shaderPrewarmProgressHooked = false;
+        }
+
         lock (_sync)
         {
             _gpuAlive = false;

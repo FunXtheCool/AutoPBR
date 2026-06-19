@@ -8,7 +8,7 @@ namespace AutoPBR.Core;
 
 internal static partial class NormalHeightGenerator
 {
-    private static DeepBumpNormalsGenerator? CreateDeepBumpGenerator(AutoPbrOptions options)
+    internal static DeepBumpNormalsGenerator? CreateDeepBumpGenerator(AutoPbrOptions options)
     {
         return options.UseDeepBumpNormals && !string.IsNullOrWhiteSpace(options.DeepBumpModelPath)
             ? DeepBumpNormalsGenerator.TryCreate(
@@ -18,7 +18,7 @@ internal static partial class NormalHeightGenerator
             : null;
     }
 
-    private sealed class DeepBumpFallbackTracker(
+    internal sealed class DeepBumpFallbackTracker(
         ConversionStage stage,
         int total,
         IProgress<ConversionProgress>? progress)

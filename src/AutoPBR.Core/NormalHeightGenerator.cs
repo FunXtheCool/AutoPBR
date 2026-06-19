@@ -48,164 +48,16 @@ internal static partial class NormalHeightGenerator
                     {
                         ThreadingUtil.SetThreadName("AutoPBR.Normals");
                         ct.ThrowIfCancellationRequested();
-                        var textureUsedDeepBumpFallback = 0;
-
-                        if (!options.BrickProbePreviewDebug)
-                        {
-                            t.BrickProbeDebugText = null;
-                        }
 
                         using var diffuseImg = Image.Load<Rgba32>(t.DiffusePath);
-                        var atlasPlan = t.HasUvWrap
-                            ? AtlasTiling.Decide(
-                                diffuseImg.Width,
-                                diffuseImg.Height,
-                                preferredTileSize: t.PackBaseTileSize)
-                            : AtlasTiling.None;
-                        string? brickInfo = null;
-                        if (atlasPlan.IsAtlas)
-                        {
-                            var tiles = AtlasTiling.EnumerateTiles(atlasPlan).ToList();
-                            using var atlasNormal = new Image<Rgba32>(diffuseImg.Width, diffuseImg.Height);
-                            var tileWorkerCount = total <= 1
-                                ? Math.Min(Math.Max(1, ThreadingUtil.GetConversionParallelism(options)), Math.Max(1, tiles.Count))
-                                : 1;
-                            if (tileWorkerCount <= 1)
-                            {
-                                foreach (var tile in tiles)
-                                {
-                                    ct.ThrowIfCancellationRequested();
-                                    using var tileDiffuse = AtlasTiling.ExtractTile(diffuseImg, tile);
-                                    var deepBumpFaulted = deepBumpFallback.IsActivated;
-                                    var generatorForTile = !deepBumpFaulted
-                                        ? generatorForLoop
-                                        : null;
-                                    if (deepBumpFaulted && generatorForLoop != null)
-                                    {
-                                        Interlocked.Exchange(ref textureUsedDeepBumpFallback, 1);
-                                    }
-
-                                    using var tileNormal = GenerateNormalForDiffuse(
-                                        tileDiffuse,
-                                        t,
-                                        options,
-                                        generatorForTile,
-                                        out var tileBrickInfo,
-                                        out var tileUsedFallback,
-                                        deepBumpFallback.Activate);
-                                    if (tileUsedFallback)
-                                    {
-                                        Interlocked.Exchange(ref textureUsedDeepBumpFallback, 1);
-                                    }
-
-                                    AtlasTiling.PasteTile(atlasNormal, tile, tileNormal);
-                                    brickInfo ??= tileBrickInfo;
-                                }
-                            }
-                            else
-                            {
-                                var tileDiffuses = new Image<Rgba32>?[tiles.Count];
-                                var tileNormals = new Image<Rgba32>?[tiles.Count];
-                                var tileBrickInfos = new string?[tiles.Count];
-                                try
-                                {
-                                    for (var i = 0; i < tiles.Count; i++)
-                                    {
-                                        tileDiffuses[i] = AtlasTiling.ExtractTile(diffuseImg, tiles[i]);
-                                    }
-
-                                    Parallel.For(
-                                        0,
-                                        tiles.Count,
-                                        new ParallelOptions
-                                        {
-                                            MaxDegreeOfParallelism = tileWorkerCount,
-                                            CancellationToken = ct
-                                        },
-                                        i =>
-                                        {
-                                            var tileDiffuse = tileDiffuses[i] ?? throw new InvalidOperationException("Atlas tile extraction failed.");
-                                            var deepBumpFaulted = deepBumpFallback.IsActivated;
-                                            var generatorForTile = !deepBumpFaulted
-                                                ? generatorForLoop
-                                                : null;
-                                            if (deepBumpFaulted && generatorForLoop != null)
-                                            {
-                                                Interlocked.Exchange(ref textureUsedDeepBumpFallback, 1);
-                                            }
-
-                                            tileNormals[i] = GenerateNormalForDiffuse(
-                                                tileDiffuse,
-                                                t,
-                                                options,
-                                                generatorForTile,
-                                                out var tileBrickInfo,
-                                                out var tileUsedFallback,
-                                                deepBumpFallback.Activate);
-                                            if (tileUsedFallback)
-                                            {
-                                                Interlocked.Exchange(ref textureUsedDeepBumpFallback, 1);
-                                            }
-
-                                            tileBrickInfos[i] = tileBrickInfo;
-                                        });
-
-                                    for (var i = 0; i < tiles.Count; i++)
-                                    {
-                                        var tileNormal = tileNormals[i];
-                                        if (tileNormal is null)
-                                        {
-                                            continue;
-                                        }
-
-                                        AtlasTiling.PasteTile(atlasNormal, tiles[i], tileNormal);
-                                        brickInfo ??= tileBrickInfos[i];
-                                    }
-                                }
-                                finally
-                                {
-                                    for (var i = 0; i < tileNormals.Length; i++)
-                                    {
-                                        tileNormals[i]?.Dispose();
-                                        tileDiffuses[i]?.Dispose();
-                                    }
-                                }
-                            }
-
-                            atlasNormal.Save(t.NormalPath);
-                        }
-                        else
-                        {
-                            using var croppedDiffuse = CropToSquare(diffuseImg);
-                            var deepBumpFaulted = deepBumpFallback.IsActivated;
-                            var generatorForTexture = !deepBumpFaulted
-                                ? generatorForLoop
-                                : null;
-                            if (deepBumpFaulted && generatorForLoop != null)
-                            {
-                                Interlocked.Exchange(ref textureUsedDeepBumpFallback, 1);
-                            }
-
-                            using var normal = GenerateNormalForDiffuse(
-                                croppedDiffuse,
-                                t,
-                                options,
-                                generatorForTexture,
-                                out brickInfo,
-                                out var textureUsedFallback,
-                                deepBumpFallback.Activate);
-                            if (textureUsedFallback)
-                            {
-                                Interlocked.Exchange(ref textureUsedDeepBumpFallback, 1);
-                            }
-
-                            normal.Save(t.NormalPath);
-                        }
-
-                        if (Volatile.Read(ref textureUsedDeepBumpFallback) != 0)
-                        {
-                            deepBumpFallback.IncrementTextureFallback();
-                        }
+                        var brickInfo = GenerateLoaded(
+                            t,
+                            diffuseImg,
+                            options,
+                            generatorForLoop,
+                            deepBumpFallback,
+                            total,
+                            ct);
 
                         var n = Interlocked.Increment(ref completed);
                         progress?.Report(new ConversionProgress(stage, n, total, t.Name, brickInfo));
@@ -218,6 +70,170 @@ internal static partial class NormalHeightGenerator
                 deepBumpGenerator?.Dispose();
             }
         }, ct);
+    }
+
+    internal static string? GenerateLoaded(
+        TextureWorkItem t,
+        Image<Rgba32> diffuseImg,
+        AutoPbrOptions options,
+        DeepBumpNormalsGenerator? generatorForLoop,
+        DeepBumpFallbackTracker deepBumpFallback,
+        int totalForTileParallelism,
+        CancellationToken ct)
+    {
+        var textureUsedDeepBumpFallback = 0;
+
+        if (!options.BrickProbePreviewDebug)
+        {
+            t.BrickProbeDebugText = null;
+        }
+
+        var atlasPlan = t.HasUvWrap
+            ? AtlasTiling.Decide(
+                diffuseImg.Width,
+                diffuseImg.Height,
+                preferredTileSize: t.PackBaseTileSize)
+            : AtlasTiling.None;
+        string? brickInfo = null;
+        if (atlasPlan.IsAtlas)
+        {
+            var tiles = AtlasTiling.EnumerateTiles(atlasPlan).ToList();
+            using var atlasNormal = new Image<Rgba32>(diffuseImg.Width, diffuseImg.Height);
+            var tileWorkerCount = totalForTileParallelism <= 1
+                ? Math.Min(Math.Max(1, ThreadingUtil.GetConversionParallelism(options)), Math.Max(1, tiles.Count))
+                : 1;
+            if (tileWorkerCount <= 1)
+            {
+                foreach (var tile in tiles)
+                {
+                    ct.ThrowIfCancellationRequested();
+                    using var tileDiffuse = AtlasTiling.ExtractTile(diffuseImg, tile);
+                    var deepBumpFaulted = deepBumpFallback.IsActivated;
+                    var generatorForTile = !deepBumpFaulted ? generatorForLoop : null;
+                    if (deepBumpFaulted && generatorForLoop != null)
+                    {
+                        Interlocked.Exchange(ref textureUsedDeepBumpFallback, 1);
+                    }
+
+                    using var tileNormal = GenerateNormalForDiffuse(
+                        tileDiffuse,
+                        t,
+                        options,
+                        generatorForTile,
+                        out var tileBrickInfo,
+                        out var tileUsedFallback,
+                        deepBumpFallback.Activate);
+                    if (tileUsedFallback)
+                    {
+                        Interlocked.Exchange(ref textureUsedDeepBumpFallback, 1);
+                    }
+
+                    AtlasTiling.PasteTile(atlasNormal, tile, tileNormal);
+                    brickInfo ??= tileBrickInfo;
+                }
+            }
+            else
+            {
+                var tileDiffuses = new Image<Rgba32>?[tiles.Count];
+                var tileNormals = new Image<Rgba32>?[tiles.Count];
+                var tileBrickInfos = new string?[tiles.Count];
+                try
+                {
+                    for (var i = 0; i < tiles.Count; i++)
+                    {
+                        tileDiffuses[i] = AtlasTiling.ExtractTile(diffuseImg, tiles[i]);
+                    }
+
+                    Parallel.For(
+                        0,
+                        tiles.Count,
+                        new ParallelOptions
+                        {
+                            MaxDegreeOfParallelism = tileWorkerCount,
+                            CancellationToken = ct
+                        },
+                        i =>
+                        {
+                            var tileDiffuse = tileDiffuses[i] ?? throw new InvalidOperationException("Atlas tile extraction failed.");
+                            var deepBumpFaulted = deepBumpFallback.IsActivated;
+                            var generatorForTile = !deepBumpFaulted ? generatorForLoop : null;
+                            if (deepBumpFaulted && generatorForLoop != null)
+                            {
+                                Interlocked.Exchange(ref textureUsedDeepBumpFallback, 1);
+                            }
+
+                            tileNormals[i] = GenerateNormalForDiffuse(
+                                tileDiffuse,
+                                t,
+                                options,
+                                generatorForTile,
+                                out var tileBrickInfo,
+                                out var tileUsedFallback,
+                                deepBumpFallback.Activate);
+                            if (tileUsedFallback)
+                            {
+                                Interlocked.Exchange(ref textureUsedDeepBumpFallback, 1);
+                            }
+
+                            tileBrickInfos[i] = tileBrickInfo;
+                        });
+
+                    for (var i = 0; i < tiles.Count; i++)
+                    {
+                        var tileNormal = tileNormals[i];
+                        if (tileNormal is null)
+                        {
+                            continue;
+                        }
+
+                        AtlasTiling.PasteTile(atlasNormal, tiles[i], tileNormal);
+                        brickInfo ??= tileBrickInfos[i];
+                    }
+                }
+                finally
+                {
+                    for (var i = 0; i < tileNormals.Length; i++)
+                    {
+                        tileNormals[i]?.Dispose();
+                        tileDiffuses[i]?.Dispose();
+                    }
+                }
+            }
+
+            atlasNormal.Save(t.NormalPath);
+        }
+        else
+        {
+            using var croppedDiffuse = CropToSquare(diffuseImg);
+            var deepBumpFaulted = deepBumpFallback.IsActivated;
+            var generatorForTexture = !deepBumpFaulted ? generatorForLoop : null;
+            if (deepBumpFaulted && generatorForLoop != null)
+            {
+                Interlocked.Exchange(ref textureUsedDeepBumpFallback, 1);
+            }
+
+            using var normal = GenerateNormalForDiffuse(
+                croppedDiffuse,
+                t,
+                options,
+                generatorForTexture,
+                out brickInfo,
+                out var textureUsedFallback,
+                deepBumpFallback.Activate);
+            if (textureUsedFallback)
+            {
+                Interlocked.Exchange(ref textureUsedDeepBumpFallback, 1);
+            }
+
+            normal.Save(t.NormalPath);
+        }
+
+        if (Volatile.Read(ref textureUsedDeepBumpFallback) != 0)
+        {
+            deepBumpFallback.IncrementTextureFallback();
+        }
+
+        return brickInfo;
     }
 
     private static Image<Rgba32> GenerateNormalForDiffuse(

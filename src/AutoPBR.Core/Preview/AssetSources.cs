@@ -52,12 +52,17 @@ internal sealed class ZipAssetSource(ZipArchive zip) : IAssetSource
 
 internal sealed class DirectoryAssetSource(string rootDirectory) : IAssetSource
 {
-    public bool Exists(string assetPath) => File.Exists(ToDiskPath(assetPath));
+    public bool Exists(string assetPath) =>
+        TryToDiskPath(assetPath, out var path) && File.Exists(path);
 
     public bool TryReadBytes(string assetPath, out byte[] bytes)
     {
         bytes = Array.Empty<byte>();
-        var p = ToDiskPath(assetPath);
+        if (!TryToDiskPath(assetPath, out var p))
+        {
+            return false;
+        }
+
         if (!File.Exists(p))
         {
             return false;
@@ -70,7 +75,11 @@ internal sealed class DirectoryAssetSource(string rootDirectory) : IAssetSource
     public bool TryReadText(string assetPath, out string text)
     {
         text = string.Empty;
-        var p = ToDiskPath(assetPath);
+        if (!TryToDiskPath(assetPath, out var p))
+        {
+            return false;
+        }
+
         if (!File.Exists(p))
         {
             return false;
@@ -80,11 +89,8 @@ internal sealed class DirectoryAssetSource(string rootDirectory) : IAssetSource
         return true;
     }
 
-    private string ToDiskPath(string assetPath)
-    {
-        var rel = assetPath.Replace('\\', '/').TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
-        return Path.Combine(rootDirectory, rel);
-    }
+    private bool TryToDiskPath(string assetPath, out string path) =>
+        ArchivePathSafety.TryResolveExtractionPath(rootDirectory, assetPath, out path);
 }
 
 internal sealed class CompositeAssetSource(params IAssetSource[] sources) : IAssetSource
@@ -140,8 +146,11 @@ internal static class AssetSourceMaterializer
             return false;
         }
 
-        var rel = assetPath.Replace('\\', '/').TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
-        var outPath = Path.Combine(extractedRoot, rel);
+        if (!ArchivePathSafety.TryResolveExtractionPath(extractedRoot, assetPath, out var outPath))
+        {
+            return false;
+        }
+
         var dir = Path.GetDirectoryName(outPath);
         if (!string.IsNullOrEmpty(dir))
         {

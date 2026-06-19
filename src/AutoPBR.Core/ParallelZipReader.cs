@@ -52,7 +52,13 @@ internal static class ParallelZipReader
 
                 cancellationToken.ThrowIfCancellationRequested();
                 var (fullName, dataOffset, compressedSize, uncompressedSize, isStored) = entry;
-                var destPath = Path.Combine(extracted, fullName);
+                if (!ArchivePathSafety.TryResolveExtractionPath(extracted, fullName, out var destPath))
+                {
+                    var skipped = Interlocked.Increment(ref completed);
+                    progress?.Report(new ConversionProgress(stage, skipped, total));
+                    return;
+                }
+
                 var dir = Path.GetDirectoryName(destPath);
                 if (!string.IsNullOrEmpty(dir))
                 {

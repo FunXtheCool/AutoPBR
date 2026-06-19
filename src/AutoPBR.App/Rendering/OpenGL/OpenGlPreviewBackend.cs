@@ -162,6 +162,24 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     public bool IsInitialized => _gpuAlive && _program?.IsValid == true;
     public string? LastErrorMessage => _lastError;
 
+    public bool NeedsContinuousRendering
+    {
+        get
+        {
+            lock (_sync)
+            {
+                return !_gpuAlive ||
+                       _gpuBootstrap is not null ||
+                       _settings.AutoRotate ||
+                       _settings.AnimateTimeOfDay ||
+                       (_settings.EnableEntityAnimation && _blockModelSubject?.EnableRenderTimeAnimation == true) ||
+                       (_settings.EnableVolumetricClouds && !_settings.CloudFreezeWind) ||
+                       (_debugFlyRmbHeld && _flyEngaged) ||
+                       _userCameraDragging;
+            }
+        }
+    }
+
     public void Initialize(RenderPreviewInitializationOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);

@@ -61,7 +61,12 @@ internal static class PackExtractionService
                     continue;
                 }
 
-                var destPath = Path.Combine(extracted, fullName);
+                if (!ArchivePathSafety.TryResolveExtractionPath(extracted, fullName, out var destPath))
+                {
+                    ReportProgress();
+                    continue;
+                }
+
                 var dir = Path.GetDirectoryName(destPath);
                 if (!string.IsNullOrEmpty(dir))
                 {
@@ -107,7 +112,12 @@ internal static class PackExtractionService
                         continue;
                     }
 
-                    var destPath = Path.Combine(extracted, fullName);
+                    if (!ArchivePathSafety.TryResolveExtractionPath(extracted, fullName, out var destPath))
+                    {
+                        ReportProgress();
+                        continue;
+                    }
+
                     var dir = Path.GetDirectoryName(destPath);
                     if (!string.IsNullOrEmpty(dir))
                     {
@@ -133,7 +143,11 @@ internal static class PackExtractionService
         var entry = archive.GetEntry(archivePath)
                     ?? throw new FileNotFoundException("Texture entry not found in pack.", archivePath);
 
-        var destPath = Path.Combine(extractedRoot, entry.FullName.Replace('/', Path.DirectorySeparatorChar));
+        if (!ArchivePathSafety.TryResolveExtractionPath(extractedRoot, entry.FullName, out var destPath))
+        {
+            throw new InvalidDataException($"Archive entry resolves outside extraction root: {entry.FullName}");
+        }
+
         var dir = Path.GetDirectoryName(destPath);
         if (!string.IsNullOrEmpty(dir))
         {

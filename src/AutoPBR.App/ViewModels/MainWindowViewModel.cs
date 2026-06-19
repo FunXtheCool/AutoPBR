@@ -516,7 +516,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
                 manualPreview,
                 PreviewBrickProbeDebug);
             using var previewPoseScope = EntityPreviewBuildContext.UsePose(SelectedPreviewPoseId);
-            var previewResult = await PreviewService.RenderPreviewDetailedAsync(diskPack, entryPath, options, ct)
+            var previewResult = await Task.Run(
+                    () => PreviewService.RenderPreviewDetailedAsync(diskPack, entryPath, options, ct),
+                    ct)
                 .ConfigureAwait(false);
 
             if (ct.IsCancellationRequested)

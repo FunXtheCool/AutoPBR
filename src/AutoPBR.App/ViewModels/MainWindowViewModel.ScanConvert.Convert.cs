@@ -208,7 +208,9 @@ public partial class MainWindowViewModel
                         ProgressValue = p.completed;
                         SetStatus("Status_ScanningPackProgress", p.completed, p.total);
                     }));
-                var scanData = await Task.Run(() => PackScannerService.BuildArchiveIndex(PackPath!, scanProg));
+                var scanData = await Task.Run(
+                    () => PackScannerService.BuildArchiveIndex(PackPath!, scanProg, _cts.Token),
+                    _cts.Token);
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     _exploreController.SetData(scanData, PackPath!);

@@ -1,6 +1,7 @@
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using Microsoft.ML.Tokenizers;
+using AutoPBR.Core;
 
 namespace AutoPBR.Core.Embeddings;
 
@@ -40,7 +41,8 @@ public sealed class MiniLmEmbeddingEngine : IDisposable
 
         try
         {
-            var session = new InferenceSession(modelPath);
+            using var options = OnnxRuntimeSessionOptions.CreateCpuSingleThreaded();
+            var session = new InferenceSession(modelPath, options);
             var modelSignature = MiniLmEmbeddingPersistentCache.ComputeModelSignature(
                 modelPath,
                 MiniLmOnnxResources.GetVocabPath(baseDirectory));

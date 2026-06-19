@@ -6,20 +6,24 @@ namespace AutoPBR.App.Services;
 internal static class PackScannerService
 {
     /// <summary>Build a lightweight index (path → immediate children) and file count. Only .png files are indexed; only entry names are read.</summary>
-    public static ScannedArchiveData BuildArchiveIndex(string zipPath,
-        IProgress<(int completed, int total)>? progress = null)
+    public static ScannedArchiveData BuildArchiveIndex(
+        string zipPath,
+        IProgress<(int completed, int total)>? progress = null,
+        CancellationToken cancellationToken = default)
     {
         var childLists = new Dictionary<string, List<ArchiveChildEntry>>(StringComparer.OrdinalIgnoreCase);
         var seenChildren = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
         var fileCount = 0;
-        AddZipToIndex(zipPath, pathPrefix: "", childLists, seenChildren, ref fileCount, progress);
+        AddZipToIndex(zipPath, pathPrefix: "", childLists, seenChildren, ref fileCount, progress, cancellationToken);
         var index = ToReadOnlyIndex(childLists);
         return new ScannedArchiveData(index, fileCount);
     }
 
     /// <summary>Index all .zip/.jar files in <paramref name="directory"/> (non-recursive). Root shows one folder per pack; inner paths are <c>{packRoot}/assets/...</c>.</summary>
-    public static ScannedArchiveData BuildBatchArchiveIndex(string directory,
-        IProgress<(int completed, int total)>? progress = null)
+    public static ScannedArchiveData BuildBatchArchiveIndex(
+        string directory,
+        IProgress<(int completed, int total)>? progress = null,
+        CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
         {
@@ -47,6 +51,7 @@ internal static class PackScannerService
 
         foreach (var packPath in packFiles)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var baseName = Path.GetFileName(packPath);
             var uniqueRoot = baseName;
             for (var i = 0; rootSeen.Contains(uniqueRoot); i++)
@@ -57,7 +62,7 @@ internal static class PackScannerService
             batchMap[uniqueRoot] = packPath;
             rootList.Add(new ArchiveChildEntry(uniqueRoot, uniqueRoot, true));
             rootSeen.Add(uniqueRoot);
-            AddZipToIndex(packPath, uniqueRoot, childLists, seenChildren, ref fileCount, progress);
+            AddZipToIndex(packPath, uniqueRoot, childLists, seenChildren, ref fileCount, progress, cancellationToken);
         }
 
         var index = ToReadOnlyIndex(childLists);
@@ -81,7 +86,8 @@ internal static class PackScannerService
         Dictionary<string, List<ArchiveChildEntry>> childLists,
         Dictionary<string, HashSet<string>> seenChildren,
         ref int fileCount,
-        IProgress<(int completed, int total)>? progress)
+        IProgress<(int completed, int total)>? progress,
+        CancellationToken cancellationToken)
     {
         using var zip = System.IO.Compression.ZipFile.OpenRead(zipPath);
         var entries = zip.Entries.ToList();
@@ -89,6 +95,7 @@ internal static class PackScannerService
         var completed = 0;
         foreach (var entry in entries)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var full = entry.FullName.TrimEnd('/');
             if (string.IsNullOrEmpty(full))
             {

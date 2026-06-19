@@ -78,6 +78,7 @@ internal static class OnnxRuntimeWindowsNative
             try
             {
                 using var cudaOptions = SessionOptions.MakeSessionOptionWithCudaProvider();
+                OnnxRuntimeSessionOptions.ApplyGraphOptimizations(cudaOptions);
                 provider = "CUDA";
                 return new InferenceSession(modelPath, cudaOptions);
             }
@@ -91,6 +92,7 @@ internal static class OnnxRuntimeWindowsNative
         try
         {
             using var so = new SessionOptions();
+            OnnxRuntimeSessionOptions.ApplyGraphOptimizations(so);
             var cacheDir = GetTensorRtCacheDirectory();
             using (var trtOpts = new OrtTensorRTProviderOptions())
             {
@@ -114,6 +116,7 @@ internal static class OnnxRuntimeWindowsNative
             try
             {
                 using var cudaOptions = SessionOptions.MakeSessionOptionWithCudaProvider();
+                OnnxRuntimeSessionOptions.ApplyGraphOptimizations(cudaOptions);
                 provider = "CUDA";
                 return new InferenceSession(modelPath, cudaOptions);
             }

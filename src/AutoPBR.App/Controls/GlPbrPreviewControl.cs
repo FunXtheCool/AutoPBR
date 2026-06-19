@@ -83,7 +83,11 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
     /// <summary>Updates render settings only (no scene/block-model re-push).</summary>
     public void UpdatePreview3DSettings(PreviewRenderSettings settings)
     {
-        void Core() => _backend.SetRenderSettings(settings);
+        void Core()
+        {
+            _backend.SetRenderSettings(settings);
+            RequestNextFrameRendering();
+        }
 
         if (Dispatcher.UIThread.CheckAccess())
         {
@@ -140,6 +144,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
             _backend.SetRenderSettings(settings);
             _backend.SetMaterial(material);
             _backend.SetBlockModelPreview(javaBlockModel, javaSlotMaterials);
+            RequestNextFrameRendering();
         }
 
         if (Dispatcher.UIThread.CheckAccess())
@@ -174,7 +179,10 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         var w = Math.Max(1, (int)Math.Ceiling(Bounds.Width * scale));
         var h = Math.Max(1, (int)Math.Ceiling(Bounds.Height * scale));
         _backend.GlRender(gl, fb, w, h);
-        RequestNextFrameRendering();
+        if (_backend.NeedsContinuousRendering)
+        {
+            RequestNextFrameRendering();
+        }
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)

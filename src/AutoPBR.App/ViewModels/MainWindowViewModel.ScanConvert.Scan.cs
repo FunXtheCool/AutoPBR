@@ -52,7 +52,7 @@ public partial class MainWindowViewModel
         });
         try
         {
-            var data = await Task.Run(() => PackScannerService.BuildArchiveIndex(PackPath!, scanProgress), scanToken)
+            var data = await Task.Run(() => PackScannerService.BuildArchiveIndex(PackPath!, scanProgress, scanToken), scanToken)
                 .ConfigureAwait(false);
             scanToken.ThrowIfCancellationRequested();
             await Dispatcher.UIThread.InvokeAsync(() =>
@@ -153,7 +153,7 @@ public partial class MainWindowViewModel
         });
         try
         {
-            var data = await Task.Run(() => PackScannerService.BuildBatchArchiveIndex(BatchFolderPath!, scanProgress), scanToken)
+            var data = await Task.Run(() => PackScannerService.BuildBatchArchiveIndex(BatchFolderPath!, scanProgress, scanToken), scanToken)
                 .ConfigureAwait(false);
             scanToken.ThrowIfCancellationRequested();
             await Dispatcher.UIThread.InvokeAsync(() =>
