@@ -1,4 +1,5 @@
 using System.Numerics;
+
 using AutoPBR.Core.Models;
 
 namespace AutoPBR.Core.Preview;
@@ -9,7 +10,7 @@ internal sealed class MergedJavaBlockModel
     public required Dictionary<string, string> Textures { get; init; }
 
     /// <summary>
-    /// True when <see cref="ApplyLivingEntityRendererColumnRootScale"/> (or equivalent LER <c>scale(-1,-1,1)</c>)
+    /// True when ApplyLivingEntityRendererColumnRootScale (or equivalent LER <c>scale(-1,-1,1)</c>)
     /// was folded into element <see cref="ModelElement.LocalToParent"/> poses. Drives vertical face-plane UV routing at bake.
     /// </summary>
     public bool UsesLivingEntityRendererColumnYFlip { get; init; }
@@ -30,19 +31,19 @@ internal sealed class ModelElement
     public PreviewDepthLayerKind DepthLayerKind { get; init; } = PreviewDepthLayerKind.Base;
 
     /// <summary>Ordinal within overlay layers of the same kind (draw order and polygon-offset step).</summary>
-    public int LayerOrdinal { get; init; } = 0;
+    public int LayerOrdinal { get; init; }
 
     /// <summary>When true, element casts into shadow maps even if overlay kind normally skips.</summary>
-    public bool CastsShadow { get; init; } = false;
+    public bool CastsShadow { get; init; }
 
     /// <summary>Optional shell inflation in entity texel space for parity geometry shells.</summary>
-    public float ShellInflateTexels { get; init; } = 0f;
+    public float ShellInflateTexels { get; init; }
 
     /// <summary>
     /// True when the source Java cuboid used <c>CubeListBuilder.mirror()</c>. Java mirrors by swapping X endpoints before
     /// polygon construction and reversing polygon vertices after UV remap; it is not just a UV U-bound swap.
     /// </summary>
-    public bool MirrorCuboidUv { get; init; } = false;
+    public bool MirrorCuboidUv { get; init; }
 }
 
 internal sealed class ModelFace

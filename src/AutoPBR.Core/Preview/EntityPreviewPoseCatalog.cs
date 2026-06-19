@@ -126,9 +126,6 @@ public static class EntityPreviewPoseCatalog
         return ResolveDefaultHumanoidArmPose(builderMethod);
     }
 
-    public static bool TryParsePoseId(string? poseId, out EntityIllagerPreviewArmPose armPose) =>
-        TryParseIllagerPoseId(poseId, out armPose);
-
     public static bool TryParseIllagerPoseId(string? poseId, out EntityIllagerPreviewArmPose armPose)
     {
         armPose = default;

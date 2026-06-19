@@ -192,8 +192,8 @@ internal static class JavapMeshBytecodeProfiles
             return AddBoxInvokeShape.Float6CubeDeformationTailFloats;
         }
 
-        if (System.Text.RegularExpressions.Regex.IsMatch(mergedInvokeLine,
-                @"addBox:\(FFFFFFL[\w$]+;\)", System.Text.RegularExpressions.RegexOptions.CultureInvariant))
+        if (Regex.IsMatch(mergedInvokeLine,
+                @"addBox:\(FFFFFFL[\w$]+;\)", RegexOptions.CultureInvariant))
         {
             return AddBoxInvokeShape.Float6;
         }

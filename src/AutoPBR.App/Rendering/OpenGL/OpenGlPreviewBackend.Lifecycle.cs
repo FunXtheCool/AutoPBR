@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 using AutoPBR.App.Rendering.Abstractions;
-using AutoPBR.App.Rendering.Scene;
 using AutoPBR.Core.Models;
 using AutoPBR.Core.Preview;
 

@@ -31,21 +31,49 @@ internal sealed partial class CleanRoomEntityModelRuntime
         return b.Build(texRef);
     }
 
-    /// <summary>BedRenderer layers (~1.21.11 hrf): head + foot each with main 16x16x6 slab and two 3x3x3 legs on atlas 64x64.</summary>
+    /// <summary>
+    /// Entity-atlas preview facing from <c>BedRenderer.createModelTransform</c> (26.1.2): lift 9 texels, lay flat (Rx 90°),
+    /// spin 180° around model center. Default <paramref name="facingYRotDegrees"/> matches south (0°).
+    /// </summary>
+    private static Matrix4x4 CreateBedPreviewFacingTransform(float facingYRotDegrees = 0f)
+    {
+        const float pivot = 8f;
+        var lift = EntityParityTemplate.T(0f, 9f, 0f);
+        var layFlat = EntityParityTemplate.Rx(MathF.PI / 2f);
+        var spin = EntityParityTemplate.Rz(MathF.PI + facingYRotDegrees * (MathF.PI / 180f));
+        var spinAroundCenter = EntityParityTemplate.Mul(
+            EntityParityTemplate.Mul(EntityParityTemplate.T(pivot, pivot, pivot), spin),
+            EntityParityTemplate.T(-pivot, -pivot, -pivot));
+        return EntityParityTemplate.Mul(EntityParityTemplate.Mul(lift, layFlat), spinAroundCenter);
+    }
+
+    /// <summary>BedRenderer layers (26.1.2): head + foot each with main 16×16×6 slab and rotated 3×3×3 legs on atlas 64×64.</summary>
     private static MergedJavaBlockModel BuildBed(string texRef, MinecraftNativeProfile profile, bool isBaby)
     {
         _ = profile;
         _ = isBaby;
         var b = new RigBuilder(64, 64);
-        // Head piece (createHeadLayer): main + two legs.
+
+        static Matrix4x4 BedPartPoseTexel(float tx, float ty, float tz, float xRad = 0f, float yRad = 0f, float zRad = 0f) =>
+            BlockRowAffineToTexel(EntityParityTemplate.ModelPartRenderLocalBlock(tx, ty, tz, xRad, yRad, zRad));
+
+        // Head piece (createHeadLayer).
         new EntityCuboid(0f, 0f, 0f, 16f, 16f, 6f, 0, 0).Emit(b, Matrix4x4.Identity, 1f);
-        new EntityCuboid(0f, 6f, 0f, 3f, 9f, 3f, 50, 6).Emit(b, Matrix4x4.Identity, 1f);
-        new EntityCuboid(-16f, 6f, 0f, -13f, 9f, 3f, 50, 18).Emit(b, Matrix4x4.Identity, 1f);
-        // Foot piece (createFootLayer): main + two legs.
-        new EntityCuboid(0f, 0f, 8f, 16f, 16f, 14f, 0, 22).Emit(b, Matrix4x4.Identity, 1f);
-        new EntityCuboid(0f, 6f, -8f, 3f, 9f, -5f, 50, 0).Emit(b, Matrix4x4.Identity, 1f);
-        new EntityCuboid(-16f, 6f, -8f, -13f, 9f, -5f, 50, 12).Emit(b, Matrix4x4.Identity, 1f);
-        return b.Build(texRef);
+        new EntityCuboid(0f, 6f, 0f, 3f, 9f, 3f, 50, 6).Emit(b, BedPartPoseTexel(0f, 0f, 0f, MathF.PI / 2f, 0f, MathF.PI / 2f), 1f);
+        new EntityCuboid(-16f, 6f, 0f, -13f, 9f, 3f, 50, 18).Emit(b, BedPartPoseTexel(0f, 0f, 0f, MathF.PI / 2f, 0f, MathF.PI), 1f);
+
+        // Foot piece (createFootLayer) merged +16Y so mattress halves abut before preview facing.
+        var footLayerOffset = BedPartPoseTexel(0f, 16f, 0f);
+        new EntityCuboid(0f, 0f, 0f, 16f, 16f, 6f, 0, 22).Emit(b, footLayerOffset, 1f);
+        new EntityCuboid(0f, 6f, -16f, 3f, 9f, -13f, 50, 0).Emit(
+            b,
+            EntityParityTemplate.Mul(BedPartPoseTexel(0f, 0f, 0f, MathF.PI / 2f, 0f, 0f), footLayerOffset),
+            1f);
+        new EntityCuboid(-16f, 6f, -16f, -13f, 9f, -13f, 50, 12).Emit(
+            b,
+            EntityParityTemplate.Mul(BedPartPoseTexel(0f, 0f, 0f, MathF.PI / 2f, 0f, 3f * MathF.PI / 2f), footLayerOffset),
+            1f);
+        return ApplyGlobalTransform(b.Build(texRef), CreateBedPreviewFacingTransform());
     }
 
     /// <summary>
@@ -101,27 +129,88 @@ internal sealed partial class CleanRoomEntityModelRuntime
     }
 
 
+    private static bool PathIsRaftBoat(string path) =>
+        path.Contains("/textures/entity/boat/bamboo", StringComparison.OrdinalIgnoreCase) ||
+        path.Contains("/textures/entity/chest_boat/bamboo", StringComparison.OrdinalIgnoreCase);
+
+    private static MergedJavaBlockModel BuildBoatFamily(
+        string texRef,
+        MinecraftNativeProfile profile,
+        bool isBaby,
+        bool isChestBoat,
+        string normalizedAssetPath) =>
+        PathIsRaftBoat(normalizedAssetPath)
+            ? BuildRaft(texRef, profile, isBaby, isChestBoat)
+            : BuildBoat(texRef, profile, isBaby, isChestBoat);
+
     private static MergedJavaBlockModel BuildBoat(string texRef, MinecraftNativeProfile profile, bool isBaby, bool isChestBoat = false)
     {
         _ = profile;
         _ = isBaby;
-        var b = new RigBuilder(128, 64);
+        var b = new RigBuilder(128, isChestBoat ? 128 : 64);
+        const float paddleZ = 0.19634955f;
+        var paddlePivot = new Vector3(0f, 1f, 4f);
         new EntityCuboid(-14f, -9f, -3f, 14f, 7f, 0f, 0, 0, XRot: MathF.PI / 2f, YRot: 0f, ZRot: 0f) { RotationPivot = new Vector3(0f, -1f, -1.5f) }.Emit(b, Matrix4x4.CreateTranslation(0f, 3f, 1f), 1f); // bottom 28x16x3
         new EntityCuboid(-13f, -7f, -1f, 5f, -1f, 1f, 0, 19, XRot: 0f, YRot: 3f * MathF.PI / 2f, ZRot: 0f) { RotationPivot = new Vector3(-4f, -4f, 0f) }.Emit(b, Matrix4x4.CreateTranslation(-15f, 4f, 4f), 1f); // back
         new EntityCuboid(-8f, -7f, -1f, 8f, -1f, 1f, 0, 27, XRot: 0f, YRot: MathF.PI / 2f, ZRot: 0f) { RotationPivot = new Vector3(0f, -4f, 0f) }.Emit(b, Matrix4x4.CreateTranslation(15f, 4f, 0f), 1f); // front
         new EntityCuboid(-14f, -7f, -1f, 14f, -1f, 1f, 0, 35, XRot: 0f, YRot: MathF.PI, ZRot: 0f) { RotationPivot = new Vector3(0f, -4f, 0f) }.Emit(b, Matrix4x4.CreateTranslation(0f, 4f, -9f), 1f); // right wall
         new EntityCuboid(-14f, -7f, -1f, 14f, -1f, 1f, 0, 43).Emit(b, Matrix4x4.CreateTranslation(0f, 4f, 9f), 1f); // left wall
-        new EntityCuboid(-1f, 0f, -5f, 1f, 2f, 13f, 62, 0, XRot: 0f, YRot: 0f, ZRot: 0.19634955f) { RotationPivot = new Vector3(0f, 1f, 4f) }.Emit(b, Matrix4x4.CreateTranslation(3f, -5f, 9f), 1f); // left paddle
-        new EntityCuboid(-1f, 0f, -5f, 1f, 2f, 13f, 62, 20, XRot: 0f, YRot: MathF.PI, ZRot: 0.19634955f) { RotationPivot = new Vector3(0f, 1f, 4f) }.Emit(b, Matrix4x4.CreateTranslation(3f, -5f, -9f), 1f); // right paddle
+        var leftPaddleRoot = Matrix4x4.CreateTranslation(3f, -5f, 9f);
+        new EntityCuboid(-1f, 0f, -5f, 1f, 2f, 13f, 62, 0, ZRot: paddleZ) { RotationPivot = paddlePivot }.Emit(b, leftPaddleRoot, 1f);
+        new EntityCuboid(-1.001f, -3f, 8f, -0.001f, 3f, 15f, 62, 0, ZRot: paddleZ) { RotationPivot = paddlePivot }.Emit(b, leftPaddleRoot, 1f);
+        var rightPaddleRoot = Matrix4x4.CreateTranslation(3f, -5f, -9f);
+        new EntityCuboid(-1f, 0f, -5f, 1f, 2f, 13f, 62, 20, YRot: MathF.PI, ZRot: paddleZ) { RotationPivot = paddlePivot }.Emit(b, rightPaddleRoot, 1f);
+        new EntityCuboid(0.001f, -3f, 8f, 1.001f, 3f, 15f, 62, 20, YRot: MathF.PI, ZRot: paddleZ) { RotationPivot = paddlePivot }.Emit(b, rightPaddleRoot, 1f);
         if (isChestBoat)
         {
-            // BoatModel.createChestBoatModel (~1.21.11 hgo): chest_bottom/lid/lock.
-            var chestRoot = Matrix4x4.Multiply(Matrix4x4.CreateTranslation(-2f, -5f, -6f), Matrix4x4.CreateRotationY(-MathF.PI / 2f));
-            new EntityCuboid(0f, 0f, 0f, 12f, 8f, 12f, 0, 76).Emit(b, chestRoot, 1f);
-            new EntityCuboid(0f, 0f, 0f, 12f, 4f, 12f, 0, 59).Emit(b, Matrix4x4.Multiply(Matrix4x4.CreateTranslation(-2f, -9f, -6f), Matrix4x4.CreateRotationY(-MathF.PI / 2f)), 1f);
-            new EntityCuboid(0f, 0f, 0f, 2f, 4f, 1f, 0, 59).Emit(b, Matrix4x4.Multiply(Matrix4x4.CreateTranslation(-1f, -6f, -1f), Matrix4x4.CreateRotationY(-MathF.PI / 2f)), 1f);
+            EmitChestBoatStack(b);
         }
+
         return b.Build(texRef);
+    }
+
+    /// <summary>RaftModel.createRaftModel / createChestRaftModel (26.1.2 javap): flat bottom slab + paddles only.</summary>
+    private static MergedJavaBlockModel BuildRaft(string texRef, MinecraftNativeProfile profile, bool isBaby, bool isChestBoat = false)
+    {
+        _ = profile;
+        _ = isBaby;
+        var b = new RigBuilder(128, isChestBoat ? 128 : 64);
+        const float paddleZ = 0.19634955f;
+        var paddlePivot = new Vector3(0f, 1f, 4f);
+        var bottomPose = Matrix4x4.Multiply(
+            Matrix4x4.CreateTranslation(0f, -2.1f, 1f),
+            Matrix4x4.CreateRotationX(MathF.PI / 2f));
+        new EntityCuboid(-14f, -11f, -4f, 14f, 9f, 0f, 0, 0).Emit(b, bottomPose, 1f);
+        new EntityCuboid(-14f, -9f, -8f, 14f, 7f, -4f, 0, 0).Emit(b, bottomPose, 1f);
+        var leftPaddleRoot = Matrix4x4.CreateTranslation(3f, -4f, 9f);
+        new EntityCuboid(-1f, 0f, -5f, 1f, 2f, 13f, 0, 24, ZRot: paddleZ) { RotationPivot = paddlePivot }.Emit(b, leftPaddleRoot, 1f);
+        new EntityCuboid(-1.001f, -3f, 8f, -0.001f, 3f, 15f, 0, 24, ZRot: paddleZ) { RotationPivot = paddlePivot }.Emit(b, leftPaddleRoot, 1f);
+        var rightPaddleRoot = Matrix4x4.CreateTranslation(3f, -4f, -9f);
+        new EntityCuboid(-1f, 0f, -5f, 1f, 2f, 13f, 40, 24, YRot: MathF.PI, ZRot: paddleZ) { RotationPivot = paddlePivot }.Emit(b, rightPaddleRoot, 1f);
+        new EntityCuboid(0.001f, -3f, 8f, 1.001f, 3f, 15f, 40, 24, YRot: MathF.PI, ZRot: paddleZ) { RotationPivot = paddlePivot }.Emit(b, rightPaddleRoot, 1f);
+        if (isChestBoat)
+        {
+            EmitChestRaftStack(b);
+        }
+
+        return b.Build(texRef);
+    }
+
+    private static void EmitChestBoatStack(RigBuilder b)
+    {
+        // BoatModel.createChestBoatModel: chest_bottom/lid/lock with PartPose.offsetAndRotation (T × Ry).
+        var chestRoot = Matrix4x4.Multiply(Matrix4x4.CreateTranslation(-2f, -5f, -6f), Matrix4x4.CreateRotationY(-MathF.PI / 2f));
+        new EntityCuboid(0f, 0f, 0f, 12f, 8f, 12f, 0, 76).Emit(b, chestRoot, 1f);
+        new EntityCuboid(0f, 0f, 0f, 12f, 4f, 12f, 0, 59).Emit(b, Matrix4x4.Multiply(Matrix4x4.CreateTranslation(-2f, -9f, -6f), Matrix4x4.CreateRotationY(-MathF.PI / 2f)), 1f);
+        new EntityCuboid(0f, 0f, 0f, 2f, 4f, 1f, 0, 59).Emit(b, Matrix4x4.Multiply(Matrix4x4.CreateTranslation(-1f, -6f, -1f), Matrix4x4.CreateRotationY(-MathF.PI / 2f)), 1f);
+    }
+
+    private static void EmitChestRaftStack(RigBuilder b)
+    {
+        var chestRoot = Matrix4x4.Multiply(Matrix4x4.CreateTranslation(-2f, -10.1f, -6f), Matrix4x4.CreateRotationY(-MathF.PI / 2f));
+        new EntityCuboid(0f, 0f, 0f, 12f, 8f, 12f, 0, 76).Emit(b, chestRoot, 1f);
+        new EntityCuboid(0f, 0f, 0f, 12f, 4f, 12f, 0, 59).Emit(b, Matrix4x4.Multiply(Matrix4x4.CreateTranslation(-2f, -14.1f, -6f), Matrix4x4.CreateRotationY(-MathF.PI / 2f)), 1f);
+        new EntityCuboid(0f, 0f, 0f, 2f, 4f, 1f, 0, 59).Emit(b, Matrix4x4.Multiply(Matrix4x4.CreateTranslation(-1f, -11.1f, -1f), Matrix4x4.CreateRotationY(-MathF.PI / 2f)), 1f);
     }
 
     /// <summary>LeashKnotModel (1.21.11 <c>javap</c> <c>hhc</c>): single <c>knot</c> cuboid <c>6×8×6</c> at <c>texOffs(0,0)</c>, atlas <c>32×32</c>.</summary>
@@ -283,10 +372,35 @@ internal sealed partial class CleanRoomEntityModelRuntime
         _ = profile;
         _ = isBaby;
         var b = new RigBuilder(64, 64);
-        // Chest body, lid, and lock nub.
-        new EntityCuboid(1f, 0f, 1f, 15f, 10f, 15f, 0, 0).Emit(b, Matrix4x4.Identity, 1f);
-        new EntityCuboid(1f, 10f, 1f, 15f, 14f, 15f, 0, 19).Emit(b, Matrix4x4.Identity, 1f);
-        new EntityCuboid(7f, 8f, 15f, 9f, 12f, 16f, 0, 0).Emit(b, Matrix4x4.Identity, 1f);
+        var path = texRef.Replace('\\', '/').ToLowerInvariant();
+
+        static Matrix4x4 ChestPartPose(float tx, float ty, float tz) =>
+            BlockRowAffineToTexel(EntityParityTemplate.ModelPartRenderLocalBlock(tx, ty, tz));
+
+        var lidLockPose = ChestPartPose(0f, 9f, 1f);
+
+        if (path.Contains("_left", StringComparison.Ordinal))
+        {
+            // ChestModel.createDoubleBodyLeftLayer
+            new EntityCuboid(0f, 0f, 1f, 15f, 10f, 15f, 0, 19).Emit(b, Matrix4x4.Identity, 1f);
+            new EntityCuboid(0f, 0f, 0f, 15f, 5f, 14f, 0, 0).Emit(b, lidLockPose, 1f);
+            new EntityCuboid(0f, -2f, 14f, 1f, 2f, 15f, 0, 0).Emit(b, lidLockPose, 1f);
+        }
+        else if (path.Contains("_right", StringComparison.Ordinal))
+        {
+            // ChestModel.createDoubleBodyRightLayer
+            new EntityCuboid(1f, 0f, 1f, 16f, 10f, 15f, 0, 19).Emit(b, Matrix4x4.Identity, 1f);
+            new EntityCuboid(1f, 0f, 0f, 16f, 5f, 14f, 0, 0).Emit(b, lidLockPose, 1f);
+            new EntityCuboid(15f, -2f, 14f, 16f, 2f, 15f, 0, 0).Emit(b, lidLockPose, 1f);
+        }
+        else
+        {
+            // ChestModel.createSingleBodyLayer
+            new EntityCuboid(1f, 0f, 1f, 15f, 10f, 15f, 0, 19).Emit(b, Matrix4x4.Identity, 1f);
+            new EntityCuboid(1f, 0f, 0f, 15f, 5f, 14f, 0, 0).Emit(b, lidLockPose, 1f);
+            new EntityCuboid(7f, -2f, 14f, 9f, 2f, 15f, 0, 0).Emit(b, lidLockPose, 1f);
+        }
+
         return b.Build(texRef);
     }
 }

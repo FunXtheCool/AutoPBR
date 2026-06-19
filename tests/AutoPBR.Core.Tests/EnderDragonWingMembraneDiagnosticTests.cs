@@ -1,7 +1,3 @@
-using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
-using AutoPBR.Tests.TestSupport;
-
 namespace AutoPBR.Core.Tests;
 
 public sealed class EnderDragonWingMembraneDiagnosticTests
@@ -17,24 +13,24 @@ public sealed class EnderDragonWingMembraneDiagnosticTests
             "assets/minecraft/textures/entity/enderdragon/dragon.png", Profile26, 0f, 0f, out var merged, out var provenance));
         Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
 
-        // Geometry IR preserves Java texOffs(-56, *) for dragon membranes, then shifts the
-        // horizontal UP sheet by one width so Java's UP rect wraps to visible U 0..56.
+        // Java emits the dragon membranes as unmasked zero-height cuboids. The visible
+        // negative-U skin artwork is on Direction.DOWN; Direction.UP is the neighboring slot.
         var visibleMembraneSlots = new[]
         {
             EntityCuboidJavaUvConvention.GetUvRect(
-                EntityCuboidJavaUvConvention.JavaDirection.Up, -112, 88, 56, 0, 56),
+                EntityCuboidJavaUvConvention.JavaDirection.Down, -56, 88, 56, 0, 56),
             EntityCuboidJavaUvConvention.GetUvRect(
-                EntityCuboidJavaUvConvention.JavaDirection.Up, -112, 88, 56, 0, 56, mirrorU: true),
+                EntityCuboidJavaUvConvention.JavaDirection.Down, -56, 88, 56, 0, 56, mirrorU: true),
             EntityCuboidJavaUvConvention.GetUvRect(
-                EntityCuboidJavaUvConvention.JavaDirection.Up, -112, 144, 56, 0, 56),
+                EntityCuboidJavaUvConvention.JavaDirection.Down, -56, 144, 56, 0, 56),
             EntityCuboidJavaUvConvention.GetUvRect(
-                EntityCuboidJavaUvConvention.JavaDirection.Up, -112, 144, 56, 0, 56, mirrorU: true),
+                EntityCuboidJavaUvConvention.JavaDirection.Down, -56, 144, 56, 0, 56, mirrorU: true),
         };
 
         var matched = 0;
         foreach (var el in merged.Elements)
         {
-            if (!TryGetWingMembraneUpFace(el, out var face))
+            if (!TryGetWingMembraneFace(el, "down", out var face))
             {
                 continue;
             }
@@ -58,7 +54,7 @@ public sealed class EnderDragonWingMembraneDiagnosticTests
         var sheetExtents = new List<(float spanX, float spanZ, float[] uv)>();
         foreach (var el in merged.Elements)
         {
-            if (!TryGetWingMembraneUpFace(el, out var face))
+            if (!TryGetWingMembraneFace(el, "down", out var face))
             {
                 continue;
             }
@@ -255,8 +251,12 @@ public sealed class EnderDragonWingMembraneDiagnosticTests
 
             sheets++;
             Assert.Equal(PreviewDepthLayerKind.Base, el.DepthLayerKind);
-            Assert.True(el.Faces.ContainsKey("down"));
-            Assert.Equal(upFace.Uv, el.Faces["down"].Uv);
+            Assert.True(el.Faces.TryGetValue("down", out var downFace));
+            Assert.NotNull(upFace.Uv);
+            Assert.NotNull(downFace.Uv);
+            Assert.NotEqual(upFace.Uv, downFace.Uv);
+            Assert.InRange(MathF.Min(downFace.Uv![0], downFace.Uv[2]), 0f, 1f);
+            Assert.InRange(MathF.Max(downFace.Uv[0], downFace.Uv[2]), 55f, 57f);
         }
 
         Assert.True(sheets >= 4, $"expected >=4 wing membrane sheets, got {sheets}");
@@ -300,7 +300,7 @@ public sealed class EnderDragonWingMembraneDiagnosticTests
             texSizes[ordered[i]] = (256, 256);
         }
 
-        Assert.True(MinecraftModelBaker.TryBake(merged, "minecraft", pathToIdx, texSizes, out var verts, out var indices, out var batches));
+        Assert.True(MinecraftModelBaker.TryBake(merged, "minecraft", pathToIdx, texSizes, out var verts, out _, out _));
 
         var membraneVerts = 0;
         const int stride = MinecraftModelBaker.FloatsPerVertex;
@@ -316,19 +316,22 @@ public sealed class EnderDragonWingMembraneDiagnosticTests
             membraneVerts++;
         }
 
-        Assert.True(membraneVerts >= 32, $"expected double-sided wing membrane verts, got {membraneVerts}");
+        Assert.True(membraneVerts >= 16, $"expected visible DOWN wing membrane verts, got {membraneVerts}");
     }
 
     private static bool IsVisibleDragonMembraneUv(float u, float v) =>
-        u >= 0f &&
-        u <= (57f / 256f) &&
-        v >= (88f / 256f) &&
-        v <= (200f / 256f);
+        u is >= 0f and <= (57f / 256f) &&
+        v is >= (88f / 256f) and <= (200f / 256f);
 
     private static bool TryGetWingMembraneUpFace(ModelElement el, out ModelFace face)
     {
+        return TryGetWingMembraneFace(el, "up", out face);
+    }
+
+    private static bool TryGetWingMembraneFace(ModelElement el, string faceName, out ModelFace face)
+    {
         face = null!;
-        if (!el.Faces.TryGetValue("up", out var up) || up.Uv is not { Length: >= 4 })
+        if (!el.Faces.TryGetValue(faceName, out var matched) || matched.Uv is not { Length: >= 4 })
         {
             return false;
         }
@@ -340,7 +343,7 @@ public sealed class EnderDragonWingMembraneDiagnosticTests
             return false;
         }
 
-        face = up;
+        face = matched;
         return true;
     }
 }

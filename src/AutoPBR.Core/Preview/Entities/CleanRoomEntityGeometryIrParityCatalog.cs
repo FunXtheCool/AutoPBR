@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Text.Json;
 // ReSharper disable CheckNamespace
 
@@ -204,6 +205,21 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         merged = FinishGeometryIrMeshLivingEntityRendererBasis(built, lerPlan);
 
+        if (string.Equals(parityRule.BuilderMethod, "Minecart", StringComparison.OrdinalIgnoreCase))
+        {
+            merged = ApplyGlobalTransform(merged, Matrix4x4.CreateRotationX(MathF.PI));
+        }
+
+        if (string.Equals(parityRule.BuilderMethod, "Bed", StringComparison.OrdinalIgnoreCase))
+        {
+            merged = ApplyGlobalTransform(merged, CreateBedPreviewFacingTransform());
+        }
+
+        if (string.Equals(parityRule.BuilderMethod, "Skull", StringComparison.OrdinalIgnoreCase))
+        {
+            merged = ApplyGlobalTransform(merged, Matrix4x4.CreateTranslation(0f, 8f, 0f));
+        }
+
         if (EntityRigPoseCapture.IsActive)
         {
             foreach (var el in merged.Elements)
@@ -291,7 +307,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
             out geometryRoot);
 
     /// <summary>
-    /// Atlas size from manifest, lifted shard fields, materialized PNG, or parity-catalog builder defaults.
+    /// Atlas size from lifted shard (<c>LayerDefinition.create</c> args), manifest override, materialized PNG,
+    /// or parity-catalog builder defaults.
     /// </summary>
     private static bool TryResolveParityCatalogGeometryIrAtlasDimensions(
         JsonElement geometryRoot,
@@ -302,13 +319,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
     {
         atlasW = 0;
         atlasH = 0;
-        if (rule.GeometryIrTextureWidth is > 0 and var rw && rule.GeometryIrTextureHeight is > 0 and var rh)
-        {
-            atlasW = rw;
-            atlasH = rh;
-            return true;
-        }
-
         if (geometryRoot.TryGetProperty("textureWidth", out var tw) &&
             tw.TryGetInt32(out var tww) &&
             tww > 0 &&
@@ -318,6 +328,13 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             atlasW = tww;
             atlasH = thh;
+            return true;
+        }
+
+        if (rule.GeometryIrTextureWidth is > 0 and var rw && rule.GeometryIrTextureHeight is > 0 and var rh)
+        {
+            atlasW = rw;
+            atlasH = rh;
             return true;
         }
 
@@ -334,21 +351,29 @@ internal sealed partial class CleanRoomEntityModelRuntime
         return GeometryIrParityAtlasDefaults.TryGetForBuilderMethod(rule.BuilderMethod, out atlasW, out atlasH);
     }
 
+    private static bool UsesDedicatedBabyGeometryIrHost(bool isBaby, string? resolvedOfficialJvm) =>
+        isBaby &&
+        !string.IsNullOrWhiteSpace(resolvedOfficialJvm) &&
+        (GeometryIrParityJvmResolver.SimpleClassNameContainsBaby(resolvedOfficialJvm) ||
+         GeometryIrParityJvmResolver.IsAlternateBabyBodyLayerFactoryShard(resolvedOfficialJvm));
+
     /// <summary>
-    /// Post–26.1 <c>Baby*Model</c> IR hosts are already baby-sized; only scale adult mesh hosts (e.g. <c>SkeletonModel</c>).
-    /// Policy: runtime-ir-preview-plan § Baby JVM family (do not apply <see cref="BabyProfile.VanillaUniformBaby"/> on dedicated Baby* shards).
+    /// Dedicated <c>Baby*Model</c> IR hosts are already baby layer meshes and keep unit cuboid-local scale during
+    /// emit, even when the native data root is reported as an unversioned <c>root</c> profile. Adult mesh hosts
+    /// (e.g. <c>SkeletonModel</c>) still use <see cref="BabyProfile.VanillaUniformBaby"/>.
     /// </summary>
     private static BabyProfile ParityCatalogDefaultBabyProfile(
         MinecraftNativeProfile profile,
         bool isBaby,
-        string? resolvedOfficialJvm) =>
-        !isBaby
+        string? resolvedOfficialJvm)
+    {
+        _ = profile;
+        return !isBaby
             ? BabyProfile.Adult
-            : UsesPostBabyModelUpdate(profile) &&
-              !string.IsNullOrWhiteSpace(resolvedOfficialJvm) &&
-              GeometryIrParityJvmResolver.SimpleClassNameContainsBaby(resolvedOfficialJvm)
+            : UsesDedicatedBabyGeometryIrHost(isBaby, resolvedOfficialJvm)
                 ? BabyProfile.Adult
                 : BabyProfile.VanillaUniformBaby;
+    }
 
     private static float ResolveDefaultPartScale(string partId, BabyProfile p)
     {

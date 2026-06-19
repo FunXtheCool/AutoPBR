@@ -1,42 +1,10 @@
 using System.Text.Json.Nodes;
-using AutoPBR.Tools.GeometryCompiler;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
 /// <summary>T0 helpers for Phase 1A binding / hierarchy lift probes (jar-gated).</summary>
 internal static class MeshLiftHierarchyTestSupport
 {
-    internal static int CountBindingLines(string concat) =>
-        concat.Split('\n').Count(l => JavapMeshBytecodeProfiles.IsNamedOrObfuscatedMeshBindingLine(l));
-
-    internal static List<string> CollectPartIds(JsonArray roots)
-    {
-        var ids = new List<string>();
-        void Walk(JsonArray arr)
-        {
-            foreach (var node in arr)
-            {
-                if (node is not JsonObject p)
-                {
-                    continue;
-                }
-
-                if (p["id"] is JsonValue id)
-                {
-                    ids.Add(id.GetValue<string>()!);
-                }
-
-                if (p["children"] is JsonArray ch)
-                {
-                    Walk(ch);
-                }
-            }
-        }
-
-        Walk(roots);
-        return ids;
-    }
-
     internal static int MaxTreeDepth(JsonArray roots)
     {
         var max = 0;

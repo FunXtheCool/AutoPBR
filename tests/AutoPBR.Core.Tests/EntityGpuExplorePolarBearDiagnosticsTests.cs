@@ -1,5 +1,4 @@
 using System.Numerics;
-using AutoPBR.Core.Preview;
 
 namespace AutoPBR.Core.Tests;
 
@@ -53,7 +52,7 @@ public sealed class EntityGpuExplorePolarBearDiagnosticsTests
         var rule = EntityTextureParityCatalog.ResolveRule(texturePath, stem);
         Assert.NotNull(rule);
         Assert.True(GeometryIrParityJvmResolver.TryResolveLiftedRoot(
-            Profile26, rule!, texturePath, stem, isBaby, out var jvm, out var geometryRoot));
+            Profile26, rule, texturePath, stem, isBaby, out var jvm, out var geometryRoot));
         geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, geometryRoot);
         var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
             geometryRoot,

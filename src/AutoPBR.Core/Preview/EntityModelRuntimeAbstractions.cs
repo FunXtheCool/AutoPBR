@@ -17,7 +17,8 @@ internal interface IEntityModelRuntime
         float animationTimeSeconds,
         out MergedJavaBlockModel mergedModel,
         out PreviewMeshProvenance meshProvenance,
-        bool applyGeometryIrSetupAnimMotion = false);
+        bool applyGeometryIrSetupAnimMotion = false,
+        bool pairDoubleChestPreviewHalves = true);
 
     /// <summary>
     /// Fast path for GPU bone uniforms: pose matrices without cuboid face allocation (see runtime implementation for fallbacks).
@@ -47,7 +48,8 @@ internal static class EntityModelRuntimeExtensions
         float idlePhase01,
         float animationTimeSeconds,
         out MergedJavaBlockModel mergedModel,
-        bool applyGeometryIrSetupAnimMotion = false) =>
+        bool applyGeometryIrSetupAnimMotion = false,
+        bool pairDoubleChestPreviewHalves = true) =>
         runtime.TryBuildStaticMesh(
             entityTextureAssetPath,
             profile,
@@ -55,6 +57,7 @@ internal static class EntityModelRuntimeExtensions
             animationTimeSeconds,
             out mergedModel,
             out _,
-            applyGeometryIrSetupAnimMotion);
+            applyGeometryIrSetupAnimMotion,
+            pairDoubleChestPreviewHalves);
 }
 

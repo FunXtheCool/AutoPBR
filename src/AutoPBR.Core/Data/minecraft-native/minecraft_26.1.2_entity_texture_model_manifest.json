@@ -2689,9 +2689,10 @@
       "builder_method": "NautilusMob",
       "deobf_model_class": "net.minecraft.client.model.animal.nautilus.NautilusModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.NautilusModel",
+      "geometry_ir_official_jvm_baby": "net.minecraft.client.model.animal.nautilus.NautilusModel.createBabyBodyLayer",
       "notes": "",
-      "geometry_ir_texture_width": 128,
-      "geometry_ir_texture_height": 128
+      "geometry_ir_texture_width": 64,
+      "geometry_ir_texture_height": 64
     },
     {
       "path_prefix": "assets/minecraft/textures/entity/shield/half_horizontal",

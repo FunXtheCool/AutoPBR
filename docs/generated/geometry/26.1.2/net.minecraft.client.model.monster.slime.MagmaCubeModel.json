@@ -55,8 +55,8 @@
                 4
               ],
               "uvOrigin": [
-                9,
-                36
+                0,
+                0
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
@@ -93,8 +93,8 @@
                 4
               ],
               "uvOrigin": [
-                9,
-                36
+                0,
+                9
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
@@ -131,8 +131,8 @@
                 4
               ],
               "uvOrigin": [
-                9,
-                36
+                0,
+                18
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
@@ -169,8 +169,8 @@
                 4
               ],
               "uvOrigin": [
-                9,
-                36
+                0,
+                27
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
@@ -207,8 +207,8 @@
                 4
               ],
               "uvOrigin": [
-                9,
-                36
+                32,
+                0
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
@@ -245,8 +245,8 @@
                 4
               ],
               "uvOrigin": [
-                9,
-                36
+                32,
+                9
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
@@ -283,8 +283,8 @@
                 4
               ],
               "uvOrigin": [
-                9,
-                36
+                32,
+                18
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
@@ -321,8 +321,8 @@
                 4
               ],
               "uvOrigin": [
-                9,
-                36
+                32,
+                27
               ],
               "textureKey": "#skin",
               "liftKind": "exact",

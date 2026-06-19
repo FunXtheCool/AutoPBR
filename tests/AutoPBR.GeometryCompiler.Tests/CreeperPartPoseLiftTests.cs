@@ -1,5 +1,4 @@
 using System.Text.Json.Nodes;
-using AutoPBR.Tools.GeometryCompiler;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
@@ -81,10 +80,10 @@ public sealed class CreeperPartPoseLiftTests
 
         var body = FindPart(roots, "body");
         Assert.NotNull(body);
-        var rx = body!["pose"]!["rotationEulerRad"]![0]!.GetValue<double>();
+        var rx = body["pose"]!["rotationEulerRad"]![0]!.GetValue<double>();
         Assert.True(Math.Abs(rx - HalfPi) < PoseTol, $"cow body Rx expected ~π/2, got {rx}");
-        Assert.Equal(5d, Ty(body!), 0.01);
-        Assert.Equal(2d, Tz(body!), 0.01);
+        Assert.Equal(5d, Ty(body), 0.01);
+        Assert.Equal(2d, Tz(body), 0.01);
     }
 
     [Fact]
@@ -99,14 +98,14 @@ public sealed class CreeperPartPoseLiftTests
         Assert.NotNull(body);
         Assert.NotNull(leg);
 
-        var rx = body!["pose"]!["rotationEulerRad"]![0]!.GetValue<double>();
+        var rx = body["pose"]!["rotationEulerRad"]![0]!.GetValue<double>();
         Assert.True(Math.Abs(rx - HalfPi) < PoseTol, $"body Rx expected ~π/2, got {rx}");
-        Assert.Equal(5d, Ty(body!), 0.01);
-        Assert.Equal(2d, Tz(body!), 0.01);
+        Assert.Equal(5d, Ty(body), 0.01);
+        Assert.Equal(2d, Tz(body), 0.01);
 
-        Assert.Equal(-3d, Tx(leg!), 0.01);
-        Assert.Equal(12d, Ty(leg!), 0.01);
-        Assert.Equal(7d, Tz(leg!), 0.01);
+        Assert.Equal(-3d, Tx(leg), 0.01);
+        Assert.Equal(12d, Ty(leg), 0.01);
+        Assert.Equal(7d, Tz(leg), 0.01);
     }
 
     [Fact]
@@ -132,18 +131,18 @@ public sealed class CreeperPartPoseLiftTests
         Assert.NotNull(rightHind);
 
         // 26.1.2 javap: PartPose.offset only (see tools/minecraft-parity/26.1.2/javap-snapshots/CreeperModel.createBodyLayer.javap.txt)
-        Assert.Equal(0d, Tx(head!), 0.01);
-        Assert.Equal(6d, Ty(head!), 0.01);
-        Assert.Equal(0d, Tz(head!), 0.01);
-        Assert.Equal(0d, Rx(body!), 0.01);
+        Assert.Equal(0d, Tx(head), 0.01);
+        Assert.Equal(6d, Ty(head), 0.01);
+        Assert.Equal(0d, Tz(head), 0.01);
+        Assert.Equal(0d, Rx(body), 0.01);
 
-        Assert.Equal(0d, Tx(body!), 0.01);
-        Assert.Equal(6d, Ty(body!), 0.01);
-        Assert.Equal(0d, Tz(body!), 0.01);
+        Assert.Equal(0d, Tx(body), 0.01);
+        Assert.Equal(6d, Ty(body), 0.01);
+        Assert.Equal(0d, Tz(body), 0.01);
 
-        Assert.Equal(-2d, Tx(rightHind!), 0.01);
-        Assert.Equal(18d, Ty(rightHind!), 0.01);
-        Assert.Equal(4d, Tz(rightHind!), 0.01);
+        Assert.Equal(-2d, Tx(rightHind), 0.01);
+        Assert.Equal(18d, Ty(rightHind), 0.01);
+        Assert.Equal(4d, Tz(rightHind), 0.01);
     }
 
     [Fact]
@@ -166,7 +165,7 @@ public sealed class CreeperPartPoseLiftTests
 
         var body = FindPart(roots, "body");
         Assert.NotNull(body);
-        var rx = body!["pose"]!["rotationEulerRad"]![0]!.GetValue<double>();
+        var rx = body["pose"]!["rotationEulerRad"]![0]!.GetValue<double>();
         var poseApprox = CountPoseApproxWarnings(roots);
 
         if (hasOffsetAndRotation)
@@ -198,7 +197,7 @@ public sealed class CreeperPartPoseLiftTests
 
         var rightHind = FindPart(roots, "right_hind_leg");
         Assert.NotNull(rightHind);
-        var t = Translation(rightHind!);
+        var t = Translation(rightHind);
 
         // Hand parity (1.21.11 clean-room): T(-3, 12, 7)
         var handParity = (-3d, 12d, 7d);

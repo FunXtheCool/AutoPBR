@@ -1,0 +1,442 @@
+﻿{
+    "schemaVersion":  2,
+    "versionLabel":  "26.1.2",
+    "officialJvmName":  "net.minecraft.client.model.object.boat.RaftModel.createChestRaftModel",
+    "profile":  "named_jar_26.1.2",
+    "extractionStatus":  "ok",
+    "extractionNotes":  [
+                            "Part tree lifted from bytecode_asm variant factory createChestRaftModel.",
+                            "Chest stack merged from BoatModel.createChestBoatModel / RaftModel.createChestRaftModel javap constants."
+                        ],
+    "factoryMethod":  "createChestRaftModel",
+    "roots":  [
+                  {
+                      "id":  "root",
+                      "pose":  {
+                                   "translation":  [
+                                                       0.000000000,
+                                                       0.000000000,
+                                                       0.000000000
+                                                   ],
+                                   "rotationEulerRad":  [
+                                                            0.000000000,
+                                                            0.000000000,
+                                                            0.000000000
+                                                        ],
+                                   "eulerOrder":  "XYZ"
+                               },
+                      "cuboids":  [
+
+                                  ],
+                      "children":  [
+                                       {
+                                           "id":  "bottom",
+                                           "pose":  {
+                                                        "translation":  [
+                                                                            0.000000000,
+                                                                            -2.099999905,
+                                                                            1.000000000
+                                                                        ],
+                                                        "rotationEulerRad":  [
+                                                                                 1.570799947,
+                                                                                 0.000000000,
+                                                                                 0.000000000
+                                                                             ],
+                                                        "eulerOrder":  "XYZ"
+                                                    },
+                                           "cuboids":  [
+                                                           {
+                                                               "from":  [
+                                                                            -14,
+                                                                            -11,
+                                                                            -4
+                                                                        ],
+                                                               "to":  [
+                                                                          14,
+                                                                          9,
+                                                                          0
+                                                                      ],
+                                                               "uvOrigin":  [
+                                                                                0,
+                                                                                0
+                                                                            ],
+                                                               "textureKey":  "#skin",
+                                                               "liftKind":  "exact",
+                                                               "provenance":  "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                                                           },
+                                                           {
+                                                               "from":  [
+                                                                            -14,
+                                                                            -9,
+                                                                            -8
+                                                                        ],
+                                                               "to":  [
+                                                                          14,
+                                                                          7,
+                                                                          -4
+                                                                      ],
+                                                               "uvOrigin":  [
+                                                                                0,
+                                                                                0
+                                                                            ],
+                                                               "textureKey":  "#skin",
+                                                               "liftKind":  "exact",
+                                                               "provenance":  "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                                                           }
+                                                       ],
+                                           "children":  [
+
+                                                        ]
+                                       },
+                                       {
+                                           "id":  "left_paddle",
+                                           "pose":  {
+                                                        "translation":  [
+                                                                            3.000000000,
+                                                                            -4.000000000,
+                                                                            9.000000000
+                                                                        ],
+                                                        "rotationEulerRad":  [
+                                                                                 0.000000000,
+                                                                                 0.000000000,
+                                                                                 0.1963495463
+                                                                             ],
+                                                        "eulerOrder":  "XYZ"
+                                                    },
+                                           "cuboids":  [
+                                                           {
+                                                               "from":  [
+                                                                            -1,
+                                                                            0,
+                                                                            -5
+                                                                        ],
+                                                               "to":  [
+                                                                          1,
+                                                                          2,
+                                                                          13
+                                                                      ],
+                                                               "uvOrigin":  [
+                                                                                0,
+                                                                                24
+                                                                            ],
+                                                               "textureKey":  "#skin",
+                                                               "liftKind":  "exact",
+                                                               "provenance":  "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                                                           },
+                                                           {
+                                                               "from":  [
+                                                                            -1.00100005,
+                                                                            -3,
+                                                                            8
+                                                                        ],
+                                                               "to":  [
+                                                                          -0.00100005,
+                                                                          3,
+                                                                          15
+                                                                      ],
+                                                               "uvOrigin":  [
+                                                                                0,
+                                                                                24
+                                                                            ],
+                                                               "textureKey":  "#skin",
+                                                               "liftKind":  "exact",
+                                                               "provenance":  "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                                                           }
+                                                       ],
+                                           "children":  [
+
+                                                        ]
+                                       },
+                                       {
+                                           "id":  "right_paddle",
+                                           "pose":  {
+                                                        "translation":  [
+                                                                            3.000000000,
+                                                                            -4.000000000,
+                                                                            -9.000000000
+                                                                        ],
+                                                        "rotationEulerRad":  [
+                                                                                 0.000000000,
+                                                                                 3.141592741,
+                                                                                 0.1963495463
+                                                                             ],
+                                                        "eulerOrder":  "XYZ"
+                                                    },
+                                           "cuboids":  [
+                                                           {
+                                                               "from":  [
+                                                                            -1,
+                                                                            0,
+                                                                            -5
+                                                                        ],
+                                                               "to":  [
+                                                                          1,
+                                                                          2,
+                                                                          13
+                                                                      ],
+                                                               "uvOrigin":  [
+                                                                                40,
+                                                                                24
+                                                                            ],
+                                                               "textureKey":  "#skin",
+                                                               "liftKind":  "exact",
+                                                               "provenance":  "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                                                           },
+                                                           {
+                                                               "from":  [
+                                                                            0.001,
+                                                                            -3,
+                                                                            8
+                                                                        ],
+                                                               "to":  [
+                                                                          1.001,
+                                                                          3,
+                                                                          15
+                                                                      ],
+                                                               "uvOrigin":  [
+                                                                                40,
+                                                                                24
+                                                                            ],
+                                                               "textureKey":  "#skin",
+                                                               "liftKind":  "exact",
+                                                               "provenance":  "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+                                                           }
+                                                       ],
+                                           "children":  [
+
+                                                        ]
+                                       },
+                                       {
+                                           "cuboids":  [
+                                                           {
+                                                               "provenance":  "javap lift createChestBoatModel chest stack",
+                                                               "uvOrigin":  [
+                                                                                0,
+                                                                                76
+                                                                            ],
+                                                               "to":  [
+                                                                          12,
+                                                                          8,
+                                                                          12
+                                                                      ],
+                                                               "from":  [
+                                                                            0,
+                                                                            0,
+                                                                            0
+                                                                        ],
+                                                               "textureKey":  "#skin",
+                                                               "liftKind":  "exact"
+                                                           }
+                                                       ],
+                                           "id":  "chest_bottom",
+                                           "pose":  {
+                                                        "eulerOrder":  "XYZ",
+                                                        "translation":  [
+                                                                            -2,
+                                                                            -10.1,
+                                                                            -6
+                                                                        ],
+                                                        "rotationEulerRad":  [
+                                                                                 0,
+                                                                                 -1.5707964,
+                                                                                 0
+                                                                             ]
+                                                    },
+                                           "children":  [
+
+                                                        ]
+                                       },
+                                       {
+                                           "cuboids":  [
+                                                           {
+                                                               "provenance":  "javap lift createChestBoatModel chest stack",
+                                                               "uvOrigin":  [
+                                                                                0,
+                                                                                59
+                                                                            ],
+                                                               "to":  [
+                                                                          12,
+                                                                          4,
+                                                                          12
+                                                                      ],
+                                                               "from":  [
+                                                                            0,
+                                                                            0,
+                                                                            0
+                                                                        ],
+                                                               "textureKey":  "#skin",
+                                                               "liftKind":  "exact"
+                                                           }
+                                                       ],
+                                           "id":  "chest_lid",
+                                           "pose":  {
+                                                        "eulerOrder":  "XYZ",
+                                                        "translation":  [
+                                                                            -2,
+                                                                            -14.1,
+                                                                            -6
+                                                                        ],
+                                                        "rotationEulerRad":  [
+                                                                                 0,
+                                                                                 -1.5707964,
+                                                                                 0
+                                                                             ]
+                                                    },
+                                           "children":  [
+
+                                                        ]
+                                       },
+                                       {
+                                           "cuboids":  [
+                                                           {
+                                                               "provenance":  "javap lift createChestBoatModel chest stack",
+                                                               "uvOrigin":  [
+                                                                                0,
+                                                                                59
+                                                                            ],
+                                                               "to":  [
+                                                                          2,
+                                                                          4,
+                                                                          1
+                                                                      ],
+                                                               "from":  [
+                                                                            0,
+                                                                            0,
+                                                                            0
+                                                                        ],
+                                                               "textureKey":  "#skin",
+                                                               "liftKind":  "exact"
+                                                           }
+                                                       ],
+                                           "id":  "chest_lock",
+                                           "pose":  {
+                                                        "eulerOrder":  "XYZ",
+                                                        "translation":  [
+                                                                            -1,
+                                                                            -11.1,
+                                                                            -1
+                                                                        ],
+                                                        "rotationEulerRad":  [
+                                                                                 0,
+                                                                                 -1.5707964,
+                                                                                 0
+                                                                             ]
+                                                    },
+                                           "children":  [
+
+                                                        ]
+                                       }
+                                   ]
+                  }
+              ],
+    "jarPath":  "net/minecraft/client/model/object/boat/RaftModel.class",
+    "classSha256Hex":  "43db0e1bb2f3d1b722ea92fac0bfeff6f231415b79b9a5e099b16cfdb6c01359",
+    "bytecodeFloatProbe":  [
+                               -14,
+                               -11,
+                               -4,
+                               28,
+                               20,
+                               4,
+                               -14,
+                               -9,
+                               -8,
+                               28,
+                               16,
+                               4,
+                               -2.1,
+                               1.5708,
+                               -5,
+                               -1,
+                               -5,
+                               18,
+                               -1.001,
+                               -3,
+                               8,
+                               6,
+                               7,
+                               3,
+                               -4,
+                               9,
+                               0.19634955,
+                               -1,
+                               -5,
+                               18,
+                               0.001,
+                               -3,
+                               8,
+                               6,
+                               7,
+                               3,
+                               -4,
+                               -9,
+                               3.1415927,
+                               0.19634955,
+                               12,
+                               8,
+                               12,
+                               -2,
+                               -10.1,
+                               -6,
+                               -1.5707964,
+                               12,
+                               4,
+                               12,
+                               -2,
+                               -14.1,
+                               -6,
+                               -1.5707964,
+                               4,
+                               -1,
+                               -11.1,
+                               -1,
+                               -1.5707964,
+                               -14,
+                               -11,
+                               -4,
+                               28,
+                               20,
+                               4,
+                               -14,
+                               -9,
+                               -8,
+                               28,
+                               16,
+                               4,
+                               -2.1,
+                               1.5708,
+                               -5,
+                               -1,
+                               -5,
+                               18,
+                               -1.001,
+                               -3,
+                               8,
+                               6,
+                               7,
+                               3,
+                               -4,
+                               9,
+                               0.19634955,
+                               -1,
+                               -5,
+                               18,
+                               0.001,
+                               -3,
+                               8,
+                               6,
+                               7,
+                               3,
+                               -4,
+                               -9,
+                               3.1415927,
+                               0.19634955
+                           ],
+    "textureWidth":  128,
+    "textureHeight":  128,
+    "liftSummary":  {
+                        "cuboidApproxCount":  0,
+                        "poseApproxCount":  0,
+                        "delegationDepth":  0
+                    }
+}

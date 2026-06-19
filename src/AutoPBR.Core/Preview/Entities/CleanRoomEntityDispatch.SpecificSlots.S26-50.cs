@@ -325,11 +325,12 @@ internal sealed partial class CleanRoomEntityModelRuntime
             if (normalizedAssetPath.Contains("/textures/entity/boat/", StringComparison.OrdinalIgnoreCase) ||
                 normalizedAssetPath.Contains("/textures/entity/chest_boat/", StringComparison.OrdinalIgnoreCase))
             {
-                merged = BuildBoat(
-                texRef,
-                profile,
-                isBaby,
-                isChestBoat: normalizedAssetPath.Contains("/textures/entity/chest_boat/", StringComparison.OrdinalIgnoreCase));
+                merged = BuildBoatFamily(
+                    texRef,
+                    profile,
+                    isBaby,
+                    isChestBoat: normalizedAssetPath.Contains("/textures/entity/chest_boat/", StringComparison.OrdinalIgnoreCase),
+                    normalizedAssetPath);
                 specificRouteSlotHit = gpuBoneDispatchSlot;
                 return true;
             }

@@ -1,4 +1,5 @@
 using System.Text.Json.Nodes;
+
 using AutoPBR.Core.Preview;
 
 namespace AutoPBR.Tools.GeometryCompiler;
@@ -32,6 +33,7 @@ internal static class GeometryIrLiftTreeRepair
         ("right_pants", "right_leg"),
     ];
 
+    /// <param name="roots">Lifted mesh part tree roots to repair in place.</param>
     /// <param name="hoistStandardQuadrupedLegsToRoot">
     /// When true (bytecode lift / reference-aligned shards), hoists hind/front legs from under <c>body</c> to mesh root.
     /// Javap segment lifts keep nested binding order for hierarchy probes.
@@ -74,6 +76,7 @@ internal static class GeometryIrLiftTreeRepair
                 }
 
                 RemoveDuplicatePartIdsPreferCuboids(rootKids);
+                EnsureSlimeOuterBodyLayer(rootKids);
             }
 
             DeduplicateNestedPartIds(ro);
@@ -266,13 +269,8 @@ internal static class GeometryIrLiftTreeRepair
                 continue;
             }
 
-            if (cub["inflate"] is not null)
-            {
-                headCuboids.RemoveAt(i);
-                continue;
-            }
-
-            if (cub["uvOrigin"] is JsonArray uv && uv.Count >= 2 &&
+            if (cub["inflate"] is not null ||
+                cub["uvOrigin"] is JsonArray { Count: >= 2 } uv &&
                 Math.Abs(uv[1]!.GetValue<double>() - 32) < 0.01)
             {
                 headCuboids.RemoveAt(i);
@@ -290,9 +288,8 @@ internal static class GeometryIrLiftTreeRepair
         foreach (var kid in headKids)
         {
             if (kid is JsonObject hat &&
-                string.Equals((string?)hat["id"], "hat", StringComparison.Ordinal) &&
-                hat["cuboids"] is JsonArray hatCuboids &&
-                hatCuboids.Count > 0)
+                hat["id"]?.GetValue<string>() is "hat" &&
+                hat["cuboids"] is JsonArray { Count: > 0 })
             {
                 return true;
             }
@@ -514,7 +511,7 @@ internal static class GeometryIrLiftTreeRepair
                 continue;
             }
 
-            if (cub["uvOrigin"] is JsonArray uv && uv.Count >= 2 &&
+            if (cub["uvOrigin"] is JsonArray { Count: >= 2 } uv &&
                 Math.Abs(uv[1]!.GetValue<double>() - 32) < 0.01)
             {
                 bodyCuboids.RemoveAt(i);
@@ -814,6 +811,87 @@ internal static class GeometryIrLiftTreeRepair
 
     private sealed record PartOccurrence(string Id, JsonArray Parent, int Index, JsonObject Node);
 
+    /// <summary>
+    /// Deep mesh concat lifts <c>createInnerBodyLayer</c> after <c>createOuterBodyLayer</c> and last-wins the shared
+    /// <c>cube</c> id. Re-insert the outer 8×8×8 shell when inner eyes are present.
+    /// </summary>
+    private static void EnsureSlimeOuterBodyLayer(JsonArray rootChildren)
+    {
+        if (!TryFindPartById(rootChildren, "right_eye", out _))
+        {
+            return;
+        }
+
+        if (TryFindPartById(rootChildren, "cube", out var cubePart) &&
+            cubePart is not null &&
+            PartCuboidMatchesBounds(cubePart, -4, 16, -4, 4, 24, 4))
+        {
+            return;
+        }
+
+        if (TryFindPartById(rootChildren, "outer_cube", out var existingOuter) && existingOuter is not null)
+        {
+            if (existingOuter["cuboids"] is JsonArray existingCuboids && existingCuboids.Count > 0)
+            {
+                return;
+            }
+
+            existingOuter["cuboids"] = CreateSlimeOuterShellCuboids();
+            return;
+        }
+
+        rootChildren.Insert(0, CreateSlimeOuterShellPart());
+    }
+
+    private static JsonObject CreateSlimeOuterShellPart() =>
+        new()
+        {
+            ["id"] = "outer_cube",
+            ["pose"] = ZeroPose(),
+            ["cuboids"] = CreateSlimeOuterShellCuboids(),
+            ["children"] = new JsonArray()
+        };
+
+    private static JsonArray CreateSlimeOuterShellCuboids() =>
+        new()
+        {
+            new JsonObject
+            {
+                ["from"] = new JsonArray { -4, 16, -4 },
+                ["to"] = new JsonArray { 4, 24, 4 },
+                ["uvOrigin"] = new JsonArray { 0, 0 },
+                ["textureKey"] = "#skin",
+                ["liftKind"] = "exact",
+                ["provenance"] = "javap lift repair SlimeModel.createOuterBodyLayer"
+            }
+        };
+
+    private static JsonObject ZeroPose() =>
+        new()
+        {
+            ["translation"] = new JsonArray { 0, 0, 0 },
+            ["rotationEulerRad"] = new JsonArray { 0, 0, 0 },
+            ["eulerOrder"] = "XYZ"
+        };
+
+    private static bool PartCuboidMatchesBounds(JsonObject part, float fx, float fy, float fz, float tx, float ty, float tz)
+    {
+        if (part["cuboids"] is not JsonArray cuboids || cuboids.Count == 0)
+        {
+            return false;
+        }
+
+        if (cuboids[0] is not JsonObject c)
+        {
+            return false;
+        }
+
+        return TryReadVec3(c["from"], out var x0, out var y0, out var z0) &&
+               TryReadVec3(c["to"], out var x1, out var y1, out var z1) &&
+               Math.Abs(x0 - fx) < 0.01 && Math.Abs(y0 - fy) < 0.01 && Math.Abs(z0 - fz) < 0.01 &&
+               Math.Abs(x1 - tx) < 0.01 && Math.Abs(y1 - ty) < 0.01 && Math.Abs(z1 - tz) < 0.01;
+    }
+
     private static void RemoveDuplicatePartIdsPreferCuboids(JsonArray rootChildren)
     {
         var occurrences = new List<PartOccurrence>();
@@ -828,7 +906,7 @@ internal static class GeometryIrLiftTreeRepair
 
             var keep = items
                 .OrderByDescending(o => DirectCuboidCount(o.Node))
-                .ThenBy(o => occurrences.IndexOf(o))
+                .ThenBy(occurrences.IndexOf)
                 .First();
             foreach (var remove in items.Where(o => !ReferenceEquals(o.Node, keep.Node))
                          .OrderByDescending(o => o.Index))
@@ -873,20 +951,6 @@ internal static class GeometryIrLiftTreeRepair
 
     private static int DirectCuboidCount(JsonObject part) =>
         part["cuboids"] is JsonArray cuboids ? cuboids.Count : 0;
-
-    private static int CountCuboids(JsonObject part)
-    {
-        var count = part["cuboids"] is JsonArray cuboids ? cuboids.Count : 0;
-        if (part["children"] is JsonArray kids)
-        {
-            foreach (var kid in kids.OfType<JsonObject>())
-            {
-                count += CountCuboids(kid);
-            }
-        }
-
-        return count;
-    }
 
     /// <summary>Drop a root sibling when the same part id already exists deeper (e.g. hat on head + hat at root).</summary>
     private static void RemoveRootSiblingWhenNested(JsonArray rootChildren)

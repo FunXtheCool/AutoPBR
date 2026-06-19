@@ -188,6 +188,7 @@ internal static class GeometryIrMeshWalk
         JsonElement poseEl,
         Matrix4x4 parentWorldBlock,
         in GeometryIrMeshEmitOptions options,
+        string? partId,
         out Matrix4x4 worldBlock,
         out Matrix4x4 worldTexel,
         out string? failureReason)
@@ -195,7 +196,8 @@ internal static class GeometryIrMeshWalk
         failureReason = null;
         worldBlock = parentWorldBlock;
         var useColumnPartPose = options.ResolveUseColumnTranslationTimesRotationPartPose();
-        var useLegacyPartPose = EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose &&
+        var useLegacyPartPose = (EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose ||
+                                 GeometryIrEmitPolicy.UsesTranslationTimesRotationPartPose(options.OfficialJvmName, partId)) &&
             !useColumnPartPose &&
             !GeometryIrEmitPolicy.IgnoresLegacyPartPoseDebugSwitch(options.OfficialJvmName);
         worldTexel = useLegacyPartPose
@@ -220,13 +222,13 @@ internal static class GeometryIrMeshWalk
 
         if (useLegacyPartPose)
         {
-            if (!CleanRoomEntityModelRuntime.TryComposePartPosePublic(poseEl, parentWorldBlock, out worldTexel))
+            if (!CleanRoomEntityModelRuntime.TryComposeTranslationTimesRotationPartPosePublic(
+                    poseEl, parentWorldBlock, out worldBlock, out failureReason))
             {
-                failureReason = "compose part pose failed";
                 return false;
             }
 
-            worldBlock = worldTexel;
+            worldTexel = worldBlock;
             return true;
         }
 
@@ -240,8 +242,9 @@ internal static class GeometryIrMeshWalk
         return true;
     }
 
-    private static bool ShouldUseLegacyPartPose(GeometryIrMeshEmitOptions options) =>
-        EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose &&
+    private static bool ShouldUseLegacyPartPose(GeometryIrMeshEmitOptions options, string? partId = null) =>
+        (EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose ||
+         GeometryIrEmitPolicy.UsesTranslationTimesRotationPartPose(options.OfficialJvmName, partId)) &&
         !options.ResolveUseColumnTranslationTimesRotationPartPose() &&
         !GeometryIrEmitPolicy.IgnoresLegacyPartPoseDebugSwitch(options.OfficialJvmName);
 
@@ -253,10 +256,12 @@ internal static class GeometryIrMeshWalk
         Action<string, Matrix4x4>? onPartWorld,
         ref string? failureReason)
     {
+        var partId = part.TryGetProperty("id", out var idEl) ? idEl.GetString() ?? "" : "";
         if (!TryComposePartWorldFromParent(
                 part.TryGetProperty("pose", out var poseEl) ? poseEl : default,
                 parentWorldBlock,
                 options,
+                partId,
                 out var worldBlock,
                 out var worldTexel,
                 out failureReason))
@@ -264,7 +269,6 @@ internal static class GeometryIrMeshWalk
             return false;
         }
 
-        var partId = part.TryGetProperty("id", out var idEl) ? idEl.GetString() ?? "" : "";
         var skipPartCuboids = options.ShouldEmitPartCuboids is { } shouldEmit
             ? !shouldEmit(partId)
             : options.IncludePartIds is { Count: > 0 } include && !include.Contains(partId);
@@ -272,7 +276,7 @@ internal static class GeometryIrMeshWalk
         if (options.TryGetPartPoseOverride is { } poseOverride && !skipPartCuboids)
         {
             worldTexel = poseOverride(partId, worldTexel);
-            worldBlock = ShouldUseLegacyPartPose(options)
+            worldBlock = ShouldUseLegacyPartPose(options, partId)
                 ? worldTexel
                 : CleanRoomEntityModelRuntime.TexelRowAffineToBlock(worldTexel);
         }

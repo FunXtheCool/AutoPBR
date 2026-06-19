@@ -22,6 +22,12 @@ Related: [runtime-ir-preview-plan.md](runtime-ir-preview-plan.md) (§ PartPose v
 
 CPU and GPU both call `CleanRoomEntityModelRuntime.TryBuildStaticMesh` with the same flags for a given Explore frame (`EnableEntityAnimation` → `applyGeometryIrSetupAnimMotion`).
 
+### Baby scale contract
+
+Dedicated parity-catalog `Baby*Model` Geometry IR shards are final baby meshes, not adult meshes waiting for the old uniform baby transformer. Resolve scale from the JVM host that `GeometryIrParityJvmResolver` selected: `BabyCowModel`, `BabyFoxModel`, `BabySheepModel`, `BabyDrownedModel`, etc. emit with unit cuboid scale (`BabyProfile.Adult`) even when the diagnostic line shows an unversioned native profile such as `profile=root parsed=?`.
+
+Do not add preview-only origin compaction, per-family part offsets, or GPU-only scale compensation for these cases. CPU bake, GPU bind-pose bake, and Explore placement must all consume the same merged mesh. Regression coverage lives in `BabyCatalogGeometryIrPreviewTests`, `BabyFamilyAttachmentClusterTests`, and `EntityPreviewPlacementTests.Baby_rebake_records_meaningful_part_centroid_diagnostics`.
+
 ### Render ground truth (attached / rotated parts)
 
 For **cuboid placement** parity (horns, ears, nested stacks), prefer JVM export fields when present:
@@ -124,6 +130,8 @@ dotnet test tests/AutoPBR.Core.Tests --filter "BabyFamilyAttachmentClusterTests|
 |------|--------|
 | `EntityGpuSkinnedMatrixCpuParityTests` | `W(v · inv · M_anim)` ≡ CPU bake per vertex |
 | `BabyFamilyAttachmentClusterTests` | Body/head/leg clusters after CPU placement **and** GPU bind + `W()` |
+| `BabyCatalogGeometryIrPreviewTests` | Dedicated `Baby*Model` IR hosts emit unit cuboid scale, including unversioned `root` profiles |
+| `EntityPreviewPlacementTests.Baby_rebake_records_meaningful_part_centroid_diagnostics` | Explore placement diagnostics report body/head/leg centroid data for baby preview regressions |
 | `EntityViewportGpuCpuParityTests` | Fast bone fill ≡ `LocalToParent` for parity-catalog IR |
 | `EntityGpuSkinnedBoneIndexTests` | Bit-cast bone index decode / slot coverage |
 | `GeometryIrQuadrupedReferenceWorldPoseTests` | Catalog static mesh vs Java reference **`worldPose`** (origins; may diverge from render on attached parts) |

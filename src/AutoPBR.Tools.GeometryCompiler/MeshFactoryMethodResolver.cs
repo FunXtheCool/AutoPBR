@@ -16,6 +16,7 @@ internal static class MeshFactoryMethodResolver
         "createCapeLayer",
         "createBabyMesh",
         "createBabyLayer",
+        "createBabyBodyLayer",
         "createBaseChickenModel",
         "createBodyMesh",
         "apply",

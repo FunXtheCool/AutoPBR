@@ -1,17 +1,6 @@
-using System.Buffers.Binary;
-using System.Diagnostics;
 using System.Numerics;
-using System.Runtime.InteropServices;
 
 using AutoPBR.App.Rendering.Abstractions;
-using AutoPBR.App.Rendering.Scene;
-using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
-
-using Avalonia.OpenGL;
-using Avalonia.Platform;
-
-using Silk.NET.OpenGL;
 
 namespace AutoPBR.App.Rendering.OpenGL;
 
@@ -57,15 +46,6 @@ public sealed partial class OpenGlPreviewBackend
         if (loc >= 0)
         {
             _gl!.Uniform3(loc, v.X, v.Y, v.Z);
-        }
-    }
-
-    private void SetVec2OnProgram(GlProceduralSkyProgram program, string name, Vector2 v)
-    {
-        var loc = program.GetUniformLocation(name);
-        if (loc >= 0)
-        {
-            _gl!.Uniform2(loc, v.X, v.Y);
         }
     }
 

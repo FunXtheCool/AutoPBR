@@ -74,6 +74,13 @@ internal static class GeometryIrParityJvmResolver
         string stem,
         bool isBaby)
     {
+        foreach (var objectEntityJvm in GeometryIrParityObjectEntityJvmMap.EnumerateCandidates(
+                     rule.BuilderMethod,
+                     normalizedAssetPath))
+        {
+            yield return objectEntityJvm;
+        }
+
         if (GeometryIrParityHandLiftJvmMap.TryGetHandLiftJvm(rule.BuilderMethod, normalizedAssetPath, out var handLiftJvm))
         {
             yield return handLiftJvm;
@@ -197,6 +204,13 @@ internal static class GeometryIrParityJvmResolver
         var simple = idx >= 0 ? officialJvm[(idx + 1)..] : officialJvm;
         return simple.Contains("Baby", StringComparison.Ordinal);
     }
+
+    /// <summary>
+    /// Variant geometry-index rows that lift <c>createBabyBodyLayer</c> on a shared adult model host
+    /// (e.g. <c>NautilusModel.createBabyBodyLayer</c>).
+    /// </summary>
+    internal static bool IsAlternateBabyBodyLayerFactoryShard(string officialJvm) =>
+        officialJvm.EndsWith(".createBabyBodyLayer", StringComparison.Ordinal);
 
     private static string NormalizeModelStem(string modelStem)
     {

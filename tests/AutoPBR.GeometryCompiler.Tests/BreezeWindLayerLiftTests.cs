@@ -1,5 +1,4 @@
 using System.Text.Json.Nodes;
-using AutoPBR.Tools.GeometryCompiler;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
@@ -16,7 +15,7 @@ public sealed class BreezeWindLayerLiftTests
             string.Join("; ", attempt.Notes));
         var windMid = FindPartById(attempt.Roots, "wind_mid");
         Assert.NotNull(windMid);
-        Assert.True(windMid!["cuboids"]!.AsArray().Count >= 3);
+        Assert.True(windMid["cuboids"]!.AsArray().Count >= 3);
     }
 
     [Fact]
@@ -33,7 +32,7 @@ public sealed class BreezeWindLayerLiftTests
         var windMid = FindPartById(attempt.Roots, "wind_mid");
         Assert.NotNull(windMid);
         Assert.NotNull(FindPartById(attempt.Roots, "wind_top"));
-        Assert.Contains(windBottom!["children"]!.AsArray(),
+        Assert.Contains(windBottom["children"]!.AsArray(),
             n => n is JsonObject o && string.Equals((string?)o["id"], "wind_mid", StringComparison.Ordinal));
     }
 

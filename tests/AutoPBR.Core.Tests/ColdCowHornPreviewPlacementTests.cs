@@ -1,7 +1,5 @@
 using System.Numerics;
 using System.Text.Json;
-using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
 
 namespace AutoPBR.Core.Tests;
 
@@ -29,7 +27,7 @@ public sealed class ColdCowHornPreviewPlacementTests
         var geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(Jvm, shard.RootElement);
         var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
             geometryRoot,
-            GeometryIrMeshEmitOptions.ForParity(64, 64) with { OfficialJvmName = Jvm });
+            GeometryIrMeshEmitOptions.ForParity() with { OfficialJvmName = Jvm });
 
         var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(merged, "minecraft");
         var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -65,7 +63,7 @@ public sealed class ColdCowHornPreviewPlacementTests
             repo, "tools", "MinecraftGeometryReference", "reference-output", $"{Jvm}.json")));
         var refHornPreview = JvmRenderCuboidPreviewCentroid(reference.RootElement, "right_horn", gpuPlacement.GroundLiftY);
         Assert.NotNull(refHornPreview);
-        var meshHornPreview = HornElementPreviewCentroid(merged, partIds, gpuBind, gpuPlacement.GroundLiftY);
+        var meshHornPreview = HornElementPreviewCentroid(merged, partIds, gpuPlacement.GroundLiftY);
         Assert.NotNull(meshHornPreview);
         Assert.True(Vector3.Distance(refHornPreview.Value, meshHornPreview.Value) <= 0.08f,
             $"mesh horn cuboid vs JVM renderCenterTexel: ref={refHornPreview.Value} mesh={meshHornPreview.Value}");
@@ -105,7 +103,6 @@ public sealed class ColdCowHornPreviewPlacementTests
     private static Vector3? HornElementPreviewCentroid(
         MergedJavaBlockModel mesh,
         List<string> partIds,
-        float[] gpuBind,
         float liftY)
     {
         for (var e = 0; e < mesh.Elements.Count; e++)

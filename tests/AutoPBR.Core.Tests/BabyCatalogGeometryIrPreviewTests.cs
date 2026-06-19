@@ -11,6 +11,9 @@ public sealed class BabyCatalogGeometryIrPreviewTests
     private static readonly MinecraftNativeProfile Profile26 =
         new("26.1.2", Path.Combine(AppContext.BaseDirectory, "Data", "minecraft-native", "26.1.2"), new Version(26, 1, 2));
 
+    private static readonly MinecraftNativeProfile RootProfile =
+        new("root", Path.Combine(AppContext.BaseDirectory, "Data", "minecraft-native"), null);
+
     public static TheoryData<string, string> BabyPilotTextures => new()
     {
         { "assets/minecraft/textures/entity/bear/polarbear_baby.png", "net.minecraft.client.model.animal.polarbear.BabyPolarBearModel" },
@@ -68,6 +71,27 @@ public sealed class BabyCatalogGeometryIrPreviewTests
         Assert.False(HasElementSize(baby, 3f, 2.5f, 2f, epsilon: 0.2f));
     }
 
+    [Fact]
+    public void Dedicated_baby_ir_uses_unit_cuboid_scale_when_profile_is_unversioned_root()
+    {
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(
+            "assets/minecraft/textures/entity/cow/cow_temperate_baby.png",
+            RootProfile,
+            0f,
+            0f,
+            out var baby,
+            out var provenance));
+        Assert.Contains("BabyCowModel", provenance.Detail ?? "", StringComparison.Ordinal);
+
+        Assert.True(
+            HasWorldElementSize(baby, 8f, 6f, 12f, epsilon: 0.25f),
+            "dedicated Baby* IR must preserve the baked baby body cuboid size");
+        Assert.False(
+            HasWorldElementSize(baby, 4f, 3f, 6f, epsilon: 0.25f),
+            "dedicated Baby* IR must not apply legacy half-scale when the profile version is unknown");
+    }
+
     private static bool HasElementSize(MergedJavaBlockModel model, float w, float h, float d, float epsilon)
     {
         foreach (var el in model.Elements)
@@ -82,6 +106,45 @@ public sealed class BabyCatalogGeometryIrPreviewTests
         }
 
         return false;
+    }
+
+    private static bool HasWorldElementSize(MergedJavaBlockModel model, float w, float h, float d, float epsilon)
+    {
+        foreach (var el in model.Elements)
+        {
+            var size = ComputeWorldAabbSize(el);
+            if (MathF.Abs(size.X - w) <= epsilon &&
+                MathF.Abs(size.Y - h) <= epsilon &&
+                MathF.Abs(size.Z - d) <= epsilon)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static Vector3 ComputeWorldAabbSize(ModelElement el)
+    {
+        var min = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
+        var max = new Vector3(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity);
+        for (var xi = 0; xi < 2; xi++)
+        {
+            var x = xi == 0 ? el.From[0] : el.To[0];
+            for (var yi = 0; yi < 2; yi++)
+            {
+                var y = yi == 0 ? el.From[1] : el.To[1];
+                for (var zi = 0; zi < 2; zi++)
+                {
+                    var z = zi == 0 ? el.From[2] : el.To[2];
+                    var p = Vector3.Transform(new Vector3(x, y, z), el.LocalToParent);
+                    min = Vector3.Min(min, p);
+                    max = Vector3.Max(max, p);
+                }
+            }
+        }
+
+        return max - min;
     }
 
     [Fact]

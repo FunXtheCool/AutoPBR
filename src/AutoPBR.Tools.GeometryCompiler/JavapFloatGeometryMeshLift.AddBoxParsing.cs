@@ -355,78 +355,139 @@ internal static partial class JavapFloatGeometryMeshLift
     /// Fallback when <see cref="TryParseTexOffsBackward"/> misses <c>iconst/bipush</c> pairs before
     /// <c>texOffs:(II)</c> on the same builder chain (e.g. <c>PlayerCapeModel.createCapeLayer</c> cape slab).
     /// </summary>
-    private static bool TryParseTexOffsImmediatelyBeforeAddBox(List<string> seg, int addBoxLineIdx, out double u,
-        out double v)
+    private static bool TryParseTexOffsImmediatelyBeforeAddBox(List<string> seg, int addBoxLineIdx,
+        IReadOnlyDictionary<int, int> boxIntLocals, out double u, out double v)
     {
         u = v = 0;
         var searchFrom = Math.Max(0, addBoxLineIdx - 32);
         for (var t = addBoxLineIdx - 1; t >= searchFrom; t--)
         {
-            if (!seg[t].Contains("texOffs:(II)", StringComparison.Ordinal) &&
-                !JavapMeshBytecodeProfiles.IsNamedOrObfuscatedTexTwoIntsLine(seg[t]))
+            if (!linesContainTexOffs(seg[t]))
             {
                 continue;
             }
 
-            var ints = new List<double>();
-            for (var j = t - 1; j >= searchFrom && ints.Count < 2; j--)
+            if (TryParseTexOffsFromIntLocalOperandsBackward(seg, t, searchFrom, boxIntLocals, out u, out v))
             {
-                if (JavapBytecodeStreamAnalyzer.TryParseIntLine(seg[j], out var iv))
-                {
-                    ints.Add(iv);
-                }
+                return true;
             }
 
-            if (ints.Count < 2)
+            if (TryParseTexOffsLiteralIntsBackward(seg, t, searchFrom, out u, out v))
             {
-                return false;
+                return true;
             }
-
-            ints.Reverse();
-            u = ints[0];
-            v = ints[1];
-            return true;
         }
 
         return false;
     }
 
-    private static bool TryParseTexOffsBackward(List<string> lines, int startIdx, int floatMinIdx, out double u, out double v,
-        out int nextIdx)
+    private static bool TryParseTexOffsBackward(List<string> lines, int startIdx, int floatMinIdx,
+        IReadOnlyDictionary<int, int> boxIntLocals, out double u, out double v, out int nextIdx)
     {
         u = v = 0;
         nextIdx = startIdx;
         for (var t = startIdx; t >= floatMinIdx; t--)
         {
-            if (!lines[t].Contains("texOffs:(II)", StringComparison.Ordinal) &&
-                !JavapMeshBytecodeProfiles.IsNamedOrObfuscatedTexTwoIntsLine(lines[t]))
+            if (!linesContainTexOffs(lines[t]))
             {
                 continue;
             }
 
-            var ints = new List<double>();
-            var j = t - 1;
-            for (; j >= floatMinIdx && ints.Count < 2; j--)
+            if (TryParseTexOffsFromIntLocalOperandsBackward(lines, t, floatMinIdx, boxIntLocals, out u, out v))
             {
-                if (JavapBytecodeStreamAnalyzer.TryParseIntLine(lines[j], out var iv))
-                {
-                    ints.Add(iv);
-                }
+                nextIdx = t - 1;
+                return true;
             }
 
-            if (ints.Count < 2)
+            if (TryParseTexOffsLiteralIntsBackward(lines, t, floatMinIdx, out u, out v, out var literalNextIdx))
             {
-                return false;
+                nextIdx = literalNextIdx;
+                return true;
             }
-
-            ints.Reverse();
-            u = ints[0];
-            v = ints[1];
-            nextIdx = j;
-            return true;
         }
 
         return false;
+    }
+
+    private static bool linesContainTexOffs(string line) =>
+        line.Contains("texOffs:(II)", StringComparison.Ordinal) ||
+        JavapMeshBytecodeProfiles.IsNamedOrObfuscatedTexTwoIntsLine(line);
+
+    /// <summary>
+    /// Resolves <c>texOffs:(II)</c> operands pushed via <c>iload</c> (e.g. MagmaCube loop locals in slots 3/4).
+    /// </summary>
+    private static bool TryParseTexOffsFromIntLocalOperandsBackward(List<string> lines, int texOffsLineIdx,
+        int floatMinIdx, IReadOnlyDictionary<int, int> boxIntLocals, out double u, out double v)
+    {
+        u = v = 0;
+        var ints = new List<int>();
+        for (var j = texOffsLineIdx - 1; j >= floatMinIdx && ints.Count < 2; j--)
+        {
+            if (JavapBytecodeStreamAnalyzer.TryParseIloadLocalSlot(lines[j], out var slot))
+            {
+                if (boxIntLocals.TryGetValue(slot, out var localVal))
+                {
+                    ints.Add(localVal);
+                    continue;
+                }
+
+                if (TryResolveIntLocal(lines, j, slot, out var resolved))
+                {
+                    ints.Add(resolved);
+                    continue;
+                }
+            }
+
+            if (ints.Count == 0 &&
+                (JavapBytecodeStreamAnalyzer.IsBackwardStackNoiseLine(lines[j]) ||
+                 string.IsNullOrWhiteSpace(lines[j])))
+            {
+                continue;
+            }
+
+            break;
+        }
+
+        if (ints.Count < 2)
+        {
+            return false;
+        }
+
+        ints.Reverse();
+        u = ints[0];
+        v = ints[1];
+        return true;
+    }
+
+    private static bool TryParseTexOffsLiteralIntsBackward(List<string> lines, int texOffsLineIdx, int floatMinIdx,
+        out double u, out double v) =>
+        TryParseTexOffsLiteralIntsBackward(lines, texOffsLineIdx, floatMinIdx, out u, out v, out _);
+
+    private static bool TryParseTexOffsLiteralIntsBackward(List<string> lines, int texOffsLineIdx, int floatMinIdx,
+        out double u, out double v, out int nextIdx)
+    {
+        u = v = 0;
+        nextIdx = floatMinIdx;
+        var ints = new List<double>();
+        var j = texOffsLineIdx - 1;
+        for (; j >= floatMinIdx && ints.Count < 2; j--)
+        {
+            if (JavapBytecodeStreamAnalyzer.TryParseIntLine(lines[j], out var iv))
+            {
+                ints.Add(iv);
+            }
+        }
+
+        if (ints.Count < 2)
+        {
+            return false;
+        }
+
+        ints.Reverse();
+        u = ints[0];
+        v = ints[1];
+        nextIdx = j;
+        return true;
     }
 
     /// <summary>

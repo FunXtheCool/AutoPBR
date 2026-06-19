@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Text.Json;
+
 using AutoPBR.Core.Models;
 
 namespace AutoPBR.Core.Preview;
@@ -38,9 +39,7 @@ internal static class PreviewDepthLayerResolver
 
         // Horizontal wing/gill sheets stay Base: javap emits bone cuboids before skin on the same
         // ModelPart and relies on polygon order, not a separate overlay depth pass.
-        var inflate = 0f;
-        _ = GeometryIrCuboidMetadata.TryGetInflate(cuboid, out inflate);
-        if (inflate > 0f)
+        if (GeometryIrCuboidMetadata.TryGetInflate(cuboid, out var inflate) && inflate > 0f)
         {
             return (PreviewDepthLayerKind.Base, cuboidIndexOnPart, true);
         }
@@ -104,7 +103,7 @@ internal static class PreviewDepthLayerResolver
             return false;
         }
 
-        var key = textureKey.StartsWith("#", StringComparison.Ordinal) ? textureKey : "#" + textureKey;
+        var key = textureKey.StartsWith('#') ? textureKey : "#" + textureKey;
         if (IsPrimaryTextureKey(key))
         {
             return false;
@@ -198,7 +197,7 @@ internal static class PreviewDepthLayerResolver
             var key = MatrixKey.From(merged.Elements[i].LocalToParent);
             if (!groups.TryGetValue(key, out var list))
             {
-                list = new List<int>();
+                list = [];
                 groups[key] = list;
             }
 
@@ -223,7 +222,7 @@ internal static class PreviewDepthLayerResolver
                 }
 
                 // Horizontal wing/gill membranes are not outer shells; they get an explicit overlay pass above.
-                if (TryClassifyHorizontalUpFaceMembraneElement(element, out _))
+                if (TryClassifyHorizontalUpFaceMembraneElement(element))
                 {
                     continue;
                 }
@@ -317,9 +316,8 @@ internal static class PreviewDepthLayerResolver
     /// <summary>
     /// Detects horizontal <c>faceMask:["up"]</c> sheets so coplanar-sibling enrich does not treat them as outer shells.
     /// </summary>
-    private static bool TryClassifyHorizontalUpFaceMembraneElement(ModelElement element, out int layerOrdinal)
+    private static bool TryClassifyHorizontalUpFaceMembraneElement(ModelElement element)
     {
-        layerOrdinal = 0;
         if (!element.Faces.TryGetValue("up", out var upFace) || upFace.Uv is not { Length: >= 4 })
         {
             return false;
@@ -342,13 +340,7 @@ internal static class PreviewDepthLayerResolver
         var spanX = max.X - min.X;
         var spanY = max.Y - min.Y;
         var spanZ = max.Z - min.Z;
-        if (spanX < 8f || spanZ < 8f || spanY > MathF.Max(spanX, spanZ) * 0.25f)
-        {
-            return false;
-        }
-
-        layerOrdinal = 1;
-        return true;
+        return spanX >= 8f && spanZ >= 8f && spanY <= MathF.Max(spanX, spanZ) * 0.25f;
     }
 
     /// <summary>Coplanar enrich only tags a larger overlapping sibling (outer robe/shell), not disjoint cuboids on the same pose.</summary>

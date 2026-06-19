@@ -1,9 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Numerics;
 
 using AutoPBR.Core.Models;
+
+// ReSharper disable CheckNamespace
 
 namespace AutoPBR.Core.Preview;
 
@@ -16,9 +15,9 @@ internal sealed partial class CleanRoomEntityModelRuntime
     /// <b>Rigging policy:</b> compose vanilla <c>PartPose</c>-equivalent chains only through these methods
     /// (<see cref="Mul"/>, <see cref="T"/>, <see cref="Rx"/>, <see cref="Ry"/>, <see cref="Rz"/>, <see cref="Er"/>).
     /// Do not duplicate local <c>static Mul/T/Er</c> helpers in new or refactored builders.
-    /// Living-entity previews should end with column-root LER (<see cref="ApplyLivingEntityRendererColumnRootScale"/>)
+    /// Living-entity previews should end with column-root LER (<see cref="ApplyLivingEntityRendererColumnRootScale(in Matrix4x4)"/>)
     /// after model-space emit. Legacy hand paths may still pass <c>lerMirrorRightComposeLocalChain: true</c> for A/B tests only; production emit uses
-    /// <see cref="ApplyLivingEntityRendererColumnRootScale"/> (see <see cref="GeometryIrLerBasisKind.StandardWorldRoot"/>).
+    /// <see cref="ApplyLivingEntityRendererColumnRootScale(MergedJavaBlockModel)"/> (see <see cref="GeometryIrLerBasisKind.StandardWorldRoot"/>).
     /// </summary>
     private static class EntityParityTemplate
     {
@@ -55,7 +54,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         /// <summary>
         /// Vanilla <c>ModelPart.translateAndRotate</c> bind rotation: JOML <c>Quaternionf.rotationZYX(z, y, x)</c> in row-matrix form.
         /// </summary>
-        public static Matrix4x4 ModelPartRotationZyx(float xRad, float yRad, float zRad) =>
+        private static Matrix4x4 ModelPartRotationZyx(float xRad, float yRad, float zRad) =>
             Mul(Mul(Rx(xRad), Ry(yRad)), Rz(zRad));
 
         /// <summary>
@@ -159,20 +158,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 DepthLayerKind,
                 LayerOrdinal,
                 CastsShadow);
-        }
-    }
-
-    /// <summary>Emit every cuboid in <paramref name="cuboids"/> under the same parent pose and part scale.</summary>
-    private static void EmitCuboids(
-        RigBuilder builder,
-        ReadOnlySpan<EntityCuboid> cuboids,
-        Matrix4x4 parentPose,
-        float partScale,
-        string texKey = "#skin")
-    {
-        foreach (var c in cuboids)
-        {
-            c.Emit(builder, parentPose, partScale, texKey);
         }
     }
 
@@ -296,38 +281,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
     }
 
     /// <summary>
-    /// Applies an additional world-root matrix on the baked element poses: <c>LocalToParent' = worldRoot * LocalToParent</c>
-    /// (column-vector mesh convention — same as <see cref="MinecraftModelBaker"/>).
-    /// </summary>
-    private static MergedJavaBlockModel ApplyPreviewWorldRoot(MergedJavaBlockModel model, Matrix4x4 worldRoot)
-    {
-        var transformed = new List<ModelElement>(model.Elements.Count);
-        foreach (var e in model.Elements)
-        {
-            var m = Matrix4x4.Multiply(worldRoot, e.LocalToParent);
-            transformed.Add(new ModelElement
-            {
-                From = e.From,
-                To = e.To,
-                Faces = e.Faces,
-                LocalToParent = m,
-                DepthLayerKind = e.DepthLayerKind,
-                LayerOrdinal = e.LayerOrdinal,
-                CastsShadow = e.CastsShadow,
-                ShellInflateTexels = e.ShellInflateTexels,
-                MirrorCuboidUv = e.MirrorCuboidUv,
-            });
-        }
-
-        return new MergedJavaBlockModel
-        {
-            Elements = transformed,
-            Textures = model.Textures,
-            UsesLivingEntityRendererColumnYFlip = model.UsesLivingEntityRendererColumnYFlip,
-        };
-    }
-
-    /// <summary>
     /// Vanilla LER <c>PoseStack.scale(-1,-1,1)</c> before the model tree: column <c>S * M</c> on points, stored as row affine.
     /// </summary>
     internal static Matrix4x4 ApplyLivingEntityRendererColumnRootScale(in Matrix4x4 modelPose)
@@ -381,8 +334,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
     /// <summary>
     /// Vanilla <c>LivingEntityRenderer</c> applies <c>PoseStack.scale(-1, -1, 1)</c> before drawing most mob models.
     /// Geometry IR uses <see cref="ResolveGeometryIrParityEmitPlan"/> for a single fold: PoseStack root on emit, or one post-batch
-    /// (<see cref="ApplyPreviewWorldRoot"/> / <see cref="ApplyGlobalTransform"/>). Hand-built rigs may pass
-    /// <paramref name="lerMirrorRightComposeLocalChain"/> directly (see <see cref="ApplyEquineLivingEntityRendererPreviewBasis"/>).
+    /// world-root transform via <see cref="ApplyGlobalTransform"/>. Hand-built rigs may pass
+    /// <paramref name="lerMirrorRightComposeLocalChain"/> directly for equine-specific preview basis paths.
     /// </summary>
     /// <remarks>
     /// Geometry IR and hand <c>Build*</c> fallbacks use
@@ -417,7 +370,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 model,
                 lerMirrorRightComposeLocalChain: true),
             GeometryIrLerBasisKind.StandardWorldRoot => ApplyLivingEntityRendererColumnRootScale(model),
-            _ => ApplyLivingEntityRendererColumnRootScale(model)
+            GeometryIrLerBasisKind.EquineDedicated => ApplyLivingEntityRendererColumnRootScale(model),
+            _ => throw new ArgumentOutOfRangeException(nameof(basis), basis, null),
         };
 
 
@@ -483,7 +437,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         /// <summary>
         /// Matches vanilla <c>LivingEntity.DEFAULT_BABY_SCALE</c> (<c>0.5F</c>, 26.1.2 <c>client.jar</c>): uniform <c>getAgeScale()</c> while the
-        /// renderer keeps the adult <see cref="HumanoidModel"/> / shared mesh (e.g. <c>SkeletonModel</c>, <c>PlayerModel</c>, <c>IllagerModel</c> —
+        /// renderer keeps the adult HumanoidModel / shared mesh (e.g. <c>SkeletonModel</c>, <c>PlayerModel</c>, <c>IllagerModel</c> —
         /// see geometry IR under <c>docs/generated/geometry/26.1.2/</c>).
         /// </summary>
         public static readonly BabyProfile VanillaUniformBaby = new(0.5f, 0.5f, 0.5f);

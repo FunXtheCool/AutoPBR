@@ -263,39 +263,12 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
-                merged = BuildBoat(
-
-
-
-
-
-
-
+                merged = BuildBoatFamily(
                     texRef,
-
-
-
-
-
-
-
                     profile,
-
-
-
-
-
-
-
                     isBaby,
-
-
-
-
-
-
-
-                    isChestBoat: normalizedAssetPath.Contains("/textures/entity/chest_boat/", StringComparison.OrdinalIgnoreCase));
+                    isChestBoat: normalizedAssetPath.Contains("/textures/entity/chest_boat/", StringComparison.OrdinalIgnoreCase),
+                    normalizedAssetPath);
 
 
 
@@ -313,7 +286,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
-                merged = BuildBoat(texRef, profile, isBaby, isChestBoat: true);
+                merged = BuildBoatFamily(texRef, profile, isBaby, isChestBoat: true, normalizedAssetPath);
 
 
 

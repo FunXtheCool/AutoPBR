@@ -1,4 +1,5 @@
 using System.Numerics;
+
 using AutoPBR.Core.Models;
 // ReSharper disable CheckNamespace
 
@@ -150,15 +151,10 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 faceMask is { Length: > 0 } &&
                 IsNorthSouthFaceMaskOnly(faceMask);
 
-            (float[] North, float[] South, float[] West, float[] East, float[] Up, float[] Down) uv;
-            if (useNorthSouthUvSpan)
-            {
-                uv = BuildNorthSouthUvSpanLayout(texU, texV, uvSizeW, uvSizeH, mirrorCuboidUv);
-            }
-            else
-            {
-                uv = BuildCubeUvLayout(texU, texV, uw, uh, ud, mirrorCuboidUv);
-            }
+            (float[] North, float[] South, float[] West, float[] East, float[] Up, float[] Down) uv =
+                useNorthSouthUvSpan
+                    ? BuildNorthSouthUvSpanLayout(texU, texV, uvSizeW, uvSizeH, mirrorCuboidUv)
+                    : BuildCubeUvLayout(texU, texV, uw, uh, ud, mirrorCuboidUv);
 
             var allFaces = new Dictionary<string, ModelFace>(StringComparer.OrdinalIgnoreCase)
             {
@@ -182,20 +178,21 @@ internal sealed partial class CleanRoomEntityModelRuntime
                     }
                 }
 
-                // Zero-height horizontal sheets (dragon wing membranes): vanilla only masks "up" but
-                // preview must be double-sided so the membrane is visible from below.
+                // Zero-height horizontal sheets may be lifted as a single existing plane even when
+                // the Java addBox call was unmasked. Keep the real Java DOWN UV slot instead of
+                // copying UP; dragon membranes use DOWN for the visible negative-U artwork.
                 if (uh == 0 &&
                     uvSizeW > 0 &&
                     uvSizeD > 0 &&
                     faceMask.Length == 1 &&
                     faceMask[0].Equals("up", StringComparison.OrdinalIgnoreCase) &&
-                    allFaces.TryGetValue("up", out var upFace))
+                    allFaces.TryGetValue("down", out var downFace))
                 {
                     faces["down"] = new ModelFace
                     {
-                        TextureKey = upFace.TextureKey,
-                        Uv = upFace.Uv,
-                        RotationDegrees = upFace.RotationDegrees,
+                        TextureKey = downFace.TextureKey,
+                        Uv = downFace.Uv,
+                        RotationDegrees = downFace.RotationDegrees,
                     };
                 }
 

@@ -34,7 +34,9 @@ internal static partial class JavapFloatGeometryMeshLift
 
         if (!seg.Any(static l => l.Contains("nextInt:(I)I", StringComparison.Ordinal)) ||
             !seg.Any(static l => l.Contains("bipush        7", StringComparison.Ordinal) ||
-                                 l.Contains("bipush 7", StringComparison.Ordinal)))
+                                 l.Contains("bipush 7", StringComparison.Ordinal)) ||
+            !seg.Any(static l => l.Contains("istore        6", StringComparison.Ordinal) ||
+                                 l.Contains("istore 6", StringComparison.Ordinal)))
         {
             return;
         }

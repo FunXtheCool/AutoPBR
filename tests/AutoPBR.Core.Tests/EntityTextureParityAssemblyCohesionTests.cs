@@ -29,18 +29,26 @@ public sealed class EntityTextureParityAssemblyCohesionTests
     }
 
     [Theory]
-    [InlineData("assets/minecraft/textures/entity/boat/oak.png")]
-    [InlineData("assets/minecraft/textures/entity/boat/bamboo.png")]
-    [InlineData("assets/minecraft/textures/entity/chest_boat/oak.png")]
-    public void BoatFamily_Assembly_OverallWorldDiagonal_IsTight(string path)
+    [InlineData("assets/minecraft/textures/entity/boat/oak.png", 58f, 66f)]
+    [InlineData("assets/minecraft/textures/entity/chest_boat/oak.png", 58f, 66f)]
+    public void BoatFamily_Assembly_OverallWorldDiagonal_IsTight(string path, float minDiag, float maxDiag)
     {
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
         Assert.True(model.Elements.Count >= 5, $"{path}: expected hull elements");
 
-        // Paddles (and chest on chest_boat) stretch the union diagonal; band matches the current vanilla-tuned rig.
         var unionDiag = UnionWorldAabbDiagonal(model);
-        Assert.InRange(unionDiag, 58f, 66f);
+        Assert.InRange(unionDiag, minDiag, maxDiag);
+    }
+
+    [Fact]
+    public void BambooRaft_Assembly_OverallWorldDiagonal_IsTight()
+    {
+        const string path = "assets/minecraft/textures/entity/boat/bamboo.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
+        var unionDiag = UnionWorldAabbDiagonal(model);
+        Assert.InRange(unionDiag, 45f, 52f);
     }
 
     [Fact]

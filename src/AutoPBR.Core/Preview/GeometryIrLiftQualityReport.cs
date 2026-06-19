@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.Json.Nodes;
 
 namespace AutoPBR.Core.Preview;
 
@@ -80,8 +79,8 @@ public static partial class GeometryIrLiftQualityReport
         IReadOnlyList<Entry> Entries,
         IReadOnlyList<string> PrioritizedBacklogJvmNames);
 
-    private static readonly HashSet<(string ParentId, string ChildId)> KnownNestedPairs = new()
-    {
+    private static readonly HashSet<(string ParentId, string ChildId)> KnownNestedPairs =
+    [
         ("head", "beak"),
         ("head", "red_thing"),
         ("head", "hat"),
@@ -96,7 +95,7 @@ public static partial class GeometryIrLiftQualityReport
         ("body", "right_front_leg"),
         ("body", "left_hind_leg"),
         ("body", "right_hind_leg"),
-    };
+    ];
 
     private static readonly string[] BodyLegPartIds =
     [
@@ -140,7 +139,7 @@ public static partial class GeometryIrLiftQualityReport
                 : null;
             var shardPath = string.IsNullOrEmpty(rel)
                 ? null
-                : Path.Combine(repoRoot, "docs", "generated", rel!);
+                : Path.Combine(repoRoot, "docs", "generated", rel);
             if (shardPath is null || !File.Exists(shardPath))
             {
                 continue;

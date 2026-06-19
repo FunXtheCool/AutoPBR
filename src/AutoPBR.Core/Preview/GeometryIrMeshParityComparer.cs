@@ -39,8 +39,31 @@ internal static class GeometryIrMeshParityComparer
         return new CompareResult(true, maxDelta, null);
     }
 
-    private static string ElementSortKey(ModelElement e) =>
-        $"{e.From[0]:F4},{e.From[1]:F4},{e.From[2]:F4},{e.To[0]:F4},{e.To[1]:F4},{e.To[2]:F4}";
+    private static string ElementSortKey(ModelElement e)
+    {
+        GetWorldMinCorner(e, out var wMin);
+        return $"{wMin.X:F4},{wMin.Y:F4},{wMin.Z:F4},{e.From[0]:F4},{e.From[1]:F4},{e.From[2]:F4},{e.To[0]:F4},{e.To[1]:F4},{e.To[2]:F4}";
+    }
+
+    private static void GetWorldMinCorner(ModelElement e, out Vector3 wMin)
+    {
+        wMin = new Vector3(float.PositiveInfinity);
+        ReadOnlySpan<(float x, float y, float z)> corners =
+        [
+            (e.From[0], e.From[1], e.From[2]),
+            (e.To[0], e.From[1], e.From[2]),
+            (e.From[0], e.To[1], e.From[2]),
+            (e.To[0], e.To[1], e.From[2]),
+            (e.From[0], e.From[1], e.To[2]),
+            (e.To[0], e.From[1], e.To[2]),
+            (e.From[0], e.To[1], e.To[2]),
+            (e.To[0], e.To[1], e.To[2]),
+        ];
+        foreach (var (x, y, z) in corners)
+        {
+            wMin = Vector3.Min(wMin, Vector3.Transform(new Vector3(x, y, z), e.LocalToParent));
+        }
+    }
 
     private static float ElementCornerDelta(ModelElement a, ModelElement b)
     {

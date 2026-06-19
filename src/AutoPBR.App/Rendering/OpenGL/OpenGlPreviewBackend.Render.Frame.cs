@@ -58,14 +58,12 @@ public sealed partial class OpenGlPreviewBackend
         public bool EnableSpecularMapEff;
         public bool EnableParallaxShadowEff;
         public bool ShadowAvailable;
-        public bool DrewAtmosphereSky;
         public Vector3 Eye;
         public Vector3 LookTarget;
         public Matrix4x4 Proj;
         public Matrix4x4 View;
         public Vector3 LightDir;
         public bool GodRayCaptureActive;
-        public bool VolumeFroxelsReady;
         public double LastVolumeInjectMs;
         public double LastVolumeIntegrateMs;
     }

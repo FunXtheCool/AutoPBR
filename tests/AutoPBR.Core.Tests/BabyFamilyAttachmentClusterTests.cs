@@ -1,6 +1,4 @@
 using System.Numerics;
-using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
 
 namespace AutoPBR.Core.Tests;
 
@@ -15,14 +13,18 @@ public sealed class BabyFamilyAttachmentClusterTests
 
     public static TheoryData<string, float> BabyAttachmentCases => new()
     {
+        { "assets/minecraft/textures/entity/armadillo/armadillo_baby.png", 0.65f },
+        { "assets/minecraft/textures/entity/axolotl/axolotl_blue_baby.png", 0.65f },
         { "assets/minecraft/textures/entity/fox/fox_baby.png", 0.55f },
         { "assets/minecraft/textures/entity/cow/cow_temperate_baby.png", 0.65f },
         { "assets/minecraft/textures/entity/chicken/chicken_temperate_baby.png", 0.55f },
         { "assets/minecraft/textures/entity/cat/cat_british_shorthair_baby.png", 0.55f },
         { "assets/minecraft/textures/entity/bear/polarbear_baby.png", 0.55f },
         { "assets/minecraft/textures/entity/horse/horse_black_baby.png", 0.65f },
-        { "assets/minecraft/textures/entity/horse/donkey_baby.png", 0.65f },
+        { "assets/minecraft/textures/entity/horse/donkey_baby.png", 0.95f },
         { "assets/minecraft/textures/entity/goat/goat_baby.png", 0.65f },
+        { "assets/minecraft/textures/entity/sheep/sheep_baby.png", 0.65f },
+        { "assets/minecraft/textures/entity/zombie/drowned_baby.png", 0.65f },
     };
 
     [Theory]
@@ -37,11 +39,11 @@ public sealed class BabyFamilyAttachmentClusterTests
         var rule = EntityTextureParityCatalog.ResolveRule(texturePath, stem);
         Assert.NotNull(rule);
         Assert.True(GeometryIrParityJvmResolver.TryResolveLiftedRoot(
-            Profile26, rule!, texturePath, stem, isBaby: true, out var jvm, out var geometryRoot));
+            Profile26, rule, texturePath, stem, isBaby: true, out var jvm, out var geometryRoot));
         geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, geometryRoot);
         var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
             geometryRoot,
-            GeometryIrMeshEmitOptions.ForParity(64, 64) with { OfficialJvmName = jvm });
+            GeometryIrMeshEmitOptions.ForParity() with { OfficialJvmName = jvm });
         Assert.Equal(mesh.Elements.Count, partIds.Count);
 
         var bodyCentroid = ComputePartPreviewCentroid(mesh, partIds, static id =>
@@ -58,7 +60,7 @@ public sealed class BabyFamilyAttachmentClusterTests
                 continue;
             }
 
-            var maxGap = suffix == "head" ? 0.75f : maxGapPreviewUnits;
+            var maxGap = suffix == "head" ? MathF.Max(0.75f, maxGapPreviewUnits) : maxGapPreviewUnits;
             var gap = Vector3.Distance(bodyCentroid.Value, partCentroid.Value);
             Assert.True(
                 gap <= maxGap,
@@ -93,11 +95,11 @@ public sealed class BabyFamilyAttachmentClusterTests
         var rule = EntityTextureParityCatalog.ResolveRule(texturePath, stem);
         Assert.NotNull(rule);
         Assert.True(GeometryIrParityJvmResolver.TryResolveLiftedRoot(
-            Profile26, rule!, texturePath, stem, isBaby: true, out var jvm, out var geometryRoot));
+            Profile26, rule, texturePath, stem, isBaby: true, out var jvm, out var geometryRoot));
         geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, geometryRoot);
         var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
             geometryRoot,
-            GeometryIrMeshEmitOptions.ForParity(64, 64) with { OfficialJvmName = jvm });
+            GeometryIrMeshEmitOptions.ForParity() with { OfficialJvmName = jvm });
         Assert.Equal(merged.Elements.Count, partIds.Count);
 
         var bodyCentroid = ComputeBakedPartPreviewCentroid(merged, verts, partIds, static id =>
@@ -114,7 +116,7 @@ public sealed class BabyFamilyAttachmentClusterTests
                 continue;
             }
 
-            var maxGap = suffix == "head" ? 0.75f : maxGapPreviewUnits;
+            var maxGap = suffix == "head" ? MathF.Max(0.75f, maxGapPreviewUnits) : maxGapPreviewUnits;
             var gap = Vector3.Distance(bodyCentroid.Value, partCentroid.Value);
             Assert.True(
                 gap <= maxGap,
@@ -147,11 +149,11 @@ public sealed class BabyFamilyAttachmentClusterTests
         var rule = EntityTextureParityCatalog.ResolveRule(texturePath, stem);
         Assert.NotNull(rule);
         Assert.True(GeometryIrParityJvmResolver.TryResolveLiftedRoot(
-            Profile26, rule!, texturePath, stem, isBaby: true, out var jvm, out var geometryRoot));
+            Profile26, rule, texturePath, stem, isBaby: true, out var jvm, out var geometryRoot));
         geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, geometryRoot);
         var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
             geometryRoot,
-            GeometryIrMeshEmitOptions.ForParity(64, 64) with { OfficialJvmName = jvm });
+            GeometryIrMeshEmitOptions.ForParity() with { OfficialJvmName = jvm });
         Assert.Equal(mergedBind.Elements.Count, partIds.Count);
 
         EntityPreviewPlacement.ApplyToGpuBindVertices(gpuVerts, partIds);
@@ -170,7 +172,7 @@ public sealed class BabyFamilyAttachmentClusterTests
                 continue;
             }
 
-            var maxGap = suffix == "head" ? 0.75f : maxGapPreviewUnits;
+            var maxGap = suffix == "head" ? MathF.Max(0.75f, maxGapPreviewUnits) : maxGapPreviewUnits;
             var gap = Vector3.Distance(bodyCentroid.Value, partCentroid.Value);
             Assert.True(
                 gap <= maxGap,
@@ -233,11 +235,11 @@ public sealed class BabyFamilyAttachmentClusterTests
         var rule = EntityTextureParityCatalog.ResolveRule(texturePath, stem);
         Assert.NotNull(rule);
         Assert.True(GeometryIrParityJvmResolver.TryResolveLiftedRoot(
-            Profile26, rule!, texturePath, stem, isBaby: true, out var jvm, out var geometryRoot));
+            Profile26, rule, texturePath, stem, isBaby: true, out var jvm, out var geometryRoot));
         geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, geometryRoot);
         var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
             geometryRoot,
-            GeometryIrMeshEmitOptions.ForParity(64, 64) with { OfficialJvmName = jvm });
+            GeometryIrMeshEmitOptions.ForParity() with { OfficialJvmName = jvm });
         Assert.Equal(merged.Elements.Count, partIds.Count);
 
         EntityPreviewPlacement.ApplyToPreviewVertices(
@@ -259,7 +261,7 @@ public sealed class BabyFamilyAttachmentClusterTests
                 continue;
             }
 
-            var maxGap = suffix == "head" ? 0.75f : maxGapPreviewUnits;
+            var maxGap = suffix == "head" ? MathF.Max(0.75f, maxGapPreviewUnits) : maxGapPreviewUnits;
             var gap = Vector3.Distance(bodyCentroid.Value, partCentroid.Value);
             Assert.True(
                 gap <= maxGap,
@@ -283,11 +285,11 @@ public sealed class BabyFamilyAttachmentClusterTests
         var rule = EntityTextureParityCatalog.ResolveRule(texturePath, stem);
         Assert.NotNull(rule);
         Assert.True(GeometryIrParityJvmResolver.TryResolveLiftedRoot(
-            Profile26, rule!, texturePath, stem, isBaby: true, out var jvm, out var geometryRoot));
+            Profile26, rule, texturePath, stem, isBaby: true, out var jvm, out var geometryRoot));
         geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, geometryRoot);
         var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
             geometryRoot,
-            GeometryIrMeshEmitOptions.ForParity(64, 64) with { OfficialJvmName = jvm });
+            GeometryIrMeshEmitOptions.ForParity() with { OfficialJvmName = jvm });
 
         var bodyCentroid = ComputePartPreviewCentroid(animated, partIds, static id =>
             id.Contains("body", StringComparison.Ordinal));

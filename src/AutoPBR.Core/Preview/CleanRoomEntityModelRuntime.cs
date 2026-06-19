@@ -96,7 +96,8 @@ internal sealed partial class CleanRoomEntityModelRuntime : IEntityModelRuntime
         float animationTimeSeconds,
         out MergedJavaBlockModel mergedModel,
         out PreviewMeshProvenance meshProvenance,
-        bool applyGeometryIrSetupAnimMotion = false)
+        bool applyGeometryIrSetupAnimMotion = false,
+        bool pairDoubleChestPreviewHalves = true)
     {
         mergedModel = null!;
         meshProvenance = default;
@@ -124,6 +125,24 @@ internal sealed partial class CleanRoomEntityModelRuntime : IEntityModelRuntime
                 out meshProvenance))
         {
             return false;
+        }
+
+        if (pairDoubleChestPreviewHalves &&
+            TryMergeDoubleChestPartnerHalf(
+                norm,
+                profile,
+                idlePhase01,
+                animationTimeSeconds,
+                applyGeometryIrSetupAnimMotion,
+                ref mergedModel))
+        {
+            var partnerSuffix = norm.Contains("_left", StringComparison.OrdinalIgnoreCase) ? "+right half" : "+left half";
+            meshProvenance = meshProvenance with
+            {
+                Detail = string.IsNullOrWhiteSpace(meshProvenance.Detail)
+                    ? $"paired double chest {partnerSuffix}"
+                    : $"{meshProvenance.Detail} · paired double chest {partnerSuffix}",
+            };
         }
 
         var parityRule = EntityTextureParityCatalog.ResolveRule(norm, stem);

@@ -45,6 +45,20 @@ public sealed class GhastPreviewAttachmentTests
         Assert.Equal(0f, y0);
         Assert.Equal(5f, y1);
 
+        y0 = 0f;
+        y1 = 8f;
+        Assert.True(GeometryIrEmitPolicy.TryReorientGhastFamilyTentacleCuboidYForModelSpace(
+            "net.minecraft.client.model.GhastModel", "tentacle0", ref y0, ref y1));
+        Assert.Equal(-8f, y0);
+        Assert.Equal(0f, y1);
+
+        y0 = 0f;
+        y1 = 8f;
+        Assert.True(GeometryIrEmitPolicy.TryReorientGhastFamilyTentacleCuboidYForModelSpace(
+            "net.minecraft.client.model.monster.Ghast.GhastModel", "tentacle0", ref y0, ref y1));
+        Assert.Equal(-8f, y0);
+        Assert.Equal(0f, y1);
+
         Assert.Equal(0.4f + 0.2f * MathF.Sin(2f), GeometryIrEmitPolicy.ComputeGhastAnimateTentaclesXRot(2, 0f), 3);
     }
 

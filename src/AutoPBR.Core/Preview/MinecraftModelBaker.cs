@@ -1,4 +1,3 @@
-using System.Numerics;
 using AutoPBR.Core.Models;
 
 namespace AutoPBR.Core.Preview;

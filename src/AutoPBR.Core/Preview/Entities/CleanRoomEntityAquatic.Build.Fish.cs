@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Numerics;
 // ReSharper disable CheckNamespace
 
@@ -17,7 +15,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             : (isBaby ? new BabyProfile(0.92f, 1.0f, 0.92f) : BabyProfile.Adult);
 
         var b = new RigBuilder(32, 32);
-        _ = TryBuildCodMeshFromGeometryIr(b, profile, p, tailSway, out _);
+        _ = TryBuildCodMeshFromGeometryIr(b, profile, p, tailSway);
 
         return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef));
     }
@@ -30,7 +28,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             : (isBaby ? new BabyProfile(0.92f, 1.0f, 0.92f) : BabyProfile.Adult);
 
         var b = new RigBuilder(32, 32);
-        _ = TryBuildSalmonMeshFromGeometryIr(b, profile, p, tailSway, out _);
+        _ = TryBuildSalmonMeshFromGeometryIr(b, profile, p, tailSway);
 
         return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef));
     }

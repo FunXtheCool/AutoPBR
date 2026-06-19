@@ -280,11 +280,11 @@ public sealed partial class OpenGlPreviewBackend
         return gl.GetError() == GLEnum.NoError;
     }
 
-    private bool TryCompositeAdditiveRays(ref GlRenderFrame frame, uint raysTexture, uint cloudMaskTexture = 0)
+    private void TryCompositeAdditiveRays(ref GlRenderFrame frame, uint raysTexture, uint cloudMaskTexture = 0)
     {
         if (_godRayCompositeProgram is not { IsValid: true } || _godRayQuadVao == 0)
         {
-            return false;
+            return;
         }
 
         var gl = frame.Gl;
@@ -323,15 +323,13 @@ public sealed partial class OpenGlPreviewBackend
         {
             gl.Disable(EnableCap.Blend);
         }
-
-        return true;
     }
 
-    private bool TryRunScreenSpaceGodRays(ref GlRenderFrame frame)
+    private void TryRunScreenSpaceGodRays(ref GlRenderFrame frame)
     {
         if (_screenSpaceGodRayProgram is null || _sceneCapture is null || _godRayQuadVao == 0)
         {
-            return false;
+            return;
         }
 
         var aspect = frame.Vw / (float)Math.Max(frame.Vh, 1);
@@ -340,7 +338,7 @@ public sealed partial class OpenGlPreviewBackend
         var tls = towardSun.LengthSquared();
         if (tls < 1e-12f)
         {
-            return false;
+            return;
         }
 
         towardSun /= MathF.Sqrt(tls);
@@ -398,8 +396,6 @@ public sealed partial class OpenGlPreviewBackend
             _screenSpaceGodRayLogged = 1;
             EmitDiagnostic("[3D preview] Screen-space god-ray fallback active.");
         }
-
-        return true;
     }
 
     private bool TryRunShadowAwareGodRays(ref GlRenderFrame frame)
@@ -599,7 +595,6 @@ public sealed partial class OpenGlPreviewBackend
         gl.DepthMask(false);
         gl.BindVertexArray(_godRayQuadVao);
 
-        frame.VolumeFroxelsReady = false;
         var volumeSw = frame.Settings.LogVolumetricTiming ? Stopwatch.StartNew() : null;
         var injectMs = 0.0;
         var integrateMs = 0.0;
@@ -609,8 +604,6 @@ public sealed partial class OpenGlPreviewBackend
             volumeSw.Stop();
             MaybeLogVolumetricTiming(frame.Settings, injectMs, integrateMs);
         }
-
-        frame.VolumeFroxelsReady = usedVolumePath;
 
         if (!usedVolumePath)
         {

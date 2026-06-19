@@ -1,7 +1,3 @@
-using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
-using AutoPBR.Tests.TestSupport;
-
 namespace AutoPBR.Core.Tests;
 
 /// <summary>

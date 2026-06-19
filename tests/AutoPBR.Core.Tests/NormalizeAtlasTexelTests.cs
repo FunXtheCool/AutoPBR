@@ -1,5 +1,3 @@
-using AutoPBR.Core.Preview;
-
 namespace AutoPBR.Core.Tests;
 
 public sealed class NormalizeAtlasTexelTests

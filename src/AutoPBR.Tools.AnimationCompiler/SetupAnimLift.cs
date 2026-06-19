@@ -39,7 +39,7 @@ internal static partial class SetupAnimLift
          note.Contains("(visible)", StringComparison.Ordinal));
 
     private static readonly Dictionary<string, string> AbstractSetupAnimHoistTemplates =
-        new Dictionary<string, string>(StringComparer.Ordinal)
+        new(StringComparer.Ordinal)
         {
             ["net.minecraft.client.model.animal.feline.AbstractFelineModel"] =
                 "net.minecraft.client.model.animal.feline.AdultFelineModel"

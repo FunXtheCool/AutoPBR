@@ -203,7 +203,7 @@ public sealed partial class OpenGlPreviewBackend
         }
     }
 
-    private void TryInitAtmosphere(GL gl, bool useOpenGlEs)
+    private void TryInitAtmosphere(GL gl)
     {
         DestroyAtmosphereResources();
         EnsureAtmoQuadBuffer(gl);
@@ -564,7 +564,6 @@ public sealed partial class OpenGlPreviewBackend
             gl.BindVertexArray(_atmoQuadVao);
             gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
             gl.BindVertexArray(0);
-            return;
         }
     }
 

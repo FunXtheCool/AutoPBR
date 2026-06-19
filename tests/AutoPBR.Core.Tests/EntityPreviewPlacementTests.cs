@@ -9,6 +9,16 @@ public sealed class EntityPreviewPlacementTests
   private static readonly MinecraftNativeProfile Profile26 =
       new("26.1.2", TestEnvironmentPaths.AbsentNativeRoot, new Version(26, 1, 2));
 
+  public static TheoryData<string> BabyCentroidCases => new()
+  {
+    "assets/minecraft/textures/entity/armadillo/armadillo_baby.png",
+    "assets/minecraft/textures/entity/axolotl/axolotl_blue_baby.png",
+    "assets/minecraft/textures/entity/cow/cow_temperate_baby.png",
+    "assets/minecraft/textures/entity/horse/donkey_baby.png",
+    "assets/minecraft/textures/entity/sheep/sheep_baby.png",
+    "assets/minecraft/textures/entity/zombie/drowned_baby.png",
+  };
+
   [Fact]
   public void Cow_temperate_bind_pose_foot_contact_near_preview_floor_after_placement()
   {
@@ -59,5 +69,70 @@ public sealed class EntityPreviewPlacementTests
     }
 
     Assert.InRange(minY, floor - 0.08f, floor + 0.08f);
+  }
+
+  [Theory]
+  [MemberData(nameof(BabyCentroidCases))]
+  public void Baby_rebake_records_meaningful_part_centroid_diagnostics(string texturePath)
+  {
+    var runtime = EntityModelRuntimeFactory.Create();
+    Assert.True(runtime.TryBuildStaticMesh(
+        texturePath,
+        Profile26,
+        idlePhase01: 0f,
+        animationTimeSeconds: 0f,
+        out var merged,
+        applyGeometryIrSetupAnimMotion: false));
+
+    var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(merged, "minecraft");
+    Assert.NotEmpty(ordered);
+
+    var rebake = new EntityEmulatedPreviewRebakeContext
+    {
+      PackZipPath = "pack.zip",
+      AssetArchivePath = texturePath,
+      NativeRootDirectory = AppContext.BaseDirectory,
+      NativeProfileName = Profile26.Name,
+      NativeParsedVersion = Profile26.ParsedVersion?.ToString(),
+      ModelDefaultNamespace = "minecraft",
+      IdlePhase01 = 0f,
+      OrderedTextureZipPaths = ordered.ToArray()
+    };
+
+    var materials = ordered.Select(_ => CreateMaps(64, 64)).ToArray();
+    Assert.True(EntityEmulatedPreviewRebaker.TryRebakeMesh(
+        rebake,
+        materials,
+        animationTimeSeconds: 0f,
+        out _,
+        out _,
+        out _,
+        applyGeometryIrSetupAnimMotion: false));
+
+    AssertDiagnosticCentroid(texturePath, "body", rebake.LastBodyCentroidY);
+    AssertDiagnosticCentroid(texturePath, "head", rebake.LastHeadCentroidY);
+    AssertDiagnosticCentroid(texturePath, "leg", rebake.LastLegCentroidY);
+  }
+
+  private static PreviewTextureMaps CreateMaps(int width, int height) => new()
+  {
+    Width = width,
+    Height = height,
+    DiffuseRgba = new byte[width * height * 4],
+    NormalRgba = new byte[width * height * 4],
+    SpecularRgba = new byte[width * height * 4],
+    HeightRgba = new byte[width * height * 4],
+  };
+
+  private static void AssertDiagnosticCentroid(string texturePath, string partLabel, float y)
+  {
+    if (MathF.Abs(y) <= 1e-5f)
+    {
+      return;
+    }
+
+    Assert.True(
+        float.IsFinite(y) && y >= -32f && y <= 4f,
+        $"{texturePath} {partLabel} centroid diagnostic should stay in entity model range, got y={y:F3}");
   }
 }

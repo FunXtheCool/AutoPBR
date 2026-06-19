@@ -168,6 +168,7 @@ This section is **locked process policy** for every entity parity rollout. The h
 2. **Treat baby models as separate classes**
    - Do not scale adult rigs to approximate babies.
    - Port `Baby*Model.createBabyMesh` / `createBabyLayer` directly (horse + donkey required this).
+   - In parity-catalog Geometry IR, use the resolved JVM host to choose scale. Dedicated `Baby*Model` shards are already baby geometry and must emit with unit cuboid scale (`BabyProfile.Adult`), including unversioned `profile=root parsed=?` previews; adult/shared hosts are the ones that may use `VanillaUniformBaby`.
 3. **Apply renderer-space transforms explicitly**
    - Vanilla living entities use pre-draw pose stack scale `(-1, -1, 1)`.
    - Apply this consistently in preview mesh space or part hierarchy will appear mirrored/offset.
@@ -193,7 +194,7 @@ This section is **locked process policy** for every entity parity rollout. The h
 | **G2 — Runtime template audit** | Runtime implementation follows reusable structure: geometry block, rig/setup block, setup math block, global transform audit notes. **Rigging:** vanilla `PartPose`-equivalent chains use `EntityParityTemplate` (`Mul`, `T`, `Rx`/`Ry`/`Rz`, `Er`) only — no ad-hoc duplicate local `Mul`/`T`/`Er` in refactored builders; call `AssertFinitePose` on primary root/child rig matrices where setup math is non-trivial. | Builder matches block order; grep shows no shadow `static Mul`/`Er` locals outside the template class for entities in scope of the rollout. |
 | **G3 — Formula parity asserts** | At least one formula assertion validates setup math, not only cuboid size snapshots. | Dedicated helper/assert computes expected formula and compares runtime output. |
 | **G4 — Ordered anchor centers** | At least one ordered anchor-center check validates front/back or mirror placement under `LocalToParent`. | Test uses ordered transformed-center helpers and checks direction/sign. |
-| **G5 — Baby/adult consistency** | Baby vs adult route and/or geometry consistency is verified for the same model family. | Test exercises both adult and baby texture paths. |
+| **G5 — Baby/adult consistency** | Baby vs adult route and/or geometry consistency is verified for the same model family. Dedicated `Baby*Model` IR hosts keep unit cuboid scale; adult/shared hosts keep explicit legacy baby-transform coverage. | Test exercises both adult and baby texture paths. For catalog IR, include `BabyCatalogGeometryIrPreviewTests.Dedicated_baby_ir_uses_unit_cuboid_scale_when_profile_is_unversioned_root`. |
 | **G6 — Route integrity** | Representative texture path resolves to `SpecificMesh` (not fallback/unknown). | `ClassifyEntityTextureRoute` assertions per entity/model route. |
 | **G7 — Test execution** | Targeted entity tests and filtered parity suite both pass locally. | Commands + pass results recorded in session/PR notes. |
 

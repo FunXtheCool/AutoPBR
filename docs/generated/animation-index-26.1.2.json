@@ -132,6 +132,14 @@
       "extractionStatus": "ok",
       "classSha256Hex": "f177adb0579fcf3aa5f0becd055bef594721277557d6eded872a8465d4da84be",
       "jarPath": "net/minecraft/client/animation/definitions/WardenAnimation.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.monster.slime.MagmaCubeModel",
+      "jarPath": "net/minecraft/client/model/monster/slime/MagmaCubeModel.class",
+      "classSha256Hex": "68d16f46f986d9af010d72c28f33271df784c5f948003da9fd22d58f83986134",
+      "shardRelPath": "animation/26.1.2/net.minecraft.client.model.monster.slime.MagmaCubeModel.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "partial"
     }
   ]
 }

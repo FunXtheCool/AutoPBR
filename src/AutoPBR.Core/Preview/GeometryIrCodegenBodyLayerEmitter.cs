@@ -181,8 +181,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
             faceMask = faceMaskFromIr;
         }
 
-        ApplyNegativeUHorizontalUpOnlySheetUvFix(ref texU, uw, uh, ud, faceMask);
-
         string? textureKey = null;
         if (GeometryIrCuboidMetadata.TryGetTextureKey(cuboidEl, out var tk))
         {

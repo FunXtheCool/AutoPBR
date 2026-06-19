@@ -1,6 +1,5 @@
 using System.Numerics;
 using System.Text.Json;
-using AutoPBR.Core.Models;
 
 // ReSharper disable CheckNamespace
 
@@ -10,7 +9,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 {
     private static class IllagerPreviewPoseSupport
     {
-        public static bool ShouldEmitIllagerPartCuboid(string partId, EntityIllagerPreviewArmPose armPose)
+        private static bool ShouldEmitIllagerPartCuboid(string partId, EntityIllagerPreviewArmPose armPose)
         {
             if (string.Equals(partId, "hat", StringComparison.OrdinalIgnoreCase))
             {
@@ -198,7 +197,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             float xRot,
             float yRot,
             float zRot,
-            IReadOnlyDictionary<string, Matrix4x4> partOriginWorld,
+            Dictionary<string, Matrix4x4> partOriginWorld,
             IReadOnlyDictionary<string, VanillaSetupAnimRuntime.PartPose> baselineParts,
             out Matrix4x4 deltaWorld)
         {
@@ -279,57 +278,57 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 case EntityIllagerPreviewArmPose.Crossed:
                     break;
                 case EntityIllagerPreviewArmPose.AttackingEmptyHands:
-                {
-                    var attackT = Math.Clamp(0.35f + idlePhase01 * 0.45f + wave * 0.2f, 0f, 1f);
-                    IllagerAnimateZombieArms(
-                        ref laX,
-                        ref laY,
-                        ref laZ,
-                        ref raX,
-                        ref raY,
-                        ref raZ,
-                        useFifteenDivisor: true,
-                        swingIsStab: false,
-                        attackTime: attackT,
-                        ageInTicks: ageInTicks);
-                    break;
-                }
+                    {
+                        var attackT = Math.Clamp(0.35f + idlePhase01 * 0.45f + wave * 0.2f, 0f, 1f);
+                        IllagerAnimateZombieArms(
+                            ref laX,
+                            ref laY,
+                            ref laZ,
+                            ref raX,
+                            ref raY,
+                            ref raZ,
+                            useFifteenDivisor: true,
+                            swingIsStab: false,
+                            attackTime: attackT,
+                            ageInTicks: ageInTicks);
+                        break;
+                    }
                 case EntityIllagerPreviewArmPose.AttackingWeapon:
-                {
-                    raX = raY = raZ = laX = laY = laZ = 0f;
-                    var attackAnim = Math.Clamp(0.2f + idlePhase01 * 0.55f + wave * 0.25f, 0f, 1f);
-                    IllagerSwingWeaponDown(
-                        ref raX,
-                        ref raY,
-                        ref raZ,
-                        ref laX,
-                        ref laY,
-                        ref laZ,
-                        mainHandIsRight: true,
-                        attackAnim,
-                        ageInTicks);
-                    break;
-                }
+                    {
+                        raX = raY = raZ = laX = laY = laZ = 0f;
+                        var attackAnim = Math.Clamp(0.2f + idlePhase01 * 0.55f + wave * 0.25f, 0f, 1f);
+                        IllagerSwingWeaponDown(
+                            ref raX,
+                            ref raY,
+                            ref raZ,
+                            ref laX,
+                            ref laY,
+                            ref laZ,
+                            mainHandIsRight: true,
+                            attackAnim,
+                            ageInTicks);
+                        break;
+                    }
                 case EntityIllagerPreviewArmPose.Spellcasting:
-                {
-                    var sc = MathF.Cos(ageInTicks * k6662);
-                    raX = sc * 0.25f;
-                    laX = sc * 0.25f;
-                    raZ = 2.3561945f;
-                    laZ = -2.3561945f;
-                    raY = laY = 0f;
-                    break;
-                }
+                    {
+                        var sc = MathF.Cos(ageInTicks * k6662);
+                        raX = sc * 0.25f;
+                        laX = sc * 0.25f;
+                        raZ = 2.3561945f;
+                        laZ = -2.3561945f;
+                        raY = laY = 0f;
+                        break;
+                    }
                 case EntityIllagerPreviewArmPose.BowAndArrow:
-                {
-                    raY = -0.1f + headYawRad;
-                    raX = -1.5707964f + headPitchRad;
-                    laX = -0.9424779f + headPitchRad;
-                    laY = headYawRad - 0.4f;
-                    laZ = 1.5707964f;
-                    raZ = 0f;
-                    break;
-                }
+                    {
+                        raY = -0.1f + headYawRad;
+                        raX = -1.5707964f + headPitchRad;
+                        laX = -0.9424779f + headPitchRad;
+                        laY = headYawRad - 0.4f;
+                        laZ = 1.5707964f;
+                        raZ = 0f;
+                        break;
+                    }
                 case EntityIllagerPreviewArmPose.CrossbowHold:
                     IllagerAnimateCrossbowHold(
                         ref raX,
@@ -355,17 +354,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
                         rightHanded: true);
                     break;
                 case EntityIllagerPreviewArmPose.Celebrating:
-                {
-                    var cc = MathF.Cos(ageInTicks * k6662);
-                    raX = cc * 0.05f;
-                    laX = cc * 0.05f;
-                    raZ = 2.670354f;
-                    laZ = -2.3561945f;
-                    raY = laY = 0f;
-                    break;
-                }
-                default:
-                    break;
+                    {
+                        var cc = MathF.Cos(ageInTicks * k6662);
+                        raX = cc * 0.05f;
+                        laX = cc * 0.05f;
+                        raZ = 2.670354f;
+                        laZ = -2.3561945f;
+                        raY = laY = 0f;
+                        break;
+                    }
             }
         }
     }

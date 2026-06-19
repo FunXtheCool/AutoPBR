@@ -331,8 +331,8 @@ public sealed class SetupAnimLiftTests
         Assert.True(
             SetupAnimLift.TryLift(disasm, "net.minecraft.client.model.monster.slime.MagmaCubeModel", out var shard, out var notes),
             string.Join("; ", notes));
-        Assert.Contains(shard["assignments"]!.AsArray(), a => MatchPartProp(a, "segment0", "y"));
-        Assert.Contains(shard["assignments"]!.AsArray(), a => MatchPartProp(a, "segment7", "y"));
+        Assert.Contains(shard["assignments"]!.AsArray(), a => MatchPartProp(a, "cube0", "y"));
+        Assert.Contains(shard["assignments"]!.AsArray(), a => MatchPartProp(a, "cube7", "y"));
         Assert.Equal(0, notes.Count(n => !SetupAnimLift.IsNonBlockingNote(n)));
     }
 

@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.BedModel.previewComposite",
+  "profile": "named_jar_26.1.2",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Preview composite from BedRenderer.createHeadLayer / createFootLayer (26.1.2 javap).",
+    "Foot layer root translated +16Y so head and foot mattress slabs abut along bed length before BedRenderer preview facing."
+  ],
+  "factoryMethod": "createHeadLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [0, 0, 0],
+        "rotationEulerRad": [0, 0, 0],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "head_piece",
+          "pose": {
+            "translation": [0, 0, 0],
+            "rotationEulerRad": [0, 0, 0],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [],
+          "children": [
+            {
+              "id": "main",
+              "pose": {
+                "translation": [0, 0, 0],
+                "rotationEulerRad": [0, 0, 0],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [0, 0, 0],
+                  "to": [16, 16, 6],
+                  "uvOrigin": [0, 0],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "BedRenderer.createHeadLayer main"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "left_leg",
+              "pose": {
+                "translation": [0, 0, 0],
+                "rotationEulerRad": [1.5707964, 0, 1.5707964],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [0, 6, 0],
+                  "to": [3, 9, 3],
+                  "uvOrigin": [50, 6],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "BedRenderer.createHeadLayer left_leg"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "right_leg",
+              "pose": {
+                "translation": [0, 0, 0],
+                "rotationEulerRad": [1.5707964, 0, 3.1415927],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [-16, 6, 0],
+                  "to": [-13, 9, 3],
+                  "uvOrigin": [50, 18],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "BedRenderer.createHeadLayer right_leg"
+                }
+              ],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "foot_piece",
+          "pose": {
+            "translation": [0, 16, 0],
+            "rotationEulerRad": [0, 0, 0],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [],
+          "children": [
+            {
+              "id": "main",
+              "pose": {
+                "translation": [0, 0, 0],
+                "rotationEulerRad": [0, 0, 0],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [0, 0, 0],
+                  "to": [16, 16, 6],
+                  "uvOrigin": [0, 22],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "BedRenderer.createFootLayer main"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "left_leg",
+              "pose": {
+                "translation": [0, 0, 0],
+                "rotationEulerRad": [1.5707964, 0, 0],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [0, 6, -16],
+                  "to": [3, 9, -13],
+                  "uvOrigin": [50, 0],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "BedRenderer.createFootLayer left_leg"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "right_leg",
+              "pose": {
+                "translation": [0, 0, 0],
+                "rotationEulerRad": [1.5707964, 0, 4.712389],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [-16, 6, -16],
+                  "to": [-13, 9, -13],
+                  "uvOrigin": [50, 12],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "BedRenderer.createFootLayer right_leg"
+                }
+              ],
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "textureWidth": 64,
+  "textureHeight": 64
+}

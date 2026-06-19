@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
+
 using AutoPBR.Core.Preview;
-using AutoPBR.Tools.GeometryCompiler;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
@@ -93,7 +93,7 @@ public sealed class DonkeyMeshTransformerLiftTests
 
                 if (p["id"] is JsonValue id)
                 {
-                    ids.Add(id.GetValue<string>()!);
+                    ids.Add(id.GetValue<string>());
                 }
 
                 if (p["children"] is JsonArray ch)
@@ -105,34 +105,5 @@ public sealed class DonkeyMeshTransformerLiftTests
 
         Walk(roots);
         return ids;
-    }
-
-    private static JsonObject? FindPartById(JsonArray roots, string id)
-    {
-        foreach (var node in roots)
-        {
-            if (node is not JsonObject o)
-            {
-                continue;
-            }
-
-            if (string.Equals((string?)o["id"], id, StringComparison.Ordinal))
-            {
-                return o;
-            }
-
-            if (o["children"] is JsonArray kids && FindPartById(kids, id) is { } nested)
-            {
-                return nested;
-            }
-        }
-
-        return null;
-    }
-
-    private static void AssertChildPartId(JsonArray children, string id)
-    {
-        Assert.Contains(children, n =>
-            n is JsonObject o && string.Equals((string?)o["id"], id, StringComparison.Ordinal));
     }
 }

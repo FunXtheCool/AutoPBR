@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.skull.SkullModel.previewComposite",
+  "profile": "named_jar_26.1.2",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Preview composite: SkullModel.createHeadModel head cuboid + SkullModel.e() hat layer (CubeDeformation 0.25)."
+  ],
+  "factoryMethod": "createHeadModel",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [0, 0, 0],
+        "rotationEulerRad": [0, 0, 0],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "head",
+          "pose": {
+            "translation": [0, 0, 0],
+            "rotationEulerRad": [0, 0, 0],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [-4, -8, -4],
+              "to": [4, 0, 4],
+              "uvOrigin": [0, 0],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "SkullModel.createHeadModel"
+            },
+            {
+              "from": [-4.25, -8.25, -4.25],
+              "to": [4.25, 0.25, 4.25],
+              "uvOrigin": [32, 0],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "SkullModel.e hat inflate 0.25"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "textureWidth": 64,
+  "textureHeight": 64
+}

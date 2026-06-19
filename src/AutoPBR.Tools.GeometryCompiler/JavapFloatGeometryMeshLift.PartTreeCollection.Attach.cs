@@ -1,6 +1,4 @@
-using System.Globalization;
 using System.Text.Json.Nodes;
-using System.Text.RegularExpressions;
 
 namespace AutoPBR.Tools.GeometryCompiler;
 
@@ -117,35 +115,6 @@ internal static partial class JavapFloatGeometryMeshLift
             }
 
             aloadLineIdx = j;
-            return true;
-        }
-
-        return false;
-    }
-
-    /// <summary>Last <c>aload</c> local in <c>[beforeIdx-maxLookback, beforeIdx)</c> — the PartDefinition receiver for addOrReplaceChild.</summary>
-    private static bool TryFindReceiverAloadBeforeIndex(List<string> lines, int beforeIdx, int maxLookback,
-        out int slot)
-    {
-        slot = 0;
-        int? last = null;
-        var start = Math.Max(0, beforeIdx - maxLookback);
-        for (var j = beforeIdx - 1; j >= start; j--)
-        {
-            if (JavapMeshBytecodeProfiles.IsNamedOrObfuscatedMeshBindingLine(lines[j]))
-            {
-                break;
-            }
-
-            if (JavapBytecodeStreamAnalyzer.TryParseAloadLocalSlot(lines[j], out var loc))
-            {
-                last = loc;
-            }
-        }
-
-        if (last is int l)
-        {
-            slot = l;
             return true;
         }
 

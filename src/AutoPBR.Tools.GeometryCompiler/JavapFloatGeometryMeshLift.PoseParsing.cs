@@ -1,5 +1,6 @@
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
+
 using static AutoPBR.Tools.GeometryCompiler.GeometryLiftCoordinateRounding;
 
 namespace AutoPBR.Tools.GeometryCompiler;
@@ -155,7 +156,7 @@ internal static partial class JavapFloatGeometryMeshLift
             return;
         }
 
-        var w = pose["liftWarnings"] as JsonArray ?? new JsonArray();
+        var w = pose["liftWarnings"] as JsonArray ?? [];
         foreach (var c in codes)
         {
             w.Add(c);
@@ -331,7 +332,7 @@ internal static partial class JavapFloatGeometryMeshLift
     }
 
     /// <summary>
-    /// Lifts JVM stack operands backward for vanilla <see cref="PartPose"/> factories: ldc/fconst values,
+    /// Lifts JVM stack operands backward for vanilla <c>PartPose</c> factories: ldc/fconst values,
     /// <c>fneg</c>/<c>fadd</c>/<c>fmul</c>/<c>fsub</c>/<c>fdiv</c> of recursively parsed operands,
     /// <c>fload*</c> resolved from simple <c>fstore</c> constants when available, unknown <c>fload*</c> and
     /// <c>iload</c>+<c>isub</c>+<c>i2f</c>, and <c>dload*</c> placeholders as <c>0</c> when slots are unknown.
@@ -340,7 +341,7 @@ internal static partial class JavapFloatGeometryMeshLift
         IReadOnlyDictionary<int, double> poseFloatLocals, IReadOnlyDictionary<int, int> poseIntLocals,
         ICollection<string> poseWarnings, out List<double> floats)
     {
-        floats = new List<double>();
+        floats = [];
         var j = start;
         while (floats.Count < want && j >= minIdx)
         {
@@ -415,8 +416,6 @@ internal static partial class JavapFloatGeometryMeshLift
             var op = mathMatch.Groups[1].Success && mathMatch.Groups[1].Value.Length > 0
                 ? mathMatch.Groups[1].Value
                 : mathMatch.Groups[2].Value;
-            var isDoubleUnary = line.Contains(":(D)D", StringComparison.Ordinal) ||
-                                line.Contains("Mth.", StringComparison.Ordinal);
             j--;
             if (j >= minIdx && JavapBytecodeStreamAnalyzer.JavapD2iInsnRegex().IsMatch(seg[j]))
             {
@@ -444,8 +443,8 @@ internal static partial class JavapFloatGeometryMeshLift
 
             v = op switch
             {
-                "sin" => Math.Sin(isDoubleUnary ? arg : arg),
-                "cos" => Math.Cos(isDoubleUnary ? arg : arg),
+                "sin" => Math.Sin(arg),
+                "cos" => Math.Cos(arg),
                 "toRadians" => arg * Math.PI / 180.0,
                 "abs" => Math.Abs(arg),
                 _ => 0

@@ -2,9 +2,6 @@ using System.Globalization;
 using System.Numerics;
 using System.Text;
 using System.Text.Json;
-using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
-using AutoPBR.Tests.TestSupport;
 
 namespace AutoPBR.Core.Tests;
 
@@ -84,7 +81,7 @@ public sealed class BabyVsAdultReferenceOriginDumpTests
 
         foreach (var (partId, refOrigin) in refWorld.OrderBy(kv => kv.Key, StringComparer.Ordinal))
         {
-            if (!TryMeanPartOrigin(mesh!, partIds, partId, out var meshPreviewOrigin))
+            if (!TryMeanPartOrigin(mesh, partIds, partId, out var meshPreviewOrigin))
             {
                 sb.AppendLine(CultureInfo.InvariantCulture, $"{label}\t{partId}\t{refOrigin.X:F3}\t{refOrigin.Y:F3}\t{refOrigin.Z:F3}\tNA\tNA\tNA\tNA\tNA\tNA");
                 continue;

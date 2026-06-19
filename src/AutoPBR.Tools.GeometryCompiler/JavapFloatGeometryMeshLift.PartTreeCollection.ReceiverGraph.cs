@@ -1,6 +1,3 @@
-using System.Globalization;
-using System.Text.RegularExpressions;
-
 namespace AutoPBR.Tools.GeometryCompiler;
 
 internal static partial class JavapFloatGeometryMeshLift

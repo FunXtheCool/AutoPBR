@@ -4,7 +4,7 @@ namespace AutoPBR.Core.Preview;
 
 public static partial class GeometryJavapPoseOracle
 {
-    private sealed partial class Parser
+    private static partial class Parser
     {
         private static IEnumerable<string> FindSameClassMeshDefinitionFactories(string scopeText)
         {
@@ -74,7 +74,7 @@ public static partial class GeometryJavapPoseOracle
         public static string? TryFindCrossClassMeshFactoryOwner(string javapText) =>
             TryFindCrossClassMeshFactory(javapText)?.Owner;
 
-        public static (string Owner, string Method)? TryFindCrossClassMeshFactory(string javapText)
+        private static (string Owner, string Method)? TryFindCrossClassMeshFactory(string javapText)
         {
             foreach (Match m in MeshDelegateInvokeRegex.Matches(javapText))
             {
@@ -92,7 +92,7 @@ public static partial class GeometryJavapPoseOracle
             return null;
         }
 
-        public static int? TryExtractCreateBodyMeshAgeParam(string javapText)
+        private static int? TryExtractCreateBodyMeshAgeParam(string javapText)
         {
             var lines = FoldWrappedLines(javapText.Split('\n'));
             for (var i = 0; i < lines.Count; i++)

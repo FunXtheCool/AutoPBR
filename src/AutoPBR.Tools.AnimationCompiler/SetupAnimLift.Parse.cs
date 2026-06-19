@@ -201,6 +201,10 @@ internal static partial class SetupAnimLift
                 prefix = "segment";
                 count = 4;
                 return true;
+            case "bodyCubes" when officialJvmName.Contains("MagmaCubeModel", StringComparison.Ordinal):
+                prefix = "cube";
+                count = 8;
+                return true;
             case "bodyCubes":
                 prefix = "segment";
                 count = 8;
@@ -288,7 +292,7 @@ internal static partial class SetupAnimLift
         var headerIdx = -1;
         for (var j = arrayGetfieldIdx; j < Math.Min(lines.Count, arrayGetfieldIdx + 35); j++)
         {
-            if (!TryMatchLoopHeader(lines, j, iloadPattern, out var cmpIdx, out var bound))
+            if (!TryMatchLoopHeader(lines, j, iloadPattern, out var bound))
             {
                 continue;
             }
@@ -302,7 +306,7 @@ internal static partial class SetupAnimLift
         {
             for (var j = arrayGetfieldIdx - 1; j >= Math.Max(0, arrayGetfieldIdx - 12); j--)
             {
-                if (!TryMatchLoopHeader(lines, j, iloadPattern, out _, out var bound))
+                if (!TryMatchLoopHeader(lines, j, iloadPattern, out var bound))
                 {
                     continue;
                 }
@@ -322,10 +326,8 @@ internal static partial class SetupAnimLift
             List<string> lines,
             int iloadIdx,
             string iloadPattern,
-            out int cmpIdx,
             out int? bound)
         {
-            cmpIdx = -1;
             bound = null;
             if (!lines[iloadIdx].Contains(iloadPattern, StringComparison.Ordinal))
             {
@@ -339,8 +341,7 @@ internal static partial class SetupAnimLift
                     continue;
                 }
 
-                cmpIdx = k;
-                bound = TryParseIntConst(lines[cmpIdx - 1]);
+                bound = TryParseIntConst(lines[k - 1]);
                 return true;
             }
 

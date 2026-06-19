@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.object.chest.ChestModel.createDoubleBodyRightLayer",
+  "profile": "named_jar_26.1.2",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Part tree from ChestModel.createDoubleBodyRightLayer javap constants (double-chest right half)."
+  ],
+  "factoryMethod": "createDoubleBodyRightLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [0, 0, 0],
+        "rotationEulerRad": [0, 0, 0],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "bottom",
+          "pose": {
+            "translation": [0, 0, 0],
+            "rotationEulerRad": [0, 0, 0],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [1, 0, 1],
+              "to": [16, 10, 15],
+              "uvOrigin": [0, 19],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift createDoubleBodyRightLayer",
+              "faceMask": ["down", "up", "north", "south", "west"]
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "lid",
+          "pose": {
+            "translation": [0, 9, 1],
+            "rotationEulerRad": [0, 0, 0],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [0, 9, 1]
+          },
+          "cuboids": [
+            {
+              "from": [1, 0, 0],
+              "to": [16, 5, 14],
+              "uvOrigin": [0, 0],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift createDoubleBodyRightLayer",
+              "faceMask": ["down", "up", "north", "south", "west"]
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "lock",
+          "pose": {
+            "translation": [0, 9, 1],
+            "rotationEulerRad": [0, 0, 0],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [0, 9, 1]
+          },
+          "cuboids": [
+            {
+              "from": [15, -2, 14],
+              "to": [16, 2, 15],
+              "uvOrigin": [0, 0],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift createDoubleBodyRightLayer",
+              "faceMask": ["down", "up", "north", "south", "west"]
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "jarPath": "net/minecraft/client/model/object/chest/ChestModel.class",
+  "classSha256Hex": "4bdd6f6dfc2e147fd01857dee36b944a98f5c541918f50a82c60103946839471",
+  "textureWidth": 64,
+  "textureHeight": 64,
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
+}

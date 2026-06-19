@@ -18,6 +18,12 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return true;
         }
 
+        if (TryResolveLegacyMagmaCubeSetupAnimPartField(partId, out var legacyField) &&
+            pose.Parts.TryGetValue(legacyField, out partPose!))
+        {
+            return true;
+        }
+
         if (TryResolveSetupAnimPartField(partId, out var modelPartField) &&
             pose.Parts.TryGetValue(modelPartField, out partPose!))
         {
@@ -34,6 +40,12 @@ internal sealed partial class CleanRoomEntityModelRuntime
         out VanillaSetupAnimRuntime.PartPose baseline)
     {
         if (baselineParts.TryGetValue(partId, out baseline!))
+        {
+            return true;
+        }
+
+        if (TryResolveLegacyMagmaCubeSetupAnimPartField(partId, out var legacyField) &&
+            baselineParts.TryGetValue(legacyField, out baseline!))
         {
             return true;
         }
@@ -98,6 +110,20 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         return modelPartField.Length > 0;
 
+    }
+
+    private static bool TryResolveLegacyMagmaCubeSetupAnimPartField(string geometryPartId, out string modelPartField)
+    {
+        modelPartField = "";
+        if (!geometryPartId.StartsWith("cube", StringComparison.Ordinal) ||
+            geometryPartId.Length <= 4 ||
+            !int.TryParse(geometryPartId.AsSpan(4), out _))
+        {
+            return false;
+        }
+
+        modelPartField = "segment" + geometryPartId[4..];
+        return true;
     }
 
     private static VanillaSetupAnimRuntime.PartPose MergeSetupAnimEffectivePose(

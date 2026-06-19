@@ -1,7 +1,5 @@
 using System.Numerics;
 using System.Text.Json;
-using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
 
 namespace AutoPBR.Core.Tests;
 
@@ -25,7 +23,7 @@ public sealed class ColdCowHornMeshDiagnosticTests
         var geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
         var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
             geometryRoot,
-            GeometryIrMeshEmitOptions.ForParity(64, 64) with { OfficialJvmName = jvm });
+            GeometryIrMeshEmitOptions.ForParity() with { OfficialJvmName = jvm });
 
         Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, prov.Kind);
 
@@ -52,6 +50,4 @@ public sealed class ColdCowHornMeshDiagnosticTests
 
         Assert.Fail(string.Join("\n", lines));
     }
-
-    private static string Fmt(float[] v) => $"<{v[0]:F2},{v[1]:F2},{v[2]:F2}>";
 }

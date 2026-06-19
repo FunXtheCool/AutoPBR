@@ -39,9 +39,9 @@ internal static class GlslSourceAdapter
     internal static string StripNonAscii(string source)
     {
         var hasNonAscii = false;
-        for (var i = 0; i < source.Length; i++)
+        foreach (var c in source)
         {
-            if (source[i] > '\x7F')
+            if (c > '\x7F')
             {
                 hasNonAscii = true;
                 break;

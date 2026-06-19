@@ -1,8 +1,6 @@
 using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using AutoPBR.Core.Preview;
-using AutoPBR.Tests.TestSupport;
 
 namespace AutoPBR.Core.Tests;
 
@@ -86,10 +84,10 @@ public sealed class GeometryIrPartTreeRepairTests
 
         var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
             repaired,
-            GeometryIrMeshEmitOptions.ForParity(64, 64) with { OfficialJvmName = jvm });
+            GeometryIrMeshEmitOptions.ForParity() with { OfficialJvmName = jvm });
         float? tail1Y = null;
         float? tail2Y = null;
-        for (var i = 0; i < mesh!.Elements.Count; i++)
+        for (var i = 0; i < mesh.Elements.Count; i++)
         {
             var partId = partIds[i];
             var cy = (mesh.Elements[i].LocalToParent.M41 + mesh.Elements[i].LocalToParent.M42 +
@@ -439,9 +437,9 @@ public sealed class GeometryIrPartTreeRepairTests
 
         var rightArm = FindPart(repaired, "right_arm");
         Assert.NotNull(rightArm);
-        var tr = rightArm!["pose"]?["translation"]?.AsArray();
+        var tr = rightArm["pose"]?["translation"]?.AsArray();
         Assert.NotNull(tr);
-        Assert.True(tr![0]!.GetValue<double>() < -4.5);
+        Assert.True(tr[0]!.GetValue<double>() < -4.5);
         Assert.InRange(tr[1]!.GetValue<double>(), 1.5, 2.5);
     }
 
@@ -464,14 +462,14 @@ public sealed class GeometryIrPartTreeRepairTests
         Assert.NotNull(head);
         Assert.NotNull(body);
         Assert.NotNull(rightLeg);
-        Assert.InRange(head!["pose"]!["translation"]![1]!.GetValue<double>(), -0.05, 0.05);
-        Assert.InRange(body!["pose"]!["translation"]![1]!.GetValue<double>(), -0.05, 0.05);
-        Assert.InRange(rightLeg!["pose"]!["translation"]![1]!.GetValue<double>(), 11.5, 12.5);
+        Assert.InRange(head["pose"]!["translation"]![1]!.GetValue<double>(), -0.05, 0.05);
+        Assert.InRange(body["pose"]!["translation"]![1]!.GetValue<double>(), -0.05, 0.05);
+        Assert.InRange(rightLeg["pose"]!["translation"]![1]!.GetValue<double>(), 11.5, 12.5);
 
-        var headCuboid = head!["cuboids"]![0]!;
+        var headCuboid = head["cuboids"]![0]!;
         Assert.InRange(headCuboid["from"]![1]!.GetValue<double>(), -8.5, -7.5);
         Assert.InRange(headCuboid["to"]![1]!.GetValue<double>(), -0.5, 0.5);
-        Assert.Equal(16, body!["cuboids"]![0]!["uvOrigin"]![0]!.GetValue<int>());
+        Assert.Equal(16, body["cuboids"]![0]!["uvOrigin"]![0]!.GetValue<int>());
         Assert.Equal(16, body["cuboids"]![0]!["uvOrigin"]![1]!.GetValue<int>());
     }
 
@@ -513,15 +511,15 @@ public sealed class GeometryIrPartTreeRepairTests
         var slim = GeometryIrPlayerArmVariant.ApplySlimArmsIfNeeded("PlayerSlim", repaired);
         var leftArm = FindPart(slim, "left_arm");
         Assert.NotNull(leftArm);
-        var to = leftArm!["cuboids"]![0]!["to"]!.AsArray();
+        var to = leftArm["cuboids"]![0]!["to"]!.AsArray();
         Assert.InRange(to[0]!.GetValue<double>(), 1.9, 2.1);
 
         var leftSleeve = FindPart(slim, "left_sleeve");
         var rightSleeve = FindPart(slim, "right_sleeve");
         Assert.NotNull(leftSleeve);
         Assert.NotNull(rightSleeve);
-        Assert.InRange(leftSleeve!["cuboids"]![0]!["to"]![0]!.GetValue<double>(), 1.9, 2.1);
-        Assert.InRange(rightSleeve!["cuboids"]![0]!["from"]![0]!.GetValue<double>(), -2.1, -1.9);
+        Assert.InRange(leftSleeve["cuboids"]![0]!["to"]![0]!.GetValue<double>(), 1.9, 2.1);
+        Assert.InRange(rightSleeve["cuboids"]![0]!["from"]![0]!.GetValue<double>(), -2.1, -1.9);
     }
 
     [Fact]
@@ -552,7 +550,7 @@ public sealed class GeometryIrPartTreeRepairTests
 
         var rightArm = FindPart(repaired, "right_arm");
         Assert.NotNull(rightArm);
-        var armTy = rightArm!["pose"]!["translation"]![1]!.GetValue<double>();
+        var armTy = rightArm["pose"]!["translation"]![1]!.GetValue<double>();
         Assert.InRange(armTy, 1.5, 2.5);
     }
 

@@ -16,6 +16,7 @@ This file documents how to read [`schema/geometry-ir.schema.json`](schema/geomet
 ## UV
 
 - **`uvOrigin`**: `[u, v]` integer texel coordinates for `texOffs(u, v)` (upper-left of the face region in the entity atlas), not normalized UV.
+- Preserve negative `uvOrigin` values in the shard and runtime emit. Atlas wrapping belongs in the bake/normalization stage, not in Geometry IR. The 26.1.2 Ender Dragon wing membrane case is the regression guard: `texOffs(-56, 88/144)` on zero-height `addBox` cuboids samples visible artwork through the Java `DOWN` face slot; pre-shifting the origin or copying `UP` UVs misaligns both dragon wings and other entity textures.
 
 ## extractionStatus
 

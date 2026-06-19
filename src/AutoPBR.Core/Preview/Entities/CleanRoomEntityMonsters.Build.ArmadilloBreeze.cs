@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Numerics;
 // ReSharper disable CheckNamespace
 
@@ -257,8 +255,4 @@ internal sealed partial class CleanRoomEntityModelRuntime
         new EntityCuboid(-6f, -8f, -6f, 6f, 0f, 6f, 6, 6).Emit(b, windTop, 1f, windTexKey);
         new EntityCuboid(-2.5f, -8f, -2.5f, 2.5f, 0f, 2.5f, 105, 57).Emit(b, windTop, 1f, windTexKey);
     }
-
-    /// <summary>
-    /// Vanilla <c>SlimeModel</c> (26.1.2 <c>client.jar</c>): <c>createOuterBodyLayer</c> + <c>createInnerBodyLayer</c> on one <c>64×32</c> sheet.
-
 }

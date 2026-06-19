@@ -32,10 +32,22 @@ internal sealed partial class CleanRoomEntityModelRuntime
             _ = idlePhase01;
             var p = ParityCatalogDefaultBabyProfile(profile, isBaby, resolvedOfficialJvm);
             var geometryScale = ResolveParityGeometryScale(builderMethod, normalizedAssetPath);
+            var useUniformBabyRootScale = TryResolveUniformVanillaBabyRootScale(
+                isBaby,
+                resolvedOfficialJvm,
+                p,
+                geometryScale,
+                out var uniformBabyRootScale);
+            var cuboidScale = useUniformBabyRootScale ? 1f : p.BodyScale * geometryScale;
             var opts = GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH) with
             {
-                DefaultPartScale = p.BodyScale * geometryScale,
-                ResolvePartScale = partId => ResolveDefaultPartScale(partId, p) * geometryScale,
+                RootTransform = useUniformBabyRootScale
+                    ? Matrix4x4.CreateScale(uniformBabyRootScale)
+                    : Matrix4x4.Identity,
+                DefaultPartScale = cuboidScale,
+                ResolvePartScale = partId => useUniformBabyRootScale
+                    ? 1f
+                    : ResolveDefaultPartScale(partId, p) * geometryScale,
                 PreviewApplyCubeDeformationInflate = true,
             };
 
@@ -204,6 +216,37 @@ internal sealed partial class CleanRoomEntityModelRuntime
             }
 
             return 1f;
+        }
+
+        /// <summary>
+        /// Shared adult IR hosts (e.g. <c>NautilusModel</c>) keep lifted part offsets at adult texels while vanilla
+        /// applies uniform <c>getAgeScale()</c> at render time. Fold that scale into <see cref="GeometryIrMeshEmitOptions.RootTransform"/>
+        /// so pose offsets and cuboids shrink together; dedicated <c>Baby*Model</c> shards stay unit scale.
+        /// </summary>
+        private static bool TryResolveUniformVanillaBabyRootScale(
+            bool isBaby,
+            string? resolvedOfficialJvm,
+            BabyProfile profile,
+            float geometryScale,
+            out float rootScale)
+        {
+            rootScale = 1f;
+            if (!isBaby ||
+                string.IsNullOrWhiteSpace(resolvedOfficialJvm) ||
+                GeometryIrParityJvmResolver.SimpleClassNameContainsBaby(resolvedOfficialJvm))
+            {
+                return false;
+            }
+
+            if (profile.BodyScale != profile.HeadScale ||
+                profile.BodyScale != profile.LegScale ||
+                profile.BodyScale == 1f)
+            {
+                return false;
+            }
+
+            rootScale = profile.BodyScale * geometryScale;
+            return rootScale != 1f;
         }
     }
 

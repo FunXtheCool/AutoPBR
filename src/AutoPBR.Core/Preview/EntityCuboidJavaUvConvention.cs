@@ -33,7 +33,7 @@ internal static class EntityCuboidJavaUvConvention
         return rect;
     }
 
-    /// <summary>Face dictionary key for a Java direction (matches <see cref="CleanRoomEntityRigBuilder"/>).</summary>
+    /// <summary>Face dictionary key for a Java direction (matches RigBuilder face keys).</summary>
     internal static string TemplateSlotName(JavaDirection direction) => PhysicalFaceName(direction);
 
     /// <summary>Physical plane name consumed by <see cref="MinecraftModelBaker"/> face emission.</summary>

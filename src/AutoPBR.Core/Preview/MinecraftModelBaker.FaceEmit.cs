@@ -1,5 +1,4 @@
 using System.Numerics;
-using AutoPBR.Core.Models;
 
 namespace AutoPBR.Core.Preview;
 
@@ -313,9 +312,6 @@ internal static partial class MinecraftModelBaker
 
         return mapped;
     }
-
-    private static string ApplyFaceSemanticDebugRouting(string faceName) =>
-        ApplyFaceSemanticRouting(faceName, PreviewUvBakePolicy.EntityCuboidBaseline.WithDebugOverrides());
 
     private static void ApplyUvCornerOrderMode(int mode, ref Vector2 uvA, ref Vector2 uvB, ref Vector2 uvC, ref Vector2 uvD)
     {

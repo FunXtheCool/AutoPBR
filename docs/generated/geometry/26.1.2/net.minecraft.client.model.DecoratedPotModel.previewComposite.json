@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 2,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.DecoratedPotModel.previewComposite",
+  "profile": "named_jar_26.1.2",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Preview composite from DecoratedPotRenderer.createBaseLayer / createSidesLayer javap (26.1.2).",
+    "Neck PartPose.offset(0,37,16).rotationX(PI); sides packed at atlas V=32."
+  ],
+  "factoryMethod": "createBaseLayer",
+  "roots": [
+    {
+      "id": "root",
+      "pose": {
+        "translation": [0, 0, 0],
+        "rotationEulerRad": [0, 0, 0],
+        "eulerOrder": "XYZ"
+      },
+      "cuboids": [],
+      "children": [
+        {
+          "id": "neck",
+          "pose": {
+            "translation": [0, 37, 16],
+            "rotationEulerRad": [3.141592654, 0, 0],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [4, 17, 4],
+              "to": [12, 20, 12],
+              "uvOrigin": [0, 0],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "DecoratedPotRenderer.createBaseLayer texOffs(0,0)"
+            },
+            {
+              "from": [5, 20, 5],
+              "to": [11, 21, 11],
+              "uvOrigin": [0, 5],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "DecoratedPotRenderer.createBaseLayer texOffs(0,5)"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "top",
+          "pose": {
+            "translation": [1, 16, 1],
+            "rotationEulerRad": [0, 0, 0],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [0, 0, 0],
+              "to": [14, 0, 14],
+              "uvOrigin": [18, 13],
+              "uvSpan": [14, 1, 14],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "DecoratedPotRenderer.createBaseLayer texOffs(-14,13) top"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "bottom",
+          "pose": {
+            "translation": [1, 0, 1],
+            "rotationEulerRad": [0, 0, 0],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [0, 0, 0],
+              "to": [14, 0, 14],
+              "uvOrigin": [18, 13],
+              "uvSpan": [14, 1, 14],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "DecoratedPotRenderer.createBaseLayer texOffs(-14,13) bottom"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "back",
+          "pose": {
+            "translation": [15, 16, 1],
+            "rotationEulerRad": [0, 0, 3.141592654],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [0, 0, 0],
+              "to": [14, 16, 0],
+              "uvOrigin": [1, 32],
+              "uvSpan": [14, 16, 1],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "DecoratedPotRenderer.createSidesLayer north"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "left",
+          "pose": {
+            "translation": [1, 16, 1],
+            "rotationEulerRad": [0, -1.570796327, 3.141592654],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [0, 0, 0],
+              "to": [14, 16, 0],
+              "uvOrigin": [1, 32],
+              "uvSpan": [14, 16, 1],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "DecoratedPotRenderer.createSidesLayer west"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "right",
+          "pose": {
+            "translation": [15, 16, 15],
+            "rotationEulerRad": [0, 1.570796327, 3.141592654],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [0, 0, 0],
+              "to": [14, 16, 0],
+              "uvOrigin": [1, 32],
+              "uvSpan": [14, 16, 1],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "DecoratedPotRenderer.createSidesLayer east"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "front",
+          "pose": {
+            "translation": [1, 16, 15],
+            "rotationEulerRad": [3.141592654, 0, 0],
+            "eulerOrder": "XYZ"
+          },
+          "cuboids": [
+            {
+              "from": [0, 0, 0],
+              "to": [14, 16, 0],
+              "uvOrigin": [1, 32],
+              "uvSpan": [14, 16, 1],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "DecoratedPotRenderer.createSidesLayer south"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "textureWidth": 64,
+  "textureHeight": 64
+}

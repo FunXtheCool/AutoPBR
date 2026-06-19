@@ -115,11 +115,22 @@ public static class GeometryIrEmitPolicy
 
 
 
-    internal static bool IsGhastFamilyJvm(string? officialJvmName) =>
+    internal static bool IsGhastFamilyJvm(string? officialJvmName)
+    {
+        if (string.IsNullOrWhiteSpace(officialJvmName))
+        {
+            return false;
+        }
 
-        !string.IsNullOrWhiteSpace(officialJvmName) &&
+        if (officialJvmName.Contains(".ghast.", StringComparison.OrdinalIgnoreCase))
+        {
+            return !officialJvmName.Contains("Harness", StringComparison.OrdinalIgnoreCase);
+        }
 
-        officialJvmName.Contains(".ghast.", StringComparison.Ordinal);
+        // Pre-restructure mesh hosts (e.g. net.minecraft.client.model.GhastModel) omit the ghast package segment.
+        return string.Equals(officialJvmName, "net.minecraft.client.model.GhastModel", StringComparison.Ordinal) ||
+               string.Equals(officialJvmName, "net.minecraft.client.model.HappyGhastModel", StringComparison.Ordinal);
+    }
 
 
 
@@ -304,6 +315,40 @@ public static class GeometryIrEmitPolicy
     internal static bool IgnoresLegacyPartPoseDebugSwitch(string? officialJvmName) =>
         string.Equals(officialJvmName, "net.minecraft.client.model.animal.dolphin.DolphinModel", StringComparison.Ordinal) ||
         string.Equals(officialJvmName, "net.minecraft.client.model.animal.dolphin.BabyDolphinModel", StringComparison.Ordinal);
+
+    /// <summary>
+    /// Block-entity preview composites that match CleanRoom <c>Mul(T, Er)</c> row compose instead of ModelPart block-stack.
+    /// </summary>
+    internal static bool UsesTranslationTimesRotationPartPose(string? officialJvmName, string? partId = null)
+    {
+        if (string.IsNullOrWhiteSpace(officialJvmName))
+        {
+            return false;
+        }
+
+        if (string.Equals(
+                officialJvmName,
+                "net.minecraft.client.model.DecoratedPotModel.previewComposite",
+                StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        if (string.Equals(
+                officialJvmName,
+                "net.minecraft.client.model.object.boat.BoatModel.createChestBoatModel",
+                StringComparison.Ordinal))
+        {
+            return partId is null or "chest_bottom" or "chest_lid" or "chest_lock";
+        }
+
+        if (officialJvmName.Contains(".object.boat.RaftModel", StringComparison.Ordinal))
+        {
+            return partId is "bottom" or "chest_bottom" or "chest_lid" or "chest_lock";
+        }
+
+        return false;
+    }
 
     /// <summary>
     /// <c>DolphinModel.setupAnim</c> (javap 26.1.2): body <c>xRot/yRot</c> from render state; swim wobble only when

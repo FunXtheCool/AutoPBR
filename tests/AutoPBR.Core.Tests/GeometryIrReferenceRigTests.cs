@@ -1,6 +1,6 @@
 using System.Text.Json;
-using AutoPBR.Core.Preview;
-using AutoPBR.Tests.TestSupport;
+
+using AutoPBR.Core.Preview.Generated;
 
 namespace AutoPBR.Core.Tests;
 
@@ -142,11 +142,11 @@ public sealed class GeometryIrReferenceRigTests
         ReadOnlySpan<CleanRoomEntityModelRuntime.EntityCuboid> table = jvm switch
         {
             "net.minecraft.client.model.animal.fish.CodModel" =>
-                AutoPBR.Core.Preview.Generated.GeometryIrEntityCuboidTables.CodModelBodyLayer,
+                GeometryIrEntityCuboidTables.CodModelBodyLayer,
             "net.minecraft.client.model.animal.fish.SalmonModel" =>
-                AutoPBR.Core.Preview.Generated.GeometryIrEntityCuboidTables.SalmonModelBodyLayer,
+                GeometryIrEntityCuboidTables.SalmonModelBodyLayer,
             "net.minecraft.client.model.animal.chicken.ChickenModel" =>
-                AutoPBR.Core.Preview.Generated.GeometryIrEntityCuboidTables.ChickenModelBodyLayer,
+                GeometryIrEntityCuboidTables.ChickenModelBodyLayer,
             _ => ReadOnlySpan<CleanRoomEntityModelRuntime.EntityCuboid>.Empty
         };
 

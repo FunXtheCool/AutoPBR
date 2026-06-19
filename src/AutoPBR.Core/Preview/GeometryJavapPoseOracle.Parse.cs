@@ -5,7 +5,7 @@ namespace AutoPBR.Core.Preview;
 
 public static partial class GeometryJavapPoseOracle
 {
-    private sealed partial class Parser
+    private static partial class Parser
     {
         private static string? ExtractMethodText(string javapText, string methodName)
         {
@@ -275,9 +275,9 @@ public static partial class GeometryJavapPoseOracle
             lines[idx].Contains("isub", StringComparison.Ordinal) ||
             Regex.IsMatch(lines[idx], @"\biload_\d+\b", RegexOptions.CultureInvariant);
 
-        private static int SkipParametricIntToFloatBlock(List<string> lines, int i2fIdx, int minIdx)
+        private static int SkipParametricIntToFloatBlock(List<string> lines, int i2FIdx, int minIdx)
         {
-            var j = i2fIdx - 1;
+            var j = i2FIdx - 1;
             while (j >= minIdx && IsParametricIntToFloatLine(lines, j))
             {
                 j--;

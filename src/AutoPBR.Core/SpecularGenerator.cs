@@ -1,9 +1,7 @@
 using AutoPBR.Core.Models;
-using AutoPBR.Core.Atlas;
-using Colourful;
+
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 
 namespace AutoPBR.Core;
 

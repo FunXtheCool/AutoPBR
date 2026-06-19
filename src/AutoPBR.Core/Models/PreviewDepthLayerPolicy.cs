@@ -25,22 +25,13 @@ public enum PreviewDrawLayerShadowMode
 /// <summary>
 /// Per-batch depth and ordering policy for Explore 3D preview draws. Defaults match ordinary opaque geometry.
 /// </summary>
-public readonly struct PreviewDrawLayerPolicy : IEquatable<PreviewDrawLayerPolicy>
+public readonly struct PreviewDrawLayerPolicy() : IEquatable<PreviewDrawLayerPolicy>
 {
-    public PreviewDepthLayerKind Kind { get; init; }
-    public int DrawOrder { get; init; }
-    public int DepthBiasStep { get; init; }
-    public bool DepthWrite { get; init; }
-    public PreviewDrawLayerShadowMode ShadowMode { get; init; }
-
-    public PreviewDrawLayerPolicy()
-    {
-        Kind = PreviewDepthLayerKind.Base;
-        DrawOrder = 0;
-        DepthBiasStep = 0;
-        DepthWrite = true;
-        ShadowMode = PreviewDrawLayerShadowMode.Draw;
-    }
+    public PreviewDepthLayerKind Kind { get; init; } = PreviewDepthLayerKind.Base;
+    public int DrawOrder { get; init; } = 0;
+    public int DepthBiasStep { get; init; } = 0;
+    public bool DepthWrite { get; init; } = true;
+    public PreviewDrawLayerShadowMode ShadowMode { get; init; } = PreviewDrawLayerShadowMode.Draw;
 
     public static PreviewDrawLayerPolicy DefaultBase { get; } = ForKind(PreviewDepthLayerKind.Base);
 
@@ -122,6 +113,10 @@ public readonly struct PreviewDrawLayerPolicy : IEquatable<PreviewDrawLayerPolic
     public override bool Equals(object? obj) => obj is PreviewDrawLayerPolicy other && Equals(other);
 
     public override int GetHashCode() => HashCode.Combine(Kind, DrawOrder, DepthBiasStep, DepthWrite, ShadowMode);
+
+    public static bool operator ==(PreviewDrawLayerPolicy left, PreviewDrawLayerPolicy right) => left.Equals(right);
+
+    public static bool operator !=(PreviewDrawLayerPolicy left, PreviewDrawLayerPolicy right) => !left.Equals(right);
 }
 
 /// <summary>Stable sort order for <see cref="PreviewDrawBatch"/> before GPU upload or draw.</summary>
@@ -160,11 +155,7 @@ public static class PreviewDrawBatchOrdering
             return [];
         }
 
-        var list = batches is List<PreviewDrawBatch> mutable ? mutable : new List<PreviewDrawBatch>(batches);
-        if (batches is not List<PreviewDrawBatch>)
-        {
-            list.AddRange(batches);
-        }
+        var list = (batches as List<PreviewDrawBatch>) ?? [.. batches];
 
         Sort(list);
         return list.ToArray();

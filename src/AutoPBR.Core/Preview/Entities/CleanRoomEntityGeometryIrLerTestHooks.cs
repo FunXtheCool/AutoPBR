@@ -62,8 +62,18 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
     internal static GeometryIrMeshEmitOptions ApplyLivingEntityRendererEmitPlan(
         GeometryIrMeshEmitOptions options,
-        in GeometryIrLivingEntityRendererEmitPlan plan) =>
-        options with { RootTransform = plan.EmitRootTransform };
+        in GeometryIrLivingEntityRendererEmitPlan plan)
+    {
+        var root = plan.EmitRootTransform;
+        if (options.RootTransform != Matrix4x4.Identity)
+        {
+            root = root == Matrix4x4.Identity
+                ? options.RootTransform
+                : EntityParityTemplate.Mul(options.RootTransform, root);
+        }
+
+        return options with { RootTransform = root };
+    }
 
     internal static MergedJavaBlockModel FinishGeometryIrMeshLivingEntityRendererBasis(
         MergedJavaBlockModel mesh,
@@ -142,6 +152,37 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return GeometryIrLerBasisKind.Skip;
         }
 
+        if (!string.IsNullOrWhiteSpace(normalizedAssetPath))
+        {
+            var norm = normalizedAssetPath.Replace('\\', '/');
+            if (norm.Contains("/textures/entity/boat/", StringComparison.OrdinalIgnoreCase) ||
+                norm.Contains("/textures/entity/chest_boat/", StringComparison.OrdinalIgnoreCase) ||
+                norm.Contains("/textures/entity/chest/", StringComparison.OrdinalIgnoreCase) ||
+                norm.Contains("/textures/entity/minecart/", StringComparison.OrdinalIgnoreCase) ||
+                norm.Contains("/textures/entity/bed/", StringComparison.OrdinalIgnoreCase) ||
+                norm.Contains("/textures/entity/signs/", StringComparison.OrdinalIgnoreCase) ||
+                norm.Contains("/textures/entity/banner/", StringComparison.OrdinalIgnoreCase) ||
+                norm.Contains("/textures/entity/banner_base", StringComparison.OrdinalIgnoreCase) ||
+                norm.Contains("/textures/entity/bell/", StringComparison.OrdinalIgnoreCase) ||
+                norm.Contains("/textures/entity/decorated_pot/", StringComparison.OrdinalIgnoreCase) ||
+                norm.Contains("/textures/entity/conduit/", StringComparison.OrdinalIgnoreCase) ||
+                norm.Contains("/textures/entity/beacon/", StringComparison.OrdinalIgnoreCase) ||
+                norm.Contains("/textures/entity/end_portal/", StringComparison.OrdinalIgnoreCase) ||
+                norm.Contains("/textures/entity/experience/", StringComparison.OrdinalIgnoreCase) ||
+                norm.Contains("/textures/entity/fishing/", StringComparison.OrdinalIgnoreCase) ||
+                norm.Contains("/textures/entity/guardian/guardian_beam", StringComparison.OrdinalIgnoreCase) ||
+                norm.Contains("/textures/entity/enderdragon/dragon_fireball", StringComparison.OrdinalIgnoreCase))
+            {
+                return GeometryIrLerBasisKind.Skip;
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(officialJvmName) &&
+            officialJvmName.Contains(".object.", StringComparison.Ordinal))
+        {
+            return GeometryIrLerBasisKind.Skip;
+        }
+
         // Ghast / happy ghast bake ModelTransforms into the mesh root (large negative Y); LER mirror flips preview upright.
         if (!string.IsNullOrWhiteSpace(officialJvmName) &&
             (officialJvmName.Contains(".monster.ghast.", StringComparison.OrdinalIgnoreCase) ||
@@ -213,6 +254,30 @@ internal sealed partial class CleanRoomEntityModelRuntime
         }
 
         return b.Build(texRef);
+    }
+
+    /// <summary>Hand-built CleanRoom catalog mesh for bind-pose comparison (bypasses geometry IR resolver).</summary>
+    internal static bool TryBuildCleanRoomParityCatalogMeshForTests(
+        string builderMethod,
+        string normalizedAssetPath,
+        MinecraftNativeProfile profile,
+        out MergedJavaBlockModel mesh)
+    {
+        mesh = null!;
+        var norm = normalizedAssetPath.Replace('\\', '/').TrimStart('/');
+        var stem = Path.GetFileNameWithoutExtension(norm).ToLowerInvariant();
+        var texRef = ToTextureRef(norm);
+        var isBaby = LooksLikeBabyTexture(stem, norm);
+        return TryInvokeParityCatalogBuilder(
+            builderMethod,
+            norm,
+            stem,
+            texRef,
+            profile,
+            isBaby,
+            idlePhase01: 0f,
+            animationTimeSeconds: 0f,
+            out mesh);
     }
 
     /// <summary>Hand-built parity-catalog mesh for bind-pose comparison tests (no geometry IR).</summary>

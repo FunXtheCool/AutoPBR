@@ -64,6 +64,22 @@ internal sealed partial class CleanRoomEntityModelRuntime
     internal static bool TryComposePartPosePublic(JsonElement pose, Matrix4x4 parentWorld, out Matrix4x4 matrix) =>
         TryComposePartPose(pose, parentWorld, out matrix, out _);
 
+    internal static bool TryComposeTranslationTimesRotationPartPosePublic(
+        JsonElement pose,
+        Matrix4x4 parentWorldBlock,
+        out Matrix4x4 worldBlock,
+        out string? failureReason)
+    {
+        if (!TryComposeLegacyPartPoseTexel(pose, out var localPartPose, out failureReason))
+        {
+            worldBlock = default;
+            return false;
+        }
+
+        worldBlock = Matrix4x4.Multiply(localPartPose, parentWorldBlock);
+        return true;
+    }
+
     /// <summary>Vanilla bind pose <c>ModelPart.translateAndRotate</c> local delta in block space (PoseStack /16).</summary>
     internal static bool TryComposePartRenderLocalBlock(
         JsonElement pose,
@@ -168,18 +184,20 @@ internal sealed partial class CleanRoomEntityModelRuntime
         return true;
     }
     internal static Matrix4x4 BlockRowAffineToTexel(Matrix4x4 blockRow) =>
-        new(
-            blockRow.M11, blockRow.M12, blockRow.M13, blockRow.M14,
-            blockRow.M21, blockRow.M22, blockRow.M23, blockRow.M24,
-            blockRow.M31, blockRow.M32, blockRow.M33, blockRow.M34,
-            blockRow.M41 * 16f, blockRow.M42 * 16f, blockRow.M43 * 16f, blockRow.M44);
+        blockRow with
+        {
+            M41 = blockRow.M41 * 16f,
+            M42 = blockRow.M42 * 16f,
+            M43 = blockRow.M43 * 16f,
+        };
 
     internal static Matrix4x4 TexelRowAffineToBlock(Matrix4x4 texelRow) =>
-        new(
-            texelRow.M11, texelRow.M12, texelRow.M13, texelRow.M14,
-            texelRow.M21, texelRow.M22, texelRow.M23, texelRow.M24,
-            texelRow.M31, texelRow.M32, texelRow.M33, texelRow.M34,
-            texelRow.M41 / 16f, texelRow.M42 / 16f, texelRow.M43 / 16f, texelRow.M44);
+        texelRow with
+        {
+            M41 = texelRow.M41 / 16f,
+            M42 = texelRow.M42 / 16f,
+            M43 = texelRow.M43 / 16f,
+        };
 
     private static bool TryReadPose(
         JsonElement pose,
@@ -278,19 +296,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         var texU = uv[0].GetInt32();
         var texV = uv[1].GetInt32();
-        var atlasW = options.AtlasWidth;
-        var atlasH = options.AtlasHeight;
-        if (GeometryIrCuboidMetadata.TryGetAtlasDimensions(cuboid, out var cuboidAtlasW, out var cuboidAtlasH))
-        {
-            atlasW = cuboidAtlasW;
-            atlasH = cuboidAtlasH;
-        }
-        else if (!string.IsNullOrEmpty(partId) &&
-                 options.ResolvePartAtlasDimensions?.Invoke(partId) is { Width: > 0, Height: > 0 } partAtlas)
-        {
-            atlasW = partAtlas.Width;
-            atlasH = partAtlas.Height;
-        }
 
         var mirror = GeometryIrCuboidMetadata.GetMirrorCuboidUv(cuboid);
         var uw = -1;
@@ -330,8 +335,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             faceMaskArray = faceMask;
         }
-
-        ApplyNegativeUHorizontalUpOnlySheetUvFix(ref texU, uw, uh, ud, faceMaskArray);
 
         string? textureKey = null;
         if (GeometryIrCuboidMetadata.TryGetTextureKey(cuboid, out var tk))
@@ -383,28 +386,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
         return true;
     }
 
-    private static void ApplyNegativeUHorizontalUpOnlySheetUvFix(
-        ref int texU,
-        int uvSizeW,
-        int uvSizeH,
-        int uvSizeD,
-        string[]? faceMask)
-    {
-        if (texU >= 0 ||
-            uvSizeW <= 0 ||
-            uvSizeH != 0 ||
-            uvSizeD <= 0 ||
-            faceMask is not { Length: 1 } ||
-            !faceMask[0].Equals("up", StringComparison.OrdinalIgnoreCase))
-        {
-            return;
-        }
-
-        // Ender Dragon wing membranes are lifted as texOffs(-56, *) + [w,0,d] + faceMask:["up"].
-        // Pre-shift the IR origin so the normal Java UP slot lands on the visible U 0..w artwork.
-        texU -= uvSizeW;
-    }
-
     private static void ApplyPreviewDegenerateAxisThickness(
         ref float x0, ref float y0, ref float z0,
         ref float x1, ref float y1, ref float z1,
@@ -428,20 +409,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
         a1 = mid + thickness;
     }
 
-    /// <summary>Wrap negative <c>texOffs</c> origins onto the entity atlas (e.g. Cod top fin V -6 on 32px sheet → 26).</summary>
-    private static void NormalizeAtlasUv(int atlasW, int atlasH, ref int texU, ref int texV)
-    {
-        if (texU < 0)
-        {
-            texU += atlasW;
-        }
-
-        if (texV < 0)
-        {
-            texV += atlasH;
-        }
-    }
-
     private static bool TryBuildMeshFromGeometryIr(
         RigBuilder builder,
         MinecraftNativeProfile profile,
@@ -454,27 +421,25 @@ internal sealed partial class CleanRoomEntityModelRuntime
         RigBuilder builder,
         MinecraftNativeProfile profile,
         BabyProfile p,
-        float tailSway,
-        out string? failureReason) =>
+        float tailSway) =>
         TryBuildMeshFromGeometryIr(
             builder,
             profile,
             GeometryIrModelJvmNames.Cod,
             GeometryIrMeshEmitPresets.ForCod(p, tailSway),
-            out failureReason);
+            out _);
 
     private static bool TryBuildSalmonMeshFromGeometryIr(
         RigBuilder builder,
         MinecraftNativeProfile profile,
         BabyProfile p,
-        float tailSway,
-        out string? failureReason) =>
+        float tailSway) =>
         TryBuildMeshFromGeometryIr(
             builder,
             profile,
             GeometryIrModelJvmNames.Salmon,
             GeometryIrMeshEmitPresets.ForSalmon(p, tailSway),
-            out failureReason);
+            out _);
 
     internal static bool TryBuildCodGeometryIrMesh(
         RigBuilder builder,
@@ -614,7 +579,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 PreviewDegenerateAxisThickness = 0f,
             }
                 .WithOfficialJvmPoseComposeDefaults(officialJvmName)
-                with { OfficialJvmName = officialJvmName },
+                with
+            { OfficialJvmName = officialJvmName },
             lerPlan);
         if (geometryRootOverride is { } overrideRoot)
         {
@@ -635,7 +601,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
     }
 
     /// <summary>
-    /// Test-only parity emit with explicit LER multiply order (see <see cref="ApplyLivingEntityRendererPreviewBasis"/>).
+    /// Test-only parity emit with explicit LER multiply order (see ApplyLivingEntityRendererPreviewBasis with bool overload).
     /// </summary>
     internal static MergedJavaBlockModel? TryBuildGeometryIrParityMeshForTestsWithLerCompose(
         string texRef,

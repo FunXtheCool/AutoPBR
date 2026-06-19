@@ -14,6 +14,15 @@ internal static class GeometryIrVariantLiftMap
             ["net.minecraft.client.model.monster.skeleton.SkeletonModel.createSingleModelDualBodyLayer"] = new(
                 "net.minecraft.client.model.monster.skeleton.SkeletonModel",
                 "createSingleModelDualBodyLayer"),
+            ["net.minecraft.client.model.animal.nautilus.NautilusModel.createBabyBodyLayer"] = new(
+                "net.minecraft.client.model.animal.nautilus.NautilusModel",
+                "createBabyBodyLayer"),
+            ["net.minecraft.client.model.object.boat.BoatModel.createChestBoatModel"] = new(
+                "net.minecraft.client.model.object.boat.BoatModel",
+                "createChestBoatModel"),
+            ["net.minecraft.client.model.object.boat.RaftModel.createChestRaftModel"] = new(
+                "net.minecraft.client.model.object.boat.RaftModel",
+                "createChestRaftModel"),
         };
 
     public static bool TryGet(string variantOfficialJvmName, out VariantLiftSpec spec) =>

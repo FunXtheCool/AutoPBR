@@ -111,6 +111,12 @@ internal sealed partial class CleanRoomEntityModelRuntime
         GeometryIrMeshEmitOptions emitOptions,
         string? normalizedAssetPath = null)
     {
+        if (string.Equals(parityRule.BuilderMethod, "ChestEntity", StringComparison.Ordinal))
+        {
+            // Block chest atlas preview uses closed bind pose; setupAnim forces lid.xRot = π/2.
+            return false;
+        }
+
         if (string.Equals(parityRule.BuilderMethod, "Ghast", StringComparison.Ordinal) ||
             string.Equals(parityRule.BuilderMethod, "HappyGhast", StringComparison.Ordinal))
         {

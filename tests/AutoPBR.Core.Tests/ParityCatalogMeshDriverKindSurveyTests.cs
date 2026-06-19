@@ -1,18 +1,12 @@
-using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
-
 using Xunit.Abstractions;
 
 namespace AutoPBR.Core.Tests;
 
-public sealed class ParityCatalogMeshDriverKindSurveyTests
+public sealed class ParityCatalogMeshDriverKindSurveyTests(ITestOutputHelper? output)
 {
     private static readonly MinecraftNativeProfile Profile26 =
         new("26.1.2", Path.Combine(AppContext.BaseDirectory, "Data", "minecraft-native", "26.1.2"), new Version(26, 1, 2));
 
-    private readonly ITestOutputHelper? _output;
-
-    public ParityCatalogMeshDriverKindSurveyTests(ITestOutputHelper output) => _output = output;
     [Fact]
     public void ResolveAutoLatestModern_ignores_ir_payload_folders_and_prefers_26_1_2_label()
     {
@@ -61,18 +55,18 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests
             }
         }
 
-        _output?.WriteLine($"Total catalogued: {paths.Count}");
-        _output?.WriteLine($"RuntimeGeometryIrJson: {ir}");
-        _output?.WriteLine($"CleanRoom: {cleanRoom}");
-        _output?.WriteLine($"Build failed: {failed.Count}");
+        output?.WriteLine($"Total catalogued: {paths.Count}");
+        output?.WriteLine($"RuntimeGeometryIrJson: {ir}");
+        output?.WriteLine($"CleanRoom: {cleanRoom}");
+        output?.WriteLine($"Build failed: {failed.Count}");
         foreach (var p in cleanRoomPaths)
         {
-            _output?.WriteLine($"  CleanRoom: {p}");
+            output?.WriteLine($"  CleanRoom: {p}");
         }
 
         foreach (var p in failed)
         {
-            _output?.WriteLine($"  FAILED: {p}");
+            output?.WriteLine($"  FAILED: {p}");
         }
     }
 
@@ -176,7 +170,7 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests
         Assert.Contains(expectedJvmSuffix, row.ResolvedGeometryJvm ?? row.ProvenanceDetail ?? "", StringComparison.Ordinal);
         Assert.True(row.SuppressesHandFallback);
         Assert.NotEqual(CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.Skip, row.LerBasis);
-        _output?.WriteLine(
+        output?.WriteLine(
             $"{row.TexturePath}\t{row.DriverKind}\t{row.ResolvedGeometryJvm}\tsuppress={row.SuppressesHandFallback}\tsetup={row.SetupAnimWouldEvaluate}\tstate={row.SetupAnimStateSource}\tler={row.LerBasis}\tdefAnim={row.DefinitionAnimationJvm}");
     }
 
@@ -205,16 +199,21 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests
     {
         var detailed = ParityCatalogIrSurveyHelper.RunDetailed(Profile26);
         var table = ParityCatalogEntityPreviewDiagnostics.FormatGainChecklistTable(detailed.Rows);
-        _output?.WriteLine(table);
+        output?.WriteLine(table);
 
         var regressions = detailed.Rows
-            .Where(r => r.SuppressesHandFallback && !r.BuildSucceeded)
+            .Where(r => r is { SuppressesHandFallback: true, BuildSucceeded: false })
             .Select(r => r.TexturePath)
             .ToList();
         Assert.Empty(regressions);
 
         var silentIrMiss = detailed.Rows
-            .Where(r => r.SuppressesHandFallback && r.BuildSucceeded && r.DriverKind == PreviewMeshDriverKind.CleanRoom)
+            .Where(r => r is
+            {
+                SuppressesHandFallback: true,
+                BuildSucceeded: true,
+                DriverKind: PreviewMeshDriverKind.CleanRoom
+            })
             .Select(r => $"{r.TexturePath} ({r.IrFailureReason})")
             .ToList();
         Assert.Empty(silentIrMiss);
@@ -227,7 +226,7 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests
         foreach (var row in detailed.Rows.Where(r => r.SuppressesHandFallback))
         {
             Assert.True(
-                row.BuildSucceeded && row.DriverKind == PreviewMeshDriverKind.RuntimeGeometryIrJson,
+                row is { BuildSucceeded: true, DriverKind: PreviewMeshDriverKind.RuntimeGeometryIrJson },
                 $"{row.TexturePath}: driver={row.DriverKind} reason={row.IrFailureReason}");
         }
     }

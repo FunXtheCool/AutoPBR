@@ -1,17 +1,12 @@
 using System.Globalization;
 using System.Text;
-using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
+
 using Xunit.Abstractions;
 
 namespace AutoPBR.Core.Tests;
 
-public sealed class ParityCatalogMeshDriverSurveyDiagnostics
+public sealed class ParityCatalogMeshDriverSurveyDiagnostics(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public ParityCatalogMeshDriverSurveyDiagnostics(ITestOutputHelper output) => _output = output;
-
     [Fact]
     public void Survey_cleanroom_failure_reasons()
     {
@@ -41,6 +36,6 @@ public sealed class ParityCatalogMeshDriverSurveyDiagnostics
             sb.AppendLine(CultureInfo.InvariantCulture, $"  {kv.Value,4}  {kv.Key}");
         }
 
-        _output.WriteLine(sb.ToString());
+        output.WriteLine(sb.ToString());
     }
 }

@@ -1,15 +1,9 @@
-using AutoPBR.Core.Preview;
-using AutoPBR.Tests.TestSupport;
 using Xunit.Abstractions;
 
 namespace AutoPBR.Core.Tests;
 
-public sealed class EntityUvPolicyProbeTests
+public sealed class EntityUvPolicyProbeTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public EntityUvPolicyProbeTests(ITestOutputHelper output) => _output = output;
-
     [Fact]
     public void Probe_creeper_policy_combo_for_legacy_fingerprint()
     {
@@ -30,29 +24,29 @@ public sealed class EntityUvPolicyProbeTests
         }
 
         foreach (var mapJava in new[] { false, true })
-        foreach (var flipV in new[] { false, true })
-        foreach (var useBl in new[] { false, true })
-        foreach (var swap in new[] { false, true })
-        {
-            var policy = new PreviewUvBakePolicy
-            {
-                MapJavaCuboidFaceCorners = mapJava,
-                FlipV = flipV,
-                UseBottomLeftUvOrigin = useBl,
-                SwapFaceUpDown = swap,
-                PreserveDirectionalBounds = true,
-            };
-            Assert.True(MinecraftModelBaker.TryBakeWithUvPolicy(
-                merged, "minecraft", pathToIdx, texSizes, in policy, out var verts, out _, out _));
-            var fp = Fingerprint(verts);
-            var tag = fp == legacy ? "MATCH" : "     ";
-            _output.WriteLine($"{tag} mapJava={mapJava} flipV={flipV} useBL={useBl} swap={swap} fp=0x{fp:x16}");
-        }
+            foreach (var flipV in new[] { false, true })
+                foreach (var useBl in new[] { false, true })
+                    foreach (var swap in new[] { false, true })
+                    {
+                        var policy = new PreviewUvBakePolicy
+                        {
+                            MapJavaCuboidFaceCorners = mapJava,
+                            FlipV = flipV,
+                            UseBottomLeftUvOrigin = useBl,
+                            SwapFaceUpDown = swap,
+                            PreserveDirectionalBounds = true,
+                        };
+                        Assert.True(MinecraftModelBaker.TryBakeWithUvPolicy(
+                            merged, "minecraft", pathToIdx, texSizes, in policy, out var verts, out _, out _));
+                        var fp = Fingerprint(verts);
+                        var tag = fp == legacy ? "MATCH" : "     ";
+                        output.WriteLine($"{tag} mapJava={mapJava} flipV={flipV} useBL={useBl} swap={swap} fp=0x{fp:x16}");
+                    }
 
         var baseline = PreviewUvBakePolicy.EntityCuboidBaseline;
         Assert.True(MinecraftModelBaker.TryBakeWithUvPolicy(
             merged, "minecraft", pathToIdx, texSizes, in baseline, out var baselineVerts, out _, out _));
-        _output.WriteLine($"      entityBaseline fp=0x{Fingerprint(baselineVerts):x16}");
+        output.WriteLine($"      entityBaseline fp=0x{Fingerprint(baselineVerts):x16}");
     }
 
     private static ulong Fingerprint(float[] verts)

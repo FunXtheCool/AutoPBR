@@ -1215,7 +1215,7 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.monster.slime.SlimeModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.monster.slime.SlimeModel",
-      "extractionStatus": "ok",
+      "extractionStatus": "partial",
       "classSha256Hex": "875d2fb6a22a64733f8cd639a3304c668d997f85a9b94ba31780773f69a9d35a",
       "jarPath": "net/minecraft/client/model/monster/slime/SlimeModel.class"
     },
@@ -1409,6 +1409,24 @@
       "jarPath": "net/minecraft/client/model/object/banner/BannerFlagModel.class"
     },
     {
+      "officialJvmName": "net.minecraft.client.model.object.banner.BannerFlagModel.standingPreviewComposite",
+      "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.object.banner.BannerFlagModel.standingPreviewComposite.json",
+      "profile": "named_jar_26.1.2",
+      "modelIndexJvmName": "net.minecraft.client.model.object.banner.BannerFlagModel.standingPreviewComposite",
+      "extractionStatus": "ok",
+      "classSha256Hex": "f88cb11694dfffa301c23c4de5823067dea8129512d060db8aef7b12592a2511",
+      "jarPath": "net/minecraft/client/model/object/banner/BannerFlagModel.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.banner.BannerFlagModel.wallPreviewComposite",
+      "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.object.banner.BannerFlagModel.wallPreviewComposite.json",
+      "profile": "named_jar_26.1.2",
+      "modelIndexJvmName": "net.minecraft.client.model.object.banner.BannerFlagModel.wallPreviewComposite",
+      "extractionStatus": "ok",
+      "classSha256Hex": "f88cb11694dfffa301c23c4de5823067dea8129512d060db8aef7b12592a2511",
+      "jarPath": "net/minecraft/client/model/object/banner/BannerFlagModel.class"
+    },
+    {
       "officialJvmName": "net.minecraft.client.model.object.banner.BannerModel",
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.object.banner.BannerModel.json",
       "profile": "named_jar_26.1.2",
@@ -1463,10 +1481,28 @@
       "jarPath": "net/minecraft/client/model/object/boat/BoatModel.class"
     },
     {
+      "officialJvmName": "net.minecraft.client.model.object.boat.BoatModel.createChestBoatModel",
+      "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.object.boat.BoatModel.createChestBoatModel.json",
+      "profile": "named_jar_26.1.2",
+      "modelIndexJvmName": "net.minecraft.client.model.object.boat.BoatModel.createChestBoatModel",
+      "extractionStatus": "ok",
+      "classSha256Hex": "44746e7008a7148507df1d5675fc4c574b5b9edcb7f6a48d04cd714a37f09425",
+      "jarPath": "net/minecraft/client/model/object/boat/BoatModel.class"
+    },
+    {
       "officialJvmName": "net.minecraft.client.model.object.boat.RaftModel",
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.object.boat.RaftModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.object.boat.RaftModel",
+      "extractionStatus": "ok",
+      "classSha256Hex": "43db0e1bb2f3d1b722ea92fac0bfeff6f231415b79b9a5e099b16cfdb6c01359",
+      "jarPath": "net/minecraft/client/model/object/boat/RaftModel.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.boat.RaftModel.createChestRaftModel",
+      "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.object.boat.RaftModel.createChestRaftModel.json",
+      "profile": "named_jar_26.1.2",
+      "modelIndexJvmName": "net.minecraft.client.model.object.boat.RaftModel.createChestRaftModel",
       "extractionStatus": "ok",
       "classSha256Hex": "43db0e1bb2f3d1b722ea92fac0bfeff6f231415b79b9a5e099b16cfdb6c01359",
       "jarPath": "net/minecraft/client/model/object/boat/RaftModel.class"
@@ -1503,6 +1539,24 @@
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.object.chest.ChestModel.json",
       "profile": "named_jar_26.1.2",
       "modelIndexJvmName": "net.minecraft.client.model.object.chest.ChestModel",
+      "extractionStatus": "ok",
+      "classSha256Hex": "4bdd6f6dfc2e147fd01857dee36b944a98f5c541918f50a82c60103946839471",
+      "jarPath": "net/minecraft/client/model/object/chest/ChestModel.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.chest.ChestModel.createDoubleBodyLeftLayer",
+      "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.object.chest.ChestModel.createDoubleBodyLeftLayer.json",
+      "profile": "named_jar_26.1.2",
+      "modelIndexJvmName": "net.minecraft.client.model.object.chest.ChestModel.createDoubleBodyLeftLayer",
+      "extractionStatus": "ok",
+      "classSha256Hex": "4bdd6f6dfc2e147fd01857dee36b944a98f5c541918f50a82c60103946839471",
+      "jarPath": "net/minecraft/client/model/object/chest/ChestModel.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.object.chest.ChestModel.createDoubleBodyRightLayer",
+      "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.object.chest.ChestModel.createDoubleBodyRightLayer.json",
+      "profile": "named_jar_26.1.2",
+      "modelIndexJvmName": "net.minecraft.client.model.object.chest.ChestModel.createDoubleBodyRightLayer",
       "extractionStatus": "ok",
       "classSha256Hex": "4bdd6f6dfc2e147fd01857dee36b944a98f5c541918f50a82c60103946839471",
       "jarPath": "net/minecraft/client/model/object/chest/ChestModel.class"
@@ -1607,6 +1661,33 @@
       "jarPath": "net/minecraft/client/model/object/skull/SkullModel.class"
     },
     {
+      "officialJvmName": "net.minecraft.client.model.object.skull.SkullModel.previewComposite",
+      "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.object.skull.SkullModel.previewComposite.json",
+      "profile": "named_jar_26.1.2",
+      "modelIndexJvmName": "net.minecraft.client.model.object.skull.SkullModel.previewComposite",
+      "extractionStatus": "ok",
+      "classSha256Hex": "a980171a1627eaeaa0c63d5803a7dd27d7dfffb35a69d48377f2a607dc714989",
+      "jarPath": "net/minecraft/client/model/object/skull/SkullModel.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.DecoratedPotModel.previewComposite",
+      "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.DecoratedPotModel.previewComposite.json",
+      "profile": "named_jar_26.1.2",
+      "modelIndexJvmName": "net.minecraft.client.model.DecoratedPotModel.previewComposite",
+      "extractionStatus": "ok",
+      "classSha256Hex": "",
+      "jarPath": "net/minecraft/client/renderer/blockentity/DecoratedPotRenderer.class"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.BedModel.previewComposite",
+      "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.BedModel.previewComposite.json",
+      "profile": "named_jar_26.1.2",
+      "modelIndexJvmName": "net.minecraft.client.model.BedModel.previewComposite",
+      "extractionStatus": "ok",
+      "classSha256Hex": "",
+      "jarPath": "net/minecraft/client/renderer/blockentity/BedRenderer.class"
+    },
+    {
       "officialJvmName": "net.minecraft.client.model.object.skull.SkullModelBase",
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.object.skull.SkullModelBase.json",
       "profile": "named_jar_26.1.2",
@@ -1668,6 +1749,15 @@
       "profile": "named_jar_26.1.2",
       "extractionStatus": "ok",
       "modelIndexJvmName": "net.minecraft.client.model.monster.skeleton.SkeletonModel.createSingleModelDualBodyLayer"
+    },
+    {
+      "officialJvmName": "net.minecraft.client.model.animal.nautilus.NautilusModel.createBabyBodyLayer",
+      "jarPath": "net/minecraft/client/model/animal/nautilus/NautilusModel.class",
+      "classSha256Hex": "97324a695f00f735b1b01c8afff52f9e086ad45b0799b8f6d64364953a56aa90",
+      "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.animal.nautilus.NautilusModel.createBabyBodyLayer.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "ok",
+      "modelIndexJvmName": "net.minecraft.client.model.animal.nautilus.NautilusModel.createBabyBodyLayer"
     }
   ]
 }

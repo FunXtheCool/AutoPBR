@@ -172,7 +172,7 @@ internal static partial class SetupAnimLift
             var layerOffset = (float)(i - 4);
             assignments.Add(new JsonObject
             {
-                ["partField"] = $"segment{i}",
+                ["partField"] = $"cube{i}",
                 ["property"] = "y",
                 ["expr"] = SetupAnimExpressionLift.OpNode(
                     "mul",

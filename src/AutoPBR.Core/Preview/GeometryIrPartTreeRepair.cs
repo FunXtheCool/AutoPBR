@@ -219,9 +219,21 @@ internal static partial class GeometryIrPartTreeRepair
                 ZeroRootTranslation(ro);
             }
 
+            if (ShouldApplyCollapsedNautilusBabyInnerRootOffset(officialJvmName, doc, ro))
+            {
+                ApplyCollapsedInnerRootFromBytecodeProbe(doc, ro);
+            }
+
         }
 
 
+
+        if (ShouldRepairObjectBoatFamily(officialJvmName))
+        {
+            RepairObjectBoatFamilyHullPartPose(doc);
+        }
+
+        RepairObjectChestModelCuboidOrigins(doc);
 
         if (ShouldApplyPlayerWideMeshParityRepair(officialJvmName, roots) ||
             ShouldApplyHumanoidLayerMeshReferenceRepair(officialJvmName))

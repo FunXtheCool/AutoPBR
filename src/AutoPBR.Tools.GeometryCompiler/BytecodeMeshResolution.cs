@@ -193,6 +193,18 @@ internal static partial class BytecodeMeshResolution
         "createEyesLayer",
     ];
 
+    /// <summary>
+    /// Alternate static factories on the same host that must not be deep-concatenated with
+    /// <c>createBodyLayer</c>/<c>createBodyMesh</c> (e.g. nautilus baby body layer).
+    /// </summary>
+    private static readonly HashSet<string> IsolatedVariantFactoryMethods = new(StringComparer.Ordinal)
+    {
+        "createBabyBodyLayer",
+        "createSingleModelDualBodyLayer",
+        "createChestBoatModel",
+        "createChestRaftModel",
+    };
+
     private static List<string> CollectFactoryMethodNames(
         MojangMappingsParser? maps,
         string hostOfficialJvmName,
@@ -217,6 +229,11 @@ internal static partial class BytecodeMeshResolution
         }
 
         Add(factoryMethod);
+        if (IsolatedVariantFactoryMethods.Contains(factoryMethod))
+        {
+            return names;
+        }
+
         Add("createBodyLayer");
         Add("createMesh");
         Add("apply");
@@ -238,6 +255,12 @@ internal static partial class BytecodeMeshResolution
 
                 if (JvmClassFileParser.IsMeshFactoryDescriptor(desc, maps))
                 {
+                    if (IsolatedVariantFactoryMethods.Contains(name) &&
+                        !string.Equals(name, factoryMethod, StringComparison.Ordinal))
+                    {
+                        continue;
+                    }
+
                     Add(name);
                     continue;
                 }

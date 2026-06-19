@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace AutoPBR.Core.Preview;
@@ -302,14 +301,10 @@ internal static partial class GeometryIrPartTreeRepair
 
 
 
-            if (cub["uvOrigin"] is JsonArray uv && uv.Count >= 2 &&
-
+            if (cub["uvOrigin"] is JsonArray { Count: >= 2 } uv &&
                 Math.Abs(uv[1]!.GetValue<double>() - 32) < 0.01)
-
             {
-
                 bodyCuboids.RemoveAt(i);
-
             }
 
         }
@@ -645,6 +640,59 @@ internal static partial class GeometryIrPartTreeRepair
         tr[0] = 0;
         tr[1] = 0;
         tr[2] = 0;
+    }
+
+    /// <summary>
+    /// <c>NautilusModel.createBabyBodyLayer</c> nests shell/body under an inner <c>root</c> at
+    /// <c>T(-0.5,28,-0.5)</c>; when that pose-only bind is skipped, hoisted parts need the offset on outer root.
+    /// </summary>
+    private static bool ShouldApplyCollapsedNautilusBabyInnerRootOffset(
+        string? officialJvmName,
+        JsonObject shardDoc,
+        JsonObject rootPart)
+    {
+        if (!string.Equals(
+                shardDoc["factoryMethod"]?.GetValue<string>(),
+                "createBabyBodyLayer",
+                StringComparison.Ordinal) ||
+            string.IsNullOrWhiteSpace(officialJvmName) ||
+            !officialJvmName.Contains(".animal.nautilus.NautilusModel", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        if (rootPart["pose"] is not JsonObject pose ||
+            pose["translation"] is not JsonArray tr ||
+            tr.Count < 3)
+        {
+            return true;
+        }
+
+        var ty = tr[1]?.GetValue<double>() ?? 0;
+        return Math.Abs(ty) < 1.0;
+    }
+
+    private static void ApplyCollapsedInnerRootFromBytecodeProbe(JsonObject shardDoc, JsonObject rootPart)
+    {
+        double tx = -0.5;
+        double ty = 28;
+        double tz = -0.5;
+        if (shardDoc["bytecodeFloatProbe"] is JsonArray probe && probe.Count >= 3)
+        {
+            tx = probe[0]?.GetValue<double>() ?? tx;
+            ty = probe[1]?.GetValue<double>() ?? ty;
+            tz = probe[2]?.GetValue<double>() ?? tz;
+        }
+
+        rootPart["pose"] ??= new JsonObject();
+        if (rootPart["pose"] is not JsonObject pose)
+        {
+            return;
+        }
+
+        pose["translation"] = new JsonArray { tx, ty, tz };
+        pose["rotationEulerRad"] ??= new JsonArray { 0, 0, 0 };
+        pose["eulerOrder"] ??= "XYZ";
     }
 
     /// <summary>

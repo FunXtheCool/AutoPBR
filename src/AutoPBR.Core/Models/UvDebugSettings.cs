@@ -29,18 +29,6 @@ public static class UvDebugSettings
     private static bool _useBottomLeftUvOrigin;
     private static int _uvCornerOrderMode;
 
-    public static bool FlipU => _flipU;
-    public static bool FlipV => _flipV;
-    public static double OffsetUPixels => _offsetUPixels;
-    public static double OffsetVPixels => _offsetVPixels;
-    public static int GlobalFaceRotationDegrees => _globalFaceRotationDegrees;
-    public static bool SwapFaceNorthSouth => _swapFaceNorthSouth;
-    public static bool SwapFaceEastWest => _swapFaceEastWest;
-    public static bool SwapFaceUpDown => _swapFaceUpDown;
-    public static bool PreserveDirectionalBounds => _preserveDirectionalBounds;
-    public static bool UseBottomLeftUvOrigin => _useBottomLeftUvOrigin;
-    public static int UvCornerOrderMode => _uvCornerOrderMode;
-
     public static bool HasActiveOverrides =>
         _flipUOverride ||
         _flipVOverride ||
@@ -93,17 +81,17 @@ public static class UvDebugSettings
     public static bool TryGetOffsetVPixelsOverride(out float value) => TryRead(_offsetVPixelsOverride, (float)_offsetVPixels, out value);
     public static bool TryGetGlobalFaceRotationDegreesOverride(out int value) => TryRead(_globalFaceRotationOverride, _globalFaceRotationDegrees, out value);
 
-    public static void SetFlipU(bool value, bool isOverride = true) => SetBool(ref _flipUOverride, ref _flipU, value, isOverride);
-    public static void SetFlipV(bool value, bool isOverride = true) => SetBool(ref _flipVOverride, ref _flipV, value, isOverride);
-    public static void SetSwapFaceNorthSouth(bool value, bool isOverride = true) => SetBool(ref _swapFaceNorthSouthOverride, ref _swapFaceNorthSouth, value, isOverride);
-    public static void SetSwapFaceEastWest(bool value, bool isOverride = true) => SetBool(ref _swapFaceEastWestOverride, ref _swapFaceEastWest, value, isOverride);
-    public static void SetSwapFaceUpDown(bool value, bool isOverride = true) => SetBool(ref _swapFaceUpDownOverride, ref _swapFaceUpDown, value, isOverride);
-    public static void SetPreserveDirectionalBounds(bool value, bool isOverride = true) => SetBool(ref _preserveDirectionalBoundsOverride, ref _preserveDirectionalBounds, value, isOverride);
-    public static void SetUseBottomLeftUvOrigin(bool value, bool isOverride = true) => SetBool(ref _useBottomLeftUvOriginOverride, ref _useBottomLeftUvOrigin, value, isOverride);
-    public static void SetUvCornerOrderMode(int value, bool isOverride = true) => SetValue(ref _uvCornerOrderModeOverride, ref _uvCornerOrderMode, value, isOverride);
-    public static void SetOffsetUPixels(double value, bool isOverride = true) => SetDouble(ref _offsetUPixelsOverride, ref _offsetUPixels, value, isOverride);
-    public static void SetOffsetVPixels(double value, bool isOverride = true) => SetDouble(ref _offsetVPixelsOverride, ref _offsetVPixels, value, isOverride);
-    public static void SetGlobalFaceRotationDegrees(int value, bool isOverride = true) => SetValue(ref _globalFaceRotationOverride, ref _globalFaceRotationDegrees, value, isOverride);
+    public static void SetFlipU(bool value, bool isOverride = true) => SetBool(value, isOverride, out _flipU, out _flipUOverride);
+    public static void SetFlipV(bool value, bool isOverride = true) => SetBool(value, isOverride, out _flipV, out _flipVOverride);
+    public static void SetSwapFaceNorthSouth(bool value, bool isOverride = true) => SetBool(value, isOverride, out _swapFaceNorthSouth, out _swapFaceNorthSouthOverride);
+    public static void SetSwapFaceEastWest(bool value, bool isOverride = true) => SetBool(value, isOverride, out _swapFaceEastWest, out _swapFaceEastWestOverride);
+    public static void SetSwapFaceUpDown(bool value, bool isOverride = true) => SetBool(value, isOverride, out _swapFaceUpDown, out _swapFaceUpDownOverride);
+    public static void SetPreserveDirectionalBounds(bool value, bool isOverride = true) => SetBool(value, isOverride, out _preserveDirectionalBounds, out _preserveDirectionalBoundsOverride);
+    public static void SetUseBottomLeftUvOrigin(bool value, bool isOverride = true) => SetBool(value, isOverride, out _useBottomLeftUvOrigin, out _useBottomLeftUvOriginOverride);
+    public static void SetUvCornerOrderMode(int value, bool isOverride = true) => SetValue(value, isOverride, out _uvCornerOrderMode, out _uvCornerOrderModeOverride);
+    public static void SetOffsetUPixels(double value, bool isOverride = true) => SetDouble(value, isOverride, out _offsetUPixels, out _offsetUPixelsOverride);
+    public static void SetOffsetVPixels(double value, bool isOverride = true) => SetDouble(value, isOverride, out _offsetVPixels, out _offsetVPixelsOverride);
+    public static void SetGlobalFaceRotationDegrees(int value, bool isOverride = true) => SetValue(value, isOverride, out _globalFaceRotationDegrees, out _globalFaceRotationOverride);
 
     private static bool TryRead<T>(bool hasOverride, T value, out T result)
     {
@@ -111,21 +99,21 @@ public static class UvDebugSettings
         return hasOverride;
     }
 
-    private static void SetBool(ref bool flag, ref bool field, bool value, bool isOverride)
+    private static void SetBool(bool value, bool isOverride, out bool field, out bool overrideFlag)
     {
         field = value;
-        flag = isOverride;
+        overrideFlag = isOverride;
     }
 
-    private static void SetValue<T>(ref bool flag, ref T field, T value, bool isOverride)
+    private static void SetValue<T>(T value, bool isOverride, out T field, out bool overrideFlag)
     {
         field = value;
-        flag = isOverride;
+        overrideFlag = isOverride;
     }
 
-    private static void SetDouble(ref bool flag, ref double field, double value, bool isOverride)
+    private static void SetDouble(double value, bool isOverride, out double field, out bool overrideFlag)
     {
         field = value;
-        flag = isOverride;
+        overrideFlag = isOverride;
     }
 }

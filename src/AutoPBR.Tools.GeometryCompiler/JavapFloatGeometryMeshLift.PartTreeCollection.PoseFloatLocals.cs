@@ -1,6 +1,3 @@
-using System.Globalization;
-using System.Text.RegularExpressions;
-
 namespace AutoPBR.Tools.GeometryCompiler;
 
 internal static partial class JavapFloatGeometryMeshLift
@@ -79,9 +76,9 @@ internal static partial class JavapFloatGeometryMeshLift
             }
         }
 
-        for (var i = 0; i < lines.Count; i++)
+        foreach (var line in lines)
         {
-            if (JavapBytecodeStreamAnalyzer.TryParseFloadLocalSlot(lines[i], out var slot) && slot == 1)
+            if (JavapBytecodeStreamAnalyzer.TryParseFloadLocalSlot(line, out var slot) && slot == 1)
             {
                 return true;
             }

@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace AutoPBR.Core.Preview;
@@ -42,7 +41,7 @@ public static partial class GeometryJavapPoseOracle
         public bool SkipDecorativeNose { get; init; }
     }
 
-    private sealed partial class Parser
+    private static partial class Parser
     {
         private static readonly Regex LdcStringRegex = new(
             @"^\s*\d+:\s+ldc\s+#\d+\s+//\s*String\s+(\S+)",
@@ -103,7 +102,7 @@ public static partial class GeometryJavapPoseOracle
         public static Dictionary<string, PartPose> ParseBindings(string javapText) =>
             ParseBindings(javapText, new MeshParamContext());
 
-        public static Dictionary<string, PartPose> ParseBindings(string javapText, MeshParamContext ctx)
+        private static Dictionary<string, PartPose> ParseBindings(string javapText, MeshParamContext ctx)
         {
             var lines = FoldWrappedLines(javapText.Split('\n'));
             var poses = new Dictionary<string, PartPose>(StringComparer.Ordinal);

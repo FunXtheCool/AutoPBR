@@ -1,6 +1,3 @@
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Text;
 using System.Text.RegularExpressions;
 
 
@@ -45,10 +42,8 @@ internal static partial class JavapClassDisassembly
                 : "\n" + nested;
         }
 
-        /// <summary>
-        /// Delegated <c>MeshDefinition</c> factories (e.g. <c>HumanoidModel.createMesh</c>) must lift before the outer
-        /// <c>createBodyLayer</c> so island merge last-wins keeps <c>addOrReplaceChild</c> overrides from the host class.
-        /// </summary>
+        // Delegated MeshDefinition factories (e.g. HumanoidModel.createMesh) must lift before the outer
+        // createBodyLayer so island merge last-wins keeps addOrReplaceChild overrides from the host class.
         void PrependNestedBytecode(string nested, bool insertIslandBoundaryAfterNested)
         {
             if (nested.Length == 0)
@@ -68,7 +63,7 @@ internal static partial class JavapClassDisassembly
                 TryPullInvokeStaticMeshTarget(m.Groups[1].Value, m.Groups[2].Value, insertIslandBoundaryBeforeNested);
             }
 
-            var hostOwner = meshHostOfficialOuter ?? meshHostJavapArg?.Replace('/', '.');
+            var hostOwner = meshHostOfficialOuter ?? meshHostJavapArg.Replace('/', '.');
             if (!string.IsNullOrEmpty(hostOwner))
             {
                 foreach (Match m in InvokeStaticSameClassMeshDefinitionCommentRegex.Matches(scan))

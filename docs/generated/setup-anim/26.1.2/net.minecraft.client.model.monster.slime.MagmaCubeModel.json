@@ -11,7 +11,7 @@
   "superSetupAnimCall": true,
   "assignments": [
     {
-      "partField": "segment0",
+      "partField": "cube0",
       "property": "y",
       "expr": {
         "op": "mul",
@@ -34,7 +34,7 @@
       }
     },
     {
-      "partField": "segment1",
+      "partField": "cube1",
       "property": "y",
       "expr": {
         "op": "mul",
@@ -57,7 +57,7 @@
       }
     },
     {
-      "partField": "segment2",
+      "partField": "cube2",
       "property": "y",
       "expr": {
         "op": "mul",
@@ -80,7 +80,7 @@
       }
     },
     {
-      "partField": "segment3",
+      "partField": "cube3",
       "property": "y",
       "expr": {
         "op": "mul",
@@ -103,7 +103,7 @@
       }
     },
     {
-      "partField": "segment4",
+      "partField": "cube4",
       "property": "y",
       "expr": {
         "op": "mul",
@@ -126,7 +126,7 @@
       }
     },
     {
-      "partField": "segment5",
+      "partField": "cube5",
       "property": "y",
       "expr": {
         "op": "mul",
@@ -149,7 +149,7 @@
       }
     },
     {
-      "partField": "segment6",
+      "partField": "cube6",
       "property": "y",
       "expr": {
         "op": "mul",
@@ -172,7 +172,7 @@
       }
     },
     {
-      "partField": "segment7",
+      "partField": "cube7",
       "property": "y",
       "expr": {
         "op": "mul",

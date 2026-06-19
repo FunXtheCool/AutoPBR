@@ -1,7 +1,5 @@
-using System.Numerics;
 // ReSharper disable CheckNamespace
 // ReSharper disable DuplicatedStatements -- GPU fast-path dispatch repeats per-entity slot guards intentionally.
-
 
 using AutoPBR.Core.Models;
 

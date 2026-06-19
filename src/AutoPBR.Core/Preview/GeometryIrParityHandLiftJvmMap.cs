@@ -9,13 +9,6 @@ internal static class GeometryIrParityHandLiftJvmMap
     public static bool TryGetHandLiftJvm(string builderMethod, string normalizedAssetPath, out string officialJvm)
     {
         officialJvm = "";
-        var path = normalizedAssetPath.Replace('\\', '/');
-
-        if (string.Equals(builderMethod, "Bed", StringComparison.OrdinalIgnoreCase))
-        {
-            officialJvm = "net.minecraft.client.model.BedModel";
-            return true;
-        }
 
         if (string.Equals(builderMethod, "StandingSignEntity", StringComparison.OrdinalIgnoreCase))
         {
@@ -26,12 +19,6 @@ internal static class GeometryIrParityHandLiftJvmMap
         if (string.Equals(builderMethod, "HangingSignEntity", StringComparison.OrdinalIgnoreCase))
         {
             officialJvm = "net.minecraft.client.model.HangingSignModel";
-            return true;
-        }
-
-        if (string.Equals(builderMethod, "DecoratedPotEntity", StringComparison.OrdinalIgnoreCase))
-        {
-            officialJvm = "net.minecraft.client.model.DecoratedPotModel";
             return true;
         }
 
@@ -47,8 +34,7 @@ internal static class GeometryIrParityHandLiftJvmMap
             return true;
         }
 
-        if (string.Equals(builderMethod, "BeamColumn", StringComparison.OrdinalIgnoreCase) ||
-            path.Contains("/end_portal/", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(builderMethod, "BeamColumn", StringComparison.OrdinalIgnoreCase))
         {
             officialJvm = "net.minecraft.client.model.EndPortalModel";
             return true;
@@ -81,30 +67,6 @@ internal static class GeometryIrParityHandLiftJvmMap
         if (string.Equals(builderMethod, "DragonFireball", StringComparison.OrdinalIgnoreCase))
         {
             officialJvm = "net.minecraft.client.model.DragonFireballModel";
-            return true;
-        }
-
-        if (string.Equals(builderMethod, "Skull", StringComparison.OrdinalIgnoreCase))
-        {
-            officialJvm = "net.minecraft.client.model.SkullModel";
-            return true;
-        }
-
-        if (string.Equals(builderMethod, "Boat", StringComparison.OrdinalIgnoreCase))
-        {
-            officialJvm = "net.minecraft.client.model.object.boat.BoatModel";
-            return true;
-        }
-
-        if (string.Equals(builderMethod, "ChestBoat", StringComparison.OrdinalIgnoreCase))
-        {
-            officialJvm = "net.minecraft.client.model.object.boat.ChestBoatModel";
-            return true;
-        }
-
-        if (string.Equals(builderMethod, "ChestEntity", StringComparison.OrdinalIgnoreCase))
-        {
-            officialJvm = "net.minecraft.client.model.object.chest.ChestModel";
             return true;
         }
 

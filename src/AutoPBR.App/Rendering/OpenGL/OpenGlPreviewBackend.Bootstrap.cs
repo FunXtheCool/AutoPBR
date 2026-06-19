@@ -1,9 +1,4 @@
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-
 using AutoPBR.App.Rendering.Scene;
-
-using Silk.NET.OpenGL;
 
 namespace AutoPBR.App.Rendering.OpenGL;
 
@@ -37,7 +32,7 @@ public sealed partial class OpenGlPreviewBackend
 
         public void Advance(OpenGlPreviewBackend backend, double maxMilliseconds)
         {
-            var sw = Stopwatch.StartNew();
+            var sw = System.Diagnostics.Stopwatch.StartNew();
             while (_step < StepCount && sw.Elapsed.TotalMilliseconds < maxMilliseconds)
             {
                 if (!backend.RunGpuBootstrapStep(_step))
@@ -187,22 +182,21 @@ public sealed partial class OpenGlPreviewBackend
                 return true;
 
             case 3:
-                const bool nearest = true;
-                _albedo = new GlTexture2D(gl, nearest);
-                _normal = new GlTexture2D(gl, nearest);
-                _spec = new GlTexture2D(gl, nearest);
-                _height = new GlTexture2D(gl, nearest);
+                _albedo = new GlTexture2D(gl);
+                _normal = new GlTexture2D(gl);
+                _spec = new GlTexture2D(gl);
+                _height = new GlTexture2D(gl);
                 _mesh = new GlMeshBuffer(gl);
                 _groundMesh = new GlMeshBuffer(gl);
                 var groundGeom = PreviewMeshFactory.CreatePreviewGroundPlane();
                 _groundMesh.Upload(groundGeom.InterleavedVertices, groundGeom.Indices);
-                _neutralNormal = new GlTexture2D(gl, nearest);
-                _neutralNormal.UploadRgba(1, 1, [128, 128, 255, 255], nearest);
-                _neutralSpec = new GlTexture2D(gl, nearest);
-                _neutralSpec.UploadRgba(1, 1, [120, 60, 40, 255], nearest);
-                _neutralHeight = new GlTexture2D(gl, nearest);
-                _neutralHeight.UploadRgba(1, 1, [128, 128, 128, 255], nearest);
-                _grassGroundAlbedo = new GlTexture2D(gl, nearest);
+                _neutralNormal = new GlTexture2D(gl);
+                _neutralNormal.UploadRgba(1, 1, [128, 128, 255, 255]);
+                _neutralSpec = new GlTexture2D(gl);
+                _neutralSpec.UploadRgba(1, 1, [120, 60, 40, 255]);
+                _neutralHeight = new GlTexture2D(gl);
+                _neutralHeight.UploadRgba(1, 1, [128, 128, 128, 255]);
+                _grassGroundAlbedo = new GlTexture2D(gl);
                 _grassGroundReady = TryUploadGrassGroundTexture(gl);
                 return true;
 
@@ -215,7 +209,7 @@ public sealed partial class OpenGlPreviewBackend
                 return true;
 
             case 6:
-                TryInitAtmosphere(gl, _useOpenGlEs);
+                TryInitAtmosphere(gl);
                 return true;
 
             case 7:

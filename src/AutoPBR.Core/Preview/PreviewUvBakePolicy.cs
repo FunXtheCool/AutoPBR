@@ -37,9 +37,6 @@ internal readonly struct PreviewUvBakePolicy
         PreserveDirectionalBounds = true,
     };
 
-    /// <summary>Alias kept for audit tests.</summary>
-    public static PreviewUvBakePolicy JavaDirectionTarget { get; } = EntityCuboidBaseline;
-
     public static PreviewUvBakePolicy Resolve(MergedJavaBlockModel model)
     {
         var policy = UsesEntityTextures(model) ? EntityCuboidBaseline : BlockOrItemBaseline;

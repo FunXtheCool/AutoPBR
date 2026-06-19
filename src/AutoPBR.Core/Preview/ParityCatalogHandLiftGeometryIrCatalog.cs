@@ -57,14 +57,6 @@ internal static class ParityCatalogHandLiftGeometryIrCatalog
 
     private static IEnumerable<(string Jvm, JsonDocument Doc)> BuildAll()
     {
-        yield return ("net.minecraft.client.model.BedModel", Doc(64, 64, "net.minecraft.client.model.BedModel",
-            Cuboid(0, 0, 0, 16, 16, 6, 0, 0),
-            Cuboid(0, 6, 0, 3, 9, 3, 50, 6),
-            Cuboid(-16, 6, 0, -13, 9, 3, 50, 18),
-            Cuboid(0, 0, 8, 16, 16, 14, 0, 22),
-            Cuboid(0, 6, -8, 3, 9, -5, 50, 0),
-            Cuboid(-16, 6, -8, -13, 9, -5, 50, 12)));
-
         yield return ("net.minecraft.client.model.SignModel", Doc(64, 32, "net.minecraft.client.model.SignModel",
             Cuboid(-12, 0, -1, 12, 12, 1, 0, 0),
             Cuboid(-1, 12, -1, 1, 28, 1, 26, 0)));
@@ -100,19 +92,7 @@ internal static class ParityCatalogHandLiftGeometryIrCatalog
         yield return ("net.minecraft.client.model.DragonFireballModel", Doc(64, 64, "net.minecraft.client.model.DragonFireballModel",
             Cuboid(-4, -4, -4, 4, 4, 4, 0, 0)));
 
-        yield return ("net.minecraft.client.model.SkullModel", Doc(64, 64, "net.minecraft.client.model.SkullModel",
-            Cuboid(-4, -8, -4, 4, 0, 4, 0, 0),
-            Cuboid(-4.25f, -8.25f, -4.25f, 4.25f, 0.25f, 4.25f, 32, 0)));
-
         yield return HandLiftEquipmentHumanoidLeggings();
-
-        yield return HandLiftDecoratedPot();
-
-        yield return HandLiftBoatModel(includeChest: false);
-
-        yield return HandLiftBoatModel(includeChest: true);
-
-        yield return HandLiftChestModel();
     }
 
     private static (string, JsonDocument) HandLiftEquipmentHumanoidLeggings()
@@ -142,57 +122,6 @@ internal static class ParityCatalogHandLiftGeometryIrCatalog
             ["roots"] = new JsonArray { root }
         };
         return ("net.minecraft.client.model.EquipmentHumanoidLeggingsModel", JsonDocument.Parse(doc.ToJsonString()));
-    }
-
-    private static (string, JsonDocument) HandLiftDecoratedPot()
-    {
-        var root = new JsonObject
-        {
-            ["id"] = "root",
-            ["pose"] = Pose(),
-            ["cuboids"] = new JsonArray(),
-            ["children"] = new JsonArray()
-        };
-        var cuboids = (JsonArray)root["cuboids"]!;
-        cuboids.Add(CuboidNode(4, 17, 4, 12, 20, 12, 0, 0));
-        cuboids.Add(CuboidNode(5, 20, 5, 11, 21, 11, 0, 5));
-        cuboids.Add(CuboidNode(0, 0, 0, 14, 0, 14, 18, 13, 14, 1, 14));
-        cuboids.Add(CuboidNode(0, 0, 0, 14, 0, 14, 18, 13, 14, 1, 14));
-        var children = (JsonArray)root["children"]!;
-        foreach (var (id, pose, u, v) in new[]
-                 {
-                     ("back", new float[] { 15, 16, 1, 0, 0, (float)Math.PI }, 1, 32),
-                     ("left", new float[] { 1, 16, 1, 0, -(float)Math.PI / 2, (float)Math.PI }, 1, 32),
-                     ("right", new float[] { 15, 16, 15, 0, (float)Math.PI / 2, (float)Math.PI }, 1, 32),
-                     ("front", new float[] { 1, 16, 15, (float)Math.PI, 0, 0 }, 1, 32),
-                 })
-        {
-            var part = new JsonObject
-            {
-                ["id"] = id,
-                ["pose"] = Pose(pose[0], pose[1], pose[2], pose[3], pose[4], pose[5]),
-                ["cuboids"] = new JsonArray
-                {
-                    CuboidNode(0, 0, 0, 14, 16, 0, u, v, 14, 16, 1)
-                },
-                ["children"] = new JsonArray()
-            };
-            children.Add(part);
-        }
-
-        var doc = new JsonObject
-        {
-            ["schemaVersion"] = 2,
-            ["versionLabel"] = "26.1.2",
-            ["officialJvmName"] = "net.minecraft.client.model.DecoratedPotModel",
-            ["profile"] = "parity_hand_lift",
-            ["extractionStatus"] = "ok",
-            ["textureWidth"] = 64,
-            ["textureHeight"] = 64,
-            ["factoryMethod"] = "createBodyLayer",
-            ["roots"] = new JsonArray { root }
-        };
-        return ("net.minecraft.client.model.DecoratedPotModel", JsonDocument.Parse(doc.ToJsonString()));
     }
 
     private static JsonObject PartWithCuboid(string id, JsonObject cuboid) =>

@@ -229,8 +229,8 @@ internal static partial class JavapFloatGeometryMeshLift
             else if (!TryParseTexOffsFromStaticMatrixBackward(seg, scanFrom,
                          bi > 0 ? addBoxIndices[bi - 1] + 1 : 0, boxIntLocals, out u, out v, out scanFrom) &&
                      !TryParseTexOffsBackward(seg, scanFrom,
-                         floatMinIdx: bi > 0 ? addBoxIndices[bi - 1] + 1 : 0, out u, out v, out scanFrom) &&
-                     !TryParseTexOffsImmediatelyBeforeAddBox(seg, lineIdx, out u, out v))
+                         floatMinIdx: bi > 0 ? addBoxIndices[bi - 1] + 1 : 0, boxIntLocals, out u, out v, out scanFrom) &&
+                     !TryParseTexOffsImmediatelyBeforeAddBox(seg, lineIdx, boxIntLocals, out u, out v))
             {
                 notes.Add($"addBox at line {lineIdx}: could not parse texOffs (defaulting to 0,0).");
                 u = 0;

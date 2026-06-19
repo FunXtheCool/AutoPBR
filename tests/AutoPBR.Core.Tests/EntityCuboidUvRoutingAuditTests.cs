@@ -1,7 +1,4 @@
 using System.Numerics;
-using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
-using AutoPBR.Tests.TestSupport;
 
 namespace AutoPBR.Core.Tests;
 
@@ -284,8 +281,8 @@ public sealed class EntityCuboidUvRoutingAuditTests
                     To = [16, 16, 16],
                     Faces = new Dictionary<string, ModelFace>(StringComparer.OrdinalIgnoreCase)
                     {
-                        ["west"] = new ModelFace { TextureKey = "skin", Uv = westSlot },
-                        ["east"] = new ModelFace { TextureKey = "skin", Uv = eastSlot },
+                        ["west"] = new() { TextureKey = "skin", Uv = westSlot },
+                        ["east"] = new() { TextureKey = "skin", Uv = eastSlot },
                     },
                 },
             ],
@@ -306,8 +303,8 @@ public sealed class EntityCuboidUvRoutingAuditTests
                     To = [16, 16, 16],
                     Faces = new Dictionary<string, ModelFace>(StringComparer.OrdinalIgnoreCase)
                     {
-                        ["up"] = new ModelFace { TextureKey = "skin", Uv = upSlot },
-                        ["down"] = new ModelFace { TextureKey = "skin", Uv = downSlot },
+                        ["up"] = new() { TextureKey = "skin", Uv = upSlot },
+                        ["down"] = new() { TextureKey = "skin", Uv = downSlot },
                     },
                     MirrorCuboidUv = mirrorCuboidUv,
                 },
@@ -343,34 +340,6 @@ public sealed class EntityCuboidUvRoutingAuditTests
         return vertices.Length > 0;
     }
 
-    private static Vector2 AverageUvWhere(ReadOnlySpan<float> verts, float uMin, float uMax, bool xNegative)
-    {
-        const int stride = MinecraftModelBaker.FloatsPerVertex;
-        var sum = Vector2.Zero;
-        var count = 0;
-
-        for (var i = 0; i < verts.Length; i += stride)
-        {
-            var u = verts[i + 6];
-            var x = verts[i];
-            if (u < uMin - 0.0001f || u > uMax + 0.0001f)
-            {
-                continue;
-            }
-
-            if (xNegative ? x >= 0f : x <= 0f)
-            {
-                continue;
-            }
-
-            sum += new Vector2(u, verts[i + 7]);
-            count++;
-        }
-
-        Assert.True(count > 0, $"no verts in U=[{uMin:F4},{uMax:F4}] on preview {(xNegative ? "west" : "east")} side");
-        return sum / count;
-    }
-
     private static Vector2 AverageUvOnVerticalPlane(ReadOnlySpan<float> verts, float xTexel, bool positiveSide)
     {
         const int stride = MinecraftModelBaker.FloatsPerVertex;
@@ -391,28 +360,6 @@ public sealed class EntityCuboidUvRoutingAuditTests
         }
 
         Assert.True(count > 0, $"no vertices on vertical plane x={xTexel}");
-        return sum / count;
-    }
-
-    private static Vector2 AverageUvInNormalizedURange(ReadOnlySpan<float> verts, float uMin, float uMax)
-    {
-        const int stride = MinecraftModelBaker.FloatsPerVertex;
-        var sum = Vector2.Zero;
-        var count = 0;
-
-        for (var i = 0; i < verts.Length; i += stride)
-        {
-            var u = verts[i + 6];
-            if (u < uMin - 0.0001f || u > uMax + 0.0001f)
-            {
-                continue;
-            }
-
-            sum += new Vector2(u, verts[i + 7]);
-            count++;
-        }
-
-        Assert.True(count > 0, $"no vertices in U=[{uMin:F4},{uMax:F4}]");
         return sum / count;
     }
 
