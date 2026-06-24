@@ -47,6 +47,15 @@ public sealed class PreviewDrawLayerPolicyTests
     }
 
     [Fact]
+    public void ForKind_translucent_overlay_draws_last_without_depth_write()
+    {
+        var policy = PreviewDrawLayerPolicy.ForKind(PreviewDepthLayerKind.TranslucentOverlay);
+        Assert.Equal(350, policy.DrawOrder);
+        Assert.False(policy.DepthWrite);
+        Assert.Equal(PreviewDrawLayerShadowMode.Skip, policy.ShadowMode);
+    }
+
+    [Fact]
     public void PreviewDrawBatchOrdering_sorts_by_draw_order_then_material()
     {
         var batches = new List<PreviewDrawBatch>
@@ -196,6 +205,20 @@ public sealed class PreviewDepthLayerClassifierTests
             cuboidCountOnPart: 3);
         Assert.Equal(PreviewDepthLayerKind.Base, leftKind);
         Assert.Equal(PreviewDepthLayerKind.Base, rightKind);
+    }
+
+    [Fact]
+    public void ClassifyIrCuboid_slime_outer_cube_is_translucent_overlay()
+    {
+        using var cuboid = JsonDocument.Parse("{\"textureKey\":\"#skin\"}");
+        var (kind, _, castsShadow) = PreviewDepthLayerClassifier.ClassifyIrCuboid(
+            "outer_cube",
+            "net.minecraft.client.model.monster.slime.SlimeModel",
+            cuboid.RootElement,
+            cuboidIndexOnPart: 0,
+            cuboidCountOnPart: 1);
+        Assert.Equal(PreviewDepthLayerKind.TranslucentOverlay, kind);
+        Assert.False(castsShadow);
     }
 
     [Fact]

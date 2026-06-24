@@ -1,5 +1,6 @@
 using AutoPBR.Core.Embeddings;
 using AutoPBR.Core.Models;
+using AutoPBR.Core.Preview;
 
 namespace AutoPBR.Core;
 
@@ -168,7 +169,7 @@ public static class MaterialTagSemanticResolution
     }
 
     /// <summary>
-    /// Adds <see cref="FlagTagResolver.Sprite2DId"/> when the organic material tag is present and the Block flag is not.
+    /// Adds <see cref="FlagTagResolver.Sprite2DId"/> for item textures (unless exempt) and for organic materials without the Block flag.
     /// </summary>
     /// <param name="effectiveTagIds">Effective tag ids after auto resolution and manual add/remove.</param>
     /// <param name="removedTagIds">When non-null and containing <see cref="FlagTagResolver.Sprite2DId"/>, the user hid this flag — do not re-add.</param>
@@ -179,6 +180,18 @@ public static class MaterialTagSemanticResolution
         if (removedTagIds is not null &&
             removedTagIds.Contains(FlagTagResolver.Sprite2DId, StringComparer.OrdinalIgnoreCase))
         {
+            return;
+        }
+
+        if (effectiveTagIds.Contains(FlagTagResolver.Sprite2DId, StringComparer.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        if (effectiveTagIds.Contains(FlagTagResolver.ItemId, StringComparer.OrdinalIgnoreCase) &&
+            !PreviewPathPolicy.IsItemFlatSpriteExempt(effectiveTagIds))
+        {
+            effectiveTagIds.Add(FlagTagResolver.Sprite2DId);
             return;
         }
 
@@ -195,11 +208,6 @@ public static class MaterialTagSemanticResolution
         // Entity UV textures are model-mapped surfaces; do not classify as flat 2D sprites.
         if (effectiveTagIds.Contains(FlagTagResolver.EntityId, StringComparer.OrdinalIgnoreCase) &&
             effectiveTagIds.Contains(FlagTagResolver.UvWrapId, StringComparer.OrdinalIgnoreCase))
-        {
-            return;
-        }
-
-        if (effectiveTagIds.Contains(FlagTagResolver.Sprite2DId, StringComparer.OrdinalIgnoreCase))
         {
             return;
         }

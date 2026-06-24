@@ -9,14 +9,6 @@ namespace AutoPBR.Core.Tests;
 
 public sealed class GhastPreviewAttachmentTests
 {
-    private static readonly MinecraftNativeProfile Profile26 =
-        new("26.1.2", "unused", new Version(26, 1, 2));
-
-    private const string MonsterJvm = "net.minecraft.client.model.monster.ghast.GhastModel";
-    private const string HappyJvm = "net.minecraft.client.model.animal.ghast.HappyGhastModel";
-    private const string MonsterTexturePath = "assets/minecraft/textures/entity/ghast/ghast.png";
-    private const string HappyTexturePath = "assets/minecraft/textures/entity/ghast/happy_ghast.png";
-
     private readonly ITestOutputHelper _output;
 
     public GhastPreviewAttachmentTests(ITestOutputHelper output) => _output = output;
@@ -27,14 +19,14 @@ public sealed class GhastPreviewAttachmentTests
         var y0 = 0f;
         var y1 = 8f;
         Assert.True(GeometryIrEmitPolicy.TryReorientGhastFamilyTentacleCuboidYForModelSpace(
-            MonsterJvm, "tentacle0", ref y0, ref y1));
+            GhastPreviewTestLandmarks.MonsterJvm, "tentacle0", ref y0, ref y1));
         Assert.Equal(-8f, y0);
         Assert.Equal(0f, y1);
 
         y0 = 0f;
         y1 = 5f;
         Assert.True(GeometryIrEmitPolicy.TryReorientGhastFamilyTentacleCuboidYForModelSpace(
-            HappyJvm, "tentacle0", ref y0, ref y1));
+            GhastPreviewTestLandmarks.HappyJvm, "tentacle0", ref y0, ref y1));
         Assert.Equal(-5f, y0);
         Assert.Equal(0f, y1);
 
@@ -59,101 +51,92 @@ public sealed class GhastPreviewAttachmentTests
         Assert.Equal(-8f, y0);
         Assert.Equal(0f, y1);
 
+        y0 = 0f;
+        y1 = 8f;
+        Assert.True(GeometryIrEmitPolicy.TryReorientGhastFamilyTentacleCuboidYForModelSpace(
+            officialJvmName: null, "tentacle0", ref y0, ref y1, GhastPreviewTestLandmarks.MonsterTexturePath));
+        Assert.Equal(-8f, y0);
+        Assert.Equal(0f, y1);
+
         Assert.Equal(0.4f + 0.2f * MathF.Sin(2f), GeometryIrEmitPolicy.ComputeGhastAnimateTentaclesXRot(2, 0f), 3);
+    }
+
+    [Fact]
+    public void Monster_ghast_runtime_mesh_is_not_cleanroom_hand_build_landmarks()
+    {
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(
+            GhastPreviewTestLandmarks.MonsterTexturePath,
+            GhastPreviewTestLandmarks.Profile26,
+            idlePhase01: 0f,
+            animationTimeSeconds: 0f,
+            out var bind,
+            out var provenance,
+            applyGeometryIrSetupAnimMotion: false));
+        GhastPreviewTestLandmarks.AssertRuntimeGeometryIrDriver(provenance, "GhastModel");
+        GhastPreviewTestLandmarks.AssertNotCleanRoomBodyLocalCube(bind);
     }
 
     [Fact]
     public void Monster_ghast_runtime_mesh_body_and_tentacles_match_reference_java_landmarks()
     {
-        var repo = GeometryIrTestTierSupport.FindRepoRoot();
-        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{MonsterJvm}.json");
-        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
-            !string.Equals(status, "ok", StringComparison.Ordinal))
-        {
-            return;
-        }
+        GhastPreviewTestLandmarks.RequireOkCommittedShardPath(GhastPreviewTestLandmarks.MonsterJvm);
 
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(
-            MonsterTexturePath,
-            Profile26,
+            GhastPreviewTestLandmarks.MonsterTexturePath,
+            GhastPreviewTestLandmarks.Profile26,
             idlePhase01: 0f,
             animationTimeSeconds: 0f,
             out var bind,
             out var provenance,
             applyGeometryIrSetupAnimMotion: false));
-        Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
-        Assert.True(bind.Elements.Count >= 10, "body + 9 tentacles");
+        GhastPreviewTestLandmarks.AssertRuntimeGeometryIrDriver(provenance, "GhastModel");
 
-        AssertWorldAabbClose(bind.Elements[0], new Vector3(-8f, -74.456f, -8f), new Vector3(8f, -58.456f, 8f), 0.08f);
-        AssertWorldAabbClose(bind.Elements[1], new Vector3(-4.75f, -67.456f, -6f), new Vector3(-2.75f, -59.456f, -4f), 0.08f);
-
-        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
-        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(MonsterJvm, shard.RootElement);
-        var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
-            repaired,
-            GeometryIrMeshEmitOptions.ForParity(64, 32) with { OfficialJvmName = MonsterJvm });
-        var (bodyMaxY, tentacleMinY, hullGap) = MeasureBodyTentacleHullGap(bind, partIds);
-        _output.WriteLine($"bodyMaxY={bodyMaxY:F4} tentacleMinY={tentacleMinY:F4} hullGap={hullGap:F4}");
-        Assert.True(hullGap < 0.15f, $"tentacle hull should hang from body (gap={hullGap:F3})");
+        GhastPreviewTestLandmarks.AssertMonsterGhastReferenceWorldLandmarks(bind);
+        var partIds = LoadPartIds(GhastPreviewTestLandmarks.MonsterJvm, 64, 32);
+        GhastPreviewTestLandmarks.AssertGhastIrAssemblyLandmarks(bind, partIds, expectedBodyMaxY: -58.456f);
+        Assert.True(MeasurePreviewYSpan(bind) > 0.8f, "bind pose should span body plus pitched tentacles in preview Y");
     }
 
     [Fact]
     public void Happy_ghast_runtime_mesh_tentacles_hang_from_body_shell()
     {
-        var repo = GeometryIrTestTierSupport.FindRepoRoot();
-        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{HappyJvm}.json");
-        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
-            !string.Equals(status, "ok", StringComparison.Ordinal))
-        {
-            return;
-        }
+        GhastPreviewTestLandmarks.RequireOkCommittedShardPath(GhastPreviewTestLandmarks.HappyJvm);
 
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(
-            HappyTexturePath,
-            Profile26,
+            GhastPreviewTestLandmarks.HappyTexturePath,
+            GhastPreviewTestLandmarks.Profile26,
             idlePhase01: 0f,
             animationTimeSeconds: 0f,
             out var bind,
             out var provenance,
             applyGeometryIrSetupAnimMotion: false));
-        Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
-        Assert.True(bind.Elements.Count >= 10, "body + 9 tentacles");
+        GhastPreviewTestLandmarks.AssertRuntimeGeometryIrDriver(provenance, "HappyGhastModel");
 
-        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
-        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(HappyJvm, shard.RootElement);
-        var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
-            repaired,
-            GeometryIrMeshEmitOptions.ForParity(64, 64) with { OfficialJvmName = HappyJvm });
-        var (bodyMaxY, tentacleMinY, hullGap) = MeasureBodyTentacleHullGap(bind, partIds);
-        _output.WriteLine($"happy bodyMaxY={bodyMaxY:F4} tentacleMinY={tentacleMinY:F4} hullGap={hullGap:F4}");
-        Assert.True(hullGap < 0.15f, $"happy ghast tentacles should hang from body (gap={hullGap:F3})");
+        var partIds = LoadPartIds(GhastPreviewTestLandmarks.HappyJvm, 64, 64);
+        GhastPreviewTestLandmarks.AssertGhastIrAssemblyLandmarks(bind, partIds, expectedBodyMaxY: -48.048f);
     }
 
     [Fact]
     public void Ghast_shooting_variant_uses_monster_ghast_geometry_ir()
     {
-        var repo = GeometryIrTestTierSupport.FindRepoRoot();
-        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{MonsterJvm}.json");
-        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
-            !string.Equals(status, "ok", StringComparison.Ordinal))
-        {
-            return;
-        }
+        GhastPreviewTestLandmarks.RequireOkCommittedShardPath(GhastPreviewTestLandmarks.MonsterJvm);
 
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(
             "assets/minecraft/textures/entity/ghast/ghast_shooting.png",
-            Profile26,
+            GhastPreviewTestLandmarks.Profile26,
             0f,
             0f,
             out var bind,
             out var provenance,
             applyGeometryIrSetupAnimMotion: false));
-        Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
-        Assert.Contains(MonsterJvm, provenance.Detail, StringComparison.Ordinal);
-        Assert.True(bind.Elements.Count >= 10);
+        GhastPreviewTestLandmarks.AssertRuntimeGeometryIrDriver(provenance, "GhastModel");
+        GhastPreviewTestLandmarks.AssertNotCleanRoomBodyLocalCube(bind);
+        var partIds = LoadPartIds(GhastPreviewTestLandmarks.MonsterJvm, 64, 32);
+        GhastPreviewTestLandmarks.AssertGhastIrAssemblyLandmarks(bind, partIds, expectedBodyMaxY: -58.456f);
     }
 
     [Fact]
@@ -162,12 +145,12 @@ public sealed class GhastPreviewAttachmentTests
         var y0 = 0f;
         var y1 = 8f;
         Assert.True(GeometryIrEmitPolicy.TryReorientGhastFamilyTentacleCuboidYForModelSpace(
-            MonsterJvm, "tentacle0", ref y0, ref y1));
+            GhastPreviewTestLandmarks.MonsterJvm, "tentacle0", ref y0, ref y1));
         var uw = -1;
         var uh = -1;
         var ud = -1;
         Assert.True(GeometryIrEmitPolicy.TryApplyGhastFamilyCuboidUvFootprint(
-            MonsterJvm, "body", y0, y1, ref uw, ref uh, ref ud));
+            GhastPreviewTestLandmarks.MonsterJvm, "body", y0, y1, ref uw, ref uh, ref ud));
         Assert.Equal(16, uw);
         Assert.Equal(16, uh);
         Assert.Equal(16, ud);
@@ -176,7 +159,7 @@ public sealed class GhastPreviewAttachmentTests
         uh = 8;
         ud = 8;
         Assert.True(GeometryIrEmitPolicy.TryApplyGhastFamilyCuboidUvFootprint(
-            HappyJvm, "tentacle1", y0, y1, ref uw, ref uh, ref ud));
+            GhastPreviewTestLandmarks.HappyJvm, "tentacle1", y0, y1, ref uw, ref uh, ref ud));
         Assert.Equal(2, uw);
         Assert.Equal(8, uh);
         Assert.Equal(2, ud);
@@ -185,60 +168,61 @@ public sealed class GhastPreviewAttachmentTests
     [Fact]
     public void Monster_ghast_runtime_gpu_mesh_tentacles_hang_below_body_shell()
     {
-        var repo = GeometryIrTestTierSupport.FindRepoRoot();
-        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{MonsterJvm}.json");
-        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
-            !string.Equals(status, "ok", StringComparison.Ordinal))
-        {
-            return;
-        }
+        GhastPreviewTestLandmarks.RequireOkCommittedShardPath(GhastPreviewTestLandmarks.MonsterJvm);
 
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(
-            MonsterTexturePath,
-            Profile26,
+            GhastPreviewTestLandmarks.MonsterTexturePath,
+            GhastPreviewTestLandmarks.Profile26,
             0f,
             0f,
             out var bind,
             out var provenance,
             applyGeometryIrSetupAnimMotion: false));
-        Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
+        GhastPreviewTestLandmarks.AssertRuntimeGeometryIrDriver(provenance, "GhastModel");
 
-        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
-        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(MonsterJvm, shard.RootElement);
-        var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
-            repaired,
-            GeometryIrMeshEmitOptions.ForParity(64, 32) with { OfficialJvmName = MonsterJvm });
-
-        var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase) { [MonsterTexturePath] = 0 };
-        var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase) { [MonsterTexturePath] = (64, 32) };
+        var partIds = LoadPartIds(GhastPreviewTestLandmarks.MonsterJvm, 64, 32);
+        var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+        {
+            [GhastPreviewTestLandmarks.MonsterTexturePath] = 0
+        };
+        var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase)
+        {
+            [GhastPreviewTestLandmarks.MonsterTexturePath] = (64, 32)
+        };
         Assert.True(MinecraftModelBaker.TryBakeBindPoseForGpuSkinning(
             bind, "minecraft", pathToIdx, texSizes, out var gpuVerts, out _, out _));
 
-        var (bodyMaxY, tentacleMinY, hullGap) = MeasureBodyTentaclePreviewHullGap(gpuVerts, partIds);
-        _output.WriteLine($"gpu bodyMaxY={bodyMaxY:F4} tentacleMinY={tentacleMinY:F4} hullGap={hullGap:F4}");
-        Assert.True(hullGap < 0.15f, $"gpu tentacles should hang from body (gap={hullGap:F3})");
+        var (bodyMaxY, tentacleMinY, tentacleMaxY, hullGap) = MeasureBodyTentaclePreviewHullGap(gpuVerts, partIds);
+        _output.WriteLine($"gpu bodyMaxY={bodyMaxY:F4} tentacleMinY={tentacleMinY:F4} tentacleMaxY={tentacleMaxY:F4} hullGap={hullGap:F4}");
+        // GPU bind mesh uses preview-normalized coordinates (Skip LER); tentacles stay coupled under the body shell.
+        Assert.True(hullGap < 0.15f, $"gpu tentacles should stay coupled to body shell (gap={hullGap:F3})");
+        Assert.True(tentacleMaxY - tentacleMinY > 0.35f, "gpu tentacles should span visible length after bind-pose xRot");
+        Assert.True(tentacleMaxY <= bodyMaxY + 0.25f, $"gpu tentacles should not pitch above body top (tentacleMaxY={tentacleMaxY:F3}, bodyMaxY={bodyMaxY:F3})");
+        Assert.True(tentacleMinY < bodyMaxY, "gpu tentacles should extend below body top in preview Y");
     }
 
     [Fact]
     public void Monster_ghast_bind_pose_emits_exactly_ten_body_and_tentacle_cuboids()
     {
-        if (!TryBuildGhastBindPose(MonsterTexturePath, MonsterJvm, 64, 32, out var bind, out var partIds))
-        {
-            return;
-        }
-
+        var bind = BuildGhastBindPose(
+            GhastPreviewTestLandmarks.MonsterTexturePath,
+            GhastPreviewTestLandmarks.MonsterJvm,
+            64,
+            32,
+            out var partIds);
         AssertGhastVisibleCuboidCounts(partIds, bind.Elements.Count);
     }
 
     [Fact]
     public void Happy_ghast_bind_pose_emits_exactly_ten_cuboids_without_equipment_parts()
     {
-        if (!TryBuildGhastBindPose(HappyTexturePath, HappyJvm, 64, 64, out var bind, out var partIds))
-        {
-            return;
-        }
-
+        var bind = BuildGhastBindPose(
+            GhastPreviewTestLandmarks.HappyTexturePath,
+            GhastPreviewTestLandmarks.HappyJvm,
+            64,
+            64,
+            out var partIds);
         AssertGhastVisibleCuboidCounts(partIds, bind.Elements.Count);
         foreach (var id in partIds)
         {
@@ -249,168 +233,250 @@ public sealed class GhastPreviewAttachmentTests
         }
     }
 
-    [Fact]
-    public void Ghast_family_body_and_tentacle_elements_emit_all_six_faces()
+    [Theory]
+    [InlineData(GhastPreviewTestLandmarks.MonsterTexturePath, GhastPreviewTestLandmarks.MonsterJvm, 64, 32)]
+    [InlineData(GhastPreviewTestLandmarks.HappyTexturePath, GhastPreviewTestLandmarks.HappyJvm, 64, 64)]
+    public void Ghast_family_body_and_tentacle_elements_emit_all_six_faces(
+        string texturePath,
+        string jvm,
+        int atlasW,
+        int atlasH)
     {
-        foreach (var (path, jvm, atlasW, atlasH) in new[]
-                 {
-                     (MonsterTexturePath, MonsterJvm, 64, 32),
-                     (HappyTexturePath, HappyJvm, 64, 64),
-                 })
+        var bind = BuildGhastBindPose(texturePath, jvm, atlasW, atlasH, out var partIds);
+        for (var i = 0; i < bind.Elements.Count; i++)
         {
-            if (!TryBuildGhastBindPose(path, jvm, atlasW, atlasH, out var bind, out var partIds))
+            var id = partIds[i];
+            if (!IsGhastBodyOrTentaclePart(id))
             {
                 continue;
             }
 
-            for (var i = 0; i < bind.Elements.Count; i++)
-            {
-                var id = partIds[i];
-                if (!IsGhastBodyOrTentaclePart(id))
-                {
-                    continue;
-                }
+            Assert.True(
+                CountFaces(bind.Elements[i]) == 6,
+                $"{texturePath} {id} should emit all six faces");
+        }
+    }
 
-                Assert.True(
-                    CountFaces(bind.Elements[i]) == 6,
-                    $"{path} {id} should emit all six faces");
+    [Theory]
+    [InlineData(GhastPreviewTestLandmarks.MonsterTexturePath, GhastPreviewTestLandmarks.MonsterJvm, 64, 32)]
+    [InlineData("assets/minecraft/textures/entity/ghast/ghast_shooting.png", GhastPreviewTestLandmarks.MonsterJvm, 64, 32)]
+    [InlineData(GhastPreviewTestLandmarks.HappyTexturePath, GhastPreviewTestLandmarks.HappyJvm, 64, 64)]
+    public void Ghast_family_baked_uvs_use_expected_body_unfold_not_degenerate_corners(
+        string path,
+        string jvm,
+        int atlasW,
+        int atlasH)
+    {
+        var bind = BuildGhastBindPose(path, jvm, atlasW, atlasH, out var partIds);
+        var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase) { [path] = 0 };
+        var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase) { [path] = (atlasW, atlasH) };
+        Assert.True(MinecraftModelBaker.TryBake(bind, "minecraft", pathToIdx, texSizes, out var verts, out _, out _));
+
+        var bodyIdx = GhastPreviewTestLandmarks.FindBodyElementIndex(partIds);
+        Assert.True(bodyIdx >= 0, "body part id missing");
+        var body = bind.Elements[bodyIdx];
+        var north = body.Faces["north"].Uv!;
+        var javaNorth = EntityCuboidJavaUvConvention.GetUvRect(
+            EntityCuboidJavaUvConvention.JavaDirection.North, 0, 0, 16, 16, 16);
+        Assert.Equal(javaNorth, north);
+
+        AssertGhastBodyTentacleUvsWithinAtlas(verts!, bind, partIds, path);
+    }
+
+    [Theory]
+    [InlineData(GhastPreviewTestLandmarks.MonsterTexturePath, GhastPreviewTestLandmarks.MonsterJvm, 64, 32)]
+    [InlineData(GhastPreviewTestLandmarks.HappyTexturePath, GhastPreviewTestLandmarks.HappyJvm, 64, 64)]
+    public void Ghast_family_y_reoriented_tentacles_keep_java_uv_slots_on_reflected_planes(
+        string path,
+        string jvm,
+        int atlasW,
+        int atlasH)
+    {
+        var bind = BuildGhastBindPose(path, jvm, atlasW, atlasH, out var partIds);
+        var tentacleIdx = partIds.FindIndex(id => string.Equals(id, "tentacle0", StringComparison.OrdinalIgnoreCase));
+        Assert.True(tentacleIdx >= 0, "tentacle0 part id missing");
+
+        var tentacle = bind.Elements[tentacleIdx];
+        var height = Math.Max(1, (int)MathF.Round(MathF.Abs(tentacle.To[1] - tentacle.From[1])));
+        var javaDown = EntityCuboidJavaUvConvention.GetUvRect(
+            EntityCuboidJavaUvConvention.JavaDirection.Down, 0, 0, 2, height, 2);
+        var javaUp = EntityCuboidJavaUvConvention.GetUvRect(
+            EntityCuboidJavaUvConvention.JavaDirection.Up, 0, 0, 2, height, 2);
+        var javaNorth = EntityCuboidJavaUvConvention.GetUvRect(
+            EntityCuboidJavaUvConvention.JavaDirection.North, 0, 0, 2, height, 2);
+
+        // The geometry is reflected from Java +Y to preview -Y, so the attachment plane is now "up"
+        // while the free end is "down". The Java UV slot assignment must follow the original planes.
+        Assert.Equal(javaDown, tentacle.Faces["up"].Uv);
+        Assert.Equal(javaUp, tentacle.Faces["down"].Uv);
+        Assert.Equal(new[] { javaNorth[0], javaNorth[3], javaNorth[2], javaNorth[1] }, tentacle.Faces["north"].Uv);
+    }
+
+    [Theory]
+    [InlineData(GhastPreviewTestLandmarks.MonsterTexturePath, GhastPreviewTestLandmarks.MonsterJvm, 64, 32)]
+    [InlineData(GhastPreviewTestLandmarks.HappyTexturePath, GhastPreviewTestLandmarks.HappyJvm, 64, 64)]
+    public void Ghast_family_tentacle_local_y_extents_hang_below_attachment_pivot(
+        string path,
+        string jvm,
+        int atlasW,
+        int atlasH)
+    {
+        var bind = BuildGhastBindPose(path, jvm, atlasW, atlasH, out var partIds);
+        for (var i = 0; i < bind.Elements.Count; i++)
+        {
+            if (!partIds[i].StartsWith("tentacle", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
             }
+
+            var el = bind.Elements[i];
+            var localMinY = MathF.Min(el.From[1], el.To[1]);
+            var localMaxY = MathF.Max(el.From[1], el.To[1]);
+            _output.WriteLine($"{path} {partIds[i]} localY=[{localMinY:F3},{localMaxY:F3}]");
+            Assert.True(localMaxY <= 1e-4f, $"{partIds[i]} top should sit at attachment pivot (y=0)");
+            Assert.True(localMinY < -1e-4f, $"{partIds[i]} should extend below attachment pivot");
         }
     }
 
     [Fact]
-    public void Ghast_family_baked_uvs_stay_within_expected_atlas()
+    public void Explore_cpu_rebake_matches_pack_converter_bake_for_ghast_bind_pose()
     {
-        foreach (var (path, jvm, atlasW, atlasH) in new[]
-                 {
-                     (MonsterTexturePath, MonsterJvm, 64, 32),
-                     ("assets/minecraft/textures/entity/ghast/ghast_shooting.png", MonsterJvm, 64, 32),
-                     (HappyTexturePath, HappyJvm, 64, 64),
-                 })
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(
+            GhastPreviewTestLandmarks.MonsterTexturePath,
+            GhastPreviewTestLandmarks.Profile26,
+            idlePhase01: 0.3f,
+            animationTimeSeconds: 0f,
+            out var merged,
+            out var provenance,
+            applyGeometryIrSetupAnimMotion: false));
+        GhastPreviewTestLandmarks.AssertRuntimeGeometryIrDriver(provenance, "GhastModel");
+        GhastPreviewTestLandmarks.AssertMonsterGhastReferenceWorldLandmarks(merged);
+        var partIds = LoadPartIds(GhastPreviewTestLandmarks.MonsterJvm, 64, 32);
+        GhastPreviewTestLandmarks.AssertGhastIrAssemblyLandmarks(merged, partIds, expectedBodyMaxY: -58.456f);
+
+        var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(merged, "minecraft");
+        var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase) { [ordered[0]] = 0 };
+        var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase) { [ordered[0]] = (64, 32) };
+        Assert.True(MinecraftModelBaker.TryBake(merged, "minecraft", pathToIdx, texSizes, out var packVerts, out _, out _));
+
+        var rebake = new EntityEmulatedPreviewRebakeContext
         {
-            if (!TryBuildGhastBindPose(path, jvm, atlasW, atlasH, out var bind, out var partIds))
+            PackZipPath = "test.zip",
+            AssetArchivePath = GhastPreviewTestLandmarks.MonsterTexturePath,
+            NativeRootDirectory = AppContext.BaseDirectory,
+            NativeProfileName = GhastPreviewTestLandmarks.Profile26.Name,
+            NativeParsedVersion = GhastPreviewTestLandmarks.Profile26.ParsedVersion?.ToString(),
+            ModelDefaultNamespace = "minecraft",
+            IdlePhase01 = 0.3f,
+            OrderedTextureZipPaths = [GhastPreviewTestLandmarks.MonsterTexturePath],
+        };
+        var materials = new[]
+        {
+            new PreviewTextureMaps
             {
-                continue;
+                Width = 64,
+                Height = 32,
+                DiffuseRgba = new byte[64 * 32 * 4],
+                NormalRgba = new byte[64 * 32 * 4],
+                SpecularRgba = new byte[64 * 32 * 4],
+                HeightRgba = new byte[64 * 32 * 4],
             }
+        };
+        Assert.True(EntityEmulatedPreviewRebaker.TryRebakeMesh(
+            rebake,
+            materials,
+            animationTimeSeconds: 0f,
+            out var rebakedVerts,
+            out _,
+            out _,
+            applyGeometryIrSetupAnimMotion: false));
+        GhastPreviewTestLandmarks.AssertRuntimeGeometryIrDriver(rebake.MeshProvenance!.Value, "GhastModel");
 
-            var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase) { [path] = 0 };
-            var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase) { [path] = (atlasW, atlasH) };
-            Assert.True(MinecraftModelBaker.TryBake(bind, "minecraft", pathToIdx, texSizes, out var verts, out _, out _));
+        const int stride = MinecraftModelBaker.FloatsPerVertex;
+        Assert.Equal(packVerts.Length, rebakedVerts!.Length);
+        Assert.Equal(240, rebakedVerts.Length / stride);
+        EntityPreviewPlacement.TryPopulateRebakeElementPartIds(
+            rebake,
+            new MinecraftNativeProfile("26.1.2", AppContext.BaseDirectory, new Version(26, 1, 2)),
+            merged.Elements.Count);
+        EntityPreviewPlacement.ApplyToPreviewVertices(packVerts, stride, rebake.ElementPartIds!);
 
-            AssertGhastBodyTentacleUvsWithinAtlas(verts!, bind, partIds, path);
+        var maxErr = 0f;
+        for (var i = 0; i + stride - 1 < packVerts.Length; i += stride)
+        {
+            var a = new Vector3(packVerts[i], packVerts[i + 1], packVerts[i + 2]);
+            var b = new Vector3(rebakedVerts[i], rebakedVerts[i + 1], rebakedVerts[i + 2]);
+            maxErr = MathF.Max(maxErr, Vector3.Distance(a, b));
         }
+
+        _output.WriteLine($"ghast pack vs rebake max vertex err={maxErr:F5}");
+        Assert.True(maxErr <= 0.02f, $"Explore CPU rebake diverged from pack-converter bake (maxErr={maxErr:F4})");
     }
 
-    [Fact]
-    public void Ghast_family_tentacle_local_y_extents_hang_below_attachment_pivot()
+    [Theory]
+    [InlineData(GhastPreviewTestLandmarks.MonsterTexturePath, GhastPreviewTestLandmarks.MonsterJvm, 64, 32, -58.456f)]
+    [InlineData(GhastPreviewTestLandmarks.HappyTexturePath, GhastPreviewTestLandmarks.HappyJvm, 64, 64, -48.048f)]
+    public void Ghast_family_setup_anim_keeps_tentacles_attached_to_body(
+        string path,
+        string jvm,
+        int atlasW,
+        int atlasH,
+        float expectedBodyMaxY)
     {
-        foreach (var (path, jvm, atlasW, atlasH) in new[]
-                 {
-                     (MonsterTexturePath, MonsterJvm, 64, 32),
-                     (HappyTexturePath, HappyJvm, 64, 64),
-                 })
-        {
-            if (!TryBuildGhastBindPose(path, jvm, atlasW, atlasH, out var bind, out var partIds))
-            {
-                continue;
-            }
+        GhastPreviewTestLandmarks.RequireOkCommittedShardPath(jvm);
 
-            for (var i = 0; i < bind.Elements.Count; i++)
-            {
-                if (!partIds[i].StartsWith("tentacle", StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(
+            path,
+            GhastPreviewTestLandmarks.Profile26,
+            idlePhase01: 0.3f,
+            animationTimeSeconds: 2.5f,
+            out var mesh,
+            out _,
+            applyGeometryIrSetupAnimMotion: true));
 
-                var el = bind.Elements[i];
-                var localMinY = MathF.Min(el.From[1], el.To[1]);
-                var localMaxY = MathF.Max(el.From[1], el.To[1]);
-                _output.WriteLine($"{path} {partIds[i]} localY=[{localMinY:F3},{localMaxY:F3}]");
-                Assert.True(localMaxY <= 1e-4f, $"{partIds[i]} top should sit at attachment pivot (y=0)");
-                Assert.True(localMinY < -1e-4f, $"{partIds[i]} should extend below attachment pivot");
-            }
-        }
+        var partIds = LoadPartIds(jvm, atlasW, atlasH);
+        GhastPreviewTestLandmarks.AssertGhastIrAssemblyLandmarks(
+            mesh,
+            partIds,
+            expectedBodyMaxY,
+            bodyMaxYTolerance: 0.35f,
+            bindPose: false);
     }
 
-    [Fact]
-    public void Ghast_family_setup_anim_keeps_tentacles_attached_to_body()
-    {
-        const float anim = 2.5f;
-        foreach (var (path, jvm, atlasW, atlasH) in new[]
-                 {
-                     (MonsterTexturePath, MonsterJvm, 64, 32),
-                     (HappyTexturePath, HappyJvm, 64, 64),
-                 })
-        {
-            var runtime = EntityModelRuntimeFactory.Create();
-            if (!runtime.TryBuildStaticMesh(
-                    path,
-                    Profile26,
-                    idlePhase01: 0.3f,
-                    animationTimeSeconds: anim,
-                    out var mesh,
-                    out _,
-                    applyGeometryIrSetupAnimMotion: true))
-            {
-                continue;
-            }
-
-            var repo = GeometryIrTestTierSupport.FindRepoRoot();
-            var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
-            if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
-                !string.Equals(status, "ok", StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
-            var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
-            var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
-                repaired,
-                GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH) with { OfficialJvmName = jvm });
-            var (_, _, hullGap) = MeasureBodyTentacleHullGap(mesh, partIds);
-            _output.WriteLine($"{path} anim hullGap={hullGap:F4}");
-            Assert.True(hullGap < 0.35f, $"{path} tentacles detached under setupAnim (gap={hullGap:F3})");
-        }
-    }
-
-    private static bool TryBuildGhastBindPose(
+    private static MergedJavaBlockModel BuildGhastBindPose(
         string texturePath,
         string jvm,
         int atlasW,
         int atlasH,
-        out MergedJavaBlockModel bind,
         out List<string> partIds)
     {
-        bind = null!;
-        partIds = [];
-        var repo = GeometryIrTestTierSupport.FindRepoRoot();
-        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
-        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
-            !string.Equals(status, "ok", StringComparison.Ordinal))
-        {
-            return false;
-        }
+        GhastPreviewTestLandmarks.RequireOkCommittedShardPath(jvm);
 
         var runtime = EntityModelRuntimeFactory.Create();
-        if (!runtime.TryBuildStaticMesh(
-                texturePath,
-                Profile26,
-                idlePhase01: 0f,
-                animationTimeSeconds: 0f,
-                out bind,
-                out _,
-                applyGeometryIrSetupAnimMotion: false))
-        {
-            return false;
-        }
+        Assert.True(runtime.TryBuildStaticMesh(
+            texturePath,
+            GhastPreviewTestLandmarks.Profile26,
+            idlePhase01: 0f,
+            animationTimeSeconds: 0f,
+            out var bind,
+            out var provenance,
+            applyGeometryIrSetupAnimMotion: false));
+        GhastPreviewTestLandmarks.AssertRuntimeGeometryIrDriver(provenance, jvm.Split('.')[^1]);
 
+        partIds = LoadPartIds(jvm, atlasW, atlasH);
+        return bind;
+    }
+
+    private static List<string> LoadPartIds(string jvm, int atlasW, int atlasH)
+    {
+        var shardPath = GhastPreviewTestLandmarks.RequireOkCommittedShardPath(jvm);
         using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
-        partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
+        return GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
             repaired,
             GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH) with { OfficialJvmName = jvm });
-        return true;
     }
 
     private static void AssertGhastVisibleCuboidCounts(IReadOnlyList<string> partIds, int elementCount)
@@ -468,13 +534,14 @@ public sealed class GhastPreviewAttachmentTests
         return n;
     }
 
-    private static (float BodyMaxY, float TentacleMinY, float HullGap) MeasureBodyTentaclePreviewHullGap(
+    private static (float BodyMaxY, float TentacleMinY, float TentacleMaxY, float HullGap) MeasureBodyTentaclePreviewHullGap(
         ReadOnlySpan<float> gpuVerts,
         IReadOnlyList<string> partIds)
     {
         const int stride = MinecraftModelBaker.FloatsPerSkinnedVertex;
         var bodyMaxY = float.NegativeInfinity;
         var tentacleMinY = float.PositiveInfinity;
+        var tentacleMaxY = float.NegativeInfinity;
         for (var i = 0; i + stride - 1 < gpuVerts.Length; i += stride)
         {
             var bi = EntityEmulatedGpuSkinningMath.DecodeSkinnedBoneIndexFromFloat(gpuVerts[i + 12]);
@@ -493,68 +560,35 @@ public sealed class GhastPreviewAttachmentTests
             else if (id.StartsWith("tentacle", StringComparison.OrdinalIgnoreCase))
             {
                 tentacleMinY = MathF.Min(tentacleMinY, preview.Y);
+                tentacleMaxY = MathF.Max(tentacleMaxY, preview.Y);
             }
         }
 
-        return (bodyMaxY, tentacleMinY, tentacleMinY - bodyMaxY);
+        return (bodyMaxY, tentacleMinY, tentacleMaxY, tentacleMinY - bodyMaxY);
     }
 
-    private static (float BodyMaxY, float TentacleMinY, float HullGap) MeasureBodyTentacleHullGap(
-        MergedJavaBlockModel mesh,
-        IReadOnlyList<string> partIds)
+    private static float MeasurePreviewYSpan(MergedJavaBlockModel mesh)
     {
-        var bodyMaxY = float.NegativeInfinity;
-        var tentacleMinY = float.PositiveInfinity;
-        for (var i = 0; i < mesh.Elements.Count; i++)
+        var minY = float.PositiveInfinity;
+        var maxY = float.NegativeInfinity;
+        foreach (var el in mesh.Elements)
         {
-            var id = partIds[i];
-            TransformWorldCorners(mesh.Elements[i], out var min, out var max);
-            if (id.Contains("body", StringComparison.Ordinal) && !id.Contains("inner", StringComparison.Ordinal))
+            ReadOnlySpan<(float x, float y, float z)> corners =
+            [
+                (el.From[0], el.From[1], el.From[2]), (el.To[0], el.From[1], el.From[2]),
+                (el.From[0], el.To[1], el.From[2]), (el.To[0], el.To[1], el.From[2]),
+                (el.From[0], el.From[1], el.To[2]), (el.To[0], el.From[1], el.To[2]),
+                (el.From[0], el.To[1], el.To[2]), (el.To[0], el.To[1], el.To[2]),
+            ];
+            foreach (var (x, y, z) in corners)
             {
-                bodyMaxY = MathF.Max(bodyMaxY, max.Y);
-            }
-            else if (id.StartsWith("tentacle", StringComparison.OrdinalIgnoreCase))
-            {
-                tentacleMinY = MathF.Min(tentacleMinY, min.Y);
+                var previewY = EntityEmulatedGpuSkinningMath.PreviewCuboidNormalizeTexelPosition(
+                    Vector3.Transform(new Vector3(x, y, z), el.LocalToParent)).Y;
+                minY = MathF.Min(minY, previewY);
+                maxY = MathF.Max(maxY, previewY);
             }
         }
 
-        return (bodyMaxY, tentacleMinY, tentacleMinY - bodyMaxY);
-    }
-
-    private static void AssertWorldAabbClose(ModelElement el, Vector3 expectedMin, Vector3 expectedMax, float eps)
-    {
-        TransformWorldCorners(el, out var min, out var max);
-        var detail = $"expectedMin={expectedMin} actualMin={min} expectedMax={expectedMax} actualMax={max}";
-        Assert.True(MathF.Abs(expectedMin.X - min.X) <= eps, detail);
-        Assert.True(MathF.Abs(expectedMin.Y - min.Y) <= eps, detail);
-        Assert.True(MathF.Abs(expectedMin.Z - min.Z) <= eps, detail);
-        Assert.True(MathF.Abs(expectedMax.X - max.X) <= eps, detail);
-        Assert.True(MathF.Abs(expectedMax.Y - max.Y) <= eps, detail);
-        Assert.True(MathF.Abs(expectedMax.Z - max.Z) <= eps, detail);
-    }
-
-    private static void TransformWorldCorners(ModelElement el, out Vector3 min, out Vector3 max)
-    {
-        var m = el.LocalToParent;
-        min = new Vector3(float.MaxValue);
-        max = new Vector3(float.MinValue);
-        var fx = el.From[0];
-        var fy = el.From[1];
-        var fz = el.From[2];
-        var tx = el.To[0];
-        var ty = el.To[1];
-        var tz = el.To[2];
-        ReadOnlySpan<(float x, float y, float z)> c =
-        [
-            (fx, fy, fz), (tx, fy, fz), (fx, ty, fz), (tx, ty, fz),
-            (fx, fy, tz), (tx, fy, tz), (fx, ty, tz), (tx, ty, tz),
-        ];
-        foreach (var p in c)
-        {
-            var w = Vector3.Transform(new Vector3(p.x, p.y, p.z), m);
-            min = Vector3.Min(min, w);
-            max = Vector3.Max(max, w);
-        }
+        return maxY - minY;
     }
 }

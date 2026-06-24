@@ -34,6 +34,20 @@ public sealed partial class PreviewRenderingTests
     }
 
     [Fact]
+    public void SpritePixelCuboids_builds_one_cube_per_opaque_texel()
+    {
+        var rgba = new byte[]
+        {
+            255, 0, 0, 255, 0, 0, 0, 0,
+            0, 0, 0, 0, 255, 0, 0, 255
+        };
+        var mesh = PreviewMeshFactory.CreateSpritePixelCuboids(rgba, 2, 2, thickness: 0.10f, alphaCutoff: 0.5f);
+        Assert.Equal("sprite_voxels", mesh.Name);
+        Assert.Equal(48, mesh.VertexCount);
+        Assert.Equal(72, mesh.Indices.Length);
+    }
+
+    [Fact]
     public void PreviewMaterialMapperCopiesMapsFromCore()
     {
         var diffuse = new byte[4];

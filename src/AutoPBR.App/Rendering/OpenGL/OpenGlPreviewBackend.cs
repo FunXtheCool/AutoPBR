@@ -285,7 +285,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     }
 
     private static string BuildEntityGpuBindRebakeKey(EntityEmulatedPreviewRebakeContext ctx) =>
-        $"{ctx.PackZipPath}\u001f{ctx.AssetArchivePath}\u001f{ctx.PackConverterCpuMeshFingerprint}\u001f{ctx.PreviewPoseId ?? ""}";
+        $"{ctx.PackZipPath}\u001f{ctx.AssetArchivePath}\u001f{ctx.PackConverterCpuMeshFingerprint}\u001f{ctx.PreviewPoseId ?? ""}\u001f{ctx.PreviewSizeId ?? ""}";
 
     /// <summary>
     /// Stable parity-catalog animation-off CPU bind key. Do not include mesh fingerprint — TryRebakeMesh updates
@@ -293,7 +293,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     /// invalidate the GL-committed subject on every UI re-push.
     /// </summary>
     private static string BuildParityCatalogCpuBindCommitKey(EntityEmulatedPreviewRebakeContext ctx) =>
-        $"{ctx.PackZipPath}\u001f{ctx.AssetArchivePath}\u001fparity-cpu-v{PreviewMeshGeometryFingerprint.PipelineRevision}\u001f{ctx.PreviewPoseId ?? ""}";
+        $"{ctx.PackZipPath}\u001f{ctx.AssetArchivePath}\u001fparity-cpu-v{PreviewMeshGeometryFingerprint.PipelineRevision}\u001f{ctx.PreviewPoseId ?? ""}\u001f{ctx.PreviewSizeId ?? ""}";
 
     private static bool IsParityCatalogEmulatedAsset(string? assetArchivePath)
     {
@@ -352,6 +352,12 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         string.Equals(
             a?.EmulatedRebake?.PreviewPoseId,
             b?.EmulatedRebake?.PreviewPoseId,
+            StringComparison.Ordinal);
+
+    private static bool SameEntityPreviewSize(PreviewModelSubject? a, PreviewModelSubject? b) =>
+        string.Equals(
+            a?.EmulatedRebake?.PreviewSizeId,
+            b?.EmulatedRebake?.PreviewSizeId,
             StringComparison.Ordinal);
 
     private void InvalidateParityCatalogBindCommitState()
@@ -425,7 +431,8 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
             var prevPath = prev?.EmulatedRebake?.AssetArchivePath;
             var nextPath = subject?.EmulatedRebake?.AssetArchivePath;
             var previewPoseChanged = SameEntityPreviewAsset(prev, subject) && !SameEntityPreviewPose(prev, subject);
-            if ((!string.Equals(prevPath, nextPath, StringComparison.OrdinalIgnoreCase) || previewPoseChanged) &&
+            var previewSizeChanged = SameEntityPreviewAsset(prev, subject) && !SameEntityPreviewSize(prev, subject);
+            if ((!string.Equals(prevPath, nextPath, StringComparison.OrdinalIgnoreCase) || previewPoseChanged || previewSizeChanged) &&
                 subject?.EmulatedRebake is { } rebake)
             {
                 InvalidateEntityAssetBindState(rebake);
@@ -466,7 +473,16 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
                 SameEntityPreviewAsset(prev, subject))
             {
                 var incomingFp = subject.EmulatedRebake?.PackConverterCpuMeshFingerprint ?? 0;
+                var committedMeshFp = prev.InterleavedVertices.Length > 0 &&
+                    prev.InterleavedVertices.Length % PreviewMesh.FloatsPerVertex == 0
+                    ? PreviewMeshGeometryFingerprint.ComputeCpuPreviewMesh(
+                        prev.InterleavedVertices,
+                        PreviewMesh.FloatsPerVertex)
+                    : 0UL;
                 if (previewPoseChanged ||
+                    (incomingFp != 0 &&
+                     committedMeshFp != 0 &&
+                     incomingFp != committedMeshFp) ||
                     (_lastParityCatalogIncomingPackFingerprint != 0 &&
                      incomingFp != 0 &&
                      incomingFp != _lastParityCatalogIncomingPackFingerprint))
@@ -585,6 +601,8 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
                 _settings.EnableEntityAnimation != prev.EnableEntityAnimation ||
                 _settings.ForceEntityCpuSkinning != prev.ForceEntityCpuSkinning ||
                 _settings.PauseEntityIdleAnimation != prev.PauseEntityIdleAnimation ||
+                _settings.SpritePlaneCount != prev.SpritePlaneCount ||
+                Math.Abs(_settings.SpriteThickness - prev.SpriteThickness) > 1e-6f ||
                 Math.Abs(_settings.EntityAnimationSpeed - prev.EntityAnimationSpeed) > 1e-6f ||
                 Math.Abs(_settings.EntityAnimationAmplitude - prev.EntityAnimationAmplitude) > 1e-6f)
             {
@@ -1060,6 +1078,8 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         EnableEntityLabPbrShading = s.EnableEntityLabPbrShading,
         EnableEntityParallax = s.EnableEntityParallax,
         SpritePlaneCount = s.SpritePlaneCount,
+        SpriteThickness = s.SpriteThickness,
+        ItemFlatSpritePreview = s.ItemFlatSpritePreview,
         ShowBackgroundGrid = s.ShowBackgroundGrid,
         ShowGroundMesh = s.ShowGroundMesh,
         ShowCornerAxes = s.ShowCornerAxes,

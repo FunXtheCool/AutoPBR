@@ -98,7 +98,8 @@
               ],
               "textureKey": "#shell",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "previewDepthLayer": "cutoutOverlay"
             },
             {
               "from": [
@@ -117,7 +118,8 @@
               ],
               "textureKey": "#belly",
               "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
+              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+              "previewDepthLayer": "cutoutOverlay"
             }
           ],
           "children": []

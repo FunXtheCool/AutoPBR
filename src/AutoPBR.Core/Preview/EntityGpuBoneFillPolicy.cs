@@ -67,6 +67,10 @@ internal static class EntityGpuBoneFillPolicy
             return false;
         }
 
-        return !StemsSkippingLivingPreviewBasis.Contains(stemLower);
+        return CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(
+            officialJvmName: null,
+            stemLower,
+            normalizedAssetPath) is CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot
+            or CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.RightComposeLocalChain;
     }
 }

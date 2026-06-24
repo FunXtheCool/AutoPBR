@@ -304,6 +304,7 @@ public static class ResourcePackConverter
                                 ModelDefaultNamespace = modelDefaultNs,
                                 IdlePhase01 = idlePh,
                                 PreviewPoseId = EntityPreviewBuildContext.CurrentPoseId,
+                                PreviewSizeId = EntityPreviewBuildContext.CurrentSizeId,
                                 OrderedTextureZipPaths = orderedModelTextures.ToArray()
                             };
                             EntityPreviewPlacement.TryPopulateRebakeElementPartIds(
@@ -357,7 +358,10 @@ public static class ResourcePackConverter
 
                         var png = PreviewComposer.ComposePreview(primary);
                         var dbg = options.BrickProbePreviewDebug ? primary.BrickProbeDebugText : null;
-                        return new PreviewDetailedResult(png, materials[primIdx], dbg, subject, meshProvenance);
+                        var previewSubject = PreviewPathPolicy.ShouldUseFlatItemPlane(normSel, sprite)
+                            ? null
+                            : subject;
+                        return new PreviewDetailedResult(png, materials[primIdx], dbg, previewSubject, meshProvenance);
                     }
                 }
             }

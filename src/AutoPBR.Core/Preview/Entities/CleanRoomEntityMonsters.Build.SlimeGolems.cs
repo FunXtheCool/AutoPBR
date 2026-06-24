@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+
+using AutoPBR.Core.Models;
 // ReSharper disable CheckNamespace
 
 
@@ -15,13 +17,25 @@ internal sealed partial class CleanRoomEntityModelRuntime
         _ = profile;
         _ = isBaby;
         var b = new RigBuilder(64, 32);
-        // createOuterBodyLayer — child "cube"
-        new EntityCuboid(-4f, 16f, -4f, 4f, 24f, 4f, 0, 0).Emit(b, Matrix4x4.Identity, 1f);
-        // createInnerBodyLayer — "cube", "right_eye", "left_eye", "mouth"
+        // createOuterBodyLayer — semi-transparent shell (SlimeOuterLayer / entityTranslucent).
+        new EntityCuboid(-4f, 16f, -4f, 4f, 24f, 4f, 0, 0)
+        {
+            DepthLayerKind = PreviewDepthLayerKind.TranslucentOverlay,
+        }.Emit(b, Matrix4x4.Identity, 1f);
+        // createInnerBodyLayer — opaque core + face parts on atlas UV (0,16) and (32,*).
         new EntityCuboid(-3f, 17f, -3f, 3f, 23f, 3f, 0, 16).Emit(b, Matrix4x4.Identity, 1f);
-        new EntityCuboid(-3.25f, 18f, -3.5f, -1.25f, 20f, -1.5f, 32, 0).Emit(b, Matrix4x4.Identity, 1f);
-        new EntityCuboid(1.25f, 18f, -3.5f, 3.25f, 20f, -1.5f, 32, 4).Emit(b, Matrix4x4.Identity, 1f);
-        new EntityCuboid(0f, 21f, -3.5f, 1f, 22f, -2.5f, 32, 8).Emit(b, Matrix4x4.Identity, 1f);
+        new EntityCuboid(-3.25f, 18f, -3.5f, -1.25f, 20f, -1.5f, 32, 0)
+        {
+            DepthLayerKind = PreviewDepthLayerKind.CosmeticOverlay,
+        }.Emit(b, Matrix4x4.Identity, 1f);
+        new EntityCuboid(1.25f, 18f, -3.5f, 3.25f, 20f, -1.5f, 32, 4)
+        {
+            DepthLayerKind = PreviewDepthLayerKind.CosmeticOverlay,
+        }.Emit(b, Matrix4x4.Identity, 1f);
+        new EntityCuboid(0f, 21f, -3.5f, 1f, 22f, -2.5f, 32, 8)
+        {
+            DepthLayerKind = PreviewDepthLayerKind.CosmeticOverlay,
+        }.Emit(b, Matrix4x4.Identity, 1f);
         return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef));
     }
 

@@ -65,9 +65,33 @@ internal static class ParityCatalogHandLiftGeometryIrCatalog
             Cuboid(-10, 2, -1, 10, 12, 1, 0, 0),
             Cuboid(-1, 12, -1, 1, 22, 1, 22, 22)));
 
-        yield return ("net.minecraft.client.model.ConduitModel", Doc(64, 32, "net.minecraft.client.model.ConduitModel",
-            Cuboid(-6, 2, -6, 6, 14, 6, 0, 0),
-            Cuboid(-3, 5, -3, 3, 11, 3, 0, 16)));
+        yield return HandLiftConduitLayer(
+            "net.minecraft.client.model.ConduitRenderer.createShellLayer",
+            32,
+            16,
+            "createShellLayer",
+            Cuboid(-3, -3, -3, 3, 3, 3, 0, 0));
+
+        yield return HandLiftConduitLayer(
+            "net.minecraft.client.model.ConduitRenderer.createCageLayer",
+            32,
+            16,
+            "createCageLayer",
+            Cuboid(-4, -4, -4, 4, 4, 4, 0, 0));
+
+        yield return HandLiftConduitLayer(
+            "net.minecraft.client.model.ConduitRenderer.createEyeLayer",
+            16,
+            16,
+            "createEyeLayer",
+            Cuboid(-4, -4, 0, 4, 4, 0, 0, 0));
+
+        yield return HandLiftConduitLayer(
+            "net.minecraft.client.model.ConduitRenderer.createWindLayer",
+            64,
+            32,
+            "createWindLayer",
+            Cuboid(-8, -8, -8, 8, 8, 8, 0, 0));
 
         yield return ("net.minecraft.client.model.BeaconBeamModel", Doc(16, 256, "net.minecraft.client.model.BeaconBeamModel",
             Cuboid(-0.25f, 0, -0.25f, 0.25f, 64, 0.25f, 0, 0),
@@ -243,7 +267,18 @@ internal static class ParityCatalogHandLiftGeometryIrCatalog
         return ("net.minecraft.client.model.object.chest.ChestModel", JsonDocument.Parse(doc.ToJsonString()));
     }
 
-    private static JsonDocument Doc(int tw, int th, string jvm, params JsonObject[] cuboids)
+    private static (string, JsonDocument) HandLiftConduitLayer(
+        string jvm,
+        int tw,
+        int th,
+        string factoryMethod,
+        JsonObject cuboid) =>
+        (jvm, DocConduitLayer(tw, th, jvm, factoryMethod, cuboid));
+
+    private static JsonDocument Doc(int tw, int th, string jvm, params JsonObject[] cuboids) =>
+        Doc(tw, th, jvm, "createBodyLayer", cuboids);
+
+    private static JsonDocument Doc(int tw, int th, string jvm, string factoryMethod, params JsonObject[] cuboids)
     {
         var root = new JsonObject
         {
@@ -261,7 +296,36 @@ internal static class ParityCatalogHandLiftGeometryIrCatalog
             ["extractionStatus"] = "ok",
             ["textureWidth"] = tw,
             ["textureHeight"] = th,
-            ["factoryMethod"] = "createBodyLayer",
+            ["factoryMethod"] = factoryMethod,
+            ["roots"] = new JsonArray { root }
+        };
+        return JsonDocument.Parse(doc.ToJsonString());
+    }
+
+    private static JsonDocument DocConduitLayer(int tw, int th, string jvm, string factoryMethod, JsonObject cuboid)
+    {
+        var root = new JsonObject
+        {
+            ["id"] = "root",
+            ["pose"] = Pose(),
+            ["cuboids"] = new JsonArray { cuboid },
+            ["children"] = new JsonArray()
+        };
+        var doc = new JsonObject
+        {
+            ["schemaVersion"] = 2,
+            ["versionLabel"] = "26.1.2",
+            ["officialJvmName"] = jvm,
+            ["profile"] = "parity_hand_lift",
+            ["extractionStatus"] = "ok",
+            ["extractionNotes"] = new JsonArray
+            {
+                "Preview layer from ConduitRenderer javap (26.1.2 client.jar).",
+                "Block preview applies PoseStack.translate(0.5, 0.5, 0.5) via parity RootTransform."
+            },
+            ["textureWidth"] = tw,
+            ["textureHeight"] = th,
+            ["factoryMethod"] = factoryMethod,
             ["roots"] = new JsonArray { root }
         };
         return JsonDocument.Parse(doc.ToJsonString());

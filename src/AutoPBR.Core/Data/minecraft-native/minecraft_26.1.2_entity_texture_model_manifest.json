@@ -412,6 +412,7 @@
       "builder_method": "HumanoidZombieVillager",
       "deobf_model_class": "net.minecraft.client.model.monster.zombie.ZombieVillagerModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.ZombieVillagerModel",
+      "geometry_ir_official_jvm_baby": "net.minecraft.client.model.monster.zombie.BabyZombieVillagerModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
       "geometry_ir_texture_height": 64
@@ -1291,6 +1292,7 @@
       "builder_method": "HumanoidZombieVillager",
       "deobf_model_class": "net.minecraft.client.model.monster.zombie.ZombieVillagerModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.ZombieVillagerModel",
+      "geometry_ir_official_jvm_baby": "net.minecraft.client.model.monster.zombie.BabyZombieVillagerModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
       "geometry_ir_texture_height": 64
@@ -1469,6 +1471,7 @@
       "builder_method": "HumanoidZombieVillager",
       "deobf_model_class": "net.minecraft.client.model.monster.zombie.ZombieVillagerModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.ZombieVillagerModel",
+      "geometry_ir_official_jvm_baby": "net.minecraft.client.model.monster.zombie.BabyZombieVillagerModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
       "geometry_ir_texture_height": 64
@@ -1530,6 +1533,7 @@
       "builder_method": "HumanoidZombieVillager",
       "deobf_model_class": "net.minecraft.client.model.monster.zombie.ZombieVillagerModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.ZombieVillagerModel",
+      "geometry_ir_official_jvm_baby": "net.minecraft.client.model.monster.zombie.BabyZombieVillagerModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
       "geometry_ir_texture_height": 64
@@ -1548,6 +1552,7 @@
       "builder_method": "HumanoidZombieVillager",
       "deobf_model_class": "net.minecraft.client.model.monster.zombie.ZombieVillagerModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.ZombieVillagerModel",
+      "geometry_ir_official_jvm_baby": "net.minecraft.client.model.monster.zombie.BabyZombieVillagerModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
       "geometry_ir_texture_height": 64
@@ -1643,6 +1648,7 @@
       "builder_method": "HumanoidZombieVillager",
       "deobf_model_class": "net.minecraft.client.model.monster.zombie.ZombieVillagerModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.ZombieVillagerModel",
+      "geometry_ir_official_jvm_baby": "net.minecraft.client.model.monster.zombie.BabyZombieVillagerModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
       "geometry_ir_texture_height": 64
@@ -1652,6 +1658,7 @@
       "builder_method": "HumanoidZombieVillager",
       "deobf_model_class": "net.minecraft.client.model.monster.zombie.ZombieVillagerModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.ZombieVillagerModel",
+      "geometry_ir_official_jvm_baby": "net.minecraft.client.model.monster.zombie.BabyZombieVillagerModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
       "geometry_ir_texture_height": 64
@@ -2102,6 +2109,7 @@
       "builder_method": "HumanoidZombieVillager",
       "deobf_model_class": "net.minecraft.client.model.monster.zombie.ZombieVillagerModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.ZombieVillagerModel",
+      "geometry_ir_official_jvm_baby": "net.minecraft.client.model.monster.zombie.BabyZombieVillagerModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
       "geometry_ir_texture_height": 64
@@ -5050,6 +5058,7 @@
       "deobf_model_class": "net.minecraft.client.model.animal.sniffer.SnifferModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.SnifferModel",
       "notes": "",
+      "geometry_ir_official_jvm_baby": "net.minecraft.client.model.animal.sniffer.SniffletModel",
       "geometry_ir_texture_width": 192,
       "geometry_ir_texture_height": 192
     },

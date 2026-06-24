@@ -291,10 +291,11 @@ public sealed class AttachedPartWorldMatrixParityTests
             Dictionary<string, Matrix4x4> sink,
             string? officialJvmName)
         {
+            var partId = part.TryGetProperty("id", out var idEl) ? idEl.GetString() : null;
             var world = parentWorld;
             if (part.TryGetProperty("pose", out var poseEl))
             {
-                if (!CleanRoomEntityModelRuntime.TryComposePartPosePublic(poseEl, parentWorld, out var worldTexel))
+                if (!CleanRoomEntityModelRuntime.TryComposePartPosePublic(poseEl, parentWorld, out var worldTexel, partId))
                 {
                     world = parentWorld;
                 }
@@ -304,13 +305,9 @@ public sealed class AttachedPartWorldMatrixParityTests
                 }
             }
 
-            if (part.TryGetProperty("id", out var idEl))
+            if (!string.IsNullOrEmpty(partId))
             {
-                var id = idEl.GetString() ?? "";
-                if (id.Length > 0)
-                {
-                    sink[id] = world;
-                }
+                sink[partId] = world;
             }
 
             if (part.TryGetProperty("children", out var children))

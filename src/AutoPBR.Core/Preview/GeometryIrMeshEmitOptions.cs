@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Text.Json;
 
 namespace AutoPBR.Core.Preview;
 
@@ -28,6 +29,9 @@ internal readonly struct GeometryIrMeshEmitOptions
     /// <summary>Official JVM name for per-model emit policy (inflate UV footprint).</summary>
     public string? OfficialJvmName { get; init; }
 
+    /// <summary>Normalized texture archive path for catalog emit heuristics (ghast-family UV reorient).</summary>
+    public string? NormalizedAssetPath { get; init; }
+
     /// <summary>
     /// When true and a compile-time cuboid table exists, emit corners from codegen and poses from IR
     /// (<see cref="GeometryIrCodegenTables"/>).
@@ -40,6 +44,9 @@ internal readonly struct GeometryIrMeshEmitOptions
     /// <summary>When set, only parts for which this returns true emit cuboids (multi-layer path filtering).</summary>
     public Func<string, bool>? ShouldEmitPartCuboids { get; init; }
 
+    /// <summary>When set, cuboids for which this returns false are skipped (e.g. eyes layer omitting texCrop sheets).</summary>
+    public Func<JsonElement, bool>? ShouldEmitIrCuboid { get; init; }
+
     /// <summary>
     /// When cuboid IR omits per-cuboid atlas tags, resolve atlas dimensions per part (e.g. Breeze wind tiers on 128²).
     /// </summary>
@@ -49,9 +56,8 @@ internal readonly struct GeometryIrMeshEmitOptions
     public Func<string, string?>? ResolvePartTextureKey { get; init; }
 
     /// <summary>
-    /// Compose child poses from Java <c>PartPose.offsetAndRotation</c> in texel space. The source PoseStack is
-    /// <c>parent * T * R</c>; row-vector <see cref="Matrix4x4"/> storage emits the equivalent <c>(R * T) * parent</c>.
-    /// Production preview emit uses ModelPart block-stack compose instead unless this flag is set explicitly.
+    /// Compose child poses from Java <c>PartPose.offsetAndRotation</c> in texel space. Row-matrix storage uses
+    /// <c>Er × T</c> (see <see cref="EntityParityTemplate.PartPose"/>), composed as <c>local * parent</c>.
     /// </summary>
     public bool UseColumnTranslationTimesRotationPartPose { get; init; }
 
@@ -86,8 +92,18 @@ internal readonly struct GeometryIrMeshEmitOptions
         Fidelity = GeometryIrEmitFidelity.Parity
     };
 
-    public GeometryIrMeshEmitOptions WithOfficialJvmPoseComposeDefaults(string? officialJvmName) =>
-        string.IsNullOrWhiteSpace(officialJvmName)
-            ? this
-            : this with { OfficialJvmName = officialJvmName };
+    public GeometryIrMeshEmitOptions WithOfficialJvmPoseComposeDefaults(string? officialJvmName)
+    {
+        if (string.IsNullOrWhiteSpace(officialJvmName))
+        {
+            return this;
+        }
+
+        return this with
+        {
+            OfficialJvmName = officialJvmName,
+            UseColumnTranslationTimesRotationPartPose =
+                GeometryIrEmitPolicy.UsesColumnPartPoseOffsetAndRotation(officialJvmName),
+        };
+    }
 }

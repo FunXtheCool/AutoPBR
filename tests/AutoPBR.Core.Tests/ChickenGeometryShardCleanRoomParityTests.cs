@@ -3,8 +3,8 @@ using System.Text.Json;
 namespace AutoPBR.Core.Tests;
 
 /// <summary>
-/// T1: locks preview <c>Chicken</c> builder mesh literals to promoted <c>ChickenModel</c> IR
-/// (same cuboids / poses as <c>ChickenModel.createBodyLayer</c>). See docs/test-guidance-geometry-animation-ir.md.
+/// T1: locks preview <c>Chicken</c> builder mesh literals to promoted <c>AdultChickenModel</c> IR
+/// (same cuboids / poses as <c>AdultChickenModel.createBaseChickenModel</c>). See docs/test-guidance-geometry-animation-ir.md.
 /// </summary>
 public sealed class ChickenGeometryShardCleanRoomParityTests
 {
@@ -42,8 +42,8 @@ public sealed class ChickenGeometryShardCleanRoomParityTests
     public void Chicken_geometry_shard_26_1_2_cuboids_and_part_poses_match_clean_room_builder()
     {
         const string versionLabel = "26.1.2";
-        var path = ContentPath("docs", "generated", "geometry", versionLabel,
-            "net.minecraft.client.model.animal.chicken.ChickenModel.json");
+        const string jvm = "net.minecraft.client.model.animal.chicken.AdultChickenModel";
+        var path = ContentPath("docs", "generated", "geometry", versionLabel, $"{jvm}.json");
         Assert.True(File.Exists(path), $"Missing test content: {path}");
 
         using var doc = JsonDocument.Parse(File.ReadAllText(path));

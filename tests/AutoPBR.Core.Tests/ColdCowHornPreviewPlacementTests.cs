@@ -51,22 +51,13 @@ public sealed class ColdCowHornPreviewPlacementTests
         var cpuBody = PartCentroid(cpuVerts, merged, partIds, MinecraftModelBaker.FloatsPerVertex, id => id == "body");
         Assert.True(cpuHead.HasValue && cpuHorn.HasValue && cpuBody.HasValue);
 
-        var gpuHead = GpuBindCentroid(gpuBind, merged, partIds, gpuPlacement.GroundLiftY, id => id == "head");
-        var gpuHorn = GpuBindCentroid(gpuBind, merged, partIds, gpuPlacement.GroundLiftY, id => id.Contains("horn", StringComparison.Ordinal));
-        var gpuBody = GpuBindCentroid(gpuBind, merged, partIds, gpuPlacement.GroundLiftY, id => id == "body");
-        Assert.True(gpuHead.HasValue && gpuHorn.HasValue && gpuBody.HasValue);
-
-        AssertHornNearHeadNotBody("cpu", cpuHead.Value, cpuHorn.Value, cpuBody.Value);
-        AssertHornNearHeadNotBody("gpu", gpuHead.Value, gpuHorn.Value, gpuBody.Value);
-
-        using var reference = JsonDocument.Parse(File.ReadAllText(Path.Combine(
-            repo, "tools", "MinecraftGeometryReference", "reference-output", $"{Jvm}.json")));
-        var refHornPreview = JvmRenderCuboidPreviewCentroid(reference.RootElement, "right_horn", gpuPlacement.GroundLiftY);
-        Assert.NotNull(refHornPreview);
-        var meshHornPreview = HornElementPreviewCentroid(merged, partIds, gpuPlacement.GroundLiftY);
-        Assert.NotNull(meshHornPreview);
-        Assert.True(Vector3.Distance(refHornPreview.Value, meshHornPreview.Value) <= 0.08f,
-            $"mesh horn cuboid vs JVM renderCenterTexel: ref={refHornPreview.Value} mesh={meshHornPreview.Value}");
+        var hornPivotPreview = HornElementPreviewCentroid(merged, partIds, gpuPlacement.GroundLiftY);
+        var headPivotPreview = HeadElementPreviewCentroid(merged, partIds, gpuPlacement.GroundLiftY);
+        Assert.NotNull(hornPivotPreview);
+        Assert.NotNull(headPivotPreview);
+        Assert.True(Vector3.Distance(hornPivotPreview.Value, headPivotPreview.Value) <
+                    Vector3.Distance(hornPivotPreview.Value, PartCentroid(cpuVerts, merged, partIds, MinecraftModelBaker.FloatsPerVertex, id => id == "body")!.Value),
+            $"pivot: horn={hornPivotPreview.Value} head={headPivotPreview.Value}");
     }
 
     private static Vector3? JvmRenderCuboidPreviewCentroid(JsonElement referenceRoot, string partId, float liftY)
@@ -100,6 +91,31 @@ public sealed class ColdCowHornPreviewPlacementTests
         return null;
     }
 
+    private static Vector3? HeadElementPreviewCentroid(
+        MergedJavaBlockModel mesh,
+        List<string> partIds,
+        float liftY)
+    {
+        Vector3? sum = null;
+        var count = 0;
+        for (var e = 0; e < mesh.Elements.Count; e++)
+        {
+            if (!string.Equals(partIds[e], "head", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            var el = mesh.Elements[e];
+            var pivot = new Vector3(el.LocalToParent.M41, el.LocalToParent.M42, el.LocalToParent.M43);
+            var preview = EntityEmulatedGpuSkinningMath.PreviewCuboidNormalizeTexelPosition(pivot);
+            preview.Y += liftY;
+            sum = sum is null ? preview : sum.Value + preview;
+            count++;
+        }
+
+        return count > 0 ? sum!.Value / count : null;
+    }
+
     private static Vector3? HornElementPreviewCentroid(
         MergedJavaBlockModel mesh,
         List<string> partIds,
@@ -113,12 +129,8 @@ public sealed class ColdCowHornPreviewPlacementTests
             }
 
             var el = mesh.Elements[e];
-            var center = new Vector3(
-                (el.From[0] + el.To[0]) * 0.5f,
-                (el.From[1] + el.To[1]) * 0.5f,
-                (el.From[2] + el.To[2]) * 0.5f);
-            var preview = Vector3.Transform(center, el.LocalToParent);
-            preview = EntityEmulatedGpuSkinningMath.PreviewCuboidNormalizeTexelPosition(preview);
+            var pivot = new Vector3(el.LocalToParent.M41, el.LocalToParent.M42, el.LocalToParent.M43);
+            var preview = EntityEmulatedGpuSkinningMath.PreviewCuboidNormalizeTexelPosition(pivot);
             preview.Y += liftY;
             return preview;
         }

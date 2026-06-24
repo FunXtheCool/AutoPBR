@@ -8,6 +8,9 @@ namespace AutoPBR.Core.Preview;
 /// </summary>
 public static class GeometryIrUvAtlasQuality
 {
+    /// <summary>Gap between opposite texCrop direction-mask faces on U (north/south and up/down templates).</summary>
+    internal const int TexCropOppositeFaceDepthGap = 2;
+
     public sealed record Result(bool? UvWithinAtlasMatch, string? Message, bool LayerAtlasConsistent, string? LayerAtlasMessage);
 
     public static Result Evaluate(JsonElement shardRoot)
@@ -173,15 +176,127 @@ public static class GeometryIrUvAtlasQuality
     /// </summary>
     internal static (int W, int H, int D) ResolveCuboidUvExtents(JsonElement cuboid, JsonElement from, JsonElement to)
     {
-        if (GeometryIrCuboidMetadata.TryGetUvSpan(cuboid, out var spanW, out var spanH, out var spanD))
+        var logicalW = LogicalAxisExtent(from, to, 0);
+        var logicalH = LogicalAxisExtent(from, to, 1);
+        var logicalD = LogicalAxisExtent(from, to, 2);
+        if (!GeometryIrCuboidMetadata.TryGetUvSpan(cuboid, out var spanW, out var spanH, out var spanD))
         {
-            return (spanW, spanH, spanD >= 0 ? spanD : LogicalAxisExtent(from, to, 2));
+            return (logicalW, logicalH, logicalD);
         }
 
-        return (
-            LogicalAxisExtent(from, to, 0),
-            LogicalAxisExtent(from, to, 1),
-            LogicalAxisExtent(from, to, 2));
+        var texU = 0;
+        var texV = 0;
+        if (cuboid.TryGetProperty("uvOrigin", out var uv) && uv.GetArrayLength() >= 2)
+        {
+            texU = uv[0].GetInt32();
+            texV = uv[1].GetInt32();
+        }
+
+        return ResolveTexCropUvFootprint(
+            cuboid,
+            texU,
+            texV,
+            spanW,
+            spanH,
+            spanD >= 0 ? spanD : logicalD,
+            logicalW,
+            logicalH,
+            logicalD);
+    }
+
+    /// <summary>
+    /// texCrop up/down template: <c>uvOrigin</c> anchors the first entry in <paramref name="faceMask"/>.
+    /// </summary>
+    internal static (float[] Up, float[] Down) BuildUpDownTexCropFaceUvRects(
+        int u,
+        int v,
+        int w,
+        int d,
+        IReadOnlyList<string> faceMask,
+        bool mirrorU = false)
+    {
+        var anchor = new float[] { u, v, u + w, v + d };
+        var oppositeU0 = u + w + TexCropOppositeFaceDepthGap;
+        var opposite = new float[] { oppositeU0, v, oppositeU0 + w, v + d };
+
+        // Dragon membranes lift as faceMask:["up"] only; Java still draws the anchor crop on Direction.DOWN.
+        if (faceMask.Count == 1 &&
+            faceMask[0].Equals("up", StringComparison.OrdinalIgnoreCase))
+        {
+            var down = EntityCuboidJavaUvConvention.GetUvRect(
+                EntityCuboidJavaUvConvention.JavaDirection.Down, u, v, w, 0, d, mirrorU);
+            var up = EntityCuboidJavaUvConvention.GetUvRect(
+                EntityCuboidJavaUvConvention.JavaDirection.Up, u, v, w, 0, d, mirrorU);
+            return (up, down);
+        }
+
+        var anchorUp = faceMask.Count > 0 &&
+                       faceMask[0].Equals("up", StringComparison.OrdinalIgnoreCase);
+        return anchorUp ? (anchor, opposite) : (opposite, anchor);
+    }
+
+    /// <summary>
+    /// Resolves texCrop <c>uvSpan</c> emit footprint for direction-mask sheets (north/south or up/down).
+    /// </summary>
+    internal static (int W, int H, int D) ResolveTexCropUvFootprint(
+        JsonElement cuboid,
+        int texU,
+        int texV,
+        int spanW,
+        int spanH,
+        int spanD,
+        int logicalW,
+        int logicalH,
+        int logicalD)
+    {
+        if (GeometryIrCuboidMetadata.TryGetFaceMask(cuboid, out var faceMask) &&
+            IsUpDownFaceMaskOnly(faceMask) &&
+            logicalH == 0 &&
+            spanW > 0 &&
+            spanD >= 0)
+        {
+            return (spanW, 0, spanD);
+        }
+
+        return ResolveNorthSouthSheetUvFootprint(
+            cuboid,
+            texU,
+            texV,
+            spanW,
+            spanH,
+            spanD,
+            logicalW,
+            logicalH,
+            logicalD);
+    }
+
+    /// <summary>
+    /// Resolves UV atlas footprint dimensions for emit. TexCrop lifts may duplicate the crop anchor into
+    /// <c>uvSpan</c>; north/south zero-depth sheets need geometry extents (see bee leg parts).
+    /// </summary>
+    internal static (int W, int H, int D) ResolveNorthSouthSheetUvFootprint(
+        JsonElement cuboid,
+        int texU,
+        int texV,
+        int spanW,
+        int spanH,
+        int spanD,
+        int logicalW,
+        int logicalH,
+        int logicalD)
+    {
+        if (GeometryIrCuboidMetadata.TryGetFaceMask(cuboid, out var faceMask) &&
+            IsNorthSouthFaceMaskOnly(faceMask) &&
+            logicalD == 0 &&
+            logicalW > 0 &&
+            logicalH > 0 &&
+            spanW == texU &&
+            spanH == texV)
+        {
+            return (logicalW, logicalH, 0);
+        }
+
+        return (spanW, spanH, spanD);
     }
 
     private static int LogicalAxisExtent(JsonElement from, JsonElement to, int axis) =>
@@ -263,6 +378,28 @@ public static class GeometryIrUvAtlasQuality
         return true;
     }
 
+    private static bool IsUpDownFaceMaskOnly(IReadOnlyList<string> faceMask)
+    {
+        if (faceMask.Count == 0)
+        {
+            return false;
+        }
+
+        foreach (var name in faceMask)
+        {
+            if (!string.Equals(name, "up", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(name, "down", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static (int U0, int V0, int U1, int V1) RectToTuple(float[] rect) =>
+        ((int)rect[0], (int)rect[1], (int)rect[2], (int)rect[3]);
+
     private static IEnumerable<(int U, int V)> EnumerateFaceMaskUvCorners(
         int u,
         int v,
@@ -282,6 +419,10 @@ public static class GeometryIrUvAtlasQuality
                     (u, v, u + w, v + h),
                 "south" when IsNorthSouthFaceMaskOnly(faceMask) && w > 0 && h > 0 && d == 0 =>
                     (u + w + 2, v, u + w + 2 + w, v + h),
+                "down" when IsUpDownFaceMaskOnly(faceMask) && w > 0 && d > 0 && h == 0 =>
+                    RectToTuple(BuildUpDownTexCropFaceUvRects(u, v, w, d, faceMask).Down),
+                "up" when IsUpDownFaceMaskOnly(faceMask) && w > 0 && d > 0 && h == 0 =>
+                    RectToTuple(BuildUpDownTexCropFaceUvRects(u, v, w, d, faceMask).Up),
                 "north" => (u + d, v + d, u + d + w, v + d + h),
                 "east" => (u + d + w, v + d, u + d + w + d, v + d + h),
                 "south" => (u + d + w + d, v + d, u + d + w + d + w, v + d + h),

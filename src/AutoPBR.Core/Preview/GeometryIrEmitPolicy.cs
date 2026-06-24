@@ -132,6 +132,32 @@ public static class GeometryIrEmitPolicy
                string.Equals(officialJvmName, "net.minecraft.client.model.HappyGhastModel", StringComparison.Ordinal);
     }
 
+    /// <summary>Parity-catalog ghast skin paths (body + tentacles share one atlas unfold).</summary>
+    internal static bool IsGhastFamilyTexturePath(string? normalizedAssetPath)
+    {
+        if (string.IsNullOrWhiteSpace(normalizedAssetPath))
+        {
+            return false;
+        }
+
+        var norm = normalizedAssetPath.Replace('\\', '/');
+        if (!norm.Contains("/textures/entity/ghast/", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (norm.Contains("/equipment/", StringComparison.OrdinalIgnoreCase) ||
+            norm.Contains("_ropes", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    internal static bool IsGhastFamilyEmitContext(string? officialJvmName, string? normalizedAssetPath) =>
+        IsGhastFamilyJvm(officialJvmName) || IsGhastFamilyTexturePath(normalizedAssetPath);
+
 
 
     internal static bool TryParseGhastFamilyTentacleIndex(string partId, out int tentacleIndex)
@@ -160,16 +186,17 @@ public static class GeometryIrEmitPolicy
 
     /// <summary>
     /// Javap <c>createBodyLayer</c> lifts tentacles as <c>addBox(-1,0,-1,2,h,2)</c> (+Y in part space).
-    /// Ghast-family preview skips LER mirror (root already carries <c>MeshTransformer.scaling(4.5f)</c>), so +Y grows
-    /// into the body shell; reorient to −Y hang-down at the ModelPart attachment (y=0).
+    /// Ghast-family preview skips LER mirror (root already carries renderer ModelTransforms); +Y grows
+    /// into the body shell unless reoriented to −Y hang-down at the ModelPart attachment (y=0).
     /// </summary>
     internal static bool TryReorientGhastFamilyTentacleCuboidYForModelSpace(
         string? officialJvmName,
         string partId,
         ref float y0,
-        ref float y1)
+        ref float y1,
+        string? normalizedAssetPath = null)
     {
-        if (!IsGhastFamilyJvm(officialJvmName) ||
+        if (!IsGhastFamilyEmitContext(officialJvmName, normalizedAssetPath) ||
             !TryParseGhastFamilyTentacleIndex(partId, out _))
         {
             return false;
@@ -189,29 +216,18 @@ public static class GeometryIrEmitPolicy
     /// </summary>
 
     internal static bool TryApplyGhastFamilyCuboidUvFootprint(
-
         string? officialJvmName,
-
         string partId,
-
         float y0,
-
         float y1,
-
         ref int uvSizeW,
-
         ref int uvSizeH,
-
-        ref int uvSizeD)
-
+        ref int uvSizeD,
+        string? normalizedAssetPath = null)
     {
-
-        if (!IsGhastFamilyJvm(officialJvmName))
-
+        if (!IsGhastFamilyEmitContext(officialJvmName, normalizedAssetPath))
         {
-
             return false;
-
         }
 
 
@@ -306,47 +322,56 @@ public static class GeometryIrEmitPolicy
 
     }
 
-
-
     /// <summary>
     /// Bind pose must stay on ModelPart block-stack even when
     /// <see cref="EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose"/> is enabled for A/B elsewhere.
     /// </summary>
     internal static bool IgnoresLegacyPartPoseDebugSwitch(string? officialJvmName) =>
-        string.Equals(officialJvmName, "net.minecraft.client.model.animal.dolphin.DolphinModel", StringComparison.Ordinal) ||
-        string.Equals(officialJvmName, "net.minecraft.client.model.animal.dolphin.BabyDolphinModel", StringComparison.Ordinal);
+        UsesModelPartTranslateAndRotateBindPoseJvm(officialJvmName);
 
     /// <summary>
-    /// Block-entity preview composites that match CleanRoom <c>Mul(T, Er)</c> row compose instead of ModelPart block-stack.
+    /// Bind pose must use vanilla <c>ModelPart.translateAndRotate</c> block-stack compose, not column <c>Er × T</c>,
+    /// when rotated child parts attach to a parent chain (bee wings, dolphin fins, …).
     /// </summary>
-    internal static bool UsesTranslationTimesRotationPartPose(string? officialJvmName, string? partId = null)
+    internal static bool UsesModelPartTranslateAndRotateBindPoseJvm(string? officialJvmName)
     {
         if (string.IsNullOrWhiteSpace(officialJvmName))
         {
             return false;
         }
 
-        if (string.Equals(
-                officialJvmName,
-                "net.minecraft.client.model.DecoratedPotModel.previewComposite",
-                StringComparison.Ordinal))
+        return officialJvmName.Contains(".animal.bee.", StringComparison.OrdinalIgnoreCase) ||
+               officialJvmName.Contains(".animal.dolphin.", StringComparison.OrdinalIgnoreCase) ||
+               officialJvmName.Contains(".animal.equine.", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Object boat/cart bind poses use <see cref="EntityParityTemplate.ModelPartRenderLocalBlock"/> on emit;
+    /// mob <c>PartPose.offsetAndRotation</c> parts still use column <c>Er × T</c> when rotation is non-zero.
+    /// </summary>
+    internal static bool UsesObjectEntityModelPartPoseCompose(string? officialJvmName)
+    {
+        if (string.IsNullOrWhiteSpace(officialJvmName))
         {
-            return true;
+            return false;
         }
 
-        if (string.Equals(
-                officialJvmName,
-                "net.minecraft.client.model.object.boat.BoatModel.createChestBoatModel",
-                StringComparison.Ordinal))
-        {
-            return partId is null or "chest_bottom" or "chest_lid" or "chest_lock";
-        }
+        return officialJvmName.Contains(".object.boat.", StringComparison.Ordinal) ||
+               officialJvmName.Contains(".object.cart.", StringComparison.Ordinal);
+    }
 
-        if (officialJvmName.Contains(".object.boat.RaftModel", StringComparison.Ordinal))
-        {
-            return partId is "bottom" or "chest_bottom" or "chest_lid" or "chest_lock";
-        }
+    /// <summary>Legacy JVM-level column flag; per-pose rotation now drives column compose except object boat/cart.</summary>
+    internal static bool UsesColumnPartPoseOffsetAndRotation(string? officialJvmName)
+    {
+        _ = officialJvmName;
+        return false;
+    }
 
+    /// <summary>Legacy T × Er compose for ModelPart.translateAndRotate hosts (A/B via debug switch).</summary>
+    internal static bool UsesTranslationTimesRotationPartPose(string? officialJvmName, string? partId = null)
+    {
+        _ = officialJvmName;
+        _ = partId;
         return false;
     }
 

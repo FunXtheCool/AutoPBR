@@ -332,6 +332,9 @@ public sealed class UserSettings
     /// <summary>Number of crossed sprite planes to build for 2D Sprite flagged textures in 3D preview.</summary>
     public int Preview3DSpritePlaneCount { get; set; } = 1;
 
+    /// <summary>Flat sprite preview depth in world units (0 = single-sided quad). Max ~25% of the 1×1 card.</summary>
+    public double Preview3DSpriteThickness { get; set; }
+
     /// <summary>3D preview: orbit sensitivity in radians per pixel (Alt + middle mouse).</summary>
     public double Preview3DCameraOrbitSensitivity { get; set; } = 0.006;
 

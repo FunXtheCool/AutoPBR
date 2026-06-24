@@ -228,7 +228,7 @@ public sealed class GeometryIrMeshEmitterTests
     [Fact]
     public void Chicken_packaged_shard_is_v2_and_passes_parity_lift_policy()
     {
-        const string jvm = "net.minecraft.client.model.animal.chicken.ChickenModel";
+        const string jvm = "net.minecraft.client.model.animal.chicken.AdultChickenModel";
         var path = PackagedGeometryPath($"{jvm}.json");
         if (!File.Exists(path))
         {

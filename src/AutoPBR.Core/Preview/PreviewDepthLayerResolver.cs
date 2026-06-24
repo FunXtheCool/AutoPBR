@@ -138,8 +138,7 @@ internal static class PreviewDepthLayerResolver
             return true;
         }
 
-        kind = PreviewDepthLayerKind.CutoutOverlay;
-        return true;
+        return false;
     }
 
     public static void EnrichMergedModel(MergedJavaBlockModel merged, string? officialModelJvmName = null)
@@ -211,6 +210,11 @@ internal static class PreviewDepthLayerResolver
                 continue;
             }
 
+            if (indices.Any(i => merged.Elements[i].DepthLayerKind == PreviewDepthLayerKind.TranslucentOverlay))
+            {
+                continue;
+            }
+
             indices.Sort();
             for (var overlayOrdinal = 0; overlayOrdinal < indices.Count; overlayOrdinal++)
             {
@@ -221,8 +225,9 @@ internal static class PreviewDepthLayerResolver
                     continue;
                 }
 
-                // Horizontal wing/gill membranes are not outer shells; they get an explicit overlay pass above.
-                if (TryClassifyHorizontalUpFaceMembraneElement(element))
+                // Horizontal wing/gill membranes and texCrop north/south side sheets are not outer shells.
+                if (TryClassifyHorizontalUpFaceMembraneElement(element) ||
+                    TryClassifyNorthSouthFaceMembraneElement(element))
                 {
                     continue;
                 }
@@ -292,6 +297,10 @@ internal static class PreviewDepthLayerResolver
     private static bool IsPrimaryTextureKey(string key) =>
         key is "#skin" or "#main";
 
+    private static bool IsSlimeModelJvm(string? officialJvmName) =>
+        !string.IsNullOrWhiteSpace(officialJvmName) &&
+        officialJvmName.Contains(".SlimeModel", StringComparison.Ordinal);
+
     private static bool TryGetLocalAabb(ModelElement element, out Vector3 min, out Vector3 max)
     {
         min = new Vector3(
@@ -341,6 +350,37 @@ internal static class PreviewDepthLayerResolver
         var spanY = max.Y - min.Y;
         var spanZ = max.Z - min.Z;
         return spanX >= 8f && spanZ >= 8f && spanY <= MathF.Max(spanX, spanZ) * 0.25f;
+    }
+
+    /// <summary>
+    /// Detects north/south-only texCrop side sheets (e.g. Creaking head panels) so coplanar enrich does not
+    /// retag them as cutout overlays on the shared head part pose.
+    /// </summary>
+    private static bool TryClassifyNorthSouthFaceMembraneElement(ModelElement element)
+    {
+        if (element.Faces.Count == 0)
+        {
+            return false;
+        }
+
+        foreach (var faceName in element.Faces.Keys)
+        {
+            if (!faceName.Equals("north", StringComparison.OrdinalIgnoreCase) &&
+                !faceName.Equals("south", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+
+        if (!TryGetLocalAabb(element, out var min, out var max))
+        {
+            return false;
+        }
+
+        var spanX = max.X - min.X;
+        var spanY = max.Y - min.Y;
+        var spanZ = max.Z - min.Z;
+        return spanX >= 4f && spanY >= 4f && spanZ <= MathF.Max(spanX, spanY) * 0.25f;
     }
 
     /// <summary>Coplanar enrich only tags a larger overlapping sibling (outer robe/shell), not disjoint cuboids on the same pose.</summary>
@@ -418,7 +458,21 @@ internal static class PreviewDepthLayerResolver
             return false;
         }
 
+        if (string.Equals(partId, "outer_cube", StringComparison.OrdinalIgnoreCase) &&
+            IsSlimeModelJvm(officialJvmName))
+        {
+            kind = PreviewDepthLayerKind.TranslucentOverlay;
+            return true;
+        }
+
         if (partId.Contains("eye", StringComparison.OrdinalIgnoreCase))
+        {
+            kind = PreviewDepthLayerKind.CosmeticOverlay;
+            return true;
+        }
+
+        if (string.Equals(partId, "mouth", StringComparison.OrdinalIgnoreCase) &&
+            IsSlimeModelJvm(officialJvmName))
         {
             kind = PreviewDepthLayerKind.CosmeticOverlay;
             return true;

@@ -310,6 +310,62 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var armPose = EntityPreviewPoseCatalog.ResolveEffectiveHumanoidArmPose(
             parityRule.BuilderMethod,
             EntityPreviewBuildContext.CurrentPoseId);
+        return ApplyHumanoidGeometryIrArmPosePreviewPass(
+            parityRule,
+            geometryIrOfficialJvm,
+            merged,
+            geometryRoot,
+            armPose,
+            idlePhase01,
+            animationTimeSeconds,
+            wave,
+            emitOptions);
+    }
+
+    private static bool ApplyHumanoidGeometryIrArmPosePreviewPass(
+        EntityTextureParityRule parityRule,
+        string geometryIrOfficialJvm,
+        MergedJavaBlockModel merged,
+        JsonElement geometryRoot,
+        float idlePhase01,
+        float animationTimeSeconds,
+        float wave,
+        GeometryIrMeshEmitOptions emitOptions)
+    {
+        var armPose = EntityPreviewPoseCatalog.ResolveEffectiveHumanoidArmPose(
+            parityRule.BuilderMethod,
+            EntityPreviewBuildContext.CurrentPoseId);
+        return ApplyHumanoidGeometryIrArmPosePreviewPass(
+            parityRule,
+            geometryIrOfficialJvm,
+            merged,
+            geometryRoot,
+            armPose,
+            idlePhase01,
+            animationTimeSeconds,
+            wave,
+            emitOptions);
+    }
+
+    private static bool ApplyHumanoidGeometryIrArmPosePreviewPass(
+        EntityTextureParityRule parityRule,
+        string geometryIrOfficialJvm,
+        MergedJavaBlockModel merged,
+        JsonElement geometryRoot,
+        EntityHumanoidPreviewArmPose armPose,
+        float idlePhase01,
+        float animationTimeSeconds,
+        float wave,
+        GeometryIrMeshEmitOptions emitOptions)
+    {
+        if (!EntityPreviewPoseCatalog.IsHumanoidPoseBuilderMethod(parityRule.BuilderMethod) &&
+            !GeometryIrHumanoidLayerMeshPreviewPolicy.UsesHumanoidArmPosePreviewPass(
+                parityRule.BuilderMethod,
+                geometryIrOfficialJvm))
+        {
+            return false;
+        }
+
         return HumanoidPreviewPoseSupport.TryApplyArmPoseToGeometryIrMesh(
             merged,
             geometryRoot,
@@ -317,8 +373,13 @@ internal sealed partial class CleanRoomEntityModelRuntime
             armPose,
             idlePhase01,
             animationTimeSeconds,
-            wave);
+            wave,
+            IsBabyGeometryIrOfficialJvm(geometryIrOfficialJvm));
     }
+
+    private static bool IsBabyGeometryIrOfficialJvm(string? geometryIrOfficialJvm) =>
+        !string.IsNullOrWhiteSpace(geometryIrOfficialJvm) &&
+        geometryIrOfficialJvm.Contains("Baby", StringComparison.Ordinal);
 
     /// <summary>
     /// <c>GhastModel.setupAnim</c> only calls <c>animateTentacles</c> (setup-anim IR assignments are empty).
@@ -329,22 +390,31 @@ internal sealed partial class CleanRoomEntityModelRuntime
         float animationTimeSeconds,
         GeometryIrMeshEmitOptions emitOptions)
     {
-        var pose = new VanillaSetupAnimRuntime.PoseResult();
-        for (var i = 0; i < 9; i++)
+        // ModelPart xRot in row-affine emit: part-local rotation premultiplies LocalToParent (Rx * LTP).
+        var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(geometryRoot, emitOptions);
+        var count = Math.Min(merged.Elements.Count, partIds.Count);
+        for (var i = 0; i < count; i++)
         {
-            pose.Parts[$"tentacle{i}"] = new VanillaSetupAnimRuntime.PartPose
+            if (!GeometryIrEmitPolicy.TryParseGhastFamilyTentacleIndex(partIds[i], out var tentacleIndex))
             {
-                XRot = GeometryIrEmitPolicy.ComputeGhastAnimateTentaclesXRot(i, animationTimeSeconds),
-                Assigned = VanillaSetupAnimRuntime.PartPoseChannel.XRot,
+                continue;
+            }
+
+            var pitch = GeometryIrEmitPolicy.ComputeGhastAnimateTentaclesXRot(tentacleIndex, animationTimeSeconds);
+            var e = merged.Elements[i];
+            merged.Elements[i] = new ModelElement
+            {
+                From = e.From,
+                To = e.To,
+                Faces = e.Faces,
+                LocalToParent = EntityParityTemplate.Mul(EntityParityTemplate.Rx(pitch), e.LocalToParent),
+                DepthLayerKind = e.DepthLayerKind,
+                LayerOrdinal = e.LayerOrdinal,
+                CastsShadow = e.CastsShadow,
+                ShellInflateTexels = e.ShellInflateTexels,
+                MirrorCuboidUv = e.MirrorCuboidUv,
             };
         }
-
-        _ = ApplySetupAnimToGeometryIrMesh(
-            merged,
-            geometryRoot,
-            pose,
-            GeometryIrPartWorldPoseIndex.Build(geometryRoot, emitOptions),
-            emitOptions);
     }
 
     /// <summary>
@@ -396,6 +466,17 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             source = "renderer-state";
             return RendererStatePreviewResolver.Synthesize(rendererState, animationTimeSeconds, idlePhase01, wave);
+        }
+
+        if (EntityPreviewSizeCatalog.IsSlimeFamilyModelJvm(modelJvm))
+        {
+            source = "slime-family";
+            var state = new Dictionary<string, float>(
+                PreviewRenderStateSynthesis.ForLivingWalk(animationTimeSeconds, idlePhase01, wave));
+            var size = EntityPreviewSizeCatalog.ResolveEffectiveSize(EntityPreviewBuildContext.CurrentSizeId);
+            state["size"] = size;
+            state["squish"] = MathF.Max(0f, wave);
+            return state;
         }
 
         source = "living-walk";

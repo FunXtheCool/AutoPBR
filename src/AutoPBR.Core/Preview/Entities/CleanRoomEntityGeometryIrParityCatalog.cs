@@ -77,6 +77,10 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var officialJvm = geometryIrOfficialJvm;
         geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(officialJvm, geometryRoot);
         geometryRoot = GeometryIrPlayerArmVariant.ApplySlimArmsIfNeeded(parityRule.BuilderMethod, geometryRoot);
+        if (!applyGeometryIrSetupAnimMotion)
+        {
+            geometryRoot = GeometryIrPartTreeRepair.ApplyWolfIdleTailPreviewPose(officialJvm, geometryRoot);
+        }
 
         if (!TryResolveParityCatalogGeometryIrAtlasDimensions(
                 geometryRoot,
@@ -91,6 +95,26 @@ internal sealed partial class CleanRoomEntityModelRuntime
         if (string.Equals(parityRule.BuilderMethod, "Breeze", StringComparison.Ordinal))
         {
             return TryBuildParityCatalogBreezeMeshFromGeometryIr(
+                normalizedAssetPath,
+                stem,
+                texRef,
+                profile,
+                isBaby,
+                idlePhase01,
+                animationTimeSeconds,
+                parityRule,
+                applyGeometryIrSetupAnimMotion,
+                officialJvm,
+                geometryRoot,
+                atlasW,
+                atlasH,
+                out merged,
+                out geometryIrOfficialJvm);
+        }
+
+        if (string.Equals(parityRule.BuilderMethod, "Creaking", StringComparison.Ordinal))
+        {
+            return TryBuildParityCatalogCreakingMeshFromGeometryIr(
                 normalizedAssetPath,
                 stem,
                 texRef,
@@ -126,13 +150,28 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 idlePhase01,
                 applyGeometryIrSetupAnimMotion ? wave : 0f,
                 normalizedAssetPath: norm,
-                animationTimeSeconds)
+                animationTimeSeconds,
+                applyGeometryIrSetupAnimMotion)
                 .WithOfficialJvmPoseComposeDefaults(officialJvm)
-                with { OfficialJvmName = officialJvm },
+                with
+                {
+                    OfficialJvmName = officialJvm,
+                    NormalizedAssetPath = norm,
+                },
             lerPlan);
-        if (!applyGeometryIrSetupAnimMotion &&
-            !EntityPreviewPoseCatalog.IsIllagerBuilderMethod(parityRule.BuilderMethod) &&
-            !EntityPreviewPoseCatalog.IsHumanoidPoseBuilderMethod(parityRule.BuilderMethod))
+        if (EntityPreviewPoseCatalog.IsHumanoidPoseBuilderMethod(parityRule.BuilderMethod) ||
+            GeometryIrHumanoidLayerMeshPreviewPolicy.UsesHumanoidArmPosePreviewPass(
+                parityRule.BuilderMethod,
+                officialJvm) ||
+            (applyGeometryIrSetupAnimMotion &&
+             EntityPreviewPoseCatalog.IsIllagerBuilderMethod(parityRule.BuilderMethod) &&
+             emitOptions.TryGetPartPoseOverride is not null))
+        {
+            // Arm pose uses javap ModelPart joint delta after bind emit (see ApplyHumanoidGeometryIrArmPosePreviewPass).
+            emitOptions = emitOptions with { TryGetPartPoseOverride = null };
+        }
+        else if (!applyGeometryIrSetupAnimMotion &&
+                 !EntityPreviewPoseCatalog.IsIllagerBuilderMethod(parityRule.BuilderMethod))
         {
             emitOptions = emitOptions with { TryGetPartPoseOverride = null };
         }
@@ -189,6 +228,30 @@ internal sealed partial class CleanRoomEntityModelRuntime
                     norm);
             }
         }
+        else
+        {
+            _ = ApplyHumanoidGeometryIrArmPosePreviewPass(
+                parityRule,
+                officialJvm,
+                built,
+                geometryRoot,
+                idlePhase01,
+                animationTimeSeconds,
+                wave,
+                emitOptions);
+
+            // Ghast setupAnim is animateTentacles-only; bind pose still needs default xRot (~0.4 rad) or
+            // reoriented tentacle boxes sit inside the body shell and depth-occlude in Explore (animation off).
+            if (string.Equals(parityRule.BuilderMethod, "Ghast", StringComparison.Ordinal) ||
+                string.Equals(parityRule.BuilderMethod, "HappyGhast", StringComparison.Ordinal))
+            {
+                ApplyGhastFamilyAnimateTentaclesGeometryIrPreviewPass(
+                    built,
+                    geometryRoot,
+                    animationTimeSeconds: 0f,
+                    emitOptions);
+            }
+        }
 
         if (applyGeometryIrSetupAnimMotion)
         {
@@ -204,6 +267,11 @@ internal sealed partial class CleanRoomEntityModelRuntime
         }
 
         merged = FinishGeometryIrMeshLivingEntityRendererBasis(built, lerPlan);
+
+        if (UsesObjectEntityPreviewVerticalFlip(parityRule.BuilderMethod))
+        {
+            merged = ApplyObjectEntityPreviewVerticalFlip(merged, parityRule.BuilderMethod);
+        }
 
         if (string.Equals(parityRule.BuilderMethod, "Minecart", StringComparison.OrdinalIgnoreCase))
         {
@@ -383,10 +451,14 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return p.HeadScale;
         }
 
-        if (s.Contains("leg") || s.Contains("arm") || s.Contains("fin") || s.Contains("tentacle") ||
-            (s.Contains("wing") && !s.Contains("body")))
+        if (s.Contains("leg") || s.Contains("arm") || s.Contains("fin") || s.Contains("tentacle"))
         {
             return p.LegScale;
+        }
+
+        if (s.Contains("wing") && !s.Contains("body"))
+        {
+            return p.BodyScale;
         }
 
         return p.BodyScale;

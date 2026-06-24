@@ -28,6 +28,8 @@ public sealed class ColdCowHornMeshDiagnosticTests
         Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, prov.Kind);
 
         var lines = new List<string> { $"driver={prov.Kind} detail={prov.Detail}" };
+        Vector3? headPivot = null;
+        Vector3? hornPivot = null;
         foreach (var pid in new[] { "head", "right_horn", "left_horn", "body" })
         {
             for (var i = 0; i < mesh.Elements.Count; i++)
@@ -39,6 +41,15 @@ public sealed class ColdCowHornMeshDiagnosticTests
 
                 var el = mesh.Elements[i];
                 var pivot = new Vector3(el.LocalToParent.M41, el.LocalToParent.M42, el.LocalToParent.M43);
+                if (pid == "head")
+                {
+                    headPivot = pivot;
+                }
+                else if (pid == "right_horn")
+                {
+                    hornPivot = pivot;
+                }
+
                 var center = new Vector3(
                     (el.From[0] + el.To[0]) * 0.5f,
                     (el.From[1] + el.To[1]) * 0.5f,
@@ -48,6 +59,8 @@ public sealed class ColdCowHornMeshDiagnosticTests
             }
         }
 
-        Assert.Fail(string.Join("\n", lines));
+        Assert.True(headPivot.HasValue && hornPivot.HasValue, string.Join("\n", lines));
+        var hornHeadDist = Vector3.Distance(hornPivot.Value, headPivot.Value);
+        Assert.True(hornHeadDist <= 10f, string.Join("\n", lines));
     }
 }

@@ -23,11 +23,13 @@ internal static partial class JavapFloatGeometryMeshLift
     /// (seed <c>1660L</c> thread-local). Heights are stable for that seed; see reference_java bake.
     /// </summary>
     private static readonly int[] GhastTentacleHeightsByIteration = [8, 13, 9, 11, 11, 10, 12, 9, 12];
+    private static readonly int[] HappyGhastTentacleHeightsByIteration = [5, 7, 4, 5, 5, 7, 8, 8, 5];
 
     private static void ApplyGhastTentacleLoopIntLocals(IReadOnlyList<string> seg, int loopSlot, int iteration,
         Dictionary<int, int> map)
     {
-        if (loopSlot != 3 || iteration < 0 || iteration >= GhastTentacleHeightsByIteration.Length)
+        var heights = ResolveGhastTentacleHeights(seg);
+        if (loopSlot != 3 || iteration < 0 || iteration >= heights.Length)
         {
             return;
         }
@@ -41,7 +43,18 @@ internal static partial class JavapFloatGeometryMeshLift
             return;
         }
 
-        map[6] = GhastTentacleHeightsByIteration[iteration];
+        map[6] = heights[iteration];
+    }
+
+    private static ReadOnlySpan<int> ResolveGhastTentacleHeights(IReadOnlyList<string> seg)
+    {
+        if (seg.Any(static l => l.Contains("HappyGhastModel", StringComparison.Ordinal) ||
+                                l.Contains("animal/ghast/HappyGhastModel", StringComparison.Ordinal)))
+        {
+            return HappyGhastTentacleHeightsByIteration;
+        }
+
+        return GhastTentacleHeightsByIteration;
     }
 
     /// <summary>

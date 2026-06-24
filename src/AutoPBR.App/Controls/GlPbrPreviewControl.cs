@@ -133,7 +133,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
             }
             else if (kind == PreviewSceneKind.ItemPlane)
             {
-                scene = ItemPreviewSceneFactory.Create(settings);
+                scene = ItemPreviewSceneFactory.Create(settings, material);
             }
             else
             {

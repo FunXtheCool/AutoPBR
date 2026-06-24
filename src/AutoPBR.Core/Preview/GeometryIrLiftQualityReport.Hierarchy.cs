@@ -88,12 +88,21 @@ public static partial class GeometryIrLiftQualityReport
     }
 
     private static (bool Match, string? Message) EvaluateReferenceHierarchyMatch(
+        string? officialJvmName,
         JsonElement shardRoot,
         int flatNested,
         bool legsAtRoot,
         bool bindingNote,
         bool? referenceLegsAtRoot)
     {
+        if (!string.IsNullOrWhiteSpace(officialJvmName) &&
+            officialJvmName.Contains(".monster.dragon.EnderDragonModel", StringComparison.Ordinal) &&
+            flatNested > 0)
+        {
+            // Serial tail segments are intentional root siblings, not mis-hoisted quadruped legs.
+            return (true, null);
+        }
+
         if (referenceLegsAtRoot == true && LegsNestedUnderBody(shardRoot))
         {
             return (false, "IR nests legs under body but reference_java uses vanilla flat root siblings");

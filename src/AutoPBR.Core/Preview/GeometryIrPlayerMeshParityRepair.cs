@@ -21,6 +21,47 @@ internal static class GeometryIrPlayerMeshParityRepair
         RepairPlayerMeshCanonicalUv(rootChildren);
     }
 
+    /// <summary>
+    /// <c>HumanoidModel.createMesh</c> can lift an inflated head shell while the hat child keeps the reference box.
+    /// </summary>
+    public static void ApplyHumanoidHatHeadCanonicalBounds(JsonArray rootChildren)
+    {
+        if (UsesPlayerWideMeshOverlayKit(rootChildren) ||
+            !TryFindPartById(rootChildren, "head", out var head) || head is null ||
+            head["children"] is not JsonArray headKids ||
+            !TryFindPartById(headKids, "hat", out var hat) || hat is null ||
+            !TryGetFirstCuboid(hat, out var hatCuboid) ||
+            !TryGetFirstCuboid(head, out var headCuboid) ||
+            !IsCanonicalHumanoidHeadCuboid(hatCuboid))
+        {
+            return;
+        }
+
+        if (IsCanonicalHumanoidHeadCuboid(headCuboid))
+        {
+            return;
+        }
+
+        CopyCuboidBounds(hatCuboid, headCuboid, new JsonArray(0, 0));
+        headCuboid.Remove("inflate");
+    }
+
+    private static bool IsCanonicalHumanoidHeadCuboid(JsonObject cuboid)
+    {
+        if (cuboid["from"] is not JsonArray from || cuboid["to"] is not JsonArray to ||
+            from.Count < 3 || to.Count < 3)
+        {
+            return false;
+        }
+
+        return Math.Abs(from[0]!.GetValue<double>() + 4) < 0.05 &&
+               Math.Abs(from[1]!.GetValue<double>() + 8) < 0.05 &&
+               Math.Abs(from[2]!.GetValue<double>() + 4) < 0.05 &&
+               Math.Abs(to[0]!.GetValue<double>() - 4) < 0.05 &&
+               Math.Abs(to[1]!.GetValue<double>()) < 0.05 &&
+               Math.Abs(to[2]!.GetValue<double>() - 4) < 0.05;
+    }
+
     private static void RepairPlayerMeshCanonicalUv(JsonArray rootChildren)
     {
         SetPrimaryCuboidUv(rootChildren, "head", 0, 0);

@@ -88,12 +88,16 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             if (string.Equals(partId, "right_arm", StringComparison.OrdinalIgnoreCase))
             {
-                return EntityParityTemplate.Mul(world, EntityParityTemplate.Er(raX, raY, raZ));
+                return HumanoidPreviewPoseSupport.ApplyPartRotationAtJoint(
+                    world,
+                    EntityParityTemplate.Er(raX, raY, raZ));
             }
 
             if (string.Equals(partId, "left_arm", StringComparison.OrdinalIgnoreCase))
             {
-                return EntityParityTemplate.Mul(world, EntityParityTemplate.Er(laX, laY, laZ));
+                return HumanoidPreviewPoseSupport.ApplyPartRotationAtJoint(
+                    world,
+                    EntityParityTemplate.Er(laX, laY, laZ));
             }
 
             return world;

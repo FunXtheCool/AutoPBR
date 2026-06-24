@@ -25,6 +25,166 @@ public sealed class BabyFamilyAttachmentClusterTests
         { "assets/minecraft/textures/entity/goat/goat_baby.png", 0.65f },
         { "assets/minecraft/textures/entity/sheep/sheep_baby.png", 0.65f },
         { "assets/minecraft/textures/entity/zombie/drowned_baby.png", 0.65f },
+        { "assets/minecraft/textures/entity/zombie_villager/baby/desert.png", 0.75f },
+        { "assets/minecraft/textures/entity/zombie_villager/zombie_villager_baby.png", 0.75f },
+        { "assets/minecraft/textures/entity/sniffer/snifflet.png", 0.95f },
+    };
+
+    [Fact]
+    public void Baby_zombie_villager_gpu_anim_motion_head_stays_near_body()
+    {
+        const string texturePath = "assets/minecraft/textures/entity/zombie_villager/baby/desert.png";
+        GeometryIrParityPolicy.ResetForTests();
+        var runtime = new CleanRoomEntityModelRuntime();
+        MergedJavaBlockModel merged;
+        using (EntityPreviewBuildContext.UsePose(EntityPreviewPoseCatalog.HumanoidZombieArms))
+        {
+            Assert.True(runtime.TryBuildStaticMesh(
+                texturePath, Profile26, 0f, 0.5f, out merged, applyGeometryIrSetupAnimMotion: true));
+        }
+
+        var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(merged, "minecraft");
+        var rebake = new EntityEmulatedPreviewRebakeContext
+        {
+            PackZipPath = "pack.zip",
+            AssetArchivePath = texturePath,
+            NativeRootDirectory = AppContext.BaseDirectory,
+            NativeProfileName = Profile26.Name,
+            NativeParsedVersion = Profile26.ParsedVersion?.ToString(),
+            ModelDefaultNamespace = "minecraft",
+            PreviewPoseId = EntityPreviewPoseCatalog.HumanoidZombieArms,
+            IdlePhase01 = 0f,
+            OrderedTextureZipPaths = ordered.ToArray()
+        };
+
+        var materials = ordered.Select(_ => CreatePreviewMaps(64, 64)).ToArray();
+        Assert.True(EntityEmulatedPreviewRebaker.TryRebakeMesh(
+            rebake,
+            materials,
+            animationTimeSeconds: 0.5f,
+            out var verts,
+            out _,
+            out _,
+            applyGeometryIrSetupAnimMotion: true));
+
+        var stem = Path.GetFileNameWithoutExtension(texturePath).ToLowerInvariant();
+        var rule = EntityTextureParityCatalog.ResolveRule(texturePath, stem);
+        Assert.NotNull(rule);
+        Assert.True(GeometryIrParityJvmResolver.TryResolveLiftedRoot(
+            Profile26, rule, texturePath, stem, isBaby: true, out var jvm, out var geometryRoot));
+        geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, geometryRoot);
+        var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
+            geometryRoot,
+            GeometryIrMeshEmitOptions.ForParity() with { OfficialJvmName = jvm });
+
+        var bodyCentroid = ComputeBakedPartPreviewCentroid(merged, verts!, partIds, static id =>
+            id.Contains("body", StringComparison.Ordinal));
+        var headCentroid = ComputeBakedPartPreviewCentroid(merged, verts!, partIds, static id =>
+            id.Contains("head", StringComparison.Ordinal) && !id.Contains("body", StringComparison.Ordinal));
+        Assert.True(bodyCentroid.HasValue && headCentroid.HasValue);
+        Assert.True(
+            Vector3.Distance(bodyCentroid.Value, headCentroid.Value) <= 0.75f,
+            $"head-body gap={Vector3.Distance(bodyCentroid.Value, headCentroid.Value):F3}");
+    }
+
+    [Fact]
+    public void Baby_zombie_villager_rebaked_cpu_vertices_stay_clustered_with_zombie_arms_pose()
+    {
+        const string texturePath = "assets/minecraft/textures/entity/zombie_villager/baby/desert.png";
+        GeometryIrParityPolicy.ResetForTests();
+        var runtime = new CleanRoomEntityModelRuntime();
+        MergedJavaBlockModel merged;
+        using (EntityPreviewBuildContext.UsePose(EntityPreviewPoseCatalog.HumanoidZombieArms))
+        {
+            Assert.True(runtime.TryBuildStaticMesh(
+                texturePath, Profile26, 0f, 0f, out merged, applyGeometryIrSetupAnimMotion: true));
+        }
+
+        var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(merged, "minecraft");
+        var rebake = new EntityEmulatedPreviewRebakeContext
+        {
+            PackZipPath = "pack.zip",
+            AssetArchivePath = texturePath,
+            NativeRootDirectory = AppContext.BaseDirectory,
+            NativeProfileName = Profile26.Name,
+            NativeParsedVersion = Profile26.ParsedVersion?.ToString(),
+            ModelDefaultNamespace = "minecraft",
+            PreviewPoseId = EntityPreviewPoseCatalog.HumanoidZombieArms,
+            IdlePhase01 = 0f,
+            OrderedTextureZipPaths = ordered.ToArray()
+        };
+
+        var materials = ordered.Select(_ => CreatePreviewMaps(64, 64)).ToArray();
+        Assert.True(EntityEmulatedPreviewRebaker.TryRebakeMesh(
+            rebake,
+            materials,
+            animationTimeSeconds: 0f,
+            out var verts,
+            out _,
+            out _,
+            applyGeometryIrSetupAnimMotion: true));
+
+        var stem = Path.GetFileNameWithoutExtension(texturePath).ToLowerInvariant();
+        var rule = EntityTextureParityCatalog.ResolveRule(texturePath, stem);
+        Assert.NotNull(rule);
+        Assert.True(GeometryIrParityJvmResolver.TryResolveLiftedRoot(
+            Profile26, rule, texturePath, stem, isBaby: true, out var jvm, out var geometryRoot));
+        geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, geometryRoot);
+        var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
+            geometryRoot,
+            GeometryIrMeshEmitOptions.ForParity() with { OfficialJvmName = jvm });
+
+        var bodyCentroid = ComputeBakedPartPreviewCentroid(merged, verts!, partIds, static id =>
+            id.Contains("body", StringComparison.Ordinal));
+        var headCentroid = ComputeBakedPartPreviewCentroid(merged, verts!, partIds, static id =>
+            id.Contains("head", StringComparison.Ordinal) && !id.Contains("body", StringComparison.Ordinal));
+        Assert.True(bodyCentroid.HasValue && headCentroid.HasValue);
+        Assert.True(Vector3.Distance(bodyCentroid.Value, headCentroid.Value) <= 0.75f);
+    }
+
+    [Theory]
+    [InlineData("assets/minecraft/textures/entity/zombie_villager/baby/desert.png")]
+    [InlineData("assets/minecraft/textures/entity/zombie_villager/zombie_villager_baby.png")]
+    public void Baby_zombie_villager_zombie_arms_pose_keeps_arms_laterally_attached(string texturePath)
+    {
+        GeometryIrParityPolicy.ResetForTests();
+        var runtime = new CleanRoomEntityModelRuntime();
+        MergedJavaBlockModel mesh;
+        using (EntityPreviewBuildContext.UsePose(EntityPreviewPoseCatalog.HumanoidZombieArms))
+        {
+            Assert.True(runtime.TryBuildStaticMesh(
+                texturePath, Profile26, 0f, 0f, out mesh, applyGeometryIrSetupAnimMotion: false));
+        }
+
+        var stem = Path.GetFileNameWithoutExtension(texturePath).ToLowerInvariant();
+        var rule = EntityTextureParityCatalog.ResolveRule(texturePath, stem);
+        Assert.NotNull(rule);
+        Assert.True(GeometryIrParityJvmResolver.TryResolveLiftedRoot(
+            Profile26, rule, texturePath, stem, isBaby: true, out var jvm, out var geometryRoot));
+        geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, geometryRoot);
+        var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
+            geometryRoot,
+            GeometryIrMeshEmitOptions.ForParity() with { OfficialJvmName = jvm });
+
+        var bodyCentroid = ComputePartPreviewCentroid(mesh, partIds, static id =>
+            id.Contains("body", StringComparison.Ordinal));
+        var armCentroid = ComputePartPreviewCentroid(mesh, partIds, static id =>
+            id.Contains("arm", StringComparison.Ordinal));
+        Assert.True(bodyCentroid.HasValue && armCentroid.HasValue);
+        var xGap = MathF.Abs(bodyCentroid.Value.X - armCentroid.Value.X);
+        Assert.True(
+            xGap <= 0.35f,
+            $"{texturePath} zombie-arms lateral gap {xGap:F3} bodyX={bodyCentroid.Value.X:F3} armX={armCentroid.Value.X:F3}");
+    }
+
+    private static PreviewTextureMaps CreatePreviewMaps(int width, int height) => new()
+    {
+        Width = width,
+        Height = height,
+        DiffuseRgba = new byte[width * height * 4],
+        NormalRgba = new byte[width * height * 4],
+        SpecularRgba = new byte[width * height * 4],
+        HeightRgba = new byte[width * height * 4],
     };
 
     [Theory]

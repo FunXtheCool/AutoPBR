@@ -212,6 +212,15 @@ internal static partial class GeometryIrPartTreeRepair
                 RemovePlayerMeshInternalParts(rootKids);
                 GeometryIrPlayerMeshParityRepair.Apply(rootKids);
             }
+            else
+            {
+                GeometryIrPlayerMeshParityRepair.ApplyHumanoidHatHeadCanonicalBounds(rootKids);
+            }
+
+            RemoveDuplicateInflatedBodyOverlayCuboids(rootKids);
+            RemoveCopperGolemSetupAnimRotationHelperParts(rootKids, officialJvmName);
+            RemoveArmorStandArmorWideOverlayParts(rootKids, officialJvmName);
+            EnsureSnifferLegsUnderBone(rootKids, officialJvmName);
 
             if (EntityPreviewDebugSettings.RepairZeroEquineRootOffset &&
                 ShouldZeroEquineCreateBodyLayerRootOffset(officialJvmName, doc, ro))
@@ -228,20 +237,15 @@ internal static partial class GeometryIrPartTreeRepair
 
 
 
-        if (ShouldRepairObjectBoatFamily(officialJvmName))
-        {
-            RepairObjectBoatFamilyHullPartPose(doc);
-        }
-
         RepairObjectChestModelCuboidOrigins(doc);
 
         if (ShouldApplyPlayerWideMeshParityRepair(officialJvmName, roots) ||
-            ShouldApplyHumanoidLayerMeshReferenceRepair(officialJvmName))
+            ShouldApplyReferenceCuboidPreviewRepair(officialJvmName))
         {
             var repaired = JsonDocument.Parse(doc.ToJsonString()).RootElement;
             if (LoadReferenceRootForTopologyAlign(officialJvmName!) is { } referenceRoot)
             {
-                return ShouldApplyHumanoidLayerMeshReferenceRepair(officialJvmName)
+                return ShouldApplyReferenceCuboidPreviewRepair(officialJvmName)
                     ? GeometryIrReferencePoseSync.ApplyForParityPreview(referenceRoot, repaired)
                     : GeometryIrReferencePoseSync.ApplyForComparisons(
                         referenceRoot,
@@ -251,8 +255,136 @@ internal static partial class GeometryIrPartTreeRepair
             return repaired;
         }
 
+        if (ShouldApplyReferenceCuboidOnlyShardRepair(officialJvmName) &&
+            LoadReferenceRootForTopologyAlign(officialJvmName!) is { } cuboidRefRoot)
+        {
+            GeometryIrReferencePoseSync.SyncCuboidsIntoShard(cuboidRefRoot, doc);
+        }
+
         return JsonDocument.Parse(doc.ToJsonString()).RootElement;
 
+    }
+
+    /// <summary>
+    /// <c>CopperGolemModel.createBodyLayer</c> keeps setupAnim <c>*_r1</c> rotation nodes and <c>rightItem</c> that Java
+    /// reference bakes omit from the static mesh (cuboids live on parent limbs at bind pose).
+    /// </summary>
+    private static void RemoveCopperGolemSetupAnimRotationHelperParts(JsonArray rootChildren, string? officialJvmName)
+    {
+        if (officialJvmName is null ||
+            !officialJvmName.Contains(".golem.CopperGolemModel", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        RemovePartIdsFromForest(rootChildren,
+        [
+            "right_arm_r1",
+            "left_arm_r1",
+            "body_r1",
+            "right_leg_r1",
+            "left_leg_r1",
+            "rightItem",
+        ]);
+    }
+
+    /// <summary>
+    /// <c>SnifferModel</c> binds six legs as siblings of <c>body</c> under <c>bone</c>; mis-hoisted flat leg repair must not leave them at factory root.
+    /// </summary>
+    private static void EnsureSnifferLegsUnderBone(JsonArray rootChildren, string? officialJvmName)
+    {
+        if (officialJvmName is null ||
+            !officialJvmName.Contains(".animal.sniffer.SnifferModel", StringComparison.Ordinal) ||
+            !TryFindPartById(rootChildren, "bone", out var boneNode) || boneNode is not JsonObject bone)
+        {
+            return;
+        }
+
+        bone["children"] ??= new JsonArray();
+        if (bone["children"] is not JsonArray boneKids)
+        {
+            return;
+        }
+
+        foreach (var legId in QuadrupedLegPartIds)
+        {
+            if (!TryDetachPartFromForest(rootChildren, legId, out var leg) || leg is null)
+            {
+                continue;
+            }
+
+            if (!IsDirectChild(boneKids, legId))
+            {
+                boneKids.Add(leg);
+            }
+        }
+    }
+
+    private static bool TryDetachPartFromForest(JsonArray searchRoots, string partId, out JsonObject? detached)
+    {
+        detached = null;
+        for (var i = 0; i < searchRoots.Count; i++)
+        {
+            if (searchRoots[i] is not JsonObject part)
+            {
+                continue;
+            }
+
+            if (string.Equals((string?)part["id"], partId, StringComparison.Ordinal))
+            {
+                detached = part;
+                searchRoots.RemoveAt(i);
+                return true;
+            }
+
+            if (part["children"] is JsonArray kids && TryDetachPartFromForest(kids, partId, out detached))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsDirectChild(JsonArray siblings, string partId)
+    {
+        foreach (var n in siblings)
+        {
+            if (n is JsonObject o && string.Equals((string?)o["id"], partId, StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool ShouldApplyReferenceCuboidOnlyShardRepair(string? officialJvmName) =>
+        officialJvmName is not null &&
+        (officialJvmName.Contains(".animal.feline.BabyCatModel", StringComparison.Ordinal) ||
+         officialJvmName.Contains(".animal.feline.BabyOcelotModel", StringComparison.Ordinal) ||
+         officialJvmName.Contains(".golem.CopperGolemModel", StringComparison.Ordinal) ||
+         officialJvmName.Contains(".object.armorstand.ArmorStandArmorModel", StringComparison.Ordinal));
+
+    /// <summary>
+    /// <c>ArmorStandArmorModel</c> bytecode lifts player-style overlay shells; Java reference bakes head/hat only.
+    /// </summary>
+    private static void RemoveArmorStandArmorWideOverlayParts(JsonArray rootChildren, string? officialJvmName)
+    {
+        if (officialJvmName is null ||
+            !officialJvmName.Contains(".object.armorstand.ArmorStandArmorModel", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        RemovePartIdsFromForest(rootChildren,
+        [
+            "jacket",
+            "left_pants",
+            "right_pants",
+            "left_sleeve",
+            "right_sleeve",
+        ]);
     }
 
     /// <summary>
@@ -261,6 +393,10 @@ internal static partial class GeometryIrPartTreeRepair
     /// </summary>
     private static bool ShouldApplyHumanoidLayerMeshReferenceRepair(string? officialJvmName) =>
         GeometryIrHumanoidLayerMeshPreviewPolicy.IsHumanoidLayerMeshJvm(officialJvmName);
+
+    private static bool ShouldApplyReferenceCuboidPreviewRepair(string? officialJvmName) =>
+        ShouldApplyHumanoidLayerMeshReferenceRepair(officialJvmName) ||
+        string.Equals(officialJvmName, "net.minecraft.client.model.HumanoidModel", StringComparison.Ordinal);
 
     private static bool IsPlayerMeshFamily(string? officialJvmName) =>
         string.Equals(officialJvmName, "net.minecraft.client.model.player.PlayerModel", StringComparison.Ordinal) ||
@@ -353,7 +489,12 @@ internal static partial class GeometryIrPartTreeRepair
 
         officialJvmName ??= shardDoc?["officialJvmName"]?.GetValue<string>();
 
-
+        if (TryFindPartById(rootChildren, "bone", out var boneNode) && boneNode is JsonObject boneObj &&
+            boneObj["children"] is JsonArray boneKids &&
+            QuadrupedLegPartIds.Any(legId => TryFindPartById(boneKids, legId, out _)))
+        {
+            return true;
+        }
 
         var rootIds = new HashSet<string>(StringComparer.Ordinal);
 
@@ -417,5 +558,72 @@ internal static partial class GeometryIrPartTreeRepair
 
         return true;
 
+    }
+
+    /// <summary>
+    /// Baby wolf bind tail xRot (-π/6) is overwritten every frame by <c>WolfModel.setupAnim</c> with
+    /// <see cref="CleanRoomEntityModelRuntime.WolfDefaultTailAngleRad"/>; Explore bind preview must match that idle pose.
+    /// </summary>
+    public static JsonElement ApplyWolfIdleTailPreviewPose(string? officialJvmName, JsonElement geometryRoot)
+    {
+        if (!string.Equals(
+                officialJvmName,
+                "net.minecraft.client.model.animal.wolf.BabyWolfModel",
+                StringComparison.Ordinal))
+        {
+            return geometryRoot;
+        }
+
+        var node = JsonNode.Parse(geometryRoot.GetRawText());
+        if (node is not JsonObject doc || !TrySetPartRotationEulerX(doc, "tail", CleanRoomEntityModelRuntime.WolfDefaultTailAngleRad))
+        {
+            return geometryRoot;
+        }
+
+        return JsonDocument.Parse(doc.ToJsonString()).RootElement;
+    }
+
+    private static bool TrySetPartRotationEulerX(JsonObject doc, string partId, float xRad)
+    {
+        if (doc["roots"] is not JsonArray roots)
+        {
+            return false;
+        }
+
+        foreach (var root in roots)
+        {
+            if (root is JsonObject rootObj && TrySetPartRotationEulerXRecursive(rootObj, partId, xRad))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool TrySetPartRotationEulerXRecursive(JsonObject part, string partId, float xRad)
+    {
+        if (string.Equals((string?)part["id"], partId, StringComparison.Ordinal) &&
+            part["pose"]?["rotationEulerRad"] is JsonArray euler &&
+            euler.Count >= 1)
+        {
+            euler[0] = xRad;
+            return true;
+        }
+
+        if (part["children"] is not JsonArray children)
+        {
+            return false;
+        }
+
+        foreach (var child in children)
+        {
+            if (child is JsonObject childObj && TrySetPartRotationEulerXRecursive(childObj, partId, xRad))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

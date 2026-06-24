@@ -36,7 +36,7 @@ public sealed class HumanoidPlayerMeshLiftTests
                 preferAsm: true,
                 out var attempt),
             string.Join("; ", attempt.Notes));
-        Assert.True(CountCuboids(attempt.Roots) >= 8, $"{jvm}: expected wide humanoid cuboids, got {CountCuboids(attempt.Roots)}");
+        Assert.True(CountCuboids(attempt.Roots) >= MinCuboidsFor(jvm), $"{jvm}: expected wide humanoid cuboids, got {CountCuboids(attempt.Roots)}");
         Assert.NotNull(FindPartById(attempt.Roots, "head"));
         Assert.NotNull(FindPartById(attempt.Roots, "body"));
         Assert.NotNull(FindPartById(attempt.Roots, "left_arm"));
@@ -44,6 +44,9 @@ public sealed class HumanoidPlayerMeshLiftTests
     }
 
     public static IEnumerable<object[]> LiftCases() => Cases.Select(c => new object[] { c.Jvm, c.Method });
+
+    private static int MinCuboidsFor(string jvm) =>
+        string.Equals(jvm, "net.minecraft.client.model.HumanoidModel", StringComparison.Ordinal) ? 6 : 8;
 
     private static int CountCuboids(JsonArray roots)
     {

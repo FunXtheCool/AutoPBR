@@ -175,7 +175,7 @@ public sealed class HumanoidDelegatedMeshLiftTests
         Assert.NotNull(head);
         Assert.NotEmpty(head["cuboids"]!.AsArray());
         var headFrom = head["cuboids"]![0]!["from"]!.AsArray();
-        Assert.InRange(headFrom[1]!.GetValue<double>(), -7.1, -6.9);
+        Assert.InRange(headFrom[1]!.GetValue<double>(), -8.1, -7.9);
     }
 
     [Fact]

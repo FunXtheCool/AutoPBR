@@ -49,5 +49,10 @@
     }
   ],
   "textureWidth": 64,
-  "textureHeight": 64
+  "textureHeight": 64,
+  "liftSummary": {
+    "cuboidApproxCount": 0,
+    "poseApproxCount": 0,
+    "delegationDepth": 0
+  }
 }

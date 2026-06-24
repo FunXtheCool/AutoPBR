@@ -138,11 +138,12 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 options.PreviewDegenerateAxisThickness);
         }
 
-        GeometryIrEmitPolicy.TryReorientGhastFamilyTentacleCuboidYForModelSpace(
+        var invertYForJavaUv = GeometryIrEmitPolicy.TryReorientGhastFamilyTentacleCuboidYForModelSpace(
             options.OfficialJvmName,
             partId,
             ref y0,
-            ref y1);
+            ref y1,
+            options.NormalizedAssetPath);
 
         var texU = tableCuboid.TexU;
         var texV = tableCuboid.TexV;
@@ -173,7 +174,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         }
 
         _ = GeometryIrEmitPolicy.TryApplyGhastFamilyCuboidUvFootprint(
-            options.OfficialJvmName, partId, y0, y1, ref uw, ref uh, ref ud);
+            options.OfficialJvmName, partId, y0, y1, ref uw, ref uh, ref ud, options.NormalizedAssetPath);
 
         string[]? faceMask = null;
         if (GeometryIrCuboidMetadata.TryGetFaceMask(cuboidEl, out var faceMaskFromIr))
@@ -188,7 +189,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         }
 
         return new EntityCuboid(x0, y0, z0, x1, y1, z1, texU, texV, uw, uh, ud, mirror,
-            FaceMask: faceMask, TextureKey: textureKey);
+            FaceMask: faceMask, TextureKey: textureKey, InvertYForJavaUv: invertYForJavaUv);
     }
 
     private static bool TryBuildMeshFromGeometryIrOrCodegen(

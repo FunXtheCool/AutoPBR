@@ -22,6 +22,9 @@ public sealed class PreviewTextureMaps
 
     public bool IsPlantForNoHeight { get; init; }
     public bool Sprite2DFoliageTarget { get; init; }
+
+    /// <summary>When true, <see cref="Sprite2DFoliageTarget"/> refers to a flat inventory item under <c>textures/item/</c>.</summary>
+    public bool IsItemTexturePath { get; init; }
 }
 
 /// <summary>2D composite PNG plus structured maps from a single preview pipeline run.</summary>

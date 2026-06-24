@@ -1,5 +1,7 @@
+using System.Numerics;
 using System.Text.Json;
 
+using AutoPBR.Core.Preview;
 using AutoPBR.Core.Preview.Generated;
 
 namespace AutoPBR.Core.Tests;
@@ -274,6 +276,7 @@ public sealed class GeometryIrReferenceRigTests
     [InlineData("assets/minecraft/textures/entity/sheep/sheep.png", "net.minecraft.client.model.animal.sheep.SheepModel")]
     [InlineData("assets/minecraft/textures/entity/goat/goat.png", "net.minecraft.client.model.animal.goat.GoatModel")]
     [InlineData("assets/minecraft/textures/entity/wolf/wolf.png", "net.minecraft.client.model.animal.wolf.WolfModel")]
+    [InlineData("assets/minecraft/textures/entity/wolf/wolf_baby.png", "net.minecraft.client.model.animal.wolf.BabyWolfModel")]
     [InlineData("assets/minecraft/textures/entity/fox/fox.png", "net.minecraft.client.model.animal.fox.AdultFoxModel")]
     [InlineData("assets/minecraft/textures/entity/panda/panda.png", "net.minecraft.client.model.animal.panda.PandaModel")]
     [InlineData("assets/minecraft/textures/entity/bear/polarbear.png", "net.minecraft.client.model.animal.polarbear.PolarBearModel")]
@@ -307,5 +310,286 @@ public sealed class GeometryIrReferenceRigTests
 
         var cmp = GeometryIrReferenceComparer.CompareReferenceToParityMesh(reference.RootElement, mesh, tolerance: 0.08);
         Assert.True(cmp.IsMatch, $"{jvm} ({texturePath}): {cmp.Message}");
+    }
+
+    [Fact]
+    public void Baby_zombie_villager_setup_anim_motion_parts_stay_near_java_reference()
+    {
+        const string path = "assets/minecraft/textures/entity/zombie_villager/baby/desert.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        using (EntityPreviewBuildContext.UsePose(EntityPreviewPoseCatalog.HumanoidZombieArms))
+        {
+            Assert.True(
+                runtime.TryBuildStaticMesh(
+                    path,
+                    Profile26,
+                    idlePhase01: 0f,
+                    animationTimeSeconds: 0f,
+                    out var bind,
+                    out _,
+                    applyGeometryIrSetupAnimMotion: false));
+            Assert.True(
+                runtime.TryBuildStaticMesh(
+                    path,
+                    Profile26,
+                    idlePhase01: 0f,
+                    animationTimeSeconds: 0f,
+                    out var anim,
+                    out _,
+                    applyGeometryIrSetupAnimMotion: true));
+            Assert.Equal(bind.Elements.Count, anim.Elements.Count);
+            for (var i = 0; i < bind.Elements.Count; i++)
+            {
+                Assert.Equal(bind.Elements[i].From, anim.Elements[i].From);
+                Assert.Equal(bind.Elements[i].To, anim.Elements[i].To);
+            }
+        }
+    }
+
+    [Fact]
+    public void Baby_zombie_villager_resolves_dedicated_baby_jvm_not_adult_zombie_villager()
+    {
+        const string texturePath = "assets/minecraft/textures/entity/zombie_villager/baby/desert.png";
+        var stem = Path.GetFileNameWithoutExtension(texturePath).ToLowerInvariant();
+        var rule = EntityTextureParityCatalog.ResolveRule(texturePath, stem);
+        Assert.NotNull(rule);
+        Assert.True(GeometryIrParityJvmResolver.TryResolveLiftedRoot(
+            Profile26, rule, texturePath, stem, isBaby: true, out var jvm, out _));
+        Assert.Equal("net.minecraft.client.model.monster.zombie.BabyZombieVillagerModel", jvm);
+    }
+
+    [Fact]
+    public void Baby_zombie_villager_arm_pose_post_pass_mutates_arm_elements()
+    {
+        const string path = "assets/minecraft/textures/entity/zombie_villager/zombie_villager_baby.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        MergedJavaBlockModel bind;
+        MergedJavaBlockModel posed;
+        using (EntityPreviewBuildContext.UsePose(EntityPreviewPoseCatalog.HumanoidEmpty))
+        {
+            Assert.True(runtime.TryBuildStaticMesh(
+                path, Profile26, 0f, 0f, out bind, out _, applyGeometryIrSetupAnimMotion: false));
+        }
+
+        using (EntityPreviewBuildContext.UsePose(EntityPreviewPoseCatalog.HumanoidZombieArms))
+        {
+            Assert.True(runtime.TryBuildStaticMesh(
+                path, Profile26, 0f, 0f, out posed, out _, applyGeometryIrSetupAnimMotion: false));
+        }
+
+        var maxErr = 0f;
+        for (var i = 0; i < bind.Elements.Count; i++)
+        {
+            maxErr = MathF.Max(maxErr, MaxMatrixDelta(bind.Elements[i].LocalToParent, posed.Elements[i].LocalToParent));
+        }
+
+        Assert.True(maxErr > 0.05f, $"expected zombie arms pose delta, got {maxErr:F4}");
+    }
+
+    [Fact]
+    public void Baby_zombie_villager_zombie_arms_geometry_ir_matches_hand_built_javap_pose()
+    {
+        const string path = "assets/minecraft/textures/entity/zombie_villager/zombie_villager_baby.png";
+        const string builder = "HumanoidZombieVillager";
+        using (EntityPreviewBuildContext.UsePose(EntityPreviewPoseCatalog.HumanoidZombieArms))
+        {
+            Assert.True(
+                CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
+                    builder, path, Profile26, out var hand));
+            var runtime = EntityModelRuntimeFactory.Create();
+            Assert.True(
+                runtime.TryBuildStaticMesh(
+                    path,
+                    Profile26,
+                    idlePhase01: 0f,
+                    animationTimeSeconds: 0f,
+                    out var ir,
+                    out _,
+                    applyGeometryIrSetupAnimMotion: false));
+            Assert.Equal(hand.Elements.Count, ir.Elements.Count);
+            var stem = Path.GetFileNameWithoutExtension(path).ToLowerInvariant();
+            var rule = EntityTextureParityCatalog.ResolveRule(path, stem);
+            Assert.NotNull(rule);
+            Assert.True(GeometryIrParityJvmResolver.TryResolveLiftedRoot(
+                Profile26, rule, path, stem, isBaby: true, out var jvm, out var geometryRoot));
+            geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, geometryRoot);
+            var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
+                geometryRoot,
+                GeometryIrMeshEmitOptions.ForParity() with { OfficialJvmName = jvm });
+            var maxArmErr = 0f;
+            for (var i = 0; i < hand.Elements.Count; i++)
+            {
+                if (!partIds[i].Contains("arm", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                maxArmErr = MathF.Max(
+                    maxArmErr,
+                    MaxMatrixDelta(hand.Elements[i].LocalToParent, ir.Elements[i].LocalToParent));
+            }
+
+            Assert.True(maxArmErr <= 0.12f, $"hand vs IR arm matrix delta {maxArmErr:F4}");
+        }
+    }
+
+    private static float MaxMatrixDelta(Matrix4x4 a, Matrix4x4 b)
+    {
+        var max = 0f;
+        max = MathF.Max(max, MathF.Abs(a.M41 - b.M41));
+        max = MathF.Max(max, MathF.Abs(a.M42 - b.M42));
+        max = MathF.Max(max, MathF.Abs(a.M43 - b.M43));
+        max = MathF.Max(max, MathF.Abs(a.M11 - b.M11));
+        max = MathF.Max(max, MathF.Abs(a.M12 - b.M12));
+        max = MathF.Max(max, MathF.Abs(a.M13 - b.M13));
+        max = MathF.Max(max, MathF.Abs(a.M21 - b.M21));
+        max = MathF.Max(max, MathF.Abs(a.M22 - b.M22));
+        max = MathF.Max(max, MathF.Abs(a.M23 - b.M23));
+        max = MathF.Max(max, MathF.Abs(a.M31 - b.M31));
+        max = MathF.Max(max, MathF.Abs(a.M32 - b.M32));
+        max = MathF.Max(max, MathF.Abs(a.M33 - b.M33));
+        return max;
+    }
+
+    [Fact]
+    public void Baby_zombie_villager_bind_pose_ir_matches_java_createBodyLayer()
+    {
+        const string jvm = "net.minecraft.client.model.monster.zombie.BabyZombieVillagerModel";
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var referencePath = Path.Combine(
+            repo, "tools", "MinecraftGeometryReference", "reference-output", $"{jvm}.json");
+        if (!File.Exists(referencePath))
+        {
+            return;
+        }
+
+        using var reference = JsonDocument.Parse(File.ReadAllText(referencePath));
+        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+            "#skin",
+            Profile26,
+            jvm,
+            64,
+            64,
+            out _);
+        Assert.NotNull(mesh);
+
+        var cmp = GeometryIrReferenceComparer.CompareReferenceToParityMesh(reference.RootElement, mesh, tolerance: 0.12);
+        Assert.True(cmp.IsMatch, cmp.Message);
+    }
+
+    [Fact]
+    public void Baby_wolf_bind_pose_ir_matches_java_createBodyLayer()
+    {
+        const string jvm = "net.minecraft.client.model.animal.wolf.BabyWolfModel";
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var referencePath = Path.Combine(
+            repo, "tools", "MinecraftGeometryReference", "reference-output", $"{jvm}.json");
+        if (!File.Exists(referencePath))
+        {
+            return;
+        }
+
+        using var reference = JsonDocument.Parse(File.ReadAllText(referencePath));
+        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+            "#skin",
+            Profile26,
+            jvm,
+            64,
+            32,
+            out _);
+        Assert.NotNull(mesh);
+
+        var cmp = GeometryIrReferenceComparer.CompareReferenceToParityMesh(reference.RootElement, mesh, tolerance: 0.08);
+        Assert.True(cmp.IsMatch, cmp.Message);
+    }
+
+    [Fact]
+    public void Baby_wolf_idle_preview_tail_matches_java_setup_anim_render_center()
+    {
+        const string path = "assets/minecraft/textures/entity/wolf/wolf_baby.png";
+        const string jvm = "net.minecraft.client.model.animal.wolf.BabyWolfModel";
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var referencePath = Path.Combine(
+            repo, "tools", "MinecraftGeometryReference", "reference-output", $"{jvm}.json");
+        if (!File.Exists(referencePath))
+        {
+            return;
+        }
+
+        using var reference = JsonDocument.Parse(File.ReadAllText(referencePath));
+        var javaCenter = ReadJavaRenderCenter(reference.RootElement, "tail_r1");
+        if (javaCenter is null)
+        {
+            return;
+        }
+
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(
+            runtime.TryBuildStaticMesh(
+                path,
+                Profile26,
+                idlePhase01: 0f,
+                animationTimeSeconds: 0f,
+                out var mesh,
+                out _,
+                applyGeometryIrSetupAnimMotion: false));
+
+        var tail = FindBabyWolfTailCuboid(mesh);
+        var previewCenter = CuboidCenterTexel(tail);
+        var ler = CleanRoomEntityModelRuntime.LivingEntityRendererPreviewRootScale;
+        var expectedPreview = Vector3.Transform(javaCenter.Value, ler);
+
+        Assert.True(
+            Vector3.Distance(previewCenter, expectedPreview) <= 0.35f,
+            $"idle tail center: mesh={previewCenter} expected={expectedPreview} javaModel={javaCenter.Value}");
+    }
+
+    private static Vector3? ReadJavaRenderCenter(JsonElement referenceRoot, string partId)
+    {
+        if (!referenceRoot.TryGetProperty("renderCuboidCenters", out var centers) ||
+            centers.ValueKind != JsonValueKind.Array)
+        {
+            return null;
+        }
+
+        foreach (var entry in centers.EnumerateArray())
+        {
+            if (!entry.TryGetProperty("partId", out var idEl) ||
+                !string.Equals(idEl.GetString(), partId, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            if (!entry.TryGetProperty("renderCenterTexel", out var c) || c.GetArrayLength() < 3)
+            {
+                return null;
+            }
+
+            return new Vector3((float)c[0].GetDouble(), (float)c[1].GetDouble(), (float)c[2].GetDouble());
+        }
+
+        return null;
+    }
+
+    private static ModelElement FindBabyWolfTailCuboid(MergedJavaBlockModel mesh)
+    {
+        foreach (var el in mesh.Elements)
+        {
+            var ly = MathF.Abs(el.To[1] - el.From[1]);
+            if (ly is >= 5.5f and <= 6.5f)
+            {
+                return el;
+            }
+        }
+
+        throw new InvalidOperationException("tail cuboid not found");
+    }
+
+    private static Vector3 CuboidCenterTexel(ModelElement el)
+    {
+        var cx = (el.From[0] + el.To[0]) * 0.5f;
+        var cy = (el.From[1] + el.To[1]) * 0.5f;
+        var cz = (el.From[2] + el.To[2]) * 0.5f;
+        return Vector3.Transform(new Vector3(cx, cy, cz), el.LocalToParent);
     }
 }

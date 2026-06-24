@@ -34,6 +34,12 @@ public sealed class EntityEmulatedPreviewRebakeContext
     /// </summary>
     public string? PreviewPoseId { get; init; }
 
+    /// <summary>
+    /// Explore size selector id captured at initial bake (e.g. <see cref="EntityPreviewSizeCatalog.SizePrefix"/>4).
+    /// Rebakes must reuse this so slime-family renderer scale stays consistent across threads.
+    /// </summary>
+    public string? PreviewSizeId { get; init; }
+
     /// <summary>Texture zip paths in merged-model bake order (same as the initial preview pipeline).</summary>
     public required string[] OrderedTextureZipPaths { get; init; }
 

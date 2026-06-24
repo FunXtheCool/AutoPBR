@@ -15,6 +15,21 @@ public static class PreviewStageConstants
     /// <summary>One full 16×16 grass tile per world unit (matches unit cube / block scale).</summary>
     public const float MetersPerGrassTile = 1f;
 
+    /// <summary>Half extent of the 1×1 item/sprite preview card in world units.</summary>
+    public const float SpritePlaneHalfSize = 0.5f;
+
+    /// <summary>Minimum sprite cuboid depth (0 = single-sided plane).</summary>
+    public const double SpriteThicknessMin = 0.0;
+
+    /// <summary>Maximum sprite cuboid depth (~25% of the 1×1 face width; at max, voxel depth matches texel size).</summary>
+    public const double SpriteThicknessMax = 0.25;
+
+    /// <summary>UI step for the sprite thickness slider and numeric field.</summary>
+    public const double SpriteThicknessStep = 0.002;
+
+    /// <summary>Debounce before rebuilding per-texel sprite voxel meshes after slider drags.</summary>
+    public const int SpriteThicknessMeshDebounceMs = 200;
+
     /// <summary>Base Y for the volumetric cloud layer before user height offset.</summary>
     public const float CloudLayerBaseY = 18f;
 

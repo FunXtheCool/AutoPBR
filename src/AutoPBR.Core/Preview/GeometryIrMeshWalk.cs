@@ -57,7 +57,12 @@ internal static class GeometryIrMeshWalk
         out Dictionary<string, Vector3> translationsByPartId,
         out string? failureReason) =>
         TryCollectBakedWorldTranslations(geometryRoot, out translationsByPartId, out failureReason) ||
-        TryCollectPartWorldTranslationsByWalk(geometryRoot, rootTransform, out translationsByPartId, out failureReason);
+        TryCollectPartWorldTranslationsByWalk(
+            geometryRoot,
+            rootTransform,
+            GeometryIrMeshEmitOptions.ForParity() with { RootTransform = rootTransform },
+            out translationsByPartId,
+            out failureReason);
 
     /// <summary>
     /// Uses Java reference bake <c>worldPose.translation</c> when every visited part exposes it (Phase 3A).
@@ -139,14 +144,30 @@ internal static class GeometryIrMeshWalk
         return true;
     }
 
+    /// <summary>
+    /// Composed part-origin translations from reference pose walk (same semantics as IR mesh emit).
+    /// </summary>
+    internal static bool TryCollectReferencePartWorldTranslationsByWalk(
+        JsonElement geometryRoot,
+        GeometryIrMeshEmitOptions emitOptions,
+        out Dictionary<string, Vector3> translationsByPartId,
+        out string? failureReason) =>
+        TryCollectPartWorldTranslationsByWalk(
+            geometryRoot,
+            Matrix4x4.Identity,
+            emitOptions,
+            out translationsByPartId,
+            out failureReason);
+
     private static bool TryCollectPartWorldTranslationsByWalk(
         JsonElement geometryRoot,
         Matrix4x4 rootTransform,
+        GeometryIrMeshEmitOptions emitOptions,
         out Dictionary<string, Vector3> translationsByPartId,
         out string? failureReason)
     {
         var collected = new Dictionary<string, Vector3>(StringComparer.Ordinal);
-        var options = GeometryIrMeshEmitOptions.ForParity() with { RootTransform = rootTransform };
+        var options = emitOptions with { RootTransform = rootTransform };
         var ok = WalkRoots(
             geometryRoot,
             rootTransform,
@@ -195,7 +216,7 @@ internal static class GeometryIrMeshWalk
     {
         failureReason = null;
         worldBlock = parentWorldBlock;
-        var useColumnPartPose = options.ResolveUseColumnTranslationTimesRotationPartPose();
+        var useColumnPartPose = CleanRoomEntityModelRuntime.ShouldUseColumnPartPoseCompose(poseEl, options);
         var useLegacyPartPose = (EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose ||
                                  GeometryIrEmitPolicy.UsesTranslationTimesRotationPartPose(options.OfficialJvmName, partId)) &&
             !useColumnPartPose &&
@@ -209,8 +230,22 @@ internal static class GeometryIrMeshWalk
             return true;
         }
 
-        if (useColumnPartPose)
+        if (useColumnPartPose || ShouldUseOffsetAndRotationParentTimesLocalCompose(partId, poseEl))
         {
+            if (ShouldUseOffsetAndRotationParentTimesLocalCompose(partId, poseEl))
+            {
+                if (!CleanRoomEntityModelRuntime.TryComposePartPoseOffsetAndRotationLocalTexel(
+                        poseEl, out var localPartPose, out failureReason))
+                {
+                    return false;
+                }
+
+                var parentTexel = CleanRoomEntityModelRuntime.BlockRowAffineToTexel(parentWorldBlock);
+                worldTexel = Matrix4x4.Multiply(parentTexel, localPartPose);
+                worldBlock = CleanRoomEntityModelRuntime.TexelRowAffineToBlock(worldTexel);
+                return true;
+            }
+
             if (!CleanRoomEntityModelRuntime.TryComposeColumnPartPose(poseEl, worldTexel, out worldTexel, out failureReason))
             {
                 return false;
@@ -222,12 +257,15 @@ internal static class GeometryIrMeshWalk
 
         if (useLegacyPartPose)
         {
-            if (!CleanRoomEntityModelRuntime.TryComposeTranslationTimesRotationPartPosePublic(
-                    poseEl, parentWorldBlock, out worldBlock, out failureReason))
+            if (!CleanRoomEntityModelRuntime.TryComposeLegacyPartPoseTexelPublic(
+                    poseEl, out var localPartPose, out failureReason))
             {
                 return false;
             }
 
+            worldBlock = GeometryIrEmitPolicy.UsesTranslationTimesRotationPartPose(options.OfficialJvmName, partId)
+                ? Matrix4x4.Multiply(parentWorldBlock, localPartPose)
+                : Matrix4x4.Multiply(localPartPose, parentWorldBlock);
             worldTexel = worldBlock;
             return true;
         }
@@ -241,6 +279,11 @@ internal static class GeometryIrMeshWalk
         worldTexel = CleanRoomEntityModelRuntime.BlockRowAffineToTexel(worldBlock);
         return true;
     }
+
+    private static bool ShouldUseOffsetAndRotationParentTimesLocalCompose(string? partId, JsonElement poseEl) =>
+        partId is not null &&
+        partId.Contains("horn", StringComparison.OrdinalIgnoreCase) &&
+        CleanRoomEntityModelRuntime.PoseHasNonZeroRotation(poseEl);
 
     private static bool ShouldUseLegacyPartPose(GeometryIrMeshEmitOptions options, string? partId = null) =>
         (EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose ||
@@ -283,7 +326,7 @@ internal static class GeometryIrMeshWalk
 
         if (partId.Length > 0)
         {
-            onPartWorld?.Invoke(partId, worldTexel);
+            onPartWorld?.Invoke(partId, worldBlock);
         }
 
         var partScale = options.ResolvePartScale?.Invoke(partId) ?? options.DefaultPartScale;
@@ -308,6 +351,11 @@ internal static class GeometryIrMeshWalk
                     continue;
                 }
 
+                if (options.ShouldEmitIrCuboid is { } countFilter && !countFilter(cuboidEl))
+                {
+                    continue;
+                }
+
                 cuboidCount++;
             }
 
@@ -315,6 +363,11 @@ internal static class GeometryIrMeshWalk
             foreach (var cuboidEl in cuboids.EnumerateArray())
             {
                 if (GeometryIrCuboidMetadata.TryGetFaceMask(cuboidEl, out var emptyMask) && emptyMask.Length == 0)
+                {
+                    continue;
+                }
+
+                if (options.ShouldEmitIrCuboid is { } shouldEmitCuboid && !shouldEmitCuboid(cuboidEl))
                 {
                     continue;
                 }

@@ -31,14 +31,10 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
             }
 
-            var useColumn = emitOptions?.ResolveUseColumnTranslationTimesRotationPartPose() == true;
-
+            var opts = emitOptions ?? default;
             foreach (var rootPart in roots.EnumerateArray())
-
             {
-
-                VisitPart(rootPart, Matrix4x4.Identity, map, useColumn);
-
+                VisitPart(rootPart, Matrix4x4.Identity, map, opts);
             }
 
 
@@ -85,19 +81,18 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
-        private static void VisitPart(JsonElement part, Matrix4x4 parentWorld, Dictionary<string, Matrix4x4> sink, bool useColumnPose)
-
+        private static void VisitPart(
+            JsonElement part,
+            Matrix4x4 parentWorld,
+            Dictionary<string, Matrix4x4> sink,
+            in GeometryIrMeshEmitOptions emitOptions)
         {
-
             var world = parentWorld;
-
             if (part.TryGetProperty("pose", out var poseEl))
             {
-                if (useColumnPose)
+                if (ShouldUseColumnPartPoseCompose(poseEl, emitOptions))
                 {
-                    if (TryComposeColumnPartPose(poseEl, parentWorld, out world, out _))
-                    {
-                    }
+                    _ = TryComposeColumnPartPose(poseEl, parentWorld, out world, out _);
                 }
                 else if (TryComposePartPosePublic(poseEl, parentWorld, out var worldTexel))
                 {
@@ -130,13 +125,9 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
             foreach (var child in children.EnumerateArray())
-
             {
-
-                VisitPart(child, world, sink, useColumnPose);
-
+                VisitPart(child, world, sink, emitOptions);
             }
-
         }
 
     }
@@ -165,17 +156,42 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(geometryRoot, emitOptions);
 
-        if (partIds.Count != merged.Elements.Count)
-
+        var animatedElementCount = merged.Elements.Count;
+        if (partIds.Count != animatedElementCount)
         {
+            if (partIds.Count > animatedElementCount ||
+                animatedElementCount - partIds.Count > 16)
+            {
+                return false;
+            }
 
-            return false;
-
+            animatedElementCount = partIds.Count;
         }
 
         var baselineParts = BuildSetupAnimBaselineParts(geometryRoot);
-        var partDeltas = new Dictionary<string, Matrix4x4>(StringComparer.Ordinal);
+        var parentMap = GeometryIrPartWorldPoseIndex.BuildParentMap(geometryRoot);
+        var deltaCandidateIds = new HashSet<string>(StringComparer.Ordinal);
         foreach (var partId in partIds.Distinct(StringComparer.Ordinal))
+        {
+            var current = partId;
+            while (true)
+            {
+                if (!deltaCandidateIds.Add(current))
+                {
+                    break;
+                }
+
+                if (!parentMap.TryGetValue(current, out var parent) || parent is null)
+                {
+                    break;
+                }
+
+                current = parent;
+            }
+        }
+
+        var partDeltas = new Dictionary<string, Matrix4x4>(StringComparer.Ordinal);
+        foreach (var partId in deltaCandidateIds)
         {
             if (!TryGetSetupAnimPartPose(partId, pose, out var partPose) ||
                 !TryBuildSetupAnimPartWorldDelta(partId, partPose, partOriginWorld, baselineParts, out var deltaWorld))
@@ -191,8 +207,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return false;
         }
 
-        var parentMap = GeometryIrPartWorldPoseIndex.BuildParentMap(geometryRoot);
-        for (var i = 0; i < merged.Elements.Count; i++)
+        for (var i = 0; i < animatedElementCount; i++)
         {
             var partId = partIds[i];
             if (!TryComposeSetupAnimAncestorDeltas(partId, parentMap, partDeltas, out var composedDelta))
@@ -213,6 +228,11 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 ShellInflateTexels = e.ShellInflateTexels,
                 MirrorCuboidUv = e.MirrorCuboidUv,
             };
+        }
+
+        if (animatedElementCount < merged.Elements.Count)
+        {
+            SyncCosmeticOverlayPosesFromPrimarySkinTwins(merged);
         }
 
         return true;

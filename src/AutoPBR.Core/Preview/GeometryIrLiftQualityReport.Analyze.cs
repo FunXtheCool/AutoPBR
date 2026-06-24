@@ -97,6 +97,7 @@ public static partial class GeometryIrLiftQualityReport
         var legsAtRoot = LegsStillRootSiblings(shardRoot);
         var bindingNote = HasAddChildBindingExtractionNote(extractionNotes);
         (var referenceHierarchyMatch, string? hierarchyMsg) = EvaluateReferenceHierarchyMatch(
+            officialJvmName,
             shardRoot,
             flatNested,
             legsAtRoot,

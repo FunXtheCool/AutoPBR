@@ -186,9 +186,16 @@ internal sealed partial class CleanRoomEntityModelRuntime
         new EntityCuboid(-1f, 0f, -1f, 1f, 3f, 1f, 20, 0, UvSizeW: 2, UvSizeH: 3, UvSizeD: 2, MirrorUv: true).Emit(b, leftFrontPose, p.LegScale);
 
         var tailPose = EntityParityTemplate.Mul(
-            bodyPose,
-            EntityParityTemplate.Mul(EntityParityTemplate.T(0f, -0.6f, 0.2f), EntityParityTemplate.Rx(-3.1f)));
-        new EntityCuboid(-5.7f, -1f, 2f, 0.3f, 1f, 2.025f, 22, 16, UvSizeW: 6, UvSizeH: 2, UvSizeD: 1).Emit(b, tailPose, p.BodyScale);
+            root,
+            EntityParityTemplate.Mul(
+                EntityParityTemplate.T(0f, 19f, 3f),
+                EntityParityTemplate.Rx(-0.5235999823f)));
+        var tailR1Pose = EntityParityTemplate.Mul(
+            tailPose,
+            EntityParityTemplate.Mul(
+                EntityParityTemplate.T(0f, -0.6f, 0.2f),
+                EntityParityTemplate.Rx(-3.099999905f)));
+        new EntityCuboid(-1f, -5.7f, -1f, 1f, 0.3f, 1f, 22, 16, UvSizeW: 2, UvSizeH: 6, UvSizeD: 2).Emit(b, tailR1Pose, p.BodyScale);
 
         return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), GeometryIrLerBasisKind.StandardWorldRoot);
     }

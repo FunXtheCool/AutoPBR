@@ -37,7 +37,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 out var laX,
                 out var laY,
                 out var laZ);
-            ApplyGeometryIrHumanoidArmRotations(armPose, ref raX, ref raY, ref raZ, ref laX, ref laY, ref laZ);
 
             return baseOptions with
             {
@@ -66,16 +65,27 @@ internal sealed partial class CleanRoomEntityModelRuntime
             if (string.Equals(partId, "right_arm", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(partId, "rightArm", StringComparison.OrdinalIgnoreCase))
             {
-                return EntityParityTemplate.Mul(world, BuildHumanoidArmRotationMatrix(raX, raY, raZ));
+                return ApplyPartRotationAtJoint(world, BuildHumanoidArmRotationMatrix(raX, raY, raZ));
             }
 
             if (string.Equals(partId, "left_arm", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(partId, "leftArm", StringComparison.OrdinalIgnoreCase))
             {
-                return EntityParityTemplate.Mul(world, BuildHumanoidArmRotationMatrix(laX, laY, laZ));
+                return ApplyPartRotationAtJoint(world, BuildHumanoidArmRotationMatrix(laX, laY, laZ));
             }
 
             return world;
+        }
+
+        /// <summary>
+        /// Pose overrides receive texel-row part worlds; rotate in block space then re-scale translation
+        /// so shoulder pivots stay fixed (texel×block rotation mixes units and orbits limbs).
+        /// </summary>
+        internal static Matrix4x4 ApplyPartRotationAtJoint(Matrix4x4 worldTexel, Matrix4x4 rotationBlock)
+        {
+            var block = TexelRowAffineToBlock(worldTexel);
+            block = EntityParityTemplate.Mul(block, rotationBlock);
+            return BlockRowAffineToTexel(block);
         }
 
         public static void StripSetupAnimArmChannels(VanillaSetupAnimRuntime.PoseResult pose)
@@ -107,20 +117,21 @@ internal sealed partial class CleanRoomEntityModelRuntime
             EntityHumanoidPreviewArmPose armPose,
             float idlePhase01,
             float animationTimeSeconds,
-            float wave)
+            float wave,
+            bool isBaby = false)
         {
             ComputeHumanoidPreviewArmRotations(
                 armPose,
                 idlePhase01,
                 animationTimeSeconds,
                 wave,
+                isBaby,
                 out var raX,
                 out var raY,
                 out var raZ,
                 out var laX,
                 out var laY,
                 out var laZ);
-            ApplyGeometryIrHumanoidArmRotations(armPose, ref raX, ref raY, ref raZ, ref laX, ref laY, ref laZ);
 
             var partOriginWorld = GeometryIrPartWorldPoseIndex.Build(geometryRoot, emitOptions);
             var baselineParts = BuildSetupAnimBaselineParts(geometryRoot);
@@ -185,25 +196,40 @@ internal sealed partial class CleanRoomEntityModelRuntime
             out Matrix4x4 deltaWorld)
         {
             deltaWorld = Matrix4x4.Identity;
-            if (!partOriginWorld.TryGetValue(partId, out var partWorld) ||
-                !Matrix4x4.Invert(partWorld, out var partInv))
+            if (!partOriginWorld.ContainsKey(partId))
             {
                 return false;
             }
 
             _ = TryGetBaselinePartPose(partId, baselineParts, out var baseline);
-            var targetRot = BuildHumanoidArmRotationMatrix(xRot, yRot, zRot);
-            var baselineRot = BuildHumanoidArmRotationMatrix(baseline.XRot, baseline.YRot, baseline.ZRot);
-            var rotDelta = Matrix4x4.Invert(baselineRot, out var baselineRotInv)
-                ? EntityParityTemplate.Mul(targetRot, baselineRotInv)
-                : targetRot;
-            deltaWorld = EntityParityTemplate.Mul(EntityParityTemplate.Mul(partWorld, rotDelta), partInv);
+            var posedBlock = EntityParityTemplate.ModelPartRenderLocalBlock(
+                baseline.X,
+                baseline.Y,
+                baseline.Z,
+                xRot,
+                yRot,
+                zRot);
+            var bindBlock = EntityParityTemplate.ModelPartRenderLocalBlock(
+                baseline.X,
+                baseline.Y,
+                baseline.Z,
+                baseline.XRot,
+                baseline.YRot,
+                baseline.ZRot);
+            var posedWorld = BlockRowAffineToTexel(posedBlock);
+            var bindWorldFromBaseline = BlockRowAffineToTexel(bindBlock);
+            if (!Matrix4x4.Invert(bindWorldFromBaseline, out var bindInv))
+            {
+                return false;
+            }
+
+            deltaWorld = EntityParityTemplate.Mul(posedWorld, bindInv);
             return true;
         }
 
         /// <summary>
-        /// Geometry IR applies arm <c>xRot</c> at the part joint (ModelPart convention). Rig-builder
-        /// cuboids use the opposite sign on <see cref="EntityCuboid.XRot"/> for zombie-family arms.
+        /// Emit-time cuboid overrides bake rotation into <see cref="EntityCuboid.XRot"/> (opposite sign from
+        /// ModelPart <c>xRot</c> for zombie-family arms on adult HumanoidModel cuboids).
         /// </summary>
         private static void ApplyGeometryIrHumanoidArmRotations(
             EntityHumanoidPreviewArmPose armPose,
@@ -228,11 +254,43 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 ? EntityParityTemplate.Rx(xRot)
                 : EntityParityTemplate.Er(xRot, yRot, zRot);
 
+        /// <summary>
+        /// Base <c>ModelPart.xRot</c> from <c>AnimationUtils.animateZombieArms</c> at <c>attackTime=0</c>
+        /// (<c>-PI / (baby ? 1.5 : 2.25)</c>, 26.1.2 <c>client.jar</c>).
+        /// </summary>
+        internal static float ResolveZombieArmPoseBaseRad(bool isBaby) =>
+            -MathF.PI / (isBaby ? 1.5f : 2.25f);
+
         public static void ComputeHumanoidPreviewArmRotations(
             EntityHumanoidPreviewArmPose armPose,
             float idlePhase01,
             float animationTimeSeconds,
             float wave,
+            out float raX,
+            out float raY,
+            out float raZ,
+            out float laX,
+            out float laY,
+            out float laZ) =>
+            ComputeHumanoidPreviewArmRotations(
+                armPose,
+                idlePhase01,
+                animationTimeSeconds,
+                wave,
+                isBaby: false,
+                out raX,
+                out raY,
+                out raZ,
+                out laX,
+                out laY,
+                out laZ);
+
+        public static void ComputeHumanoidPreviewArmRotations(
+            EntityHumanoidPreviewArmPose armPose,
+            float idlePhase01,
+            float animationTimeSeconds,
+            float wave,
+            bool isBaby,
             out float raX,
             out float raY,
             out float raZ,
@@ -256,7 +314,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 case EntityHumanoidPreviewArmPose.Empty:
                     break;
                 case EntityHumanoidPreviewArmPose.ZombieArms:
-                    raX = laX = 1.15f + idlePhase01 * 0.55f + wave * 0.18f;
+                    raX = laX = ResolveZombieArmPoseBaseRad(isBaby);
                     raY = laY = raZ = laZ = 0f;
                     break;
                 case EntityHumanoidPreviewArmPose.Item:
@@ -323,13 +381,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
             EntityHumanoidPreviewArmPose armPose,
             float idlePhase01,
             float animationTimeSeconds,
-            float wave)
+            float wave,
+            bool isBaby = false)
         {
             ComputeHumanoidPreviewArmRotations(
                 armPose,
                 idlePhase01,
                 animationTimeSeconds,
                 wave,
+                isBaby,
                 out var raX,
                 out _,
                 out _,

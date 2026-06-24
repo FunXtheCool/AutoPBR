@@ -15,6 +15,50 @@ public sealed partial class PreviewRenderingTests
     [Theory]
     [InlineData(GhastTexturePath)]
     [InlineData(HappyGhastTexturePath)]
+    public void SetBlockModelPreview_drops_stale_ghast_parity_cpu_when_pack_fingerprint_differs_from_committed_mesh(
+        string texturePath)
+    {
+        var backend = new OpenGlPreviewBackend();
+        var textureMaps = CreateGhastTextureMaps(texturePath);
+        var slotMaterials = CreateGhastSlotMaterials(textureMaps);
+
+        var committedVerts = CreatePreviewVerts(240, seed: 11);
+        var packVerts = CreatePreviewVerts(240, seed: 12);
+        var indices = CreatePreviewIndices(360);
+        var packFingerprint = PreviewMeshGeometryFingerprint.ComputeCpuPreviewMesh(
+            packVerts,
+            PreviewMesh.FloatsPerVertex);
+
+        var committedSubject = CreateGhastSubject(
+            committedVerts,
+            indices,
+            textureMaps,
+            CreateGhastRebakeContext(texturePath, packFingerprint: packFingerprint),
+            entityGpuVerticesInPreviewSpace: true,
+            entityPreviewPlacementApplied: true);
+
+        backend.TestSimulateParityCatalogCpuBindCommit(committedSubject);
+
+        var packSubject = CreateGhastSubject(
+            packVerts,
+            indices,
+            textureMaps,
+            CreateGhastRebakeContext(texturePath, packFingerprint: packFingerprint),
+            entityGpuVerticesInPreviewSpace: false,
+            entityPreviewPlacementApplied: false);
+
+        backend.SetBlockModelPreview(packSubject, slotMaterials);
+
+        var stored = backend.TestBlockModelSubject;
+        Assert.NotNull(stored);
+        Assert.Same(packVerts, stored!.InterleavedVertices);
+        Assert.Null(backend.TestEntityBindPoseCommittedKey);
+        Assert.True(backend.TestMeshDirty);
+    }
+
+    [Theory]
+    [InlineData(GhastTexturePath)]
+    [InlineData(HappyGhastTexturePath)]
     public void SetBlockModelPreview_keeps_committed_ghast_parity_cpu_subject_on_ui_repush(string texturePath)
     {
         var backend = new OpenGlPreviewBackend();
@@ -23,11 +67,14 @@ public sealed partial class PreviewRenderingTests
 
         var textureMaps = CreateGhastTextureMaps(texturePath);
         var slotMaterials = CreateGhastSlotMaterials(textureMaps);
-        var rebake = CreateGhastRebakeContext(texturePath, packFingerprint: 4001UL);
 
         var committedVerts = CreatePreviewVerts(240, seed: 11);
         var packVerts = CreatePreviewVerts(240, seed: 12);
         var indices = CreatePreviewIndices(360);
+        var committedFingerprint = PreviewMeshGeometryFingerprint.ComputeCpuPreviewMesh(
+            committedVerts,
+            PreviewMesh.FloatsPerVertex);
+        var rebake = CreateGhastRebakeContext(texturePath, packFingerprint: committedFingerprint);
 
         var committedSubject = CreateGhastSubject(
             committedVerts,
@@ -43,7 +90,7 @@ public sealed partial class PreviewRenderingTests
             packVerts,
             indices,
             textureMaps,
-            CreateGhastRebakeContext(texturePath, packFingerprint: 4001UL),
+            CreateGhastRebakeContext(texturePath, packFingerprint: committedFingerprint),
             entityGpuVerticesInPreviewSpace: false,
             entityPreviewPlacementApplied: false);
 

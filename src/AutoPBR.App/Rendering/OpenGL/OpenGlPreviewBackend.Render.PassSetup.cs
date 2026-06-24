@@ -482,6 +482,21 @@ public sealed partial class OpenGlPreviewBackend
                 EmitDiagnostic(
                     $"[3D preview] Mesh upload: pack-converter CPU subject, verts={cpuPlaced.InterleavedVertices.Length / PreviewMesh.FloatsPerVertex}, indices={cpuPlaced.Indices.Length}.");
             }
+            else if (frame.Scene.SceneKind == PreviewSceneKind.ItemPlane)
+            {
+                var uploadMesh = ItemPreviewSceneFactory.CreateMesh(frame.Settings, frame.Material);
+                UploadPreviewMesh(uploadMesh.InterleavedVertices, uploadMesh.Indices);
+                var meshKind = uploadMesh.Name == "sprite_voxels" ? "sprite voxels" : "item plane";
+                var voxelCount = uploadMesh.Name == "sprite_voxels" ? uploadMesh.VertexCount / 24 : 0;
+                EmitDiagnostic(
+                    voxelCount > 0
+                        ? $"[3D preview] Mesh upload: {meshKind} (itemFlat={(frame.Settings.ItemFlatSpritePreview ? 1 : 0)}, thickness={frame.Settings.SpriteThickness:0.###}, voxels={voxelCount}), verts={uploadMesh.VertexCount}, indices={uploadMesh.Indices.Length}."
+                        : $"[3D preview] Mesh upload: {meshKind} (itemFlat={(frame.Settings.ItemFlatSpritePreview ? 1 : 0)}, planes={frame.Settings.SpritePlaneCount}, thickness={frame.Settings.SpriteThickness:0.###}), verts={uploadMesh.VertexCount}, indices={uploadMesh.Indices.Length}.");
+                lock (_sync)
+                {
+                    _meshDirty = false;
+                }
+            }
             else if (frame.Scene.Meshes.Count > 0 &&
                      !(frame.EntityEmulatedPreview && frame.EntityRebakeCtx is not null))
             {
@@ -495,10 +510,7 @@ public sealed partial class OpenGlPreviewBackend
                 // Defensive fallback: if frame.Scene mesh population races with the first render frame,
                 // synthesize a canonical mesh so preview never goes blank.
                 var uploadMesh = frame.Scene.SceneKind == PreviewSceneKind.ItemPlane
-                    ? (frame.Settings.SpritePlaneCount <= 1
-                        ? PreviewMeshFactory.CreateItemPlane()
-                        : PreviewMeshFactory.CreateSpritePlanes(
-                            planeCount: Math.Clamp(frame.Settings.SpritePlaneCount, 1, 8)))
+                    ? ItemPreviewSceneFactory.CreateMesh(frame.Settings, frame.Material)
                     : PreviewMeshFactory.CreateUnitCube();
                 EmitDiagnostic($"[3D preview] Fallback mesh upload used ({frame.Scene.SceneKind}).");
                 UploadPreviewMesh(uploadMesh.InterleavedVertices, uploadMesh.Indices);

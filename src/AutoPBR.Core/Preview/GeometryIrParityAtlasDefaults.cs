@@ -22,6 +22,8 @@ internal static class GeometryIrParityAtlasDefaults
             ["TropicalFishB"] = (32, 32),
             ["Bat"] = (64, 64),
             ["Blaze"] = (64, 32),
+            ["Ghast"] = (64, 32),
+            ["HappyGhast"] = (64, 64),
             ["Horse"] = (64, 64),
             ["DonkeyMuleHorse"] = (64, 64),
             ["Cat"] = (64, 64),

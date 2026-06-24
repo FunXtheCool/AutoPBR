@@ -79,7 +79,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
             string[]? faceMask = null,
             PreviewDepthLayerKind depthLayerKind = PreviewDepthLayerKind.Base,
             int layerOrdinal = 0,
-            bool castsShadow = false)
+            bool castsShadow = false,
+            bool invertYForJavaUv = false)
         {
             var extentX = MathF.Abs(x1 - x0);
             var extentY = MathF.Abs(y1 - y0);
@@ -151,10 +152,22 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 faceMask is { Length: > 0 } &&
                 IsNorthSouthFaceMaskOnly(faceMask);
 
+            var useUpDownUvSpan =
+                uvSizeW > 0 &&
+                uvSizeD > 0 &&
+                faceMask is { Length: > 0 } &&
+                IsUpDownFaceMaskOnly(faceMask);
+
             (float[] North, float[] South, float[] West, float[] East, float[] Up, float[] Down) uv =
                 useNorthSouthUvSpan
                     ? BuildNorthSouthUvSpanLayout(texU, texV, uvSizeW, uvSizeH, mirrorCuboidUv)
-                    : BuildCubeUvLayout(texU, texV, uw, uh, ud, mirrorCuboidUv);
+                    : useUpDownUvSpan
+                        ? BuildUpDownUvSpanLayout(texU, texV, uvSizeW, uvSizeD, faceMask!, mirrorCuboidUv)
+                        : BuildCubeUvLayout(texU, texV, uw, uh, ud, mirrorCuboidUv);
+            if (invertYForJavaUv)
+            {
+                uv = InvertYReflectedJavaCuboidUv(uv);
+            }
 
             var allFaces = new Dictionary<string, ModelFace>(StringComparer.OrdinalIgnoreCase)
             {
@@ -300,6 +313,23 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return (north, south, west, east, up, down);
         }
 
+        private static (float[] North, float[] South, float[] West, float[] East, float[] Up, float[] Down)
+            InvertYReflectedJavaCuboidUv(
+                (float[] North, float[] South, float[] West, float[] East, float[] Up, float[] Down) uv) =>
+            (
+                FlipFaceVBounds(uv.North),
+                FlipFaceVBounds(uv.South),
+                FlipFaceVBounds(uv.West),
+                FlipFaceVBounds(uv.East),
+                uv.Down,
+                uv.Up
+            );
+
+        private static float[] FlipFaceVBounds(float[] rect) =>
+            rect.Length >= 4
+                ? [rect[0], rect[3], rect[2], rect[1]]
+                : rect;
+
         /// <summary>
         /// Direction-mask / <c>uvSpan</c> north–south sheets: <c>uvOrigin</c> is the first face corner (no full-box
         /// <c>+d</c> padding). Opposite face is offset by <c>w + TemplateDepthGap</c> on U (vanilla template depth 2).
@@ -320,6 +350,20 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return faceMask.Length > 0;
         }
 
+        private static bool IsUpDownFaceMaskOnly(string[] faceMask)
+        {
+            foreach (var name in faceMask)
+            {
+                if (!string.Equals(name, "up", StringComparison.OrdinalIgnoreCase) &&
+                    !string.Equals(name, "down", StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+            }
+
+            return faceMask.Length > 0;
+        }
+
         private static (float[] North, float[] South, float[] West, float[] East, float[] Up, float[] Down)
             BuildNorthSouthUvSpanLayout(int u, int v, int w, int h, bool mirrorCuboidUv = false)
         {
@@ -330,6 +374,14 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
             var empty = Array.Empty<float>();
             return (north, south, empty, empty, empty, empty);
+        }
+
+        private static (float[] North, float[] South, float[] West, float[] East, float[] Up, float[] Down)
+            BuildUpDownUvSpanLayout(int u, int v, int w, int d, string[] faceMask, bool mirrorCuboidUv = false)
+        {
+            var (up, down) = GeometryIrUvAtlasQuality.BuildUpDownTexCropFaceUvRects(u, v, w, d, faceMask, mirrorCuboidUv);
+            var empty = Array.Empty<float>();
+            return (empty, empty, empty, empty, up, down);
         }
 
         public MergedJavaBlockModel Build(

@@ -7,6 +7,9 @@ namespace AutoPBR.Core.Preview;
 
 internal sealed partial class CleanRoomEntityModelRuntime
 {
+    /// <summary>WolfEntity.DEFAULT_TAIL_ANGLE (π/5 rad) — idle tail pitch written by WolfModel.setupAnim.</summary>
+    internal const float WolfDefaultTailAngleRad = 0.62831855f;
+
 
     private static (float Rh, float Lh, float Rf, float Lf) ComputePreviewStandardQuadrupedLegPitches(
         float animationTimeSeconds,

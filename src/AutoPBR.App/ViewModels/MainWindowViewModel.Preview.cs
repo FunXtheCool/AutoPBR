@@ -5,6 +5,7 @@ using Avalonia.Input;
 using Avalonia.Threading;
 
 using AutoPBR.App.Controls;
+using AutoPBR.App.Rendering.Scene;
 using AutoPBR.App.Lang;
 using AutoPBR.App.Rendering;
 using AutoPBR.App.Rendering.Abstractions;
@@ -26,6 +27,7 @@ public partial class MainWindowViewModel
     private PreviewMeshProvenance? _lastLoggedPreviewMeshProvenance;
     private string? _lastPreview3DLoggedError;
     private DispatcherTimer? _preview3DCameraPoseTimer;
+    private CancellationTokenSource? _preview3DSpriteThicknessDebounceCts;
 
     public static string[] Preview3DEntityAlphaModeOptions { get; } =
     [
@@ -78,6 +80,7 @@ public partial class MainWindowViewModel
     [ObservableProperty] private double _preview3DLightPitchDegrees = -55.0;
     [ObservableProperty] private bool _preview3DEnableShadowCascades;
     [ObservableProperty] private int _preview3DSpritePlaneCount = 1;
+    [ObservableProperty] private double _preview3DSpriteThickness;
     [ObservableProperty] private double _preview3DCameraOrbitSensitivity = 0.006;
     [ObservableProperty] private double _preview3DCameraPanSensitivity = 0.0022;
     [ObservableProperty] private double _preview3DCameraZoomSensitivity = 0.12;
@@ -158,7 +161,16 @@ public partial class MainWindowViewModel
 
     public bool IsPreview2D => PreviewDisplayMode == 0;
     public bool IsPreview3D => PreviewDisplayMode == 1;
-    public bool IsPreview3DItemMode => IsPreview3D && (_lastPreviewTextureMaps?.Sprite2DFoliageTarget ?? false);
+    public bool IsPreview3DItemMode =>
+        IsPreview3D &&
+        (_lastPreviewTextureMaps?.Sprite2DFoliageTarget ?? false) &&
+        (_lastPreviewTextureMaps?.IsItemTexturePath ?? false);
+    public bool IsPreview3DFoliageSpriteMode =>
+        IsPreview3D &&
+        (_lastPreviewTextureMaps?.Sprite2DFoliageTarget ?? false) &&
+        !(_lastPreviewTextureMaps?.IsItemTexturePath ?? false);
+    public bool IsPreview3DSpriteMode => IsPreview3DItemMode || IsPreview3DFoliageSpriteMode;
+    public bool IsPreviewSpriteTarget => _lastPreviewTextureMaps?.Sprite2DFoliageTarget ?? false;
 
     internal void RegisterGlPreview(GlPbrPreviewControl glPreview)
     {
@@ -195,6 +207,9 @@ public partial class MainWindowViewModel
         OnPropertyChanged(nameof(IsPreview2D));
         OnPropertyChanged(nameof(IsPreview3D));
         OnPropertyChanged(nameof(IsPreview3DItemMode));
+        OnPropertyChanged(nameof(IsPreview3DFoliageSpriteMode));
+        OnPropertyChanged(nameof(IsPreview3DSpriteMode));
+        OnPropertyChanged(nameof(IsPreviewSpriteTarget));
         if (!_loadingSettings)
         {
             SaveSettings();
@@ -286,6 +301,54 @@ public partial class MainWindowViewModel
     partial void OnPreview3DLightPitchDegreesChanged(double value) => OnPreview3DLightDirectionChanged(value);
     partial void OnPreview3DEnableShadowCascadesChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DSpritePlaneCountChanged(int value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DSpriteThicknessChanged(double value)
+    {
+        _ = value;
+        if (_loadingSettings)
+        {
+            return;
+        }
+
+        SaveSettings();
+        ScheduleDebouncedSpriteThicknessMeshRebuild();
+    }
+
+    private void ScheduleDebouncedSpriteThicknessMeshRebuild()
+    {
+        _preview3DSpriteThicknessDebounceCts?.Cancel();
+        _preview3DSpriteThicknessDebounceCts?.Dispose();
+        var cts = new CancellationTokenSource();
+        _preview3DSpriteThicknessDebounceCts = cts;
+        _ = RunDebouncedSpriteThicknessMeshRebuildAsync(cts);
+    }
+
+    private async Task RunDebouncedSpriteThicknessMeshRebuildAsync(CancellationTokenSource debounceCts)
+    {
+        try
+        {
+            await Task.Delay(PreviewStageConstants.SpriteThicknessMeshDebounceMs, debounceCts.Token)
+                .ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        if (!ReferenceEquals(_preview3DSpriteThicknessDebounceCts, debounceCts))
+        {
+            return;
+        }
+
+        RunOnUiThread(() =>
+        {
+            if (!ReferenceEquals(_preview3DSpriteThicknessDebounceCts, debounceCts))
+            {
+                return;
+            }
+
+            Push3DRenderSettingsOnly();
+        });
+    }
 
     partial void OnPreview3DCameraOrbitSensitivityChanged(double value) => OnPreview3DCameraSettingChanged(value);
     partial void OnPreview3DCameraPanSensitivityChanged(double value) => OnPreview3DCameraSettingChanged(value);
@@ -361,6 +424,9 @@ public partial class MainWindowViewModel
         ApplyExploreParityCatalogPreviewDefaults(_lastPreviewModelSubject);
         LogPreviewMeshProvenance(_lastPreviewMeshProvenance);
         OnPropertyChanged(nameof(IsPreview3DItemMode));
+        OnPropertyChanged(nameof(IsPreview3DFoliageSpriteMode));
+        OnPropertyChanged(nameof(IsPreview3DSpriteMode));
+        OnPropertyChanged(nameof(IsPreviewSpriteTarget));
         Apply3DPreviewIfNeeded();
     }
 
@@ -381,8 +447,10 @@ public partial class MainWindowViewModel
         Preview3DEnableLegacyEntityWobble = false;
     }
 
-    private PreviewRenderSettings BuildPreview3DRenderSettings() =>
-        new()
+    private PreviewRenderSettings BuildPreview3DRenderSettings()
+    {
+        var isItemFlatSprite = _lastPreviewTextureMaps is { Sprite2DFoliageTarget: true, IsItemTexturePath: true };
+        return new()
         {
             NormalStrength = (float)NormalIntensity,
             HeightStrength = (float)Preview3DParallaxHeightStrength,
@@ -397,7 +465,12 @@ public partial class MainWindowViewModel
             EntityAlphaMode = (PreviewEntityAlphaMode)Math.Clamp(Preview3DEntityAlphaMode, 0, 2),
             EnableEntityLabPbrShading = Preview3DEnableEntityLabPbrShading,
             EnableEntityParallax = Preview3DEnableEntityParallax,
-            SpritePlaneCount = Math.Clamp(Preview3DSpritePlaneCount, 1, 8),
+            SpritePlaneCount = isItemFlatSprite ? 1 : Math.Clamp(Preview3DSpritePlaneCount, 1, 8),
+            SpriteThickness = (float)Math.Clamp(
+                Preview3DSpriteThickness,
+                PreviewStageConstants.SpriteThicknessMin,
+                PreviewStageConstants.SpriteThicknessMax),
+            ItemFlatSpritePreview = isItemFlatSprite,
             ShowBackgroundGrid = Preview3DShowGrid,
             ShowGroundMesh = Preview3DShowGroundMesh,
             ShowCornerAxes = Preview3DShowAxes,
@@ -453,6 +526,7 @@ public partial class MainWindowViewModel
             CloudQuality = PreviewVolumetricQuality.Resolve(Math.Clamp(Preview3DVolumetricQuality, 0, 2)).CloudQuality,
             LogVolumetricTiming = DebugMode
         };
+    }
 
     private void PushPreview3DCamera()
     {
@@ -515,7 +589,12 @@ public partial class MainWindowViewModel
         PreviewModelSubject? subject = _lastPreviewModelSubject;
         PreviewMaterial[]? slotMaterials = null;
 
-        if (subject is { Materials.Length: > 0 })
+        if (maps is { Sprite2DFoliageTarget: true, IsItemTexturePath: true })
+        {
+            kind = PreviewSceneKind.ItemPlane;
+            subject = null;
+        }
+        else if (subject is { Materials.Length: > 0 })
         {
             kind = PreviewSceneKind.BlockModel;
             slotMaterials = subject.Materials.Select(PreviewMaterialMapper.FromCoreMaps).ToArray();
@@ -619,6 +698,10 @@ public partial class MainWindowViewModel
 
     private void DisposePreviewResources()
     {
+        _preview3DSpriteThicknessDebounceCts?.Cancel();
+        _preview3DSpriteThicknessDebounceCts?.Dispose();
+        _preview3DSpriteThicknessDebounceCts = null;
+
         if (_preview3DCameraPoseTimer is { } timer)
         {
             timer.Stop();

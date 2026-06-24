@@ -24,6 +24,7 @@ public sealed class GeometryIrParityJvmResolverTests
     [InlineData("assets/minecraft/textures/entity/camel/camel_baby.png", true, "net.minecraft.client.model.animal.camel.BabyCamelModel")]
     [InlineData("assets/minecraft/textures/entity/axolotl/axolotl_blue_baby.png", true, "net.minecraft.client.model.animal.axolotl.BabyAxolotlModel")]
     [InlineData("assets/minecraft/textures/entity/bear/polarbear_baby.png", true, "net.minecraft.client.model.animal.polarbear.BabyPolarBearModel")]
+    [InlineData("assets/minecraft/textures/entity/sniffer/snifflet.png", true, "net.minecraft.client.model.animal.sniffer.SniffletModel")]
     public void EnumerateCandidates_prefers_climate_and_baby_mesh_hosts(
         string texturePath,
         bool isBaby,
@@ -165,5 +166,22 @@ public sealed class GeometryIrParityJvmResolverTests
         Assert.True(mesh.Elements.Count >= 4);
         Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
         Assert.Contains("ColdCowModel", provenance.Detail ?? "", StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Snifflet_texture_builds_SniffletModel_geometry_ir_parity_mesh()
+    {
+        var runtime = EntityModelRuntimeFactory.Create();
+        const string path = "assets/minecraft/textures/entity/sniffer/snifflet.png";
+        Assert.True(runtime.TryBuildStaticMesh(
+            path,
+            Profile26,
+            idlePhase01: 0f,
+            animationTimeSeconds: 0f,
+            out var mesh,
+            out var provenance));
+        Assert.True(mesh.Elements.Count >= 4);
+        Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
+        Assert.Contains("SniffletModel", provenance.Detail ?? "", StringComparison.Ordinal);
     }
 }

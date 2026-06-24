@@ -131,7 +131,7 @@ internal static class GeometryLiftPipeline
         if (useAsmFirst && hostClassBytes is { Length: > 0 })
         {
             if (BytecodeGeometryMeshLift.TryLiftConcat(meshText, maps, out var asmRoots, out var asmNotes,
-                    hostClassBytes) &&
+                    hostClassBytes, officialJvmName) &&
                 CountAllCuboids(asmRoots) > 0)
             {
                 roots = asmRoots;
@@ -153,7 +153,7 @@ internal static class GeometryLiftPipeline
         }
 
         if (JavapFloatGeometryMeshLift.TryLift(meshText, out var javapRoots, out var javapNotes, maps, delegationDepth,
-                staticIntMatrices, staticFloatArrays) &&
+                staticIntMatrices, staticFloatArrays, officialJvmName) &&
             CountAllCuboids(javapRoots) > 0)
         {
             roots = javapRoots;
@@ -249,7 +249,7 @@ internal static class GeometryLiftPipeline
         {
             JavapFloatGeometryMeshLift.ClearCuboidsRecursively(roots);
             var tail = meshConcat[passStartIdx..];
-            if (!JavapFloatGeometryMeshLift.TryLift(tail, out var tailRoots, out _, maps: null, delegationDepth: 0) ||
+            if (!JavapFloatGeometryMeshLift.TryLift(tail, out var tailRoots, out _, maps: null, delegationDepth: 0, officialJvmName: officialJvmName) ||
                 CountAllCuboids(tailRoots) == 0)
             {
                 return;

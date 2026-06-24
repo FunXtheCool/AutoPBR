@@ -516,6 +516,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
                 manualPreview,
                 PreviewBrickProbeDebug);
             using var previewPoseScope = EntityPreviewBuildContext.UsePose(SelectedPreviewPoseId);
+            using var previewSizeScope = EntityPreviewBuildContext.UseSize(SelectedPreviewSizeId);
             var previewResult = await Task.Run(
                     () => PreviewService.RenderPreviewDetailedAsync(diskPack, entryPath, options, ct),
                     ct)

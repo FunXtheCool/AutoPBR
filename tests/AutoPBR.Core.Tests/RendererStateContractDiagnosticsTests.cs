@@ -7,7 +7,7 @@ public sealed class RendererStateContractDiagnosticsTests
     {
         var rows = RendererStateContractDiagnostics.Discover();
 
-        Assert.Equal(16, rows.Count);
+        Assert.Equal(17, rows.Count);
         Assert.Empty(rows.Where(r => !r.IsContractOk)
             .Select(r => $"{r.ShardFileName}: {string.Join(", ", r.ContractIssues)}"));
         Assert.All(rows, r => Assert.Equal(RendererStateContractDiagnostics.HandPilotSource, r.SourceCategory));

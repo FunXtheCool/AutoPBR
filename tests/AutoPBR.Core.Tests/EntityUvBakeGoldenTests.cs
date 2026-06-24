@@ -13,9 +13,9 @@ public sealed class EntityUvBakeGoldenTests
 
     [Theory]
     [InlineData("assets/minecraft/textures/entity/creeper/creeper.png", 64, 32, 14857558920194328997UL)]
-    [InlineData("assets/minecraft/textures/entity/cow/cow_temperate.png", 64, 64, 4053395879476443301UL)]
+    [InlineData("assets/minecraft/textures/entity/cow/cow_temperate.png", 64, 64, 1428835365211977893UL)]
     [InlineData("assets/minecraft/textures/entity/dolphin/dolphin.png", 64, 64, 16782674017197654309UL)]
-    [InlineData("assets/minecraft/textures/entity/ghast/ghast.png", 64, 32, 1082496271659415717UL)]
+    [InlineData("assets/minecraft/textures/entity/ghast/ghast.png", 64, 32, 9999980192888633509UL)]
     public void Entity_baked_uv_fingerprint_is_stable(string texturePath, int atlasW, int atlasH, ulong goldenFingerprint)
     {
         var fp = BakeUvFingerprint(texturePath, atlasW, atlasH);

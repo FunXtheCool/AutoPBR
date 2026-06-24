@@ -28,7 +28,8 @@ internal static partial class JavapFloatGeometryMeshLift
     public static bool TryLift(string meshFactoryJavap, out JsonArray roots, out List<string> notes,
         MojangMappingsParser? maps = null, int delegationDepth = 0,
         IReadOnlyDictionary<string, int[][]>? staticIntMatrices = null,
-        IReadOnlyDictionary<string, float[]>? staticFloatArrays = null)
+        IReadOnlyDictionary<string, float[]>? staticFloatArrays = null,
+        string? officialJvmName = null)
     {
         roots = new JsonArray();
         notes = new List<string>();
@@ -113,7 +114,7 @@ internal static partial class JavapFloatGeometryMeshLift
         }
 
             roots = GeometryLiftOutputAssembly.WrapSyntheticRoot(rootChildren);
-            roots = GeometryIrLiftTreeRepair.Apply(roots, hoistStandardQuadrupedLegsToRoot: false);
+            roots = GeometryIrLiftTreeRepair.Apply(roots, officialJvmName);
             return true;
         }
         finally

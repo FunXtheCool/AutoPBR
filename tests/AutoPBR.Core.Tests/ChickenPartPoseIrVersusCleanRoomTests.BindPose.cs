@@ -15,7 +15,7 @@ public sealed partial class ChickenPartPoseIrVersusCleanRoomTests
         var bodyPoseIr = ir["body"];
         var beakLeafIr = ir["beak"];
 
-        const string jvm = "net.minecraft.client.model.animal.chicken.ChickenModel";
+        const string jvm = "net.minecraft.client.model.animal.chicken.AdultChickenModel";
         var geometryRoot = LoadRepairedGeometryRoot(jvm);
         var merged = CleanRoomEntityModelRuntime.TryBuildGeometryIrModelSpaceParityMeshForTests(
             "entity/chicken/chicken", jvm, 64, 32, geometryRoot, out _);

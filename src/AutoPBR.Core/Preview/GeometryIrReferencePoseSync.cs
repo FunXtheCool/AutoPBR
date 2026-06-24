@@ -15,6 +15,7 @@ internal static class GeometryIrReferencePoseSync
         if (node is JsonObject doc)
         {
             SyncIntoShard(referenceRoot, doc);
+            SyncWorldPosesIntoShard(referenceRoot, doc);
             return JsonDocument.Parse(doc.ToJsonString()).RootElement;
         }
 
@@ -72,6 +73,69 @@ internal static class GeometryIrReferencePoseSync
         ApplyPosesToTree(irOuter, refPoses);
     }
 
+    public static void SyncWorldPosesIntoShard(JsonElement referenceRoot, JsonObject irShard)
+    {
+        if (!referenceRoot.TryGetProperty("roots", out var refRoots) ||
+            refRoots.ValueKind != JsonValueKind.Array ||
+            refRoots.GetArrayLength() == 0)
+        {
+            return;
+        }
+
+        if (irShard["roots"] is not JsonArray irRoots || irRoots.Count == 0 || irRoots[0] is not JsonObject irOuter)
+        {
+            return;
+        }
+
+        var refWorldPoses = new Dictionary<string, JsonObject>(StringComparer.Ordinal);
+        CollectReferenceWorldPosesByPartId(refRoots[0], refWorldPoses);
+        ApplyWorldPosesToTree(irOuter, refWorldPoses);
+    }
+
+    private static void CollectReferenceWorldPosesByPartId(JsonElement part, Dictionary<string, JsonObject> byId)
+    {
+        if (part.TryGetProperty("id", out var idEl) &&
+            part.TryGetProperty("worldPose", out var worldPose) &&
+            worldPose.ValueKind == JsonValueKind.Object)
+        {
+            var id = idEl.GetString();
+            if (!string.IsNullOrEmpty(id))
+            {
+                byId[id] = JsonNode.Parse(worldPose.GetRawText())!.AsObject();
+            }
+        }
+
+        if (part.TryGetProperty("children", out var children) && children.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var ch in children.EnumerateArray())
+            {
+                CollectReferenceWorldPosesByPartId(ch, byId);
+            }
+        }
+    }
+
+    private static void ApplyWorldPosesToTree(JsonObject part, IReadOnlyDictionary<string, JsonObject> refWorldPoses)
+    {
+        if (part["id"]?.GetValue<string>() is { } id &&
+            refWorldPoses.TryGetValue(id, out var refWorldPose))
+        {
+            part["worldPose"] = refWorldPose.DeepClone();
+        }
+
+        if (part["children"] is not JsonArray kids)
+        {
+            return;
+        }
+
+        foreach (var n in kids)
+        {
+            if (n is JsonObject child)
+            {
+                ApplyWorldPosesToTree(child, refWorldPoses);
+            }
+        }
+    }
+
     public static void SyncCuboidsIntoShard(JsonElement referenceRoot, JsonObject irShard)
     {
         if (!referenceRoot.TryGetProperty("roots", out var refRoots) ||
@@ -115,8 +179,14 @@ internal static class GeometryIrReferencePoseSync
 
     private static void ApplyCuboidsToTree(JsonObject part, IReadOnlyDictionary<string, JsonArray> refCuboids)
     {
-        if (part["id"]?.GetValue<string>() is { } id && refCuboids.TryGetValue(id, out var refArr) && refArr.Count > 0)
+        if (part["id"]?.GetValue<string>() is { } id && refCuboids.TryGetValue(id, out var refArr))
         {
+            if (refArr.Count == 0)
+            {
+                part["cuboids"] = new JsonArray();
+            }
+            else
+            {
             var synced = new JsonArray();
             var existing = part["cuboids"]?.AsArray();
             for (var i = 0; i < refArr.Count; i++)
@@ -152,6 +222,7 @@ internal static class GeometryIrReferencePoseSync
             if (synced.Count > 0)
             {
                 part["cuboids"] = synced;
+            }
             }
         }
 

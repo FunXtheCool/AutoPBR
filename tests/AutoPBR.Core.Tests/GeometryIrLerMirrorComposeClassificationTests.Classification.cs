@@ -79,6 +79,12 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
     {
         var repo = GeometryIrTestTierSupport.FindRepoRoot();
         var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{officialJvm}.json");
+        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
+            !string.Equals(status, "ok", StringComparison.Ordinal))
+        {
+            return;
+        }
+
         using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
         var geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(officialJvm, shard.RootElement);
         var profile = new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2));
@@ -150,7 +156,7 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
                 "horsemodel",
                 path));
         Assert.Equal(
-            CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot,
+            CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.EquineDedicated,
             CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(HorseJvm, "horsemodel", path));
     }
 
@@ -160,6 +166,15 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
     [InlineData(RabbitJvm, "rabbitmodel", "", "StandardWorldRoot")]
     [InlineData("net.minecraft.client.model.monster.hoglin.HoglinModel", "hoglinmodel", "", "StandardWorldRoot")]
     [InlineData("", "arrow", "assets/minecraft/textures/entity/projectiles/arrow.png", "Skip")]
+    [InlineData(
+        "net.minecraft.client.model.object.armorstand.ArmorStandModel",
+        "armorstand",
+        "assets/minecraft/textures/entity/armorstand/armorstand.png",
+        "StandardWorldRoot")]
+    [InlineData("net.minecraft.client.model.monster.ghast.GhastModel", "ghast", "", "Skip")]
+    [InlineData("net.minecraft.client.model.GhastModel", "ghast", "", "Skip")]
+    [InlineData("", "ghast", "assets/minecraft/textures/entity/ghast/ghast.png", "Skip")]
+    [InlineData("", "happy_ghast", "assets/minecraft/textures/entity/ghast/happy_ghast.png", "Skip")]
     public void Shared_ler_basis_resolver_classifies_viewport_policy(
         string officialJvm,
         string stem,

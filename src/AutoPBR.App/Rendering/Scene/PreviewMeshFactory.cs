@@ -93,16 +93,26 @@ public static class PreviewMeshFactory
         var h = halfSize;
         var n = new Vector3(0, 0, 1);
         var t = new Vector3(1, 0, 0);
-        float[] verts =
+        float[] flatVerts =
         [
             -h, -h, 0, n.X, n.Y, n.Z, 0, 1, t.X, t.Y, t.Z, 1f,
             h, -h, 0, n.X, n.Y, n.Z, 1, 1, t.X, t.Y, t.Z, 1f,
             h, h, 0, n.X, n.Y, n.Z, 1, 0, t.X, t.Y, t.Z, 1f,
             -h, h, 0, n.X, n.Y, n.Z, 0, 0, t.X, t.Y, t.Z, 1f
         ];
-        uint[] indices = [0u, 1u, 2u, 0u, 2u, 3u];
-        return new PreviewMesh { Name = name, InterleavedVertices = verts, Indices = indices };
+        uint[] flatIndices = [0u, 1u, 2u, 0u, 2u, 3u];
+        return new PreviewMesh { Name = name, InterleavedVertices = flatVerts, Indices = flatIndices };
     }
+
+    /// <summary>Per-texel cuboid extrusion for thickened 2D sprite preview.</summary>
+    public static PreviewMesh CreateSpritePixelCuboids(
+        ReadOnlySpan<byte> rgba,
+        int width,
+        int height,
+        float thickness,
+        float alphaCutoff = 0.5f,
+        string name = "sprite_voxels") =>
+        SpriteVoxelMeshBuilder.Build(rgba, width, height, thickness, alphaCutoff, name);
 
     /// <summary>Creates crossed Y-rotated sprite planes centered at origin (Minecraft foliage-like billboard stack).</summary>
     public static PreviewMesh CreateSpritePlanes(string name = "sprite_planes", int planeCount = 2, float halfSize = 0.5f)

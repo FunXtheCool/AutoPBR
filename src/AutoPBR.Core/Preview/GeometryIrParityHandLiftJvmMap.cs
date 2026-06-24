@@ -24,7 +24,15 @@ internal static class GeometryIrParityHandLiftJvmMap
 
         if (string.Equals(builderMethod, "ConduitEntity", StringComparison.OrdinalIgnoreCase))
         {
-            officialJvm = "net.minecraft.client.model.ConduitModel";
+            var stem = Path.GetFileNameWithoutExtension(normalizedAssetPath.Replace('\\', '/').TrimStart('/'))
+                .ToLowerInvariant();
+            officialJvm = stem switch
+            {
+                "cage" => "net.minecraft.client.model.ConduitRenderer.createCageLayer",
+                "closed_eye" or "open_eye" => "net.minecraft.client.model.ConduitRenderer.createEyeLayer",
+                "wind" or "wind_vertical" => "net.minecraft.client.model.ConduitRenderer.createWindLayer",
+                _ => "net.minecraft.client.model.ConduitRenderer.createShellLayer",
+            };
             return true;
         }
 

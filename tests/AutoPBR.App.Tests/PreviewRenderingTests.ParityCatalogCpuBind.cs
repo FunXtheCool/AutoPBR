@@ -17,16 +17,18 @@ public sealed partial class PreviewRenderingTests
         var backend = new OpenGlPreviewBackend();
         var textureMaps = CreateDolphinTextureMaps();
         var slotMaterials = CreateDolphinSlotMaterials(textureMaps);
-        var rebakeCrossed = CreateDolphinRebakeContext(
-            packFingerprint: 1201UL,
-            previewPoseId: EntityPreviewPoseCatalog.IllagerCrossed);
-        var rebakeSpell = CreateDolphinRebakeContext(
-            packFingerprint: 1201UL,
-            previewPoseId: EntityPreviewPoseCatalog.IllagerSpellcasting);
-
         var committedVerts = CreatePreviewVerts(192, seed: 31);
         var incomingVerts = CreatePreviewVerts(192, seed: 32);
         var indices = CreatePreviewIndices(288);
+        var committedFingerprint = PreviewMeshGeometryFingerprint.ComputeCpuPreviewMesh(
+            committedVerts,
+            PreviewMesh.FloatsPerVertex);
+        var rebakeCrossed = CreateDolphinRebakeContext(
+            committedFingerprint,
+            previewPoseId: EntityPreviewPoseCatalog.IllagerCrossed);
+        var rebakeSpell = CreateDolphinRebakeContext(
+            committedFingerprint,
+            previewPoseId: EntityPreviewPoseCatalog.IllagerSpellcasting);
 
         var committedSubject = CreateDolphinSubject(
             committedVerts,
@@ -61,11 +63,13 @@ public sealed partial class PreviewRenderingTests
         var backend = new OpenGlPreviewBackend();
         var textureMaps = CreateDolphinTextureMaps();
         var slotMaterials = CreateDolphinSlotMaterials(textureMaps);
-        var rebake = CreateDolphinRebakeContext(packFingerprint: 1001UL);
-
         var committedVerts = CreatePreviewVerts(192, seed: 1);
         var packVerts = CreatePreviewVerts(192, seed: 2);
         var indices = CreatePreviewIndices(288);
+        var committedFingerprint = PreviewMeshGeometryFingerprint.ComputeCpuPreviewMesh(
+            committedVerts,
+            PreviewMesh.FloatsPerVertex);
+        var rebake = CreateDolphinRebakeContext(committedFingerprint);
 
         var committedSubject = CreateDolphinSubject(
             committedVerts,
@@ -77,7 +81,7 @@ public sealed partial class PreviewRenderingTests
 
         backend.TestSimulateParityCatalogCpuBindCommit(committedSubject);
 
-        var repushRebake = CreateDolphinRebakeContext(packFingerprint: 1001UL);
+        var repushRebake = CreateDolphinRebakeContext(committedFingerprint);
         var packSubject = CreateDolphinSubject(
             packVerts,
             indices,
@@ -108,11 +112,13 @@ public sealed partial class PreviewRenderingTests
         var backend = new OpenGlPreviewBackend();
         var textureMaps = CreateDolphinTextureMaps();
         var slotMaterials = CreateDolphinSlotMaterials(textureMaps);
-        var rebake = CreateDolphinRebakeContext(packFingerprint: 1101UL);
-
         var committedVerts = CreatePreviewVerts(192, seed: 21);
         var packVerts = CreatePreviewVerts(192, seed: 22);
         var indices = CreatePreviewIndices(288);
+        var committedFingerprint = PreviewMeshGeometryFingerprint.ComputeCpuPreviewMesh(
+            committedVerts,
+            PreviewMesh.FloatsPerVertex);
+        var rebake = CreateDolphinRebakeContext(committedFingerprint);
 
         var committedSubject = CreateDolphinSubject(
             committedVerts,
@@ -132,7 +138,7 @@ public sealed partial class PreviewRenderingTests
             packVerts,
             indices,
             textureMaps,
-            CreateDolphinRebakeContext(packFingerprint: 1101UL),
+            CreateDolphinRebakeContext(committedFingerprint),
             entityGpuVerticesInPreviewSpace: false,
             entityPreviewPlacementApplied: false);
 
@@ -157,12 +163,15 @@ public sealed partial class PreviewRenderingTests
         var slotMaterials = CreateDolphinSlotMaterials(textureMaps);
         var committedVerts = CreatePreviewVerts(192, seed: 10);
         var indices = CreatePreviewIndices(288);
+        var committedFingerprint = PreviewMeshGeometryFingerprint.ComputeCpuPreviewMesh(
+            committedVerts,
+            PreviewMesh.FloatsPerVertex);
 
         var committedSubject = CreateDolphinSubject(
             committedVerts,
             indices,
             textureMaps,
-            CreateDolphinRebakeContext(packFingerprint: 2001UL),
+            CreateDolphinRebakeContext(committedFingerprint),
             entityGpuVerticesInPreviewSpace: true,
             entityPreviewPlacementApplied: true);
         backend.TestSimulateParityCatalogCpuBindCommit(committedSubject);
@@ -173,7 +182,7 @@ public sealed partial class PreviewRenderingTests
             CreatePreviewVerts(192, seed: 99),
             indices,
             textureMaps,
-            CreateDolphinRebakeContext(packFingerprint: 2001UL),
+            CreateDolphinRebakeContext(committedFingerprint),
             entityGpuVerticesInPreviewSpace: false,
             entityPreviewPlacementApplied: false);
         backend.SetBlockModelPreview(sameFpSubject, slotMaterials);
@@ -200,7 +209,10 @@ public sealed partial class PreviewRenderingTests
             CreatePreviewVerts(192, seed: 3),
             CreatePreviewIndices(288),
             CreateDolphinTextureMaps(),
-            CreateDolphinRebakeContext(packFingerprint: 3001UL),
+            CreateDolphinRebakeContext(
+                PreviewMeshGeometryFingerprint.ComputeCpuPreviewMesh(
+                    CreatePreviewVerts(192, seed: 3),
+                    PreviewMesh.FloatsPerVertex)),
             entityGpuVerticesInPreviewSpace: true,
             entityPreviewPlacementApplied: true);
 
@@ -242,7 +254,8 @@ public sealed partial class PreviewRenderingTests
 
     private static EntityEmulatedPreviewRebakeContext CreateDolphinRebakeContext(
         ulong packFingerprint,
-        string? previewPoseId = null) =>
+        string? previewPoseId = null,
+        string? previewSizeId = null) =>
         new()
         {
             PackZipPath = "minecraft-26.1.2-client.jar",
@@ -253,6 +266,7 @@ public sealed partial class PreviewRenderingTests
             ModelDefaultNamespace = "minecraft",
             IdlePhase01 = 0.3f,
             PreviewPoseId = previewPoseId,
+            PreviewSizeId = previewSizeId,
             OrderedTextureZipPaths = [DolphinTexturePath],
             PackConverterCpuMeshFingerprint = packFingerprint,
         };

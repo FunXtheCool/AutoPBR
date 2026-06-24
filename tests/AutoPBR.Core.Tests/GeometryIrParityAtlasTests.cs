@@ -27,7 +27,7 @@ public sealed class GeometryIrParityAtlasTests
             "generated",
             "geometry",
             "26.1.2",
-            "net.minecraft.client.model.animal.chicken.ChickenModel.json");
+            "net.minecraft.client.model.animal.chicken.AdultChickenModel.json");
         Assert.True(File.Exists(shardPath), $"Missing {shardPath}");
         using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
         Assert.Equal(64, shard.RootElement.GetProperty("textureWidth").GetInt32());

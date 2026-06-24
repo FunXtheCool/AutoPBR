@@ -467,6 +467,8 @@ public static class Resources
     public static string Preview3DEnableEntityParallaxTooltip => GetString("Preview3DEnableEntityParallaxTooltip");
     public static string Preview3DSpritePlaneCount => GetString("Preview3DSpritePlaneCount");
     public static string Preview3DSpritePlaneCountTooltip => GetString("Preview3DSpritePlaneCountTooltip");
+    public static string Preview3DSpriteThickness => GetString("Preview3DSpriteThickness");
+    public static string Preview3DSpriteThicknessTooltip => GetString("Preview3DSpriteThicknessTooltip");
     public static string Preview3DCameraDebugFlyHint => GetString("Preview3DCameraDebugFlyHint");
 
     public static string GetStatusString(string key, params object[] args)

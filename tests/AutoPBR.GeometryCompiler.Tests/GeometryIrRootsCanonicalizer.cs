@@ -26,6 +26,7 @@ internal static class GeometryIrRootsCanonicalizer
         {
             case JsonObject o:
                 o.Remove("setupAnimPivot");
+                o.Remove("previewDepthLayer");
                 foreach (var prop in o.ToList())
                 {
                     if (prop.Value is JsonValue jv && jv.TryGetValue<double>(out var d))

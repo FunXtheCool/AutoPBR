@@ -122,7 +122,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
         float YRot = 0f,
         float ZRot = 0f,
         string[]? FaceMask = null,
-        string? TextureKey = null)
+        string? TextureKey = null,
+        bool InvertYForJavaUv = false)
     {
         public Vector3? RotationPivot { get; init; }
 
@@ -157,7 +158,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 FaceMask,
                 DepthLayerKind,
                 LayerOrdinal,
-                CastsShadow);
+                CastsShadow,
+                InvertYForJavaUv);
         }
     }
 
@@ -402,6 +404,69 @@ internal sealed partial class CleanRoomEntityModelRuntime
             ? $"{siblingFileStemWithoutExtension}.png"
             : $"{parent}/{siblingFileStemWithoutExtension}.png";
         return ToTextureRef(relPng);
+    }
+
+    internal static void SyncCosmeticOverlayPosesFromPrimarySkinTwins(MergedJavaBlockModel merged)
+    {
+        for (var i = 0; i < merged.Elements.Count; i++)
+        {
+            var overlay = merged.Elements[i];
+            if (!TryGetElementPrimaryTextureKey(overlay, out var overlayKey) ||
+                !string.Equals(overlayKey, "#eyes", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            foreach (var twin in merged.Elements)
+            {
+                if (ReferenceEquals(twin, overlay) ||
+                    !CuboidCornersMatch(twin.From, overlay.From) ||
+                    !CuboidCornersMatch(twin.To, overlay.To) ||
+                    !TryGetElementPrimaryTextureKey(twin, out var twinKey) ||
+                    !string.Equals(twinKey, "#skin", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                merged.Elements[i] = new ModelElement
+                {
+                    From = overlay.From,
+                    To = overlay.To,
+                    Faces = overlay.Faces,
+                    LocalToParent = twin.LocalToParent,
+                    DepthLayerKind = overlay.DepthLayerKind,
+                    LayerOrdinal = overlay.LayerOrdinal,
+                    CastsShadow = overlay.CastsShadow,
+                    ShellInflateTexels = overlay.ShellInflateTexels,
+                    MirrorCuboidUv = overlay.MirrorCuboidUv,
+                };
+                break;
+            }
+        }
+    }
+
+    private static bool TryGetElementPrimaryTextureKey(ModelElement element, out string textureKey)
+    {
+        textureKey = string.Empty;
+        foreach (var face in element.Faces.Values)
+        {
+            textureKey = face.TextureKey;
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool CuboidCornersMatch(float[] a, float[] b)
+    {
+        if (a.Length < 3 || b.Length < 3)
+        {
+            return false;
+        }
+
+        return MathF.Abs(a[0] - b[0]) < 1e-4f &&
+               MathF.Abs(a[1] - b[1]) < 1e-4f &&
+               MathF.Abs(a[2] - b[2]) < 1e-4f;
     }
 
 

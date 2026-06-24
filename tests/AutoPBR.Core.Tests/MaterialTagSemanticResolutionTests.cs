@@ -117,11 +117,27 @@ public sealed class MaterialTagSemanticResolutionTests
     }
 
     [Fact]
-    public void AppendTwoDSpriteFlagIfNeededNoPlantDoesNotAdd()
+    public void AppendTwoDSpriteFlagIfNeededItemWithoutOrganicAddsSprite2D()
     {
         var ids = new List<string> { "wood", FlagTagResolver.ItemId };
+        MaterialTagSemanticResolution.AppendTwoDSpriteFlagIfNeeded(ids, removedTagIds: null);
+        Assert.Equal(new[] { "wood", FlagTagResolver.ItemId, FlagTagResolver.Sprite2DId }, ids);
+    }
+
+    [Fact]
+    public void AppendTwoDSpriteFlagIfNeededItemWithBlockExemptDoesNotAdd()
+    {
+        var ids = new List<string> { "wood", FlagTagResolver.ItemId, FlagTagResolver.BlockId };
         MaterialTagSemanticResolution.AppendTwoDSpriteFlagIfNeeded(ids, null);
-        Assert.Equal(new[] { "wood", FlagTagResolver.ItemId }, ids);
+        Assert.Equal(new[] { "wood", FlagTagResolver.ItemId, FlagTagResolver.BlockId }, ids);
+    }
+
+    [Fact]
+    public void AppendTwoDSpriteFlagIfNeededNoPlantDoesNotAddWithoutItemFlag()
+    {
+        var ids = new List<string> { "wood", FlagTagResolver.BlockId };
+        MaterialTagSemanticResolution.AppendTwoDSpriteFlagIfNeeded(ids, null);
+        Assert.Equal(new[] { "wood", FlagTagResolver.BlockId }, ids);
     }
 
     [Fact]

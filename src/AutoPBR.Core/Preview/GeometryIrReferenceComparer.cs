@@ -306,8 +306,11 @@ internal static class GeometryIrReferenceComparer
             return new CompareResult(false, "reference is stub", 0, 0);
         }
 
-        if (!GeometryIrMeshWalk.TryCollectBakedWorldTranslations(
-                referenceRoot, out var refWorld, out var refFail))
+        if (!TryCollectReferencePartOriginsForCompare(
+                referenceRoot,
+                emitOptions,
+                out var refWorld,
+                out var refFail))
         {
             return new CompareResult(false, $"reference worldPose: {refFail}", 0, 0);
         }
@@ -360,6 +363,186 @@ internal static class GeometryIrReferenceComparer
         }
 
         return new CompareResult(true, null, refWorld.Count, compared);
+    }
+
+    private static bool TryCollectReferencePartOriginsForCompare(
+        JsonElement referenceRoot,
+        GeometryIrMeshEmitOptions emitOptions,
+        out Dictionary<string, Vector3> translationsByPartId,
+        out string? failureReason)
+    {
+        if (!GeometryIrMeshWalk.TryCollectBakedWorldTranslations(
+                referenceRoot, out translationsByPartId, out failureReason))
+        {
+            return GeometryIrMeshWalk.TryCollectPartWorldTranslations(
+                referenceRoot,
+                Matrix4x4.Identity,
+                out translationsByPartId,
+                out failureReason);
+        }
+
+        if (string.Equals(
+                emitOptions.OfficialJvmName,
+                "net.minecraft.client.model.animal.polarbear.PolarBearModel",
+                StringComparison.Ordinal) &&
+            TryCollectReferenceBlockStackPartOrigins(
+                referenceRoot,
+                emitOptions.OfficialJvmName,
+                out var polarBlockStackOrigins) &&
+            polarBlockStackOrigins.TryGetValue("body", out var bodyOrigin))
+        {
+            translationsByPartId["body"] = bodyOrigin;
+        }
+
+        if (CleanRoomEntityModelRuntime.UsesFlatPartPoseOffsetQuadrupedJvm(emitOptions.OfficialJvmName) &&
+            !string.Equals(
+                emitOptions.OfficialJvmName,
+                "net.minecraft.client.model.animal.polarbear.PolarBearModel",
+                StringComparison.Ordinal) &&
+            TryCollectReferenceRenderAffineTranslations(referenceRoot, out var flatRenderOrigins, out _))
+        {
+            foreach (var (partId, origin) in flatRenderOrigins)
+            {
+                if (partId.Contains("horn", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                translationsByPartId[partId] = origin;
+            }
+        }
+
+        if (GeometryIrEmitPolicy.UsesModelPartTranslateAndRotateBindPoseJvm(emitOptions.OfficialJvmName) &&
+            TryCollectReferenceRenderAffineTranslations(referenceRoot, out var equineRenderOrigins, out _))
+        {
+            foreach (var (partId, origin) in equineRenderOrigins)
+            {
+                translationsByPartId[partId] = origin;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool TryCollectReferenceBlockStackPartOrigins(
+        JsonElement referenceRoot,
+        string? officialJvmName,
+        out Dictionary<string, Vector3> translationsByPartId)
+    {
+        translationsByPartId = new Dictionary<string, Vector3>(StringComparer.Ordinal);
+        if (!referenceRoot.TryGetProperty("roots", out var roots) ||
+            roots.ValueKind != JsonValueKind.Array)
+        {
+            return false;
+        }
+
+        foreach (var root in roots.EnumerateArray())
+        {
+            VisitReferenceBlockStackPartOrigins(root, Matrix4x4.Identity, officialJvmName, translationsByPartId);
+        }
+
+        return translationsByPartId.Count > 0;
+    }
+
+    private static void VisitReferenceBlockStackPartOrigins(
+        JsonElement part,
+        Matrix4x4 parentWorld,
+        string? officialJvmName,
+        Dictionary<string, Vector3> sink)
+    {
+        var partId = part.TryGetProperty("id", out var idEl) ? idEl.GetString() : null;
+        var world = parentWorld;
+        if (part.TryGetProperty("pose", out var poseEl) &&
+            CleanRoomEntityModelRuntime.TryComposePartPosePublic(poseEl, parentWorld, out var worldTexel, partId))
+        {
+            world = worldTexel;
+        }
+
+        if (!string.IsNullOrEmpty(partId))
+        {
+            sink[partId] = Vector3.Transform(Vector3.Zero, world);
+        }
+
+        if (part.TryGetProperty("children", out var children) &&
+            children.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var child in children.EnumerateArray())
+            {
+                VisitReferenceBlockStackPartOrigins(child, world, officialJvmName, sink);
+            }
+        }
+    }
+
+    private static bool TryCollectReferenceRenderAffineTranslations(
+        JsonElement referenceRoot,
+        out Dictionary<string, Vector3> translationsByPartId,
+        out string? failureReason)
+    {
+        translationsByPartId = new Dictionary<string, Vector3>(StringComparer.Ordinal);
+        failureReason = null;
+        if (!referenceRoot.TryGetProperty("renderPartAffines", out var affines) ||
+            affines.ValueKind != JsonValueKind.Array)
+        {
+            failureReason = "reference missing renderPartAffines";
+            return false;
+        }
+
+        foreach (var entry in affines.EnumerateArray())
+        {
+            if (!entry.TryGetProperty("id", out var idEl) ||
+                !entry.TryGetProperty("matrixRowMajor", out var matrixEl) ||
+                matrixEl.ValueKind != JsonValueKind.Array)
+            {
+                continue;
+            }
+
+            var id = idEl.GetString();
+            if (string.IsNullOrEmpty(id))
+            {
+                continue;
+            }
+
+            if (!TryParseReferenceRenderAffineMatrix(matrixEl, out var blockRow))
+            {
+                continue;
+            }
+
+            var texel = CleanRoomEntityModelRuntime.BlockRowAffineToTexel(blockRow);
+            translationsByPartId[id] = Vector3.Transform(Vector3.Zero, texel);
+        }
+
+        return translationsByPartId.Count > 0;
+    }
+
+    private static bool TryParseReferenceRenderAffineMatrix(JsonElement matrixEl, out Matrix4x4 blockRow)
+    {
+        blockRow = Matrix4x4.Identity;
+        if (matrixEl.GetArrayLength() < 4)
+        {
+            return false;
+        }
+
+        var rows = new float[4, 4];
+        for (var row = 0; row < 4; row++)
+        {
+            var rowEl = matrixEl[row];
+            if (rowEl.ValueKind != JsonValueKind.Array || rowEl.GetArrayLength() < 4)
+            {
+                return false;
+            }
+
+            for (var col = 0; col < 4; col++)
+            {
+                rows[row, col] = (float)rowEl[col].GetDouble();
+            }
+        }
+
+        blockRow = new Matrix4x4(
+            rows[0, 0], rows[0, 1], rows[0, 2], rows[0, 3],
+            rows[1, 0], rows[1, 1], rows[1, 2], rows[1, 3],
+            rows[2, 0], rows[2, 1], rows[2, 2], rows[2, 3],
+            rows[3, 0], rows[3, 1], rows[3, 2], rows[3, 3]);
+        return true;
     }
 
     private static bool TryMeanPartOriginInMesh(

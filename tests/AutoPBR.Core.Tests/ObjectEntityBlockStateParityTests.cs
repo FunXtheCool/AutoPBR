@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Text.Json;
+using AutoPBR.Core.Models;
 using AutoPBR.Core.Preview;
 using AutoPBR.Tests.TestSupport;
 
@@ -164,10 +165,44 @@ public sealed class ObjectEntityBlockStateParityTests
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
         Assert.Equal(2, model.Elements.Count);
-        TransformWorldCorners(model.Elements[0], out var bodyMin, out _);
+        TransformWorldCorners(model.Elements[0], out var bodyMin, out var bodyMax);
         Assert.Equal(5f, bodyMin.X, 0.2f);
-        Assert.Equal(6f, bodyMin.Y, 0.2f);
+        Assert.Equal(-13f, bodyMin.Y, 0.2f);
         Assert.Equal(5f, bodyMin.Z, 0.2f);
+        Assert.True(bodyMax.Y > bodyMin.Y, "bell body should span positive height after object-entity Y-up correction");
+    }
+
+    [Fact]
+    public void Bell_ir_mesh_matches_cleanroom_bind_pose()
+    {
+        const string path = "assets/minecraft/textures/entity/bell/bell_body.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var irMesh), path);
+        Assert.True(
+            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
+                "Bell",
+                path,
+                Profile26,
+                out var cleanMesh),
+            path);
+        var cmp = GeometryIrMeshParityComparer.Compare(irMesh, cleanMesh, tolerance: 0.05f);
+        Assert.True(cmp.IsMatch, cmp.Message);
+    }
+
+    [Fact]
+    public void Bell_preview_dome_extends_below_mounting_flange()
+    {
+        const string path = "assets/minecraft/textures/entity/bell/bell_body.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
+        TransformWorldCorners(model.Elements[0], out var bodyMin, out var bodyMax);
+        TransformWorldCorners(model.Elements[1], out var baseMin, out var baseMax);
+        Assert.True(
+            bodyMin.Y < baseMin.Y - 2f,
+            $"bell dome should hang below the top flange; bodyMinY={bodyMin.Y:G3} baseMinY={baseMin.Y:G3}");
+        Assert.True(
+            bodyMax.Y <= baseMax.Y + 0.5f,
+            $"mounting flange should cap the dome; bodyMaxY={bodyMax.Y:G3} baseMaxY={baseMax.Y:G3}");
     }
 
     [Fact]
@@ -180,12 +215,89 @@ public sealed class ObjectEntityBlockStateParityTests
     }
 
     [Fact]
+    public void BannerStanding_ir_mesh_matches_cleanroom_bind_pose()
+    {
+        const string path = "assets/minecraft/textures/entity/banner/white.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var irMesh), path);
+        Assert.True(
+            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
+                "BannerFlagStanding",
+                path,
+                Profile26,
+                out var cleanMesh),
+            path);
+        var cmp = GeometryIrMeshParityComparer.Compare(irMesh, cleanMesh, tolerance: 0.05f);
+        Assert.True(cmp.IsMatch, cmp.Message);
+    }
+
+    [Fact]
+    public void BannerStanding_flag_hangs_below_bar_in_preview_space()
+    {
+        const string path = "assets/minecraft/textures/entity/banner/white.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
+        ModelElement? flag = null;
+        ModelElement? bar = null;
+        foreach (var el in model.Elements)
+        {
+            var height = el.To[1] - el.From[1];
+            if (height > 30f)
+            {
+                flag = el;
+            }
+            else if (height is >= 1.5f and <= 3f)
+            {
+                bar = el;
+            }
+        }
+
+        Assert.NotNull(flag);
+        Assert.NotNull(bar);
+        TransformWorldCorners(flag!, out var flagMin, out _);
+        TransformWorldCorners(bar!, out _, out var barMax);
+        Assert.True(
+            flagMin.Y < barMax.Y - 4f,
+            $"banner cloth should hang below the bar; flagMinY={flagMin.Y:G3} barMaxY={barMax.Y:G3}");
+    }
+
+    [Fact]
     public void BannerWall_resolves_flag_and_bar_without_pole()
     {
         const string path = "assets/minecraft/textures/entity/banner/banner_base.png";
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
         Assert.Equal(2, model.Elements.Count);
+    }
+
+    [Fact]
+    public void BannerWall_flag_hangs_below_bar_in_preview_space()
+    {
+        const string path = "assets/minecraft/textures/entity/banner/banner_base.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
+        ModelElement? flag = null;
+        ModelElement? bar = null;
+        foreach (var el in model.Elements)
+        {
+            var height = el.To[1] - el.From[1];
+            if (height > 30f)
+            {
+                flag = el;
+            }
+            else if (height is >= 1.5f and <= 3f)
+            {
+                bar = el;
+            }
+        }
+
+        Assert.NotNull(flag);
+        Assert.NotNull(bar);
+        TransformWorldCorners(flag!, out var flagMin, out _);
+        TransformWorldCorners(bar!, out _, out var barMax);
+        Assert.True(
+            flagMin.Y < barMax.Y - 4f,
+            $"wall banner cloth should hang below the bar; flagMinY={flagMin.Y:G3} barMaxY={barMax.Y:G3}");
     }
 
     [Fact]
@@ -196,6 +308,210 @@ public sealed class ObjectEntityBlockStateParityTests
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
         Assert.Equal(2, model.Elements.Count);
     }
+
+    [Fact]
+    public void StandingSign_board_sits_above_post_in_preview_space()
+    {
+        const string path = "assets/minecraft/textures/entity/signs/oak.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
+        ModelElement? board = null;
+        ModelElement? post = null;
+        foreach (var el in model.Elements)
+        {
+            if (IsStandingSignBoardElement(el))
+            {
+                board = el;
+            }
+            else if (IsStandingSignPostElement(el))
+            {
+                post = el;
+            }
+        }
+
+        Assert.NotNull(board);
+        Assert.NotNull(post);
+        TransformWorldCorners(board!, out _, out var boardMax);
+        TransformWorldCorners(post!, out var postMin, out _);
+        Assert.True(boardMax.Y > postMin.Y + 8f, $"board should sit above post base; boardMaxY={boardMax.Y:G3} postMinY={postMin.Y:G3}");
+    }
+
+    [Fact]
+    public void StandingSign_baked_vertices_stay_within_element_world_bounds()
+    {
+        const string path = "assets/minecraft/textures/entity/signs/acacia.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var mesh), path);
+
+        var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(mesh, "minecraft");
+        var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase);
+        for (var i = 0; i < ordered.Count; i++)
+        {
+            pathToIdx[ordered[i]] = i;
+            texSizes[ordered[i]] = (64, 32);
+        }
+
+        var maxSlop = 0f;
+        foreach (var el in mesh.Elements)
+        {
+            var single = new MergedJavaBlockModel
+            {
+                Elements = [el],
+                Textures = mesh.Textures,
+            };
+            Assert.True(MinecraftModelBaker.TryBake(single, "minecraft", pathToIdx, texSizes, out var verts, out _, out _));
+            TransformWorldCorners(el, out var elMin, out var elMax);
+            const int stride = MinecraftModelBaker.FloatsPerVertex;
+            const float pad = 0.05f;
+            elMin -= new Vector3(pad);
+            elMax += new Vector3(pad);
+            for (var vi = 0; vi < verts.Length; vi += stride)
+            {
+                var px = verts[vi] * 16f + 8f;
+                var py = verts[vi + 1] * 16f + 8f;
+                var pz = verts[vi + 2] * 16f + 8f;
+                var dx = MathF.Max(0f, MathF.Max(elMin.X - px, px - elMax.X));
+                var dy = MathF.Max(0f, MathF.Max(elMin.Y - py, py - elMax.Y));
+                var dz = MathF.Max(0f, MathF.Max(elMin.Z - pz, pz - elMax.Z));
+                maxSlop = MathF.Max(maxSlop, MathF.Sqrt(dx * dx + dy * dy + dz * dz));
+            }
+        }
+
+        Assert.True(maxSlop <= 0.25f, $"detached baked verts maxSlop={maxSlop:F3} texels");
+    }
+
+    [Fact]
+    public void StandingSign_gpu_bind_baked_vertices_stay_within_element_world_bounds()
+    {
+        const string path = "assets/minecraft/textures/entity/signs/acacia.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var mesh), path);
+
+        var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(mesh, "minecraft");
+        var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase);
+        for (var i = 0; i < ordered.Count; i++)
+        {
+            pathToIdx[ordered[i]] = i;
+            texSizes[ordered[i]] = (64, 32);
+        }
+
+        var maxSlop = 0f;
+        foreach (var el in mesh.Elements)
+        {
+            var single = new MergedJavaBlockModel
+            {
+                Elements = [el],
+                Textures = mesh.Textures,
+            };
+            Assert.True(MinecraftModelBaker.TryBakeBindPoseForGpuSkinning(
+                single, "minecraft", pathToIdx, texSizes, out var verts, out _, out _));
+            TransformWorldCorners(el, out var elMin, out var elMax);
+            const int stride = MinecraftModelBaker.FloatsPerSkinnedVertex;
+            const float pad = 0.05f;
+            elMin -= new Vector3(pad);
+            elMax += new Vector3(pad);
+            for (var vi = 0; vi < verts.Length; vi += stride)
+            {
+                var px = verts[vi];
+                var py = verts[vi + 1];
+                var pz = verts[vi + 2];
+                var dx = MathF.Max(0f, MathF.Max(elMin.X - px, px - elMax.X));
+                var dy = MathF.Max(0f, MathF.Max(elMin.Y - py, py - elMax.Y));
+                var dz = MathF.Max(0f, MathF.Max(elMin.Z - pz, pz - elMax.Z));
+                maxSlop = MathF.Max(maxSlop, MathF.Sqrt(dx * dx + dy * dy + dz * dz));
+            }
+        }
+
+        Assert.True(maxSlop <= 0.25f, $"detached gpu bind verts maxSlop={maxSlop:F3} texels");
+    }
+
+    [Fact]
+    public void StandingSign_geometry_ir_matches_cleanroom_after_vertical_flip()
+    {
+        const string path = "assets/minecraft/textures/entity/signs/acacia.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var ir, out var prov));
+        Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, prov.Kind);
+        Assert.True(
+            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
+                "StandingSignEntity", path, Profile26, out var hand));
+        Assert.Equal(hand.Elements.Count, ir.Elements.Count);
+        for (var i = 0; i < hand.Elements.Count; i++)
+        {
+            Assert.True(
+                MatricesClose(hand.Elements[i].LocalToParent, ir.Elements[i].LocalToParent, 1e-3f),
+                $"element {i} LTP mismatch");
+            for (var c = 0; c < 3; c++)
+            {
+                Assert.Equal(hand.Elements[i].From[c], ir.Elements[i].From[c]);
+                Assert.Equal(hand.Elements[i].To[c], ir.Elements[i].To[c]);
+            }
+        }
+    }
+
+    [Fact]
+    public void StandingSign_rebaked_mesh_post_bottom_cap_stays_attached()
+    {
+        const string path = "assets/minecraft/textures/entity/signs/acacia.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var mesh, out _), path);
+        var post = mesh.Elements.Single(IsStandingSignPostElement);
+
+        var rebake = new EntityEmulatedPreviewRebakeContext
+        {
+            PackZipPath = "pack.zip",
+            AssetArchivePath = path,
+            NativeRootDirectory = AppContext.BaseDirectory,
+            NativeProfileName = Profile26.Name,
+            NativeParsedVersion = Profile26.ParsedVersion?.ToString(),
+            ModelDefaultNamespace = "minecraft",
+            OrderedTextureZipPaths = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(mesh, "minecraft").ToArray()
+        };
+        var materials = rebake.OrderedTextureZipPaths.Select(_ => CreatePreviewMaps(64, 32)).ToArray();
+        Assert.True(EntityEmulatedPreviewRebaker.TryRebakeMesh(
+            rebake, materials, 0f, out var verts, out _, out _, applyGeometryIrSetupAnimMotion: false));
+
+        const int stride = MinecraftModelBaker.FloatsPerVertex;
+        var postSideY = new List<float>();
+        var capY = new List<float>();
+        foreach (var vi in Enumerable.Range(0, verts!.Length / stride))
+        {
+            var baseIdx = vi * stride;
+            var u = verts[baseIdx + 6];
+            var v = verts[baseIdx + 7];
+            var y = verts[baseIdx + 1];
+            var isCapUv = u >= 30f / 64f - 0.001f && u <= 32f / 64f + 0.001f &&
+                          v >= 0f - 0.001f && v <= 2f / 32f + 0.001f;
+            if (isCapUv)
+            {
+                capY.Add(y);
+            }
+            else if (MathF.Abs(u - 28f / 64f) < 0.02f || MathF.Abs(u - 26f / 64f) < 0.02f)
+            {
+                postSideY.Add(y);
+            }
+        }
+
+        Assert.True(capY.Count >= 4, $"expected post cap verts, got {capY.Count}");
+        Assert.True(postSideY.Count >= 4, $"expected post side verts, got {postSideY.Count}");
+        var capMax = capY.Max();
+        var sideMin = postSideY.Min();
+        Assert.True(
+            capMax >= sideMin - 0.02f,
+            $"post bottom cap detached: capMaxY={capMax:F4} sideMinY={sideMin:F4} gap={sideMin - capMax:F4}");
+    }
+
+    private static PreviewTextureMaps CreatePreviewMaps(int width, int height) => new()
+    {
+        Width = width,
+        Height = height,
+        DiffuseRgba = new byte[width * height * 4],
+        NormalRgba = new byte[width * height * 4],
+        SpecularRgba = new byte[width * height * 4],
+        HeightRgba = new byte[width * height * 4],
+    };
 
     [Fact]
     public void Skull_resolves_head_and_hat_layers_with_block_offset()
@@ -215,6 +531,25 @@ public sealed class ObjectEntityBlockStateParityTests
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
         Assert.Equal(8, model.Elements.Count);
+    }
+
+    [Fact]
+    public void DecoratedPot_world_bounds_match_javap_closed_pot_assembly()
+    {
+        const string path = "assets/minecraft/textures/entity/decorated_pot/angler_pottery_pattern.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
+        var corners = CollectWorldCorners(model).ToList();
+        var minX = corners.Min(c => c.X);
+        var maxX = corners.Max(c => c.X);
+        var minY = corners.Min(c => c.Y);
+        var maxY = corners.Max(c => c.Y);
+        var minZ = corners.Min(c => c.Z);
+        var maxZ = corners.Max(c => c.Z);
+        Assert.InRange(maxX - minX, 0f, 17f);
+        Assert.InRange(maxZ - minZ, 0f, 17f);
+        Assert.True(maxY - minY < 42f, $"height span {maxY - minY:G3} exceeds javap pot envelope");
+        Assert.True(minY < 4f, $"expected neck Rx(PI) to pull geometry down; minY={minY:G3}");
     }
 
     [Fact]
@@ -276,6 +611,40 @@ public sealed class ObjectEntityBlockStateParityTests
     }
 
     [Fact]
+    public void Bed_preview_mattress_sits_above_legs_in_world_space()
+    {
+        const string path = "assets/minecraft/textures/entity/bed/black.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
+
+        var mattressYs = new List<float>();
+        var legMaxY = float.MinValue;
+        foreach (var el in model.Elements)
+        {
+            var width = el.To[0] - el.From[0];
+            var depth = el.To[1] - el.From[1];
+            var isMattress = width > 10f && depth > 10f;
+            TransformWorldCorners(el, out var min, out var max);
+            if (isMattress)
+            {
+                mattressYs.Add((min.Y + max.Y) * 0.5f);
+            }
+            else
+            {
+                legMaxY = MathF.Max(legMaxY, max.Y);
+            }
+        }
+
+        Assert.Equal(2, mattressYs.Count);
+        foreach (var mattressCenterY in mattressYs)
+        {
+            Assert.True(
+                mattressCenterY > legMaxY - 0.5f,
+                $"mattress should sit above legs; mattressCenterY={mattressCenterY:G3} legMaxY={legMaxY:G3}");
+        }
+    }
+
+    [Fact]
     public void Bed_preview_mattress_slabs_lie_flat_and_connect()
     {
         const string path = "assets/minecraft/textures/entity/bed/red.png";
@@ -302,13 +671,40 @@ public sealed class ObjectEntityBlockStateParityTests
         Assert.InRange(MathF.Abs(headCenterZ - footCenterZ), 14f, 18f);
     }
 
-    [Fact]
-    public void Conduit_resolves_two_shell_cuboids_from_hand_lift_shard()
+    [Theory]
+    [InlineData("assets/minecraft/textures/entity/conduit/base.png", 1, 6f)]
+    [InlineData("assets/minecraft/textures/entity/conduit/cage.png", 1, 8f)]
+    [InlineData("assets/minecraft/textures/entity/conduit/break_particle.png", 1, 6f)]
+    [InlineData("assets/minecraft/textures/entity/conduit/wind.png", 1, 16f)]
+    public void Conduit_resolves_one_layer_cuboid_from_javap_hand_lift_shard(string path, int expectedElements, float expectedSpan)
     {
-        const string path = "assets/minecraft/textures/entity/conduit/break_particle.png";
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
-        Assert.Equal(2, model.Elements.Count);
+        Assert.Equal(expectedElements, model.Elements.Count);
+        TransformWorldCorners(model.Elements[0], out var min, out var max);
+        Assert.Equal(expectedSpan, max.X - min.X, 0.08f);
+        Assert.Equal(expectedSpan, max.Y - min.Y, 0.08f);
+        Assert.Equal(expectedSpan, max.Z - min.Z, 0.08f);
+        Assert.Equal(8f, (min.X + max.X) * 0.5f, 0.08f);
+        Assert.Equal(8f, (min.Y + max.Y) * 0.5f, 0.08f);
+        Assert.Equal(8f, (min.Z + max.Z) * 0.5f, 0.08f);
+    }
+
+    [Theory]
+    [InlineData("assets/minecraft/textures/entity/conduit/base.png")]
+    [InlineData("assets/minecraft/textures/entity/conduit/cage.png")]
+    public void Conduit_ir_mesh_matches_cleanroom_bind_pose(string path)
+    {
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var irMesh), path);
+        Assert.True(
+            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
+                "ConduitEntity",
+                path,
+                Profile26,
+                out var cleanMesh),
+            path);
+        AssertWorldCornerSetsMatch(cleanMesh, irMesh, tolerance: 0.05f);
     }
 
     [Fact]
@@ -373,7 +769,7 @@ public sealed class ObjectEntityBlockStateParityTests
     public void HandLift_object_entity_paths_skip_living_entity_renderer_basis(string path)
     {
         var basis = CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(
-            officialJvmName: "net.minecraft.client.model.ConduitModel",
+            officialJvmName: "net.minecraft.client.model.ConduitRenderer.createShellLayer",
             stemLower: "break_particle",
             normalizedAssetPath: path);
         Assert.Equal(CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.Skip, basis);
@@ -383,6 +779,11 @@ public sealed class ObjectEntityBlockStateParityTests
     [InlineData("assets/minecraft/textures/entity/bed/red.png", "red")]
     [InlineData("assets/minecraft/textures/entity/signs/oak.png", "oak")]
     [InlineData("assets/minecraft/textures/entity/banner/white.png", "white")]
+    [InlineData("assets/minecraft/textures/entity/boat/oak.png", "oak")]
+    [InlineData("assets/minecraft/textures/entity/boat/bamboo.png", "bamboo")]
+    [InlineData("assets/minecraft/textures/entity/chest_boat/oak.png", "oak")]
+    [InlineData("assets/minecraft/textures/entity/chest_boat/bamboo.png", "bamboo")]
+    [InlineData("assets/minecraft/textures/entity/minecart/minecart.png", "minecart")]
     public void ObjectEntity_paths_skip_living_entity_renderer_basis(string path, string stem)
     {
         var basis = CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(
@@ -390,60 +791,162 @@ public sealed class ObjectEntityBlockStateParityTests
             stemLower: stem,
             normalizedAssetPath: path);
         Assert.Equal(CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.Skip, basis);
+        Assert.False(EntityGpuBoneFillPolicy.ShouldApplyStandardLivingPreviewBasis(path, stem), path);
     }
 
     [Fact]
-    public void BoatOak_emit_from_repaired_resolver_root_matches_cleanroom_landmark()
+    public void ArmorStand_resolves_standard_living_entity_renderer_basis_despite_object_jvm_package()
     {
-        const string path = "assets/minecraft/textures/entity/boat/oak.png";
-        var rule = EntityTextureParityCatalog.ResolveRule(path, "oak");
-        Assert.NotNull(rule);
-        Assert.True(
-            GeometryIrParityJvmResolver.TryResolveLiftedRoot(
-                Profile26,
-                rule!,
-                path,
-                "oak",
-                isBaby: false,
-                out var jvm,
-                out var geometryRoot),
-            path);
-        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, geometryRoot);
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
-            "assets/minecraft/textures/entity/boat/oak",
-            Profile26,
-            jvm,
-            atlasWidth: 128,
-            atlasHeight: 64,
-            out var failure,
-            geometryRootOverride: repaired);
-        Assert.Null(failure);
-        Assert.NotNull(mesh);
-        TransformWorldCorners(mesh!.Elements[0], out var min, out _);
-        Assert.Equal(1.5f, min.Y, 0.15f);
+        const string path = "assets/minecraft/textures/entity/armorstand/armorstand.png";
+        const string jvm = "net.minecraft.client.model.object.armorstand.ArmorStandModel";
+        var basis = CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(jvm, "armorstand", path);
+        Assert.Equal(CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot, basis);
+        Assert.True(EntityGpuBoneFillPolicy.ShouldApplyStandardLivingPreviewBasis(path, "armorstand"));
+        Assert.True(CleanRoomEntityModelRuntime.UsesLivingEntityRendererDespiteObjectPackage(jvm, path));
     }
 
     [Fact]
-    public void BoatOak_resolved_shard_repair_zeros_bottom_part_rotation()
+    public void ArmorStand_geometry_ir_mesh_folds_living_entity_renderer_and_orients_upright()
+    {
+        const string path = "assets/minecraft/textures/entity/armorstand/armorstand.png";
+        const string jvm = "net.minecraft.client.model.object.armorstand.ArmorStandModel";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var mesh, out var provenance), path);
+        Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
+        Assert.True(mesh.UsesLivingEntityRendererColumnYFlip, path);
+
+        var stem = Path.GetFileNameWithoutExtension(path).ToLowerInvariant();
+        var rule = EntityTextureParityCatalog.ResolveRule(path, stem);
+        Assert.NotNull(rule);
+        Assert.True(GeometryIrParityJvmResolver.TryResolveLiftedRoot(
+            Profile26, rule, path, stem, isBaby: false, out var resolvedJvm, out var geometryRoot));
+        Assert.Equal(jvm, resolvedJvm);
+        geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, geometryRoot);
+        var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
+            geometryRoot,
+            new GeometryIrMeshEmitOptions
+            {
+                Fidelity = GeometryIrEmitFidelity.Parity,
+                OfficialJvmName = jvm,
+                AtlasWidth = 64,
+                AtlasHeight = 64,
+            });
+
+        float headY = 0f;
+        var headCount = 0;
+        float plateY = 0f;
+        var plateCount = 0;
+        for (var i = 0; i < mesh.Elements.Count; i++)
+        {
+            var partId = partIds[i];
+            var centroidY = MeasureElementPreviewCentroidY(mesh.Elements[i]);
+            if (partId.Contains("head", StringComparison.OrdinalIgnoreCase) &&
+                !partId.Contains("stick", StringComparison.OrdinalIgnoreCase))
+            {
+                headY += centroidY;
+                headCount++;
+            }
+
+            if (partId.Contains("base_plate", StringComparison.OrdinalIgnoreCase))
+            {
+                plateY += centroidY;
+                plateCount++;
+            }
+        }
+
+        Assert.True(headCount > 0 && plateCount > 0);
+        headY /= headCount;
+        plateY /= plateCount;
+        Assert.True(
+            headY > plateY,
+            $"armor stand should be upright: headY={headY:F3} plateY={plateY:F3}");
+    }
+
+    private static float MeasureElementPreviewCentroidY(ModelElement el)
+    {
+        ReadOnlySpan<(float x, float y, float z)> corners =
+        [
+            (el.From[0], el.From[1], el.From[2]),
+            (el.To[0], el.From[1], el.From[2]),
+            (el.From[0], el.To[1], el.From[2]),
+            (el.To[0], el.To[1], el.From[2]),
+            (el.From[0], el.From[1], el.To[2]),
+            (el.To[0], el.From[1], el.To[2]),
+            (el.From[0], el.To[1], el.To[2]),
+            (el.To[0], el.To[1], el.To[2]),
+        ];
+        var sumY = 0f;
+        foreach (var (x, y, z) in corners)
+        {
+            var world = Vector3.Transform(new Vector3(x, y, z), el.LocalToParent);
+            sumY += world.Y / 16f - 0.5f;
+        }
+
+        return sumY / corners.Length;
+    }
+
+    [Theory]
+    [InlineData("assets/minecraft/textures/entity/boat/oak.png")]
+    [InlineData("assets/minecraft/textures/entity/chest_boat/oak.png")]
+    public void Boat_family_static_mesh_does_not_fold_living_entity_renderer_basis(string path)
+    {
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var mesh, out var provenance), path);
+        Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, provenance.Kind);
+        Assert.False(mesh.UsesLivingEntityRendererColumnYFlip, path);
+
+        var scratch = new List<Matrix4x4>();
+        Assert.True(runtime.TryFillBoneMatricesFast(path, Profile26, 0f, 0f, scratch, out var boneCount), path);
+        Assert.Equal(mesh.Elements.Count, boneCount);
+        for (var i = 0; i < boneCount; i++)
+        {
+            Assert.True(
+                MatricesClose(scratch[i], mesh.Elements[i].LocalToParent, 1e-4f),
+                $"{path}: bone {i} must match bind LocalToParent (no LER double-apply)");
+        }
+    }
+
+    private static bool MatricesClose(in Matrix4x4 a, in Matrix4x4 b, float eps) =>
+        MathF.Abs(a.M11 - b.M11) <= eps && MathF.Abs(a.M22 - b.M22) <= eps && MathF.Abs(a.M33 - b.M33) <= eps &&
+        MathF.Abs(a.M44 - b.M44) <= eps && MathF.Abs(a.M41 - b.M41) <= eps && MathF.Abs(a.M42 - b.M42) <= eps &&
+        MathF.Abs(a.M43 - b.M43) <= eps;
+
+    [Fact]
+    public void BoatOak_emit_from_lifted_resolver_root_matches_cleanroom_landmark()
     {
         const string path = "assets/minecraft/textures/entity/boat/oak.png";
-        var rule = EntityTextureParityCatalog.ResolveRule(path, "oak");
-        Assert.NotNull(rule);
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var mesh), path);
+        var bottom = FindBoatHullBottomSlab(mesh);
+        TransformWorldCorners(bottom, out var min, out _);
         Assert.True(
-            GeometryIrParityJvmResolver.TryResolveLiftedRoot(
-                Profile26,
-                rule!,
+            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
+                "Boat",
                 path,
-                "oak",
-                isBaby: false,
-                out var jvm,
-                out var geometryRoot),
+                Profile26,
+                out var clean),
             path);
-        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, geometryRoot);
-        var bottom = FindPart(repaired, "bottom");
-        Assert.NotNull(bottom);
-        var poseRot = bottom!.Value.GetProperty("pose").GetProperty("rotationEulerRad");
-        Assert.Equal(0d, poseRot[0].GetDouble(), 3);
+        TransformWorldCorners(FindBoatHullBottomSlab(clean), out var cleanMin, out _);
+        Assert.True(Vector3.Distance(min, cleanMin) <= 0.05f,
+            $"bottom min corner delta {Vector3.Distance(min, cleanMin):G6}");
+    }
+
+    private static ModelElement FindBoatHullBottomSlab(MergedJavaBlockModel model)
+    {
+        foreach (var el in model.Elements)
+        {
+            var lx = MathF.Abs(el.To[0] - el.From[0]);
+            var ly = MathF.Abs(el.To[1] - el.From[1]);
+            var lz = MathF.Abs(el.To[2] - el.From[2]);
+            if (lx is >= 27f and <= 29f &&
+                ly is >= 15f and <= 17f &&
+                lz is >= 2.5f and <= 3.5f)
+            {
+                return el;
+            }
+        }
+
+        throw new InvalidOperationException("boat hull bottom slab (28×16×3 local) not found");
     }
 
     [Fact]
@@ -468,42 +971,28 @@ public sealed class ObjectEntityBlockStateParityTests
     }
 
     [Fact]
-    public void BoatOak_bottom_slab_matches_cleanroom_landmark_after_repair()
+    public void BoatOak_bottom_slab_matches_cleanroom_landmark()
     {
         const string path = "assets/minecraft/textures/entity/boat/oak.png";
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
-        TransformWorldCorners(model.Elements[0], out var min, out _);
-        Assert.Equal(1.5f, min.Y, 0.15f);
-        Assert.Equal(-5.5f, min.Z, 0.35f);
-        Assert.Equal(-14f, min.X, 0.35f);
+        Assert.True(
+            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
+                "Boat",
+                path,
+                Profile26,
+                out var clean),
+            path);
+        TransformWorldCorners(FindBoatHullBottomSlab(model), out var irMin, out var irMax);
+        TransformWorldCorners(FindBoatHullBottomSlab(clean), out var cleanMin, out var cleanMax);
+        AssertWorldCornerSetsMatchSingleCorner(irMin, cleanMin, 0.05f);
+        AssertWorldCornerSetsMatchSingleCorner(irMax, cleanMax, 0.05f);
     }
 
-    [Fact]
-    public void BoatModel_part_tree_repair_hoists_bottom_rotation_to_cuboid_pivot()
+    private static void AssertWorldCornerSetsMatchSingleCorner(Vector3 actual, Vector3 expected, float tolerance)
     {
-        var root = GeometryIrTestTierSupport.FindRepoRoot();
-        var path = Path.Combine(
-            root,
-            "docs",
-            "generated",
-            "geometry",
-            "26.1.2",
-            "net.minecraft.client.model.object.boat.BoatModel.json");
-        using var shard = JsonDocument.Parse(File.ReadAllText(path));
-        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(
-            "net.minecraft.client.model.object.boat.BoatModel",
-            shard.RootElement);
-
-        var bottom = FindPart(repaired, "bottom");
-        Assert.NotNull(bottom);
-        var poseRot = bottom!.Value.GetProperty("pose").GetProperty("rotationEulerRad");
-        Assert.Equal(0d, poseRot[0].GetDouble(), 3);
-        Assert.Equal(0d, poseRot[1].GetDouble(), 3);
-        Assert.Equal(0d, poseRot[2].GetDouble(), 3);
-        var cuboid = bottom.Value.GetProperty("cuboids")[0];
-        Assert.True(cuboid.TryGetProperty("rotationPivot", out _));
-        Assert.True(Math.Abs(cuboid.GetProperty("cuboidRotationEulerRad")[0].GetDouble() - Math.PI / 2) < 0.01);
+        Assert.True(Vector3.Distance(actual, expected) <= tolerance,
+            $"corner delta {Vector3.Distance(actual, expected):G6} exceeds {tolerance:G6}");
     }
 
     [Theory]
@@ -526,48 +1015,21 @@ public sealed class ObjectEntityBlockStateParityTests
         Assert.True(cmp.IsMatch, cmp.Message);
     }
 
-    private static JsonElement? FindPart(JsonElement doc, string partId)
+    [Fact]
+    public void Minecart_ir_mesh_matches_cleanroom_bind_pose()
     {
-        if (!doc.TryGetProperty("roots", out var roots))
-        {
-            return null;
-        }
-
-        foreach (var root in roots.EnumerateArray())
-        {
-            if (TryFindPartRecursive(root, partId, out var found))
-            {
-                return found;
-            }
-        }
-
-        return null;
-    }
-
-    private static bool TryFindPartRecursive(JsonElement part, string partId, out JsonElement found)
-    {
-        found = default;
-        if (part.TryGetProperty("id", out var idEl) &&
-            string.Equals(idEl.GetString(), partId, StringComparison.Ordinal))
-        {
-            found = part;
-            return true;
-        }
-
-        if (!part.TryGetProperty("children", out var kids))
-        {
-            return false;
-        }
-
-        foreach (var child in kids.EnumerateArray())
-        {
-            if (TryFindPartRecursive(child, partId, out found))
-            {
-                return true;
-            }
-        }
-
-        return false;
+        const string path = "assets/minecraft/textures/entity/minecart/minecart.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var irMesh), path);
+        Assert.True(
+            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
+                "Minecart",
+                path,
+                Profile26,
+                out var cleanMesh),
+            path);
+        var cmp = GeometryIrMeshParityComparer.Compare(irMesh, cleanMesh, tolerance: 0.05f);
+        Assert.True(cmp.IsMatch, cmp.Message);
     }
 
     private static void AssertWorldCornerSetsMatch(MergedJavaBlockModel expected, MergedJavaBlockModel actual, float tolerance)
@@ -580,6 +1042,20 @@ public sealed class ObjectEntityBlockStateParityTests
             var delta = Vector3.Distance(expectedCorners[i], actualCorners[i]);
             Assert.True(delta <= tolerance, $"corner {i} delta {delta:G6} exceeds {tolerance:G6}");
         }
+    }
+
+    private static bool IsStandingSignBoardElement(ModelElement el)
+    {
+        var width = el.To[0] - el.From[0];
+        var height = el.To[1] - el.From[1];
+        return width > 20f && MathF.Abs(height - 12f) < 0.01f;
+    }
+
+    private static bool IsStandingSignPostElement(ModelElement el)
+    {
+        var width = el.To[0] - el.From[0];
+        var height = el.To[1] - el.From[1];
+        return width < 5f && MathF.Abs(height - 16f) < 0.01f;
     }
 
     private static IEnumerable<Vector3> CollectWorldCorners(MergedJavaBlockModel model)

@@ -37,7 +37,8 @@ internal static class BytecodeGeometryMeshLift
         MojangMappingsParser? maps,
         out JsonArray roots,
         out List<string> notes,
-        ReadOnlySpan<byte> hostClassBytes = default)
+        ReadOnlySpan<byte> hostClassBytes = default,
+        string? officialJvmName = null)
     {
         roots = [];
         notes = [];
@@ -57,7 +58,7 @@ internal static class BytecodeGeometryMeshLift
 
         var delegationDepth = syntheticJavap.Split(JavapClassDisassembly.GeometryMeshIslandBoundaryMarker).Length - 1;
         if (!JavapFloatGeometryMeshLift.TryLift(syntheticJavap, out roots, out notes, maps, delegationDepth,
-                matrices, floatArrays))
+                matrices, floatArrays, officialJvmName))
         {
             notes.Insert(0, "Bytecode disassembly produced lines but segment lift failed.");
             return false;

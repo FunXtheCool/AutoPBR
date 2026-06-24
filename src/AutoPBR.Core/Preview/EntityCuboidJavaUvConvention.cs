@@ -30,6 +30,11 @@ internal static class EntityCuboidJavaUvConvention
             _ => throw new ArgumentOutOfRangeException(nameof(direction)),
         };
 
+        if (mirrorU && rect[0] != rect[2])
+        {
+            (rect[0], rect[2]) = (rect[2], rect[0]);
+        }
+
         return rect;
     }
 

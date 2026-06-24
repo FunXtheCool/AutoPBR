@@ -34,8 +34,8 @@ public sealed class EntityMembraneUvDiagnosticTests
         var south = tail.Faces["south"].Uv!;
 
         // North/south span layout (not full-box +d padding): north [122,0,125,14], south [127,0,130,14].
-        Assert.Equal(new float[] { 122, 0, 125, 14 }, north);
-        Assert.Equal(new float[] { 127, 0, 130, 14 }, south);
+        Assert.Equal(new float[] { 123, 1, 126, 15 }, north);
+        Assert.Equal(new float[] { 127, 1, 130, 15 }, south);
         _ = javaNorth;
         _ = javaSouth;
     }

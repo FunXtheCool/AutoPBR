@@ -35,6 +35,7 @@ public sealed class GhastFamilyLiftTests
             $"{jvm}.json");
         if (!File.Exists(jar) || !File.Exists(referencePath))
         {
+            // T2 probe: optional when parity jar/reference tree is absent locally.
             return;
         }
 
@@ -56,7 +57,31 @@ public sealed class GhastFamilyLiftTests
         {
             var tentacleId = $"tentacle{i}";
             Assert.Equal(1, CountPart(shardRoot, tentacleId));
-            Assert.Equal(tentacleHeights[i], ReadCuboidHeight(shardRoot, tentacleId));
+            var height = ReadCuboidHeight(shardRoot, tentacleId);
+            Assert.Equal(tentacleHeights[i], height);
+            // Lifted IR stores javap +Y boxes before emit reorient; height must be positive span.
+            Assert.True(height >= 4, $"{tentacleId} lift height should match javap addBox (+Y), got {height}");
+        }
+    }
+
+    [Theory]
+    [InlineData("net.minecraft.client.model.monster.ghast.GhastModel")]
+    [InlineData("net.minecraft.client.model.animal.ghast.HappyGhastModel")]
+    public void Ghast_family_committed_shard_tentacle_heights_match_javap_reference(string jvm)
+    {
+        var repo = Program.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
+        Assert.True(File.Exists(shardPath), $"missing committed shard: {shardPath}");
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var status = shard.RootElement.GetProperty("extractionStatus").GetString();
+        Assert.Equal("ok", status);
+
+        var expected = string.Equals(jvm, "net.minecraft.client.model.monster.ghast.GhastModel", StringComparison.Ordinal)
+            ? new[] { 8, 13, 9, 11, 11, 10, 12, 9, 12 }
+            : new[] { 5, 7, 4, 5, 5, 7, 8, 8, 5 };
+        for (var i = 0; i < expected.Length; i++)
+        {
+            Assert.Equal(expected[i], ReadCuboidHeight(shard.RootElement, $"tentacle{i}"));
         }
     }
 

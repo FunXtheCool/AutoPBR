@@ -17,6 +17,11 @@ public static class EntityEmulatedPreviewRebaker
             ? null
             : EntityPreviewBuildContext.UsePose(rebake.PreviewPoseId);
 
+    private static IDisposable? EnterPreviewSizeScope(EntityEmulatedPreviewRebakeContext rebake) =>
+        string.IsNullOrWhiteSpace(rebake.PreviewSizeId)
+            ? null
+            : EntityPreviewBuildContext.UseSize(rebake.PreviewSizeId);
+
     /// <summary>
     /// Recomputes interleaved vertices, indices, and draw batches for an emulated entity subject.
     /// </summary>
@@ -63,6 +68,7 @@ public static class EntityEmulatedPreviewRebaker
 
         var runtime = EntityModelRuntimeFactory.Create();
         using var previewPoseScope = EnterPreviewPoseScope(rebake);
+        using var previewSizeScope = EnterPreviewSizeScope(rebake);
         if (!runtime.TryBuildStaticMesh(
                 rebake.AssetArchivePath,
                 profile,
@@ -188,6 +194,7 @@ public static class EntityEmulatedPreviewRebaker
 
         var runtime = EntityModelRuntimeFactory.Create();
         using var previewPoseScope = EnterPreviewPoseScope(rebake);
+        using var previewSizeScope = EnterPreviewSizeScope(rebake);
         if (!runtime.TryBuildStaticMesh(
                 rebake.AssetArchivePath,
                 profile,
@@ -312,6 +319,7 @@ public static class EntityEmulatedPreviewRebaker
         var animTime = applyGeometryIrSetupAnimMotion ? animationTimeSeconds : 0f;
         var useFullMeshExtract = EntityGpuBoneFillPolicy.RequiresFullMeshBoneExtract(rebake.AssetArchivePath);
         using var previewPoseScope = EnterPreviewPoseScope(rebake);
+        using var previewSizeScope = EnterPreviewSizeScope(rebake);
         if (useFullMeshExtract)
         {
             if (!runtime.TryBuildStaticMesh(

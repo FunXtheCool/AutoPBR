@@ -146,6 +146,15 @@ internal sealed partial class CleanRoomEntityModelRuntime : IEntityModelRuntime
         }
 
         var parityRule = EntityTextureParityCatalog.ResolveRule(norm, stem);
+        if (EntityPreviewSizeCatalog.IsSlimeFamilyBuilderMethod(parityRule?.BuilderMethod))
+        {
+            var squish = SlimeFamilyPreviewScale.ComputePreviewSquish(animationTimeSeconds);
+            var size = EntityPreviewSizeCatalog.ResolveEffectiveSize(
+                EntityPreviewBuildContext.CurrentSizeId,
+                parityRule?.BuilderMethod);
+            mergedModel = SlimeFamilyPreviewScale.ApplyRendererScale(mergedModel, size, squish);
+        }
+
         PreviewDepthLayerResolver.EnrichMergedModel(
             mergedModel,
             parityRule?.GeometryIrOfficialJvm ?? parityRule?.DeobfuscatedModelClass);

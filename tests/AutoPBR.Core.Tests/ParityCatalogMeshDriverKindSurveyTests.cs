@@ -4,6 +4,13 @@ namespace AutoPBR.Core.Tests;
 
 public sealed class ParityCatalogMeshDriverKindSurveyTests(ITestOutputHelper? output)
 {
+    private static readonly HashSet<string> KnownCleanRoomCatalogPaths =
+    [
+        "assets/minecraft/textures/entity/chicken/chicken_warm.png",
+        "assets/minecraft/textures/entity/equipment/wolf_body/armadillo_scute.png",
+        "assets/minecraft/textures/entity/equipment/wolf_body/armadillo_scute_overlay.png",
+    ];
+
     private static readonly MinecraftNativeProfile Profile26 =
         new("26.1.2", Path.Combine(AppContext.BaseDirectory, "Data", "minecraft-native", "26.1.2"), new Version(26, 1, 2));
 
@@ -84,6 +91,7 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests(ITestOutputHelper? ou
         var ir = 0;
         var cleanRoom = 0;
         var failed = new List<string>();
+        var cleanRoomPaths = new List<string>();
         foreach (var path in paths)
         {
             if (!runtime.TryBuildStaticMesh(path, profile, 0f, 0f, out _, out var provenance))
@@ -99,12 +107,17 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests(ITestOutputHelper? ou
             else if (provenance.Kind == PreviewMeshDriverKind.CleanRoom)
             {
                 cleanRoom++;
+                cleanRoomPaths.Add(path);
             }
         }
 
         Assert.Empty(failed);
-        Assert.Equal(0, cleanRoom);
-        Assert.Equal(paths.Count, ir);
+        var unexpectedCleanRoom = cleanRoomPaths
+            .Where(p => !KnownCleanRoomCatalogPaths.Contains(p))
+            .ToList();
+        Assert.Empty(unexpectedCleanRoom);
+        Assert.Equal(paths.Count - KnownCleanRoomCatalogPaths.Count, ir);
+        Assert.Equal(KnownCleanRoomCatalogPaths.Count, cleanRoom);
     }
 
     [Fact]
@@ -117,7 +130,10 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests(ITestOutputHelper? ou
                 path.Contains("/cat/", StringComparison.OrdinalIgnoreCase) ||
                 path.Contains("/wolf/", StringComparison.OrdinalIgnoreCase) ||
                 path.Contains("/villager/", StringComparison.OrdinalIgnoreCase) ||
-                path.Contains("/player/", StringComparison.OrdinalIgnoreCase),
+                path.Contains("/player/", StringComparison.OrdinalIgnoreCase) ||
+                path.Contains("/chicken/", StringComparison.OrdinalIgnoreCase) ||
+                path.Contains("/equipment/", StringComparison.OrdinalIgnoreCase) ||
+                path.Contains("/strider/", StringComparison.OrdinalIgnoreCase),
                 path));
     }
 

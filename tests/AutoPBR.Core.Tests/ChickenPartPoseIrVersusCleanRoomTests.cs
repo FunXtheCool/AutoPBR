@@ -49,7 +49,7 @@ public sealed partial class ChickenPartPoseIrVersusCleanRoomTests
     private static Dictionary<string, Matrix4x4> LoadChicken26IrBindPoseMatrices()
     {
         var path = ContentPath("docs", "generated", "geometry", "26.1.2",
-            "net.minecraft.client.model.animal.chicken.ChickenModel.json");
+            "net.minecraft.client.model.animal.chicken.AdultChickenModel.json");
         Assert.True(File.Exists(path), $"Missing test content: {path}");
         using var doc = JsonDocument.Parse(File.ReadAllText(path));
         var map = new Dictionary<string, Matrix4x4>(StringComparer.Ordinal);
@@ -160,7 +160,7 @@ public sealed partial class ChickenPartPoseIrVersusCleanRoomTests
         var idle = pitch / (8f * (MathF.PI / 180f));
         Assert.True(runtime.TryBuildStaticMesh(path, profile, idlePhase01: idle, animationTimeSeconds: 0f, out var merged));
         var repo = GeometryIrTestTierSupport.FindRepoRoot();
-        const string jvm = "net.minecraft.client.model.animal.chicken.ChickenModel";
+        const string jvm = "net.minecraft.client.model.animal.chicken.AdultChickenModel";
         using var shard = JsonDocument.Parse(File.ReadAllText(Path.Combine(
             repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json")));
         var geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);

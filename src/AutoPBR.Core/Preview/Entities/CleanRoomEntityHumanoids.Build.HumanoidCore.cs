@@ -59,6 +59,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             animationTimeSeconds,
             wave,
             armLiftFallback,
+            isBaby,
             out var raX,
             out var raY,
             out var raZ,
@@ -87,6 +88,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         float animationTimeSeconds,
         float wave,
         float armLiftFallback,
+        bool isBaby,
         out float raX,
         out float raY,
         out float raZ,
@@ -105,18 +107,37 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 idlePhase01,
                 animationTimeSeconds,
                 wave,
+                isBaby,
                 out raX,
                 out raY,
                 out raZ,
                 out laX,
                 out laY,
                 out laZ);
+            if (armPose == EntityHumanoidPreviewArmPose.ZombieArms && !isBaby)
+            {
+                raX = -raX;
+                laX = -laX;
+            }
+
             return;
         }
 
         raX = laX = armLiftFallback;
         raY = laY = raZ = laZ = 0f;
     }
+
+    /// <summary>
+    /// Flat-root <c>ModelPart.translateAndRotate</c> pose in texel row space (matches geometry IR emit / arm post-pass).
+    /// </summary>
+    private static Matrix4x4 BuildFlatRootModelPartPose(
+        float txTexel,
+        float tyTexel,
+        float tzTexel,
+        float xRad,
+        float yRad = 0f,
+        float zRad = 0f) =>
+        BlockRowAffineToTexel(EntityParityTemplate.ModelPartRenderLocalBlock(txTexel, tyTexel, tzTexel, xRad, yRad, zRad));
 
     /// <summary>
     /// <c>BabyZombieModel.createBodyLayer</c> — geometry IR
@@ -137,14 +158,10 @@ internal sealed partial class CleanRoomEntityModelRuntime
         new EntityCuboid(-6.25f, -3f, 6f, -0.25f, 3f, 6f, 3, 3, UvSizeW: 6, UvSizeH: 6, UvSizeD: 1).Emit(b, headPose, p.HeadScale);
         new EntityCuboid(-6.15f, -3f, 6f, -0.15f, 3f, 6.25f, 35, 3, UvSizeW: 6, UvSizeH: 6, UvSizeD: 1).Emit(b, headPose, p.HeadScale);
 
-        var rightArmPose = EntityParityTemplate.Mul(
-            EntityParityTemplate.Mul(root, EntityParityTemplate.T(-3f, 15.5f, 0f)),
-            EntityParityTemplate.Rx(armLiftRad));
+        var rightArmPose = BuildFlatRootModelPartPose(-3f, 15.5f, 0f, armLiftRad);
         new EntityCuboid(-1f, -0.5f, -1f, 1f, 4.5f, 1f, 36, 16, UvSizeW: 2, UvSizeH: 5, UvSizeD: 2).Emit(b, rightArmPose, p.BodyScale);
 
-        var leftArmPose = EntityParityTemplate.Mul(
-            EntityParityTemplate.Mul(root, EntityParityTemplate.T(3f, 15.5f, 0f)),
-            EntityParityTemplate.Rx(armLiftRad));
+        var leftArmPose = BuildFlatRootModelPartPose(3f, 15.5f, 0f, armLiftRad);
         new EntityCuboid(-1f, -0.5f, -1f, 1f, 4.5f, 1f, 28, 16, UvSizeW: 2, UvSizeH: 5, UvSizeD: 2).Emit(b, leftArmPose, p.BodyScale);
 
         var rightLegPose = EntityParityTemplate.Mul(root, EntityParityTemplate.T(-1f, 20f, 0f));
@@ -181,13 +198,13 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         var bodyPose = EntityParityTemplate.Mul(root, EntityParityTemplate.T(0f, 18.75f, 0f));
         new EntityCuboid(-2f, -2.75f, -1.5f, 2f, 2.25f, 1.5f, 0, 15, UvSizeW: 4, UvSizeH: 5, UvSizeD: 3).Emit(b, bodyPose, p.BodyScale);
-        new EntityCuboid(-2.75f, -1.5f, 4f, 3.25f, 1.5f, 4.1f, 16, 22, UvSizeW: 6, UvSizeH: 3, UvSizeD: 1).Emit(b, bodyPose, p.BodyScale);
+        new EntityCuboid(-2f, -2.75f, -1.5f, 2f, 3.25f, 1.5f, 16, 22, UvSizeW: 4, UvSizeH: 6, UvSizeD: 3).Emit(b, bodyPose, p.BodyScale);
 
         var headRoot = EntityParityTemplate.Mul(root, EntityParityTemplate.T(0f, 16f, 0f));
         new EntityCuboid(-4f, -8f, -3.5f, 4f, 0f, 3.5f, 0, 0, UvSizeW: 8, UvSizeH: 8, UvSizeD: 7).Emit(b, headRoot, p.HeadScale);
 
         var hatPose = EntityParityTemplate.Mul(headRoot, EntityParityTemplate.T(0f, -4f, 0f));
-        new EntityCuboid(-4f, -3.5f, 8f, 4f, 3.5f, 8.3f, 0, 31, UvSizeW: 8, UvSizeH: 7, UvSizeD: 1).Emit(b, hatPose, p.HeadScale);
+        new EntityCuboid(-4f, -4f, -3.5f, 4f, 4f, 3.5f, 0, 31, UvSizeW: 8, UvSizeH: 8, UvSizeD: 7).Emit(b, hatPose, p.HeadScale);
 
         var hatRimPose = EntityParityTemplate.Mul(headRoot, EntityParityTemplate.T(0f, -4.5f, 0f));
         new EntityCuboid(-7f, -0.5f, -6f, 7f, 0.5f, 6f, 0, 46, UvSizeW: 14, UvSizeH: 1, UvSizeD: 12).Emit(b, hatRimPose, p.HeadScale);
@@ -195,15 +212,11 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var nosePose = EntityParityTemplate.Mul(headRoot, EntityParityTemplate.T(0f, -1f, -4f));
         new EntityCuboid(-1f, -1f, -0.5f, 1f, 1f, 0.5f, 23, 0, UvSizeW: 2, UvSizeH: 2, UvSizeD: 1).Emit(b, nosePose, p.HeadScale);
 
-        var rightArmPose = EntityParityTemplate.Mul(
-            EntityParityTemplate.Mul(root, EntityParityTemplate.T(-3f, 15.5f, 0f)),
-            EntityParityTemplate.Rx(armLiftRad));
-        new EntityCuboid(-0.5f, -1f, 2f, 4.5f, 1f, 2f, 24, 15, UvSizeW: 5, UvSizeH: 2, UvSizeD: 1).Emit(b, rightArmPose, p.BodyScale);
+        var rightArmPose = BuildFlatRootModelPartPose(-3f, 15.5f, 0f, armLiftRad);
+        new EntityCuboid(-1f, -0.5f, -1f, 1f, 4.5f, 1f, 24, 15, UvSizeW: 2, UvSizeH: 5, UvSizeD: 2).Emit(b, rightArmPose, p.BodyScale);
 
-        var leftArmPose = EntityParityTemplate.Mul(
-            EntityParityTemplate.Mul(root, EntityParityTemplate.T(3f, 15.5f, 0f)),
-            EntityParityTemplate.Rx(armLiftRad));
-        new EntityCuboid(-0.5f, -1f, 2f, 4.5f, 1f, 2f, 16, 15, UvSizeW: 5, UvSizeH: 2, UvSizeD: 1).Emit(b, leftArmPose, p.BodyScale);
+        var leftArmPose = BuildFlatRootModelPartPose(3f, 15.5f, 0f, armLiftRad);
+        new EntityCuboid(-1f, -0.5f, -1f, 1f, 4.5f, 1f, 16, 15, UvSizeW: 2, UvSizeH: 5, UvSizeD: 2).Emit(b, leftArmPose, p.BodyScale);
 
         var rightLegPose = EntityParityTemplate.Mul(root, EntityParityTemplate.T(-1f, 21.5f, 0f));
         new EntityCuboid(-1f, -0.5f, -1f, 1f, 2.5f, 1f, 8, 23, UvSizeW: 2, UvSizeH: 3, UvSizeD: 2).Emit(b, rightLegPose, p.LegScale);
@@ -328,6 +341,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             animationTimeSeconds,
             wave,
             armLiftFallback: 0.18f + idlePhase01 * 0.25f + wave * 0.08f,
+            isBaby,
             out var raX,
             out var raY,
             out var raZ,
@@ -365,6 +379,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             animationTimeSeconds,
             wave,
             armLiftFallback: 0.18f + idlePhase01 * 0.25f + wave * 0.08f,
+            isBaby,
             out var raX,
             out var raY,
             out var raZ,
@@ -434,7 +449,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
                         EntityPreviewBuildContext.CurrentPoseId),
                     idlePhase01,
                     animationTimeSeconds,
-                    wave));
+                    wave,
+                    isBaby: true));
         }
 
         ResolveHumanoidPreviewArmRotations(
@@ -442,7 +458,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
             idlePhase01,
             animationTimeSeconds,
             wave,
-            armLiftFallback: 1.15f + idlePhase01 * 0.55f + wave * 0.18f,
+            armLiftFallback: HumanoidPreviewPoseSupport.ResolveZombieArmPoseBaseRad(isBaby: false),
+            isBaby: false,
             out var raX,
             out var raY,
             out var raZ,

@@ -281,7 +281,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         {
 
-            if (partPose is { ZRot: 0f })
+            if (partPose is { XRot: 0f, YRot: 0f, ZRot: 0f })
 
             {
 
@@ -291,7 +291,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
 
-            localRot = EntityParityTemplate.Rz(partPose.ZRot);
+            localRot = EntityParityTemplate.Er(partPose.XRot, partPose.YRot, partPose.ZRot);
 
             return true;
 

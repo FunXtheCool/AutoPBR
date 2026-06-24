@@ -41,7 +41,7 @@ public sealed class HornComposeOrderProbeTests
         _ = erTHeadDist;
         _ = txErHeadDist;
         Assert.True(
-            txErHeadDist < erTHeadDist,
-            $"T×Er horn cuboid should be closer to head; Er×T={erTCenter} dHead={erTHeadDist:F3} T×Er={txErCenter} dHead={txErHeadDist:F3} head={headPivot}");
+            erTHeadDist < txErHeadDist,
+            $"PartRender Er×T horn cuboid should be closer to head; Er×T={erTCenter} dHead={erTHeadDist:F3} T×Er={txErCenter} dHead={txErHeadDist:F3} head={headPivot}");
     }
 }

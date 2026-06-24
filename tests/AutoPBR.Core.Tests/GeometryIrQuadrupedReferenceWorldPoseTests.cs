@@ -33,6 +33,7 @@ public sealed class GeometryIrQuadrupedReferenceWorldPoseTests
     }
 
     [Theory]
+    [InlineData("net.minecraft.client.model.monster.zombie.BabyZombieVillagerModel", 64, 64)]
     [InlineData("net.minecraft.client.model.animal.cow.CowModel", 64, 64)]
     [InlineData("net.minecraft.client.model.animal.cow.ColdCowModel", 64, 64)]
     [InlineData("net.minecraft.client.model.animal.panda.PandaModel", 64, 64)]

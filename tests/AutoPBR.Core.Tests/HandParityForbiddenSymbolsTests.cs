@@ -27,7 +27,8 @@ public sealed class HandParityForbiddenSymbolsTests
 
             var text = File.ReadAllText(file);
             if (file.EndsWith("VanillaAnimationIrPreviewSampler.cs", StringComparison.OrdinalIgnoreCase) ||
-                file.EndsWith("DefinitionAnimationPreviewSampling.Catalog.cs", StringComparison.OrdinalIgnoreCase))
+                file.EndsWith("DefinitionAnimationPreviewSampling.Catalog.cs", StringComparison.OrdinalIgnoreCase) ||
+                file.EndsWith("DefinitionAnimationPreviewSampling.Catalog.Breeze.cs", StringComparison.OrdinalIgnoreCase))
             {
                 continue;
             }

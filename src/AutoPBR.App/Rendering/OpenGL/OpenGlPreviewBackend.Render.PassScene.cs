@@ -260,13 +260,7 @@ public sealed partial class OpenGlPreviewBackend
                 _loggedMeshReady = true;
                 EmitDepthLayerDiagnostic(frame.BlockModel, nearPlane, farPlane, frame.Gl);
             }
-            var blendWasEnabled = false;
-            if (frame.EntityBlendDraw)
-            {
-                blendWasEnabled = frame.Gl.IsEnabled(EnableCap.Blend);
-                frame.Gl.Enable(EnableCap.Blend);
-                frame.Gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-            }
+            var blendWasEnabled = frame.Gl.IsEnabled(EnableCap.Blend);
 
             foreach (var batch in frame.BlockModel.DrawBatches)
             {
@@ -274,6 +268,26 @@ public sealed partial class OpenGlPreviewBackend
                 {
                     continue;
                 }
+
+                var batchUsesTranslucentOverlay =
+                    batch.LayerPolicy.Kind == PreviewDepthLayerKind.TranslucentOverlay;
+                var batchAlphaMode = batchUsesTranslucentOverlay
+                    ? (int)PreviewEntityAlphaMode.Blend
+                    : frame.EntityEmulatedPreview
+                        ? frame.EntityAlphaModeUniform
+                        : 0;
+                var batchBlend = frame.EntityBlendDraw || batchUsesTranslucentOverlay;
+                if (batchBlend)
+                {
+                    frame.Gl.Enable(EnableCap.Blend);
+                    frame.Gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+                }
+                else if (blendWasEnabled)
+                {
+                    frame.Gl.Disable(EnableCap.Blend);
+                }
+
+                SetInt("uEntityAlphaMode", batchAlphaMode);
 
                 var slot = frame.BlockSlots[batch.MaterialIndex];
                 UploadMaterial(frame.Gl, slot, frame.Settings.NearestTextureFilter);
@@ -314,10 +328,16 @@ public sealed partial class OpenGlPreviewBackend
                 }
             }
 
-            if (frame.EntityBlendDraw && !blendWasEnabled)
+            if (!blendWasEnabled)
             {
                 frame.Gl.Disable(EnableCap.Blend);
             }
+            else
+            {
+                frame.Gl.Enable(EnableCap.Blend);
+            }
+
+            SetInt("uEntityAlphaMode", frame.EntityEmulatedPreview ? frame.EntityAlphaModeUniform : 0);
         }
         else
         {

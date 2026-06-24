@@ -34,11 +34,12 @@ internal static class GeometryIrLiftTreeRepair
     ];
 
     /// <param name="roots">Lifted mesh part tree roots to repair in place.</param>
-    /// <param name="hoistStandardQuadrupedLegsToRoot">
-    /// When true (bytecode lift / reference-aligned shards), hoists hind/front legs from under <c>body</c> to mesh root.
-    /// Javap segment lifts keep nested binding order for hierarchy probes.
+    /// <param name="officialJvmName">
+    /// When set (geometry compiler batch / pipeline), hoists standard quadruped legs from under <c>body</c> for flat
+    /// vanilla bakes (cow, creeper, pig, …). Omitted for direct <see cref="JavapFloatGeometryMeshLift.TryLift"/> probes
+    /// so nested pilots (feline, wolf, axolotl, …) keep legs under <c>body</c>.
     /// </param>
-    public static JsonArray Apply(JsonArray roots, bool hoistStandardQuadrupedLegsToRoot = true)
+    public static JsonArray Apply(JsonArray roots, string? officialJvmName = null)
     {
         foreach (var root in roots)
         {
@@ -69,8 +70,11 @@ internal static class GeometryIrLiftTreeRepair
                 RemovePlayerMeshInternalParts(rootKids);
                 GeometryIrPlayerMeshParityRepair.Apply(rootKids);
                 TrimHumanoidDelegateOverlayCuboids(rootKids);
+                TrimHumanoidHatHeadCanonicalBounds(rootKids);
+                RemoveDuplicateInflatedBodyOverlayCuboids(rootKids);
+                RemoveCopperGolemSetupAnimRotationHelperParts(rootKids, officialJvmName);
                 HoistFelineFlatTail2ToRoot(rootKids);
-                if (hoistStandardQuadrupedLegsToRoot)
+                if (ShouldHoistStandardQuadrupedLegsToRoot(rootKids, officialJvmName))
                 {
                     HoistStandardQuadrupedLegsFromBody(rootKids);
                 }
@@ -247,6 +251,98 @@ internal static class GeometryIrLiftTreeRepair
         return false;
     }
 
+    private static void TrimHumanoidHatHeadCanonicalBounds(JsonArray rootChildren)
+    {
+        if (!TryFindPartById(rootChildren, "head", out var head) || head is null ||
+            head["children"] is not JsonArray headKids ||
+            !TryFindPartById(headKids, "hat", out var hat) || hat is null ||
+            hat["cuboids"] is not JsonArray hatCuboids || hatCuboids.Count == 0 ||
+            hatCuboids[0] is not JsonObject hatCuboid ||
+            head["cuboids"] is not JsonArray headCuboids || headCuboids.Count == 0 ||
+            headCuboids[0] is not JsonObject headCuboid ||
+            !IsCanonicalHumanoidHeadCuboid(hatCuboid) ||
+            IsCanonicalHumanoidHeadCuboid(headCuboid))
+        {
+            return;
+        }
+
+        CopyCuboidBounds(hatCuboid, headCuboid, 0, 0);
+        headCuboid.Remove("inflate");
+    }
+
+    private static bool IsCanonicalHumanoidHeadCuboid(JsonObject cuboid)
+    {
+        if (cuboid["from"] is not JsonArray from || cuboid["to"] is not JsonArray to ||
+            from.Count < 3 || to.Count < 3)
+        {
+            return false;
+        }
+
+        return Math.Abs(from[0]!.GetValue<double>() + 4) < 0.05 &&
+               Math.Abs(from[1]!.GetValue<double>() + 8) < 0.05 &&
+               Math.Abs(from[2]!.GetValue<double>() + 4) < 0.05 &&
+               Math.Abs(to[0]!.GetValue<double>() - 4) < 0.05 &&
+               Math.Abs(to[1]!.GetValue<double>()) < 0.05 &&
+               Math.Abs(to[2]!.GetValue<double>() - 4) < 0.05;
+    }
+
+    private static void CopyCuboidBounds(JsonObject source, JsonObject target, int uvU, int uvV)
+    {
+        target["from"] = source["from"]?.DeepClone();
+        target["to"] = source["to"]?.DeepClone();
+        target["uvOrigin"] = new JsonArray(uvU, uvV);
+    }
+
+    private static void RemoveDuplicateInflatedBodyOverlayCuboids(JsonArray rootChildren)
+    {
+        if (!TryFindPartById(rootChildren, "body", out var body) || body is null ||
+            body["cuboids"] is not JsonArray cuboids)
+        {
+            return;
+        }
+
+        for (var i = cuboids.Count - 1; i >= 0; i--)
+        {
+            if (cuboids[i] is not JsonObject inflated || inflated["inflate"] is null)
+            {
+                continue;
+            }
+
+            foreach (var other in cuboids)
+            {
+                if (other is not JsonObject plain || plain["inflate"] is not null ||
+                    !CuboidBoundsEqual(plain, inflated))
+                {
+                    continue;
+                }
+
+                inflated.Remove("inflate");
+                break;
+            }
+        }
+    }
+
+    private static bool CuboidBoundsEqual(JsonObject left, JsonObject right)
+    {
+        if (left["from"] is not JsonArray lf || right["from"] is not JsonArray rf ||
+            left["to"] is not JsonArray lt || right["to"] is not JsonArray rt ||
+            lf.Count < 3 || rf.Count < 3 || lt.Count < 3 || rt.Count < 3)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < 3; i++)
+        {
+            if (Math.Abs(lf[i]!.GetValue<double>() - rf[i]!.GetValue<double>()) > 0.01 ||
+                Math.Abs(lt[i]!.GetValue<double>() - rt[i]!.GetValue<double>()) > 0.01)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private static void TrimDelegateHeadOverlayCuboids(JsonArray rootChildren)
     {
         if (!TryFindPartById(rootChildren, "head", out var head) || head is null ||
@@ -377,6 +473,25 @@ internal static class GeometryIrLiftTreeRepair
         }
 
         return Math.Abs(to[axis]!.GetValue<double>() - from[axis]!.GetValue<double>());
+    }
+
+    private static void RemoveCopperGolemSetupAnimRotationHelperParts(JsonArray rootChildren, string? officialJvmName)
+    {
+        if (officialJvmName is null ||
+            !officialJvmName.Contains(".golem.CopperGolemModel", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        RemovePartIdsFromForest(rootChildren,
+        [
+            "right_arm_r1",
+            "left_arm_r1",
+            "body_r1",
+            "right_leg_r1",
+            "left_leg_r1",
+            "rightItem",
+        ]);
     }
 
     private static void RemovePartIdsFromForest(JsonArray parts, IReadOnlyList<string> idsToRemove)
@@ -687,6 +802,51 @@ internal static class GeometryIrLiftTreeRepair
         rootChildren.RemoveAt(childIdx);
     }
 
+    private static bool ShouldHoistStandardQuadrupedLegsToRoot(JsonArray rootChildren, string? officialJvmName)
+    {
+        if (string.IsNullOrWhiteSpace(officialJvmName))
+        {
+            return false;
+        }
+
+        if (IsNestedBodyLegQuadrupedMeshFamily(officialJvmName))
+        {
+            return false;
+        }
+
+        if (officialJvmName.Contains(".animal.feline.", StringComparison.Ordinal) ||
+            officialJvmName.Contains(".animal.wolf.", StringComparison.Ordinal) ||
+            officialJvmName.Contains(".animal.llama.", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        if (!TryFindPartById(rootChildren, "body", out var body) || body is null ||
+            body["children"] is not JsonArray bodyKids)
+        {
+            return false;
+        }
+
+        foreach (var kid in bodyKids)
+        {
+            if (kid is JsonObject child &&
+                child["id"]?.GetValue<string>() is { } id &&
+                IsStandardQuadrupedLegPartId(id))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsNestedBodyLegQuadrupedMeshFamily(string officialJvmName) =>
+        officialJvmName.Contains(".animal.axolotl.", StringComparison.Ordinal) ||
+        officialJvmName.Contains(".animal.rabbit.", StringComparison.Ordinal) ||
+        officialJvmName.Contains(".animal.sniffer.", StringComparison.Ordinal) ||
+        officialJvmName.Contains(".animal.equine.BabyDonkey", StringComparison.Ordinal) ||
+        officialJvmName.Contains(".monster.dragon.EnderDragon", StringComparison.Ordinal);
+
     private static void HoistStandardQuadrupedLegsFromBody(JsonArray rootChildren)
     {
         if (!TryFindPartById(rootChildren, "body", out var body) || body is null ||
@@ -862,6 +1022,7 @@ internal static class GeometryIrLiftTreeRepair
                 ["uvOrigin"] = new JsonArray { 0, 0 },
                 ["textureKey"] = "#skin",
                 ["liftKind"] = "exact",
+                ["previewDepthLayer"] = "translucentOverlay",
                 ["provenance"] = "javap lift repair SlimeModel.createOuterBodyLayer"
             }
         };

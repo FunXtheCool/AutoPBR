@@ -29,7 +29,7 @@ public sealed class CowDelegatedMeshLiftTests
         Assert.Contains("createBaseCowModel", resolved.MeshConcat, StringComparison.Ordinal);
 
         Assert.True(
-            BytecodeGeometryMeshLift.TryLiftConcat(resolved.MeshConcat, null, out var roots, out var notes),
+            BytecodeGeometryMeshLift.TryLiftConcat(resolved.MeshConcat, null, out var roots, out var notes, officialJvmName: CowFqn),
             string.Join("; ", notes.Take(12)));
 
         var children = roots[0]!["children"]!.AsArray();
@@ -54,7 +54,7 @@ public sealed class CowDelegatedMeshLiftTests
         Assert.True(
             BytecodeMeshResolution.TryResolve(jar, null, CowFqn, "createBodyLayer", out var resolved));
         Assert.True(
-            BytecodeGeometryMeshLift.TryLiftConcat(resolved.MeshConcat, null, out var roots, out var notes),
+            BytecodeGeometryMeshLift.TryLiftConcat(resolved.MeshConcat, null, out var roots, out var notes, officialJvmName: CowFqn),
             string.Join("; ", notes.Take(12)));
 
         var legs = roots[0]!["children"]!.AsArray().OfType<JsonObject>()

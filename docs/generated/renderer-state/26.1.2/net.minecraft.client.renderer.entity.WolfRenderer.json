@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.renderer.entity.WolfRenderer",
+  "renderStateType": "net.minecraft.client.renderer.entity.state.WolfRenderState",
+  "modelJvmNames": [
+    "net.minecraft.client.model.animal.wolf.WolfModel",
+    "net.minecraft.client.model.animal.wolf.AdultWolfModel",
+    "net.minecraft.client.model.animal.wolf.BabyWolfModel"
+  ],
+  "extractionStatus": "partial hand-pilot",
+  "extractionNotes": [
+    "P6 hand shard: idle preview supplies WolfEntity.DEFAULT_TAIL_ANGLE so WolfModel.setupAnim overwrites createBodyLayer tail bind xRot (required for BabyWolfModel; no-op for adult bind 0.62831855).",
+    "RendererStateLift compiler remains deferred; this shard supplies static scalar preview defaults only."
+  ],
+  "scalarRenderStateFields": [
+    { "renderStateField": "tailAngle", "setupAnimStateField": "tailAngle" }
+  ],
+  "livingEntityFields": [
+    "ageInTicks",
+    "walkAnimationPos",
+    "walkAnimationSpeed",
+    "xRot",
+    "yRot"
+  ],
+  "previewDriver": "static_scalar_state",
+  "scalarDefaults": {
+    "tailAngle": 0.62831855
+  }
+}

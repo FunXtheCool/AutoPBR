@@ -110,6 +110,12 @@ internal sealed partial class CleanRoomEntityModelRuntime
                officialJvmName.Contains(".animal.polarbear.", StringComparison.OrdinalIgnoreCase);
     }
 
+    internal static bool IsPolarBearGeometryIrJvm(string? officialJvmName) =>
+        string.Equals(
+            officialJvmName,
+            "net.minecraft.client.model.animal.polarbear.PolarBearModel",
+            StringComparison.Ordinal);
+
     /// <summary>Hosts that need default <c>S * LocalToParent</c> (hoglin / ravager / rabbit class).</summary>
     internal static bool UsesComposedOffsetAndRotationBodyDefaultLerJvm(string? officialJvmName)
     {
@@ -177,16 +183,13 @@ internal sealed partial class CleanRoomEntityModelRuntime
             }
         }
 
-        if (!string.IsNullOrWhiteSpace(officialJvmName) &&
-            officialJvmName.Contains(".object.", StringComparison.Ordinal))
+        if (UsesLivingEntityRendererDespiteObjectPackage(officialJvmName, normalizedAssetPath))
         {
-            return GeometryIrLerBasisKind.Skip;
+            return GeometryIrLerBasisKind.StandardWorldRoot;
         }
 
-        // Ghast / happy ghast bake ModelTransforms into the mesh root (large negative Y); LER mirror flips preview upright.
         if (!string.IsNullOrWhiteSpace(officialJvmName) &&
-            (officialJvmName.Contains(".monster.ghast.", StringComparison.OrdinalIgnoreCase) ||
-             officialJvmName.Contains(".animal.ghast.", StringComparison.OrdinalIgnoreCase)))
+            officialJvmName.Contains(".object.", StringComparison.Ordinal))
         {
             return GeometryIrLerBasisKind.Skip;
         }
@@ -196,7 +199,38 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return GeometryIrLerBasisKind.EquineDedicated;
         }
 
+        // Ghast / happy ghast: IR reorients tentacle +Y cuboids to −Y hang for preview without LER.
+        // Column-root LER would flip that hang back upward through the body shell (see vanilla reference).
+        if (GeometryIrEmitPolicy.IsGhastFamilyJvm(officialJvmName) ||
+            GeometryIrEmitPolicy.IsGhastFamilyTexturePath(normalizedAssetPath))
+        {
+            return GeometryIrLerBasisKind.Skip;
+        }
+
         return GeometryIrLerBasisKind.StandardWorldRoot;
+    }
+
+    /// <summary>
+    /// Models under <c>net.minecraft.client.model.object.*</c> that still render through vanilla
+    /// <c>LivingEntityRenderer</c> (column <c>scale(-1,-1,1)</c> before the model tree).
+    /// </summary>
+    internal static bool UsesLivingEntityRendererDespiteObjectPackage(
+        string? officialJvmName,
+        string? normalizedAssetPath = null)
+    {
+        if (!string.IsNullOrWhiteSpace(officialJvmName) &&
+            officialJvmName.Contains(".object.armorstand.", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (!string.IsNullOrWhiteSpace(normalizedAssetPath))
+        {
+            return normalizedAssetPath.Replace('\\', '/')
+                .Contains("/textures/entity/armorstand/", StringComparison.OrdinalIgnoreCase);
+        }
+
+        return false;
     }
 
     /// <summary>Vanilla <c>LivingEntityRenderer</c> mirror applied once before the model tree.</summary>

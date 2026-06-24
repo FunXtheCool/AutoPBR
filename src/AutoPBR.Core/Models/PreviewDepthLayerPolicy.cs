@@ -10,6 +10,9 @@ public enum PreviewDepthLayerKind
     CosmeticOverlay = 2,
     EmissiveOverlay = 3,
     DebugOnly = 4,
+
+    /// <summary>Alpha-blended shell (slime outer body via vanilla <c>entityTranslucent</c>).</summary>
+    TranslucentOverlay = 5,
 }
 
 /// <summary>Whether a draw batch participates in shadow-map depth passes.</summary>
@@ -42,6 +45,7 @@ public readonly struct PreviewDrawLayerPolicy() : IEquatable<PreviewDrawLayerPol
             PreviewDepthLayerKind.CutoutOverlay => new Vector3(0.2f, 0.85f, 0.95f),
             PreviewDepthLayerKind.CosmeticOverlay => new Vector3(0.95f, 0.35f, 0.85f),
             PreviewDepthLayerKind.EmissiveOverlay => new Vector3(0.95f, 0.9f, 0.2f),
+            PreviewDepthLayerKind.TranslucentOverlay => new Vector3(0.35f, 0.95f, 0.45f),
             PreviewDepthLayerKind.DebugOnly => new Vector3(0.95f, 0.25f, 0.2f),
             _ => new Vector3(0.75f, 0.75f, 0.75f),
         };
@@ -80,6 +84,15 @@ public readonly struct PreviewDrawLayerPolicy() : IEquatable<PreviewDrawLayerPol
                     DrawOrder = 300 + layerOrdinal,
                     DepthBiasStep = 2,
                     DepthWrite = true,
+                    ShadowMode = PreviewDrawLayerShadowMode.Skip,
+                };
+            case PreviewDepthLayerKind.TranslucentOverlay:
+                return new PreviewDrawLayerPolicy
+                {
+                    Kind = kind,
+                    DrawOrder = 350 + Math.Min(layerOrdinal, MaxDepthBiasStep),
+                    DepthBiasStep = 1,
+                    DepthWrite = false,
                     ShadowMode = PreviewDrawLayerShadowMode.Skip,
                 };
             case PreviewDepthLayerKind.DebugOnly:

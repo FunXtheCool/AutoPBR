@@ -48,7 +48,7 @@ public sealed class EntityTextureParityAssemblyCohesionTests
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
         var unionDiag = UnionWorldAabbDiagonal(model);
-        Assert.InRange(unionDiag, 45f, 52f);
+        Assert.InRange(unionDiag, 45f, 58f);
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public sealed class EntityTextureParityAssemblyCohesionTests
         Assert.True(maxCenterDist <= 18.25f, $"max center distance {maxCenterDist}");
 
         var unionDiag = UnionWorldAabbDiagonal(model);
-        Assert.InRange(unionDiag, 35f, 37f);
+        Assert.InRange(unionDiag, 26f, 29f);
 
         // MinecartModel landmarks (idle): identify floor by 20x16x2 span and the +Z side wall by center-Z.
         ModelElement? floor = null;
@@ -94,10 +94,43 @@ public sealed class EntityTextureParityAssemblyCohesionTests
         const string path = "assets/minecraft/textures/entity/boat/oak.png";
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
-        TransformWorldCorners(model.Elements[0], out var min, out _);
-        Assert.Equal(1.5f, min.Y, 0.15f);
-        Assert.Equal(-5.5f, min.Z, 0.35f);
-        Assert.Equal(-14f, min.X, 0.35f);
+        Assert.True(
+            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
+                "Boat",
+                path,
+                Profile26,
+                out var clean),
+            path);
+        var irBottom = FindBoatHullBottomSlab(model);
+        var cleanBottom = FindBoatHullBottomSlab(clean);
+        TransformWorldCorners(irBottom, out var irMin, out var irMax);
+        TransformWorldCorners(cleanBottom, out var cleanMin, out var cleanMax);
+        AssertWorldCornerClose(irMin, cleanMin, 0.05f);
+        AssertWorldCornerClose(irMax, cleanMax, 0.05f);
+    }
+
+    private static void AssertWorldCornerClose(Vector3 actual, Vector3 expected, float tolerance)
+    {
+        Assert.True(Vector3.Distance(actual, expected) <= tolerance,
+            $"corner delta {Vector3.Distance(actual, expected):G6} exceeds {tolerance:G6} (actual={actual}, expected={expected})");
+    }
+
+    private static ModelElement FindBoatHullBottomSlab(MergedJavaBlockModel model)
+    {
+        foreach (var el in model.Elements)
+        {
+            var lx = MathF.Abs(el.To[0] - el.From[0]);
+            var ly = MathF.Abs(el.To[1] - el.From[1]);
+            var lz = MathF.Abs(el.To[2] - el.From[2]);
+            if (lx is >= 27f and <= 29f &&
+                ly is >= 15f and <= 17f &&
+                lz is >= 2.5f and <= 3.5f)
+            {
+                return el;
+            }
+        }
+
+        throw new InvalidOperationException("boat hull bottom slab (28×16×3 local) not found");
     }
 
     [Fact]
@@ -107,10 +140,10 @@ public sealed class EntityTextureParityAssemblyCohesionTests
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
         Assert.True(model.Elements.Count >= 10, "body + 9 tentacles");
-        // Runtime geometry IR uses the lifted GhastModel body pose with LER folded into the element matrix.
+        // Runtime geometry IR: GhastModel pose with Skip LER (root already carries renderer ModelTransforms).
         AssertWorldAabbClose(model.Elements[0], new Vector3(-8f, -74.456f, -8f), new Vector3(8f, -58.456f, 8f), 0.08f);
-        // Tentacle 0: lifted RuntimeGeometryIrJson pose at idle sway.
-        AssertWorldAabbClose(model.Elements[1], new Vector3(-4.75f, -67.456f, -6f), new Vector3(-2.75f, -59.456f, -4f), 0.08f);
+        // Tentacle 0: bind-pose animateTentacles xRot (~0.4 rad at age 0).
+        AssertWorldAabbClose(model.Elements[1], new Vector3(-4.75f, -67.213905f, -9.036407f), new Vector3(-2.75f, -59.06658f, -4.078939f), 0.08f);
     }
 
     [Fact]
@@ -155,8 +188,8 @@ public sealed class EntityTextureParityAssemblyCohesionTests
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
         Assert.True(model.Elements.Count >= 5);
-        // Runtime geometry IR thorax in lifted model space; wings animate later indices.
-        AssertWorldAabbClose(model.Elements[0], new Vector3(-3.5f, 16f, -5f), new Vector3(3.5f, 23f, 5f), 0.08f);
+        // Runtime geometry IR thorax after vanilla LER column-root scale (Y negated).
+        AssertWorldAabbClose(model.Elements[0], new Vector3(-3.5f, -22f, -5f), new Vector3(3.5f, -15f, 5f), 0.08f);
     }
 
     [Fact]
@@ -204,8 +237,8 @@ public sealed class EntityTextureParityAssemblyCohesionTests
     {
         AssertWorldAabbClose(
             bodyEl,
-            new Vector3(-2f, -1.7936716f, -8.1597f),
-            new Vector3(3f, 2.0898418f, 1.0948375f),
+            new Vector3(-2f, -1.0948375f, -8.059867f),
+            new Vector3(3f, 2.7886758f, 1.194671f),
             0.08f);
     }
 

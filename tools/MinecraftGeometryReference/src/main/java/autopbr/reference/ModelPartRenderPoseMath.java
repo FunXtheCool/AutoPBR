@@ -98,6 +98,7 @@ final class ModelPartRenderPoseMath {
         var affines = new StringBuilder();
         var stack = new PoseStack();
         resetPartTreePose(rootPart);
+        applyWolfIdleSetupAnimTailAngle(rootPart);
         walkRenderPart(rootPart, "root", stack, lines, affines);
         var body = lines.toString();
         if (body.startsWith(",")) {
@@ -122,6 +123,33 @@ final class ModelPartRenderPoseMath {
         for (var child : children.values()) {
             resetPartTreePose(child);
         }
+    }
+
+    /** WolfModel.setupAnim assigns {@code tail.xRot = tailAngle}; idle healthy wolf uses {@code DEFAULT_TAIL_ANGLE}. */
+    private static void applyWolfIdleSetupAnimTailAngle(Object rootPart) throws Exception {
+        var tail = findPartByName(rootPart, "tail");
+        if (tail == null) {
+            return;
+        }
+
+        var xRot = tail.getClass().getField("xRot");
+        xRot.setFloat(tail, 0.62831855f);
+    }
+
+    private static Object findPartByName(Object part, String name) throws Exception {
+        var children = GeometryReferenceBake.getChildren(part);
+        for (var entry : children.entrySet()) {
+            if (name.equals(entry.getKey())) {
+                return entry.getValue();
+            }
+
+            var nested = findPartByName(entry.getValue(), name);
+            if (nested != null) {
+                return nested;
+            }
+        }
+
+        return null;
     }
 
     private static String fmt(float v) {

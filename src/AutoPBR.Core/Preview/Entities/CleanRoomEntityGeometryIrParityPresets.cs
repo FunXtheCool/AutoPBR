@@ -27,7 +27,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
             float idlePhase01,
             float wave,
             string? normalizedAssetPath = null,
-            float animationTimeSeconds = 0f)
+            float animationTimeSeconds = 0f,
+            bool applyGeometryIrSetupAnimMotion = true)
         {
             _ = idlePhase01;
             var p = ParityCatalogDefaultBabyProfile(profile, isBaby, resolvedOfficialJvm);
@@ -48,7 +49,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 ResolvePartScale = partId => useUniformBabyRootScale
                     ? 1f
                     : ResolveDefaultPartScale(partId, p) * geometryScale,
-                PreviewApplyCubeDeformationInflate = true,
+                PreviewApplyCubeDeformationInflate = applyGeometryIrSetupAnimMotion &&
+                    (Math.Abs(animationTimeSeconds) > 1e-6f || Math.Abs(wave) > 1e-6f),
             };
 
             if (string.Equals(builderMethod, "EquipmentHumanoidLeggings", StringComparison.OrdinalIgnoreCase))
@@ -71,7 +73,13 @@ internal sealed partial class CleanRoomEntityModelRuntime
             // for stable preview UVs. IR parity emit keeps exact bytecode boxes — thicken degenerate axes only.
             if (string.Equals(builderMethod, "Axolotl", StringComparison.OrdinalIgnoreCase))
             {
-                return opts with { PreviewDegenerateAxisThickness = 1f };
+                // CubeDeformation(0.001) is static model geometry, not animation-driven; bind and anim
+                // catalog emits must agree so GPU skinning matches CPU rebake at non-zero clocks.
+                return opts with
+                {
+                    PreviewDegenerateAxisThickness = 1f,
+                    PreviewApplyCubeDeformationInflate = true,
+                };
             }
 
             if (string.Equals(builderMethod, "EnderDragon", StringComparison.OrdinalIgnoreCase))
@@ -79,11 +87,32 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 return opts with { PreviewDegenerateAxisThickness = 1f };
             }
 
+            if (string.Equals(builderMethod, "ConduitEntity", StringComparison.OrdinalIgnoreCase))
+            {
+                var centered = opts with { RootTransform = Matrix4x4.CreateTranslation(8f, 8f, 8f) };
+                return resolvedOfficialJvm?.Contains("createEyeLayer", StringComparison.Ordinal) == true
+                    ? centered with { PreviewDegenerateAxisThickness = 0.08f }
+                    : centered;
+            }
+
             if (string.Equals(builderMethod, "Camel", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(builderMethod, "AdultCamel", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(builderMethod, "BabyCamel", StringComparison.OrdinalIgnoreCase))
             {
                 return opts with { PreviewDegenerateAxisThickness = 0.08f };
+            }
+
+            // Creaking head side panels and leg foot disks are texCrop zero-thickness sheets; thin preview
+            // thicken only (same as bee legs) so north/south and up/down faces stay coplanar like Java.
+            if (string.Equals(builderMethod, "Creaking", StringComparison.OrdinalIgnoreCase))
+            {
+                return opts with { PreviewDegenerateAxisThickness = 0.06f };
+            }
+
+            // Bee legs are north/south zero-thickness sheets; hand BuildBee uses ~0.12f Z depth for preview.
+            if (string.Equals(builderMethod, "Bee", StringComparison.OrdinalIgnoreCase))
+            {
+                return opts with { PreviewDegenerateAxisThickness = 0.06f };
             }
 
             if (EntityPreviewPoseCatalog.IsIllagerBuilderMethod(builderMethod))
@@ -121,6 +150,39 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 "tail" => EntityParityTemplate.Mul(world, EntityParityTemplate.T(0f, 0f, wave * 0.5f)),
                 _ => world
             };
+
+        public static GeometryIrMeshEmitOptions CreateCreakingEmitOptions(
+            MinecraftNativeProfile profile,
+            string? resolvedOfficialJvm,
+            int manifestAtlasW,
+            int manifestAtlasH,
+            bool isEyesTexturePath,
+            float idlePhase01,
+            float wave,
+            float animationTimeSeconds)
+        {
+            _ = idlePhase01;
+            _ = wave;
+            _ = animationTimeSeconds;
+            var p = ParityCatalogDefaultBabyProfile(profile, isBaby: false, resolvedOfficialJvm);
+            var opts = GeometryIrMeshEmitOptions.ForParity(manifestAtlasW, manifestAtlasH) with
+            {
+                DefaultPartScale = p.BodyScale,
+                ResolvePartScale = partId => ResolveDefaultPartScale(partId, p),
+                PreviewDegenerateAxisThickness = 0.06f,
+            };
+
+            if (isEyesTexturePath)
+            {
+                return opts with
+                {
+                    ShouldEmitPartCuboids = static partId =>
+                        string.Equals(partId, "head", StringComparison.OrdinalIgnoreCase),
+                };
+            }
+
+            return opts;
+        }
 
         public static GeometryIrMeshEmitOptions CreateBreezeEmitOptions(
             MinecraftNativeProfile profile,
@@ -278,6 +340,11 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 wave: 0f,
                 normalizedAssetPath: normalizedAssetPath,
                 animationTimeSeconds: 0f)
-            .WithOfficialJvmPoseComposeDefaults(officialJvm);
+            .WithOfficialJvmPoseComposeDefaults(officialJvm)
+            with
+            {
+                OfficialJvmName = officialJvm,
+                NormalizedAssetPath = normalizedAssetPath,
+            };
     }
 }

@@ -260,7 +260,7 @@ public static class EntityPreviewPlacement
         for (var i = 0; i < count; i++)
         {
             var partId = elementPartIds[i];
-            var cy = MeasureElementCornerCentroidY(mesh.Elements[i]);
+            var cy = MeasureElementCornerCentroidPreviewY(mesh.Elements[i]);
             if (partId.Contains("head", StringComparison.OrdinalIgnoreCase) &&
                 !partId.Contains("leg", StringComparison.OrdinalIgnoreCase))
             {
@@ -318,6 +318,35 @@ public static class EntityPreviewPlacement
         }
 
         return (wMin.Y + wMax.Y) * 0.5f;
+    }
+
+    private static float MeasureElementCornerCentroidPreviewY(ModelElement el)
+    {
+        ReadOnlySpan<(float x, float y, float z)> corners =
+        [
+            (el.From[0], el.From[1], el.From[2]),
+            (el.To[0], el.From[1], el.From[2]),
+            (el.From[0], el.To[1], el.From[2]),
+            (el.To[0], el.To[1], el.From[2]),
+            (el.From[0], el.From[1], el.To[2]),
+            (el.To[0], el.From[1], el.To[2]),
+            (el.From[0], el.To[1], el.To[2]),
+            (el.To[0], el.To[1], el.To[2]),
+        ];
+        var wMin = new Vector3(float.PositiveInfinity);
+        var wMax = new Vector3(float.NegativeInfinity);
+        foreach (var (x, y, z) in corners)
+        {
+            var w = Vector3.Transform(new Vector3(x, y, z), el.LocalToParent);
+            wMin = Vector3.Min(wMin, w);
+            wMax = Vector3.Max(wMax, w);
+        }
+
+        var centroidTexel = new Vector3(
+            (wMin.X + wMax.X) * 0.5f,
+            (wMin.Y + wMax.Y) * 0.5f,
+            (wMin.Z + wMax.Z) * 0.5f);
+        return EntityEmulatedGpuSkinningMath.PreviewCuboidNormalizeTexelPosition(centroidTexel).Y;
     }
 
     internal static void TryPopulateRebakeElementPartIds(

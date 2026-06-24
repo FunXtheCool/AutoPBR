@@ -3,10 +3,9 @@
   "versionLabel": "26.1.2",
   "officialJvmName": "net.minecraft.client.model.player.PlayerModel",
   "profile": "named_jar_26.1.2",
-  "extractionStatus": "partial",
+  "extractionStatus": "ok",
   "extractionNotes": [
     "Part tree lifted from bytecode_asm (mesh host net.minecraft.client.model.player.PlayerModel).",
-    "Strict structural validation failed (1): reference_mismatch: part \u0027head\u0027: fingerprint mismatch at 0: reference=-4,-8,-4|4,0,4 compared=-4.5,-7,-4.5|4.5,1,3.5",
     "Mesh lift parser notes (1): Lifted via bytecode disassembly \u002B segment parser (exact pool constants)."
   ],
   "factoryMethod": "createMesh",
@@ -15,14 +14,14 @@
       "id": "root",
       "pose": {
         "translation": [
-          0,
-          0,
-          0
+          0.000000000,
+          0.000000000,
+          0.000000000
         ],
         "rotationEulerRad": [
-          0,
-          0,
-          0
+          0.000000000,
+          0.000000000,
+          0.000000000
         ],
         "eulerOrder": "XYZ"
       },
@@ -32,21 +31,16 @@
           "id": "right_leg",
           "pose": {
             "translation": [
-              -1.5,
-              20,
-              0.5
+              -1.899999976,
+              12.00000000,
+              0.000000000
             ],
             "rotationEulerRad": [
-              0,
-              0,
-              0
+              0.000000000,
+              0.000000000,
+              0.000000000
             ],
-            "eulerOrder": "XYZ",
-            "setupAnimPivot": [
-              -1.5,
-              20,
-              0.5
-            ]
+            "eulerOrder": "XYZ"
           },
           "cuboids": [
             {
@@ -69,27 +63,102 @@
               "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
             }
           ],
-          "children": []
+          "children": [
+            {
+              "id": "right_pants",
+              "pose": {
+                "translation": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -2,
+                    0,
+                    -2
+                  ],
+                  "to": [
+                    2,
+                    12,
+                    2
+                  ],
+                  "uvOrigin": [
+                    0,
+                    32
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                  "previewDepthLayer": "cutoutOverlay"
+                }
+              ],
+              "children": [
+                {
+                  "id": "jacket",
+                  "pose": {
+                    "translation": [
+                      0.000000000,
+                      0.000000000,
+                      0.000000000
+                    ],
+                    "rotationEulerRad": [
+                      0.000000000,
+                      0.000000000,
+                      0.000000000
+                    ],
+                    "eulerOrder": "XYZ"
+                  },
+                  "cuboids": [
+                    {
+                      "from": [
+                        -4,
+                        0,
+                        -2
+                      ],
+                      "to": [
+                        4,
+                        12,
+                        2
+                      ],
+                      "uvOrigin": [
+                        16,
+                        32
+                      ],
+                      "textureKey": "#skin",
+                      "liftKind": "exact",
+                      "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                      "previewDepthLayer": "cutoutOverlay"
+                    }
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
         },
         {
           "id": "left_leg",
           "pose": {
             "translation": [
-              1.89999998,
-              12,
-              0
+              1.899999976,
+              12.00000000,
+              0.000000000
             ],
             "rotationEulerRad": [
-              0,
-              0,
-              0
+              0.000000000,
+              0.000000000,
+              0.000000000
             ],
-            "eulerOrder": "XYZ",
-            "setupAnimPivot": [
-              1.89999998,
-              12,
-              0
-            ]
+            "eulerOrder": "XYZ"
           },
           "cuboids": [
             {
@@ -117,21 +186,16 @@
               "id": "left_pants",
               "pose": {
                 "translation": [
-                  0,
-                  0,
-                  0
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
                 ],
                 "rotationEulerRad": [
-                  0,
-                  0,
-                  0
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
                 ],
-                "eulerOrder": "XYZ",
-                "setupAnimPivot": [
-                  0,
-                  0,
-                  0
-                ]
+                "eulerOrder": "XYZ"
               },
               "cuboids": [
                 {
@@ -163,33 +227,28 @@
           "id": "head",
           "pose": {
             "translation": [
-              0,
-              15,
-              0
+              0.000000000,
+              0.000000000,
+              0.000000000
             ],
             "rotationEulerRad": [
-              0,
-              0,
-              0
+              0.000000000,
+              0.000000000,
+              0.000000000
             ],
-            "eulerOrder": "XYZ",
-            "setupAnimPivot": [
-              0,
-              15,
-              0
-            ]
+            "eulerOrder": "XYZ"
           },
           "cuboids": [
             {
               "from": [
-                -4.5,
-                -7,
-                -4.5
+                -4,
+                -8,
+                -4
               ],
               "to": [
-                4.5,
-                1,
-                3.5
+                4,
+                0,
+                4
               ],
               "uvOrigin": [
                 0,
@@ -205,21 +264,16 @@
               "id": "hat",
               "pose": {
                 "translation": [
-                  0,
-                  0,
-                  0
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
                 ],
                 "rotationEulerRad": [
-                  0,
-                  0,
-                  0
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
                 ],
-                "eulerOrder": "XYZ",
-                "setupAnimPivot": [
-                  0,
-                  0,
-                  0
-                ]
+                "eulerOrder": "XYZ"
               },
               "cuboids": [
                 {
@@ -251,37 +305,32 @@
           "id": "body",
           "pose": {
             "translation": [
-              0,
-              18,
-              0
+              0.000000000,
+              0.000000000,
+              0.000000000
             ],
             "rotationEulerRad": [
-              0,
-              0,
-              0
+              0.000000000,
+              0.000000000,
+              0.000000000
             ],
-            "eulerOrder": "XYZ",
-            "setupAnimPivot": [
-              0,
-              18,
-              0
-            ]
+            "eulerOrder": "XYZ"
           },
           "cuboids": [
             {
               "from": [
-                -3,
-                -3,
-                -1.5
+                -4,
+                0,
+                -2
               ],
               "to": [
-                3,
-                2,
-                1.5
+                4,
+                12,
+                2
               ],
               "uvOrigin": [
-                0,
-                17
+                16,
+                16
               ],
               "textureKey": "#skin",
               "liftKind": "exact",
@@ -294,21 +343,16 @@
           "id": "right_arm",
           "pose": {
             "translation": [
-              0,
-              0,
-              0
+              -5.000000000,
+              2.000000000,
+              0.000000000
             ],
             "rotationEulerRad": [
-              0,
-              0,
-              0
+              0.000000000,
+              0.000000000,
+              0.000000000
             ],
-            "eulerOrder": "XYZ",
-            "setupAnimPivot": [
-              0,
-              0,
-              0
-            ]
+            "eulerOrder": "XYZ"
           },
           "cuboids": [
             {
@@ -331,27 +375,62 @@
               "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
             }
           ],
-          "children": []
+          "children": [
+            {
+              "id": "right_sleeve",
+              "pose": {
+                "translation": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "rotationEulerRad": [
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
+                ],
+                "eulerOrder": "XYZ"
+              },
+              "cuboids": [
+                {
+                  "from": [
+                    -3,
+                    -2,
+                    -2
+                  ],
+                  "to": [
+                    1,
+                    10,
+                    2
+                  ],
+                  "uvOrigin": [
+                    40,
+                    32
+                  ],
+                  "textureKey": "#skin",
+                  "liftKind": "exact",
+                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
+                  "previewDepthLayer": "cutoutOverlay"
+                }
+              ],
+              "children": []
+            }
+          ]
         },
         {
           "id": "left_arm",
           "pose": {
             "translation": [
-              5,
-              2,
-              0
+              5.000000000,
+              2.000000000,
+              0.000000000
             ],
             "rotationEulerRad": [
-              0,
-              0,
-              0
+              0.000000000,
+              0.000000000,
+              0.000000000
             ],
-            "eulerOrder": "XYZ",
-            "setupAnimPivot": [
-              5,
-              2,
-              0
-            ]
+            "eulerOrder": "XYZ"
           },
           "cuboids": [
             {
@@ -379,21 +458,16 @@
               "id": "left_sleeve",
               "pose": {
                 "translation": [
-                  0,
-                  0,
-                  0
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
                 ],
                 "rotationEulerRad": [
-                  0,
-                  0,
-                  0
+                  0.000000000,
+                  0.000000000,
+                  0.000000000
                 ],
-                "eulerOrder": "XYZ",
-                "setupAnimPivot": [
-                  0,
-                  0,
-                  0
-                ]
+                "eulerOrder": "XYZ"
               },
               "cuboids": [
                 {
@@ -410,139 +484,6 @@
                   "uvOrigin": [
                     48,
                     48
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-                  "previewDepthLayer": "cutoutOverlay"
-                }
-              ],
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "right_sleeve",
-          "pose": {
-            "translation": [
-              0,
-              0,
-              0
-            ],
-            "rotationEulerRad": [
-              0,
-              0,
-              0
-            ],
-            "eulerOrder": "XYZ",
-            "setupAnimPivot": [
-              0,
-              0,
-              0
-            ]
-          },
-          "cuboids": [
-            {
-              "from": [
-                -3,
-                -2,
-                -2
-              ],
-              "to": [
-                1,
-                10,
-                2
-              ],
-              "uvOrigin": [
-                40,
-                32
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-              "previewDepthLayer": "cutoutOverlay"
-            }
-          ],
-          "children": []
-        },
-        {
-          "id": "right_pants",
-          "pose": {
-            "translation": [
-              0,
-              0,
-              0
-            ],
-            "rotationEulerRad": [
-              0,
-              0,
-              0
-            ],
-            "eulerOrder": "XYZ",
-            "setupAnimPivot": [
-              0,
-              0,
-              0
-            ]
-          },
-          "cuboids": [
-            {
-              "from": [
-                -2,
-                0,
-                -2
-              ],
-              "to": [
-                2,
-                12,
-                2
-              ],
-              "uvOrigin": [
-                0,
-                32
-              ],
-              "textureKey": "#skin",
-              "liftKind": "exact",
-              "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
-              "previewDepthLayer": "cutoutOverlay"
-            }
-          ],
-          "children": [
-            {
-              "id": "jacket",
-              "pose": {
-                "translation": [
-                  0,
-                  0,
-                  0
-                ],
-                "rotationEulerRad": [
-                  0,
-                  0,
-                  0
-                ],
-                "eulerOrder": "XYZ",
-                "setupAnimPivot": [
-                  0,
-                  0,
-                  0
-                ]
-              },
-              "cuboids": [
-                {
-                  "from": [
-                    -4,
-                    0,
-                    -2
-                  ],
-                  "to": [
-                    4,
-                    12,
-                    2
-                  ],
-                  "uvOrigin": [
-                    16,
-                    32
                   ],
                   "textureKey": "#skin",
                   "liftKind": "exact",
@@ -622,348 +563,6 @@
     4,
     1.9,
     12,
-    -4.5,
-    -7,
-    -4.5,
-    9,
-    8,
-    8,
-    15,
-    -3,
-    -3,
-    -1.5,
-    6,
-    5,
-    3,
-    18,
-    -3,
-    -1.2,
-    -1.49,
-    5.9,
-    2.9,
-    -0.1,
-    19,
-    -1,
-    -1.53,
-    5,
-    3,
-    -3.5,
-    15.5,
-    -1,
-    -1.53,
-    5,
-    3,
-    3.5,
-    15.5,
-    -3,
-    -3,
-    -1.5,
-    6,
-    5,
-    3,
-    18,
-    -2,
-    -0.2,
-    -2,
-    3,
-    4,
-    3,
-    -0.1,
-    1.5,
-    20,
-    0.5,
-    -1,
-    -0.2,
-    -2,
-    3,
-    4,
-    3,
-    -0.1,
-    -1.5,
-    20,
-    0.5,
-    -2,
-    2.9,
-    -2,
-    3,
-    3,
-    -1,
-    2.9,
-    -2,
-    3,
-    3,
-    -4,
-    -8,
-    -4,
-    8,
-    8,
-    8,
-    -4,
-    -8,
-    -4,
-    8,
-    8,
-    8,
-    0.5,
-    -4,
-    -2,
-    8,
-    12,
-    4,
-    -3,
-    -2,
-    -2,
-    4,
-    12,
-    4,
-    -5,
-    -1,
-    -2,
-    -2,
-    4,
-    12,
-    4,
-    5,
-    -2,
-    -2,
-    4,
-    12,
-    4,
-    -1.9,
-    12,
-    -2,
-    -2,
-    4,
-    12,
-    4,
-    1.9,
-    12,
-    -2,
-    -2,
-    4,
-    12,
-    4,
-    -0.1,
-    -1.9,
-    12,
-    -2,
-    -2,
-    4,
-    12,
-    4,
-    -0.1,
-    1.9,
-    12,
-    -4.5,
-    -7,
-    -4.5,
-    9,
-    8,
-    8,
-    15,
-    -3,
-    -3,
-    -1.5,
-    6,
-    5,
-    3,
-    18,
-    -3,
-    -1.2,
-    -1.49,
-    5.9,
-    2.9,
-    -0.1,
-    19,
-    -1,
-    -1.53,
-    5,
-    3,
-    -3.5,
-    15.5,
-    -1,
-    -1.53,
-    5,
-    3,
-    3.5,
-    15.5,
-    -3,
-    -3,
-    -1.5,
-    6,
-    5,
-    3,
-    18,
-    -2,
-    -0.2,
-    -2,
-    3,
-    4,
-    3,
-    -0.1,
-    1.5,
-    20,
-    0.5,
-    -1,
-    -0.2,
-    -2,
-    3,
-    4,
-    3,
-    -0.1,
-    -1.5,
-    20,
-    0.5,
-    -2,
-    2.9,
-    -2,
-    3,
-    3,
-    -1,
-    2.9,
-    -2,
-    3,
-    3,
-    -4.5,
-    -7,
-    -4.5,
-    9,
-    8,
-    8,
-    15,
-    -3,
-    -3,
-    -1.5,
-    6,
-    5,
-    3,
-    18,
-    -3,
-    -1.2,
-    -1.49,
-    5.9,
-    2.9,
-    -0.1,
-    19,
-    -1,
-    -1.53,
-    5,
-    3,
-    -3.5,
-    15.5,
-    -1,
-    -1.53,
-    5,
-    3,
-    3.5,
-    15.5,
-    -3,
-    -3,
-    -1.5,
-    6,
-    5,
-    3,
-    18,
-    -2,
-    -0.2,
-    -2,
-    3,
-    4,
-    3,
-    -0.1,
-    1.5,
-    20,
-    0.5,
-    -1,
-    -0.2,
-    -2,
-    3,
-    4,
-    3,
-    -0.1,
-    -1.5,
-    20,
-    0.5,
-    -2,
-    2.9,
-    -2,
-    3,
-    3,
-    -1,
-    2.9,
-    -2,
-    3,
-    3,
-    -4.5,
-    -7,
-    -4.5,
-    9,
-    8,
-    8,
-    15,
-    -3,
-    -3,
-    -1.5,
-    6,
-    5,
-    3,
-    18,
-    -3,
-    -1.2,
-    -1.49,
-    5.9,
-    2.9,
-    -0.1,
-    19,
-    -1,
-    -1.53,
-    5,
-    3,
-    -3.5,
-    15.5,
-    -1,
-    -1.53,
-    5,
-    3,
-    3.5,
-    15.5,
-    -3,
-    -3,
-    -1.5,
-    6,
-    5,
-    3,
-    18,
-    -2,
-    -0.2,
-    -2,
-    3,
-    4,
-    3,
-    -0.1,
-    1.5,
-    20,
-    0.5,
-    -1,
-    -0.2,
-    -2,
-    3,
-    4,
-    3,
-    -0.1,
-    -1.5,
-    20,
-    0.5,
-    -2,
-    2.9,
-    -2,
-    3,
-    3,
-    -1,
-    2.9,
-    -2,
-    3,
-    3,
     0.25,
     -1,
     -2,

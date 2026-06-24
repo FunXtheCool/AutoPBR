@@ -43,6 +43,12 @@ public sealed class PreviewRenderSettings
 
     public int SpritePlaneCount { get; init; } = 1;
 
+    /// <summary>Flat sprite preview: depth of the item plane in world units (0 = single-sided quad).</summary>
+    public float SpriteThickness { get; init; }
+
+    /// <summary>When true, crossed-plane count is ignored and a single textured sprite plane/cuboid is used.</summary>
+    public bool ItemFlatSpritePreview { get; init; }
+
     /// <summary>Draw a subtle XZ grid under the preview object in 3D mode.</summary>
     public bool ShowBackgroundGrid { get; init; } = true;
 

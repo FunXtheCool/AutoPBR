@@ -441,5 +441,7 @@ public sealed class LocalizedStrings
     public static string Preview3DEnableEntityParallaxTooltip => Resources.Preview3DEnableEntityParallaxTooltip;
     public static string Preview3DSpritePlaneCount => Resources.Preview3DSpritePlaneCount;
     public static string Preview3DSpritePlaneCountTooltip => Resources.Preview3DSpritePlaneCountTooltip;
+    public static string Preview3DSpriteThickness => Resources.Preview3DSpriteThickness;
+    public static string Preview3DSpriteThicknessTooltip => Resources.Preview3DSpriteThicknessTooltip;
     public static string Preview3DCameraDebugFlyHint => Resources.Preview3DCameraDebugFlyHint;
 }

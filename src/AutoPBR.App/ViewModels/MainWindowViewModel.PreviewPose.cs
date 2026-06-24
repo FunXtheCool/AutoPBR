@@ -19,6 +19,7 @@ public partial class MainWindowViewModel
     partial void OnPreviewArchivePathChanged(string? value)
     {
         RefreshPreviewPoseOptions(value);
+        RefreshPreviewSizeOptions(value);
     }
 
     partial void OnSelectedPreviewPoseIdChanged(string? value)

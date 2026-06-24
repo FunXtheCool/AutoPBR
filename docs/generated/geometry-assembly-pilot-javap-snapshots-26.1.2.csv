@@ -21,9 +21,9 @@ net.minecraft.client.model.animal.feline.AbstractFelineModel,createBodyMesh,6,2,
 net.minecraft.client.model.animal.feline.AdultCatModel,createBodyMesh,6,2,N,AdultFelineModel.createBodyMesh.javap.txt,45242
 net.minecraft.client.model.animal.feline.AdultFelineModel,createBodyMesh,6,2,N,AdultFelineModel.createBodyMesh.javap.txt,45242
 net.minecraft.client.model.animal.feline.AdultOcelotModel,createBodyMesh,6,2,N,AdultFelineModel.createBodyMesh.javap.txt,45242
-net.minecraft.client.model.animal.feline.BabyCatModel,createBodyMesh,6,2,N,AdultFelineModel.createBodyMesh.javap.txt,45242
+net.minecraft.client.model.animal.feline.BabyCatModel,createBabyLayer,6,1,Y,BabyFelineModel.createBabyLayer.javap.txt,46386
 net.minecraft.client.model.animal.feline.BabyFelineModel,createBabyLayer,6,1,Y,BabyFelineModel.createBabyLayer.javap.txt,46386
-net.minecraft.client.model.animal.feline.BabyOcelotModel,createBodyMesh,6,2,N,AdultFelineModel.createBodyMesh.javap.txt,45242
+net.minecraft.client.model.animal.feline.BabyOcelotModel,createBabyLayer,6,1,Y,BabyFelineModel.createBabyLayer.javap.txt,46386
 net.minecraft.client.model.animal.fox.AdultFoxModel,createBodyLayer,5,2,N,AdultFoxModel.createBodyLayer.javap.txt,30037
 net.minecraft.client.model.animal.fox.BabyFoxModel,createBodyLayer,7,0,N,BabyFoxModel.createBodyLayer.javap.txt,33908
 net.minecraft.client.model.animal.fox.FoxModel,createBodyLayer,5,2,N,AdultFoxModel.createBodyLayer.javap.txt,30037

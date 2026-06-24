@@ -769,4 +769,54 @@ internal static partial class GeometryIrPartTreeRepair
         return false;
     }
 
+    private static void RemoveDuplicateInflatedBodyOverlayCuboids(JsonArray rootChildren)
+    {
+        if (!TryFindPartById(rootChildren, "body", out var body) || body is null ||
+            body["cuboids"] is not JsonArray cuboids)
+        {
+            return;
+        }
+
+        for (var i = cuboids.Count - 1; i >= 0; i--)
+        {
+            if (cuboids[i] is not JsonObject inflated || inflated["inflate"] is null)
+            {
+                continue;
+            }
+
+            foreach (var other in cuboids)
+            {
+                if (other is not JsonObject plain || plain["inflate"] is not null ||
+                    !CuboidBoundsEqual(plain, inflated))
+                {
+                    continue;
+                }
+
+                inflated.Remove("inflate");
+                break;
+            }
+        }
+    }
+
+    private static bool CuboidBoundsEqual(JsonObject left, JsonObject right)
+    {
+        if (left["from"] is not JsonArray lf || right["from"] is not JsonArray rf ||
+            left["to"] is not JsonArray lt || right["to"] is not JsonArray rt ||
+            lf.Count < 3 || rf.Count < 3 || lt.Count < 3 || rt.Count < 3)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < 3; i++)
+        {
+            if (Math.Abs(lf[i]!.GetValue<double>() - rf[i]!.GetValue<double>()) > 0.01 ||
+                Math.Abs(lt[i]!.GetValue<double>() - rt[i]!.GetValue<double>()) > 0.01)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 }

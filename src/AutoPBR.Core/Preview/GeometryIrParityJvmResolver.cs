@@ -26,19 +26,21 @@ internal static class GeometryIrParityJvmResolver
         {
             if (ParityCatalogHandLiftGeometryIrCatalog.TryGetOkRoot(candidate, out geometryRoot))
             {
-                if (IsMisLiftedAdultZombieBabyMesh(isBaby, normalizedAssetPath, candidate, geometryRoot))
-                {
-                    continue;
-                }
-
-                officialJvmName = candidate;
-                return true;
+            if (IsMisLiftedAdultZombieBabyMesh(isBaby, normalizedAssetPath, candidate, geometryRoot) ||
+                IsMisLiftedAdultSnifferOnSniffletBaby(isBaby, normalizedAssetPath, candidate, geometryRoot))
+            {
+                continue;
             }
 
-            if (GeometryIrDocumentLoader.TryLoadLiftedForParityCatalog(profile, candidate, out geometryRoot) &&
-                !IsMisLiftedAdultEquineHorseModelShard(candidate, geometryRoot) &&
-                !IsAdultEquineJvmRejectedForBaby(isBaby, candidate) &&
-                !IsMisLiftedAdultZombieBabyMesh(isBaby, normalizedAssetPath, candidate, geometryRoot))
+            officialJvmName = candidate;
+            return true;
+        }
+
+        if (GeometryIrDocumentLoader.TryLoadLiftedForParityCatalog(profile, candidate, out geometryRoot) &&
+            !IsMisLiftedAdultEquineHorseModelShard(candidate, geometryRoot) &&
+            !IsAdultEquineJvmRejectedForBaby(isBaby, candidate) &&
+            !IsMisLiftedAdultZombieBabyMesh(isBaby, normalizedAssetPath, candidate, geometryRoot) &&
+            !IsMisLiftedAdultSnifferOnSniffletBaby(isBaby, normalizedAssetPath, candidate, geometryRoot))
             {
                 officialJvmName = candidate;
                 return true;
@@ -107,6 +109,11 @@ internal static class GeometryIrParityJvmResolver
         if (isBaby && PathImpliesOcelot(normalizedAssetPath, stem))
         {
             yield return "net.minecraft.client.model.animal.feline.BabyOcelotModel";
+        }
+
+        if (isBaby && PathImpliesSnifflet(normalizedAssetPath, stem))
+        {
+            yield return "net.minecraft.client.model.animal.sniffer.SniffletModel";
         }
 
         if (isBaby && !string.IsNullOrWhiteSpace(rule.GeometryIrOfficialJvmBaby))
@@ -246,6 +253,17 @@ internal static class GeometryIrParityJvmResolver
 
         var path = normalizedAssetPath.Replace('\\', '/');
         return path.Contains("/ocelot", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool PathImpliesSnifflet(string normalizedAssetPath, string stem)
+    {
+        if (stem.Contains("snifflet", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        var path = normalizedAssetPath.Replace('\\', '/');
+        return path.Contains("/sniffer/snifflet", StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool TryParseModelStem(string? officialJvm, out string package, out string modelStem)
@@ -409,6 +427,69 @@ internal static class GeometryIrParityJvmResolver
     private static bool IsAdultCataloguedZombieFamilyTexture(string path) =>
         path.Contains("/textures/entity/zombie/", StringComparison.OrdinalIgnoreCase) &&
         !path.Contains("_baby", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Baby snifflet textures must bind <c>SniffletModel</c> (bone Y=24), not adult <c>SnifferModel</c> (bone Y=5).
+    /// </summary>
+    private static bool IsMisLiftedAdultSnifferOnSniffletBaby(
+        bool isBaby,
+        string normalizedAssetPath,
+        string candidate,
+        JsonElement geometryRoot)
+    {
+        if (!isBaby || !PathImpliesSnifflet(normalizedAssetPath, Path.GetFileNameWithoutExtension(normalizedAssetPath)))
+        {
+            return false;
+        }
+
+        if (!candidate.Contains(".animal.sniffer.", StringComparison.Ordinal) ||
+            candidate.Contains("SniffletModel", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        if (TryFindPartBoneTranslationY(geometryRoot, out var boneY) && boneY < 12f)
+        {
+            return true;
+        }
+
+        return candidate.Contains("SnifferModel", StringComparison.Ordinal);
+    }
+
+    private static bool TryFindPartBoneTranslationY(JsonElement node, out float translationY)
+    {
+        translationY = 0f;
+        if (node.ValueKind != JsonValueKind.Object)
+        {
+            return false;
+        }
+
+        if (node.TryGetProperty("id", out var idProp) &&
+            string.Equals(idProp.GetString(), "bone", StringComparison.Ordinal) &&
+            node.TryGetProperty("pose", out var pose) &&
+            pose.TryGetProperty("translation", out var tr) &&
+            tr.ValueKind == JsonValueKind.Array &&
+            tr.GetArrayLength() >= 2)
+        {
+            translationY = (float)tr[1].GetDouble();
+            return true;
+        }
+
+        if (!node.TryGetProperty("children", out var children) || children.ValueKind != JsonValueKind.Array)
+        {
+            return false;
+        }
+
+        foreach (var child in children.EnumerateArray())
+        {
+            if (TryFindPartBoneTranslationY(child, out translationY))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     private static bool PathImpliesClimate(string normalizedAssetPath, string stem, string token)
     {

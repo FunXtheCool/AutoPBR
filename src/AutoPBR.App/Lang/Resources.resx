@@ -1517,7 +1517,13 @@
     <value>Sprite plane count</value>
   </data>
   <data name="Preview3DSpritePlaneCountTooltip" xml:space="preserve">
-    <value>For 2D Sprite flagged textures in 3D item preview: 1 = single quad; 2–8 = extra Y-rotated planes (fuller silhouette, can look busy).</value>
+    <value>For 2D Sprite flagged block foliage in 3D preview: 1 = single quad; 2–8 = extra Y-rotated planes (fuller silhouette, can look busy). Item textures always use one plane.</value>
+  </data>
+  <data name="Preview3DSpriteThickness" xml:space="preserve">
+    <value>Sprite thickness</value>
+  </data>
+  <data name="Preview3DSpriteThicknessTooltip" xml:space="preserve">
+    <value>Extrudes each opaque sprite texel into a cuboid (Minecraft-style item thickening). 0 = flat card; up to 0.25 extrudes depth — at max, depth matches texel size for cubic voxels. Side faces use flat texel color, not stretched UV.</value>
   </data>
   <data name="Preview3DCameraDebugFlyHint" xml:space="preserve">
     <value>Right-drag: look · WASD while right held: fly · R: reset orbit and fly offset</value>

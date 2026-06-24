@@ -94,6 +94,7 @@ public static class GeometryIrTestTierSupport
         {
             "net.minecraft.client.model.animal.fish.CodModel" => (32, 32),
             "net.minecraft.client.model.animal.fish.SalmonModel" => (32, 32),
+            "net.minecraft.client.model.animal.chicken.AdultChickenModel" => (64, 32),
             "net.minecraft.client.model.animal.chicken.ChickenModel" => (64, 32),
             "net.minecraft.client.model.animal.chicken.BabyChickenModel" => (64, 32),
             "net.minecraft.client.model.animal.cow.CowModel" => (64, 64),

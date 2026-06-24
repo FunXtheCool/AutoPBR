@@ -1,4 +1,5 @@
 using AutoPBR.Core.Models;
+using AutoPBR.Core.Preview;
 
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -58,7 +59,8 @@ internal static class PreviewTextureMapsLoader
             SpecularRgba = specBytes,
             HeightRgba = heightBytes,
             IsPlantForNoHeight = target.IsPlantForNoHeight,
-            Sprite2DFoliageTarget = target.Sprite2DFoliageTarget
+            Sprite2DFoliageTarget = target.Sprite2DFoliageTarget,
+            IsItemTexturePath = PreviewPathPolicy.IsItemTexturePath(target.RelativeKey)
         };
     }
 }

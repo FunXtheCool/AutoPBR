@@ -1,4 +1,5 @@
 using AutoPBR.App.Models;
+using AutoPBR.App.Rendering.Scene;
 using AutoPBR.App.Rendering.OpenGL;
 using AutoPBR.App.ViewModels;
 using AutoPBR.Core;
@@ -129,6 +130,10 @@ internal static class UserSettingsSynchronizer
         vm.Preview3DSpritePlaneCount = settings.Preview3DSpritePlaneCount <= 0
             ? 2
             : Math.Clamp(settings.Preview3DSpritePlaneCount, 1, 8);
+        vm.Preview3DSpriteThickness = Math.Clamp(
+            settings.Preview3DSpriteThickness,
+            PreviewStageConstants.SpriteThicknessMin,
+            PreviewStageConstants.SpriteThicknessMax);
         vm.Preview3DCameraOrbitSensitivity = settings.Preview3DCameraOrbitSensitivity <= 0
             ? 0.006
             : Math.Clamp(settings.Preview3DCameraOrbitSensitivity, 0.0008, 0.04);
@@ -346,6 +351,10 @@ internal static class UserSettingsSynchronizer
         settings.Preview3DLightPitchDegrees = Math.Clamp(vm.Preview3DLightPitchDegrees, -89.0, 89.0);
         settings.Preview3DEnableShadowCascades = vm.Preview3DEnableShadowCascades;
         settings.Preview3DSpritePlaneCount = Math.Clamp(vm.Preview3DSpritePlaneCount, 1, 8);
+        settings.Preview3DSpriteThickness = Math.Clamp(
+            vm.Preview3DSpriteThickness,
+            PreviewStageConstants.SpriteThicknessMin,
+            PreviewStageConstants.SpriteThicknessMax);
         settings.Preview3DCameraOrbitSensitivity = Math.Clamp(vm.Preview3DCameraOrbitSensitivity, 0.0008, 0.04);
         settings.Preview3DCameraPanSensitivity = Math.Clamp(vm.Preview3DCameraPanSensitivity, 0.0003, 0.02);
         settings.Preview3DCameraZoomSensitivity = Math.Clamp(vm.Preview3DCameraZoomSensitivity, 0.02, 0.5);

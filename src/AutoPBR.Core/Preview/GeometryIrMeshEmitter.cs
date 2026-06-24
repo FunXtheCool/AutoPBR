@@ -62,7 +62,33 @@ internal sealed partial class CleanRoomEntityModelRuntime
         TryComposePartPose(pose, Matrix4x4.Identity, out matrix, out _);
 
     internal static bool TryComposePartPosePublic(JsonElement pose, Matrix4x4 parentWorld, out Matrix4x4 matrix) =>
-        TryComposePartPose(pose, parentWorld, out matrix, out _);
+        TryComposePartPose(pose, parentWorld, out matrix, out _, partId: null);
+
+    internal static bool TryComposePartPosePublic(
+        JsonElement pose,
+        Matrix4x4 parentWorld,
+        out Matrix4x4 matrix,
+        string? partId) =>
+        TryComposePartPose(pose, parentWorld, out matrix, out _, partId: partId);
+
+    internal static bool TryComposePartPoseOffsetAndRotationLocalTexel(
+        JsonElement pose,
+        out Matrix4x4 localTexel,
+        out string? failureReason)
+    {
+        localTexel = Matrix4x4.Identity;
+        failureReason = null;
+        if (!TryReadPose(pose, out var tx, out var ty, out var tz, out var rx, out var ry, out var rz, out var order, out failureReason))
+        {
+            return false;
+        }
+
+        localTexel = EntityParityTemplate.PartPose(tx, ty, tz, rx, ry, rz, order);
+        return true;
+    }
+
+    internal static bool TryComposeLegacyPartPoseTexelPublic(JsonElement pose, out Matrix4x4 matrix, out string? failureReason) =>
+        TryComposeLegacyPartPoseTexel(pose, out matrix, out failureReason);
 
     internal static bool TryComposeTranslationTimesRotationPartPosePublic(
         JsonElement pose,
@@ -118,11 +144,26 @@ internal sealed partial class CleanRoomEntityModelRuntime
         Matrix4x4 parentWorld,
         out Matrix4x4 matrix,
         out string? failureReason,
-        bool useColumnTranslationTimesRotation = false)
+        bool useColumnTranslationTimesRotation = false,
+        string? partId = null)
     {
         if (useColumnTranslationTimesRotation)
         {
             return TryComposeColumnPartPose(pose, parentWorld, out matrix, out failureReason);
+        }
+
+        if (partId is not null &&
+            partId.Contains("horn", StringComparison.OrdinalIgnoreCase) &&
+            PoseHasNonZeroRotation(pose))
+        {
+            if (!TryComposePartPoseOffsetAndRotationLocalTexel(pose, out var localPartPose, out failureReason))
+            {
+                matrix = Matrix4x4.Identity;
+                return false;
+            }
+
+            matrix = Matrix4x4.Multiply(parentWorld, localPartPose);
+            return true;
         }
 
         if (EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose)
@@ -145,6 +186,54 @@ internal sealed partial class CleanRoomEntityModelRuntime
     /// Java <c>PartPose.offsetAndRotation</c> chain in texel space. PoseStack stores the equivalent column chain as
     /// <c>parent * T * R</c>; with <see cref="Matrix4x4"/> row-vector transforms this must be <c>(R * T) * parent</c>.
     /// </summary>
+    internal static bool PoseHasNonZeroRotation(JsonElement pose)
+    {
+        if (!pose.ValueKind.Equals(JsonValueKind.Object) ||
+            !pose.TryGetProperty("rotationEulerRad", out var r) ||
+            r.ValueKind != JsonValueKind.Array ||
+            r.GetArrayLength() < 3)
+        {
+            return false;
+        }
+
+        const float eps = 1e-5f;
+        return MathF.Abs((float)r[0].GetDouble()) > eps ||
+               MathF.Abs((float)r[1].GetDouble()) > eps ||
+               MathF.Abs((float)r[2].GetDouble()) > eps;
+    }
+
+    internal static bool ShouldUseColumnPartPoseCompose(JsonElement pose, in GeometryIrMeshEmitOptions options)
+    {
+        if (GeometryIrEmitPolicy.UsesObjectEntityModelPartPoseCompose(options.OfficialJvmName) ||
+            GeometryIrEmitPolicy.UsesModelPartTranslateAndRotateBindPoseJvm(options.OfficialJvmName) ||
+            (UsesFlatPartPoseOffsetQuadrupedJvm(options.OfficialJvmName) &&
+             !IsPolarBearGeometryIrJvm(options.OfficialJvmName)))
+        {
+            return false;
+        }
+
+        if (options.ResolveUseColumnTranslationTimesRotationPartPose())
+        {
+            return true;
+        }
+
+        if (!PoseHasNonZeroRotation(pose))
+        {
+            return false;
+        }
+
+        // Flat root-sibling quadrupeds use ModelPart.translateAndRotate at bind unless the part carries
+        // a non-zero PartPose rotation (cow/polar/chicken torso Rx π/2) where column Er×T matches Java.
+        if (UsesFlatPartPoseOffsetQuadrupedJvm(options.OfficialJvmName) && !PoseHasNonZeroRotation(pose))
+        {
+            return false;
+        }
+
+        var jvm = options.OfficialJvmName ?? "";
+        return jvm.Contains(".animal.", StringComparison.Ordinal) ||
+               jvm.Contains(".monster.", StringComparison.Ordinal);
+    }
+
     internal static bool TryComposeColumnPartPose(
         JsonElement pose,
         Matrix4x4 parentWorldTexel,
@@ -277,22 +366,27 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var inflate = GeometryIrCuboidMetadata.ApplyCubeDeformationInflateForEmit(
             cuboid, options, ref x0, ref y0, ref z0, ref x1, ref y1, ref z1);
 
-        _ = options.PreviewDegenerateAxisThickness > 0f &&
-            GeometryIrEmitPolicy.TryExpandAxolotlGillCuboidZExtents(
-                options.OfficialJvmName, partId, ref z0, ref z1);
-
         if (options.PreviewDegenerateAxisThickness > 0f)
         {
-            ApplyPreviewDegenerateAxisThickness(
-                ref x0, ref y0, ref z0, ref x1, ref y1, ref z1,
-                options.PreviewDegenerateAxisThickness);
+            _ = GeometryIrEmitPolicy.TryExpandAxolotlGillCuboidZExtents(
+                options.OfficialJvmName, partId, ref z0, ref z1);
         }
 
-        GeometryIrEmitPolicy.TryReorientGhastFamilyTentacleCuboidYForModelSpace(
+        GeometryIrCuboidMetadata.TryGetFaceMask(cuboid, out var previewFaceMask);
+        if (options.PreviewDegenerateAxisThickness > 0f)
+        {
+            ApplyPreviewDegenerateAxisThicknessForFaceMask(
+                ref x0, ref y0, ref z0, ref x1, ref y1, ref z1,
+                options.PreviewDegenerateAxisThickness,
+                previewFaceMask);
+        }
+
+        var invertYForJavaUv = GeometryIrEmitPolicy.TryReorientGhastFamilyTentacleCuboidYForModelSpace(
             options.OfficialJvmName,
             partId,
             ref y0,
-            ref y1);
+            ref y1,
+            options.NormalizedAssetPath);
 
         var texU = uv[0].GetInt32();
         var texV = uv[1].GetInt32();
@@ -301,11 +395,23 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var uw = -1;
         var uh = -1;
         var ud = -1;
-        if (GeometryIrCuboidMetadata.TryGetUvSpan(cuboid, out var spanW, out var spanH, out var spanD))
+        var hasUvSpan = GeometryIrCuboidMetadata.TryGetUvSpan(cuboid, out var spanW, out var spanH, out var spanD);
+        if (hasUvSpan)
         {
-            uw = spanW;
-            uh = spanH;
-            ud = spanD >= 0 ? spanD : -1;
+            var logicalW = (int)MathF.Round(MathF.Abs(x1 - x0));
+            var logicalH = (int)MathF.Round(MathF.Abs(y1 - y0));
+            var logicalD = (int)MathF.Round(MathF.Abs(z1 - z0));
+            (uw, uh, var resolvedD) = GeometryIrUvAtlasQuality.ResolveTexCropUvFootprint(
+                cuboid,
+                texU,
+                texV,
+                spanW,
+                spanH,
+                spanD >= 0 ? spanD : logicalD,
+                logicalW,
+                logicalH,
+                logicalD);
+            ud = resolvedD >= 0 ? resolvedD : -1;
         }
         else if (inflate != 0f)
         {
@@ -328,7 +434,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         }
 
         _ = GeometryIrEmitPolicy.TryApplyGhastFamilyCuboidUvFootprint(
-            options.OfficialJvmName, partId, y0, y1, ref uw, ref uh, ref ud);
+            options.OfficialJvmName, partId, y0, y1, ref uw, ref uh, ref ud, options.NormalizedAssetPath);
 
         string[]? faceMaskArray = null;
         if (GeometryIrCuboidMetadata.TryGetFaceMask(cuboid, out var faceMask))
@@ -379,7 +485,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
             YRot: cuboidRy,
             ZRot: cuboidRz,
             FaceMask: faceMaskArray,
-            TextureKey: textureKey)
+            TextureKey: textureKey,
+            InvertYForJavaUv: invertYForJavaUv)
         {
             RotationPivot = rotationPivot
         };
@@ -394,6 +501,68 @@ internal sealed partial class CleanRoomEntityModelRuntime
         ExpandAxisIfDegenerate(ref x0, ref x1, thickness);
         ExpandAxisIfDegenerate(ref y0, ref y1, thickness);
         ExpandAxisIfDegenerate(ref z0, ref z1, thickness);
+    }
+
+    /// <summary>
+    /// Preview thicken only the sheet normal axis (bee legs = Z on north/south masks; wings = Y on up/down masks).
+    /// </summary>
+    private static void ApplyPreviewDegenerateAxisThicknessForFaceMask(
+        ref float x0, ref float y0, ref float z0,
+        ref float x1, ref float y1, ref float z1,
+        float thickness,
+        string[]? faceMask)
+    {
+        if (faceMask is { Length: > 0 } && IsNorthSouthFaceMaskOnly(faceMask))
+        {
+            ExpandAxisIfDegenerate(ref z0, ref z1, thickness);
+            return;
+        }
+
+        if (faceMask is { Length: > 0 } && IsUpDownFaceMaskOnly(faceMask))
+        {
+            ExpandAxisIfDegenerate(ref y0, ref y1, thickness);
+            return;
+        }
+
+        ApplyPreviewDegenerateAxisThickness(ref x0, ref y0, ref z0, ref x1, ref y1, ref z1, thickness);
+    }
+
+    private static bool IsNorthSouthFaceMaskOnly(string[] faceMask)
+    {
+        if (faceMask.Length == 0)
+        {
+            return false;
+        }
+
+        foreach (var face in faceMask)
+        {
+            if (!face.Equals("north", StringComparison.OrdinalIgnoreCase) &&
+                !face.Equals("south", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool IsUpDownFaceMaskOnly(string[] faceMask)
+    {
+        if (faceMask.Length == 0)
+        {
+            return false;
+        }
+
+        foreach (var face in faceMask)
+        {
+            if (!face.Equals("up", StringComparison.OrdinalIgnoreCase) &&
+                !face.Equals("down", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static void ExpandAxisIfDegenerate(ref float a0, ref float a1, float thickness)
