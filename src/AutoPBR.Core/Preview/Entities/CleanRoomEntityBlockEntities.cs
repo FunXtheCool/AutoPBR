@@ -49,6 +49,13 @@ internal sealed partial class CleanRoomEntityModelRuntime
         string.Equals(builderMethod, "BannerFlagStanding", StringComparison.OrdinalIgnoreCase) ||
         string.Equals(builderMethod, "BannerFlagWall", StringComparison.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Decorated pot bind pose already includes neck <c>rotationX(PI)</c>; a global matrix
+    /// <c>scale(1,-1,1)</c> inverts the closed assembly and breaks zero-height cap winding (see standing sign).
+    /// </summary>
+    internal static bool UsesDecoratedPotPreviewVerticalOrientation(string builderMethod) =>
+        string.Equals(builderMethod, "DecoratedPotEntity", StringComparison.OrdinalIgnoreCase);
+
     private static MergedJavaBlockModel ApplyObjectEntityPreviewVerticalFlipIfNeeded(
         MergedJavaBlockModel model,
         string builderMethod) =>
@@ -57,21 +64,260 @@ internal sealed partial class CleanRoomEntityModelRuntime
             : model;
 
     /// <summary>
-    /// Standing/hanging signs use flat root cuboids with identity bind poses. Reflecting local
+    /// Standing signs use flat root cuboids with identity bind poses. Reflecting local
     /// <see cref="ModelElement.From"/>/<see cref="ModelElement.To"/> and swapping up/down face slots
     /// preserves triangle winding; a matrix <c>scale(1,-1,1)</c> on <see cref="ModelElement.LocalToParent"/>
     /// inverts winding and detaches cap faces in Explore.
+    /// Hanging signs include tilted chain sheets under <c>PartPose.offsetAndRotation</c>; conjugating those
+    /// poses under local geometry reflection keeps chains attached to the board.
     /// </summary>
     internal static bool UsesObjectEntityLocalGeometryVerticalFlip(string builderMethod) =>
-        string.Equals(builderMethod, "StandingSignEntity", StringComparison.OrdinalIgnoreCase) ||
-        string.Equals(builderMethod, "HangingSignEntity", StringComparison.OrdinalIgnoreCase);
+        string.Equals(builderMethod, "StandingSignEntity", StringComparison.OrdinalIgnoreCase);
 
     internal static MergedJavaBlockModel ApplyObjectEntityPreviewVerticalFlip(
         MergedJavaBlockModel model,
         string builderMethod) =>
         UsesObjectEntityLocalGeometryVerticalFlip(builderMethod)
             ? ApplyObjectEntityPreviewVerticalFlipLocalGeometry(model)
-            : ApplyGlobalTransform(model, ObjectEntityPreviewVerticalFlip);
+            : string.Equals(builderMethod, "HangingSignEntity", StringComparison.OrdinalIgnoreCase)
+                ? ApplyHangingSignPreviewOrientation(model)
+                : ApplyGlobalTransform(model, ObjectEntityPreviewVerticalFlip);
+
+    /// <summary>
+    /// Board/plank/vChains and tilted chain sheets all use local geometry reflection plus Y-flip pose
+    /// conjugation so parts at negative Java Y stay attached to the board. North/south zero-depth sheets
+    /// also swap face slots so preview winding matches the reflected geometry.
+    /// </summary>
+    private static MergedJavaBlockModel ApplyHangingSignPreviewOrientation(MergedJavaBlockModel model)
+    {
+        var transformed = new List<ModelElement>(model.Elements.Count);
+        foreach (var element in model.Elements)
+        {
+            transformed.Add(ReflectHangingSignElementForPreview(element));
+        }
+
+        return new MergedJavaBlockModel
+        {
+            Elements = transformed,
+            Textures = model.Textures,
+            UsesLivingEntityRendererColumnYFlip = model.UsesLivingEntityRendererColumnYFlip,
+        };
+    }
+
+    private static ModelElement ReflectHangingSignElementForPreview(ModelElement element)
+    {
+        var reflected = ReflectElementVerticalLocalGeometry(element);
+        var pose = ConjugateVerticalFlipPartPose(element.LocalToParent);
+        var faces = reflected.Faces;
+        if (IsHangingSignNorthSouthSheetElement(element))
+        {
+            faces = IsHangingSignVerticalChainSheet(reflected, pose)
+                ? SwapNorthSouthFaceSlots(reflected.Faces)
+                : FlipNorthSouthFaceVBounds(reflected.Faces);
+        }
+
+        return new ModelElement
+        {
+            From = reflected.From,
+            To = reflected.To,
+            Faces = faces,
+            LocalToParent = pose,
+            DepthLayerKind = reflected.DepthLayerKind,
+            LayerOrdinal = reflected.LayerOrdinal,
+            CastsShadow = reflected.CastsShadow,
+            ShellInflateTexels = reflected.ShellInflateTexels,
+            MirrorCuboidUv = reflected.MirrorCuboidUv,
+        };
+    }
+
+    /// <summary>
+    /// CEILING_MIDDLE <c>vChains</c> sheet (12×6, identity pose). Swap face slots after Y reflection so
+    /// preview winding matches the visible billboard side.
+    /// </summary>
+    private static bool IsHangingSignVerticalChainSheet(ModelElement reflected, Matrix4x4 conjugatedPose) =>
+        MathF.Abs(reflected.To[0] - reflected.From[0] - 12f) < 0.15f &&
+        !IsHangingSignTiltedChainPose(conjugatedPose);
+
+    private static bool IsHangingSignTiltedChainPose(Matrix4x4 pose) =>
+        MathF.Abs(pose.M12) > 0.01f || MathF.Abs(pose.M21) > 0.01f;
+
+    private static Dictionary<string, ModelFace> SwapNorthSouthFaceSlots(Dictionary<string, ModelFace> faces)
+    {
+        if (!faces.TryGetValue("north", out var north) || !faces.TryGetValue("south", out var south))
+        {
+            return new Dictionary<string, ModelFace>(faces, StringComparer.OrdinalIgnoreCase);
+        }
+
+        var swapped = new Dictionary<string, ModelFace>(faces, StringComparer.OrdinalIgnoreCase);
+        swapped["north"] = south;
+        swapped["south"] = north;
+        return swapped;
+    }
+
+    private static Dictionary<string, ModelFace> FlipNorthSouthFaceVBounds(IReadOnlyDictionary<string, ModelFace> faces)
+    {
+        var flipped = new Dictionary<string, ModelFace>(faces, StringComparer.OrdinalIgnoreCase);
+        foreach (var name in new[] { "north", "south" })
+        {
+            if (!flipped.TryGetValue(name, out var face) || face.Uv is not { Length: >= 4 } uv)
+            {
+                continue;
+            }
+
+            flipped[name] = new ModelFace
+            {
+                TextureKey = face.TextureKey,
+                Uv = [uv[0], uv[3], uv[2], uv[1]],
+                RotationDegrees = face.RotationDegrees,
+            };
+        }
+
+        return flipped;
+    }
+
+    /// <summary><c>flip * pose * flip</c> — mirror <c>PartPose.offsetAndRotation</c> under preview Y-up correction.</summary>
+    private static Matrix4x4 ConjugateVerticalFlipPartPose(Matrix4x4 pose)
+    {
+        var flip = ObjectEntityPreviewVerticalFlip;
+        return Matrix4x4.Multiply(Matrix4x4.Multiply(flip, pose), flip);
+    }
+
+    private static bool IsHangingSignNorthSouthSheetElement(ModelElement element) =>
+        element.Faces.ContainsKey("north") &&
+        element.Faces.ContainsKey("south") &&
+        !element.Faces.ContainsKey("east");
+
+    /// <summary>
+    /// Reflect horizontal cap sheets in element-local space and swap lone down→up (standing-sign pattern).
+    /// </summary>
+    internal static MergedJavaBlockModel ApplyDecoratedPotPreviewVerticalOrientation(MergedJavaBlockModel model)
+    {
+        var transformed = new List<ModelElement>(model.Elements.Count);
+        foreach (var element in model.Elements)
+        {
+            transformed.Add(IsDecoratedPotHorizontalCapElement(element)
+                ? ReflectElementVerticalLocalGeometry(element)
+                : element);
+        }
+
+        return new MergedJavaBlockModel
+        {
+            Elements = transformed,
+            Textures = model.Textures,
+            UsesLivingEntityRendererColumnYFlip = model.UsesLivingEntityRendererColumnYFlip,
+        };
+    }
+
+    private static bool IsDecoratedPotHorizontalCapElement(ModelElement element)
+    {
+        if (element.Faces.Count != 1)
+        {
+            return false;
+        }
+
+        var (faceName, face) = element.Faces.First();
+        if (face.Uv is not { Length: 4 })
+        {
+            return false;
+        }
+
+        if (!faceName.Equals("down", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        var texKey = face.TextureKey ?? "";
+        if (!texKey.Contains("base", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return IsDecoratedPotCapRingBaseUv(face.Uv);
+    }
+
+    private static bool IsDecoratedPotCapRingBaseUv(float[] uv)
+    {
+        if (uv is not { Length: 4 })
+        {
+            return false;
+        }
+
+        // javap texOffs(-14,13) down unfold on 32×32 #base → [14,13,28,27] (legacy lifts may still emit [18,13,32,27]).
+        var corrected = uv[0] >= 13.5f && uv[2] <= 28.5f && uv[1] >= 12.5f && uv[3] <= 27.5f;
+        var legacy = uv[0] >= 17.5f && uv[2] <= 32.5f && uv[1] >= 12.5f && uv[3] <= 27.5f;
+        return corrected || legacy;
+    }
+
+    private static bool IsDecoratedPotCapRingElement(ModelElement element)
+    {
+        if (!element.Faces.TryGetValue("up", out var face) || face.Uv is not { Length: 4 })
+        {
+            return false;
+        }
+
+        var texKey = face.TextureKey ?? "";
+        if (!texKey.Contains("base", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return IsDecoratedPotCapRingBaseUv(face.Uv);
+    }
+
+    /// <summary>After cap down→up orientation, extend Y toward body for side junction seal (preview-only; no X/Z widen).</summary>
+    internal static MergedJavaBlockModel ApplyDecoratedPotPreviewCapRimSeal(MergedJavaBlockModel model)
+    {
+        var overlap = DecoratedPotPreviewVerticalSealOverlap;
+        var transformed = new List<ModelElement>(model.Elements.Count);
+        foreach (var element in model.Elements)
+        {
+            if (!IsDecoratedPotCapRingElement(element))
+            {
+                transformed.Add(element);
+                continue;
+            }
+
+            TransformElementCorners(element, out var cMin, out var cMax);
+            var isTopCap = cMax.Y > cMin.Y + 1e-3f && cMax.Y > 8f;
+            var from = (float[])element.From.Clone();
+            var to = (float[])element.To.Clone();
+            if (isTopCap)
+            {
+                to[1] += overlap;
+            }
+            else
+            {
+                from[1] -= overlap;
+            }
+
+            transformed.Add(new ModelElement
+            {
+                From = from,
+                To = to,
+                Faces = element.Faces,
+                LocalToParent = element.LocalToParent,
+                DepthLayerKind = element.DepthLayerKind,
+                LayerOrdinal = element.LayerOrdinal,
+                CastsShadow = element.CastsShadow,
+                ShellInflateTexels = element.ShellInflateTexels,
+                MirrorCuboidUv = element.MirrorCuboidUv,
+            });
+        }
+
+        return new MergedJavaBlockModel
+        {
+            Elements = transformed,
+            Textures = model.Textures,
+            UsesLivingEntityRendererColumnYFlip = model.UsesLivingEntityRendererColumnYFlip,
+        };
+    }
+
+    private static MergedJavaBlockModel ApplyDecoratedPotPreviewVerticalOrientationIfNeeded(
+        MergedJavaBlockModel model,
+        string builderMethod) =>
+        UsesDecoratedPotPreviewVerticalOrientation(builderMethod)
+            ? ApplyDecoratedPotPreviewVerticalOrientation(model)
+            : model;
 
     private static MergedJavaBlockModel ApplyObjectEntityPreviewVerticalFlipLocalGeometry(MergedJavaBlockModel model)
     {
@@ -311,8 +557,9 @@ internal sealed partial class CleanRoomEntityModelRuntime
         _ = profile;
         _ = isBaby;
         var b = new RigBuilder(64, 32);
-        new EntityCuboid(-12f, 0f, -1f, 12f, 12f, 1f, 0, 0).Emit(b, Matrix4x4.Identity, 1f);
-        new EntityCuboid(-1f, 12f, -1f, 1f, 28f, 1f, 26, 0).Emit(b, Matrix4x4.Identity, 1f);
+        // StandingSignRenderer.createSignLayer (26.1.2): sign + stick siblings, PartPose.ZERO, joint at Y = −2.
+        new EntityCuboid(-12f, -14f, -1f, 12f, -2f, 1f, 0, 0).Emit(b, Matrix4x4.Identity, 1f);
+        new EntityCuboid(-1f, -2f, -1f, 1f, 12f, 1f, 0, 14).Emit(b, Matrix4x4.Identity, 1f);
         return ApplyObjectEntityPreviewVerticalFlipIfNeeded(b.Build(texRef), "StandingSignEntity");
     }
 
@@ -322,52 +569,180 @@ internal sealed partial class CleanRoomEntityModelRuntime
         _ = profile;
         _ = isBaby;
         var b = new RigBuilder(64, 32);
-        new EntityCuboid(-10f, 2f, -1f, 10f, 12f, 1f, 0, 0).Emit(b, Matrix4x4.Identity, 1f);
-        new EntityCuboid(-1f, 12f, -1f, 1f, 22f, 1f, 22, 22).Emit(b, Matrix4x4.Identity, 1f);
+        var attachment = EntityPreviewContextTypeCatalog.ResolveEffectiveAttachment(
+            EntityPreviewBuildContext.CurrentContextTypeId);
+        EmitHangingSignBoard(b);
+        switch (attachment)
+        {
+            case EntityPreviewContextTypeCatalog.HangingSignAttachment.Wall:
+                EmitHangingSignWallPlank(b);
+                EmitHangingSignCeilingChains(b);
+                break;
+            case EntityPreviewContextTypeCatalog.HangingSignAttachment.CeilingMiddle:
+                EmitHangingSignCeilingMiddleChains(b);
+                break;
+            default:
+                EmitHangingSignCeilingChains(b);
+                break;
+        }
+
         return ApplyObjectEntityPreviewVerticalFlipIfNeeded(b.Build(texRef), "HangingSignEntity");
+    }
+
+    private static void EmitHangingSignBoard(RigBuilder b) =>
+        new EntityCuboid(-7f, 0f, -1f, 7f, 10f, 1f, 0, 12).Emit(b, Matrix4x4.Identity, 1f);
+
+    private static void EmitHangingSignWallPlank(RigBuilder b) =>
+        new EntityCuboid(-8f, -6f, -2f, 8f, -4f, 2f, 0, 0).Emit(b, Matrix4x4.Identity, 1f);
+
+    private static void EmitHangingSignCeilingMiddleChains(RigBuilder b)
+    {
+        string[] chainFaces = ["north", "south"];
+        new EntityCuboid(-6f, -6f, 0f, 6f, 0f, 0f, 14, 6, UvSizeW: 12, UvSizeH: 6, UvSizeD: 0, FaceMask: chainFaces)
+            .Emit(b, Matrix4x4.Identity, 1f);
+    }
+
+    private static void EmitHangingSignCeilingChains(RigBuilder b)
+    {
+        const float chainTilt = MathF.PI / 4f;
+        string[] chainFaces = ["north", "south"];
+        new EntityCuboid(-1.5f, 0f, -0.03f, 1.5f, 6f, 0.03f, 0, 6, UvSizeW: 3, UvSizeH: 6, UvSizeD: 0, FaceMask: chainFaces)
+            .Emit(b, ObjectPartModelPoseTexel(-5f, -6f, 0f, zRad: -chainTilt), 1f);
+        new EntityCuboid(-1.5f, 0f, -0.03f, 1.5f, 6f, 0.03f, 6, 6, UvSizeW: 3, UvSizeH: 6, UvSizeD: 0, FaceMask: chainFaces)
+            .Emit(b, ObjectPartModelPoseTexel(-5f, -6f, 0f, zRad: chainTilt), 1f);
+        new EntityCuboid(-1.5f, 0f, -0.03f, 1.5f, 6f, 0.03f, 0, 6, UvSizeW: 3, UvSizeH: 6, UvSizeD: 0, FaceMask: chainFaces)
+            .Emit(b, ObjectPartModelPoseTexel(5f, -6f, 0f, zRad: -chainTilt), 1f);
+        new EntityCuboid(-1.5f, 0f, -0.03f, 1.5f, 6f, 0.03f, 6, 6, UvSizeW: 3, UvSizeH: 6, UvSizeD: 0, FaceMask: chainFaces)
+            .Emit(b, ObjectPartModelPoseTexel(5f, -6f, 0f, zRad: chainTilt), 1f);
     }
 
     /// <summary>
     /// Vanilla <c>DecoratedPotRenderer.createBaseLayer</c> / <c>createSidesLayer</c> (26.1.2 <c>javap</c> on <c>client.jar</c>).
-    /// There is no <c>DecoratedPotModel</c> class; geometry uses <c>DECORATED_POT_BASE</c> (32×32) and <c>DECORATED_POT_SIDES</c> (16×16).
-    /// Side-pattern UVs are packed at <c>texV = 32</c> on a 64× atlas so they do not overlap base texels in preview.
+    /// Base layer uses <c>DECORATED_POT_BASE</c> (32×32); sides use <c>DECORATED_POT_SIDES</c> (16×16) with north-only sheets.
     /// </summary>
     private static MergedJavaBlockModel BuildDecoratedPotEntity(string texRef, MinecraftNativeProfile profile, bool isBaby)
     {
         _ = profile;
         _ = isBaby;
-        var b = new RigBuilder(64, 64);
+        var b = new RigBuilder(32, 32);
 
-        // DecoratedPotRenderer layers use ModelPart.translateAndRotate (rotationZYX), not PartPose matrix multiply.
         static Matrix4x4 PotPartPoseTexel(float tx, float ty, float tz, float xRad = 0f, float yRad = 0f, float zRad = 0f) =>
             BlockRowAffineToTexel(EntityParityTemplate.ModelPartRenderLocalBlock(tx, ty, tz, xRad, yRad, zRad));
 
         const float pi = MathF.PI;
         var neckPose = PotPartPoseTexel(0f, 37f, 16f, pi, 0f, 0f);
+        string[] northOnly = ["north"];
 
         // Base layer neck (CubeDeformation ± ignored for parity): texOffs (0,0) + (0,5).
-        new EntityCuboid(4f, 17f, 4f, 12f, 20f, 12f, 0, 0).Emit(b, neckPose, 1f);
-        new EntityCuboid(5f, 20f, 5f, 11f, 21f, 11f, 0, 5).Emit(b, neckPose, 1f);
+        new EntityCuboid(4f, 17f, 4f, 12f, 20f, 12f, 0, 0, TextureKey: "#base").Emit(b, neckPose, 1f);
+        new EntityCuboid(5f, 20f, 5f, 11f, 21f, 11f, 0, 5, TextureKey: "#base").Emit(b, neckPose, 1f);
 
-        // texOffs(-14, 13).addBox(0,0,0, 14,0,14) — same mesh for top (offset 1,16,1) and bottom (1,0,1).
-        // U uses 18 ≡ -14 (mod 32) for unfolded cube UV math on the 32-wide base sprite.
+        // texOffs(-14, 13).addBox(0,0,0, 14,0,14) — zero-height cap; only DOWN texCrop (not full cube unfold).
+        string[] capDown = ["down"];
         var topPose = PotPartPoseTexel(1f, 16f, 1f);
         var bottomPose = PotPartPoseTexel(1f, 0f, 1f);
-        new EntityCuboid(0f, 0f, 0f, 14f, 0f, 14f, 18, 13, UvSizeW: 14, UvSizeH: 1, UvSizeD: 14).Emit(b, topPose, 1f);
-        new EntityCuboid(0f, 0f, 0f, 14f, 0f, 14f, 18, 13, UvSizeW: 14, UvSizeH: 1, UvSizeD: 14).Emit(b, bottomPose, 1f);
+        EmitDecoratedPotPreviewSheet(b, 0f, 0f, 0f, 14f, 0f, 14f, DecoratedPotCapTexCropRawU, DecoratedPotCapTexCropV, 14, 0, 14, capDown, "#base", topPose);
+        EmitDecoratedPotPreviewSheet(b, 0f, 0f, 0f, 14f, 0f, 14f, DecoratedPotCapTexCropRawU, DecoratedPotCapTexCropV, 14, 0, 14, capDown, "#base", bottomPose);
 
-        // Sides: single north-only sheet in Java; full thin box with dz=0. texOffs(1,0) on 16×16 → packed below base.
-        const int sideAtlasV = 32;
+        // Sides: texOffs(1,0) north-only sheet on 16×16 pattern sprite (javap EnumSet.of(NORTH)).
         var backPose = PotPartPoseTexel(15f, 16f, 1f, 0f, 0f, pi);
         var leftPose = PotPartPoseTexel(1f, 16f, 1f, 0f, -pi / 2f, pi);
         var rightPose = PotPartPoseTexel(15f, 16f, 15f, 0f, pi / 2f, pi);
         var frontPose = PotPartPoseTexel(1f, 16f, 15f, pi, 0f, 0f);
-        new EntityCuboid(0f, 0f, 0f, 14f, 16f, 0f, 1, sideAtlasV, UvSizeW: 14, UvSizeH: 16, UvSizeD: 1).Emit(b, backPose, 1f);
-        new EntityCuboid(0f, 0f, 0f, 14f, 16f, 0f, 1, sideAtlasV, UvSizeW: 14, UvSizeH: 16, UvSizeD: 1).Emit(b, leftPose, 1f);
-        new EntityCuboid(0f, 0f, 0f, 14f, 16f, 0f, 1, sideAtlasV, UvSizeW: 14, UvSizeH: 16, UvSizeD: 1).Emit(b, rightPose, 1f);
-        new EntityCuboid(0f, 0f, 0f, 14f, 16f, 0f, 1, sideAtlasV, UvSizeW: 14, UvSizeH: 16, UvSizeD: 1).Emit(b, frontPose, 1f);
+        EmitDecoratedPotPreviewSheet(b, 0f, 0f, 0f, 14f, 16f, 0f, 1, 0, 14, 16, 0, northOnly, null, backPose);
+        EmitDecoratedPotPreviewSheet(b, 0f, 0f, 0f, 14f, 16f, 0f, 1, 0, 14, 16, 0, northOnly, null, leftPose);
+        EmitDecoratedPotPreviewSheet(b, 0f, 0f, 0f, 14f, 16f, 0f, 1, 0, 14, 16, 0, northOnly, null, rightPose);
+        EmitDecoratedPotPreviewSheet(b, 0f, 0f, 0f, 14f, 16f, 0f, 1, 0, 14, 16, 0, northOnly, null, frontPose);
 
-        return b.Build(texRef);
+        return ApplyDecoratedPotPreviewGroundLift(
+            ApplyDecoratedPotPreviewCapRimSeal(
+                ApplyDecoratedPotPreviewVerticalOrientationIfNeeded(
+                    b.Build(texRef, BuildDecoratedPotCompanionTextureRefs(AssetPathFromTextureRef(texRef), texRef)),
+                    "DecoratedPotEntity")));
+    }
+
+    private static void EmitDecoratedPotPreviewSheet(
+        RigBuilder builder,
+        float x0, float y0, float z0, float x1, float y1, float z1,
+        int texU, int texV,
+        int uvSizeW, int uvSizeH, int uvSizeD,
+        string[] faceMask,
+        string? textureKey,
+        Matrix4x4 pose)
+    {
+        ApplyDecoratedPotPreviewSheetThickness(
+            ref x0, ref y0, ref z0, ref x1, ref y1, ref z1,
+            DecoratedPotPreviewDegenerateAxisThickness,
+            faceMask);
+        new EntityCuboid(
+            x0, y0, z0, x1, y1, z1,
+            texU, texV,
+            UvSizeW: uvSizeW,
+            UvSizeH: uvSizeH,
+            UvSizeD: uvSizeD,
+            TextureKey: textureKey,
+            FaceMask: faceMask)
+            .Emit(builder, pose, 1f);
+    }
+
+    private static string AssetPathFromTextureRef(string texRef) =>
+        $"assets/minecraft/textures/{texRef.Replace('\\', '/').TrimStart('/')}.png";
+
+    internal static Dictionary<string, string> BuildDecoratedPotCompanionTextureRefs(
+        string normalizedAssetPath,
+        string patternTexRef) =>
+        new(StringComparer.Ordinal)
+        {
+            ["skin"] = patternTexRef,
+            ["base"] = CompanionDiffuseTextureRefFromSiblingFileStem(normalizedAssetPath, "decorated_pot_base"),
+        };
+
+    private static bool IsDecoratedPotBasePartId(string partId) =>
+        string.Equals(partId, "neck", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(partId, "top", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(partId, "bottom", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// After object-entity Y flip the javap pot sits mostly below model origin; lift so the base ring rests near Y=0.
+    /// </summary>
+    private static MergedJavaBlockModel ApplyDecoratedPotPreviewGroundLift(MergedJavaBlockModel model)
+    {
+        var minY = float.MaxValue;
+        foreach (var el in model.Elements)
+        {
+            TransformElementCorners(el, out var cMin, out _);
+            minY = MathF.Min(minY, cMin.Y);
+        }
+
+        if (!float.IsFinite(minY) || minY >= -0.05f)
+        {
+            return model;
+        }
+
+        return ApplyGlobalTransform(model, Matrix4x4.CreateTranslation(0f, -minY, 0f));
+    }
+
+    private static void TransformElementCorners(ModelElement el, out Vector3 min, out Vector3 max)
+    {
+        min = new Vector3(float.MaxValue);
+        max = new Vector3(float.MinValue);
+        var corners = new[]
+        {
+            new Vector3(el.From[0], el.From[1], el.From[2]),
+            new Vector3(el.To[0], el.From[1], el.From[2]),
+            new Vector3(el.From[0], el.To[1], el.From[2]),
+            new Vector3(el.To[0], el.To[1], el.From[2]),
+            new Vector3(el.From[0], el.From[1], el.To[2]),
+            new Vector3(el.To[0], el.From[1], el.To[2]),
+            new Vector3(el.From[0], el.To[1], el.To[2]),
+            new Vector3(el.To[0], el.To[1], el.To[2]),
+        };
+        foreach (var local in corners)
+        {
+            var world = Vector3.Transform(local, el.LocalToParent);
+            min = Vector3.Min(min, world);
+            max = Vector3.Max(max, world);
+        }
     }
 
 

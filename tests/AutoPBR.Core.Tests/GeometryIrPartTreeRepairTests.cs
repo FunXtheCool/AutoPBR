@@ -474,6 +474,29 @@ public sealed class GeometryIrPartTreeRepairTests
     }
 
     [Fact]
+    public void ArmorStand_repair_preserves_small_head_cuboid_despite_hat_overlay()
+    {
+        const string jvm = "net.minecraft.client.model.object.armorstand.ArmorStandModel";
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
+        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
+            !string.Equals(status, "ok", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
+        var head = FindPart(repaired, "head");
+        Assert.NotNull(head);
+        var headCuboid = head["cuboids"]![0]!;
+        Assert.InRange(headCuboid["from"]![0]!.GetValue<double>(), -1.5, -0.5);
+        Assert.InRange(headCuboid["to"]![0]!.GetValue<double>(), 0.5, 1.5);
+        Assert.InRange(headCuboid["from"]![1]!.GetValue<double>(), -7.5, -6.5);
+        Assert.InRange(headCuboid["to"]![1]!.GetValue<double>(), -0.5, 0.5);
+    }
+
+    [Fact]
     public void AdultPiglin_repair_reparents_player_wide_overlay_kit_for_brute_preview()
     {
         const string jvm = "net.minecraft.client.model.monster.piglin.AdultPiglinModel";

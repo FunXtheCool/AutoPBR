@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Text.Json;
 using AutoPBR.Core.Preview;
 
@@ -70,5 +71,146 @@ public sealed class GeometryIrParityEmitTests
         Assert.Equal(8, cuboidOut.UvSizeW);
         Assert.Equal(8, cuboidOut.UvSizeH);
         Assert.Equal(8, cuboidOut.UvSizeD);
+    }
+
+    [Fact]
+    public void DecoratedPot_cap_cuboid_resolves_texcrop_updown_footprint()
+    {
+        const string cap = """
+            {
+              "from": [0, 0, 0],
+              "to": [14, 0, 14],
+              "uvOrigin": [18, 13],
+              "uvSpan": [14, 0, 14],
+              "textureKey": "#base",
+              "faceMask": ["down"],
+              "liftKind": "exact"
+            }
+            """;
+
+        using var doc = JsonDocument.Parse(cap);
+        var ok = CleanRoomEntityModelRuntime.TryToEntityCuboidForTests(
+            doc.RootElement,
+            new GeometryIrMeshEmitOptions
+            {
+                Fidelity = GeometryIrEmitFidelity.Parity,
+                AtlasWidth = 32,
+                AtlasHeight = 32,
+                PreviewDegenerateAxisThickness = 0.08f,
+            },
+            out var cuboidOut,
+            out var failure);
+
+        Assert.True(ok, failure);
+        Assert.Equal(14, cuboidOut.UvSizeW);
+        Assert.Equal(0, cuboidOut.UvSizeH);
+        Assert.Equal(14, cuboidOut.UvSizeD);
+        Assert.NotNull(cuboidOut.FaceMask);
+        Assert.Equal(["down"], cuboidOut.FaceMask);
+
+        var b = new CleanRoomEntityModelRuntime.RigBuilder(32, 32);
+        cuboidOut.Emit(b, Matrix4x4.Identity, 1f, "#base");
+        var built = b.Build("entity/decorated_pot/decorated_pot_base");
+        var capEl = Assert.Single(built.Elements);
+        var down = capEl.Faces["down"];
+        Assert.Equal(14f, down.Uv![0], 0.01f);
+        Assert.Equal(13f, down.Uv![1], 0.01f);
+        Assert.Equal(28f, down.Uv![2], 0.01f);
+        Assert.Equal(27f, down.Uv![3], 0.01f);
+    }
+
+    [Fact]
+    public void DecoratedPot_cap_cuboid_preserves_raw_negative_texOffs()
+    {
+        const string cap = """
+            {
+              "from": [0, 0, 0],
+              "to": [14, 0, 14],
+              "uvOrigin": [-14, 13],
+              "uvSpan": [14, 0, 14],
+              "textureKey": "#base",
+              "faceMask": ["down"],
+              "liftKind": "exact"
+            }
+            """;
+
+        using var doc = JsonDocument.Parse(cap);
+        var ok = CleanRoomEntityModelRuntime.TryToEntityCuboidForTests(
+            doc.RootElement,
+            new GeometryIrMeshEmitOptions
+            {
+                Fidelity = GeometryIrEmitFidelity.Parity,
+                AtlasWidth = 32,
+                AtlasHeight = 32,
+                PreviewDegenerateAxisThickness = 0.08f,
+            },
+            out var cuboidOut,
+            out var failure);
+
+        Assert.True(ok, failure);
+
+        var b = new CleanRoomEntityModelRuntime.RigBuilder(32, 32);
+        cuboidOut.Emit(b, Matrix4x4.Identity, 1f, "#base");
+        var built = b.Build("entity/decorated_pot/decorated_pot_base");
+        var capEl = Assert.Single(built.Elements);
+        var down = capEl.Faces["down"];
+        Assert.Equal(14f, down.Uv![0], 0.01f);
+        Assert.Equal(13f, down.Uv![1], 0.01f);
+        Assert.Equal(28f, down.Uv![2], 0.01f);
+        Assert.Equal(27f, down.Uv![3], 0.01f);
+    }
+
+    [Fact]
+    public void DecoratedPot_side_thicken_keeps_north_on_exterior_plane()
+    {
+        float x0 = 0f, y0 = 0f, z0 = 0f, x1 = 14f, y1 = 16f, z1 = 0f;
+        CleanRoomEntityModelRuntime.ApplyDecoratedPotPreviewSheetThickness(
+            ref x0, ref y0, ref z0, ref x1, ref y1, ref z1,
+            CleanRoomEntityModelRuntime.DecoratedPotPreviewDegenerateAxisThickness,
+            ["north"]);
+        Assert.Equal(0f, z0, 3);
+        Assert.Equal(CleanRoomEntityModelRuntime.DecoratedPotPreviewDegenerateAxisThickness, z1, 3);
+        Assert.True(x1 - x0 >= 14f - 0.01f);
+        Assert.True(x1 - x0 <= 14f + 0.01f);
+    }
+
+    [Fact]
+    public void Bee_wing_sheet_uses_java_cube_unfold_not_texcrop_anchor()
+    {
+        const string wing = """
+            {
+              "from": [-9, 0, 0],
+              "to": [0, 0, 6],
+              "uvOrigin": [0, 18],
+              "uvSpan": [9, 0, 6],
+              "textureKey": "#skin",
+              "faceMask": ["up", "down"],
+              "liftKind": "exact"
+            }
+            """;
+
+        using var doc = JsonDocument.Parse(wing);
+        var ok = CleanRoomEntityModelRuntime.TryToEntityCuboidForTests(
+            doc.RootElement,
+            new GeometryIrMeshEmitOptions
+            {
+                Fidelity = GeometryIrEmitFidelity.Parity,
+                AtlasWidth = 64,
+                AtlasHeight = 64,
+                PreviewDegenerateAxisThickness = 0.06f,
+            },
+            out var cuboidOut,
+            out var failure);
+
+        Assert.True(ok, failure);
+        var b = new CleanRoomEntityModelRuntime.RigBuilder(64, 64);
+        cuboidOut.Emit(b, Matrix4x4.Identity, 1f);
+        var built = b.Build("entity/bee/bee");
+        var el = Assert.Single(built.Elements);
+        var up = el.Faces["up"].Uv!;
+        Assert.Equal(15f, up[0], 0.01f);
+        Assert.Equal(24f, up[1], 0.01f);
+        Assert.Equal(24f, up[2], 0.01f);
+        Assert.Equal(18f, up[3], 0.01f);
     }
 }

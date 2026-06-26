@@ -403,11 +403,6 @@ internal static class GeometryIrReferenceComparer
         {
             foreach (var (partId, origin) in flatRenderOrigins)
             {
-                if (partId.Contains("horn", StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
                 translationsByPartId[partId] = origin;
             }
         }

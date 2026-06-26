@@ -4,7 +4,7 @@
 **Pinned version:** 26.1.2 (`tools/minecraft-parity/26.1.2/client.jar`)  
 **Assembly pilots:** 56 JVMs ([`geometry-assembly-parity-pilots-26.1.2.txt`](generated/geometry-assembly-parity-pilots-26.1.2.txt))  
 **Quality snapshot:** [`geometry-lift-quality-26.1.2.json`](generated/geometry-lift-quality-26.1.2.json) — `generatedUtc` 2026-05-26T02:32:22Z · **Completion audit:** [`plan-completion-audit.md`](generated/plan-completion-audit.md) · **Automated tracks:** [`automated-tracks-complete.md`](generated/automated-tracks-complete.md)  
-**Related:** [`test-guidance-geometry-animation-ir.md`](test-guidance-geometry-animation-ir.md) (tiers), [`generated/geometry-ir-conventions.md`](generated/geometry-ir-conventions.md), [`vanilla-preview-parity.md`](vanilla-preview-parity.md), [`cleanroom-entity-cuboid.md`](cleanroom-entity-cuboid.md)  
+**Related:** [`test-guidance-geometry-animation-ir.md`](test-guidance-geometry-animation-ir.md) (tiers), [`generated/geometry-ir-conventions.md`](generated/geometry-ir-conventions.md), [`vanilla-preview-parity.md`](vanilla-preview-parity.md), [`cleanroom-entity-cuboid.md`](cleanroom-entity-cuboid.md), [`ghast-family-parity.md`](ghast-family-parity.md)
 **Superseded plans:** [`archive/README.md`](archive/README.md) (historical roadmaps only — do not edit for new work)
 
 ---

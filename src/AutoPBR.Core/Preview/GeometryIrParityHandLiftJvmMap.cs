@@ -78,6 +78,12 @@ internal static class GeometryIrParityHandLiftJvmMap
             return true;
         }
 
+        if (string.Equals(builderMethod, "DecoratedPotEntity", StringComparison.OrdinalIgnoreCase))
+        {
+            officialJvm = "net.minecraft.client.model.DecoratedPotModel.previewComposite";
+            return true;
+        }
+
         return false;
     }
 }

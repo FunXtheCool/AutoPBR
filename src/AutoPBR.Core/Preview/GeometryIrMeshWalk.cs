@@ -230,22 +230,8 @@ internal static class GeometryIrMeshWalk
             return true;
         }
 
-        if (useColumnPartPose || ShouldUseOffsetAndRotationParentTimesLocalCompose(partId, poseEl))
+        if (useColumnPartPose)
         {
-            if (ShouldUseOffsetAndRotationParentTimesLocalCompose(partId, poseEl))
-            {
-                if (!CleanRoomEntityModelRuntime.TryComposePartPoseOffsetAndRotationLocalTexel(
-                        poseEl, out var localPartPose, out failureReason))
-                {
-                    return false;
-                }
-
-                var parentTexel = CleanRoomEntityModelRuntime.BlockRowAffineToTexel(parentWorldBlock);
-                worldTexel = Matrix4x4.Multiply(parentTexel, localPartPose);
-                worldBlock = CleanRoomEntityModelRuntime.TexelRowAffineToBlock(worldTexel);
-                return true;
-            }
-
             if (!CleanRoomEntityModelRuntime.TryComposeColumnPartPose(poseEl, worldTexel, out worldTexel, out failureReason))
             {
                 return false;
@@ -279,11 +265,6 @@ internal static class GeometryIrMeshWalk
         worldTexel = CleanRoomEntityModelRuntime.BlockRowAffineToTexel(worldBlock);
         return true;
     }
-
-    private static bool ShouldUseOffsetAndRotationParentTimesLocalCompose(string? partId, JsonElement poseEl) =>
-        partId is not null &&
-        partId.Contains("horn", StringComparison.OrdinalIgnoreCase) &&
-        CleanRoomEntityModelRuntime.PoseHasNonZeroRotation(poseEl);
 
     private static bool ShouldUseLegacyPartPose(GeometryIrMeshEmitOptions options, string? partId = null) =>
         (EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose ||
@@ -330,13 +311,6 @@ internal static class GeometryIrMeshWalk
         }
 
         var partScale = options.ResolvePartScale?.Invoke(partId) ?? options.DefaultPartScale;
-        if (!skipPartCuboids &&
-            part.TryGetProperty("pose", out var poseForScale) &&
-            poseForScale.TryGetProperty("uniformScale", out var scaleEl) &&
-            scaleEl.ValueKind == JsonValueKind.Number)
-        {
-            partScale *= (float)scaleEl.GetDouble();
-        }
 
         if (!skipPartCuboids &&
             part.TryGetProperty("cuboids", out var cuboids) &&

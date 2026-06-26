@@ -38,7 +38,7 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
     [InlineData(PolarBearJvm, 128, 64)]
     [InlineData(BabyPandaJvm, 64, 64)]
     [InlineData(BabyPolarBearJvm, 128, 64)]
-    [InlineData(AdultCatJvm, 64, 64)]
+    [InlineData(AdultCatJvm, 64, 32)]
     public void Flat_quadruped_ir_emit_body_centroid_between_legs_and_head_when_shard_ok(
         string officialJvm,
         int atlasW,

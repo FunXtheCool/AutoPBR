@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using AutoPBR.Core.Models;
 
@@ -14,12 +15,13 @@ public static class PreviewDrawBatchDiagnostics
         }
 
         var sb = new StringBuilder();
-        sb.Append($"materials={materialCount} batches={batches.Length}");
+        sb.Append(CultureInfo.InvariantCulture, $"materials={materialCount} batches={batches.Length}");
         for (var i = 0; i < batches.Length; i++)
         {
             var b = batches[i];
             var p = b.LayerPolicy;
             sb.Append(
+                CultureInfo.InvariantCulture,
                 $"\n  [{i}] mat={b.MaterialIndex} kind={p.Kind} order={p.DrawOrder} bias={p.DepthBiasStep} " +
                 $"depthWrite={p.DepthWrite} shadow={p.ShadowMode} idx={b.FirstIndex}+{b.IndexCount}");
         }

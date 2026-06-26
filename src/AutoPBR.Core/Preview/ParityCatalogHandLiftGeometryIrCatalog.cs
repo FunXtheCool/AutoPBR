@@ -57,13 +57,11 @@ internal static class ParityCatalogHandLiftGeometryIrCatalog
 
     private static IEnumerable<(string Jvm, JsonDocument Doc)> BuildAll()
     {
-        yield return ("net.minecraft.client.model.SignModel", Doc(64, 32, "net.minecraft.client.model.SignModel",
-            Cuboid(-12, 0, -1, 12, 12, 1, 0, 0),
-            Cuboid(-1, 12, -1, 1, 28, 1, 26, 0)));
-
-        yield return ("net.minecraft.client.model.HangingSignModel", Doc(64, 32, "net.minecraft.client.model.HangingSignModel",
-            Cuboid(-10, 2, -1, 10, 12, 1, 0, 0),
-            Cuboid(-1, 12, -1, 1, 22, 1, 22, 22)));
+        yield return HandLiftStandingSignModel();
+        yield return HandLiftHangingSignModelCeiling();
+        yield return HandLiftHangingSignModelWall();
+        yield return HandLiftHangingSignModelCeilingMiddle();
+        yield return HandLiftDecoratedPotPreviewComposite();
 
         yield return HandLiftConduitLayer(
             "net.minecraft.client.model.ConduitRenderer.createShellLayer",
@@ -156,6 +154,302 @@ internal static class ParityCatalogHandLiftGeometryIrCatalog
             ["cuboids"] = new JsonArray { cuboid },
             ["children"] = new JsonArray()
         };
+
+    /// <summary>
+    /// <c>StandingSignRenderer.createSignLayer</c> (26.1.2 javap): sibling <c>sign</c> + <c>stick</c> under root,
+    /// both <c>PartPose.ZERO</c> — joint at model Y = −2 (not parent-chain translated).
+    /// </summary>
+    private static (string, JsonDocument) HandLiftStandingSignModel()
+    {
+        var root = new JsonObject
+        {
+            ["id"] = "root",
+            ["pose"] = Pose(),
+            ["cuboids"] = new JsonArray(),
+            ["children"] = new JsonArray
+            {
+                PartWithCuboid("sign", Cuboid(-12, -14, -1, 12, -2, 1, 0, 0)),
+                PartWithCuboid("stick", Cuboid(-1, -2, -1, 1, 12, 1, 0, 14)),
+            }
+        };
+        var doc = new JsonObject
+        {
+            ["schemaVersion"] = 2,
+            ["versionLabel"] = "26.1.2",
+            ["officialJvmName"] = "net.minecraft.client.model.SignModel",
+            ["profile"] = "parity_hand_lift",
+            ["extractionStatus"] = "ok",
+            ["extractionNotes"] = new JsonArray
+            {
+                "StandingSignRenderer.createSignLayer (26.1.2 client.jar): sign + stick siblings at PartPose.ZERO."
+            },
+            ["textureWidth"] = 64,
+            ["textureHeight"] = 32,
+            ["factoryMethod"] = "createSignLayer",
+            ["roots"] = new JsonArray { root }
+        };
+        return ("net.minecraft.client.model.SignModel", JsonDocument.Parse(doc.ToJsonString()));
+    }
+
+    private static JsonObject HangingSignBoardPart() =>
+        PartWithCuboid("board", Cuboid(-7, 0, -1, 7, 10, 1, 0, 12));
+
+    private static JsonArray HangingSignNormalChainChildren()
+    {
+        const float chainTilt = 0.7853982f;
+        return new JsonArray
+        {
+            PartWithCuboidPose("chainL1", ChainSheetCuboid(0, 6), -5, -6, 0, 0, 0, -chainTilt),
+            PartWithCuboidPose("chainL2", ChainSheetCuboid(6, 6), -5, -6, 0, 0, 0, chainTilt),
+            PartWithCuboidPose("chainR1", ChainSheetCuboid(0, 6), 5, -6, 0, 0, 0, -chainTilt),
+            PartWithCuboidPose("chainR2", ChainSheetCuboid(6, 6), 5, -6, 0, 0, 0, chainTilt),
+        };
+    }
+
+    /// <summary>
+    /// <c>HangingSignRenderer.createHangingSignLayer</c> CEILING attachment (26.1.2 javap): <c>board</c> +
+    /// <c>normalChains</c> with four tilted zero-depth chain sheets; joint at model Y = 0.
+    /// </summary>
+    private static (string, JsonDocument) HandLiftHangingSignModelCeiling()
+    {
+        var root = new JsonObject
+        {
+            ["id"] = "root",
+            ["pose"] = Pose(),
+            ["cuboids"] = new JsonArray(),
+            ["children"] = new JsonArray
+            {
+                HangingSignBoardPart(),
+                PartWithChildren("normalChains", HangingSignNormalChainChildren()),
+            }
+        };
+        return HandLiftHangingSignDoc(
+            EntityPreviewContextTypeCatalog.HangingSignHandLiftJvm,
+            "HangingSignRenderer.createHangingSignLayer CEILING (26.1.2 client.jar): board + normalChains.",
+            root);
+    }
+
+    /// <summary>
+    /// <c>HangingSignRenderer.createHangingSignLayer</c> WALL attachment: <c>board</c> + <c>plank</c> + <c>normalChains</c>.
+    /// </summary>
+    private static (string, JsonDocument) HandLiftHangingSignModelWall()
+    {
+        var root = new JsonObject
+        {
+            ["id"] = "root",
+            ["pose"] = Pose(),
+            ["cuboids"] = new JsonArray(),
+            ["children"] = new JsonArray
+            {
+                HangingSignBoardPart(),
+                PartWithCuboid("plank", Cuboid(-8, -6, -2, 8, -4, 2, 0, 0)),
+                PartWithChildren("normalChains", HangingSignNormalChainChildren()),
+            }
+        };
+        return HandLiftHangingSignDoc(
+            EntityPreviewContextTypeCatalog.ResolveHandLiftJvm(EntityPreviewContextTypeCatalog.HangingSignAttachment.Wall),
+            "HangingSignRenderer.createHangingSignLayer WALL (26.1.2 client.jar): board + plank + normalChains.",
+            root);
+    }
+
+    /// <summary>
+    /// <c>HangingSignRenderer.createHangingSignLayer</c> CEILING_MIDDLE attachment: <c>board</c> + <c>vChains</c>.
+    /// </summary>
+    private static (string, JsonDocument) HandLiftHangingSignModelCeilingMiddle()
+    {
+        var root = new JsonObject
+        {
+            ["id"] = "root",
+            ["pose"] = Pose(),
+            ["cuboids"] = new JsonArray(),
+            ["children"] = new JsonArray
+            {
+                HangingSignBoardPart(),
+                PartWithCuboid("vChains", VerticalChainSheetCuboid()),
+            }
+        };
+        return HandLiftHangingSignDoc(
+            EntityPreviewContextTypeCatalog.ResolveHandLiftJvm(EntityPreviewContextTypeCatalog.HangingSignAttachment.CeilingMiddle),
+            "HangingSignRenderer.createHangingSignLayer CEILING_MIDDLE (26.1.2 client.jar): board + vChains.",
+            root);
+    }
+
+    private static (string, JsonDocument) HandLiftHangingSignDoc(string jvmName, string note, JsonObject root)
+    {
+        var doc = new JsonObject
+        {
+            ["schemaVersion"] = 2,
+            ["versionLabel"] = "26.1.2",
+            ["officialJvmName"] = jvmName,
+            ["profile"] = "parity_hand_lift",
+            ["extractionStatus"] = "ok",
+            ["extractionNotes"] = new JsonArray { note },
+            ["textureWidth"] = 64,
+            ["textureHeight"] = 32,
+            ["factoryMethod"] = "createHangingSignLayer",
+            ["roots"] = new JsonArray { root }
+        };
+        return (jvmName, JsonDocument.Parse(doc.ToJsonString()));
+    }
+
+    /// <summary>
+    /// <c>DecoratedPotRenderer.createBaseLayer</c> + <c>createSidesLayer</c> (26.1.2 javap): base neck/top/bottom on
+    /// <c>#base</c> (32×32) and north-only side sheets on <c>#skin</c> (16×16 pattern).
+    /// </summary>
+    private static (string, JsonDocument) HandLiftDecoratedPotPreviewComposite()
+    {
+        const float pi = 3.141592654f;
+        var children = new JsonArray
+        {
+            PartWithCuboidsPose(
+                "neck",
+                new JsonArray
+                {
+                    PotBaseCuboid(4, 17, 4, 12, 20, 12, 0, 0),
+                    PotBaseCuboid(5, 20, 5, 11, 21, 11, 0, 5),
+                },
+                0, 37, 16, pi, 0, 0),
+            PartWithCuboidPose(
+                "top",
+                PotCapCuboid(CleanRoomEntityModelRuntime.DecoratedPotCapTexCropRawU, CleanRoomEntityModelRuntime.DecoratedPotCapTexCropV),
+                1, 16, 1),
+            PartWithCuboidPose(
+                "bottom",
+                PotCapCuboid(CleanRoomEntityModelRuntime.DecoratedPotCapTexCropRawU, CleanRoomEntityModelRuntime.DecoratedPotCapTexCropV),
+                1, 0, 1),
+            PartWithCuboidPose(
+                "back",
+                PotSideCuboid(0, 0, 0, 14, 16, 0, 1, 0),
+                15, 16, 1, 0, 0, pi),
+            PartWithCuboidPose(
+                "left",
+                PotSideCuboid(0, 0, 0, 14, 16, 0, 1, 0),
+                1, 16, 1, 0, -pi / 2f, pi),
+            PartWithCuboidPose(
+                "right",
+                PotSideCuboid(0, 0, 0, 14, 16, 0, 1, 0),
+                15, 16, 15, 0, pi / 2f, pi),
+            PartWithCuboidPose(
+                "front",
+                PotSideCuboid(0, 0, 0, 14, 16, 0, 1, 0),
+                1, 16, 15, pi, 0, 0),
+        };
+
+        var root = new JsonObject
+        {
+            ["id"] = "root",
+            ["pose"] = Pose(),
+            ["cuboids"] = new JsonArray(),
+            ["children"] = children
+        };
+        var doc = new JsonObject
+        {
+            ["schemaVersion"] = 2,
+            ["versionLabel"] = "26.1.2",
+            ["officialJvmName"] = "net.minecraft.client.model.DecoratedPotModel.previewComposite",
+            ["profile"] = "parity_hand_lift",
+            ["extractionStatus"] = "ok",
+            ["extractionNotes"] = new JsonArray
+            {
+                "DecoratedPotRenderer.createBaseLayer + createSidesLayer (26.1.2 client.jar javap).",
+                "Base #base 32x32; sides #skin north-only 16x16."
+            },
+            ["textureWidth"] = 32,
+            ["textureHeight"] = 32,
+            ["factoryMethod"] = "createBaseLayer",
+            ["roots"] = new JsonArray { root }
+        };
+        return ("net.minecraft.client.model.DecoratedPotModel.previewComposite", JsonDocument.Parse(doc.ToJsonString()));
+    }
+
+    private static JsonObject PotCapCuboid(int u, int v)
+    {
+        var c = new JsonObject
+        {
+            ["from"] = new JsonArray { 0, 0, 0 },
+            ["to"] = new JsonArray { 14, 0, 14 },
+            ["uvOrigin"] = new JsonArray { u, v },
+            ["uvSpan"] = new JsonArray { 14, 0, 14 },
+            ["textureKey"] = "#base",
+            ["faceMask"] = new JsonArray { "down" },
+            ["liftKind"] = "exact",
+        };
+        return c;
+    }
+
+    private static JsonObject PotBaseCuboid(
+        float x0, float y0, float z0, float x1, float y1, float z1, int u, int v,
+        int? uvW = null, int? uvH = null, int? uvD = null)
+    {
+        var c = CuboidNode(x0, y0, z0, x1, y1, z1, u, v, uvW, uvH, uvD);
+        c["textureKey"] = "#base";
+        return c;
+    }
+
+    private static JsonObject PotSideCuboid(float x0, float y0, float z0, float x1, float y1, float z1, int u, int v)
+    {
+        var c = CuboidNode(x0, y0, z0, x1, y1, z1, u, v, 14, 16, 0);
+        c["textureKey"] = "#skin";
+        c["faceMask"] = new JsonArray { "north" };
+        return c;
+    }
+
+    private static JsonObject PartWithCuboidPose(
+        string id,
+        JsonObject cuboid,
+        float tx = 0,
+        float ty = 0,
+        float tz = 0,
+        float rx = 0,
+        float ry = 0,
+        float rz = 0) =>
+        new()
+        {
+            ["id"] = id,
+            ["pose"] = Pose(tx, ty, tz, rx, ry, rz),
+            ["cuboids"] = new JsonArray { cuboid },
+            ["children"] = new JsonArray()
+        };
+
+    private static JsonObject PartWithCuboidsPose(
+        string id,
+        JsonArray cuboids,
+        float tx = 0,
+        float ty = 0,
+        float tz = 0,
+        float rx = 0,
+        float ry = 0,
+        float rz = 0) =>
+        new()
+        {
+            ["id"] = id,
+            ["pose"] = Pose(tx, ty, tz, rx, ry, rz),
+            ["cuboids"] = cuboids,
+            ["children"] = new JsonArray()
+        };
+
+    private static JsonObject PartWithChildren(string id, JsonArray children) =>
+        new()
+        {
+            ["id"] = id,
+            ["pose"] = Pose(),
+            ["cuboids"] = new JsonArray(),
+            ["children"] = children
+        };
+
+    private static JsonObject ChainSheetCuboid(int u, int v)
+    {
+        var cuboid = Cuboid(-1.5f, 0f, -0.03f, 1.5f, 6f, 0.03f, u, v, 3, 6, 0);
+        cuboid["faceMask"] = new JsonArray { "north", "south" };
+        return cuboid;
+    }
+
+    private static JsonObject VerticalChainSheetCuboid()
+    {
+        var cuboid = Cuboid(-6f, -6f, 0f, 6f, 0f, 0f, 14, 6, 12, 6, 0);
+        cuboid["faceMask"] = new JsonArray { "north", "south" };
+        return cuboid;
+    }
 
     private static JsonObject BoatPart(
         string id,
@@ -350,7 +644,7 @@ internal static class ParityCatalogHandLiftGeometryIrCatalog
         };
         if (uvW is not null && uvH is not null && uvD is not null)
         {
-            c["uvSize"] = new JsonArray { uvW.Value, uvH.Value, uvD.Value };
+            c["uvSpan"] = new JsonArray { uvW.Value, uvH.Value, uvD.Value };
         }
 
         return c;

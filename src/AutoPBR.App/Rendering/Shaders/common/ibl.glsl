@@ -1,6 +1,6 @@
-// Genesis preview shader - environment IBL without a cubemap (2D sky-view LUT + hemisphere fallback).
-// Diffuse: low-frequency hemisphere irradiance (N.y only - avoids per-quad sky stickers on block models).
-// Specular: Epic split-sum with a dielectric roughness floor and attenuation (metals stay glossy).
+// Genesis preview shader - generated world-space environment probe.
+// Diffuse: six-direction irradiance probe so side faces are not tied to screen-space sun placement.
+// Specular: generated sky/ground/sun "virtual cubemap" prefiltered by roughness.
 
 #ifndef GENESIS_IBL_GLSL
 #define GENESIS_IBL_GLSL
@@ -45,73 +45,158 @@ vec3 sampleAtmoSkyViewRadianceLinear(vec3 dirWorld, sampler2D atmoSkyViewLut)
     return srgbToLinear(c0);
 }
 
-// GI-probe style irradiance. A diffuse probe shifts ambient *energy* with only a gentle
-// hue cast; it must not repaint albedo with saturated zenith blue. We average hemisphere
-// anchors, fold in ground bounce, then temper chroma toward luminance.
-vec3 iblSkyIrradiance(vec3 N, sampler2D atmoSkyViewLut, vec3 groundTintLin)
+vec3 previewEnvTowardSun(vec3 lightPropagationDir)
 {
-    vec3 skyZenith = sampleAtmoSkyViewRadianceLinear(vec3(0.0, 1.0, 0.0), atmoSkyViewLut);
-    vec3 skyHorizon = sampleAtmoSkyViewRadianceLinear(normalize(vec3(0.15, 0.2, 1.0)), atmoSkyViewLut);
-    float hemi = pow(clamp(N.y * 0.5 + 0.5, 0.0, 1.0), 0.72);
-    vec3 skyIrr = mix(skyHorizon, skyZenith, hemi);
+    float l2 = dot(lightPropagationDir, lightPropagationDir);
+    if (l2 <= GEN_EPS)
+    {
+        return normalize(vec3(0.35, 0.85, 0.4));
+    }
 
-    // Ground bounce keeps downward faces lit (real GI from the grass/ground plane).
-    vec3 groundRad = groundTintLin * 0.45;
-    float skyOcc = smoothstep(-0.55, 0.62, N.y);
-    vec3 irr = mix(groundRad, skyIrr, skyOcc);
-
-    // Probe tempering: keep the brightness, retain only ~30 percent of the color cast.
-    float lum = dot(irr, vec3(0.2126, 0.7152, 0.0722));
-    return mix(vec3(lum), irr, 0.3);
+    return -lightPropagationDir * inversesqrt(l2);
 }
 
-vec3 fakeIblAmbientDiffuse(vec3 N, vec3 skyTint, vec3 groundTint, int enableAtmoSky, sampler2D atmoSkyViewLut)
+float previewEnvDayFactor(vec3 lightPropagationDir, float sunIntensity)
+{
+    vec3 towardSun = previewEnvTowardSun(lightPropagationDir);
+    float dayFromSun = smoothstep(-0.04, 0.22, towardSun.y);
+    float dayFromIntensity = smoothstep(0.08, 2.0, sunIntensity);
+    return saturate1(dayFromSun * dayFromIntensity);
+}
+
+vec3 previewEnvSunWarmColor(vec3 lightPropagationDir, vec3 lightColor, float sunIntensity)
+{
+    vec3 towardSun = previewEnvTowardSun(lightPropagationDir);
+    vec3 horizonWarm = vec3(1.0, 0.62, 0.28);
+    vec3 zenithWarm = vec3(1.0, 0.96, 0.86);
+    float boundedIntensity = 0.65 + 0.35 * smoothstep(1.0, 12.0, sunIntensity);
+    return lightColor * mix(horizonWarm, zenithWarm, smoothstep(0.0, 0.42, max(towardSun.y, 0.0))) * boundedIntensity;
+}
+
+vec3 previewEnvSkyGroundRadiance(vec3 dir, vec3 skyTintLin, vec3 groundTintLin, int enableAtmoSky,
+    sampler2D atmoSkyViewLut)
+{
+    vec3 d = normalize(dir);
+    vec3 sky = enableAtmoSky > 0
+        ? sampleAtmoSkyViewRadianceLinear(d, atmoSkyViewLut)
+        : fakeIblSky(d, skyTintLin, groundTintLin);
+
+    float below = smoothstep(0.08, -0.24, d.y);
+    vec3 groundReflection = groundTintLin * 0.28;
+    return mix(sky, groundReflection, below);
+}
+
+vec3 previewEnvSunRadiance(vec3 dir, vec3 lightPropagationDir, vec3 lightColor, float sunIntensity, float roughness)
+{
+    vec3 towardSun = previewEnvTowardSun(lightPropagationDir);
+    float dayAmt = previewEnvDayFactor(lightPropagationDir, sunIntensity);
+    float cosSun = max(dot(normalize(dir), towardSun), 0.0);
+    float r = saturate1(roughness);
+
+    // Generated cubemap sun: narrow for smooth metals, wide and softer for rough metals.
+    float tightExp = mix(1600.0, 18.0, r);
+    float broadExp = mix(96.0, 4.0, r);
+    float tight = pow(cosSun, tightExp) * mix(7.5, 1.1, r);
+    float broad = pow(cosSun, broadExp) * mix(0.25, 0.85, r);
+    float sunScale = dayAmt * mix(0.35, 1.4, smoothstep(0.4, 10.0, sunIntensity));
+    return previewEnvSunWarmColor(lightPropagationDir, lightColor, sunIntensity) * (tight + broad) * sunScale;
+}
+
+vec3 previewEnvCubemapRadiance(vec3 dir, vec3 skyTintLin, vec3 groundTintLin, vec3 lightPropagationDir,
+    vec3 lightColor, float sunIntensity, float roughness, int enableAtmoSky, sampler2D atmoSkyViewLut)
+{
+    vec3 d = normalize(dir);
+    vec3 skyGround = previewEnvSkyGroundRadiance(d, skyTintLin, groundTintLin, enableAtmoSky, atmoSkyViewLut);
+    vec3 sun = previewEnvSunRadiance(d, lightPropagationDir, lightColor, sunIntensity, roughness);
+    return max(skyGround + sun, vec3(0.0));
+}
+
+// Six-direction generated diffuse probe. It approximates a tiny cubemap convolution
+// and keeps vertical/side faces lit from stable world-space directions.
+vec3 previewAmbientProbeIrradiance(vec3 N, vec3 skyTintLin, vec3 groundTintLin, vec3 lightPropagationDir,
+    vec3 lightColor, float sunIntensity, int enableAtmoSky, sampler2D atmoSkyViewLut)
+{
+    vec3 n = normalize(N);
+    vec3 px = vec3(1.0, 0.0, 0.0);
+    vec3 nx = vec3(-1.0, 0.0, 0.0);
+    vec3 py = vec3(0.0, 1.0, 0.0);
+    vec3 ny = vec3(0.0, -1.0, 0.0);
+    vec3 pz = vec3(0.0, 0.0, 1.0);
+    vec3 nz = vec3(0.0, 0.0, -1.0);
+
+    float roughDiffuse = 1.0;
+    vec3 radPx = previewEnvCubemapRadiance(px, skyTintLin, groundTintLin, lightPropagationDir, lightColor, sunIntensity,
+        roughDiffuse, enableAtmoSky, atmoSkyViewLut);
+    vec3 radNx = previewEnvCubemapRadiance(nx, skyTintLin, groundTintLin, lightPropagationDir, lightColor, sunIntensity,
+        roughDiffuse, enableAtmoSky, atmoSkyViewLut);
+    vec3 radPy = previewEnvCubemapRadiance(py, skyTintLin, groundTintLin, lightPropagationDir, lightColor, sunIntensity,
+        roughDiffuse, enableAtmoSky, atmoSkyViewLut);
+    vec3 radNy = previewEnvCubemapRadiance(ny, skyTintLin, groundTintLin, lightPropagationDir, lightColor, sunIntensity,
+        roughDiffuse, enableAtmoSky, atmoSkyViewLut);
+    vec3 radPz = previewEnvCubemapRadiance(pz, skyTintLin, groundTintLin, lightPropagationDir, lightColor, sunIntensity,
+        roughDiffuse, enableAtmoSky, atmoSkyViewLut);
+    vec3 radNz = previewEnvCubemapRadiance(nz, skyTintLin, groundTintLin, lightPropagationDir, lightColor, sunIntensity,
+        roughDiffuse, enableAtmoSky, atmoSkyViewLut);
+
+    float wPx = max(dot(n, px), 0.0);
+    float wNx = max(dot(n, nx), 0.0);
+    float wPy = max(dot(n, py), 0.0);
+    float wNy = max(dot(n, ny), 0.0);
+    float wPz = max(dot(n, pz), 0.0);
+    float wNz = max(dot(n, nz), 0.0);
+
+    vec3 weighted = radPx * wPx + radNx * wNx + radPy * wPy + radNy * wNy + radPz * wPz + radNz * wNz;
+    float wSum = max(wPx + wNx + wPy + wNy + wPz + wNz, GEN_EPS);
+    vec3 probe = weighted / wSum;
+
+    vec3 sideAverage = (radPx + radNx + radPz + radNz) * 0.25;
+    vec3 floorFill = radPy * 0.10 + sideAverage * 0.18 + radNy * 0.08;
+    probe += floorFill;
+
+    // Probe tempering: keep the brightness, retain only ~30 percent of the color cast.
+    float lum = dot(probe, vec3(0.2126, 0.7152, 0.0722));
+    return mix(vec3(lum), probe, 0.35);
+}
+
+vec3 fakeIblAmbientDiffuse(vec3 N, vec3 skyTint, vec3 groundTint, vec3 lightPropagationDir, vec3 lightColor,
+    float sunIntensity, int enableAtmoSky, sampler2D atmoSkyViewLut)
 {
     vec3 skyTintLin = srgbToLinear(skyTint);
     vec3 groundTintLin = srgbToLinear(groundTint);
-    if (enableAtmoSky > 0)
-    {
-        return iblSkyIrradiance(N, atmoSkyViewLut, groundTintLin);
-    }
-
-    return fakeIblSky(N, skyTintLin, groundTintLin);
+    return previewAmbientProbeIrradiance(N, skyTintLin, groundTintLin, lightPropagationDir, lightColor, sunIntensity,
+        enableAtmoSky, atmoSkyViewLut);
 }
 
-// Roughness-dependent environment radiance (stand-in for prefiltered cubemap mips).
-vec3 iblPrefilteredSkyRadiance(vec3 N, vec3 R, float roughness, sampler2D atmoSkyViewLut)
+// Roughness-dependent generated environment radiance (stand-in for prefiltered cubemap mips).
+vec3 iblPrefilteredSkyRadiance(vec3 N, vec3 R, float roughness, vec3 skyTintLin, vec3 groundTintLin,
+    vec3 lightPropagationDir, vec3 lightColor, float sunIntensity, int enableAtmoSky, sampler2D atmoSkyViewLut)
 {
     float alpha = brdfGgxAlpha(roughness);
-
-    vec3 skyUp = sampleAtmoSkyViewRadianceLinear(vec3(0.0, 1.0, 0.0), atmoSkyViewLut);
-    vec3 skyHor = sampleAtmoSkyViewRadianceLinear(normalize(vec3(0.2, 0.18, 1.0)), atmoSkyViewLut);
-    vec3 hemiAvg = mix(skyHor, skyUp, 0.55);
-    vec3 diffuseLike = mix(hemiAvg, iblSkyIrradiance(N, atmoSkyViewLut, vec3(0.0)), 0.5);
 
     vec3 up = abs(R.y) < 0.999 ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0);
     vec3 t = normalize(cross(up, R));
     vec3 b = cross(R, t);
-    float spread = max(alpha * 2.8, 0.35);
-    vec3 tap0 = sampleAtmoSkyViewRadianceLinear(normalize(R + t * spread), atmoSkyViewLut);
-    vec3 tap1 = sampleAtmoSkyViewRadianceLinear(normalize(R - t * spread), atmoSkyViewLut);
-    vec3 tap2 = sampleAtmoSkyViewRadianceLinear(normalize(R + b * spread), atmoSkyViewLut);
-    vec3 tap3 = sampleAtmoSkyViewRadianceLinear(normalize(R - b * spread), atmoSkyViewLut);
+    float spread = 0.035 + alpha * 1.65;
+    vec3 center = previewEnvCubemapRadiance(R, skyTintLin, groundTintLin, lightPropagationDir, lightColor, sunIntensity,
+        roughness, enableAtmoSky, atmoSkyViewLut);
+    vec3 tap0 = previewEnvCubemapRadiance(normalize(R + t * spread), skyTintLin, groundTintLin, lightPropagationDir,
+        lightColor, sunIntensity, roughness, enableAtmoSky, atmoSkyViewLut);
+    vec3 tap1 = previewEnvCubemapRadiance(normalize(R - t * spread), skyTintLin, groundTintLin, lightPropagationDir,
+        lightColor, sunIntensity, roughness, enableAtmoSky, atmoSkyViewLut);
+    vec3 tap2 = previewEnvCubemapRadiance(normalize(R + b * spread), skyTintLin, groundTintLin, lightPropagationDir,
+        lightColor, sunIntensity, roughness, enableAtmoSky, atmoSkyViewLut);
+    vec3 tap3 = previewEnvCubemapRadiance(normalize(R - b * spread), skyTintLin, groundTintLin, lightPropagationDir,
+        lightColor, sunIntensity, roughness, enableAtmoSky, atmoSkyViewLut);
     vec3 wide = (tap0 + tap1 + tap2 + tap3) * 0.25;
 
-    float blurT = smoothstep(0.02, 0.98, roughness);
-    return mix(wide, diffuseLike, blurT);
+    vec3 probe = previewAmbientProbeIrradiance(N, skyTintLin, groundTintLin, lightPropagationDir, lightColor,
+        sunIntensity, enableAtmoSky, atmoSkyViewLut);
+    vec3 prefiltered = mix(center, wide, smoothstep(0.02, 0.35, roughness));
+    return mix(prefiltered, probe, smoothstep(0.35, 1.0, roughness) * 0.55);
 }
 
-vec3 iblPrefilteredSkyRadianceFallback(vec3 N, vec3 R, float roughness, vec3 skyTintLin, vec3 groundTintLin)
-{
-    vec3 hemi = fakeIblSky(N, skyTintLin, groundTintLin);
-    vec3 blur = mix(skyTintLin, groundTintLin, 0.5);
-    float blurT = smoothstep(0.02, 0.98, roughness);
-    return mix(blur, hemi, blurT);
-}
-
-// Split-sum specular IBL. Sun / punctual highlights come from direct lighting only.
 vec3 fakeIblSpecular(vec3 N, vec3 V, vec3 f0, float roughness, float metallic, vec3 skyTint, vec3 groundTint,
-    int enableAtmoSky, sampler2D atmoSkyViewLut)
+    vec3 lightPropagationDir, vec3 lightColor, float sunIntensity, int enableAtmoSky, sampler2D atmoSkyViewLut)
 {
     vec3 skyTintLin = srgbToLinear(skyTint);
     vec3 groundTintLin = srgbToLinear(groundTint);
@@ -122,18 +207,8 @@ vec3 fakeIblSpecular(vec3 N, vec3 V, vec3 f0, float roughness, float metallic, v
     float specRough = max(roughness, mix(0.72, 0.04, metallic));
     vec2 envBrdf = iblEnvBrdfFactor(NoV, specRough);
 
-    vec3 prefiltered;
-    if (enableAtmoSky > 0)
-    {
-        prefiltered = iblPrefilteredSkyRadiance(N, R, specRough, atmoSkyViewLut);
-        float below = smoothstep(0.1, -0.28, R.y);
-        vec3 groundRef = groundTintLin * (0.04 + 0.07 * specRough);
-        prefiltered = mix(prefiltered, groundRef, below);
-    }
-    else
-    {
-        prefiltered = iblPrefilteredSkyRadianceFallback(N, R, specRough, skyTintLin, groundTintLin);
-    }
+    vec3 prefiltered = iblPrefilteredSkyRadiance(N, R, specRough, skyTintLin, groundTintLin, lightPropagationDir,
+        lightColor, sunIntensity, enableAtmoSky, atmoSkyViewLut);
 
     vec3 specular = prefiltered * (f0 * envBrdf.x + envBrdf.y);
     // Dielectrics: keep a faint glint; metals: full environment specular.

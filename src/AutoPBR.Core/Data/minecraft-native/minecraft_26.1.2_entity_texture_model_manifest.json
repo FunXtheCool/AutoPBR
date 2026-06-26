@@ -1061,8 +1061,8 @@
       "deobf_model_class": "net.minecraft.client.model.animal.feline.AdultCatModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
-      "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64,
+      "geometry_ir_texture_width": 32,
+      "geometry_ir_texture_height": 32,
       "geometry_ir_official_jvm_baby": "net.minecraft.client.model.animal.feline.BabyFelineModel"
     },
     {
@@ -2228,7 +2228,7 @@
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64
+      "geometry_ir_texture_height": 32
     },
     {
       "path_prefix": "assets/minecraft/textures/entity/equipment/llama_body/blue",
@@ -2983,8 +2983,8 @@
       "deobf_model_class": "net.minecraft.client.model.animal.feline.AdultCatModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
-      "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64,
+      "geometry_ir_texture_width": 32,
+      "geometry_ir_texture_height": 32,
       "geometry_ir_official_jvm_baby": "net.minecraft.client.model.animal.feline.BabyFelineModel"
     },
     {
@@ -3556,8 +3556,8 @@
       "deobf_model_class": "net.minecraft.client.model.animal.feline.AdultCatModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
-      "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64,
+      "geometry_ir_texture_width": 32,
+      "geometry_ir_texture_height": 32,
       "geometry_ir_official_jvm_baby": "net.minecraft.client.model.animal.feline.BabyFelineModel"
     },
     {
@@ -3566,8 +3566,8 @@
       "deobf_model_class": "net.minecraft.client.model.animal.feline.AdultCatModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
-      "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64,
+      "geometry_ir_texture_width": 32,
+      "geometry_ir_texture_height": 32,
       "geometry_ir_official_jvm_baby": "net.minecraft.client.model.animal.feline.BabyFelineModel"
     },
     {
@@ -3603,8 +3603,8 @@
       "deobf_model_class": "net.minecraft.client.model.animal.feline.AdultCatModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
-      "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64,
+      "geometry_ir_texture_width": 32,
+      "geometry_ir_texture_height": 32,
       "geometry_ir_official_jvm_baby": "net.minecraft.client.model.animal.feline.BabyFelineModel"
     },
     {
@@ -4025,8 +4025,8 @@
       "deobf_model_class": "net.minecraft.client.model.animal.feline.AdultCatModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
-      "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64,
+      "geometry_ir_texture_width": 32,
+      "geometry_ir_texture_height": 32,
       "geometry_ir_official_jvm_baby": "net.minecraft.client.model.animal.feline.BabyFelineModel"
     },
     {
@@ -4035,8 +4035,8 @@
       "deobf_model_class": "net.minecraft.client.model.animal.feline.AdultCatModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
-      "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64,
+      "geometry_ir_texture_width": 32,
+      "geometry_ir_texture_height": 32,
       "geometry_ir_official_jvm_baby": "net.minecraft.client.model.animal.feline.BabyFelineModel"
     },
     {
@@ -4054,8 +4054,8 @@
       "deobf_model_class": "net.minecraft.client.model.animal.feline.AdultCatModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
-      "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64,
+      "geometry_ir_texture_width": 32,
+      "geometry_ir_texture_height": 32,
       "geometry_ir_official_jvm_baby": "net.minecraft.client.model.animal.feline.BabyFelineModel"
     },
     {
@@ -4400,8 +4400,8 @@
       "deobf_model_class": "net.minecraft.client.model.animal.feline.AdultCatModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
-      "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64,
+      "geometry_ir_texture_width": 32,
+      "geometry_ir_texture_height": 32,
       "geometry_ir_official_jvm_baby": "net.minecraft.client.model.animal.feline.BabyFelineModel"
     },
     {
@@ -4480,8 +4480,8 @@
       "deobf_model_class": "net.minecraft.client.model.animal.feline.AdultCatModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
-      "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64,
+      "geometry_ir_texture_width": 32,
+      "geometry_ir_texture_height": 32,
       "geometry_ir_official_jvm_baby": "net.minecraft.client.model.animal.feline.BabyFelineModel"
     },
     {
@@ -4623,8 +4623,8 @@
       "deobf_model_class": "net.minecraft.client.model.animal.feline.AdultCatModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
-      "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64,
+      "geometry_ir_texture_width": 32,
+      "geometry_ir_texture_height": 32,
       "geometry_ir_official_jvm_baby": "net.minecraft.client.model.animal.feline.BabyFelineModel"
     },
     {
@@ -4950,7 +4950,7 @@
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64
+      "geometry_ir_texture_height": 32
     },
     {
       "path_prefix": "assets/minecraft/textures/entity/banner/stripe_top",
@@ -5021,8 +5021,8 @@
       "deobf_model_class": "net.minecraft.client.model.animal.feline.AdultCatModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
-      "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64,
+      "geometry_ir_texture_width": 32,
+      "geometry_ir_texture_height": 32,
       "geometry_ir_official_jvm_baby": "net.minecraft.client.model.animal.feline.BabyFelineModel"
     },
     {
@@ -5275,8 +5275,8 @@
       "deobf_model_class": "net.minecraft.client.model.animal.feline.AdultCatModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
-      "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64,
+      "geometry_ir_texture_width": 32,
+      "geometry_ir_texture_height": 32,
       "geometry_ir_official_jvm_baby": "net.minecraft.client.model.animal.feline.BabyOcelotModel"
     },
     {
@@ -5313,7 +5313,7 @@
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64
+      "geometry_ir_texture_height": 32
     },
     {
       "path_prefix": "assets/minecraft/textures/entity/fish/tropical_b",
@@ -5367,7 +5367,7 @@
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64
+      "geometry_ir_texture_height": 32
     },
     {
       "path_prefix": "assets/minecraft/textures/entity/player/wide/ari",
@@ -5394,7 +5394,7 @@
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64
+      "geometry_ir_texture_height": 32
     },
     {
       "path_prefix": "assets/minecraft/textures/entity/player/wide/kai",
@@ -5590,8 +5590,8 @@
       "builder_method": "Wolf",
       "deobf_model_class": "net.minecraft.client.model.animal.wolf.WolfModel",
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.WolfModel",
-      "notes": "",
-      "geometry_ir_texture_width": 64,
+      "notes": "BabyWolfModel createBodyLayer uses 32x32 atlas (not adult 64x32).",
+      "geometry_ir_texture_width": 32,
       "geometry_ir_texture_height": 32
     },
     {
@@ -5637,7 +5637,7 @@
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64
+      "geometry_ir_texture_height": 32
     },
     {
       "path_prefix": "assets/minecraft/textures/entity/cat/cat_collar",
@@ -5646,7 +5646,7 @@
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64
+      "geometry_ir_texture_height": 32
     },
     {
       "path_prefix": "assets/minecraft/textures/entity/cat/cat_calico",
@@ -5655,7 +5655,7 @@
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64
+      "geometry_ir_texture_height": 32
     },
     {
       "path_prefix": "assets/minecraft/textures/entity/bear/polarbear",
@@ -5819,7 +5819,7 @@
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64
+      "geometry_ir_texture_height": 32
     },
     {
       "path_prefix": "assets/minecraft/textures/entity/banner/mojang",
@@ -5900,7 +5900,7 @@
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64
+      "geometry_ir_texture_height": 32
     },
     {
       "path_prefix": "assets/minecraft/textures/entity/cat/cat_white",
@@ -5909,7 +5909,7 @@
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64
+      "geometry_ir_texture_height": 32
     },
     {
       "path_prefix": "assets/minecraft/textures/entity/boat/dark_oak",
@@ -6490,7 +6490,7 @@
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64
+      "geometry_ir_texture_height": 32
     },
     {
       "path_prefix": "assets/minecraft/textures/entity/allay/allay",
@@ -6589,7 +6589,7 @@
       "deobf_model_class_pre_restructure": "net.minecraft.client.model.CatModel",
       "notes": "",
       "geometry_ir_texture_width": 64,
-      "geometry_ir_texture_height": 64,
+      "geometry_ir_texture_height": 32,
       "geometry_ir_official_jvm": "net.minecraft.client.model.animal.feline.AdultOcelotModel"
     },
     {

@@ -69,15 +69,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 };
             }
 
-            // Vanilla axolotl legs/gills use zero-thickness sheets (faceMask); hand BuildAxolotl used thin solids
-            // for stable preview UVs. IR parity emit keeps exact bytecode boxes — thicken degenerate axes only.
+            // Vanilla axolotl legs/fins/gills use zero-thickness faceMask sheets. Gill Z depth is restored via
+            // TryExpandAxolotlGillCuboidZExtents; preview thicken matches bee/chicken/creaking (thin solid, not ±1 gap).
             if (string.Equals(builderMethod, "Axolotl", StringComparison.OrdinalIgnoreCase))
             {
                 // CubeDeformation(0.001) is static model geometry, not animation-driven; bind and anim
                 // catalog emits must agree so GPU skinning matches CPU rebake at non-zero clocks.
                 return opts with
                 {
-                    PreviewDegenerateAxisThickness = 1f,
+                    PreviewDegenerateAxisThickness = 0.06f,
                     PreviewApplyCubeDeformationInflate = true,
                 };
             }
@@ -113,6 +113,32 @@ internal sealed partial class CleanRoomEntityModelRuntime
             if (string.Equals(builderMethod, "Bee", StringComparison.OrdinalIgnoreCase))
             {
                 return opts with { PreviewDegenerateAxisThickness = 0.06f };
+            }
+
+            // Bat and allay wings are zero-thickness faceMask sheets in the runtime geometry IR.
+            // Give them the same thin preview solid treatment as bee/chicken sheets so the two
+            // opposing faces do not fight inside one draw batch.
+            if (string.Equals(builderMethod, "Bat", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(builderMethod, "Allay", StringComparison.OrdinalIgnoreCase))
+            {
+                return opts with { PreviewDegenerateAxisThickness = 0.06f };
+            }
+
+            // Chicken wings are north/south and up/down faceMask sheets; match bee/creaking preview thicken.
+            if (string.Equals(builderMethod, "Chicken", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(builderMethod, "Flying", StringComparison.OrdinalIgnoreCase))
+            {
+                return opts with { PreviewDegenerateAxisThickness = 0.06f };
+            }
+
+            if (string.Equals(builderMethod, "DecoratedPotEntity", StringComparison.OrdinalIgnoreCase))
+            {
+                return opts with
+                {
+                    PreviewDegenerateAxisThickness = DecoratedPotPreviewDegenerateAxisThickness,
+                    ResolvePartAtlasDimensions = partId =>
+                        IsDecoratedPotBasePartId(partId) ? (32, 32) : (16, 16),
+                };
             }
 
             if (EntityPreviewPoseCatalog.IsIllagerBuilderMethod(builderMethod))

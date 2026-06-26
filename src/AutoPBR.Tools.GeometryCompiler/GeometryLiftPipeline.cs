@@ -239,6 +239,7 @@ internal static class GeometryLiftPipeline
     private static void ApplyLiftedMeshPostProcessing(JsonArray roots, string meshConcat, string officialJvmName)
     {
         ApplyDeferredMeshFactoryPostProcessing(roots, meshConcat, officialJvmName);
+        LayerDefinitionMeshTransformerScaleStamp.ApplyToLiftedRoots(roots, meshConcat);
         LayerDefinitionRetainAtlasStamp.ApplyToLiftedRoots(roots, meshConcat);
         PreviewDepthLayerIrStamp.ApplyToLiftedRoots(roots, officialJvmName);
     }

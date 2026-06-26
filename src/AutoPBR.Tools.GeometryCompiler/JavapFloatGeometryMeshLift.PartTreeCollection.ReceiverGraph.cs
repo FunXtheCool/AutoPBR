@@ -41,14 +41,30 @@ internal static partial class JavapFloatGeometryMeshLift
                 continue;
             }
 
-            var parentReceiverSlot = TryInferReceiverLocalSlotForBinding(lines, i, child);
-            if (TryFindFirstAstoreLocalSlotAfter(lines, i, 1, 256, out _, out var chainSlot))
+            var parentReceiverSlot = TryInferReceiverLocalSlotForBinding(lines, i, child, map);
+            if (TryFindImmediateBindingResultAstore(lines, i, out var chainSlot))
             {
                 map[chainSlot] = new ReceiverSlotEntry(child, parentReceiverSlot);
             }
         }
 
         return map;
+    }
+
+    private static bool TryFindImmediateBindingResultAstore(List<string> lines, int bindingLineIdx, out int slot)
+    {
+        slot = 0;
+        for (var i = bindingLineIdx + 1; i < lines.Count; i++)
+        {
+            if (string.IsNullOrWhiteSpace(lines[i]))
+            {
+                continue;
+            }
+
+            return JavapBytecodeStreamAnalyzer.TryParseAstoreLocalSlot(lines[i], out slot);
+        }
+
+        return false;
     }
 
     /// <summary>

@@ -20,6 +20,7 @@ internal static partial class JavapFloatGeometryMeshLift
         bool mirrorU,
         int? uvSpanW,
         int? uvSpanH,
+        int? uvSpanD,
         double? inflate)
     {
         var c = new JsonObject
@@ -65,7 +66,9 @@ internal static partial class JavapFloatGeometryMeshLift
 
         if (uvSpanW is { } uw && uvSpanH is { } uh)
         {
-            c["uvSpan"] = new JsonArray { uw, uh };
+            c["uvSpan"] = uvSpanD is { } ud
+                ? new JsonArray { uw, uh, ud }
+                : new JsonArray { uw, uh };
         }
 
         if (inflate is { } inf && Math.Abs(inf) > 1e-12)

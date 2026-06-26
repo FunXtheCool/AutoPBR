@@ -465,6 +465,23 @@ internal static class PreviewDepthLayerResolver
             return true;
         }
 
+        if (IsChestModelJvm(officialJvmName))
+        {
+            if (string.Equals(partId, "lid", StringComparison.OrdinalIgnoreCase))
+            {
+                kind = PreviewDepthLayerKind.CutoutOverlay;
+                layerOrdinal = 1;
+                return true;
+            }
+
+            if (string.Equals(partId, "lock", StringComparison.OrdinalIgnoreCase))
+            {
+                kind = PreviewDepthLayerKind.CutoutOverlay;
+                layerOrdinal = 2;
+                return true;
+            }
+        }
+
         if (partId.Contains("eye", StringComparison.OrdinalIgnoreCase))
         {
             kind = PreviewDepthLayerKind.CosmeticOverlay;
@@ -551,4 +568,8 @@ internal static class PreviewDepthLayerResolver
         (jvm.Contains("Villager", StringComparison.Ordinal) ||
          jvm.Contains("Illager", StringComparison.Ordinal) ||
          jvm.Contains("ZombieVillager", StringComparison.Ordinal));
+
+    private static bool IsChestModelJvm(string? officialJvmName) =>
+        officialJvmName is { Length: > 0 } jvm &&
+        jvm.Contains(".object.chest.ChestModel", StringComparison.Ordinal);
 }

@@ -134,9 +134,12 @@ public sealed class ExtendedAddBoxBytecodeLiftTests
             string.Join("; ", notes));
         var cub = roots[0]!["children"]!.AsArray()[0]!["cuboids"]!.AsArray()[0]!.AsObject();
         Assert.Equal("#body_part", (string?)cub["textureKey"]);
+        Assert.Equal(2, cub["uvOrigin"]![0]!.GetValue<int>());
+        Assert.Equal(3, cub["uvOrigin"]![1]!.GetValue<int>());
         var span = cub["uvSpan"]!.AsArray();
-        Assert.Equal(2, span[0]!.GetValue<int>());
-        Assert.Equal(3, span[1]!.GetValue<int>());
+        Assert.Equal(4, span[0]!.GetValue<int>());
+        Assert.Equal(5, span[1]!.GetValue<int>());
+        Assert.Equal(6, span[2]!.GetValue<int>());
         Assert.Equal(1d, cub["from"]![0]!.GetValue<double>(), 5);
         Assert.Equal(5d, cub["to"]![0]!.GetValue<double>(), 5);
     }
@@ -158,8 +161,11 @@ public sealed class ExtendedAddBoxBytecodeLiftTests
             string.Join("; ", notes));
         var cub = roots[0]!["children"]!.AsArray()[0]!["cuboids"]!.AsArray()[0]!.AsObject();
         Assert.Equal("#fin_crop", (string?)cub["textureKey"]);
-        Assert.Equal(5, cub["uvSpan"]![0]!.GetValue<int>());
-        Assert.Equal(7, cub["uvSpan"]![1]!.GetValue<int>());
+        Assert.Equal(5, cub["uvOrigin"]![0]!.GetValue<int>());
+        Assert.Equal(7, cub["uvOrigin"]![1]!.GetValue<int>());
+        Assert.Equal(2, cub["uvSpan"]![0]!.GetValue<int>());
+        Assert.Equal(3, cub["uvSpan"]![1]!.GetValue<int>());
+        Assert.Equal(4, cub["uvSpan"]![2]!.GetValue<int>());
         Assert.False(cub.ContainsKey("inflate"));
         Assert.Equal(0d, cub["from"]![0]!.GetValue<double>(), 5);
         Assert.Equal(2d, cub["to"]![0]!.GetValue<double>(), 5);

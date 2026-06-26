@@ -237,7 +237,7 @@ public sealed class HumanoidPreviewPoseTests
 
     private static Vector3? ComputePartPreviewCentroid(
         MergedJavaBlockModel mesh,
-        IReadOnlyList<string> partIds,
+        List<string> partIds,
         Func<string, bool> partFilter)
     {
         Vector3 sum = Vector3.Zero;

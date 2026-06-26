@@ -57,6 +57,7 @@ Edit these under `src/AutoPBR.Core/Data/minecraft-native/` when **promoting** a 
 ## What to prefer
 
 - **Lifter vs javap** on pinned `client.jar` (T0) — locks tools, not draft shards.
+- **Cross-stage regressions for promoted hard cases:** direct jar lift plus runtime affine, UV bake, GPU bind, and visual preview checks. Ghast-family tests must include padded physical textures (`128x64` / `128x128`) while asserting logical Geometry IR atlases (`64x32` / `64x64`); see [`ghast-family-parity.md`](ghast-family-parity.md).
 - **Part-tree probes** (T0, `PartialModelLiftDiagnosticsTests`): `AdultAxolotlModel` / `BabyAxolotlModel` body + hind-leg cuboid ownership; `Lifted_tree_passes_semantic_validator_for_adult_axolotl`; Humanoid/Bat duplicate-cuboid probes (no assert when reference JSON absent).
 - **Min cuboid counts** only on T1 pilots (lower bound, not exact snapshot).
 - **Strict reference alignment** only for names in `geometry_ir_reference_cuboid_strict_jvm.txt`.

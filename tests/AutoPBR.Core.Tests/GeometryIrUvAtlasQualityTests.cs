@@ -56,17 +56,29 @@ public sealed class GeometryIrUvAtlasQualityTests
     }
 
     [Fact]
-    public void BuildUpDownTexCropFaceUvRects_anchors_first_face_in_mask_order()
+    public void BuildUpDownTexCropFaceUvRects_down_mask_uses_java_down_unfold_for_decorated_pot_caps()
     {
-        var upFirst = GeometryIrUvAtlasQuality.BuildUpDownTexCropFaceUvRects(
-            0, 18, 9, 6, ["up", "down"]);
-        Assert.Equal(new float[] { 0, 18, 9, 24 }, upFirst.Up);
-        Assert.Equal(new float[] { 11, 18, 20, 24 }, upFirst.Down);
+        var legacy = GeometryIrUvAtlasQuality.BuildUpDownTexCropFaceUvRects(18, 13, 14, 14, ["down"]);
+        Assert.Equal([14f, 13f, 28f, 27f], legacy.Down);
+        Assert.Equal([28f, 27f, 42f, 13f], legacy.Up);
 
-        var downFirst = GeometryIrUvAtlasQuality.BuildUpDownTexCropFaceUvRects(
-            0, 18, 9, 6, ["down", "up"]);
-        Assert.Equal(new float[] { 11, 18, 20, 24 }, downFirst.Up);
-        Assert.Equal(new float[] { 0, 18, 9, 24 }, downFirst.Down);
+        var raw = GeometryIrUvAtlasQuality.BuildUpDownTexCropFaceUvRects(-14, 13, 14, 14, ["down"]);
+        Assert.Equal([14f, 13f, 28f, 27f], raw.Down);
+        Assert.Equal([28f, 27f, 42f, 13f], raw.Up);
+    }
+
+    [Fact]
+    public void BuildUpDownTexCropFaceUvRects_dual_mask_uses_texcrop_anchor_on_first_face()
+    {
+        var bee = GeometryIrUvAtlasQuality.BuildUpDownTexCropFaceUvRects(
+            0, 18, 9, 6, ["up", "down"]);
+        Assert.Equal([0f, 18f, 9f, 24f], bee.Up);
+        Assert.Equal([11f, 18f, 20f, 24f], bee.Down);
+
+        var mirrored = GeometryIrUvAtlasQuality.BuildUpDownTexCropFaceUvRects(
+            0, 18, 9, 6, ["down", "up"], mirrorU: true);
+        Assert.Equal([11f, 18f, 20f, 24f], mirrored.Up);
+        Assert.Equal([0f, 18f, 9f, 24f], mirrored.Down);
     }
 
     [Fact]
@@ -86,6 +98,25 @@ public sealed class GeometryIrUvAtlasQualityTests
         Assert.Equal(7, w);
         Assert.Equal(2, h);
         Assert.Equal(0, d);
+    }
+
+    [Fact]
+    public void ResolveNorthSouthSheetUvFootprint_texCrop_full_box_anchor_duplicated_uses_geometry_without_face_mask()
+    {
+        var cuboid = JsonDocument.Parse("""
+            {
+              "from": [-1.5, -0.001, -4],
+              "to": [1.5, 1.999, -2],
+              "uvOrigin": [0, 24],
+              "textureKey": "#nose",
+              "uvSpan": [0, 24]
+            }
+            """).RootElement;
+        var (w, h, depth) = GeometryIrUvAtlasQuality.ResolveNorthSouthSheetUvFootprint(
+            cuboid, 0, 24, 0, 24, -1, 3, 2, 2);
+        Assert.Equal(3, w);
+        Assert.Equal(2, h);
+        Assert.Equal(2, depth);
     }
 
     [Fact]

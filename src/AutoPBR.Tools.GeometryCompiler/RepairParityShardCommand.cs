@@ -5,6 +5,11 @@ namespace AutoPBR.Tools.GeometryCompiler;
 
 internal static class RepairParityShardCommand
 {
+    private static readonly JsonSerializerOptions WriteIndentedJson = new(JsonSerializerOptions.Default)
+    {
+        WriteIndented = true
+    };
+
     public static int Run(string[] args)
     {
         if (args.Length == 0 || HasHelp(args))
@@ -33,8 +38,7 @@ internal static class RepairParityShardCommand
 
         using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
-        var options = new JsonSerializerOptions { WriteIndented = true };
-        File.WriteAllText(shardPath, JsonSerializer.Serialize(JsonDocument.Parse(repaired.GetRawText()).RootElement, options));
+        File.WriteAllText(shardPath, JsonSerializer.Serialize(JsonDocument.Parse(repaired.GetRawText()).RootElement, WriteIndentedJson));
         Console.WriteLine($"Repaired parity shard: {shardPath}");
         return 0;
     }

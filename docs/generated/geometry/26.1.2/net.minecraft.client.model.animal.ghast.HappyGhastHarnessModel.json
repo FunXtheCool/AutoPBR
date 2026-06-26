@@ -23,7 +23,8 @@
           0.000000000,
           0.000000000
         ],
-        "eulerOrder": "XYZ"
+        "eulerOrder": "XYZ",
+        "uniformScale": 4
       },
       "cuboids": [],
       "children": [

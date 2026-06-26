@@ -20,6 +20,7 @@ public partial class MainWindowViewModel
     {
         RefreshPreviewPoseOptions(value);
         RefreshPreviewSizeOptions(value);
+        RefreshPreviewContextTypeOptions(value);
     }
 
     partial void OnSelectedPreviewPoseIdChanged(string? value)

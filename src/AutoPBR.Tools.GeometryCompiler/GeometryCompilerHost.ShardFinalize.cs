@@ -14,13 +14,17 @@ internal sealed partial class GeometryCompilerHost
         textureWidth = 0;
         textureHeight = 0;
         if (!string.IsNullOrEmpty(meshText) &&
-            LayerDefinitionAtlasSizeProbe.TryRead(meshText, out textureWidth, out textureHeight))
+            (LayerDefinitionRetainAtlasStamp.TryReadPrimaryRetainFactoryAtlas(meshText, out textureWidth, out textureHeight) ||
+             LayerDefinitionAtlasSizeProbe.TryReadPrimaryIsland(meshText, out textureWidth, out textureHeight) ||
+             LayerDefinitionAtlasSizeProbe.TryRead(meshText, out textureWidth, out textureHeight)))
         {
             return true;
         }
 
         if (meshDisasm is { Stdout.Length: > 0 } disasm &&
-            LayerDefinitionAtlasSizeProbe.TryRead(disasm.Stdout, out textureWidth, out textureHeight))
+            (LayerDefinitionRetainAtlasStamp.TryReadPrimaryRetainFactoryAtlas(disasm.Stdout, out textureWidth, out textureHeight) ||
+             LayerDefinitionAtlasSizeProbe.TryReadPrimaryIsland(disasm.Stdout, out textureWidth, out textureHeight) ||
+             LayerDefinitionAtlasSizeProbe.TryRead(disasm.Stdout, out textureWidth, out textureHeight)))
         {
             return true;
         }

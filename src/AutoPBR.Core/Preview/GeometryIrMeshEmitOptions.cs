@@ -29,7 +29,7 @@ internal readonly struct GeometryIrMeshEmitOptions
     /// <summary>Official JVM name for per-model emit policy (inflate UV footprint).</summary>
     public string? OfficialJvmName { get; init; }
 
-    /// <summary>Normalized texture archive path for catalog emit heuristics (ghast-family UV reorient).</summary>
+    /// <summary>Normalized texture archive path for catalog emit policy.</summary>
     public string? NormalizedAssetPath { get; init; }
 
     /// <summary>

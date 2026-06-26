@@ -6,7 +6,8 @@
   "extractionStatus": "ok",
   "extractionNotes": [
     "Preview composite from DecoratedPotRenderer.createBaseLayer / createSidesLayer javap (26.1.2).",
-    "Neck PartPose.offset(0,37,16).rotationX(PI); sides packed at atlas V=32."
+    "Base cuboids use #base (32x32); sides use #skin north-only sheets (16x16 pattern).",
+    "Neck PartPose.offset(0,37,16).rotationX(PI)."
   ],
   "factoryMethod": "createBaseLayer",
   "roots": [
@@ -31,7 +32,7 @@
               "from": [4, 17, 4],
               "to": [12, 20, 12],
               "uvOrigin": [0, 0],
-              "textureKey": "#skin",
+              "textureKey": "#base",
               "liftKind": "exact",
               "provenance": "DecoratedPotRenderer.createBaseLayer texOffs(0,0)"
             },
@@ -39,7 +40,7 @@
               "from": [5, 20, 5],
               "to": [11, 21, 11],
               "uvOrigin": [0, 5],
-              "textureKey": "#skin",
+              "textureKey": "#base",
               "liftKind": "exact",
               "provenance": "DecoratedPotRenderer.createBaseLayer texOffs(0,5)"
             }
@@ -57,9 +58,10 @@
             {
               "from": [0, 0, 0],
               "to": [14, 0, 14],
-              "uvOrigin": [18, 13],
-              "uvSpan": [14, 1, 14],
-              "textureKey": "#skin",
+              "uvOrigin": [-14, 13],
+              "uvSpan": [14, 0, 14],
+              "textureKey": "#base",
+              "faceMask": ["down"],
               "liftKind": "exact",
               "provenance": "DecoratedPotRenderer.createBaseLayer texOffs(-14,13) top"
             }
@@ -77,9 +79,10 @@
             {
               "from": [0, 0, 0],
               "to": [14, 0, 14],
-              "uvOrigin": [18, 13],
-              "uvSpan": [14, 1, 14],
-              "textureKey": "#skin",
+              "uvOrigin": [-14, 13],
+              "uvSpan": [14, 0, 14],
+              "textureKey": "#base",
+              "faceMask": ["down"],
               "liftKind": "exact",
               "provenance": "DecoratedPotRenderer.createBaseLayer texOffs(-14,13) bottom"
             }
@@ -97,9 +100,10 @@
             {
               "from": [0, 0, 0],
               "to": [14, 16, 0],
-              "uvOrigin": [1, 32],
-              "uvSpan": [14, 16, 1],
+              "uvOrigin": [1, 0],
+              "uvSpan": [14, 16, 0],
               "textureKey": "#skin",
+              "faceMask": ["north"],
               "liftKind": "exact",
               "provenance": "DecoratedPotRenderer.createSidesLayer north"
             }
@@ -117,9 +121,10 @@
             {
               "from": [0, 0, 0],
               "to": [14, 16, 0],
-              "uvOrigin": [1, 32],
-              "uvSpan": [14, 16, 1],
+              "uvOrigin": [1, 0],
+              "uvSpan": [14, 16, 0],
               "textureKey": "#skin",
+              "faceMask": ["north"],
               "liftKind": "exact",
               "provenance": "DecoratedPotRenderer.createSidesLayer west"
             }
@@ -137,9 +142,10 @@
             {
               "from": [0, 0, 0],
               "to": [14, 16, 0],
-              "uvOrigin": [1, 32],
-              "uvSpan": [14, 16, 1],
+              "uvOrigin": [1, 0],
+              "uvSpan": [14, 16, 0],
               "textureKey": "#skin",
+              "faceMask": ["north"],
               "liftKind": "exact",
               "provenance": "DecoratedPotRenderer.createSidesLayer east"
             }
@@ -157,9 +163,10 @@
             {
               "from": [0, 0, 0],
               "to": [14, 16, 0],
-              "uvOrigin": [1, 32],
-              "uvSpan": [14, 16, 1],
+              "uvOrigin": [1, 0],
+              "uvSpan": [14, 16, 0],
               "textureKey": "#skin",
+              "faceMask": ["north"],
               "liftKind": "exact",
               "provenance": "DecoratedPotRenderer.createSidesLayer south"
             }
@@ -169,8 +176,8 @@
       ]
     }
   ],
-  "textureWidth": 64,
-  "textureHeight": 64,
+  "textureWidth": 32,
+  "textureHeight": 32,
   "liftSummary": {
     "cuboidApproxCount": 0,
     "poseApproxCount": 0,

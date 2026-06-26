@@ -22,6 +22,11 @@ public static class EntityEmulatedPreviewRebaker
             ? null
             : EntityPreviewBuildContext.UseSize(rebake.PreviewSizeId);
 
+    private static IDisposable? EnterPreviewContextTypeScope(EntityEmulatedPreviewRebakeContext rebake) =>
+        string.IsNullOrWhiteSpace(rebake.PreviewContextTypeId)
+            ? null
+            : EntityPreviewBuildContext.UseContextType(rebake.PreviewContextTypeId);
+
     /// <summary>
     /// Recomputes interleaved vertices, indices, and draw batches for an emulated entity subject.
     /// </summary>
@@ -69,6 +74,7 @@ public static class EntityEmulatedPreviewRebaker
         var runtime = EntityModelRuntimeFactory.Create();
         using var previewPoseScope = EnterPreviewPoseScope(rebake);
         using var previewSizeScope = EnterPreviewSizeScope(rebake);
+        using var previewContextTypeScope = EnterPreviewContextTypeScope(rebake);
         if (!runtime.TryBuildStaticMesh(
                 rebake.AssetArchivePath,
                 profile,
@@ -103,7 +109,13 @@ public static class EntityEmulatedPreviewRebaker
         {
             var p = ordered[i];
             pathToIdx[p] = i;
-            texSizes[p] = (materialsInBakeOrder[i].Width, materialsInBakeOrder[i].Height);
+            var size = EntityGeometryIrTextureAtlas.ResolveForBake(
+                p,
+                materialsInBakeOrder[i].Width,
+                materialsInBakeOrder[i].Height,
+                meshProvenance,
+                profile);
+            texSizes[p] = (size.Width, size.Height);
         }
 
         var profileForParts = profile;
@@ -195,6 +207,7 @@ public static class EntityEmulatedPreviewRebaker
         var runtime = EntityModelRuntimeFactory.Create();
         using var previewPoseScope = EnterPreviewPoseScope(rebake);
         using var previewSizeScope = EnterPreviewSizeScope(rebake);
+        using var previewContextTypeScope = EnterPreviewContextTypeScope(rebake);
         if (!runtime.TryBuildStaticMesh(
                 rebake.AssetArchivePath,
                 profile,
@@ -236,7 +249,13 @@ public static class EntityEmulatedPreviewRebaker
         {
             var p = ordered[i];
             pathToIdx[p] = i;
-            texSizes[p] = (materialsInBakeOrder[i].Width, materialsInBakeOrder[i].Height);
+            var size = EntityGeometryIrTextureAtlas.ResolveForBake(
+                p,
+                materialsInBakeOrder[i].Width,
+                materialsInBakeOrder[i].Height,
+                meshProvenance,
+                profile);
+            texSizes[p] = (size.Width, size.Height);
         }
 
         if (!MinecraftModelBaker.TryBakeBindPoseForGpuSkinning(
@@ -320,6 +339,7 @@ public static class EntityEmulatedPreviewRebaker
         var useFullMeshExtract = EntityGpuBoneFillPolicy.RequiresFullMeshBoneExtract(rebake.AssetArchivePath);
         using var previewPoseScope = EnterPreviewPoseScope(rebake);
         using var previewSizeScope = EnterPreviewSizeScope(rebake);
+        using var previewContextTypeScope = EnterPreviewContextTypeScope(rebake);
         if (useFullMeshExtract)
         {
             if (!runtime.TryBuildStaticMesh(

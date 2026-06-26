@@ -14,11 +14,25 @@ public sealed class EntityUvBakeGoldenTests
     [Theory]
     [InlineData("assets/minecraft/textures/entity/creeper/creeper.png", 64, 32, 14857558920194328997UL)]
     [InlineData("assets/minecraft/textures/entity/cow/cow_temperate.png", 64, 64, 1428835365211977893UL)]
+    [InlineData("assets/minecraft/textures/entity/cat/cat_calico.png", 64, 32, 10285574214237588581UL)]
     [InlineData("assets/minecraft/textures/entity/dolphin/dolphin.png", 64, 64, 16782674017197654309UL)]
-    [InlineData("assets/minecraft/textures/entity/ghast/ghast.png", 64, 32, 9999980192888633509UL)]
+    [InlineData("assets/minecraft/textures/entity/ghast/ghast.png", 64, 32, 1082496271659415717UL)]
     public void Entity_baked_uv_fingerprint_is_stable(string texturePath, int atlasW, int atlasH, ulong goldenFingerprint)
     {
-        var fp = BakeUvFingerprint(texturePath, atlasW, atlasH);
+        var fp = BakeUvFingerprint(texturePath, atlasW, atlasH, useLogicalAtlasFromManifest: false);
+        Assert.Equal(goldenFingerprint, fp);
+    }
+
+    [Theory]
+    [InlineData("assets/minecraft/textures/entity/axolotl/axolotl_blue_baby.png", 10557795273113060837UL)]
+    [InlineData("assets/minecraft/textures/entity/chicken/chicken_temperate_baby.png", 294592320418992677UL)]
+    [InlineData("assets/minecraft/textures/entity/camel/camel_baby.png", 17390841223401462245UL)]
+    [InlineData("assets/minecraft/textures/entity/cow/cow_temperate_baby.png", 18632341434119397UL)]
+    [InlineData("assets/minecraft/textures/entity/wolf/wolf_baby.png", 4052047643320367269UL)]
+    [InlineData("assets/minecraft/textures/entity/cat/cat_calico.png", 10285574214237588581UL)]
+    public void Baby_entity_baked_uv_fingerprint_is_stable_with_logical_atlas(string texturePath, ulong goldenFingerprint)
+    {
+        var fp = BakeUvFingerprint(texturePath, physicalW: 64, physicalH: 64, useLogicalAtlasFromManifest: true);
         Assert.Equal(goldenFingerprint, fp);
     }
 
@@ -80,7 +94,7 @@ public sealed class EntityUvBakeGoldenTests
 
         Assert.True(runtime.TryBuildStaticMesh(
             "assets/minecraft/textures/entity/ghast/ghast.png", Profile26, 0f, 0f, out var ghast, out _));
-        Assert.False(ghast.UsesLivingEntityRendererColumnYFlip);
+        Assert.True(ghast.UsesLivingEntityRendererColumnYFlip);
         Assert.False(PreviewUvBakePolicy.Resolve(ghast).SwapFaceEastWest);
         Assert.False(PreviewUvBakePolicy.Resolve(ghast).SwapFaceUpDown);
     }
@@ -99,10 +113,14 @@ public sealed class EntityUvBakeGoldenTests
         Assert.False(UvDebugSettings.HasActiveOverrides);
     }
 
-    private static ulong BakeUvFingerprint(string texturePath, int atlasW, int atlasH)
+    private static ulong BakeUvFingerprint(
+        string texturePath,
+        int physicalW,
+        int physicalH,
+        bool useLogicalAtlasFromManifest)
     {
         var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(texturePath, Profile26, 0f, 0f, out var merged, out _));
+        Assert.True(runtime.TryBuildStaticMesh(texturePath, Profile26, 0f, 0f, out var merged, out var provenance));
 
         var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(merged, "minecraft");
         var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -110,7 +128,9 @@ public sealed class EntityUvBakeGoldenTests
         for (var i = 0; i < ordered.Count; i++)
         {
             pathToIdx[ordered[i]] = i;
-            texSizes[ordered[i]] = (atlasW, atlasH);
+            texSizes[ordered[i]] = useLogicalAtlasFromManifest
+                ? EntityGeometryIrTextureAtlas.ResolveForBake(ordered[i], physicalW, physicalH, provenance, Profile26)
+                : (physicalW, physicalH);
         }
 
         Assert.True(MinecraftModelBaker.TryBake(merged, "minecraft", pathToIdx, texSizes, out var verts, out _, out _));

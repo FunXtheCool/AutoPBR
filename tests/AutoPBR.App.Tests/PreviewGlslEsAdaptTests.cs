@@ -69,6 +69,35 @@ public class PreviewGlslEsAdaptTests
     }
 
     [Fact]
+    public void GenesisMetalIbl_RetainsPreviewBaseForLabPbrMetalIds()
+    {
+        var src = GlslIncludeResolver.Resolve("genesis.frag", LoadShader);
+        var adapted = GlslSourceAdapter.Adapt(src, ShaderType.FragmentShader, useOpenGlEs: true);
+
+        Assert.Contains("metalPreviewBaseVisibility", adapted, StringComparison.Ordinal);
+        Assert.Contains("mat.metallic * metalPreviewBaseVisibility(mat.roughness)", adapted, StringComparison.Ordinal);
+        Assert.Contains("metalPreviewIrradiance * albedoLinear * metalBaseVisibility", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            "indirect += iblDiff * albedoLinear * (1.0 - mat.metallic) * uIblStrength;",
+            adapted,
+            StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GenesisIbl_UsesGeneratedWorldSpaceProbeAndOffscreenSun()
+    {
+        var src = GlslIncludeResolver.Resolve("genesis.frag", LoadShader);
+        var adapted = GlslSourceAdapter.Adapt(src, ShaderType.FragmentShader, useOpenGlEs: true);
+
+        Assert.Contains("previewEnvSunRadiance", adapted, StringComparison.Ordinal);
+        Assert.Contains("previewEnvCubemapRadiance", adapted, StringComparison.Ordinal);
+        Assert.Contains("previewAmbientProbeIrradiance", adapted, StringComparison.Ordinal);
+        Assert.Contains("uLightDir, uLightColor, uAtmosphereSunIntensity", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("Sun / punctual highlights come from direct lighting only", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("iblPrefilteredSkyRadianceFallback", adapted, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void EsAdapt_LeavesAsciiSourceUnchangedAfterHeaderSwap()
     {
         const string src = "#version 330 core\n// plain ascii\nout vec4 c;\nvoid main(){c=vec4(1.0);}\n";

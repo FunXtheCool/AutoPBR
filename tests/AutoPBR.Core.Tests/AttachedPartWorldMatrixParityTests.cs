@@ -17,6 +17,7 @@ public sealed class AttachedPartWorldMatrixParityTests
     [InlineData("net.minecraft.client.model.animal.cow.ColdCowModel", 64, 64, "right_horn", "left_horn")]
     [InlineData("net.minecraft.client.model.animal.polarbear.PolarBearModel", 128, 64, "body")]
     [InlineData("net.minecraft.client.model.animal.goat.GoatModel", 64, 64, "left_horn", "right_horn")]
+    [InlineData("net.minecraft.client.model.animal.goat.BabyGoatModel", 64, 64, "left_horn", "right_horn")]
     public void Catalog_mesh_part_affine_matches_reference_java_model_space_before_ler(
         string jvm,
         int atlasW,

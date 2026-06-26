@@ -17,13 +17,17 @@ public sealed class GhastFamilyLiftTests
 
     public static IEnumerable<object[]> GhastLiftCases() =>
     [
-        [MonsterJvm, MonsterTentacleHeights],
-        [HappyJvm, HappyTentacleHeights],
+        [MonsterJvm, MonsterTentacleHeights, 4.5d, "root"],
+        [HappyJvm, HappyTentacleHeights, 4d, "body"],
     ];
 
     [Theory]
     [MemberData(nameof(GhastLiftCases))]
-    public void Ghast_family_jar_lift_matches_reference_cuboids_and_tentacle_heights(string jvm, int[] tentacleHeights)
+    public void Ghast_family_jar_lift_matches_javap_transform_hierarchy_and_cuboids(
+        string jvm,
+        int[] tentacleHeights,
+        double expectedScale,
+        string expectedTentacleParent)
     {
         var repo = Program.FindRepoRoot();
         var jar = Path.Combine(repo, "tools", "minecraft-parity", "26.1.2", "client.jar");
@@ -46,6 +50,7 @@ public sealed class GhastFamilyLiftTests
 
         using var reference = JsonDocument.Parse(File.ReadAllText(referencePath));
         var shardRoot = BuildShardRoot(jvm, attempt.Roots);
+        AssertRootMeshTransformerScale(shardRoot, expectedScale);
         var cmp = GeometryIrReferenceComparer.CompareReferenceToIrShardCuboidsByPartId(
             reference.RootElement,
             shardRoot,
@@ -57,9 +62,9 @@ public sealed class GhastFamilyLiftTests
         {
             var tentacleId = $"tentacle{i}";
             Assert.Equal(1, CountPart(shardRoot, tentacleId));
+            Assert.Equal(expectedTentacleParent, FindParentPartId(shardRoot, tentacleId));
             var height = ReadCuboidHeight(shardRoot, tentacleId);
             Assert.Equal(tentacleHeights[i], height);
-            // Lifted IR stores javap +Y boxes before emit reorient; height must be positive span.
             Assert.True(height >= 4, $"{tentacleId} lift height should match javap addBox (+Y), got {height}");
         }
     }
@@ -76,12 +81,13 @@ public sealed class GhastFamilyLiftTests
         var status = shard.RootElement.GetProperty("extractionStatus").GetString();
         Assert.Equal("ok", status);
 
-        var expected = string.Equals(jvm, "net.minecraft.client.model.monster.ghast.GhastModel", StringComparison.Ordinal)
-            ? new[] { 8, 13, 9, 11, 11, 10, 12, 9, 12 }
-            : new[] { 5, 7, 4, 5, 5, 7, 8, 8, 5 };
+        var monster = string.Equals(jvm, MonsterJvm, StringComparison.Ordinal);
+        var expected = monster ? MonsterTentacleHeights : HappyTentacleHeights;
+        AssertRootMeshTransformerScale(shard.RootElement, monster ? 4.5d : 4d);
         for (var i = 0; i < expected.Length; i++)
         {
             Assert.Equal(expected[i], ReadCuboidHeight(shard.RootElement, $"tentacle{i}"));
+            Assert.Equal(monster ? "root" : "body", FindParentPartId(shard.RootElement, $"tentacle{i}"));
         }
     }
 
@@ -121,6 +127,54 @@ public sealed class GhastFamilyLiftTests
         }
 
         return count;
+    }
+
+    private static void AssertRootMeshTransformerScale(JsonElement shardRoot, double expectedScale)
+    {
+        var pose = shardRoot.GetProperty("roots")[0].GetProperty("pose");
+        Assert.Equal(expectedScale, pose.GetProperty("uniformScale").GetDouble(), 5);
+        Assert.Equal(24.016d * (1d - expectedScale), pose.GetProperty("translation")[1].GetDouble(), 4);
+    }
+
+    private static string? FindParentPartId(JsonElement shardRoot, string partId)
+    {
+        foreach (var root in shardRoot.GetProperty("roots").EnumerateArray())
+        {
+            if (TryFindParentPartId(root, parentId: null, partId, out var parentId))
+            {
+                return parentId;
+            }
+        }
+
+        return null;
+    }
+
+    private static bool TryFindParentPartId(
+        JsonElement part,
+        string? parentId,
+        string targetId,
+        out string? foundParentId)
+    {
+        var currentId = part.TryGetProperty("id", out var idEl) ? idEl.GetString() : null;
+        if (string.Equals(currentId, targetId, StringComparison.Ordinal))
+        {
+            foundParentId = parentId;
+            return true;
+        }
+
+        if (part.TryGetProperty("children", out var children))
+        {
+            foreach (var child in children.EnumerateArray())
+            {
+                if (TryFindParentPartId(child, currentId ?? parentId, targetId, out foundParentId))
+                {
+                    return true;
+                }
+            }
+        }
+
+        foundParentId = null;
+        return false;
     }
 
     private static int WalkPartCount(JsonElement part, string partId)

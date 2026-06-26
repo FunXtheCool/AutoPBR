@@ -149,7 +149,7 @@ internal static class RendererStateDocumentLoader
             return false;
         }
 
-        var normalizedKey = textureKey.StartsWith("#", StringComparison.Ordinal) ? textureKey : "#" + textureKey;
+        var normalizedKey = textureKey.StartsWith('#') ? textureKey : "#" + textureKey;
         foreach (var node in layers)
         {
             if (node is not JsonObject layer)
@@ -163,7 +163,7 @@ internal static class RendererStateDocumentLoader
                 continue;
             }
 
-            var candidate = layerKey.StartsWith("#", StringComparison.Ordinal) ? layerKey : "#" + layerKey;
+            var candidate = layerKey.StartsWith('#') ? layerKey : "#" + layerKey;
             if (!string.Equals(candidate, normalizedKey, StringComparison.OrdinalIgnoreCase))
             {
                 continue;

@@ -81,8 +81,9 @@
               "liftKind": "exact",
               "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
               "uvSpan": [
-                0,
-                24
+                3,
+                2,
+                2
               ]
             },
             {
@@ -104,8 +105,9 @@
               "liftKind": "exact",
               "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
               "uvSpan": [
-                0,
-                10
+                1,
+                1,
+                2
               ]
             },
             {
@@ -127,8 +129,9 @@
               "liftKind": "exact",
               "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float",
               "uvSpan": [
-                6,
-                10
+                1,
+                1,
+                2
               ]
             }
           ],
@@ -458,6 +461,8 @@
     -5
   ],
   "delegatedFromOfficialJvmName": "net.minecraft.client.model.animal.feline.AdultFelineModel",
+  "textureWidth": 64,
+  "textureHeight": 32,
   "liftSummary": {
     "cuboidApproxCount": 0,
     "poseApproxCount": 0,

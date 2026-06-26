@@ -69,8 +69,38 @@ internal static partial class JavapFloatGeometryMeshLift
         return TryResolvePartNameForBinding(lines, bindingIdx, new Dictionary<int, int>(), out var name) ? name : null;
     }
 
-    private static int? TryInferReceiverLocalSlotForBinding(List<string> lines, int bindingIdx, string partName)
+    private static int? TryInferReceiverLocalSlotForBinding(
+        List<string> lines,
+        int bindingIdx,
+        string partName,
+        IReadOnlyDictionary<int, ReceiverSlotEntry>? knownReceiverSlots = null)
     {
+        if (knownReceiverSlots is { Count: > 0 })
+        {
+            var segmentStart = 0;
+            for (var i = bindingIdx - 1; i >= 0; i--)
+            {
+                if (!JavapMeshBytecodeProfiles.IsNamedOrObfuscatedMeshBindingLine(lines[i]))
+                {
+                    continue;
+                }
+
+                segmentStart = i + 1;
+                break;
+            }
+
+            // The PartDefinition receiver is the first known part local pushed for this binding. This also
+            // covers computed names such as PartNames.tentacle(i), where no ldc String follows the receiver.
+            for (var i = segmentStart; i < bindingIdx; i++)
+            {
+                if (JavapBytecodeStreamAnalyzer.TryParseAloadLocalSlot(lines[i], out var slot) &&
+                    knownReceiverSlots.ContainsKey(slot))
+                {
+                    return slot;
+                }
+            }
+        }
+
         for (var j = bindingIdx - 1; j >= 0 && j > bindingIdx - 16; j--)
         {
             var sm = JavapBytecodeStreamAnalyzer.MatchLdcString(lines[j]);
@@ -126,7 +156,7 @@ internal static partial class JavapFloatGeometryMeshLift
         string partName, List<PendingPartAttach> pendingAttaches)
     {
         var graphAtBind = BuildReceiverLocalSlotGraph(lines.GetRange(0, Math.Min(bindingLineIdx + 1, lines.Count)));
-        var recv = TryInferReceiverLocalSlotForBinding(lines, bindingLineIdx, partName);
+        var recv = TryInferReceiverLocalSlotForBinding(lines, bindingLineIdx, partName, graphAtBind);
         var parentPartId = recv is { } r
             ? ResolveParentPartIdFromReceiverSlot(r, graphAtBind)
             : null;

@@ -171,10 +171,10 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
         "armorstand",
         "assets/minecraft/textures/entity/armorstand/armorstand.png",
         "StandardWorldRoot")]
-    [InlineData("net.minecraft.client.model.monster.ghast.GhastModel", "ghast", "", "Skip")]
-    [InlineData("net.minecraft.client.model.GhastModel", "ghast", "", "Skip")]
-    [InlineData("", "ghast", "assets/minecraft/textures/entity/ghast/ghast.png", "Skip")]
-    [InlineData("", "happy_ghast", "assets/minecraft/textures/entity/ghast/happy_ghast.png", "Skip")]
+    [InlineData("net.minecraft.client.model.monster.ghast.GhastModel", "ghast", "", "StandardWorldRoot")]
+    [InlineData("net.minecraft.client.model.GhastModel", "ghast", "", "StandardWorldRoot")]
+    [InlineData("", "ghast", "assets/minecraft/textures/entity/ghast/ghast.png", "StandardWorldRoot")]
+    [InlineData("", "happy_ghast", "assets/minecraft/textures/entity/ghast/happy_ghast.png", "StandardWorldRoot")]
     public void Shared_ler_basis_resolver_classifies_viewport_policy(
         string officialJvm,
         string stem,

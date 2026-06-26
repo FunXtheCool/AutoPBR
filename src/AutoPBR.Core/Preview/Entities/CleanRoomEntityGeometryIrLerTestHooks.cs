@@ -199,14 +199,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return GeometryIrLerBasisKind.EquineDedicated;
         }
 
-        // Ghast / happy ghast: IR reorients tentacle +Y cuboids to −Y hang for preview without LER.
-        // Column-root LER would flip that hang back upward through the body shell (see vanilla reference).
-        if (GeometryIrEmitPolicy.IsGhastFamilyJvm(officialJvmName) ||
-            GeometryIrEmitPolicy.IsGhastFamilyTexturePath(normalizedAssetPath))
-        {
-            return GeometryIrLerBasisKind.Skip;
-        }
-
         return GeometryIrLerBasisKind.StandardWorldRoot;
     }
 

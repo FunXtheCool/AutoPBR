@@ -11,8 +11,7 @@ namespace AutoPBR.App.Rendering.OpenGL;
 /// <summary>OpenGL implementation of <see cref="IRenderPreviewBackend"/>; GPU entry points must run on the OpenGL thread (Avalonia <see cref="AutoPBR.App.Controls.GlPbrPreviewControl"/> callbacks).</summary>
 public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
 {
-    private static readonly float DefaultOrbitBoomArmDistance =
-        MathF.Sqrt(3.6f * 3.6f + 2.6f * 2.6f + 3.6f * 3.6f);
+    private static readonly float DefaultOrbitBoomArmDistance = PreviewCamera.DefaultOrbitBoomArmDistance;
 
     private readonly object _sync = new();
     private GL? _gl;
@@ -285,7 +284,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     }
 
     private static string BuildEntityGpuBindRebakeKey(EntityEmulatedPreviewRebakeContext ctx) =>
-        $"{ctx.PackZipPath}\u001f{ctx.AssetArchivePath}\u001f{ctx.PackConverterCpuMeshFingerprint}\u001f{ctx.PreviewPoseId ?? ""}\u001f{ctx.PreviewSizeId ?? ""}";
+        $"{ctx.PackZipPath}\u001f{ctx.AssetArchivePath}\u001f{ctx.PackConverterCpuMeshFingerprint}\u001f{ctx.PreviewPoseId ?? ""}\u001f{ctx.PreviewSizeId ?? ""}\u001f{ctx.PreviewContextTypeId ?? ""}";
 
     /// <summary>
     /// Stable parity-catalog animation-off CPU bind key. Do not include mesh fingerprint — TryRebakeMesh updates
@@ -293,7 +292,13 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     /// invalidate the GL-committed subject on every UI re-push.
     /// </summary>
     private static string BuildParityCatalogCpuBindCommitKey(EntityEmulatedPreviewRebakeContext ctx) =>
-        $"{ctx.PackZipPath}\u001f{ctx.AssetArchivePath}\u001fparity-cpu-v{PreviewMeshGeometryFingerprint.PipelineRevision}\u001f{ctx.PreviewPoseId ?? ""}\u001f{ctx.PreviewSizeId ?? ""}";
+        $"{ctx.PackZipPath}\u001f{ctx.AssetArchivePath}\u001fparity-cpu-v{PreviewMeshGeometryFingerprint.PipelineRevision}\u001f{ctx.PreviewPoseId ?? ""}\u001f{ctx.PreviewSizeId ?? ""}\u001f{ctx.PreviewContextTypeId ?? ""}";
+
+    private static bool ParityCatalogCpuBindCommitKeyMatchesCurrentRevision(string? committedKey) =>
+        committedKey is not null &&
+        committedKey.Contains(
+            $"parity-cpu-v{PreviewMeshGeometryFingerprint.PipelineRevision}",
+            StringComparison.Ordinal);
 
     private static bool IsParityCatalogEmulatedAsset(string? assetArchivePath)
     {
@@ -358,6 +363,12 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         string.Equals(
             a?.EmulatedRebake?.PreviewSizeId,
             b?.EmulatedRebake?.PreviewSizeId,
+            StringComparison.Ordinal);
+
+    private static bool SameEntityPreviewContextType(PreviewModelSubject? a, PreviewModelSubject? b) =>
+        string.Equals(
+            a?.EmulatedRebake?.PreviewContextTypeId,
+            b?.EmulatedRebake?.PreviewContextTypeId,
             StringComparison.Ordinal);
 
     private void InvalidateParityCatalogBindCommitState()
@@ -432,7 +443,8 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
             var nextPath = subject?.EmulatedRebake?.AssetArchivePath;
             var previewPoseChanged = SameEntityPreviewAsset(prev, subject) && !SameEntityPreviewPose(prev, subject);
             var previewSizeChanged = SameEntityPreviewAsset(prev, subject) && !SameEntityPreviewSize(prev, subject);
-            if ((!string.Equals(prevPath, nextPath, StringComparison.OrdinalIgnoreCase) || previewPoseChanged || previewSizeChanged) &&
+            var previewContextTypeChanged = SameEntityPreviewAsset(prev, subject) && !SameEntityPreviewContextType(prev, subject);
+            if ((!string.Equals(prevPath, nextPath, StringComparison.OrdinalIgnoreCase) || previewPoseChanged || previewSizeChanged || previewContextTypeChanged) &&
                 subject?.EmulatedRebake is { } rebake)
             {
                 InvalidateEntityAssetBindState(rebake);
@@ -480,6 +492,8 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
                         PreviewMesh.FloatsPerVertex)
                     : 0UL;
                 if (previewPoseChanged ||
+                    (_entityBindPoseCommittedKey is not null &&
+                     !ParityCatalogCpuBindCommitKeyMatchesCurrentRevision(_entityBindPoseCommittedKey)) ||
                     (incomingFp != 0 &&
                      committedMeshFp != 0 &&
                      incomingFp != committedMeshFp) ||
@@ -497,6 +511,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
 
                 if (_entityBindPoseCommittedKey is not null &&
                     subject.EmulatedRebake is { } incomingRebake &&
+                    ParityCatalogCpuBindCommitKeyMatchesCurrentRevision(_entityBindPoseCommittedKey) &&
                     prev is
                     {
                         GpuEntityBoneSkinning: false,

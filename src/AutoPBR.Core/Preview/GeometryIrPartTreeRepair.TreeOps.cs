@@ -756,6 +756,85 @@ internal static partial class GeometryIrPartTreeRepair
         return false;
     }
 
+    /// <summary>
+    /// TexCrop <c>addBox</c> lifts may echo the crop anchor into <c>uvSpan</c>; rewrite to integer box extents.
+    /// </summary>
+    internal static void RepairTexCropUvSpanDuplicateAnchors(JsonArray roots)
+    {
+        foreach (var root in roots)
+        {
+            if (root is JsonObject rootObj)
+            {
+                RepairTexCropUvSpanDuplicateAnchorsRecursive(rootObj);
+            }
+        }
+    }
+
+    private static void RepairTexCropUvSpanDuplicateAnchorsRecursive(JsonObject part)
+    {
+        if (part["cuboids"] is JsonArray cuboids)
+        {
+            foreach (var cuboidNode in cuboids)
+            {
+                if (cuboidNode is not JsonObject cuboid)
+                {
+                    continue;
+                }
+
+                RepairTexCropUvSpanDuplicateAnchorCuboid(cuboid);
+            }
+        }
+
+        if (part["children"] is not JsonArray children)
+        {
+            return;
+        }
+
+        foreach (var child in children)
+        {
+            if (child is JsonObject childObj)
+            {
+                RepairTexCropUvSpanDuplicateAnchorsRecursive(childObj);
+            }
+        }
+    }
+
+    private static void RepairTexCropUvSpanDuplicateAnchorCuboid(JsonObject cuboid)
+    {
+        if (cuboid["uvSpan"] is not JsonArray span ||
+            span.Count < 2 ||
+            cuboid["uvOrigin"] is not JsonArray uv ||
+            uv.Count < 2 ||
+            cuboid["from"] is not JsonArray from ||
+            from.Count < 3 ||
+            cuboid["to"] is not JsonArray to ||
+            to.Count < 3)
+        {
+            return;
+        }
+
+        var texU = uv[0]?.GetValue<int>() ?? 0;
+        var texV = uv[1]?.GetValue<int>() ?? 0;
+        var spanW = span[0]?.GetValue<int>() ?? 0;
+        var spanH = span[1]?.GetValue<int>() ?? 0;
+        if (spanW != texU || spanH != texV)
+        {
+            return;
+        }
+
+        var logicalW = (int)Math.Round(Math.Abs((to[0]?.GetValue<double>() ?? 0d) - (from[0]?.GetValue<double>() ?? 0d)));
+        var logicalH = (int)Math.Round(Math.Abs((to[1]?.GetValue<double>() ?? 0d) - (from[1]?.GetValue<double>() ?? 0d)));
+        var logicalD = (int)Math.Round(Math.Abs((to[2]?.GetValue<double>() ?? 0d) - (from[2]?.GetValue<double>() ?? 0d)));
+        if (logicalW <= 0 || logicalH <= 0)
+        {
+            return;
+        }
+
+        cuboid["uvSpan"] = logicalD > 0
+            ? new JsonArray { logicalW, logicalH, logicalD }
+            : new JsonArray { logicalW, logicalH };
+    }
+
     private static bool IsFlatRootSibling(JsonArray rootChildren, string partId)
     {
         foreach (var n in rootChildren)

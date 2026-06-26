@@ -23,21 +23,51 @@ internal static partial class LayerDefinitionAtlasSizeProbe
 
         foreach (Match m in CreateLayerDefinitionPairRegex().Matches(meshBytecodeText))
         {
-            if (!int.TryParse(m.Groups[1].Value, out var w) ||
-                !int.TryParse(m.Groups[2].Value, out var h) ||
-                w <= 0 ||
-                h <= 0 ||
-                w > 512 ||
-                h > 512)
+            if (!TryParseAtlasPair(m.Groups[1].Value, m.Groups[2].Value, out textureWidth, out textureHeight))
             {
                 continue;
             }
 
-            textureWidth = w;
-            textureHeight = h;
             return true;
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Reads the terminal <c>LayerDefinition.create</c> on the primary mesh island (before supplementary factories).
+    /// Avoids false early matches from unrelated <c>bipush</c> pairs in the same bytecode stream.
+    /// </summary>
+    public static bool TryReadPrimaryIsland(string meshBytecodeText, out int textureWidth, out int textureHeight)
+    {
+        textureWidth = 0;
+        textureHeight = 0;
+        if (string.IsNullOrWhiteSpace(meshBytecodeText))
+        {
+            return false;
+        }
+
+        var marker = JavapClassDisassembly.GeometryMeshIslandBoundaryMarker;
+        var primary = meshBytecodeText.Split(marker, 2, StringSplitOptions.None)[0];
+        Match? last = null;
+        foreach (Match m in CreateLayerDefinitionPairRegex().Matches(primary))
+        {
+            last = m;
+        }
+
+        return last is not null &&
+               TryParseAtlasPair(last.Groups[1].Value, last.Groups[2].Value, out textureWidth, out textureHeight);
+    }
+
+    private static bool TryParseAtlasPair(string widthText, string heightText, out int textureWidth, out int textureHeight)
+    {
+        textureWidth = 0;
+        textureHeight = 0;
+        return int.TryParse(widthText, out textureWidth) &&
+               int.TryParse(heightText, out textureHeight) &&
+               textureWidth > 0 &&
+               textureHeight > 0 &&
+               textureWidth <= 512 &&
+               textureHeight <= 512;
     }
 }

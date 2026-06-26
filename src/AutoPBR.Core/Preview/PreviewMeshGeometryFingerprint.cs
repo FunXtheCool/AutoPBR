@@ -6,7 +6,7 @@ namespace AutoPBR.Core.Preview;
 public static class PreviewMeshGeometryFingerprint
 {
     /// <summary>Bump when geometry emit / pose-compose / UV layout logic changes (invalidates cached GPU bind meshes).</summary>
-    public const int PipelineRevision = 15;
+    public const int PipelineRevision = 32;
 
     public static ulong ComputeCpuPreviewMesh(ReadOnlySpan<float> interleavedVertices, int vertexStrideFloats)
     {
@@ -28,6 +28,29 @@ public static class PreviewMeshGeometryFingerprint
         }
 
         return hash;
+    }
+
+    /// <summary>Hash of baked UV channels only (stride offsets 6–7), aligned with <c>EntityUvBakeGoldenTests</c>.</summary>
+    public static ulong ComputeCpuPreviewMeshUvFingerprint(ReadOnlySpan<float> interleavedVertices, int vertexStrideFloats)
+    {
+        if (vertexStrideFloats < 8 || interleavedVertices.Length < vertexStrideFloats)
+        {
+            return 0;
+        }
+
+        unchecked
+        {
+            ulong hash = 14695981039346656037UL;
+            for (var i = 6; i < interleavedVertices.Length; i += vertexStrideFloats)
+            {
+                hash ^= unchecked((uint)BitConverter.SingleToInt32Bits(interleavedVertices[i]));
+                hash *= 1099511628211UL;
+                hash ^= unchecked((uint)BitConverter.SingleToInt32Bits(interleavedVertices[i + 1]));
+                hash *= 1099511628211UL;
+            }
+
+            return hash;
+        }
     }
 
     private static ulong Mix(ulong hash, uint value) =>

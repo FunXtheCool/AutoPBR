@@ -21,6 +21,46 @@ public sealed class GeometryIrBreezeParityEmitTests
     }
 
     [Fact]
+    public void Breeze_wind_rebake_uses_128_logical_atlas_not_shard_primary_32()
+    {
+        const string path = "assets/minecraft/textures/entity/breeze/breeze_wind.png";
+        var provenance = new PreviewMeshProvenance(
+            PreviewMeshDriverKind.RuntimeGeometryIrJson,
+            "net.minecraft.client.model.monster.breeze.BreezeModel");
+        var size = EntityGeometryIrTextureAtlas.ResolveForBake(path, 128, 128, provenance, Profile26);
+        Assert.Equal((128, 128), size);
+    }
+
+    [Fact]
+    public void Breeze_wind_baked_uv_fingerprint_matches_128_atlas_not_32()
+    {
+        const string path = "assets/minecraft/textures/entity/breeze/breeze_wind.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.3f, animationTimeSeconds: 0f,
+            out var merged, out var provenance));
+
+        var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(merged, "minecraft");
+        var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase);
+        for (var i = 0; i < ordered.Count; i++)
+        {
+            pathToIdx[ordered[i]] = i;
+            texSizes[ordered[i]] = EntityGeometryIrTextureAtlas.ResolveForBake(
+                ordered[i], 128, 128, provenance, Profile26);
+        }
+
+        Assert.True(MinecraftModelBaker.TryBake(merged, "minecraft", pathToIdx, texSizes, out var logicalVerts, out _, out _));
+
+        for (var i = 0; i < ordered.Count; i++)
+        {
+            texSizes[ordered[i]] = (32, 32);
+        }
+
+        Assert.True(MinecraftModelBaker.TryBake(merged, "minecraft", pathToIdx, texSizes, out var wrongVerts, out _, out _));
+        Assert.NotEqual(ComputeUvFingerprint(logicalVerts), ComputeUvFingerprint(wrongVerts));
+    }
+
+    [Fact]
     public void Breeze_wind_geometry_ir_emit_maps_high_u_on_128_atlas()
     {
         const string path = "assets/minecraft/textures/entity/breeze/breeze_wind.png";
@@ -215,5 +255,23 @@ public sealed class GeometryIrBreezeParityEmitTests
 
         element = null!;
         return false;
+    }
+
+    private static ulong ComputeUvFingerprint(ReadOnlySpan<float> verts)
+    {
+        unchecked
+        {
+            ulong hash = 14695981039346656037UL;
+            const int stride = MinecraftModelBaker.FloatsPerVertex;
+            for (var i = 6; i < verts.Length; i += stride)
+            {
+                hash ^= BitConverter.SingleToUInt32Bits(verts[i]);
+                hash *= 1099511628211UL;
+                hash ^= BitConverter.SingleToUInt32Bits(verts[i + 1]);
+                hash *= 1099511628211UL;
+            }
+
+            return hash;
+        }
     }
 }

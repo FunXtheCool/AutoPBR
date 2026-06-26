@@ -81,6 +81,7 @@ internal static class GeometryIrLiftTreeRepair
 
                 RemoveDuplicatePartIdsPreferCuboids(rootKids);
                 EnsureSlimeOuterBodyLayer(rootKids);
+                GeometryIrPartTreeRepair.RepairTexCropUvSpanDuplicateAnchors(rootKids);
             }
 
             DeduplicateNestedPartIds(ro);

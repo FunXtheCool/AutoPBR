@@ -74,7 +74,7 @@
         "eulerOrder": { "type": "string", "enum": ["XYZ", "XZY", "YXZ", "YZX", "ZXY", "ZYX"] },
         "uniformScale": {
           "type": "number",
-          "description": "Optional uniform PartPose.withScale factor when lifted from a constant ldc/fconst before withScale."
+            "description": "Optional uniform pose factor lifted from PartPose.withScale or a root MeshTransformer.scaling application."
         },
         "setupAnimPivot": {
           "$ref": "#/$defs/vec3",

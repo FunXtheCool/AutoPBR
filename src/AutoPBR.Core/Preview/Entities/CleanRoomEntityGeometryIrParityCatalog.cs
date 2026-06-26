@@ -182,7 +182,15 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return false;
         }
 
-        var built = b.Build(texRef, BuildGeometryIrTextureRefs(geometryRoot, texRef));
+        var textureRefs = BuildGeometryIrTextureRefs(geometryRoot, texRef);
+        if (string.Equals(parityRule.BuilderMethod, "DecoratedPotEntity", StringComparison.OrdinalIgnoreCase))
+        {
+            textureRefs ??= new Dictionary<string, string>(StringComparer.Ordinal);
+            textureRefs["base"] = CompanionDiffuseTextureRefFromSiblingFileStem(norm, "decorated_pot_base");
+            textureRefs["skin"] = texRef;
+        }
+
+        var built = b.Build(texRef, textureRefs);
         if (built.Elements.Count == 0)
         {
             return false;
@@ -240,8 +248,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 wave,
                 emitOptions);
 
-            // Ghast setupAnim is animateTentacles-only; bind pose still needs default xRot (~0.4 rad) or
-            // reoriented tentacle boxes sit inside the body shell and depth-occlude in Explore (animation off).
+            // Ghast setupAnim is animateTentacles-only; bind pose still needs vanilla's default xRot (~0.4 rad).
             if (string.Equals(parityRule.BuilderMethod, "Ghast", StringComparison.Ordinal) ||
                 string.Equals(parityRule.BuilderMethod, "HappyGhast", StringComparison.Ordinal))
             {
@@ -272,6 +279,11 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             merged = ApplyObjectEntityPreviewVerticalFlip(merged, parityRule.BuilderMethod);
         }
+        else if (UsesDecoratedPotPreviewVerticalOrientation(parityRule.BuilderMethod))
+        {
+            merged = ApplyDecoratedPotPreviewCapRimSeal(
+                ApplyDecoratedPotPreviewVerticalOrientation(merged));
+        }
 
         if (string.Equals(parityRule.BuilderMethod, "Minecart", StringComparison.OrdinalIgnoreCase))
         {
@@ -286,6 +298,11 @@ internal sealed partial class CleanRoomEntityModelRuntime
         if (string.Equals(parityRule.BuilderMethod, "Skull", StringComparison.OrdinalIgnoreCase))
         {
             merged = ApplyGlobalTransform(merged, Matrix4x4.CreateTranslation(0f, 8f, 0f));
+        }
+
+        if (string.Equals(parityRule.BuilderMethod, "DecoratedPotEntity", StringComparison.OrdinalIgnoreCase))
+        {
+            merged = ApplyDecoratedPotPreviewGroundLift(merged);
         }
 
         if (EntityRigPoseCapture.IsActive)
@@ -387,6 +404,17 @@ internal sealed partial class CleanRoomEntityModelRuntime
     {
         atlasW = 0;
         atlasH = 0;
+        var norm = normalizedAssetPath.Replace('\\', '/').TrimStart('/');
+        if (string.Equals(rule.BuilderMethod, "Breeze", StringComparison.Ordinal) &&
+            norm.Contains("breeze_wind", StringComparison.OrdinalIgnoreCase) &&
+            rule.GeometryIrTextureWidth is > 0 and var windW &&
+            rule.GeometryIrTextureHeight is > 0 and var windH)
+        {
+            atlasW = windW;
+            atlasH = windH;
+            return true;
+        }
+
         if (geometryRoot.TryGetProperty("textureWidth", out var tw) &&
             tw.TryGetInt32(out var tww) &&
             tww > 0 &&
@@ -406,7 +434,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return true;
         }
 
-        var norm = normalizedAssetPath.Replace('\\', '/').TrimStart('/');
         var rel = norm.StartsWith("assets/", StringComparison.OrdinalIgnoreCase) ? norm["assets/".Length..] : norm;
         var pngPath = Path.Combine(AppContext.BaseDirectory, rel.Replace('/', Path.DirectorySeparatorChar));
         if (EntityTexturePngDimensions.TryRead(pngPath, out var pw, out var ph))

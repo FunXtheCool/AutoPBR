@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+using AutoPBR.App.Rendering.Abstractions;
 using AutoPBR.Core;
 using AutoPBR.Core.Models;
 
@@ -345,8 +346,7 @@ public sealed class UserSettings
     public double Preview3DCameraZoomSensitivity { get; set; } = 0.12;
 
     /// <summary>3D preview: orbit boom arm length (world units), pivot-to-eye distance for default framing.</summary>
-    public double Preview3DCameraOrbitBoomDistance { get; set; } =
-        Math.Sqrt(3.6 * 3.6 + 2.6 * 2.6 + 3.6 * 3.6);
+    public double Preview3DCameraOrbitBoomDistance { get; set; } = PreviewCamera.DefaultOrbitBoomArmDistance;
 
     /// <summary>3D preview: keyboard key name to reset camera (Avalonia Key enum name, e.g. R, Home, Escape).</summary>
     public string Preview3DCameraResetKey { get; set; } = "R";

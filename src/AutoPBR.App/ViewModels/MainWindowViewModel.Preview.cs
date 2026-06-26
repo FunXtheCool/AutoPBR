@@ -84,8 +84,7 @@ public partial class MainWindowViewModel
     [ObservableProperty] private double _preview3DCameraOrbitSensitivity = 0.006;
     [ObservableProperty] private double _preview3DCameraPanSensitivity = 0.0022;
     [ObservableProperty] private double _preview3DCameraZoomSensitivity = 0.12;
-    [ObservableProperty] private double _preview3DCameraOrbitBoomDistance =
-        Math.Sqrt(3.6 * 3.6 + 2.6 * 2.6 + 3.6 * 3.6);
+    [ObservableProperty] private double _preview3DCameraOrbitBoomDistance = PreviewCamera.DefaultOrbitBoomArmDistance;
     [ObservableProperty] private string _preview3DCameraResetKey = "R";
     [ObservableProperty] private double _preview3DCameraFlyLookSensitivity = 0.006;
     [ObservableProperty] private bool _preview3DCameraInvertLookY;

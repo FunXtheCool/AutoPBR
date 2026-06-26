@@ -1,4 +1,5 @@
 using AutoPBR.App.Models;
+using AutoPBR.App.Rendering.Abstractions;
 using AutoPBR.App.Rendering.Scene;
 using AutoPBR.App.Rendering.OpenGL;
 using AutoPBR.App.ViewModels;
@@ -143,7 +144,7 @@ internal static class UserSettingsSynchronizer
         vm.Preview3DCameraZoomSensitivity = settings.Preview3DCameraZoomSensitivity <= 0
             ? 0.12
             : Math.Clamp(settings.Preview3DCameraZoomSensitivity, 0.02, 0.5);
-        var boomDefault = Math.Sqrt(3.6 * 3.6 + 2.6 * 2.6 + 3.6 * 3.6);
+        var boomDefault = (double)PreviewCamera.DefaultOrbitBoomArmDistance;
         vm.Preview3DCameraOrbitBoomDistance = settings.Preview3DCameraOrbitBoomDistance <= 0
             ? boomDefault
             : Math.Clamp(settings.Preview3DCameraOrbitBoomDistance, 1.05, 120.0);

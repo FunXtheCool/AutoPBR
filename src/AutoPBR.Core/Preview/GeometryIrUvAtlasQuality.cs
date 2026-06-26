@@ -205,7 +205,19 @@ public static class GeometryIrUvAtlasQuality
     }
 
     /// <summary>
-    /// texCrop up/down template: <c>uvOrigin</c> anchors the first entry in <paramref name="faceMask"/>.
+    /// texCrop north/south direction-mask sheets at <c>d=0</c>: anchor on north, opposite on south with
+    /// <see cref="TexCropOppositeFaceDepthGap"/> (not full cube cross-unfold).
+    /// </summary>
+    internal static (float[] North, float[] South) BuildTexCropNorthSouthFaceUvRects(int u, int v, int w, int h)
+    {
+        var north = new float[] { u, v, u + w, v + h };
+        var oppositeU0 = u + w + TexCropOppositeFaceDepthGap;
+        var south = new float[] { oppositeU0, v, oppositeU0 + w, v + h };
+        return (north, south);
+    }
+
+    /// <summary>
+    /// keeps the same UV bounds and applies mirror only when building polygons (see bake <c>MirrorCuboidUv</c>).
     /// </summary>
     internal static (float[] Up, float[] Down) BuildUpDownTexCropFaceUvRects(
         int u,
@@ -215,24 +227,64 @@ public static class GeometryIrUvAtlasQuality
         IReadOnlyList<string> faceMask,
         bool mirrorU = false)
     {
-        var anchor = new float[] { u, v, u + w, v + d };
-        var oppositeU0 = u + w + TexCropOppositeFaceDepthGap;
-        var opposite = new float[] { oppositeU0, v, oppositeU0 + w, v + d };
+        _ = mirrorU;
 
         // Dragon membranes lift as faceMask:["up"] only; Java still draws the anchor crop on Direction.DOWN.
         if (faceMask.Count == 1 &&
             faceMask[0].Equals("up", StringComparison.OrdinalIgnoreCase))
         {
             var down = EntityCuboidJavaUvConvention.GetUvRect(
-                EntityCuboidJavaUvConvention.JavaDirection.Down, u, v, w, 0, d, mirrorU);
+                EntityCuboidJavaUvConvention.JavaDirection.Down, u, v, w, 0, d);
             var up = EntityCuboidJavaUvConvention.GetUvRect(
-                EntityCuboidJavaUvConvention.JavaDirection.Up, u, v, w, 0, d, mirrorU);
+                EntityCuboidJavaUvConvention.JavaDirection.Up, u, v, w, 0, d);
             return (up, down);
         }
+
+        // Decorated pot caps: javap texOffs(-14,13).addBox(14,0,14) with faceMask:["down"] uses ModelPart.Cube DOWN
+        // cross-unfold (u+d, v, u+d+w, v+d), not the texCrop [u,v,u+w,v+d] anchor used by dual-mask sheets.
+        if (faceMask.Count == 1 &&
+            faceMask[0].Equals("down", StringComparison.OrdinalIgnoreCase) &&
+            d > 0 &&
+            TryResolveDecoratedPotCapDownTexCropEmitU(u, v, w, d, out var emitU))
+        {
+            var down = EntityCuboidJavaUvConvention.GetUvRect(
+                EntityCuboidJavaUvConvention.JavaDirection.Down, emitU, v, w, 0, d);
+            var up = EntityCuboidJavaUvConvention.GetUvRect(
+                EntityCuboidJavaUvConvention.JavaDirection.Up, emitU, v, w, 0, d);
+            return (up, down);
+        }
+
+        // texCrop anchor: uvOrigin anchors the first entry in faceMask (dual-mask bee sheets, etc.).
+        var anchor = new float[] { u, v, u + w, v + d };
+        var oppositeU0 = u + w + TexCropOppositeFaceDepthGap;
+        var opposite = new float[] { oppositeU0, v, oppositeU0 + w, v + d };
 
         var anchorUp = faceMask.Count > 0 &&
                        faceMask[0].Equals("up", StringComparison.OrdinalIgnoreCase);
         return anchorUp ? (anchor, opposite) : (opposite, anchor);
+    }
+
+    /// <summary>
+    /// javap <c>texOffs(-14,13)</c> on 32×32 <c>#base</c>: DOWN slot is <see cref="EntityCuboidJavaUvConvention.GetUvRect"/>
+    /// with emit U = <c>texU + d</c> when <c>texU &lt; 0</c>, or repaired from legacy wrapped <c>uvOrigin[18]</c>.
+    /// </summary>
+    internal static bool TryResolveDecoratedPotCapDownTexCropEmitU(
+        int texU,
+        int texV,
+        int spanW,
+        int spanD,
+        out int emitU)
+    {
+        emitU = texU;
+        if (spanW != 14 || spanD != 14 || texV != 13)
+        {
+            return false;
+        }
+
+        emitU = texU < 0
+            ? texU + spanD
+            : texU - spanD - (2 * TexCropOppositeFaceDepthGap);
+        return true;
     }
 
     /// <summary>
@@ -285,15 +337,19 @@ public static class GeometryIrUvAtlasQuality
         int logicalH,
         int logicalD)
     {
+        if (spanW == texU && spanH == texV &&
+            logicalW > 0 &&
+            logicalH > 0)
+        {
+            return (logicalW, logicalH, logicalD > 0 ? logicalD : spanD);
+        }
+
         if (GeometryIrCuboidMetadata.TryGetFaceMask(cuboid, out var faceMask) &&
             IsNorthSouthFaceMaskOnly(faceMask) &&
-            logicalD == 0 &&
             logicalW > 0 &&
-            logicalH > 0 &&
-            spanW == texU &&
-            spanH == texV)
+            logicalH > 0)
         {
-            return (logicalW, logicalH, 0);
+            return (spanW, spanH, 0);
         }
 
         return (spanW, spanH, spanD);
@@ -416,9 +472,11 @@ public static class GeometryIrUvAtlasQuality
             {
                 "west" => (u, v + d, u + d, v + d + h),
                 "north" when IsNorthSouthFaceMaskOnly(faceMask) && w > 0 && h > 0 && d == 0 =>
-                    (u, v, u + w, v + h),
+                    RectToTuple(EntityCuboidJavaUvConvention.GetUvRect(
+                        EntityCuboidJavaUvConvention.JavaDirection.North, u, v, w, h, 0)),
                 "south" when IsNorthSouthFaceMaskOnly(faceMask) && w > 0 && h > 0 && d == 0 =>
-                    (u + w + 2, v, u + w + 2 + w, v + h),
+                    RectToTuple(EntityCuboidJavaUvConvention.GetUvRect(
+                        EntityCuboidJavaUvConvention.JavaDirection.South, u, v, w, h, 0)),
                 "down" when IsUpDownFaceMaskOnly(faceMask) && w > 0 && d > 0 && h == 0 =>
                     RectToTuple(BuildUpDownTexCropFaceUvRects(u, v, w, d, faceMask).Down),
                 "up" when IsUpDownFaceMaskOnly(faceMask) && w > 0 && d > 0 && h == 0 =>

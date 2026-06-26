@@ -29,17 +29,17 @@ public sealed class BeeLegMeshDiagnosticTests
 
         var front = legSheets.Single(el => el.Faces["north"].Uv![1] < 2f);
         Assert.Equal(new float[] { 26, 1, 33, 3 }, front.Faces["north"].Uv!);
-        Assert.Equal(new float[] { 35, 1, 42, 3 }, front.Faces["south"].Uv!);
+        Assert.Equal(new float[] { 33, 1, 40, 3 }, front.Faces["south"].Uv!);
 
         var middle = legSheets.Single(el =>
             MathF.Abs(el.Faces["north"].Uv![1] - 3f) < 0.01f);
         Assert.Equal(new float[] { 26, 3, 33, 5 }, middle.Faces["north"].Uv!);
-        Assert.Equal(new float[] { 35, 3, 42, 5 }, middle.Faces["south"].Uv!);
+        Assert.Equal(new float[] { 33, 3, 40, 5 }, middle.Faces["south"].Uv!);
 
         var back = legSheets.Single(el =>
             MathF.Abs(el.Faces["north"].Uv![1] - 5f) < 0.01f);
         Assert.Equal(new float[] { 26, 5, 33, 7 }, back.Faces["north"].Uv!);
-        Assert.Equal(new float[] { 35, 5, 42, 7 }, back.Faces["south"].Uv!);
+        Assert.Equal(new float[] { 33, 5, 40, 7 }, back.Faces["south"].Uv!);
     }
 
     [Fact]
@@ -100,6 +100,41 @@ public sealed class BeeLegMeshDiagnosticTests
     }
 
     [Fact]
+    public void Adult_bee_baked_wing_vertices_match_w_of_local_to_parent_corners()
+    {
+        const string path = "assets/minecraft/textures/entity/bee/bee.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var mesh, out _), path);
+
+        var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(mesh, "minecraft");
+        var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase) { [ordered[0]] = 0 };
+        var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase) { [ordered[0]] = (64, 64) };
+        Assert.True(MinecraftModelBaker.TryBake(mesh, "minecraft", pathToIdx, texSizes, out var baked, out _, out _));
+
+        const int stride = MinecraftModelBaker.FloatsPerVertex;
+        var floatOffset = 0;
+        for (var ei = 0; ei < mesh.Elements.Count; ei++)
+        {
+            var el = mesh.Elements[ei];
+            if (!(el.Faces.ContainsKey("up") && el.Faces.ContainsKey("down") && !el.Faces.ContainsKey("north")))
+            {
+                floatOffset += el.Faces.Count * 4 * stride;
+                continue;
+            }
+
+            var expected = CollectWTransformedCorners(el);
+            var vertexCount = el.Faces.Count * 4;
+            for (var vi = 0; vi < vertexCount; vi++, floatOffset += stride)
+            {
+                var bakedPos = new Vector3(baked[floatOffset], baked[floatOffset + 1], baked[floatOffset + 2]);
+                var nearest = expected.MinBy(p => Vector3.Distance(p, bakedPos));
+                Assert.True(Vector3.Distance(nearest, bakedPos) <= 0.02f,
+                    $"wing baked vertex {bakedPos} far from L2P preview corners (nearest {nearest}, mirror={el.MirrorCuboidUv})");
+            }
+        }
+    }
+
+    [Fact]
     public void Adult_bee_wing_world_corners_stay_near_body()
     {
         const string path = "assets/minecraft/textures/entity/bee/bee.png";
@@ -119,8 +154,8 @@ public sealed class BeeLegMeshDiagnosticTests
 
         foreach (var wing in wings)
         {
-            TransformWorldCorners(body, out var bodyMin, out var bodyMax);
-            TransformWorldCorners(wing, out var wingMin, out var wingMax);
+            TransformTexelCorners(body, out var bodyMin, out var bodyMax);
+            TransformTexelCorners(wing, out var wingMin, out var wingMax);
             Assert.True(MathF.Abs(wingMax.Y - bodyMax.Y) < 1f,
                 $"wing top Y {wingMax.Y} should attach near body top Y {bodyMax.Y}");
             var overlapX = MathF.Min(wingMax.X, bodyMax.X) - MathF.Max(wingMin.X, bodyMin.X);
@@ -129,7 +164,26 @@ public sealed class BeeLegMeshDiagnosticTests
         }
     }
 
-    private static void TransformWorldCorners(ModelElement el, out Vector3 min, out Vector3 max)
+    private static List<Vector3> CollectWTransformedCorners(ModelElement el)
+    {
+        ReadOnlySpan<(float x, float y, float z)> corners =
+        [
+            (el.From[0], el.From[1], el.From[2]), (el.To[0], el.From[1], el.From[2]),
+            (el.From[0], el.To[1], el.From[2]), (el.To[0], el.To[1], el.From[2]),
+            (el.From[0], el.From[1], el.To[2]), (el.To[0], el.From[1], el.To[2]),
+            (el.From[0], el.To[1], el.To[2]), (el.To[0], el.To[1], el.To[2]),
+        ];
+        var list = new List<Vector3>(corners.Length);
+        foreach (var c in corners)
+        {
+            var model = Vector3.Transform(new Vector3(c.x, c.y, c.z), el.LocalToParent);
+            list.Add(new Vector3(model.X / 16f - 0.5f, model.Y / 16f - 0.5f, model.Z / 16f - 0.5f));
+        }
+
+        return list;
+    }
+
+    private static void TransformTexelCorners(ModelElement el, out Vector3 min, out Vector3 max)
     {
         var m = el.LocalToParent;
         min = new Vector3(float.MaxValue);
@@ -188,8 +242,8 @@ public sealed class BeeLegMeshDiagnosticTests
 
         foreach (var wing in wings)
         {
-            TransformWorldCorners(body, out var bodyMin, out var bodyMax);
-            TransformWorldCorners(wing, out var wingMin, out var wingMax);
+            TransformTexelCorners(body, out var bodyMin, out var bodyMax);
+            TransformTexelCorners(wing, out var wingMin, out var wingMax);
             Assert.True(MathF.Abs(wingMax.Y - bodyMax.Y) < 1f,
                 $"wing top Y {wingMax.Y} should attach near body top Y {bodyMax.Y}");
             var overlapX = MathF.Min(wingMax.X, bodyMax.X) - MathF.Max(wingMin.X, bodyMin.X);
@@ -199,7 +253,7 @@ public sealed class BeeLegMeshDiagnosticTests
     }
 
     [Fact]
-    public void Adult_bee_wing_sheets_use_texCrop_up_anchor_uv_at_origin()
+    public void Adult_bee_wing_sheets_use_java_texCrop_up_down_uv_slots()
     {
         const string path = "assets/minecraft/textures/entity/bee/bee.png";
         var runtime = EntityModelRuntimeFactory.Create();
@@ -211,17 +265,87 @@ public sealed class BeeLegMeshDiagnosticTests
             .ToList();
         Assert.Equal(2, wings.Count);
 
-        var (expectedUp, expectedDown) = GeometryIrUvAtlasQuality.BuildUpDownTexCropFaceUvRects(
-            0, 18, 9, 6, ["up", "down"]);
-
         foreach (var wing in wings)
         {
-            Assert.Equal(expectedUp, wing.Faces["up"].Uv!);
-            Assert.Equal(expectedDown, wing.Faces["down"].Uv!);
+            var up = EntityCuboidJavaUvConvention.GetUvRect(
+                EntityCuboidJavaUvConvention.JavaDirection.Up, 0, 18, 9, 0, 6);
+            var down = EntityCuboidJavaUvConvention.GetUvRect(
+                EntityCuboidJavaUvConvention.JavaDirection.Down, 0, 18, 9, 0, 6);
+            Assert.Equal(up, wing.Faces["up"].Uv!);
+            Assert.Equal(down, wing.Faces["down"].Uv!);
+        }
+    }
+
+    [Fact]
+    public void Adult_bee_left_wing_baked_uv_uses_mirror_polygon_reorder_only()
+    {
+        const string path = "assets/minecraft/textures/entity/bee/bee.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var mesh, out _), path);
+
+        var rightWing = mesh.Elements
+            .Single(el => !el.MirrorCuboidUv &&
+                          el.Faces.ContainsKey("up") &&
+                          el.Faces.ContainsKey("down") &&
+                          !el.Faces.ContainsKey("north"));
+        var leftWing = mesh.Elements
+            .Single(el => el.MirrorCuboidUv &&
+                          el.Faces.ContainsKey("up") &&
+                          el.Faces.ContainsKey("down") &&
+                          !el.Faces.ContainsKey("north"));
+
+        Assert.Equal(rightWing.Faces["up"].Uv!, leftWing.Faces["up"].Uv!);
+        Assert.Equal(rightWing.Faces["down"].Uv!, leftWing.Faces["down"].Uv!);
+
+        var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(mesh, "minecraft");
+        var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase) { [ordered[0]] = 0 };
+        var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase) { [ordered[0]] = (64, 64) };
+        Assert.True(MinecraftModelBaker.TryBake(mesh, "minecraft", pathToIdx, texSizes, out var baked, out _, out _));
+
+        var rightUp = ExtractFaceUvs(baked, mesh, rightWing, "up");
+        var leftUp = ExtractFaceUvs(baked, mesh, leftWing, "up");
+        Assert.Equal(4, rightUp.Count);
+        Assert.Equal(4, leftUp.Count);
+        Assert.NotEqual(rightUp, leftUp);
+        foreach (var uv in leftUp)
+        {
+            Assert.Contains(rightUp, u => MathF.Abs(u.X - uv.X) < 0.001f && MathF.Abs(u.Y - uv.Y) < 0.001f);
+        }
+    }
+
+    private static List<Vector2> ExtractFaceUvs(
+        ReadOnlySpan<float> baked,
+        MergedJavaBlockModel mesh,
+        ModelElement target,
+        string faceName)
+    {
+        const int stride = MinecraftModelBaker.FloatsPerVertex;
+        var floatOffset = 0;
+        for (var ei = 0; ei < mesh.Elements.Count; ei++)
+        {
+            var el = mesh.Elements[ei];
+            if (!ReferenceEquals(el, target))
+            {
+                floatOffset += el.Faces.Count * 4 * stride;
+                continue;
+            }
+
+            var faceIndex = el.Faces.Keys
+                .Select((name, idx) => (name, idx))
+                .Single(t => t.name.Equals(faceName, StringComparison.OrdinalIgnoreCase))
+                .idx;
+            floatOffset += faceIndex * 4 * stride;
+
+            var uvs = new List<Vector2>(4);
+            for (var vi = 0; vi < 4; vi++, floatOffset += stride)
+            {
+                uvs.Add(new Vector2(baked[floatOffset + 6], baked[floatOffset + 7]));
+            }
+
+            return uvs;
         }
 
-        var mirrored = wings.Single(w => w.MirrorCuboidUv);
-        Assert.Equal(expectedUp, mirrored.Faces["up"].Uv!);
+        throw new InvalidOperationException("target element not found");
     }
 
     [Fact]

@@ -126,7 +126,7 @@ public sealed class RabbitPreviewAttachmentTests
 
     private static (float BodyMaxY, float LegMinY, float HullGap) MeasureBodyLegPreviewHullGap(
         ReadOnlySpan<float> gpuVerts,
-        IReadOnlyList<string> partIds)
+        List<string> partIds)
     {
         const int stride = MinecraftModelBaker.FloatsPerSkinnedVertex;
         var bodyMaxY = float.NegativeInfinity;

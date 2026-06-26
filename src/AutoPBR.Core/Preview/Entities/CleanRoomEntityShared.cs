@@ -122,8 +122,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         float YRot = 0f,
         float ZRot = 0f,
         string[]? FaceMask = null,
-        string? TextureKey = null,
-        bool InvertYForJavaUv = false)
+        string? TextureKey = null)
     {
         public Vector3? RotationPivot { get; init; }
 
@@ -132,6 +131,11 @@ internal sealed partial class CleanRoomEntityModelRuntime
         public int LayerOrdinal { get; init; } = 0;
 
         public bool CastsShadow { get; init; } = false;
+
+        /// <summary>
+        /// When true, north/south direction-mask sheets use texCrop opposite-face gap layout; otherwise Java cube unfold at <c>d=0</c>.
+        /// </summary>
+        public bool TexCropNorthSouthFaceUv { get; init; }
 
         public void Emit(RigBuilder builder, Matrix4x4 parentPose, float partScale, string texKey = "#skin")
         {
@@ -159,7 +163,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 DepthLayerKind,
                 LayerOrdinal,
                 CastsShadow,
-                InvertYForJavaUv);
+                TexCropNorthSouthFaceUv);
         }
     }
 
@@ -495,6 +499,164 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
 
     private static float Wave(float t, float hz) => MathF.Sin(t * MathF.PI * 2f * hz);
+
+    /// <summary>Preview-only thicken for decorated pot zero-thickness javap sheets (matches <see cref="GeometryIrMeshEmitOptions.ForViewport"/>).</summary>
+    internal const float DecoratedPotPreviewDegenerateAxisThickness = 0.5f;
+
+    /// <summary>Vertical-only preview overlap for side/cap ring junctions (no horizontal widen — that protrudes past javap corners).</summary>
+    internal const float DecoratedPotPreviewVerticalSealOverlap =
+        DecoratedPotPreviewDegenerateAxisThickness * 0.5f;
+
+    /// <summary>javap <c>texOffs(-14, 13)</c> on 32×32 <c>DECORATED_POT_BASE</c> (preserve raw negative in IR).</summary>
+    internal const int DecoratedPotCapTexCropRawU = -14;
+
+    internal const int DecoratedPotCapTexCropV = 13;
+
+    private const float DegenerateAxisEpsilon = 1e-5f;
+
+    internal static void ApplyPreviewDegenerateAxisThicknessForFaceMask(
+        ref float x0, ref float y0, ref float z0,
+        ref float x1, ref float y1, ref float z1,
+        float thickness,
+        string[]? faceMask)
+    {
+        if (faceMask is { Length: > 0 } && IsNorthSouthFaceMaskOnly(faceMask))
+        {
+            ExpandAxisIfDegenerate(ref z0, ref z1, thickness);
+            return;
+        }
+
+        if (faceMask is { Length: > 0 } && IsEastWestFaceMaskOnly(faceMask))
+        {
+            ExpandAxisIfDegenerate(ref x0, ref x1, thickness);
+            return;
+        }
+
+        if (faceMask is { Length: > 0 } && IsUpDownFaceMaskOnly(faceMask))
+        {
+            ExpandAxisIfDegenerate(ref y0, ref y1, thickness);
+            return;
+        }
+
+        ApplyPreviewDegenerateAxisThickness(ref x0, ref y0, ref z0, ref x1, ref y1, ref z1, thickness);
+    }
+
+    internal static bool IsDecoratedPotPreviewCompositeJvm(string? officialJvmName) =>
+        officialJvmName?.Contains("DecoratedPotModel.previewComposite", StringComparison.Ordinal) == true;
+
+    /// <summary>
+    /// Decorated pot preview seal (javap sheets are zero-thickness at exact junctions; overlap is preview-only with locked uvSpan).
+    /// Caps: no emit thicken — <see cref="ApplyDecoratedPotPreviewCapRimSeal"/> after orientation handles vertical rim overlap.
+    /// Sides: extend local +Y only (maps to bottom-cap junction after side part rotations); +Z inward. Do not widen local −Y
+    /// (that maps to the top shoulder in world space and protrudes past the cap ring).
+    /// </summary>
+    internal static void ApplyDecoratedPotPreviewSheetThickness(
+        ref float x0, ref float y0, ref float z0,
+        ref float x1, ref float y1, ref float z1,
+        float thickness,
+        string[]? faceMask)
+    {
+        if (faceMask is not { Length: > 0 })
+        {
+            return;
+        }
+
+        if (IsUpDownFaceMaskOnly(faceMask))
+        {
+            return;
+        }
+
+        if (faceMask.Length == 1 &&
+            faceMask[0].Equals("north", StringComparison.OrdinalIgnoreCase) &&
+            MathF.Abs(z1 - z0) < DegenerateAxisEpsilon)
+        {
+            if (MathF.Abs(y1 - y0) > DegenerateAxisEpsilon)
+            {
+                y1 += DecoratedPotPreviewVerticalSealOverlap;
+            }
+
+            z1 += thickness;
+        }
+    }
+
+    private static void ApplyPreviewDegenerateAxisThickness(
+        ref float x0, ref float y0, ref float z0,
+        ref float x1, ref float y1, ref float z1,
+        float thickness)
+    {
+        ExpandAxisIfDegenerate(ref x0, ref x1, thickness);
+        ExpandAxisIfDegenerate(ref y0, ref y1, thickness);
+        ExpandAxisIfDegenerate(ref z0, ref z1, thickness);
+    }
+
+    internal static void ExpandAxisIfDegenerate(ref float a0, ref float a1, float thickness)
+    {
+        if (MathF.Abs(a1 - a0) >= DegenerateAxisEpsilon)
+        {
+            return;
+        }
+
+        var mid = (a0 + a1) * 0.5f;
+        a0 = mid - thickness;
+        a1 = mid + thickness;
+    }
+
+    internal static bool IsNorthSouthFaceMaskOnly(string[] faceMask)
+    {
+        if (faceMask.Length == 0)
+        {
+            return false;
+        }
+
+        foreach (var face in faceMask)
+        {
+            if (!face.Equals("north", StringComparison.OrdinalIgnoreCase) &&
+                !face.Equals("south", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    internal static bool IsEastWestFaceMaskOnly(string[] faceMask)
+    {
+        if (faceMask.Length == 0)
+        {
+            return false;
+        }
+
+        foreach (var face in faceMask)
+        {
+            if (!face.Equals("east", StringComparison.OrdinalIgnoreCase) &&
+                !face.Equals("west", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    internal static bool IsUpDownFaceMaskOnly(string[] faceMask)
+    {
+        if (faceMask.Length == 0)
+        {
+            return false;
+        }
+
+        foreach (var face in faceMask)
+        {
+            if (!face.Equals("up", StringComparison.OrdinalIgnoreCase) &&
+                !face.Equals("down", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     internal readonly record struct BabyProfile(float BodyScale, float HeadScale, float LegScale)
     {

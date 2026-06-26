@@ -28,6 +28,8 @@ internal static class GeometryIrPlayerMeshParityRepair
     {
         if (UsesPlayerWideMeshOverlayKit(rootChildren) ||
             !TryFindPartById(rootChildren, "head", out var head) || head is null ||
+            !TryReadPoseTranslation(head, out _, out var headY, out _) ||
+            headY < 10 ||
             head["children"] is not JsonArray headKids ||
             !TryFindPartById(headKids, "hat", out var hat) || hat is null ||
             !TryGetFirstCuboid(hat, out var hatCuboid) ||

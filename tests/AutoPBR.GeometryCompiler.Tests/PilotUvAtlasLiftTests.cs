@@ -15,6 +15,7 @@ public sealed class PilotUvAtlasLiftTests
         "net.minecraft.client.model.animal.bee.BeeModel",
         "net.minecraft.client.model.animal.bee.BabyBeeModel",
         "net.minecraft.client.model.animal.bee.AdultBeeModel",
+        "net.minecraft.client.model.animal.wolf.BabyWolfModel",
         "net.minecraft.client.model.monster.breeze.BreezeModel",
     };
 

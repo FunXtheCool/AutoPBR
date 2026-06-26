@@ -159,6 +159,9 @@ internal static partial class JavapFloatGeometryMeshLift
             string? mirrorQuadKey = null;
             int? uvSpanW = null;
             int? uvSpanH = null;
+            int? uvSpanD = null;
+            int? texCropU = null;
+            int? texCropV = null;
             var usesEmbeddedTexCropUv = false;
 
             switch (shape)
@@ -177,8 +180,11 @@ internal static partial class JavapFloatGeometryMeshLift
                     sx = dx;
                     sy = dy;
                     sz = dz;
-                    uvSpanW = tu;
-                    uvSpanH = tv;
+                    texCropU = tu;
+                    texCropV = tv;
+                    uvSpanW = dx;
+                    uvSpanH = dy;
+                    uvSpanD = dz;
                     usesEmbeddedTexCropUv = true;
                     break;
 
@@ -197,8 +203,11 @@ internal static partial class JavapFloatGeometryMeshLift
                         sx = tdx;
                         sy = tdy;
                         sz = tdz;
-                        uvSpanW = tcropU;
-                        uvSpanH = tcropV;
+                        texCropU = tcropU;
+                        texCropV = tcropV;
+                        uvSpanW = tdx;
+                        uvSpanH = tdy;
+                        uvSpanD = tdz;
                         usesEmbeddedTexCropUv = true;
                         break;
                     }
@@ -223,8 +232,8 @@ internal static partial class JavapFloatGeometryMeshLift
             double v;
             if (usesEmbeddedTexCropUv)
             {
-                u = uvSpanW ?? 0;
-                v = uvSpanH ?? 0;
+                u = texCropU ?? 0;
+                v = texCropV ?? 0;
             }
             else if (!TryParseTexOffsFromStaticMatrixBackward(seg, scanFrom,
                          bi > 0 ? addBoxIndices[bi - 1] + 1 : 0, boxIntLocals, out u, out v, out scanFrom) &&
@@ -283,7 +292,7 @@ internal static partial class JavapFloatGeometryMeshLift
             var warnings = BuildCuboidLiftWarnings(liftKind, maskResult, obfDef);
             faceMaskList = GeometryLiftDegenerateFaceMask.ApplyForLift(faceMaskList, sx, sy, sz);
             var c = CreateCuboidJson(from, to, uv, textureKey, provenanceCube, liftKind, warnings,
-                faceMaskList, mirrorU, uvSpanW, uvSpanH, inflateAmt);
+                faceMaskList, mirrorU, uvSpanW, uvSpanH, uvSpanD, inflateAmt);
 
             cuboids.Add(c);
         }

@@ -99,11 +99,26 @@ tools/minecraft-parity/**/client.jar
 tools/MinecraftGeometryReference/.gradle/
 tools/MinecraftGeometryReference/build/
 
-# Cursor IDE (local agent rules; not shared via repo)
-.cursor/
+# Cursor IDE local state; share project rules with future agents.
+.cursor/*
+!.cursor/rules/
+.cursor/rules/*
+!.cursor/rules/test-guidance-geometry-animation-ir.mdc
+!.cursor/rules/ghast-family-parity.mdc
 
-# Ephemeral one-off scripts at repo root
+# Ephemeral one-off scripts and agent diagnostics at repo root
 /_list_diag.py
+/.tmp*
+/.scratch/
+/.diagnostics/
+
+# Test/coverage diagnostics
+*.trx
+coverage*.xml
+coverage*.json
+
+# Downloaded parity runtime libraries
+tools/minecraft-parity/**/libraries/
 
 # User-specific / IDE
 *~

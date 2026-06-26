@@ -6,6 +6,8 @@ Explore 3D preview uses two tessellation paths for emulated entities (parity-cat
 
 Related: [runtime-ir-preview-plan.md](runtime-ir-preview-plan.md) (§ PartPose vs ModelPart render, § Canonical LER policy, § Explore scene placement), [vanilla-preview-parity.md](vanilla-preview-parity.md).
 
+Ghast-family direct-lift and padded-atlas contract: [ghast-family-parity.md](ghast-family-parity.md).
+
 ---
 
 ## Shared mesh source (LER + walk + compose)
@@ -36,6 +38,12 @@ For **cuboid placement** parity (horns, ears, nested stacks), prefer JVM export 
 - **`renderCuboidCenters`** — model texel centroids after that walk
 
 Do **not** assert render placement from **`worldPose.translation` alone** — it uses `PartWorldPoseMath` (Er×T origin bake) and can stay green while Explore cuboids are wrong (e.g. cold-cow horns near body Z while render centers sit on the head cluster).
+
+### Logical geometry atlas contract
+
+Entity texture upload dimensions are not always the UV atlas dimensions used by the Java model. Geometry-IR baking resolves logical dimensions through `EntityGeometryIrTextureAtlas` from the parity manifest and uses them consistently for initial CPU bake, animated CPU rebake, and GPU bind-pose bake. Keep the physical `PreviewTextureMaps.Width/Height` for OpenGL upload.
+
+The ghast family is the regression case: model UVs use `64x32` or `64x64`, while the 26.1.2 jar PNGs are padded to `128x64` or `128x128`. Using physical PNG dimensions during mesh bake can pass pose tests yet render only partial face regions.
 
 ---
 
@@ -149,3 +157,4 @@ dotnet test tests/AutoPBR.Core.Tests --filter "BabyFamilyAttachmentClusterTests|
 5. **Double lift** — emulated GPU subjects skip `PreviewSubjectPlacement.LiftSubjectIfClipping`; GPU lift only via `uEntityMeshLiftY`.
 6. **No CPU preview-space bake or per-frame CPU skin for display** — do not strip anim-off to 12-float, do not rebake/skin on CPU each anim frame when GPU bind prep succeeded. Keep **`GpuPreparedBoneCount`** on rebake ctx across anim toggles.
 7. **Production compose = ModelPart block stack** — bind **`Er` + row-4 offset**, **`local × parent`**, block **÷16**. Do **not** revert to legacy **`T × Er`** (Entity Debug toggle only). Er×T **`worldPose`** bake remains valid for lift quality, not a substitute for render affines on horns/ears.
+8. **Logical atlas dimensions for Geometry IR** — do not replace manifest atlas dimensions with padded physical PNG dimensions in initial, CPU-rebake, or GPU-bind bake paths.

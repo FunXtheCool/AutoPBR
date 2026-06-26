@@ -134,7 +134,7 @@ public sealed class BeeWingComposeProbeTests
 
     private static Vector3 MeasureElementCuboidCenter(
         MergedJavaBlockModel mesh,
-        IReadOnlyList<string> partIds,
+        List<string> partIds,
         string partId)
     {
         for (var i = 0; i < mesh.Elements.Count && i < partIds.Count; i++)
@@ -171,7 +171,7 @@ public sealed class BeeWingComposeProbeTests
         ReadOnlySpan<float> vertices,
         int stride,
         MergedJavaBlockModel model,
-        IReadOnlyList<string> partIds,
+        List<string> partIds,
         string partId)
     {
         PreviewBounds? bounds = null;

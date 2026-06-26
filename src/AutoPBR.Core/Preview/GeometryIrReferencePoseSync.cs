@@ -317,7 +317,15 @@ internal static class GeometryIrReferencePoseSync
         if (part["id"]?.GetValue<string>() is { } id &&
             refPoses.TryGetValue(id, out var refPose))
         {
-            part["pose"] = refPose.DeepClone();
+            var priorPose = part["pose"] as JsonObject;
+            var syncedPose = refPose.DeepClone().AsObject();
+            if (!syncedPose.ContainsKey("uniformScale") &&
+                priorPose?["uniformScale"] is JsonNode liftedUniformScale)
+            {
+                syncedPose["uniformScale"] = liftedUniformScale.DeepClone();
+            }
+
+            part["pose"] = syncedPose;
         }
 
         if (part["children"] is not JsonArray kids)

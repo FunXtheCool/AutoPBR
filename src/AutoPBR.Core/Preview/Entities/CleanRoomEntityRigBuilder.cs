@@ -80,7 +80,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             PreviewDepthLayerKind depthLayerKind = PreviewDepthLayerKind.Base,
             int layerOrdinal = 0,
             bool castsShadow = false,
-            bool invertYForJavaUv = false)
+            bool texCropNorthSouthFaceUv = false)
         {
             var extentX = MathF.Abs(x1 - x0);
             var extentY = MathF.Abs(y1 - y0);
@@ -98,6 +98,10 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 {
                     uh = uvSizeH;
                 }
+                else if (uvSizeH == 0)
+                {
+                    uh = 0;
+                }
                 else if (uvSizeD > 0)
                 {
                     // [w,0,d] horizontal sheets (Ender Dragon wing membranes).
@@ -107,6 +111,10 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 if (uvSizeD > 0)
                 {
                     ud = uvSizeD;
+                }
+                else if (uvSizeD == 0)
+                {
+                    ud = 0;
                 }
             }
 
@@ -147,28 +155,36 @@ internal sealed partial class CleanRoomEntityModelRuntime
             }
 
             var useNorthSouthUvSpan =
-                uvSizeW > 0 &&
-                uvSizeH > 0 &&
+                ud == 0 &&
+                uw > 0 &&
+                uh > 0 &&
                 faceMask is { Length: > 0 } &&
                 IsNorthSouthFaceMaskOnly(faceMask);
 
             var useUpDownUvSpan =
-                uvSizeW > 0 &&
-                uvSizeD > 0 &&
+                uh == 0 &&
+                uw > 0 &&
+                ud > 0 &&
                 faceMask is { Length: > 0 } &&
-                IsUpDownFaceMaskOnly(faceMask);
+                IsUpDownFaceMaskOnly(faceMask) &&
+                faceMask[0].Equals("down", StringComparison.OrdinalIgnoreCase);
+
+            var useJavaHorizontalMembraneUv =
+                uh == 0 &&
+                uw > 0 &&
+                ud > 0 &&
+                faceMask is { Length: > 0 } &&
+                IsUpDownFaceMaskOnly(faceMask) &&
+                !faceMask[0].Equals("down", StringComparison.OrdinalIgnoreCase);
 
             (float[] North, float[] South, float[] West, float[] East, float[] Up, float[] Down) uv =
                 useNorthSouthUvSpan
-                    ? BuildNorthSouthUvSpanLayout(texU, texV, uvSizeW, uvSizeH, mirrorCuboidUv)
+                    ? BuildNorthSouthUvSpanLayout(texU, texV, uw, uh, texCropNorthSouthFaceUv, mirrorCuboidUv)
                     : useUpDownUvSpan
-                        ? BuildUpDownUvSpanLayout(texU, texV, uvSizeW, uvSizeD, faceMask!, mirrorCuboidUv)
-                        : BuildCubeUvLayout(texU, texV, uw, uh, ud, mirrorCuboidUv);
-            if (invertYForJavaUv)
-            {
-                uv = InvertYReflectedJavaCuboidUv(uv);
-            }
-
+                        ? BuildUpDownUvSpanLayout(texU, texV, uw, ud, faceMask!, mirrorCuboidUv)
+                        : useJavaHorizontalMembraneUv
+                            ? BuildJavaHorizontalMembraneUvLayout(texU, texV, uw, ud, mirrorCuboidUv)
+                            : BuildCubeUvLayout(texU, texV, uw, uh, ud, mirrorCuboidUv);
             var allFaces = new Dictionary<string, ModelFace>(StringComparer.OrdinalIgnoreCase)
             {
                 ["north"] = new() { TextureKey = texKey, Uv = uv.North, RotationDegrees = 0 },
@@ -313,29 +329,10 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return (north, south, west, east, up, down);
         }
 
-        private static (float[] North, float[] South, float[] West, float[] East, float[] Up, float[] Down)
-            InvertYReflectedJavaCuboidUv(
-                (float[] North, float[] South, float[] West, float[] East, float[] Up, float[] Down) uv) =>
-            (
-                FlipFaceVBounds(uv.North),
-                FlipFaceVBounds(uv.South),
-                FlipFaceVBounds(uv.West),
-                FlipFaceVBounds(uv.East),
-                uv.Down,
-                uv.Up
-            );
-
-        private static float[] FlipFaceVBounds(float[] rect) =>
-            rect.Length >= 4
-                ? [rect[0], rect[3], rect[2], rect[1]]
-                : rect;
-
         /// <summary>
-        /// Direction-mask / <c>uvSpan</c> north–south sheets: <c>uvOrigin</c> is the first face corner (no full-box
-        /// <c>+d</c> padding). Opposite face is offset by <c>w + TemplateDepthGap</c> on U (vanilla template depth 2).
+        /// Direction-mask / <c>uvSpan</c> north–south sheets at <c>d=0</c>: unfold via
+        /// <see cref="EntityCuboidJavaUvConvention"/> (ModelPart.Cube javap).
         /// </summary>
-        private const int NorthSouthUvSpanTemplateDepthGap = 2;
-
         private static bool IsNorthSouthFaceMaskOnly(string[] faceMask)
         {
             foreach (var name in faceMask)
@@ -365,15 +362,43 @@ internal sealed partial class CleanRoomEntityModelRuntime
         }
 
         private static (float[] North, float[] South, float[] West, float[] East, float[] Up, float[] Down)
-            BuildNorthSouthUvSpanLayout(int u, int v, int w, int h, bool mirrorCuboidUv = false)
+            BuildNorthSouthUvSpanLayout(
+                int u,
+                int v,
+                int w,
+                int h,
+                bool texCropNorthSouthFaceUv,
+                bool mirrorCuboidUv = false)
         {
             _ = mirrorCuboidUv;
-            var north = new float[] { u, v, u + w, v + h };
-            var southU0 = u + w + NorthSouthUvSpanTemplateDepthGap;
-            var south = new float[] { southU0, v, southU0 + w, v + h };
+            float[] north;
+            float[] south;
+            if (texCropNorthSouthFaceUv)
+            {
+                (north, south) = GeometryIrUvAtlasQuality.BuildTexCropNorthSouthFaceUvRects(u, v, w, h);
+            }
+            else
+            {
+                north = EntityCuboidJavaUvConvention.GetUvRect(
+                    EntityCuboidJavaUvConvention.JavaDirection.North, u, v, w, h, 0);
+                south = EntityCuboidJavaUvConvention.GetUvRect(
+                    EntityCuboidJavaUvConvention.JavaDirection.South, u, v, w, h, 0);
+            }
 
             var empty = Array.Empty<float>();
             return (north, south, empty, empty, empty, empty);
+        }
+
+        private static (float[] North, float[] South, float[] West, float[] East, float[] Up, float[] Down)
+            BuildJavaHorizontalMembraneUvLayout(int u, int v, int w, int d, bool mirrorCuboidUv = false)
+        {
+            _ = mirrorCuboidUv;
+            var up = EntityCuboidJavaUvConvention.GetUvRect(
+                EntityCuboidJavaUvConvention.JavaDirection.Up, u, v, w, 0, d);
+            var down = EntityCuboidJavaUvConvention.GetUvRect(
+                EntityCuboidJavaUvConvention.JavaDirection.Down, u, v, w, 0, d);
+            var empty = Array.Empty<float>();
+            return (empty, empty, empty, empty, up, down);
         }
 
         private static (float[] North, float[] South, float[] West, float[] East, float[] Up, float[] Down)

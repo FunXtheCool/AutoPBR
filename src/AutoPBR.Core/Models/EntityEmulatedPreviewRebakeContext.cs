@@ -40,6 +40,12 @@ public sealed class EntityEmulatedPreviewRebakeContext
     /// </summary>
     public string? PreviewSizeId { get; init; }
 
+    /// <summary>
+    /// Explore context-type selector id captured at initial bake (e.g. <see cref="EntityPreviewContextTypeCatalog.Ceiling"/>).
+    /// Rebakes must reuse this so hanging-sign attachment geometry stays consistent across threads.
+    /// </summary>
+    public string? PreviewContextTypeId { get; init; }
+
     /// <summary>Texture zip paths in merged-model bake order (same as the initial preview pipeline).</summary>
     public required string[] OrderedTextureZipPaths { get; init; }
 

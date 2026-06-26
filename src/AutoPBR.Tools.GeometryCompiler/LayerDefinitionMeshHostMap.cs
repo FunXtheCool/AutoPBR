@@ -30,6 +30,12 @@ internal static class LayerDefinitionMeshHostMap
                 "createMesh",
                 64,
                 64),
+            // LayerDefinitions.createRoots wraps AdultFelineModel.createBodyMesh with LayerDefinition.create(64, 32).
+            ["net.minecraft.client.model.animal.feline.AdultFelineModel"] = new(
+                "net.minecraft.client.model.animal.feline.AdultFelineModel",
+                "createBodyMesh",
+                64,
+                32),
         };
 
     public static bool TryGet(string officialJvmName, out MeshHostSpec spec) =>

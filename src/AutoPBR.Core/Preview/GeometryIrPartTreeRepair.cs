@@ -238,6 +238,11 @@ internal static partial class GeometryIrPartTreeRepair
 
 
         RepairObjectChestModelCuboidOrigins(doc);
+        RepairDecoratedPotCapUvOrigins(doc);
+        if (doc["roots"] is JsonArray repairedRoots)
+        {
+            RepairTexCropUvSpanDuplicateAnchors(repairedRoots);
+        }
 
         if (ShouldApplyPlayerWideMeshParityRepair(officialJvmName, roots) ||
             ShouldApplyReferenceCuboidPreviewRepair(officialJvmName))

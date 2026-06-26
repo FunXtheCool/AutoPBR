@@ -17,7 +17,11 @@ public static class BlockModelPreviewSceneFactory
         return new PreviewScene(
             PreviewSceneKind.BlockModel,
             [bakedSubject],
-            new PreviewCamera { Target = target },
+            new PreviewCamera
+            {
+                Target = target,
+                Position = target + PreviewCamera.DefaultOrbitEyeOffsetFromTarget,
+            },
             new PreviewLight { Direction = lightDir });
     }
 }

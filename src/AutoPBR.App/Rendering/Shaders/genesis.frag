@@ -91,6 +91,11 @@ vec3 sampleNormal(vec2 uv, vec3 Nw, vec3 Tw, vec3 Bw)
     return normalize(tbn * tn);
 }
 
+float metalPreviewBaseVisibility(float roughness)
+{
+    return mix(0.22, 0.38, saturate1(roughness));
+}
+
 void main()
 {
     vec4 albRaw = texture(uAlbedo, vUv);
@@ -230,16 +235,25 @@ void main()
     vec3 indirect = vec3(0.0);
     if (uEnableIbl > 0)
     {
-        vec3 iblDiff = fakeIblAmbientDiffuse(N, uSkyTint, uGroundTint, uEnableAtmosphericSky, uAtmoSkyViewLut);
-        // Only dielectric (1 - metallic) gets diffuse indirect; metals are reflection-only.
-        indirect += iblDiff * albedoLinear * (1.0 - mat.metallic) * uIblStrength;
+        vec3 iblDiff = fakeIblAmbientDiffuse(N, uSkyTint, uGroundTint, uLightDir, uLightColor,
+            uAtmosphereSunIntensity, uEnableAtmosphericSky, uAtmoSkyViewLut);
+        float dielectricDiffuseVisibility = 1.0 - mat.metallic;
+        // The preview has no captured scene cubemap. Keep a small irradiance-backed base
+        // for LabPBR metal IDs so valid G>=230 pixels do not crush to black off-highlight.
+        float metalBaseVisibility = mat.metallic * metalPreviewBaseVisibility(mat.roughness);
+        vec3 metalPreviewIrradiance = max(iblDiff, vec3(uAmbient * 0.75));
+        indirect += iblDiff * albedoLinear * dielectricDiffuseVisibility * uIblStrength;
+        indirect += metalPreviewIrradiance * albedoLinear * metalBaseVisibility * uIblStrength;
         indirect += fakeIblSpecular(N, V, mat.f0, mat.roughness, mat.metallic, uSkyTint, uGroundTint,
-                           uEnableAtmosphericSky, uAtmoSkyViewLut) * uIblStrength;
+                           uLightDir, uLightColor, uAtmosphereSunIntensity, uEnableAtmosphericSky, uAtmoSkyViewLut) *
+                    uIblStrength;
     }
     else
     {
         // Constant ambient fallback so previews are not pitch-black with IBL off.
-        indirect = albedoLinear * uAmbient * (1.0 - mat.metallic);
+        float dielectricAmbientVisibility = 1.0 - mat.metallic;
+        float metalAmbientVisibility = mat.metallic * metalPreviewBaseVisibility(mat.roughness);
+        indirect = albedoLinear * uAmbient * (dielectricAmbientVisibility + metalAmbientVisibility);
     }
 
     // Parallax contact AO mostly darkens indirect/cavity light while keeping direct lobe readable.

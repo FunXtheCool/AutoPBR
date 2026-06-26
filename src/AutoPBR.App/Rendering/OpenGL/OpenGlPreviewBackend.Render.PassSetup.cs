@@ -775,8 +775,11 @@ public sealed partial class OpenGlPreviewBackend
         {
             _parityCatalogCpuBindDiagKey = diagKey;
             _parityCatalogCpuBindFailDiagKey = null;
+            var rebakeUvFp = PreviewMeshGeometryFingerprint.ComputeCpuPreviewMeshUvFingerprint(
+                cpuVerts,
+                PreviewMesh.FloatsPerVertex);
             EmitDiagnostic(
-                $"[3D preview] Parity-catalog CPU bind-pose mesh: verts={cpuVerts.Length / PreviewMesh.FloatsPerVertex}, indices={cpuIdx.Length}.");
+                $"[3D preview] Parity-catalog CPU bind-pose mesh: verts={cpuVerts.Length / PreviewMesh.FloatsPerVertex}, indices={cpuIdx.Length}, uvFp={rebakeUvFp}.");
         }
 
         return true;

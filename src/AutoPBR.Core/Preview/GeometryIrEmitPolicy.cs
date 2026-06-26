@@ -132,34 +132,6 @@ public static class GeometryIrEmitPolicy
                string.Equals(officialJvmName, "net.minecraft.client.model.HappyGhastModel", StringComparison.Ordinal);
     }
 
-    /// <summary>Parity-catalog ghast skin paths (body + tentacles share one atlas unfold).</summary>
-    internal static bool IsGhastFamilyTexturePath(string? normalizedAssetPath)
-    {
-        if (string.IsNullOrWhiteSpace(normalizedAssetPath))
-        {
-            return false;
-        }
-
-        var norm = normalizedAssetPath.Replace('\\', '/');
-        if (!norm.Contains("/textures/entity/ghast/", StringComparison.OrdinalIgnoreCase))
-        {
-            return false;
-        }
-
-        if (norm.Contains("/equipment/", StringComparison.OrdinalIgnoreCase) ||
-            norm.Contains("_ropes", StringComparison.OrdinalIgnoreCase))
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    internal static bool IsGhastFamilyEmitContext(string? officialJvmName, string? normalizedAssetPath) =>
-        IsGhastFamilyJvm(officialJvmName) || IsGhastFamilyTexturePath(normalizedAssetPath);
-
-
-
     internal static bool TryParseGhastFamilyTentacleIndex(string partId, out int tentacleIndex)
 
     {
@@ -179,92 +151,6 @@ public static class GeometryIrEmitPolicy
         var suffix = partId.AsSpan("tentacle".Length);
 
         return suffix.Length > 0 && int.TryParse(suffix, out tentacleIndex) && tentacleIndex >= 0;
-
-    }
-
-
-
-    /// <summary>
-    /// Javap <c>createBodyLayer</c> lifts tentacles as <c>addBox(-1,0,-1,2,h,2)</c> (+Y in part space).
-    /// Ghast-family preview skips LER mirror (root already carries renderer ModelTransforms); +Y grows
-    /// into the body shell unless reoriented to −Y hang-down at the ModelPart attachment (y=0).
-    /// </summary>
-    internal static bool TryReorientGhastFamilyTentacleCuboidYForModelSpace(
-        string? officialJvmName,
-        string partId,
-        ref float y0,
-        ref float y1,
-        string? normalizedAssetPath = null)
-    {
-        if (!IsGhastFamilyEmitContext(officialJvmName, normalizedAssetPath) ||
-            !TryParseGhastFamilyTentacleIndex(partId, out _))
-        {
-            return false;
-        }
-
-        if (y0 >= -1e-5f && y1 > y0)
-        {
-            (y0, y1) = (-y1, -y0);
-            return true;
-        }
-
-        return false;
-    }
-
-    /// <summary>
-    /// Ghast skin atlases use a single <c>texOffs(0,0)</c> unfold: body <c>16³</c>, tentacles <c>2×h×2</c>.
-    /// </summary>
-
-    internal static bool TryApplyGhastFamilyCuboidUvFootprint(
-        string? officialJvmName,
-        string partId,
-        float y0,
-        float y1,
-        ref int uvSizeW,
-        ref int uvSizeH,
-        ref int uvSizeD,
-        string? normalizedAssetPath = null)
-    {
-        if (!IsGhastFamilyEmitContext(officialJvmName, normalizedAssetPath))
-        {
-            return false;
-        }
-
-
-
-        if (string.Equals(partId, "body", StringComparison.OrdinalIgnoreCase))
-
-        {
-
-            uvSizeW = 16;
-
-            uvSizeH = 16;
-
-            uvSizeD = 16;
-
-            return true;
-
-        }
-
-
-
-        if (!partId.StartsWith("tentacle", StringComparison.OrdinalIgnoreCase))
-
-        {
-
-            return false;
-
-        }
-
-
-
-        uvSizeW = 2;
-
-        uvSizeD = 2;
-
-        uvSizeH = Math.Max(1, (int)MathF.Round(MathF.Abs(y1 - y0)));
-
-        return true;
 
     }
 

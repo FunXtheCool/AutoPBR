@@ -191,8 +191,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
             float xRot,
             float yRot,
             float zRot,
-            IReadOnlyDictionary<string, Matrix4x4> partOriginWorld,
-            IReadOnlyDictionary<string, VanillaSetupAnimRuntime.PartPose> baselineParts,
+            Dictionary<string, Matrix4x4> partOriginWorld,
+            Dictionary<string, VanillaSetupAnimRuntime.PartPose> baselineParts,
             out Matrix4x4 deltaWorld)
         {
             deltaWorld = Matrix4x4.Identity;

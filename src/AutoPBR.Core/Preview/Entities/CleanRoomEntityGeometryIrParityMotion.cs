@@ -18,29 +18,26 @@ internal sealed partial class CleanRoomEntityModelRuntime
     {
 
         public static Dictionary<string, Matrix4x4> Build(JsonElement geometryRoot, in GeometryIrMeshEmitOptions? emitOptions = null)
-
         {
-
             var map = new Dictionary<string, Matrix4x4>(StringComparer.Ordinal);
-
             if (!geometryRoot.TryGetProperty("roots", out var roots) || roots.ValueKind != JsonValueKind.Array)
-
             {
-
                 return map;
-
             }
 
-            var opts = emitOptions ?? default;
-            foreach (var rootPart in roots.EnumerateArray())
-            {
-                VisitPart(rootPart, Matrix4x4.Identity, map, opts);
-            }
-
-
+            var opts = emitOptions ?? GeometryIrMeshEmitOptions.ForParity();
+            _ = GeometryIrMeshWalk.WalkRoots(
+                geometryRoot,
+                opts.RootTransform,
+                opts,
+                onCuboid: null,
+                onPartWorld: (partId, worldBlock) =>
+                {
+                    map[partId] = BlockRowAffineToTexel(worldBlock);
+                },
+                out _);
 
             return map;
-
         }
 
         /// <summary>Maps each part <c>id</c> to its parent part <c>id</c> (model root children use <c>null</c> parent).</summary>
@@ -80,55 +77,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
         }
 
 
-
-        private static void VisitPart(
-            JsonElement part,
-            Matrix4x4 parentWorld,
-            Dictionary<string, Matrix4x4> sink,
-            in GeometryIrMeshEmitOptions emitOptions)
-        {
-            var world = parentWorld;
-            if (part.TryGetProperty("pose", out var poseEl))
-            {
-                if (ShouldUseColumnPartPoseCompose(poseEl, emitOptions))
-                {
-                    _ = TryComposeColumnPartPose(poseEl, parentWorld, out world, out _);
-                }
-                else if (TryComposePartPosePublic(poseEl, parentWorld, out var worldTexel))
-                {
-                    world = worldTexel;
-                }
-            }
-
-
-
-            var partId = part.TryGetProperty("id", out var idEl) ? idEl.GetString() ?? "" : "";
-
-            if (partId.Length > 0)
-
-            {
-
-                sink[partId] = world;
-
-            }
-
-
-
-            if (!part.TryGetProperty("children", out var children) || children.ValueKind != JsonValueKind.Array)
-
-            {
-
-                return;
-
-            }
-
-
-
-            foreach (var child in children.EnumerateArray())
-            {
-                VisitPart(child, world, sink, emitOptions);
-            }
-        }
 
     }
 
@@ -244,8 +192,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
     /// </summary>
     private static bool TryComposeSetupAnimAncestorDeltas(
         string partId,
-        IReadOnlyDictionary<string, string?> parentMap,
-        IReadOnlyDictionary<string, Matrix4x4> partDeltas,
+        Dictionary<string, string?> parentMap,
+        Dictionary<string, Matrix4x4> partDeltas,
         out Matrix4x4 composedDelta)
     {
         composedDelta = Matrix4x4.Identity;

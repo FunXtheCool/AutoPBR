@@ -110,9 +110,9 @@ public sealed class CreakingMeshDiagnosticTests
         var west = sheets.Single(el => el.From[0] < 0f);
 
         Assert.Equal(new float[] { 12, 40, 21, 54 }, east.Faces["north"].Uv!);
-        Assert.Equal(new float[] { 23, 40, 32, 54 }, east.Faces["south"].Uv!);
+        Assert.Equal(new float[] { 21, 40, 30, 54 }, east.Faces["south"].Uv!);
         Assert.Equal(new float[] { 34, 12, 43, 26 }, west.Faces["north"].Uv!);
-        Assert.Equal(new float[] { 45, 12, 54, 26 }, west.Faces["south"].Uv!);
+        Assert.Equal(new float[] { 43, 12, 52, 26 }, west.Faces["south"].Uv!);
     }
 
     [Fact]
@@ -224,12 +224,12 @@ public sealed class CreakingMeshDiagnosticTests
         Assert.Equal(2, footDisks.Count);
 
         var left = footDisks.Single(el => el.To[0] > 2f);
-        Assert.Equal(new float[] { 52, 55, 57, 63 }, left.Faces["down"].Uv!);
-        Assert.Equal(new float[] { 45, 55, 50, 63 }, left.Faces["up"].Uv!);
+        Assert.Equal(new float[] { 53, 55, 58, 63 }, left.Faces["down"].Uv!);
+        Assert.Equal(new float[] { 58, 63, 63, 55 }, left.Faces["up"].Uv!);
 
         var right = footDisks.Single(el => el.From[0] <= -3f);
-        Assert.Equal(new float[] { 52, 46, 57, 54 }, right.Faces["down"].Uv!);
-        Assert.Equal(new float[] { 45, 46, 50, 54 }, right.Faces["up"].Uv!);
+        Assert.Equal(new float[] { 53, 46, 58, 54 }, right.Faces["down"].Uv!);
+        Assert.Equal(new float[] { 58, 54, 63, 46 }, right.Faces["up"].Uv!);
     }
 
     [Fact]

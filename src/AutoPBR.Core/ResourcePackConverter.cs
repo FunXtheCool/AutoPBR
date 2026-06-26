@@ -260,11 +260,18 @@ public static class ResourcePackConverter
 
                     cancellationToken.ThrowIfCancellationRequested();
 
+                    var bakeProfile = ResolvePreviewMeshNativeProfile(previewNativeProfile);
                     var materials = workOrdered.Select(PreviewTextureMapsLoader.Load).ToArray();
                     var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase);
                     for (var i = 0; i < orderedModelTextures.Count; i++)
                     {
-                        texSizes[orderedModelTextures[i]] = (materials[i].Width, materials[i].Height);
+                        var size = EntityGeometryIrTextureAtlas.ResolveForBake(
+                            orderedModelTextures[i],
+                            materials[i].Width,
+                            materials[i].Height,
+                            meshProvenance,
+                            bakeProfile);
+                        texSizes[orderedModelTextures[i]] = (size.Width, size.Height);
                     }
 
                     var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -305,6 +312,7 @@ public static class ResourcePackConverter
                                 IdlePhase01 = idlePh,
                                 PreviewPoseId = EntityPreviewBuildContext.CurrentPoseId,
                                 PreviewSizeId = EntityPreviewBuildContext.CurrentSizeId,
+                                PreviewContextTypeId = EntityPreviewBuildContext.CurrentContextTypeId,
                                 OrderedTextureZipPaths = orderedModelTextures.ToArray()
                             };
                             EntityPreviewPlacement.TryPopulateRebakeElementPartIds(

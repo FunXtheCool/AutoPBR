@@ -114,35 +114,31 @@ public sealed class AxolotlPreviewAttachmentTests
     [Fact]
     public void Runtime_mesh_gill_face_uv_corners_match_vanilla_uv_span_layout()
     {
+        AssertGillFaceUvCornersMatchVanilla(TexturePath, Jvm);
+    }
+
+    [Fact]
+    public void Baby_runtime_mesh_gill_face_uv_corners_match_vanilla_uv_span_layout()
+    {
+        const string babyTexture = "assets/minecraft/textures/entity/axolotl/axolotl_blue_baby.png";
+        const string babyJvm = "net.minecraft.client.model.animal.axolotl.BabyAxolotlModel";
+        AssertGillFaceUvCornersMatchVanilla(babyTexture, babyJvm);
+    }
+
+    private void AssertGillFaceUvCornersMatchVanilla(string texturePath, string jvm)
+    {
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(
-            TexturePath, Profile26, 0f, 0f, out var mesh, out _, applyGeometryIrSetupAnimMotion: false));
+            texturePath, Profile26, 0f, 0f, out var mesh, out _, applyGeometryIrSetupAnimMotion: false));
 
         using var shard = JsonDocument.Parse(File.ReadAllText(Path.Combine(
             GeometryIrTestTierSupport.FindRepoRoot(),
-            "docs", "generated", "geometry", "26.1.2", $"{Jvm}.json")));
-        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(Jvm, shard.RootElement);
+            "docs", "generated", "geometry", "26.1.2", $"{jvm}.json")));
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
         var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
-            repaired, GeometryIrMeshEmitOptions.ForParity(64, 64) with { OfficialJvmName = Jvm });
+            repaired, GeometryIrMeshEmitOptions.ForParity(64, 64) with { OfficialJvmName = jvm });
 
-        var expected = new Dictionary<string, Dictionary<string, float[]>>(StringComparer.Ordinal)
-        {
-            ["top_gills"] = new(StringComparer.Ordinal)
-            {
-                ["north"] = [3, 37, 11, 40],
-                ["south"] = [13, 37, 21, 40],
-            },
-            ["left_gills"] = new(StringComparer.Ordinal)
-            {
-                ["north"] = [0, 40, 3, 47],
-                ["south"] = [5, 40, 8, 47],
-            },
-            ["right_gills"] = new(StringComparer.Ordinal)
-            {
-                ["north"] = [11, 40, 14, 47],
-                ["south"] = [16, 40, 19, 47],
-            },
-        };
+        var expected = BuildGillTexCropExpectedFromShard(repaired);
 
         foreach (var (gillId, faces) in expected)
         {
@@ -160,14 +156,130 @@ public sealed class AxolotlPreviewAttachmentTests
             foreach (var (faceName, expUv) in faces)
             {
                 Assert.True(irEl!.Faces.TryGetValue(faceName, out var irFace), $"{gillId}.{faceName}");
-                _output.WriteLine($"{gillId}.{faceName} expected=[{expUv[0]},{expUv[1]},{expUv[2]},{expUv[3]}] ir=[{irFace.Uv[0]},{irFace.Uv[1]},{irFace.Uv[2]},{irFace.Uv[3]}]");
+                Assert.NotNull(irFace.Uv);
+                var irUv = irFace.Uv!;
+                _output.WriteLine($"{gillId}.{faceName} expected=[{expUv[0]},{expUv[1]},{expUv[2]},{expUv[3]}] ir=[{irUv[0]},{irUv[1]},{irUv[2]},{irUv[3]}]");
                 for (var c = 0; c < 4; c++)
                 {
-                    Assert.True(MathF.Abs(expUv[c] - irFace.Uv[c]) <= 0.05f,
-                        $"{gillId}.{faceName}[{c}]: expected={expUv[c]} ir={irFace.Uv[c]}");
+                    Assert.True(MathF.Abs(expUv[c] - irUv[c]) <= 0.05f,
+                        $"{gillId}.{faceName}[{c}]: expected={expUv[c]} ir={irUv[c]}");
                 }
             }
         }
+    }
+
+    private static Dictionary<string, Dictionary<string, float[]>> BuildGillTexCropExpectedFromShard(JsonElement geometryRoot)
+    {
+        var expected = new Dictionary<string, Dictionary<string, float[]>>(StringComparer.Ordinal);
+        WalkGillParts(geometryRoot, part =>
+        {
+            if (!part.TryGetProperty("id", out var idEl) ||
+                idEl.GetString() is not { } partId ||
+                !partId.EndsWith("_gills", StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            if (!part.TryGetProperty("cuboids", out var cuboids) || cuboids.GetArrayLength() == 0)
+            {
+                return;
+            }
+
+            var cuboid = cuboids[0];
+            if (!cuboid.TryGetProperty("uvOrigin", out var uv) || uv.GetArrayLength() < 2 ||
+                !GeometryIrCuboidMetadata.TryGetFaceMask(cuboid, out var faceMask) ||
+                !IsNorthSouthFaceMaskOnly(faceMask))
+            {
+                return;
+            }
+
+            var texU = uv[0].GetInt32();
+            var texV = uv[1].GetInt32();
+            var w = ResolveGillSheetWidth(cuboid);
+            var h = ResolveGillSheetHeight(cuboid);
+            var (north, south) = (
+                EntityCuboidJavaUvConvention.GetUvRect(
+                    EntityCuboidJavaUvConvention.JavaDirection.North, texU, texV, w, h, 0),
+                EntityCuboidJavaUvConvention.GetUvRect(
+                    EntityCuboidJavaUvConvention.JavaDirection.South, texU, texV, w, h, 0));
+            expected[partId] = new Dictionary<string, float[]>(StringComparer.Ordinal)
+            {
+                ["north"] = north,
+                ["south"] = south,
+            };
+        });
+
+        return expected;
+    }
+
+    private static void WalkGillParts(JsonElement node, Action<JsonElement> visit)
+    {
+        if (node.ValueKind == JsonValueKind.Object)
+        {
+            visit(node);
+            if (node.TryGetProperty("children", out var children) && children.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var child in children.EnumerateArray())
+                {
+                    WalkGillParts(child, visit);
+                }
+            }
+        }
+        else if (node.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var child in node.EnumerateArray())
+            {
+                WalkGillParts(child, visit);
+            }
+        }
+    }
+
+    private static int ResolveGillSheetWidth(JsonElement cuboid)
+    {
+        if (GeometryIrCuboidMetadata.TryGetUvSpan(cuboid, out var spanW, out _, out _) && spanW > 0 &&
+            (!cuboid.TryGetProperty("uvOrigin", out var uv) || spanW != uv[0].GetInt32()))
+        {
+            return spanW;
+        }
+
+        return LogicalAxisExtent(cuboid, "from", "to", 0);
+    }
+
+    private static int ResolveGillSheetHeight(JsonElement cuboid)
+    {
+        if (GeometryIrCuboidMetadata.TryGetUvSpan(cuboid, out _, out var spanH, out _) && spanH > 0 &&
+            (!cuboid.TryGetProperty("uvOrigin", out var uv) || uv.GetArrayLength() < 2 || spanH != uv[1].GetInt32()))
+        {
+            return spanH;
+        }
+
+        return LogicalAxisExtent(cuboid, "from", "to", 1);
+    }
+
+    private static int LogicalAxisExtent(JsonElement cuboid, string fromKey, string toKey, int axis)
+    {
+        var from = cuboid.GetProperty(fromKey);
+        var to = cuboid.GetProperty(toKey);
+        return (int)MathF.Round(MathF.Abs((float)to[axis].GetDouble() - (float)from[axis].GetDouble()));
+    }
+
+    private static bool IsNorthSouthFaceMaskOnly(string[] faceMask)
+    {
+        if (faceMask.Length == 0)
+        {
+            return false;
+        }
+
+        foreach (var face in faceMask)
+        {
+            if (!face.Equals("north", StringComparison.OrdinalIgnoreCase) &&
+                !face.Equals("south", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     [Fact]
@@ -397,7 +509,7 @@ public sealed class AxolotlPreviewAttachmentTests
 
     private static (float BodyMaxY, float LegMinY, float HullGap) MeasureBodyLegHullGap(
         ReadOnlySpan<float> gpuVerts,
-        IReadOnlyList<string> partIds)
+        List<string> partIds)
     {
         const int stride = MinecraftModelBaker.FloatsPerSkinnedVertex;
         var bodyMaxY = float.NegativeInfinity;

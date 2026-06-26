@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.Numerics;
 using System.Text;
+using System.Text.Json;
+using AutoPBR.Tests.TestSupport;
 
 namespace AutoPBR.Core.Tests;
 
@@ -140,10 +142,22 @@ public sealed class EntityTextureParityAssemblyCohesionTests
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
         Assert.True(model.Elements.Count >= 10, "body + 9 tentacles");
-        // Runtime geometry IR: GhastModel pose with Skip LER (root already carries renderer ModelTransforms).
-        AssertWorldAabbClose(model.Elements[0], new Vector3(-8f, -74.456f, -8f), new Vector3(8f, -58.456f, 8f), 0.08f);
-        // Tentacle 0: bind-pose animateTentacles xRot (~0.4 rad at age 0).
-        AssertWorldAabbClose(model.Elements[1], new Vector3(-4.75f, -67.213905f, -9.036407f), new Vector3(-2.75f, -59.06658f, -4.078939f), 0.08f);
+        var shardPath = GhastPreviewTestLandmarks.RequireOkCommittedShardPath(GhastPreviewTestLandmarks.MonsterJvm);
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(
+            GhastPreviewTestLandmarks.MonsterJvm,
+            shard.RootElement);
+        var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
+            repaired,
+            GeometryIrMeshEmitOptions.ForParity(64, 32) with
+            {
+                OfficialJvmName = GhastPreviewTestLandmarks.MonsterJvm,
+            });
+        GhastPreviewTestLandmarks.AssertGhastRuntimeMatchesReferenceAffines(
+            model,
+            partIds,
+            GhastPreviewTestLandmarks.MonsterJvm,
+            animationTimeSeconds: 0f);
     }
 
     [Fact]

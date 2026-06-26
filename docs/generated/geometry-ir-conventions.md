@@ -11,6 +11,7 @@ This file documents how to read [`schema/geometry-ir.schema.json`](schema/geomet
 
 - **`translation`**: three floats, translation applied in the same space as vanilla `PartPose.offset` (before child cuboids).
 - **`rotationEulerRad`**: three floats **in radians**, applied in order given by **`eulerOrder`** (intrinsic / chained application matches AutoPBR `EntityParityTemplate` usage: `Mul(T, Er(x)*Er(y)*Er(z))` style compositions — document per-class if a part uses `offsetAndRotation` with a different convention).
+- **`uniformScale`**: inherited part-pose scale. It may come from `PartPose.withScale` or a terminal root `LayerDefinition.apply(MeshTransformer.scaling(...))`. Compose it in the part transform; do not multiply each cuboid independently.
 - Default `eulerOrder` for quadruped-style rigs in committed shards: **`XYZ`** (rotate X, then Y, then Z on the composed local frame unless noted).
 
 ## UV
@@ -33,6 +34,8 @@ AutoPBR.Tools.GeometryCompiler lifts **`CubeListBuilder.texOffs` / `addBox` / `P
 
 - **Pattern coverage:** Only call shapes the parser recognizes (including `addBox(FFFFFF)`, mirrored `addBox(String, FFFFFF)`, and `addBox(..., CubeDeformation)`). Other `CubeListBuilder` or `PartDefinition` patterns, or models built without this style, stay **`partial`** / **`heuristic`**.
 - **Part id (`ldc` child name):** The lifter resolves `PartDefinition.addOrReplaceChild`’s first argument from the **`ldc // String …` immediately before that call** (javac’s usual layout). If that is missing, it falls back to the **`ldc` before `CubeListBuilder.create`** (older layout). Mismatches here skip the segment.
+- **Computed child names and receiver locals:** Loop-built parts may compute names such as `PartNames.tentacle(i)` before `addOrReplaceChild`. Parent recovery must use the receiver `PartDefinition` local at the binding call and must only treat an immediately following `astore` as the returned child binding. A later unrelated store is not the child.
+- **Layer mesh transformers:** A terminal `LayerDefinition.apply(MeshTransformer.scaling(s))` changes both root scale and root Y translation. For 26.1.2, lift `uniformScale=s` and `translationY=24.016*(1-s)`. Omitting the scale while preserving only the translation creates severe assembly drift.
 - **Mesh host resolution:** The tool tries the listed official `*Model` class first, then common companions in the **same package** (`Adult*`, `Baby*`, `Cold*`, `Warm*`). Classes whose factories live under a **different** package naming pattern may not be found unless reached by delegation (below).
 - **Delegated factories:** If `createBodyLayer` only forwards to another class via **`invokestatic` returning `MeshDefinition`**, `ConcatMeshFactoryCodeDeep` **iteratively** follows those targets (and same-class helpers) until no new mesh factories appear, with island boundaries between merged blocks. Indirect chains via fields, instance helpers, or non-`MeshDefinition` returns are still not expanded.
 - **Authored shards:** Shards that already look like a real part tree (non-placeholder parts or cuboids) are **not overwritten** by the lifter (e.g. hand-maintained **Cow** geometry).
@@ -78,6 +81,8 @@ Pilot hierarchy expectations (nested vs flat vs binding_gap): [`runtime-ir-previ
 ## Tests
 
 When adding or changing geometry IR tests, follow [test-guidance-geometry-animation-ir.md](../test-guidance-geometry-animation-ir.md) (tiers, allowlists, promotion). Runtime-IR preview plan: [`runtime-ir-preview-plan.md`](../runtime-ir-preview-plan.md).
+
+Ghast-family scale, hierarchy, UV, and preview invariants are documented in [`ghast-family-parity.md`](../ghast-family-parity.md).
 
 ## Living-entity renderer (LER) preview fold — **regression guard**
 

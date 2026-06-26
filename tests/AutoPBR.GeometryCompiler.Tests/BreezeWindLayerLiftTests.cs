@@ -36,6 +36,29 @@ public sealed class BreezeWindLayerLiftTests
             n => n is JsonObject o && string.Equals((string?)o["id"], "wind_mid", StringComparison.Ordinal));
     }
 
+    [Fact]
+    public void BreezeModel_lift_stamps_wind_cuboids_with_128_atlas_and_wind_texture_key()
+    {
+        var jar = ResolveClientJar();
+        Assert.True(
+            GeometryLiftPipeline.TryLiftWithJavapFallback(JavapLocator.FindJavap(), jar, null,
+                "net.minecraft.client.model.monster.breeze.BreezeModel", "createBodyLayer", preferAsm: true,
+                out var attempt),
+            string.Join("; ", attempt.Notes));
+
+        foreach (var partId in new[] { "wind_bottom", "wind_mid", "wind_top" })
+        {
+            var part = FindPartById(attempt.Roots, partId);
+            Assert.NotNull(part);
+            foreach (var cuboid in part["cuboids"]!.AsArray())
+            {
+                Assert.Equal(128, cuboid!["textureWidth"]!.GetValue<int>());
+                Assert.Equal(128, cuboid["textureHeight"]!.GetValue<int>());
+                Assert.Equal("#wind", (string?)cuboid["textureKey"]);
+            }
+        }
+    }
+
     private static string ResolveClientJar()
     {
         var root = Program.FindRepoRoot();

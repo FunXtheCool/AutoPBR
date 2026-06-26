@@ -85,6 +85,11 @@ internal static class GeometryIrParityJvmResolver
 
         if (GeometryIrParityHandLiftJvmMap.TryGetHandLiftJvm(rule.BuilderMethod, normalizedAssetPath, out var handLiftJvm))
         {
+            if (EntityPreviewContextTypeCatalog.TryGetHandLiftJvmOverride(handLiftJvm, out var contextJvm))
+            {
+                yield return contextJvm;
+            }
+
             yield return handLiftJvm;
         }
 

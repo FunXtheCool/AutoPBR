@@ -83,7 +83,9 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return false;
         }
 
-        localTexel = EntityParityTemplate.PartPose(tx, ty, tz, rx, ry, rz, order);
+        localTexel = ApplyPoseScale(
+            EntityParityTemplate.PartPose(tx, ty, tz, rx, ry, rz, order),
+            ReadUniformPoseScale(pose));
         return true;
     }
 
@@ -121,7 +123,9 @@ internal sealed partial class CleanRoomEntityModelRuntime
         }
 
         _ = order;
-        localBlock = EntityParityTemplate.ModelPartRenderLocalBlock(tx, ty, tz, rx, ry, rz);
+        localBlock = ApplyPoseScale(
+            EntityParityTemplate.ModelPartRenderLocalBlock(tx, ty, tz, rx, ry, rz),
+            ReadUniformPoseScale(pose));
         return true;
     }
 
@@ -156,14 +160,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             partId.Contains("horn", StringComparison.OrdinalIgnoreCase) &&
             PoseHasNonZeroRotation(pose))
         {
-            if (!TryComposePartPoseOffsetAndRotationLocalTexel(pose, out var localPartPose, out failureReason))
-            {
-                matrix = Matrix4x4.Identity;
-                return false;
-            }
-
-            matrix = Matrix4x4.Multiply(parentWorld, localPartPose);
-            return true;
+            return TryComposeColumnPartPose(pose, parentWorld, out matrix, out failureReason);
         }
 
         if (EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose)
@@ -252,10 +249,24 @@ internal sealed partial class CleanRoomEntityModelRuntime
             return false;
         }
 
-        var local = EntityParityTemplate.PartPose(tx, ty, tz, rx, ry, rz, order);
+        var local = ApplyPoseScale(
+            EntityParityTemplate.PartPose(tx, ty, tz, rx, ry, rz, order),
+            ReadUniformPoseScale(pose));
         worldTexel = EntityParityTemplate.Child(parentWorldTexel, local);
         return true;
     }
+
+    private static Matrix4x4 ApplyPoseScale(Matrix4x4 localPose, float uniformScale) =>
+        MathF.Abs(uniformScale - 1f) <= PoseEpsilon
+            ? localPose
+            : Matrix4x4.Multiply(Matrix4x4.CreateScale(uniformScale), localPose);
+
+    private static float ReadUniformPoseScale(JsonElement pose) =>
+        pose.ValueKind == JsonValueKind.Object &&
+        pose.TryGetProperty("uniformScale", out var scaleEl) &&
+        scaleEl.ValueKind == JsonValueKind.Number
+            ? (float)scaleEl.GetDouble()
+            : 1f;
 
     private static bool TryComposeLegacyPartPoseTexel(JsonElement pose, out Matrix4x4 matrix, out string? failureReason)
     {
@@ -269,7 +280,9 @@ internal sealed partial class CleanRoomEntityModelRuntime
 
         var translation = EntityParityTemplate.T(tx, ty, tz);
         var rotation = EntityParityTemplate.ComposeEuler(order, rx, ry, rz);
-        matrix = EntityParityTemplate.Mul(translation, rotation);
+        matrix = ApplyPoseScale(
+            EntityParityTemplate.Mul(translation, rotation),
+            ReadUniformPoseScale(pose));
         return true;
     }
     internal static Matrix4x4 BlockRowAffineToTexel(Matrix4x4 blockRow) =>
@@ -363,6 +376,11 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var y1 = (float)to[1].GetDouble();
         var z1 = (float)to[2].GetDouble();
 
+        // UV footprint follows lifted IR texOffs/uvSpan — not preview-only thicken or axolotl gill Z-expand.
+        var irLogicalW = (int)MathF.Round(MathF.Abs(x1 - x0));
+        var irLogicalH = (int)MathF.Round(MathF.Abs(y1 - y0));
+        var irLogicalD = (int)MathF.Round(MathF.Abs(z1 - z0));
+
         var inflate = GeometryIrCuboidMetadata.ApplyCubeDeformationInflateForEmit(
             cuboid, options, ref x0, ref y0, ref z0, ref x1, ref y1, ref z1);
 
@@ -375,18 +393,21 @@ internal sealed partial class CleanRoomEntityModelRuntime
         GeometryIrCuboidMetadata.TryGetFaceMask(cuboid, out var previewFaceMask);
         if (options.PreviewDegenerateAxisThickness > 0f)
         {
-            ApplyPreviewDegenerateAxisThicknessForFaceMask(
-                ref x0, ref y0, ref z0, ref x1, ref y1, ref z1,
-                options.PreviewDegenerateAxisThickness,
-                previewFaceMask);
+            if (IsDecoratedPotPreviewCompositeJvm(options.OfficialJvmName))
+            {
+                ApplyDecoratedPotPreviewSheetThickness(
+                    ref x0, ref y0, ref z0, ref x1, ref y1, ref z1,
+                    options.PreviewDegenerateAxisThickness,
+                    previewFaceMask);
+            }
+            else
+            {
+                ApplyPreviewDegenerateAxisThicknessForFaceMask(
+                    ref x0, ref y0, ref z0, ref x1, ref y1, ref z1,
+                    options.PreviewDegenerateAxisThickness,
+                    previewFaceMask);
+            }
         }
-
-        var invertYForJavaUv = GeometryIrEmitPolicy.TryReorientGhastFamilyTentacleCuboidYForModelSpace(
-            options.OfficialJvmName,
-            partId,
-            ref y0,
-            ref y1,
-            options.NormalizedAssetPath);
 
         var texU = uv[0].GetInt32();
         var texV = uv[1].GetInt32();
@@ -398,19 +419,16 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var hasUvSpan = GeometryIrCuboidMetadata.TryGetUvSpan(cuboid, out var spanW, out var spanH, out var spanD);
         if (hasUvSpan)
         {
-            var logicalW = (int)MathF.Round(MathF.Abs(x1 - x0));
-            var logicalH = (int)MathF.Round(MathF.Abs(y1 - y0));
-            var logicalD = (int)MathF.Round(MathF.Abs(z1 - z0));
             (uw, uh, var resolvedD) = GeometryIrUvAtlasQuality.ResolveTexCropUvFootprint(
                 cuboid,
                 texU,
                 texV,
                 spanW,
                 spanH,
-                spanD >= 0 ? spanD : logicalD,
-                logicalW,
-                logicalH,
-                logicalD);
+                spanD >= 0 ? spanD : irLogicalD,
+                irLogicalW,
+                irLogicalH,
+                irLogicalD);
             ud = resolvedD >= 0 ? resolvedD : -1;
         }
         else if (inflate != 0f)
@@ -433,9 +451,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
             }
         }
 
-        _ = GeometryIrEmitPolicy.TryApplyGhastFamilyCuboidUvFootprint(
-            options.OfficialJvmName, partId, y0, y1, ref uw, ref uh, ref ud, options.NormalizedAssetPath);
-
         string[]? faceMaskArray = null;
         if (GeometryIrCuboidMetadata.TryGetFaceMask(cuboid, out var faceMask))
         {
@@ -452,6 +467,41 @@ internal sealed partial class CleanRoomEntityModelRuntime
         {
             textureKey = partTexKey;
         }
+
+        if (faceMaskArray is { Length: > 0 })
+        {
+            if (IsNorthSouthFaceMaskOnly(faceMaskArray))
+            {
+                if (uw <= 0 && irLogicalW > 0)
+                {
+                    uw = irLogicalW;
+                }
+
+                if (uh <= 0 && irLogicalH > 0)
+                {
+                    uh = irLogicalH;
+                }
+
+                ud = 0;
+            }
+            else if (IsUpDownFaceMaskOnly(faceMaskArray))
+            {
+                if (uw <= 0 && irLogicalW > 0)
+                {
+                    uw = irLogicalW;
+                }
+
+                uh = 0;
+                if (ud <= 0 && irLogicalD > 0)
+                {
+                    ud = irLogicalD;
+                }
+            }
+        }
+
+        // ModelPart.Cube (26.1.2 javap) always lays out north/south with the standard cube cross-unfold at d=0;
+        // inferred lift uvSpan footprints must not switch to texCrop opposite-face gap layout.
+        var texCropNorthSouthFaceUv = false;
 
         var cuboidRx = 0f;
         var cuboidRy = 0f;
@@ -485,97 +535,12 @@ internal sealed partial class CleanRoomEntityModelRuntime
             YRot: cuboidRy,
             ZRot: cuboidRz,
             FaceMask: faceMaskArray,
-            TextureKey: textureKey,
-            InvertYForJavaUv: invertYForJavaUv)
+            TextureKey: textureKey)
         {
-            RotationPivot = rotationPivot
+            RotationPivot = rotationPivot,
+            TexCropNorthSouthFaceUv = texCropNorthSouthFaceUv,
         };
         return true;
-    }
-
-    private static void ApplyPreviewDegenerateAxisThickness(
-        ref float x0, ref float y0, ref float z0,
-        ref float x1, ref float y1, ref float z1,
-        float thickness)
-    {
-        ExpandAxisIfDegenerate(ref x0, ref x1, thickness);
-        ExpandAxisIfDegenerate(ref y0, ref y1, thickness);
-        ExpandAxisIfDegenerate(ref z0, ref z1, thickness);
-    }
-
-    /// <summary>
-    /// Preview thicken only the sheet normal axis (bee legs = Z on north/south masks; wings = Y on up/down masks).
-    /// </summary>
-    private static void ApplyPreviewDegenerateAxisThicknessForFaceMask(
-        ref float x0, ref float y0, ref float z0,
-        ref float x1, ref float y1, ref float z1,
-        float thickness,
-        string[]? faceMask)
-    {
-        if (faceMask is { Length: > 0 } && IsNorthSouthFaceMaskOnly(faceMask))
-        {
-            ExpandAxisIfDegenerate(ref z0, ref z1, thickness);
-            return;
-        }
-
-        if (faceMask is { Length: > 0 } && IsUpDownFaceMaskOnly(faceMask))
-        {
-            ExpandAxisIfDegenerate(ref y0, ref y1, thickness);
-            return;
-        }
-
-        ApplyPreviewDegenerateAxisThickness(ref x0, ref y0, ref z0, ref x1, ref y1, ref z1, thickness);
-    }
-
-    private static bool IsNorthSouthFaceMaskOnly(string[] faceMask)
-    {
-        if (faceMask.Length == 0)
-        {
-            return false;
-        }
-
-        foreach (var face in faceMask)
-        {
-            if (!face.Equals("north", StringComparison.OrdinalIgnoreCase) &&
-                !face.Equals("south", StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static bool IsUpDownFaceMaskOnly(string[] faceMask)
-    {
-        if (faceMask.Length == 0)
-        {
-            return false;
-        }
-
-        foreach (var face in faceMask)
-        {
-            if (!face.Equals("up", StringComparison.OrdinalIgnoreCase) &&
-                !face.Equals("down", StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static void ExpandAxisIfDegenerate(ref float a0, ref float a1, float thickness)
-    {
-        if (MathF.Abs(a1 - a0) >= PoseEpsilon)
-        {
-            return;
-        }
-
-        var mid = (a0 + a1) * 0.5f;
-        // Zero-thickness IR axis → visible preview sheet (span 2×thickness centered on lifted coordinate).
-        a0 = mid - thickness;
-        a1 = mid + thickness;
     }
 
     private static bool TryBuildMeshFromGeometryIr(
