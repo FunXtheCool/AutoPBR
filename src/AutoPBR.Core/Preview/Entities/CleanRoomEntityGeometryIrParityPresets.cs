@@ -49,8 +49,11 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 ResolvePartScale = partId => useUniformBabyRootScale
                     ? 1f
                     : ResolveDefaultPartScale(partId, p) * geometryScale,
-                PreviewApplyCubeDeformationInflate = applyGeometryIrSetupAnimMotion &&
-                    (Math.Abs(animationTimeSeconds) > 1e-6f || Math.Abs(wave) > 1e-6f),
+                // Parity-catalog preview is viewport-stable by default: exact parity helpers keep zero
+                // thickness/inflate off, but the app preview must not render coplanar sheet faces or
+                // ignored static CubeDeformation boxes on top of each other.
+                PreviewDegenerateAxisThickness = 0.06f,
+                PreviewApplyCubeDeformationInflate = true,
             };
 
             if (string.Equals(builderMethod, "EquipmentHumanoidLeggings", StringComparison.OrdinalIgnoreCase))
@@ -66,19 +69,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 return opts with
                 {
                     TryGetPartPoseOverride = (partId, world) => ApplyEquinePreviewPoseOverride(partId, world, neckBend, wave)
-                };
-            }
-
-            // Vanilla axolotl legs/fins/gills use zero-thickness faceMask sheets. Gill Z depth is restored via
-            // TryExpandAxolotlGillCuboidZExtents; preview thicken matches bee/chicken/creaking (thin solid, not ±1 gap).
-            if (string.Equals(builderMethod, "Axolotl", StringComparison.OrdinalIgnoreCase))
-            {
-                // CubeDeformation(0.001) is static model geometry, not animation-driven; bind and anim
-                // catalog emits must agree so GPU skinning matches CPU rebake at non-zero clocks.
-                return opts with
-                {
-                    PreviewDegenerateAxisThickness = 0.06f,
-                    PreviewApplyCubeDeformationInflate = true,
                 };
             }
 
@@ -100,35 +90,6 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 string.Equals(builderMethod, "BabyCamel", StringComparison.OrdinalIgnoreCase))
             {
                 return opts with { PreviewDegenerateAxisThickness = 0.08f };
-            }
-
-            // Creaking head side panels and leg foot disks are texCrop zero-thickness sheets; thin preview
-            // thicken only (same as bee legs) so north/south and up/down faces stay coplanar like Java.
-            if (string.Equals(builderMethod, "Creaking", StringComparison.OrdinalIgnoreCase))
-            {
-                return opts with { PreviewDegenerateAxisThickness = 0.06f };
-            }
-
-            // Bee legs are north/south zero-thickness sheets; hand BuildBee uses ~0.12f Z depth for preview.
-            if (string.Equals(builderMethod, "Bee", StringComparison.OrdinalIgnoreCase))
-            {
-                return opts with { PreviewDegenerateAxisThickness = 0.06f };
-            }
-
-            // Bat and allay wings are zero-thickness faceMask sheets in the runtime geometry IR.
-            // Give them the same thin preview solid treatment as bee/chicken sheets so the two
-            // opposing faces do not fight inside one draw batch.
-            if (string.Equals(builderMethod, "Bat", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(builderMethod, "Allay", StringComparison.OrdinalIgnoreCase))
-            {
-                return opts with { PreviewDegenerateAxisThickness = 0.06f };
-            }
-
-            // Chicken wings are north/south and up/down faceMask sheets; match bee/creaking preview thicken.
-            if (string.Equals(builderMethod, "Chicken", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(builderMethod, "Flying", StringComparison.OrdinalIgnoreCase))
-            {
-                return opts with { PreviewDegenerateAxisThickness = 0.06f };
             }
 
             if (string.Equals(builderMethod, "DecoratedPotEntity", StringComparison.OrdinalIgnoreCase))

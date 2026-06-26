@@ -269,6 +269,25 @@ public sealed class BabyFaceMaskUvRoutingTests
         Assert.All(sheets, e => Assert.InRange(AxisSpan(e, axis: 0), 0.08f, 0.15f));
     }
 
+    [Fact]
+    public void Allay_runtime_body_applies_static_negative_cube_deformation()
+    {
+        const string texturePath = "assets/minecraft/textures/entity/allay/allay.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(texturePath, Profile26, 0f, 0f, out var merged, out _));
+
+        var bodyBase = merged.Elements.Single(e =>
+            AxisSpan(e, axis: 0) is > 2.95f and < 3.05f &&
+            AxisSpan(e, axis: 1) is > 3.95f and < 4.05f &&
+            AxisSpan(e, axis: 2) is > 1.95f and < 2.05f);
+        var bodyDeformed = merged.Elements.Single(e =>
+            AxisSpan(e, axis: 0) is > 2.55f and < 2.75f &&
+            AxisSpan(e, axis: 1) is > 4.55f and < 4.85f &&
+            AxisSpan(e, axis: 2) is > 1.55f and < 1.75f);
+
+        Assert.False(CuboidCornersMatch(bodyBase, bodyDeformed));
+    }
+
     private static void AssertLocalAxisSpan(
         string cuboidJson,
         GeometryIrMeshEmitOptions options,
@@ -310,6 +329,20 @@ public sealed class BabyFaceMaskUvRoutingTests
         foreach (var faceName in faceNames)
         {
             if (!element.Faces.ContainsKey(faceName))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool CuboidCornersMatch(ModelElement a, ModelElement b)
+    {
+        for (var axis = 0; axis < 3; axis++)
+        {
+            if (MathF.Abs(a.From[axis] - b.From[axis]) > 0.001f ||
+                MathF.Abs(a.To[axis] - b.To[axis]) > 0.001f)
             {
                 return false;
             }

@@ -126,8 +126,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var irLogicalH = (int)MathF.Round(MathF.Abs(tableCuboid.Y1 - tableCuboid.Y0));
         var irLogicalD = (int)MathF.Round(MathF.Abs(tableCuboid.Z1 - tableCuboid.Z0));
 
-        var inflate = GeometryIrCuboidMetadata.ApplyCubeDeformationInflateIfNonParity(
-            cuboidEl, options.Fidelity, ref x0, ref y0, ref z0, ref x1, ref y1, ref z1);
+        var inflate = GeometryIrCuboidMetadata.ApplyCubeDeformationInflateForEmit(
+            cuboidEl, options, ref x0, ref y0, ref z0, ref x1, ref y1, ref z1);
 
         if (options.PreviewDegenerateAxisThickness > 0f)
         {
