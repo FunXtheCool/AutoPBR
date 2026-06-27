@@ -74,7 +74,8 @@ internal static class GeometryIrParityEquipmentJvmMap
 
         if (path.Contains("/textures/entity/equipment/wolf_body/", StringComparison.OrdinalIgnoreCase))
         {
-            officialJvm = "net.minecraft.client.model.animal.wolf.WolfModel";
+            // 26.1.2 mesh host is AdultWolfModel; WolfModel is a non-mesh interface (skipped shard).
+            officialJvm = "net.minecraft.client.model.animal.wolf.AdultWolfModel";
             return true;
         }
 

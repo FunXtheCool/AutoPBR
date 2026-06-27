@@ -16,6 +16,13 @@ internal static class ArchivePathSafety
         }
 
         var normalizedArchivePath = archivePath.Replace('\\', '/');
+        if (normalizedArchivePath.Length >= 2 &&
+            char.IsAsciiLetter(normalizedArchivePath[0]) &&
+            normalizedArchivePath[1] == ':')
+        {
+            return false;
+        }
+
         if (normalizedArchivePath.Length > 0 && normalizedArchivePath[0] == '/')
         {
             return false;
