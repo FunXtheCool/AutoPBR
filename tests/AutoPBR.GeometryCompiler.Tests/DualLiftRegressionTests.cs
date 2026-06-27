@@ -1,11 +1,11 @@
-
-
+using AutoPBR.Tests.TestSupport;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
 /// <summary>
 /// Ensures bytecode disassembly lift stays aligned with javap reference lift on real client.jar models.
 /// </summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class DualLiftRegressionTests
 {
     private static readonly (string Jvm, string Method)[] PilotModels =

@@ -1,9 +1,11 @@
+using AutoPBR.Tests.TestSupport;
+using System.Text.Json;
 using System.Text.Json.Nodes;
-
-using AutoPBR.Core.Preview;
+using System.Text.Json.Nodes;  using AutoPBR.Core.Preview;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class DonkeyMeshTransformerLiftTests
 {
     private const string DonkeyJvm = "net.minecraft.client.model.animal.equine.DonkeyModel";

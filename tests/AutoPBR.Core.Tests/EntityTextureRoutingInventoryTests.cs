@@ -1,14 +1,14 @@
+using AutoPBR.Tests.TestSupport;
 using System.IO.Compression;
-
 
 namespace AutoPBR.Core.Tests;
 
 /// <summary>
 /// Inventory against pinned <c>tools/minecraft-parity/&lt;version&gt;/client.jar</c>.
 /// When the jar is not present (typical CI or shallow checkouts), tests exit without asserting.
-/// Filter with <c>-notrait "Category=MinecraftClientJar"</c> to skip in environments without the jar.
+/// Excluded from default CI via <c>tests/ci.runsettings</c> (<see cref="GeometryIrTestTierSupport.MinecraftClientJarCategory"/> trait).
 /// </summary>
-[Trait("Category", "MinecraftClientJar")]
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class EntityTextureRoutingInventoryTests
 {
     private static string? FindClientJar(string versionFolder)

@@ -78,7 +78,7 @@ $env:AUTOPBR_RUN_ASSEMBLY_VIEWPORT_PROBES = "1"
 dotnet test tests/AutoPBR.Core.Tests --filter "FullyQualifiedName~GeometryIrAssemblyViewportSanityTests.T2"
 ```
 
-Filter xUnit by trait (optional): `Category=Diagnostic`.
+Filter xUnit by trait (optional): `Category=Diagnostic`. CI excludes jar-lift tests via `tests/ci.runsettings` (`Category!=MinecraftClientJar`); tag new jar tests with `[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]`.
 
 ## Shared helpers
 

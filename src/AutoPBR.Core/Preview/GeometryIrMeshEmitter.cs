@@ -530,7 +530,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             x0, y0, z0, x1, y1, z1,
             texU, texV,
             uw, uh, ud,
-            mirror,
+            MirrorUv: mirror,
             XRot: cuboidRx,
             YRot: cuboidRy,
             ZRot: cuboidRz,

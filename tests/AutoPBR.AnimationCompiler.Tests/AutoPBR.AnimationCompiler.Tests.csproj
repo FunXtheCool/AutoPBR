@@ -94,6 +94,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\Shared\GeometryIrTestTierSupport.cs" Link="Shared\GeometryIrTestTierSupport.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 

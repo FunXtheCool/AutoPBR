@@ -1,13 +1,18 @@
-
+using AutoPBR.Tests.TestSupport;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class StaticIntMatrixExtractorTests
 {
     [Fact]
     public void SilverfishModel_clinit_exposes_body_tables()
     {
-        var jar = ResolveClientJar();
+        if (ResolveClientJar() is not { } jar)
+        {
+            return;
+        }
+
         var bytes = ReadClassBytes(jar, "net/minecraft/client/model/monster/silverfish/SilverfishModel");
         var matrices = JvmStaticIntMatrixExtractor.ExtractFromClass(bytes);
         Assert.True(matrices.TryGetValue("BODY_SIZES", out var sizes));
@@ -47,11 +52,8 @@ public sealed class StaticIntMatrixExtractorTests
         return bytes;
     }
 
-    private static string ResolveClientJar()
-    {
-        var root = FindRepoRoot();
-        return Path.Combine(root, "tools", "minecraft-parity", "26.1.2", "client.jar");
-    }
+    private static string? ResolveClientJar() =>
+        GeometryIrTestTierSupport.TryClientJarPath(FindRepoRoot());
 
     private static string FindRepoRoot()
     {

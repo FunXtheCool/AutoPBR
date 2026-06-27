@@ -3,6 +3,7 @@ using System.Text.Json.Nodes;
 
 using AutoPBR.Tools.AnimationCompiler;
 using AutoPBR.Tools.GeometryCompiler;
+using AutoPBR.Tests.TestSupport;
 
 using GeometryJavapLocator = AutoPBR.Tools.GeometryCompiler.JavapLocator;
 
@@ -13,6 +14,7 @@ namespace AutoPBR.AnimationCompiler.Tests;
 /// <summary>
 /// Phase 10: live obfuscated <c>javap -c</c> lift (ProGuard mappings + normalizer) must match committed 1.21.11 animation IR.
 /// </summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class Phase10ObfuscatedAnimationJarLiftReconciliationTests(ITestOutputHelper output)
 {
     private static readonly JsonSerializerOptions CanonicalJson = new() { WriteIndented = false };

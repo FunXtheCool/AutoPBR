@@ -1,7 +1,9 @@
+using AutoPBR.Tests.TestSupport;
 using System.Text.Json.Nodes;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class NautilusBabyBodyLayerLiftTests
 {
     [Fact]
@@ -41,13 +43,8 @@ public sealed class NautilusBabyBodyLayerLiftTests
         Assert.Equal(64, shard["textureHeight"]!.GetValue<int>());
     }
 
-    private static string ResolveClientJar()
-    {
-        var root = Program.FindRepoRoot();
-        var jar = Path.Combine(root, "tools", "minecraft-parity", "26.1.2", "client.jar");
-        Assert.True(File.Exists(jar), $"Missing client.jar at {jar}");
-        return jar;
-    }
+    private static string? ResolveClientJar() =>
+        GeometryIrTestTierSupport.TryClientJarPath(Program.FindRepoRoot());
 
     private static JsonObject? FindPartById(JsonArray parts, string id)
     {

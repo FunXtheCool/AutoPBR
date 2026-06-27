@@ -1,6 +1,6 @@
+using AutoPBR.Tests.TestSupport;
 using System.Text.Json.Nodes;
-
-
+using System.Text.Json.Nodes;   using Xunit.Abstractions;
 using Xunit.Abstractions;
 
 namespace AutoPBR.GeometryCompiler.Tests;
@@ -8,6 +8,7 @@ namespace AutoPBR.GeometryCompiler.Tests;
 /// <summary>
 /// Phase 8: live obfuscated jar lift (ProGuard mappings) must match committed 1.21.11 geometry IR roots.
 /// </summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class Phase8ObfuscatedJarLiftReconciliationTests(ITestOutputHelper output)
 {
     [Theory]

@@ -1,11 +1,13 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using AutoPBR.Tests.TestSupport;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
 /// <summary>
 /// T3: clusters 1.21.11 partial index rows by extractionNotes for lift backlog triage.
 /// </summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class GeometryIr12111PartialClusterTests
 {
     private static readonly JsonSerializerOptions ClusterJsonOptions = new() { WriteIndented = true };

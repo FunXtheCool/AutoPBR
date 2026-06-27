@@ -1,9 +1,11 @@
 using System.Text.Json.Nodes;
 
+using AutoPBR.Tests.TestSupport;
 using AutoPBR.Tools.AnimationCompiler;
 
 namespace AutoPBR.AnimationCompiler.Tests;
 
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class SetupAnimLiftTests
 {
     private static string ClientJarPath =>
@@ -390,11 +392,15 @@ public sealed class SetupAnimLiftTests
             return File.ReadAllText(cachePath);
         }
 
-        Assert.True(File.Exists(ClientJarPath), $"client.jar not found at {ClientJarPath}");
+        var jar = GeometryIrTestTierSupport.TryClientJarPath(GeometryIrTestTierSupport.FindRepoRoot());
+        if (jar is null)
+        {
+            return string.Empty;
+        }
 
         var javap = JavapLocator.FindJavap();
         Assert.False(string.IsNullOrWhiteSpace(javap), "javap not found on PATH");
-        Assert.True(JavapRunner.TryDisassemble(javap, ClientJarPath, officialJvmName, out var disasm, out var err), err ?? "javap failed");
+        Assert.True(JavapRunner.TryDisassemble(javap, jar, officialJvmName, out var disasm, out var err), err ?? "javap failed");
         var cacheDir = Path.GetDirectoryName(cachePath);
         if (!string.IsNullOrEmpty(cacheDir))
         {

@@ -241,7 +241,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             textureKey = tk;
         }
 
-        return new EntityCuboid(x0, y0, z0, x1, y1, z1, texU, texV, uw, uh, ud, mirror,
+        return new EntityCuboid(x0, y0, z0, x1, y1, z1, texU, texV, uw, uh, ud, MirrorUv: mirror,
             FaceMask: faceMask, TextureKey: textureKey)
         {
             TexCropNorthSouthFaceUv = texCropNorthSouthFaceUv,

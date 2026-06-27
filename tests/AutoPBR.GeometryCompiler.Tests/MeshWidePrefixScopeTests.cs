@@ -1,11 +1,13 @@
+using AutoPBR.Tests.TestSupport;
 using System.Text.Json.Nodes;
-using AutoPBR.Tools.GeometryCompiler;
+using System.Text.Json.Nodes; using AutoPBR.Tools.GeometryCompiler;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
 /// <summary>
 /// Mesh-wide int/float maps must not use constants from later islands when lifting delegated createMesh.
 /// </summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class MeshWidePrefixScopeTests
 {
     private static string? ClientJar =>

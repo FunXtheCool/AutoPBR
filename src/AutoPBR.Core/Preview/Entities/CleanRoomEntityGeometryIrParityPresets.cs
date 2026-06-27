@@ -77,6 +77,13 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 return opts with { PreviewDegenerateAxisThickness = 1f };
             }
 
+            if (string.Equals(builderMethod, "HangingSignEntity", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(builderMethod, "StandingSignEntity", StringComparison.OrdinalIgnoreCase))
+            {
+                // Zero-depth north/south billboard sheets must stay coplanar with hand-built CleanRoom parity.
+                return opts with { PreviewDegenerateAxisThickness = 0f };
+            }
+
             if (string.Equals(builderMethod, "ConduitEntity", StringComparison.OrdinalIgnoreCase))
             {
                 var centered = opts with { RootTransform = Matrix4x4.CreateTranslation(8f, 8f, 8f) };

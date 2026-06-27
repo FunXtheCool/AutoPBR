@@ -1,12 +1,14 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using AutoPBR.Core.Preview;
+using AutoPBR.Tests.TestSupport;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
 /// <summary>
 /// Javap-strength lift locks for monster and happy ghast body/tentacle factories.
 /// </summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class GhastFamilyLiftTests
 {
     private const string MonsterJvm = "net.minecraft.client.model.monster.ghast.GhastModel";

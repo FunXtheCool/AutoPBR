@@ -1,3 +1,4 @@
+using AutoPBR.Tests.TestSupport;
 using System.Text.Json;
 
 namespace AutoPBR.Tests.TestSupport;
@@ -8,6 +9,12 @@ namespace AutoPBR.Tests.TestSupport;
 public static class GeometryIrTestTierSupport
 {
     public const string DiagnosticCategory = "Diagnostic";
+
+    /// <summary>xUnit trait value for tests that require a local Mojang <c>client.jar</c> (gitignored).</summary>
+    public const string MinecraftClientJarCategory = "MinecraftClientJar";
+
+    /// <summary>xUnit trait name paired with <see cref="MinecraftClientJarCategory"/>.</summary>
+    public const string MinecraftClientJarTraitName = "Category";
 
     /// <summary>Version label for mob-family T1 pilots (geometry_ir_mob_family_pilot_jvm.txt).</summary>
     public const string MobFamilyPilotVersionLabel = "26.1.2";
@@ -80,6 +87,10 @@ public static class GeometryIrTestTierSupport
 
     public static bool IsClientJarPresent(string repoRoot, string versionLabel = MobFamilyPilotVersionLabel) =>
         File.Exists(ClientJarPath(repoRoot, versionLabel));
+
+    /// <summary>Returns null when the pinned jar is absent (typical CI).</summary>
+    public static string? TryClientJarPath(string repoRoot, string versionLabel = MobFamilyPilotVersionLabel) =>
+        IsClientJarPresent(repoRoot, versionLabel) ? ClientJarPath(repoRoot, versionLabel) : null;
 
     public static (int W, int H) ResolveParityAtlasSize(string officialJvmName, JsonElement? geometryRoot = null)
     {

@@ -7,8 +7,6 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests(ITestOutputHelper? ou
     private static readonly HashSet<string> KnownCleanRoomCatalogPaths =
     [
         "assets/minecraft/textures/entity/chicken/chicken_warm.png",
-        "assets/minecraft/textures/entity/equipment/wolf_body/armadillo_scute.png",
-        "assets/minecraft/textures/entity/equipment/wolf_body/armadillo_scute_overlay.png",
     ];
 
     private static readonly MinecraftNativeProfile Profile26 =

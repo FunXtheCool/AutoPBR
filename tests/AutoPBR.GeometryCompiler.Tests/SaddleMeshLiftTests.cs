@@ -1,7 +1,10 @@
+using AutoPBR.Tests.TestSupport;
 using AutoPBR.Tools.GeometryCompiler;
+using System.Text.Json.Nodes;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class SaddleMeshLiftTests
 {
     [Theory]

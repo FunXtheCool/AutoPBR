@@ -1,5 +1,6 @@
+using AutoPBR.Tests.TestSupport;
 using System.Text.Json.Nodes;
-using AutoPBR.Tools.GeometryCompiler;
+using System.Text.Json.Nodes; using AutoPBR.Tools.GeometryCompiler;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
@@ -7,6 +8,7 @@ namespace AutoPBR.GeometryCompiler.Tests;
 /// <c>HumanoidModel</c> / <c>PlayerModel</c> wide <c>createMesh</c> must lift without the
 /// <c>clearRecursively</c> post-pass stripping in-factory shell clears.
 /// </summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class HumanoidPlayerMeshLiftTests
 {
     private static readonly (string Jvm, string Method)[] Cases =

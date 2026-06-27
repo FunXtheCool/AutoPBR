@@ -1,8 +1,11 @@
+using AutoPBR.Tests.TestSupport;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
 /// <summary>T0 jar lifts for index partial backlog (26.1.2).</summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class PartialBacklogLiftTests
 {
     private static readonly string[] PartialBacklogJvmNames =
@@ -73,12 +76,8 @@ public sealed class PartialBacklogLiftTests
     public static IEnumerable<object[]> PartialBacklogCases() =>
         PartialBacklogJvmNames.Select(j => new object[] { j });
 
-    private static string ResolveClientJar()
-    {
-        var path = Path.Combine(FindRepoRoot(), "tools", "minecraft-parity", "26.1.2", "client.jar");
-        Assert.True(File.Exists(path), $"Missing client.jar at {path}");
-        return path;
-    }
+    private static string? ResolveClientJar() =>
+        GeometryIrTestTierSupport.TryClientJarPath(FindRepoRoot());
 
     private static string FindRepoRoot()
     {

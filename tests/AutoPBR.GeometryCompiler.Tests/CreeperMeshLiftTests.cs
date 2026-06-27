@@ -1,11 +1,13 @@
+using AutoPBR.Tests.TestSupport;
 using System.Text.Json.Nodes;
-using AutoPBR.Tools.GeometryCompiler;
+using System.Text.Json.Nodes; using AutoPBR.Tools.GeometryCompiler;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
 /// <summary>
 /// Agent 1A: creeper-like factories must recover <c>PartDefinition.addOrReplaceChild</c> bindings from bytecode concat.
 /// </summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class CreeperMeshLiftTests
 {
     private const string CreeperJvm = "net.minecraft.client.model.monster.creeper.CreeperModel";

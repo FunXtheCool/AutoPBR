@@ -274,6 +274,7 @@ internal static class PreviewDepthLayerResolver
             LayerOrdinal = layerOrdinal,
             CastsShadow = castsShadow,
             ShellInflateTexels = element.ShellInflateTexels,
+            MirrorCuboidUv = element.MirrorCuboidUv,
         };
 
     private static bool TryInferFromFaceTextureKeys(

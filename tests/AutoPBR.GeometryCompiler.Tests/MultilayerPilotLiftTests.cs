@@ -1,7 +1,9 @@
+using AutoPBR.Tests.TestSupport;
 using System.Text.Json.Nodes;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class MultilayerPilotLiftTests
 {
     private static readonly string[] MultilayerJvmNames =
@@ -44,13 +46,8 @@ public sealed class MultilayerPilotLiftTests
     public static IEnumerable<object[]> MultilayerCases() =>
         MultilayerJvmNames.Select(j => new object[] { j });
 
-    private static string ResolveClientJar()
-    {
-        var root = FindRepoRoot();
-        var path = Path.Combine(root, "tools", "minecraft-parity", "26.1.2", "client.jar");
-        Assert.True(File.Exists(path), $"Missing client.jar at {path}");
-        return path;
-    }
+    private static string? ResolveClientJar() =>
+        GeometryIrTestTierSupport.TryClientJarPath(FindRepoRoot());
 
     private static string FindRepoRoot()
     {

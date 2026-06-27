@@ -1,14 +1,14 @@
-using System.Text.Json.Nodes;
-
+using AutoPBR.Tests.TestSupport;
 using AutoPBR.Tools.GeometryCompiler;
-
-using Xunit;
+using System.Text.Json.Nodes;
+using System.Text.Json.Nodes;  using AutoPBR.Tools.GeometryCompiler;  using Xunit;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
 /// <summary>
 /// Cow <c>createBodyLayer</c> delegates to <c>createBaseCowModel</c>; concat must not duplicate factories or merge wrong islands.
 /// </summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class CowDelegatedMeshLiftTests
 {
     private const string CowFqn = "net.minecraft.client.model.animal.cow.CowModel";

@@ -1,7 +1,8 @@
-
+using AutoPBR.Tests.TestSupport;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class MatrixLiftDebugTests
 {
     [Fact]

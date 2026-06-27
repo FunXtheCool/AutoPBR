@@ -1,7 +1,9 @@
-
+using AutoPBR.Tests.TestSupport;
+using System.Text.Json.Nodes;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class PigMultiAddBoxLiftTests
 {
     [Fact]

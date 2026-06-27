@@ -1,8 +1,10 @@
+using AutoPBR.Tests.TestSupport;
 using System.Text.Json.Nodes;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
 /// <summary>Diagnose and lock lift for models that were stuck as index partial placeholders.</summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class PartialModelLiftDiagnosticsTests
 {
     private static readonly string[] FormerPlaceholderModels =
@@ -214,13 +216,8 @@ public sealed class PartialModelLiftDiagnosticsTests
     public static IEnumerable<object[]> FormerPlaceholderModelNames() =>
         FormerPlaceholderModels.Select(m => new object[] { m });
 
-    private static string ResolveClientJar()
-    {
-        var root = FindRepoRoot();
-        var path = Path.Combine(root, "tools", "minecraft-parity", "26.1.2", "client.jar");
-        Assert.True(File.Exists(path), $"Missing client.jar at {path}");
-        return path;
-    }
+    private static string? ResolveClientJar() =>
+        GeometryIrTestTierSupport.TryClientJarPath(FindRepoRoot());
 
     private static string FindRepoRoot()
     {

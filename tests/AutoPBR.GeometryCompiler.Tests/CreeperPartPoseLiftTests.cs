@@ -1,3 +1,4 @@
+using AutoPBR.Tests.TestSupport;
 using System.Text.Json.Nodes;
 
 namespace AutoPBR.GeometryCompiler.Tests;
@@ -6,6 +7,7 @@ namespace AutoPBR.GeometryCompiler.Tests;
 /// Agent 1B: <c>PartPose.offsetAndRotation</c> and reused <c>CubeListBuilder</c> leg binds (creeper / quadruped pattern).
 /// Hand-parity targets from <c>CleanRoomEntityMonsters.BuildCreeper</c> (1.21.11); 26.1.2 jar uses <c>PartPose.offset</c> only per javap snapshot.
 /// </summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class CreeperPartPoseLiftTests
 {
     private const string CreeperJvm = "net.minecraft.client.model.monster.creeper.CreeperModel";

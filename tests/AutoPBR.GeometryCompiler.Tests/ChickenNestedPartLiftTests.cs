@@ -1,12 +1,12 @@
+using AutoPBR.Tests.TestSupport;
 using System.Text.Json.Nodes;
-
-
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
 /// <summary>
 /// Regression: nested <c>PartDefinition.addOrReplaceChild</c> (head → beak) must lift for non-piglin models too.
 /// </summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class ChickenNestedPartLiftTests
 {
     /// <summary>Subset of <c>AdultChickenModel.createBaseChickenModel</c> javap from 26.1.2 named client.jar.</summary>

@@ -1,7 +1,9 @@
+using AutoPBR.Tests.TestSupport;
 using AutoPBR.Tools.GeometryCompiler;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class BabyWolfAtlasLiftTests
 {
     private const string Jvm = "net.minecraft.client.model.animal.wolf.BabyWolfModel";
@@ -9,8 +11,11 @@ public sealed class BabyWolfAtlasLiftTests
     [Fact]
     public void Lifted_BabyWolfModel_documents_32x32_atlas_from_createBodyLayer()
     {
-        var jar = Path.Combine(Program.FindRepoRoot(), "tools", "minecraft-parity", "26.1.2", "client.jar");
-        Assert.True(File.Exists(jar), $"Missing client.jar at {jar}");
+        var jar = GeometryIrTestTierSupport.TryClientJarPath(Program.FindRepoRoot());
+        if (jar is null)
+        {
+            return;
+        }
 
         Assert.True(
             GeometryLiftPipeline.TryLiftWithJavapFallback(

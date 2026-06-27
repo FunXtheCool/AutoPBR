@@ -1,9 +1,11 @@
+using AutoPBR.Tests.TestSupport;
 using System.Text.Json.Nodes;
-using AutoPBR.Tools.GeometryCompiler;
+using System.Text.Json.Nodes; using AutoPBR.Tools.GeometryCompiler;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
 /// <summary>Wave 7 partial drain — promoted lifts, tree repair, and honest skip policy.</summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class Wave7PartialDrainTests
 {
     private static string? ClientJar =>

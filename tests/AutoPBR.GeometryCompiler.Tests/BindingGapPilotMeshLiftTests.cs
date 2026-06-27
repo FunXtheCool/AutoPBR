@@ -1,5 +1,7 @@
-using System.Text.Json.Nodes;
+using AutoPBR.Tests.TestSupport;
 using AutoPBR.Tools.GeometryCompiler;
+using System.Text.Json.Nodes;
+using System.Text.Json.Nodes; using AutoPBR.Tools.GeometryCompiler;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
@@ -7,6 +9,7 @@ namespace AutoPBR.GeometryCompiler.Tests;
 /// Agent 1A binding_gap pilots: entry factories with 0 bind lines must deep-concat host mesh
 /// (<c>createBodyMesh</c>, <c>createBabyMesh</c>, saddle layers) and recover honest part trees.
 /// </summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed partial class BindingGapPilotMeshLiftTests
 {
     public static TheoryData<string, string, string?, string, int> BindingGapPilotCases { get; } = new()

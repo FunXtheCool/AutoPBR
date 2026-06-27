@@ -1,9 +1,11 @@
+using AutoPBR.Tests.TestSupport;
 using System.Text.Json.Nodes;
-using AutoPBR.Tools.GeometryCompiler;
+using System.Text.Json.Nodes; using AutoPBR.Tools.GeometryCompiler;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
 /// <summary>Phase 1A T0: pilots whose javap nests parts (e.g. head → beak, body → legs), not flat quadruped siblings.</summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class NestedHierarchyMeshLiftTests
 {
     private const string AdultChickenJvm = "net.minecraft.client.model.animal.chicken.AdultChickenModel";

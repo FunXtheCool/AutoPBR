@@ -1,5 +1,6 @@
+using AutoPBR.Tests.TestSupport;
 using System.Text.Json.Nodes;
-using AutoPBR.Tools.GeometryCompiler;
+using System.Text.Json.Nodes; using AutoPBR.Tools.GeometryCompiler;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
@@ -7,6 +8,7 @@ namespace AutoPBR.GeometryCompiler.Tests;
 /// Humanoid <c>createMesh</c> delegation: deep concat must prepend the delegate island and must not re-append it last
 /// (which would let default arm/head cuboids override host <c>createBodyLayer</c> <c>addOrReplaceChild</c> overrides).
 /// </summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class HumanoidDelegatedMeshLiftTests
 {
     private static string? ClientJar =>

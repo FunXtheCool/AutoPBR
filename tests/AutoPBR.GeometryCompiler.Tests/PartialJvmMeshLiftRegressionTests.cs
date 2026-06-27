@@ -1,9 +1,11 @@
+using AutoPBR.Tests.TestSupport;
 using System.Text.Json.Nodes;
-using AutoPBR.Tools.GeometryCompiler;
+using System.Text.Json.Nodes; using AutoPBR.Tools.GeometryCompiler;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
 /// <summary>Regression locks for remaining partial JVMs (baby piglin, cape, zombie nautilus coral).</summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class PartialJvmMeshLiftRegressionTests
 {
     private static string? ClientJar =>

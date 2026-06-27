@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 
 using AutoPBR.Tools.AnimationCompiler;
+using AutoPBR.Tests.TestSupport;
 
 using Xunit.Abstractions;
 
@@ -10,6 +11,7 @@ namespace AutoPBR.AnimationCompiler.Tests;
 /// <summary>
 /// Phase 7: live <c>javap -c</c> lift from pinned client.jar must match committed animation IR structure.
 /// </summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class Phase7AnimationJarLiftReconciliationTests(ITestOutputHelper output)
 {
     private static readonly JsonSerializerOptions CanonicalJson = new() { WriteIndented = false };

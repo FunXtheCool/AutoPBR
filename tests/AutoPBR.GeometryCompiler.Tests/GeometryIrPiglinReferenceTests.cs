@@ -1,12 +1,15 @@
-using System.Text.Json.Nodes;
 using AutoPBR.Core.Preview;
-using AutoPBR.Tools.GeometryCompiler;
+using AutoPBR.Tests.TestSupport;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Nodes; using AutoPBR.Core.Preview; using AutoPBR.Tools.GeometryCompiler;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
 /// <summary>
 /// Piglin family (26.1.2): <c>AbstractPiglinModel.addHead</c> ears must lift and match Java reference bakes.
 /// </summary>
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class GeometryIrPiglinReferenceTests
 {
     private static readonly (string Jvm, int RefPartCount, bool StrictReference)[] PilotPiglins =

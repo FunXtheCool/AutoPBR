@@ -12,6 +12,7 @@ namespace AutoPBR.GeometryCompiler.Tests;
 /// T0 jar lift + T2 committed-shard probe for partial→ok promotion list (geometry_ir_partial_to_ok_promotion_jvm.txt).
 /// </summary>
 [Collection(nameof(GeometryLiftSerialDefinition))]
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class PartialToOkLiftTests(ITestOutputHelper output)
 {
     private static readonly string[] PromotionJvmNames =
@@ -425,13 +426,8 @@ public sealed class PartialToOkLiftTests(ITestOutputHelper output)
         return "createBodyLayer";
     }
 
-    private static string ResolveClientJar()
-    {
-        var root = FindRepoRoot();
-        var path = Path.Combine(root, "tools", "minecraft-parity", "26.1.2", "client.jar");
-        Assert.True(File.Exists(path), $"Missing client.jar at {path}");
-        return path;
-    }
+    private static string? ResolveClientJar() =>
+        GeometryIrTestTierSupport.TryClientJarPath(FindRepoRoot());
 
     private static string FindRepoRoot()
     {

@@ -1,10 +1,10 @@
+using AutoPBR.Tests.TestSupport;
 using System.Text.Json.Nodes;
-
-
 
 namespace AutoPBR.GeometryCompiler.Tests;
 
 [Collection(nameof(GeometryLiftSerialDefinition))]
+[Trait(GeometryIrTestTierSupport.MinecraftClientJarTraitName, GeometryIrTestTierSupport.MinecraftClientJarCategory)]
 public sealed class HeuristicStatusFixTests
 {
     private static readonly string[] FormerHeuristicModels =
@@ -164,13 +164,8 @@ public sealed class HeuristicStatusFixTests
         id.Length > prefix.Length &&
         id.AsSpan(prefix.Length).IndexOfAnyExcept("0123456789".AsSpan()) < 0;
 
-    private static string ResolveClientJar()
-    {
-        var root = FindRepoRoot();
-        var path = Path.Combine(root, "tools", "minecraft-parity", "26.1.2", "client.jar");
-        Assert.True(File.Exists(path), $"Missing client.jar at {path}");
-        return path;
-    }
+    private static string? ResolveClientJar() =>
+        GeometryIrTestTierSupport.TryClientJarPath(FindRepoRoot());
 
     private static string FindRepoRoot()
     {
