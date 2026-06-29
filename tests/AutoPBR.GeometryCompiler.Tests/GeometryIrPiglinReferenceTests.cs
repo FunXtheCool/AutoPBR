@@ -2,7 +2,6 @@ using AutoPBR.Core.Preview;
 using AutoPBR.Tests.TestSupport;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Text.Json.Nodes; using AutoPBR.Core.Preview; using AutoPBR.Tools.GeometryCompiler;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 

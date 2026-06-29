@@ -76,17 +76,54 @@ public sealed partial class OpenGlPreviewBackend
             return;
         }
 
-        var aspect = frame.Vw / (float)Math.Max(frame.Vh, 1);
-        var coneScale = Math.Max(frame.Settings.GodRayConeScale, 0.05f);
-        PreviewSunScreenProjection.Compute(frame.Eye, frame.LightDir, frame.View, frame.Proj, aspect, coneScale,
-            frame.Settings.AtmosphereSunDiscSize, out var sunUv, out var sunDiscRadiusUv, out _, out _);
-        PreviewSunScreenProjection.ComputeMoon(frame.Eye, frame.LightDir, frame.View, frame.Proj, aspect,
-            out var moonUv, out var moonDiscRadiusUv, out _);
+        var viewProj = frame.Proj * frame.View;
+        var towardSun = NormalizeOrDefault(-frame.WorldLightDir, Vector3.UnitY);
+        var sunCenter = frame.Eye + towardSun * PreviewSunScreenProjection.SunDistance;
+        var sunRight = CelestialBillboardRight(towardSun);
+        var sunUp = Vector3.Normalize(Vector3.Cross(towardSun, sunRight));
+        var sunRadius = PreviewSunScreenProjection.SunRadius * Math.Clamp(frame.Settings.AtmosphereSunDiscSize, 0.05f, 2f);
+
+        MoonBillboardPlacement moonPlacement = default;
+        var moonFarPlane = frame.FarPlane > 1f ? frame.FarPlane : PreviewSunScreenProjection.SunDistance;
+        var drawMoonMarker = TryComputeMoonBillboardPlacement(
+            frame.Eye,
+            frame.WorldLightDir,
+            moonFarPlane,
+            frame.Settings.AtmosphereMoonDiscSize,
+            out moonPlacement);
 
         Span<float> verts = stackalloc float[SunDebugFloatCount];
         var i = 0;
-        AppendSunDebugDisc(ref i, verts, sunUv, sunDiscRadiusUv, frame.Vw, frame.Vh, 1f, 0.15f, 0.15f, 0.15f, 1f, 0.35f);
-        AppendSunDebugDisc(ref i, verts, moonUv, moonDiscRadiusUv, frame.Vw, frame.Vh, 0.55f, 0.65f, 1f, 0.35f, 0.55f, 1f);
+        if (IsInFrontOfCamera(sunCenter, viewProj))
+        {
+            AppendCelestialDebugDiscWorld(
+                ref i,
+                verts,
+                sunCenter,
+                sunRight,
+                sunUp,
+                sunRadius,
+                1f, 0.15f, 0.15f,
+                0.15f, 1f, 0.35f);
+        }
+
+        if (drawMoonMarker && IsInFrontOfCamera(moonPlacement.Center, viewProj))
+        {
+            AppendCelestialDebugDiscWorld(
+                ref i,
+                verts,
+                moonPlacement.Center,
+                moonPlacement.Right,
+                moonPlacement.Up,
+                moonPlacement.Radius,
+                0.55f, 0.65f, 1f,
+                0.35f, 0.55f, 1f);
+        }
+
+        if (i == 0)
+        {
+            return;
+        }
 
         var priorDepth = gl.IsEnabled(EnableCap.DepthTest);
         var priorBlend = gl.IsEnabled(EnableCap.Blend);
@@ -99,7 +136,7 @@ public sealed partial class OpenGlPreviewBackend
         gl.BindBuffer(BufferTargetARB.ArrayBuffer, _sunDebugVbo);
         gl.BufferSubData<float>(GLEnum.ArrayBuffer, 0, verts[..i]);
         _lineProgram.Use();
-        SetLineProgramMvp(gl, Matrix4x4.Identity);
+        SetLineProgramMvp(gl, viewProj);
         gl.DrawArrays(PrimitiveType.Lines, 0, (uint)(i / PreviewGridLinesFactory.FloatsPerVertex));
         gl.BindVertexArray(0);
 
@@ -118,38 +155,73 @@ public sealed partial class OpenGlPreviewBackend
         }
     }
 
-    private static void AppendSunDebugDisc(ref int offset, Span<float> verts, Vector2 uv, float discRadiusUv, int vw, int vh,
-        float crossR, float crossG, float crossB, float ringR, float ringG, float ringB)
+    private static bool IsInFrontOfCamera(Vector3 worldPos, Matrix4x4 viewProj)
     {
-        var ndcX = uv.X * 2f - 1f;
-        var ndcY = uv.Y * 2f - 1f;
-        var minDim = Math.Min(vw, vh);
-        var armPx = Math.Max(18f, discRadiusUv * minDim * 1.4f);
-        var discPx = Math.Max(armPx * 1.15f, 22f);
-        var armX = armPx / vw * 2f;
-        var armY = armPx / vh * 2f;
-        var discX = discPx / vw * 2f;
-        var discY = discPx / vh * 2f;
-        AddSunDebugLine(verts, ref offset, ndcX - armX, ndcY, ndcX + armX, ndcY, crossR, crossG, crossB, 1f);
-        AddSunDebugLine(verts, ref offset, ndcX, ndcY - armY, ndcX, ndcY + armY, crossR, crossG, crossB, 1f);
-        AddSunDebugLine(verts, ref offset, ndcX - discX, ndcY - discY, ndcX + discX, ndcY - discY, ringR, ringG, ringB, 1f);
-        AddSunDebugLine(verts, ref offset, ndcX + discX, ndcY - discY, ndcX + discX, ndcY + discY, ringR, ringG, ringB, 1f);
-        AddSunDebugLine(verts, ref offset, ndcX + discX, ndcY + discY, ndcX - discX, ndcY + discY, ringR, ringG, ringB, 1f);
-        AddSunDebugLine(verts, ref offset, ndcX - discX, ndcY + discY, ndcX - discX, ndcY - discY, ringR, ringG, ringB, 1f);
+        var clip = Vector4.Transform(new Vector4(worldPos, 1f), viewProj);
+        return clip.W > 1e-5f;
     }
 
-    private static void AddSunDebugLine(Span<float> verts, ref int offset, float x0, float y0, float x1, float y1,
-        float r, float g, float b, float a)
+    private static Vector3 NormalizeOrDefault(Vector3 v, Vector3 fallback)
     {
-        WriteSunDebugVertex(verts, ref offset, x0, y0, r, g, b, a);
-        WriteSunDebugVertex(verts, ref offset, x1, y1, r, g, b, a);
+        var len2 = v.LengthSquared();
+        return len2 > 1e-12f ? v / MathF.Sqrt(len2) : fallback;
     }
 
-    private static void WriteSunDebugVertex(Span<float> verts, ref int offset, float x, float y, float r, float g, float b, float a)
+    private static Vector3 CelestialBillboardRight(Vector3 towardBody)
+    {
+        towardBody = NormalizeOrDefault(towardBody, Vector3.UnitY);
+        var right = Vector3.Cross(Vector3.UnitY, towardBody);
+        if (right.LengthSquared() < 1e-10f)
+        {
+            right = Vector3.Cross(Vector3.UnitZ, towardBody);
+        }
+
+        return NormalizeOrDefault(right, Vector3.UnitX);
+    }
+
+    private static void AppendCelestialDebugDiscWorld(
+        ref int offset,
+        Span<float> verts,
+        Vector3 center,
+        Vector3 right,
+        Vector3 up,
+        float radius,
+        float crossR,
+        float crossG,
+        float crossB,
+        float ringR,
+        float ringG,
+        float ringB)
+    {
+        right = NormalizeOrDefault(right, Vector3.UnitX);
+        up = NormalizeOrDefault(up, Vector3.UnitY);
+        radius = Math.Max(radius, 1e-4f);
+        var arm = radius * 1.4f;
+        var ring = radius * 1.15f;
+        AddSunDebugLine(verts, ref offset, center - right * arm, center + right * arm, crossR, crossG, crossB, 1f);
+        AddSunDebugLine(verts, ref offset, center - up * arm, center + up * arm, crossR, crossG, crossB, 1f);
+        var bl = center - right * ring - up * ring;
+        var br = center + right * ring - up * ring;
+        var tr = center + right * ring + up * ring;
+        var tl = center - right * ring + up * ring;
+        AddSunDebugLine(verts, ref offset, bl, br, ringR, ringG, ringB, 1f);
+        AddSunDebugLine(verts, ref offset, br, tr, ringR, ringG, ringB, 1f);
+        AddSunDebugLine(verts, ref offset, tr, tl, ringR, ringG, ringB, 1f);
+        AddSunDebugLine(verts, ref offset, tl, bl, ringR, ringG, ringB, 1f);
+    }
+
+    private static void AddSunDebugLine(Span<float> verts, ref int offset, Vector3 p0, Vector3 p1,
+        float r, float g, float b, float alpha)
+    {
+        WriteSunDebugVertex(verts, ref offset, p0.X, p0.Y, p0.Z, r, g, b, alpha);
+        WriteSunDebugVertex(verts, ref offset, p1.X, p1.Y, p1.Z, r, g, b, alpha);
+    }
+
+    private static void WriteSunDebugVertex(Span<float> verts, ref int offset, float x, float y, float z, float r, float g, float b, float a)
     {
         verts[offset++] = x;
         verts[offset++] = y;
-        verts[offset++] = 0f;
+        verts[offset++] = z;
         verts[offset++] = r;
         verts[offset++] = g;
         verts[offset++] = b;

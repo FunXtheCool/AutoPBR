@@ -82,6 +82,7 @@ tools/MlSpecularTrainer/shuffle_dataset/
 
 # Local scratch / agent export (root + nested)
 .build-verify/
+.build-test-out/
 .tmpbuild/
 .tmpanim/
 **/.tmpbuild/
@@ -112,6 +113,7 @@ tools/MinecraftGeometryReference/build/
 /.tmp*
 /.scratch/
 /.diagnostics/
+tools/chain-test.cs
 
 # Test/coverage diagnostics
 *.trx

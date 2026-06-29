@@ -208,7 +208,7 @@ internal static class ParityCatalogHandLiftGeometryIrCatalog
 
     /// <summary>
     /// <c>HangingSignRenderer.createHangingSignLayer</c> CEILING attachment (26.1.2 javap): <c>board</c> +
-    /// <c>normalChains</c> with four tilted zero-depth chain sheets; joint at model Y = 0.
+    /// <c>normalChains</c> with four tilted zero-depth chain sheets; preview uprights them like WALL.
     /// </summary>
     private static (string, JsonDocument) HandLiftHangingSignModelCeiling()
     {
@@ -230,7 +230,8 @@ internal static class ParityCatalogHandLiftGeometryIrCatalog
     }
 
     /// <summary>
-    /// <c>HangingSignRenderer.createHangingSignLayer</c> WALL attachment: <c>board</c> + <c>plank</c> + <c>normalChains</c>.
+    /// <c>HangingSignRenderer.createHangingSignLayer</c> WALL attachment: <c>board</c> + <c>plank</c> +
+    /// <c>normalChains</c> (same tilted chain poses as CEILING in 26.1.2 javap; preview uprights them).
     /// </summary>
     private static (string, JsonDocument) HandLiftHangingSignModelWall()
     {

@@ -179,4 +179,37 @@ public partial class MainWindow : Window
             // Prevent unhandled exception in async void from crashing the process
         }
     }
+
+    private async void BrowseMinecraftAssets_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        try
+        {
+            var topLevel = TopLevel.GetTopLevel(this);
+            if (topLevel?.StorageProvider is null)
+            {
+                return;
+            }
+
+            var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+            {
+                Title = "Select Minecraft version or assets folder",
+                AllowMultiple = false
+            });
+
+            var path = folders.Count > 0 ? folders[0].TryGetLocalPath() : null;
+            if (path is null)
+            {
+                return;
+            }
+
+            if (DataContext is MainWindowViewModel vm)
+            {
+                vm.MinecraftAssetsDirectory = path;
+            }
+        }
+        catch (Exception)
+        {
+            // Prevent unhandled exception in async void from crashing the process
+        }
+    }
 }

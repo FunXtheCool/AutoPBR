@@ -55,6 +55,10 @@ public sealed class UserSettings
     public double? PlantMaterialPorosityExtra { get; set; }
     public int MaxThreads { get; set; } // 0 = auto
     public string? TempDirectory { get; set; }
+
+    /// <summary>Optional local Minecraft install/version folder for block model JSON fallback during 3D preview.</summary>
+    public string? MinecraftAssetsDirectory { get; set; }
+
     public bool DebugMode { get; set; }
     public string ColorScheme { get; set; } = "Dark";
 
@@ -252,8 +256,29 @@ public sealed class UserSettings
     /// <summary>3D preview: additive sun disc bloom on sky composite.</summary>
     public double Preview3DAtmosphereSunDiscStrength { get; set; } = 0.35;
 
+    /// <summary>3D preview: limb-darkened sun disc surface brightness (bloom is separate).</summary>
+    public double Preview3DAtmosphereSunDiscBrightness { get; set; } = 1.0;
+
     /// <summary>3D preview: sun angular-size multiplier (1 = stylized default; ~0.07 = real sun).</summary>
     public double Preview3DAtmosphereSunDiscSize { get; set; } = 1.0;
+
+    /// <summary>3D preview: moon surface brightness multiplier.</summary>
+    public double Preview3DAtmosphereMoonDiscStrength { get; set; } = 1.35;
+
+    /// <summary>3D preview: moon angular-size multiplier.</summary>
+    public double Preview3DAtmosphereMoonDiscSize { get; set; } = 1.0;
+
+    /// <summary>3D preview: moon glow/aureole multiplier.</summary>
+    public double Preview3DAtmosphereMoonGlowStrength { get; set; } = 0.7;
+
+    /// <summary>3D preview: moon texture sharpen amount.</summary>
+    public double Preview3DAtmosphereMoonTextureSharpness { get; set; } = 1.25;
+
+    /// <summary>3D preview: moon direct world-light multiplier; does not affect atmospheric sky fill.</summary>
+    public double Preview3DMoonWorldLightIntensity { get; set; } = 1.0;
+
+    /// <summary>3D preview: always draw square/cross markers for sun and moon projection.</summary>
+    public bool Preview3DShowCelestialDebug { get; set; }
 
     /// <summary>3D preview: clock time (0–24 h) for sun/moon cycle.</summary>
     public double Preview3DTimeOfDayHours { get; set; } = 12.0;

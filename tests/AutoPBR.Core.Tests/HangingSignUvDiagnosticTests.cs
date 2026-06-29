@@ -24,16 +24,16 @@ public sealed class HangingSignUvDiagnosticTests
             .ToList();
         Assert.Equal(4, chains.Count);
 
-        foreach (var chain in chains.Where(el => el.Faces["north"].Uv![0] < 1f))
+        foreach (var chain in chains.Where(el => MathF.Abs(el.Faces["north"].Uv![0] - 3f) < 0.01f))
         {
-            Assert.Equal(new float[] { 0, 12, 3, 6 }, chain.Faces["north"].Uv!);
-            Assert.Equal(new float[] { 3, 12, 6, 6 }, chain.Faces["south"].Uv!);
+            Assert.Equal(new float[] { 3, 12, 6, 6 }, chain.Faces["north"].Uv!);
+            Assert.Equal(new float[] { 0, 12, 3, 6 }, chain.Faces["south"].Uv!);
         }
 
-        foreach (var chain in chains.Where(el => MathF.Abs(el.Faces["north"].Uv![0] - 6f) < 0.01f))
+        foreach (var chain in chains.Where(el => MathF.Abs(el.Faces["north"].Uv![0] - 9f) < 0.01f))
         {
-            Assert.Equal(new float[] { 6, 12, 9, 6 }, chain.Faces["north"].Uv!);
-            Assert.Equal(new float[] { 9, 12, 12, 6 }, chain.Faces["south"].Uv!);
+            Assert.Equal(new float[] { 9, 12, 12, 6 }, chain.Faces["north"].Uv!);
+            Assert.Equal(new float[] { 6, 12, 9, 6 }, chain.Faces["south"].Uv!);
         }
     }
 
@@ -52,6 +52,50 @@ public sealed class HangingSignUvDiagnosticTests
         using var scope = EntityPreviewBuildContext.UseContextType(EntityPreviewContextTypeCatalog.CeilingMiddle);
         Assert.True(runtime.TryBuildStaticMesh(Path, Profile26, 0f, 0f, out var mesh), Path);
         AssertChainBakedUvHits(mesh, uMin: 14f / 64f, uMax: 39f / 64f, vMin: 6f / 32f, vMax: 13f / 32f, minHits: 4);
+    }
+
+    [Fact]
+    public void Ceiling_middle_vertical_chain_baked_uv_increases_with_world_y()
+    {
+        var runtime = EntityModelRuntimeFactory.Create();
+        using var scope = EntityPreviewBuildContext.UseContextType(EntityPreviewContextTypeCatalog.CeilingMiddle);
+        Assert.True(runtime.TryBuildStaticMesh(Path, Profile26, 0f, 0f, out var mesh), Path);
+
+        var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(mesh, "minecraft");
+        var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase);
+        for (var i = 0; i < ordered.Count; i++)
+        {
+            pathToIdx[ordered[i]] = i;
+            texSizes[ordered[i]] = (64, 32);
+        }
+
+        Assert.True(MinecraftModelBaker.TryBake(mesh, "minecraft", pathToIdx, texSizes, out var verts, out _, out _));
+
+        const int stride = MinecraftModelBaker.FloatsPerVertex;
+        const float uMin = 14f / 64f;
+        const float uMax = 39f / 64f;
+        const float vMin = 6f / 32f;
+        const float vMax = 13f / 32f;
+        var chainVerts = new List<(float y, float v)>();
+        for (var i = 0; i < verts.Length; i += stride)
+        {
+            var u = verts[i + 6];
+            var v = verts[i + 7];
+            if (u >= uMin && u <= uMax && v >= vMin && v <= vMax)
+            {
+                chainVerts.Add((verts[i + 1], v));
+            }
+        }
+
+        Assert.True(chainVerts.Count >= 4, $"expected chain verts in vChains region, got {chainVerts.Count}");
+        var minY = chainVerts.Min(p => p.y);
+        var maxY = chainVerts.Max(p => p.y);
+        var bottomV = chainVerts.Where(p => MathF.Abs(p.y - minY) < 0.02f).Average(p => p.v);
+        var topV = chainVerts.Where(p => MathF.Abs(p.y - maxY) < 0.02f).Average(p => p.v);
+        Assert.True(
+            topV < bottomV - 0.01f,
+            $"expected chain UV to decrease toward ceiling (topV={topV:F4} bottomV={bottomV:F4})");
     }
 
     [Fact]
@@ -109,8 +153,8 @@ public sealed class HangingSignUvDiagnosticTests
             el.Faces.ContainsKey("south") &&
             !el.Faces.ContainsKey("east") &&
             MathF.Abs(el.To[0] - el.From[0] - 12f) < 0.15f);
-        Assert.Equal(new float[] { 26, 6, 38, 12 }, chain.Faces["north"].Uv!);
-        Assert.Equal(new float[] { 14, 6, 26, 12 }, chain.Faces["south"].Uv!);
+        Assert.Equal(new float[] { 26, 12, 38, 6 }, chain.Faces["north"].Uv!);
+        Assert.Equal(new float[] { 14, 12, 26, 6 }, chain.Faces["south"].Uv!);
     }
 
     [Fact]

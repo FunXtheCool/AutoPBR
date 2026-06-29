@@ -216,8 +216,9 @@ public sealed class PartialModelLiftDiagnosticsTests
     public static IEnumerable<object[]> FormerPlaceholderModelNames() =>
         FormerPlaceholderModels.Select(m => new object[] { m });
 
-    private static string? ResolveClientJar() =>
-        GeometryIrTestTierSupport.TryClientJarPath(FindRepoRoot());
+    private static string ResolveClientJar() =>
+        GeometryIrTestTierSupport.TryClientJarPath(FindRepoRoot())
+        ?? throw new InvalidOperationException("Minecraft client jar not found.");
 
     private static string FindRepoRoot()
     {

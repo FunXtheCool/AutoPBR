@@ -70,8 +70,15 @@ public partial class MainWindowViewModel
     [ObservableProperty] private double _preview3DAtmosphereHorizonFalloff = 1.35;
     [ObservableProperty] private double _preview3DAtmosphereSkyExposure = 0.85;
     [ObservableProperty] private double _preview3DAtmosphereSunDiscStrength = 0.35;
+    [ObservableProperty] private double _preview3DAtmosphereSunDiscBrightness = 1.0;
     [ObservableProperty] private double _preview3DAtmosphereSunDiscSize = 1.0;
+    [ObservableProperty] private double _preview3DAtmosphereMoonDiscStrength = 1.35;
+    [ObservableProperty] private double _preview3DAtmosphereMoonDiscSize = 1.0;
+    [ObservableProperty] private double _preview3DAtmosphereMoonGlowStrength = 0.7;
+    [ObservableProperty] private double _preview3DAtmosphereMoonTextureSharpness = 1.25;
+    [ObservableProperty] private double _preview3DMoonWorldLightIntensity = 1.0;
     [ObservableProperty] private double _preview3DHorizonFogStrength = 1.0;
+    [ObservableProperty] private bool _preview3DShowCelestialDebug;
     [ObservableProperty] private double _preview3DTimeOfDayHours = 12.0;
     [ObservableProperty] private bool _preview3DAnimateTimeOfDay;
     [ObservableProperty] private double _preview3DTimeOfDaySpeed = 1.0;
@@ -208,6 +215,7 @@ public partial class MainWindowViewModel
         OnPropertyChanged(nameof(IsPreview3DItemMode));
         OnPropertyChanged(nameof(IsPreview3DFoliageSpriteMode));
         OnPropertyChanged(nameof(IsPreview3DSpriteMode));
+        OnPropertyChanged(nameof(IsPreview3DGrassColormapVisible));
         OnPropertyChanged(nameof(IsPreviewSpriteTarget));
         if (!_loadingSettings)
         {
@@ -269,8 +277,15 @@ public partial class MainWindowViewModel
     partial void OnPreview3DAtmosphereHorizonFalloffChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DAtmosphereSkyExposureChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DAtmosphereSunDiscStrengthChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DAtmosphereSunDiscBrightnessChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DAtmosphereSunDiscSizeChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DAtmosphereMoonDiscStrengthChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DAtmosphereMoonDiscSizeChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DAtmosphereMoonGlowStrengthChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DAtmosphereMoonTextureSharpnessChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DMoonWorldLightIntensityChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DHorizonFogStrengthChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DShowCelestialDebugChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DTimeOfDayHoursChanged(double value) => OnPreview3DTimeOfDayChanged(value);
     partial void OnPreview3DAnimateTimeOfDayChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DTimeOfDaySpeedChanged(double value) => OnPreview3DGpuSettingChanged(value);
@@ -421,6 +436,7 @@ public partial class MainWindowViewModel
         _lastPreviewModelSubject = previewResult.ModelSubject;
         _lastPreviewMeshProvenance = previewResult.MeshProvenance ?? previewResult.ModelSubject?.MeshProvenance;
         ApplyExploreParityCatalogPreviewDefaults(_lastPreviewModelSubject);
+        RefreshPreviewGrassColormapState();
         LogPreviewMeshProvenance(_lastPreviewMeshProvenance);
         OnPropertyChanged(nameof(IsPreview3DItemMode));
         OnPropertyChanged(nameof(IsPreview3DFoliageSpriteMode));
@@ -486,7 +502,13 @@ public partial class MainWindowViewModel
             AtmosphereHorizonFalloff = (float)Preview3DAtmosphereHorizonFalloff,
             AtmosphereSkyExposure = (float)Preview3DAtmosphereSkyExposure,
             AtmosphereSunDiscStrength = (float)Preview3DAtmosphereSunDiscStrength,
+            AtmosphereSunDiscBrightness = (float)Preview3DAtmosphereSunDiscBrightness,
             AtmosphereSunDiscSize = (float)Preview3DAtmosphereSunDiscSize,
+            AtmosphereMoonDiscStrength = (float)Preview3DAtmosphereMoonDiscStrength,
+            AtmosphereMoonDiscSize = (float)Preview3DAtmosphereMoonDiscSize,
+            AtmosphereMoonGlowStrength = (float)Preview3DAtmosphereMoonGlowStrength,
+            AtmosphereMoonTextureSharpness = (float)Preview3DAtmosphereMoonTextureSharpness,
+            MoonWorldLightIntensity = (float)Preview3DMoonWorldLightIntensity,
             AerialFogStrength = (float)Preview3DHorizonFogStrength,
             TimeOfDayHours = (float)Preview3DTimeOfDayHours,
             AnimateTimeOfDay = Preview3DAnimateTimeOfDay,
@@ -523,7 +545,8 @@ public partial class MainWindowViewModel
             CloudFreezeWind = Preview3DCloudFreezeWind,
             EnablePreviewTaa = Preview3DEnablePreviewTaa,
             CloudQuality = PreviewVolumetricQuality.Resolve(Math.Clamp(Preview3DVolumetricQuality, 0, 2)).CloudQuality,
-            LogVolumetricTiming = DebugMode
+            LogVolumetricTiming = DebugMode,
+            ShowSunProjectionDebug = Preview3DShowCelestialDebug
         };
     }
 
@@ -581,7 +604,7 @@ public partial class MainWindowViewModel
         var settings = BuildPreview3DRenderSettings();
         var maps = _lastPreviewTextureMaps;
         var material = maps is not null
-            ? PreviewMaterialMapper.FromCoreMaps(maps)
+            ? PreviewMaterialMapper.FromCoreMaps(ApplyGrassColormapTintIfNeeded(maps, PreviewArchivePath), PreviewArchivePath)
             : IdlePreview3DMaterial();
 
         PreviewSceneKind kind;
@@ -596,7 +619,12 @@ public partial class MainWindowViewModel
         else if (subject is { Materials.Length: > 0 })
         {
             kind = PreviewSceneKind.BlockModel;
-            slotMaterials = subject.Materials.Select(PreviewMaterialMapper.FromCoreMaps).ToArray();
+            var paths = subject.MaterialArchivePaths;
+            slotMaterials = subject.Materials.Select((m, i) =>
+            {
+                var path = paths is not null && i < paths.Length ? paths[i] : null;
+                return PreviewMaterialMapper.FromCoreMaps(ApplyGrassColormapTintIfNeeded(m, path), path);
+            }).ToArray();
         }
         else if (maps?.Sprite2DFoliageTarget == true)
         {

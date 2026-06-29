@@ -150,8 +150,58 @@ Machine-readable parity lives under [`docs/generated/`](../docs/generated/README
 
 ## Track B — Block JSON
 
-- **Implemented:** [`MinecraftModelMerger`](src/AutoPBR.Core/Preview/MinecraftModelMerger.cs) maps element `rotation` → `ModelElement.LocalToParent` = `T(origin) * R(axis, angle°) * T(-origin)` (default origin `[8,8,8]`). Tests: `Merge_BlockElementRotation_SetsNonIdentityLocalToParent`, `TryBake_ElementRotationChangesWorldPositionsVersusIdentity` in [`MinecraftJavaModelPreviewTests`](../tests/AutoPBR.Core.Tests/MinecraftJavaModelPreviewTests.cs).  
+### Track B1 — Pack model JSON (existing)
+
+- **Implemented:** [`MinecraftModelMerger`](src/AutoPBR.Core/Preview/MinecraftModelMerger.cs) maps element `rotation` → `ModelElement.LocalToParent` = `T(origin) * R(axis, angle°) * T(-origin)` (default origin `[8,8,8]`).  
 - **Optional / not modeled:** `rescale: true` (vanilla UV stretch) — rotation still applies; rescale stretch is not replicated.
+
+### Track B2 — Block texture parity catalog (synthetic cube faces)
+
+When a resource pack contains block diffuse PNGs but no resolvable `models/block/*.json`, preview uses the **block texture parity catalog** instead of repeating one texture on all six faces of the unit-cube fallback.
+
+| Artifact | Role |
+|----------|------|
+| [`minecraft_26.1.2_block_textures.json`](../src/AutoPBR.Core/Data/minecraft-native/minecraft_26.1.2_block_textures.json) | Inventory of vanilla `assets/minecraft/textures/block/*.png` (26.1.2) |
+| [`minecraft_26.1.2_block_texture_model_manifest.json`](../src/AutoPBR.Core/Data/minecraft-native/minecraft_26.1.2_block_texture_model_manifest.json) | One rule per texture: `preview_shape` + `texture_slots` |
+| [`BlockTextureParityCatalog`](../src/AutoPBR.Core/Preview/BlockTextureParityCatalog.cs) | Loads inventory + manifest |
+| [`VanillaBlockPreviewRuntime`](../src/AutoPBR.Core/Preview/VanillaBlockPreviewRuntime.cs) | Builds synthetic `MergedJavaBlockModel` → existing `MinecraftModelBaker` path |
+
+**Preview resolution order (blocks):**
+
+1. Pack model JSON (`PreviewMeshDriverKind.PackModelJson`) — pack zip, then optional Minecraft install assets, then bundled native catalogs
+2. Partial material recovery (keep JSON geometry; materialize missing sibling textures)
+3. Vanilla block parity synthetic mesh (`PreviewMeshDriverKind.VanillaBlockParity`) — cubes plus complex shapes below
+4. Entity runtime (only for `textures/entity/`)
+5. Single-texture unit cube fallback (`PreviewSceneKind.BlockCube`)
+
+**Catalog shapes:**
+
+| Shape | Example families |
+|-------|------------------|
+| `UniformCube` | `stone`, `sand`, single-file blocks |
+| `CubeDirectional` | `grass_block` (top + side + dirt bottom), `sandstone` variants |
+| `CubeColumnY` | `oak_log` + `oak_log_top` (end grain on up/down) |
+| `ThinPlate` | trapdoors (16×16×3 closed plate) |
+| `DoorHalf` | door bottom/top textures (paired upper + lower panels in one preview) |
+| `CakeWedge` | cake bites=0 inset slab (14×8×14) |
+| `CactusCross` | cactus inset side panels (not a full cube) |
+| `FencePost` | fence/gate center post (simplified) |
+| `FenceWithLink` | bamboo fence (post + north link bar) |
+| `RailTrack` | flat rail segment |
+| `CrossSprite` | short grass, flowers (two crossed quads) |
+| `StairWedge` | (reserved; no inventory stems yet) |
+| `PackModelJsonOnly` | redstone overlays, activator rail ON state — defer to pack JSON when present |
+
+**Optional Minecraft install:** Settings → Engine → **Minecraft assets** (browse or auto-detected from `.minecraft/versions/` on first launch). Point at a version folder or extracted `assets/` root so texture-only packs can resolve vanilla `models/block/*.json` at preview time.
+
+**Regenerate catalog:** `pwsh -File tools/generate-block-parity-manifest.ps1`  
+**Rollout report:** `pwsh -File tools/block-parity-manifest-by-folder.ps1`
+
+**Tests:** `BlockTextureParityJsonCatalogTests`, `BlockTextureParityMeshTests`, `BlockTextureParitySurveyTests`, `BlockModelMergerTests`, `BlockPreviewCoverageSurveyTests`, `BlockDoorPreviewPairingTests`, `BlockModelUvGoldenTests`, `BlockModelRescaleRotationTests`.
+
+**Phase 2C (deferred):** full multipart `when` evaluation, stair wedge synthesis from plank textures.
+
+**Door preview:** pack JSON from blockstate (`door_*_left` halves) is rebaked into stacked panels with vanilla-accurate thin-door UVs. Pinned goldens: `tests/AutoPBR.Core.Tests/Data/vanilla-26.1.2/` (`BlockVanillaJsonUvGoldenTests`, `BlockDoorPreviewPairingTests`).
 
 ## Shared invariants
 

@@ -48,7 +48,7 @@ uniform int   uHasHeight;
 uniform int   uSceneKind;
 uniform float uAlphaCutoff;
 uniform int   uItemAlphaBlend;
-// 0 = off, 1 = cutout, 2 = blend - only applied for batched previews that opt in (entity emulated rigs).
+// 0 = off, 1 = cutout, 2 = blend - batched block/item models and entity emulated rigs.
 uniform int   uEntityAlphaMode;
 uniform int   uPreviewDepthLayerDebug;
 uniform vec3  uPreviewLayerDebugTint;
@@ -105,6 +105,10 @@ void main()
         {
             discard;
         }
+    }
+    else if (uEntityAlphaMode == 1 && albRaw.a < uAlphaCutoff)
+    {
+        discard;
     }
 
     // Build TBN in world space.

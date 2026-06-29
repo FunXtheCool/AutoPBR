@@ -31,6 +31,7 @@ uniform float uTurbidity;
 uniform float uHorizonFalloff;
 uniform float uHorizonFogStrength;
 uniform float uSunDiscStrength;
+uniform float uSunDiscBrightness;
 uniform float uSunCosDiscEdge;
 uniform float uMoonCosDiscEdge;
 uniform float uViewportAspect;
@@ -164,9 +165,9 @@ vec3 belowHorizonFog(vec3 viewDir, float strength, float horizonBandScale)
     return vec3(0.06, 0.07, 0.09) * depth * strength * clamp(horizonBandScale, 0.0, 1.0);
 }
 
-vec3 sunDiscAureole(vec3 viewDir, vec3 lightPropagationDir, float cosDiscEdge, float bloomRadiusUv, float strength, float turbidity)
+vec3 sunDiscAureole(vec3 viewDir, vec3 lightPropagationDir, float cosDiscEdge, float bloomRadiusUv, float bloomStrength, float discBrightness, float turbidity)
 {
-    if (strength <= 0.0)
+    if (bloomStrength <= 0.0 && discBrightness <= 0.0)
     {
         return vec3(0.0);
     }
@@ -196,7 +197,9 @@ vec3 sunDiscAureole(vec3 viewDir, vec3 lightPropagationDir, float cosDiscEdge, f
     vec3 glowCol = mix(vec3(1.0, 0.88, 0.70), vec3(0.92, 0.93, 1.0), turbidityT * 0.7);
     glowCol = mix(glowCol, vec3(1.0, 0.48, 0.20), lowSun * 0.85);
     vec3 glow = glowCol * (circumsolar * 1.6 + skirt * 0.35) * glowCut;
-    return (discCol * disc * 22.0 + glow) * strength;
+    float discBright = max(discBrightness, 0.0);
+    float bloom = max(bloomStrength, 0.0);
+    return (discCol * disc * 22.0 * discBright + glow) * bloom;
 }
 
 vec2 moonDiscUv(vec3 viewDir, vec3 towardMoon, float cosDiscEdge)
@@ -264,7 +267,7 @@ void main()
     float sunVis = smoothstep(0.0, 0.06, dayAmt) * (0.35 + 0.65 * dayAmt);
     if (sunVis > 0.001)
     {
-        sky += sunDiscAureole(viewDir, uLightDir, uSunCosDiscEdge, uSunDiscRadiusUv, uSunDiscStrength, uTurbidity) * sunVis;
+        sky += sunDiscAureole(viewDir, uLightDir, uSunCosDiscEdge, uSunDiscRadiusUv, uSunDiscStrength, uSunDiscBrightness, uTurbidity) * sunVis;
     }
 
     sky *= uSkyExposure * 1.4;

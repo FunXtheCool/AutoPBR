@@ -250,7 +250,7 @@ public sealed partial class PreviewRenderingTests
     ];
 
     private static PreviewMaterial[] CreateDolphinSlotMaterials(PreviewTextureMaps[] textureMaps) =>
-        textureMaps.Select(PreviewMaterialMapper.FromCoreMaps).ToArray();
+        textureMaps.Select(m => PreviewMaterialMapper.FromCoreMaps(m)).ToArray();
 
     private static EntityEmulatedPreviewRebakeContext CreateDolphinRebakeContext(
         ulong packFingerprint,

@@ -5,7 +5,7 @@ namespace AutoPBR.App.Rendering;
 
 public static class PreviewMaterialMapper
 {
-    public static PreviewMaterial FromCoreMaps(PreviewTextureMaps maps) =>
+    public static PreviewMaterial FromCoreMaps(PreviewTextureMaps maps, string? archivePath = null) =>
         new()
         {
             Width = maps.Width,
@@ -15,6 +15,17 @@ public static class PreviewMaterialMapper
             SpecularRgba = maps.SpecularRgba,
             HeightRgba = maps.HeightRgba,
             IsPlantForNoHeight = maps.IsPlantForNoHeight,
-            Sprite2DFoliageTarget = maps.Sprite2DFoliageTarget
+            Sprite2DFoliageTarget = maps.Sprite2DFoliageTarget,
+            GlUploadFlipRows = !IsEntityTextureArchivePath(archivePath),
         };
+
+    private static bool IsEntityTextureArchivePath(string? archivePath)
+    {
+        if (string.IsNullOrWhiteSpace(archivePath))
+        {
+            return false;
+        }
+
+        return archivePath.Replace('\\', '/').Contains("/textures/entity/", StringComparison.OrdinalIgnoreCase);
+    }
 }

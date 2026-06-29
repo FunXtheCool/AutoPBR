@@ -13,6 +13,9 @@ public enum PreviewMeshDriverKind
 
     /// <summary>Hand-written clean-room entity rig code (catalog, family, or specific routes).</summary>
     CleanRoom,
+
+    /// <summary>Synthetic vanilla block cube from block texture parity catalog (multi-face slots).</summary>
+    VanillaBlockParity,
 }
 
 /// <summary>Human-readable mesh source for preview log / 3D debug overlay.</summary>
@@ -32,6 +35,10 @@ public readonly record struct PreviewMeshProvenance(PreviewMeshDriverKind Kind, 
             string.IsNullOrWhiteSpace(Detail)
                 ? "[Preview] Mesh: CleanRoom"
                 : $"[Preview] Mesh: CleanRoom ({Detail})",
+        PreviewMeshDriverKind.VanillaBlockParity =>
+            string.IsNullOrWhiteSpace(Detail)
+                ? "[Preview] Mesh: vanilla block parity"
+                : $"[Preview] Mesh: vanilla block parity ({Detail})",
         _ => "[Preview] Mesh: (none — 2D maps only)"
     };
 
@@ -50,6 +57,10 @@ public readonly record struct PreviewMeshProvenance(PreviewMeshDriverKind Kind, 
             string.IsNullOrWhiteSpace(Detail)
                 ? "Mesh: CleanRoom"
                 : $"Mesh: CleanRoom ({Detail})",
+        PreviewMeshDriverKind.VanillaBlockParity =>
+            string.IsNullOrWhiteSpace(Detail)
+                ? "Mesh: vanilla block parity"
+                : $"Mesh: vanilla block parity ({Detail})",
         _ => "Mesh: (none)"
     };
 }

@@ -86,7 +86,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
     /// <summary>
     /// Board/plank/vChains and tilted chain sheets all use local geometry reflection plus Y-flip pose
     /// conjugation so parts at negative Java Y stay attached to the board. North/south zero-depth sheets
-    /// also swap face slots so preview winding matches the reflected geometry.
+    /// flip V bounds after reflection. WALL/CEILING <c>normalChains</c> and CEILING_MIDDLE <c>vChains</c>
+    /// drop javap Z tilt (where applicable) and swap face slots so upright chains shade correctly in preview.
     /// </summary>
     private static MergedJavaBlockModel ApplyHangingSignPreviewOrientation(MergedJavaBlockModel model)
     {
@@ -108,12 +109,19 @@ internal sealed partial class CleanRoomEntityModelRuntime
     {
         var reflected = ReflectElementVerticalLocalGeometry(element);
         var pose = ConjugateVerticalFlipPartPose(element.LocalToParent);
+        if (IsHangingSignNormalChainAttachment() && IsHangingSignTiltedChainSheet(reflected, pose))
+        {
+            pose = FlattenHangingSignChainPose(pose);
+        }
+
         var faces = reflected.Faces;
         if (IsHangingSignNorthSouthSheetElement(element))
         {
-            faces = IsHangingSignVerticalChainSheet(reflected, pose)
-                ? SwapNorthSouthFaceSlots(reflected.Faces)
-                : FlipNorthSouthFaceVBounds(reflected.Faces);
+            faces = FlipNorthSouthFaceVBounds(reflected.Faces);
+            if (ShouldSwapHangingSignChainFaceSlots(reflected, pose))
+            {
+                faces = SwapNorthSouthFaceSlots(faces);
+            }
         }
 
         return new ModelElement
@@ -130,13 +138,31 @@ internal sealed partial class CleanRoomEntityModelRuntime
         };
     }
 
-    /// <summary>
-    /// CEILING_MIDDLE <c>vChains</c> sheet (12×6, identity pose). Swap face slots after Y reflection so
-    /// preview winding matches the visible billboard side.
-    /// </summary>
-    private static bool IsHangingSignVerticalChainSheet(ModelElement reflected, Matrix4x4 conjugatedPose) =>
-        MathF.Abs(reflected.To[0] - reflected.From[0] - 12f) < 0.15f &&
-        !IsHangingSignTiltedChainPose(conjugatedPose);
+    private static bool IsHangingSignNormalChainAttachment()
+    {
+        return EntityPreviewContextTypeCatalog.ResolveEffectiveAttachment(EntityPreviewBuildContext.CurrentContextTypeId)
+            is EntityPreviewContextTypeCatalog.HangingSignAttachment.Wall
+            or EntityPreviewContextTypeCatalog.HangingSignAttachment.Ceiling;
+    }
+
+    private static bool IsHangingSignTiltedChainSheet(ModelElement reflected, Matrix4x4 conjugatedPose) =>
+        IsHangingSignNormalChainCuboid(reflected) &&
+        (MathF.Abs(conjugatedPose.M12) > 0.01f || MathF.Abs(conjugatedPose.M21) > 0.01f);
+
+    /// <summary>Drop conjugated Z tilt so upright chains hang straight in preview Y-up space.</summary>
+    private static Matrix4x4 FlattenHangingSignChainPose(Matrix4x4 conjugatedPose) =>
+        Matrix4x4.CreateTranslation(conjugatedPose.M41, conjugatedPose.M42, conjugatedPose.M43);
+
+    private static bool ShouldSwapHangingSignChainFaceSlots(ModelElement reflected, Matrix4x4 pose) =>
+        IsHangingSignUprightChainSheet(reflected) && !IsHangingSignTiltedChainPose(pose);
+
+    private static bool IsHangingSignUprightChainSheet(ModelElement reflected) =>
+        MathF.Abs(reflected.To[1] - reflected.From[1] - 6f) < 0.15f &&
+        (MathF.Abs(reflected.To[0] - reflected.From[0] - 12f) < 0.15f ||
+         IsHangingSignNormalChainCuboid(reflected));
+
+    private static bool IsHangingSignNormalChainCuboid(ModelElement reflected) =>
+        MathF.Abs(reflected.To[0] - reflected.From[0] - 3f) < 0.15f;
 
     private static bool IsHangingSignTiltedChainPose(Matrix4x4 pose) =>
         MathF.Abs(pose.M12) > 0.01f || MathF.Abs(pose.M21) > 0.01f;

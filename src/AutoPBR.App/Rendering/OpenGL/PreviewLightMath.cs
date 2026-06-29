@@ -61,6 +61,48 @@ internal static class PreviewLightMath
     }
 
     /// <summary>
+    /// Converts the sun/moon cycle direction into the visible direct-light source.
+    /// During the day this is sunlight; once the sun is below the horizon it becomes
+    /// reflected moonlight from the antipodal moon.
+    /// </summary>
+    public static Vector3 SceneLightDirectionFromCelestialCycle(Vector3 celestialLightDir)
+    {
+        var len2 = celestialLightDir.LengthSquared();
+        if (len2 < 1e-12f)
+        {
+            return new Vector3(0f, -1f, 0f);
+        }
+
+        var dir = celestialLightDir / MathF.Sqrt(len2);
+        return dir.Y > 0f ? -dir : dir;
+    }
+
+    /// <summary>Cool, dim reflected moonlight when the moon is the visible source.</summary>
+    public static Vector3 SceneLightColorFromCelestialCycle(
+        Vector3 celestialLightDir,
+        Vector3 sunColor,
+        float moonWorldLightIntensity = 1f)
+    {
+        var len2 = celestialLightDir.LengthSquared();
+        if (len2 < 1e-12f)
+        {
+            return sunColor;
+        }
+
+        var dir = celestialLightDir / MathF.Sqrt(len2);
+        if (dir.Y <= 0f)
+        {
+            return sunColor;
+        }
+
+        var moonElevation = Math.Clamp(dir.Y, 0f, 1f);
+        var reflectedStrength = (0.05f + 0.13f * MathF.Pow(moonElevation, 0.65f)) *
+                                Math.Clamp(moonWorldLightIntensity, 0f, 8f);
+        var moonTint = new Vector3(0.58f, 0.66f, 0.86f);
+        return sunColor * moonTint * reflectedStrength;
+    }
+
+    /// <summary>
     /// Maps clock time (0–24 h) to sun yaw/pitch. 6:00 ≈ sunrise, 12:00 ≈ solar noon, 18:00 ≈ sunset, 0:00/24:00 ≈ midnight.
     /// </summary>
     public static (double YawDegrees, double PitchDegrees) LightYawPitchFromTimeOfDay(

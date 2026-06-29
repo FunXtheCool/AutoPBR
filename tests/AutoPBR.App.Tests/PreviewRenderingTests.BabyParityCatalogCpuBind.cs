@@ -43,7 +43,7 @@ public sealed partial class PreviewRenderingTests
     {
         var backend = new OpenGlPreviewBackend();
         var textureMaps = CreateBabyTextureMaps([texturePath], null);
-        var slotMaterials = textureMaps.Select(PreviewMaterialMapper.FromCoreMaps).ToArray();
+        var slotMaterials = textureMaps.Select(m => PreviewMaterialMapper.FromCoreMaps(m)).ToArray();
 
         var staleVerts = CreatePreviewVerts(240, seed: 41);
         var freshVerts = CreatePreviewVerts(240, seed: 42);
@@ -91,7 +91,7 @@ public sealed partial class PreviewRenderingTests
     {
         var backend = new OpenGlPreviewBackend();
         var textureMaps = CreateBabyTextureMaps([texturePath], null);
-        var slotMaterials = textureMaps.Select(PreviewMaterialMapper.FromCoreMaps).ToArray();
+        var slotMaterials = textureMaps.Select(m => PreviewMaterialMapper.FromCoreMaps(m)).ToArray();
 
         var committedVerts = CreatePreviewVerts(240, seed: 11);
         var packVerts = CreatePreviewVerts(240, seed: 12);

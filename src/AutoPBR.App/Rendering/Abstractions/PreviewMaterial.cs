@@ -13,4 +13,7 @@ public sealed class PreviewMaterial
 
     public bool IsPlantForNoHeight { get; init; }
     public bool Sprite2DFoliageTarget { get; init; }
+
+    /// <summary>When true (default), RGBA rows are flipped to OpenGL bottom-first on upload.</summary>
+    public bool GlUploadFlipRows { get; init; } = true;
 }

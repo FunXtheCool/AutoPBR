@@ -18,6 +18,12 @@ internal sealed class MergedJavaBlockModel
 
 internal sealed class ModelElement
 {
+    /// <summary>Optional element name from block model JSON (used when merging parent chains).</summary>
+    public string? Name { get; init; }
+
+    /// <summary>When true, vanilla <c>rotation.rescale</c> UV stretch is applied at bake time.</summary>
+    public bool RescaleRotation { get; init; }
+
     public required float[] From { get; init; }
     public required float[] To { get; init; }
     public required Dictionary<string, ModelFace> Faces { get; init; }

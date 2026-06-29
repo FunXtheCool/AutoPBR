@@ -6,7 +6,48 @@ namespace AutoPBR.Core.Preview;
 
 internal static class MinecraftModelMerger
 {
-    public static bool TryMerge(IAssetSource source, string modelZipPath, out MergedJavaBlockModel merged)
+    public static bool TryMerge(IAssetSource source, string modelZipPath, out MergedJavaBlockModel merged) =>
+        TryMergeMany(source, [modelZipPath], out merged);
+
+    public static bool TryMergeMany(IAssetSource source, IReadOnlyList<string> modelZipPaths, out MergedJavaBlockModel merged)
+    {
+        merged = null!;
+        if (modelZipPaths.Count == 0)
+        {
+            return false;
+        }
+
+        var allElements = new List<ModelElement>();
+        var textures = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var modelZipPath in modelZipPaths)
+        {
+            if (!TryMergeSingle(source, modelZipPath, out var single))
+            {
+                continue;
+            }
+
+            foreach (var (key, value) in single.Textures)
+            {
+                textures[key] = value;
+            }
+
+            allElements.AddRange(single.Elements);
+        }
+
+        if (allElements.Count == 0)
+        {
+            return false;
+        }
+
+        merged = new MergedJavaBlockModel
+        {
+            Elements = allElements,
+            Textures = textures,
+        };
+        return true;
+    }
+
+    private static bool TryMergeSingle(IAssetSource source, string modelZipPath, out MergedJavaBlockModel merged)
     {
         merged = null!;
         var chainTexts = new List<string>();
@@ -24,10 +65,27 @@ internal static class MinecraftModelMerger
             MergeTextures(doc.RootElement, textures);
         }
 
-        List<ModelElement>? elements = null;
-        for (var i = chainTexts.Count - 1; i >= 0; i--)
+        var elements = MergeElementsFromChain(chainTexts);
+        if (elements.Count == 0)
         {
-            using var doc = JsonDocument.Parse(chainTexts[i],
+            return false;
+        }
+
+        merged = new MergedJavaBlockModel
+        {
+            Elements = elements,
+            Textures = textures,
+        };
+        return true;
+    }
+
+    private static List<ModelElement> MergeElementsFromChain(IReadOnlyList<string> chainTexts)
+    {
+        var accumulated = new List<ModelElement>();
+        var byName = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        foreach (var jsonText in chainTexts)
+        {
+            using var doc = JsonDocument.Parse(jsonText,
                 new JsonDocumentOptions { CommentHandling = JsonCommentHandling.Skip });
             var root = doc.RootElement;
             if (!root.TryGetProperty("elements", out var elProp) || elProp.ValueKind != JsonValueKind.Array)
@@ -36,24 +94,60 @@ internal static class MinecraftModelMerger
             }
 
             var parsed = ParseElements(elProp);
-            if (parsed.Count > 0)
+            if (parsed.Count == 0)
             {
-                elements = parsed;
-                break;
+                continue;
+            }
+
+            if (accumulated.Count == 0)
+            {
+                accumulated.AddRange(parsed);
+                ReindexByName(accumulated, byName);
+                continue;
+            }
+
+            var hasNamed = parsed.Any(e => !string.IsNullOrEmpty(e.Name));
+            if (!hasNamed)
+            {
+                accumulated.Clear();
+                byName.Clear();
+                accumulated.AddRange(parsed);
+                ReindexByName(accumulated, byName);
+                continue;
+            }
+
+            foreach (var element in parsed)
+            {
+                if (!string.IsNullOrEmpty(element.Name) && byName.TryGetValue(element.Name, out var idx))
+                {
+                    accumulated[idx] = element;
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(element.Name))
+                    {
+                        byName[element.Name] = accumulated.Count;
+                    }
+
+                    accumulated.Add(element);
+                }
             }
         }
 
-        if (elements is null || elements.Count == 0)
-        {
-            return false;
-        }
+        return accumulated;
+    }
 
-        merged = new MergedJavaBlockModel
+    private static void ReindexByName(IReadOnlyList<ModelElement> elements, Dictionary<string, int> byName)
+    {
+        byName.Clear();
+        for (var i = 0; i < elements.Count; i++)
         {
-            Elements = elements,
-            Textures = textures
-        };
-        return true;
+            var name = elements[i].Name;
+            if (!string.IsNullOrEmpty(name))
+            {
+                byName[name] = i;
+            }
+        }
     }
 
     private static bool CollectChainJsonTexts(
@@ -82,13 +176,14 @@ internal static class MinecraftModelMerger
             {
                 if (parentRef.StartsWith("builtin/", StringComparison.OrdinalIgnoreCase))
                 {
-                    return false;
+                    chainTexts.Add(text);
+                    return true;
                 }
 
-                if (!TryResolveModelPath(modelZipPath, parentRef, out var parentZipPath) ||
-                    !CollectChainJsonTexts(source, parentZipPath, visited, chainTexts))
+                if (TryResolveModelPath(modelZipPath, parentRef, out var parentZipPath) &&
+                    CollectChainJsonTexts(source, parentZipPath, visited, chainTexts))
                 {
-                    return false;
+                    // Parent chain collected.
                 }
             }
         }
@@ -208,8 +303,23 @@ internal static class MinecraftModelMerger
 
             if (faces.Count > 0)
             {
-                var localToParent = TryParseElementRotation(el, out var pose) ? pose : Matrix4x4.Identity;
-                list.Add(new ModelElement { From = from, To = to, Faces = faces, LocalToParent = localToParent });
+                var hasRotation = TryParseElementRotation(el, out var pose, out var rescaleRotation);
+                var localToParent = hasRotation ? pose : Matrix4x4.Identity;
+                string? name = null;
+                if (el.TryGetProperty("name", out var nameEl) && nameEl.ValueKind == JsonValueKind.String)
+                {
+                    name = nameEl.GetString();
+                }
+
+                list.Add(new ModelElement
+                {
+                    Name = name,
+                    From = from,
+                    To = to,
+                    Faces = faces,
+                    LocalToParent = localToParent,
+                    RescaleRotation = rescaleRotation,
+                });
             }
         }
 
@@ -218,14 +328,27 @@ internal static class MinecraftModelMerger
 
     /// <summary>
     /// Block/item model element <c>rotation</c> (Minecraft Wiki): pivot <c>origin</c> (default 8,8,8), <c>axis</c>, <c>angle</c> in degrees.
-    /// <c>rescale</c> is accepted but only rotation is applied (vanilla UV rescale not replicated in preview).
+    /// <c>rescale: true</c> stretches UV at bake time to reduce rotation stretch artifacts.
     /// </summary>
-    private static bool TryParseElementRotation(JsonElement element, out Matrix4x4 localToParent)
+    private static bool TryParseElementRotation(
+        JsonElement element,
+        out Matrix4x4 localToParent,
+        out bool rescaleRotation)
     {
         localToParent = Matrix4x4.Identity;
+        rescaleRotation = false;
         if (!element.TryGetProperty("rotation", out var rot) || rot.ValueKind != JsonValueKind.Object)
         {
             return false;
+        }
+
+        if (rot.TryGetProperty("rescale", out var rescaleEl) &&
+            (rescaleEl.ValueKind == JsonValueKind.True ||
+             (rescaleEl.ValueKind == JsonValueKind.String &&
+              bool.TryParse(rescaleEl.GetString(), out var parsedRescale) &&
+              parsedRescale)))
+        {
+            rescaleRotation = true;
         }
 
         var ox = 8f;
@@ -316,5 +439,4 @@ internal static class MinecraftModelMerger
 
         return i == 3 ? v : null;
     }
-
 }

@@ -5,6 +5,7 @@ using AutoPBR.App.Rendering.OpenGL;
 using AutoPBR.App.ViewModels;
 using AutoPBR.Core;
 using AutoPBR.Core.Models;
+using AutoPBR.Core.Preview;
 
 namespace AutoPBR.App.Services;
 
@@ -78,9 +79,28 @@ internal static class UserSettingsSynchronizer
         vm.Preview3DAtmosphereSunDiscStrength = settings.Preview3DAtmosphereSunDiscStrength < 0
             ? 0.35
             : Math.Clamp(settings.Preview3DAtmosphereSunDiscStrength, 0.0, 2.0);
+        vm.Preview3DAtmosphereSunDiscBrightness = settings.Preview3DAtmosphereSunDiscBrightness <= 0
+            ? 1.0
+            : Math.Clamp(settings.Preview3DAtmosphereSunDiscBrightness, 0.0, 4.0);
         vm.Preview3DAtmosphereSunDiscSize = settings.Preview3DAtmosphereSunDiscSize <= 0
             ? 1.0
             : Math.Clamp(settings.Preview3DAtmosphereSunDiscSize, 0.05, 2.0);
+        vm.Preview3DAtmosphereMoonDiscStrength = settings.Preview3DAtmosphereMoonDiscStrength <= 0
+            ? 1.35
+            : Math.Clamp(settings.Preview3DAtmosphereMoonDiscStrength, 0.0, 4.0);
+        vm.Preview3DAtmosphereMoonDiscSize = settings.Preview3DAtmosphereMoonDiscSize <= 0
+            ? 1.0
+            : Math.Clamp(settings.Preview3DAtmosphereMoonDiscSize, 0.05, 3.0);
+        vm.Preview3DAtmosphereMoonGlowStrength = settings.Preview3DAtmosphereMoonGlowStrength < 0
+            ? 0.7
+            : Math.Clamp(settings.Preview3DAtmosphereMoonGlowStrength, 0.0, 4.0);
+        vm.Preview3DAtmosphereMoonTextureSharpness = settings.Preview3DAtmosphereMoonTextureSharpness <= 0
+            ? 1.25
+            : Math.Clamp(settings.Preview3DAtmosphereMoonTextureSharpness, 0.0, 4.0);
+        vm.Preview3DMoonWorldLightIntensity = settings.Preview3DMoonWorldLightIntensity <= 0
+            ? 1.0
+            : Math.Clamp(settings.Preview3DMoonWorldLightIntensity, 0.0, 8.0);
+        vm.Preview3DShowCelestialDebug = settings.Preview3DShowCelestialDebug;
         vm.Preview3DEnableShadows = settings.Preview3DEnableShadows;
         vm.Preview3DLightYawDegrees = Math.Clamp(settings.Preview3DLightYawDegrees, -180.0, 180.0);
         vm.Preview3DLightPitchDegrees = Math.Clamp(settings.Preview3DLightPitchDegrees, -89.0, 89.0);
@@ -175,6 +195,14 @@ internal static class UserSettingsSynchronizer
             128);
         vm.MaxThreads = settings.MaxThreads;
         vm.TempDirectory = settings.TempDirectory;
+        if (string.IsNullOrWhiteSpace(settings.MinecraftAssetsDirectory))
+        {
+            vm.MinecraftAssetsDirectory = MinecraftInstallPathDetector.TryDetectDefaultAssetsRoot();
+        }
+        else
+        {
+            vm.MinecraftAssetsDirectory = settings.MinecraftAssetsDirectory;
+        }
         vm.DebugMode = settings.DebugMode;
         vm.ColorScheme = string.IsNullOrWhiteSpace(settings.ColorScheme) ? "Dark" : settings.ColorScheme;
         vm.UiScale = settings.UiScale <= 0
@@ -321,7 +349,14 @@ internal static class UserSettingsSynchronizer
         settings.Preview3DAtmosphereHorizonFalloff = Math.Clamp(vm.Preview3DAtmosphereHorizonFalloff, 0.25, 4.0);
         settings.Preview3DAtmosphereSkyExposure = Math.Clamp(vm.Preview3DAtmosphereSkyExposure, 0.1, 3.0);
         settings.Preview3DAtmosphereSunDiscStrength = Math.Clamp(vm.Preview3DAtmosphereSunDiscStrength, 0.0, 2.0);
+        settings.Preview3DAtmosphereSunDiscBrightness = Math.Clamp(vm.Preview3DAtmosphereSunDiscBrightness, 0.0, 4.0);
         settings.Preview3DAtmosphereSunDiscSize = Math.Clamp(vm.Preview3DAtmosphereSunDiscSize, 0.05, 2.0);
+        settings.Preview3DAtmosphereMoonDiscStrength = Math.Clamp(vm.Preview3DAtmosphereMoonDiscStrength, 0.0, 4.0);
+        settings.Preview3DAtmosphereMoonDiscSize = Math.Clamp(vm.Preview3DAtmosphereMoonDiscSize, 0.05, 3.0);
+        settings.Preview3DAtmosphereMoonGlowStrength = Math.Clamp(vm.Preview3DAtmosphereMoonGlowStrength, 0.0, 4.0);
+        settings.Preview3DAtmosphereMoonTextureSharpness = Math.Clamp(vm.Preview3DAtmosphereMoonTextureSharpness, 0.0, 4.0);
+        settings.Preview3DMoonWorldLightIntensity = Math.Clamp(vm.Preview3DMoonWorldLightIntensity, 0.0, 8.0);
+        settings.Preview3DShowCelestialDebug = vm.Preview3DShowCelestialDebug;
         settings.Preview3DTimeOfDayHours = Math.Clamp(vm.Preview3DTimeOfDayHours, 0.0, 24.0);
         settings.Preview3DAnimateTimeOfDay = vm.Preview3DAnimateTimeOfDay;
         settings.Preview3DTimeOfDaySpeed = Math.Clamp(vm.Preview3DTimeOfDaySpeed, 0.1, 4.0);
@@ -380,6 +415,7 @@ internal static class UserSettingsSynchronizer
         settings.PlantMaterialPorosityExtra = vm.PlantMaterialPorosityExtra;
         settings.MaxThreads = vm.MaxThreads;
         settings.TempDirectory = vm.TempDirectory;
+        settings.MinecraftAssetsDirectory = vm.MinecraftAssetsDirectory;
         settings.DebugMode = vm.DebugMode;
         settings.ColorScheme = vm.ColorScheme;
         settings.UiScale = Math.Clamp(vm.UiScale, MainWindowViewModel.MinUiScale, MainWindowViewModel.MaxUiScale);

@@ -17,21 +17,25 @@ public sealed partial class OpenGlPreviewBackend
     {
         var (yaw, pitch) = PreviewLightMath.EffectiveLightYawPitch(frame.Settings, frame.RenderTime);
         frame.WorldLightDir = PreviewLightMath.LightDirectionFromYawPitch(yaw, pitch);
+        frame.LightDir = PreviewLightMath.SceneLightDirectionFromCelestialCycle(frame.WorldLightDir);
         if (frame.Settings.EnableAtmosphericSky)
         {
             EnsureAtmosphereLuts(frame.Gl, frame.WorldLightDir, frame.Settings);
         }
 
         frame.CascadeSplitWorldDistance = ShadowCascadeSplitDistance;
-        frame.ShadowVp = BuildShadowViewProj(frame.WorldLightDir, ShadowCascadeFarHalfExtent);
+        frame.ShadowVp = BuildShadowViewProj(frame.LightDir, ShadowCascadeFarHalfExtent);
         frame.ShadowCascadesActive = frame.Settings is { EnableShadowCascades: true, EnableShadows: true } &&
                                      _shadowTargetCascadeNear is not null;
         if (frame.ShadowCascadesActive)
         {
-            frame.ShadowVpNear = BuildShadowViewProj(frame.WorldLightDir, ShadowCascadeNearHalfExtent);
+            frame.ShadowVpNear = BuildShadowViewProj(frame.LightDir, ShadowCascadeNearHalfExtent);
         }
 
-        frame.EntityAlphaModeUniform = frame.EntityEmulatedPreview ? (int)frame.Settings.EntityAlphaMode : 0;
+        frame.EntityAlphaModeUniform = PreviewSubjectAlphaPolicy.ResolveAlphaModeUniform(
+            frame.Scene.SceneKind,
+            frame.EntityEmulatedPreview,
+            frame.Settings.EntityAlphaMode);
         frame.EntityBlendDraw =
             frame.EntityEmulatedPreview &&
             frame.Scene.SceneKind == PreviewSceneKind.BlockModel &&
@@ -179,7 +183,16 @@ public sealed partial class OpenGlPreviewBackend
             }
             else
             {
-                SetIntOnProgram(_shadowProgram, "uEntityAlphaMode", 0);
+                var alphaMode = frame.EntityAlphaModeUniform;
+                if (alphaMode != 0)
+                {
+                    SetFloatOnProgram(_shadowProgram, "uAlphaCutoff", frame.Settings.AlphaCutoff);
+                    frame.Gl.ActiveTexture(TextureUnit.Texture0);
+                    _albedo!.Bind(0);
+                    SetIntOnProgram(_shadowProgram, "uAlbedo", 0);
+                }
+
+                SetIntOnProgram(_shadowProgram, "uEntityAlphaMode", alphaMode);
                 ApplyEntitySkinningUniforms(_shadowProgram, 0, 0, 0f);
                 _mesh.Draw();
             }

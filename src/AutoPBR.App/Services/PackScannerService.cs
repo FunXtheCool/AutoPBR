@@ -1,4 +1,5 @@
 using AutoPBR.App.Models;
+using AutoPBR.Core.Preview;
 
 namespace AutoPBR.App.Services;
 
@@ -13,10 +14,12 @@ internal static class PackScannerService
     {
         var childLists = new Dictionary<string, List<ArchiveChildEntry>>(StringComparer.OrdinalIgnoreCase);
         var seenChildren = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+        var inventoryPaths = new List<string>();
         var fileCount = 0;
-        AddZipToIndex(zipPath, pathPrefix: "", childLists, seenChildren, ref fileCount, progress, cancellationToken);
+        AddZipToIndex(zipPath, pathPrefix: "", childLists, seenChildren, inventoryPaths, ref fileCount, progress, cancellationToken);
         var index = ToReadOnlyIndex(childLists);
-        return new ScannedArchiveData(index, fileCount);
+        var inventory = ArchiveModelInventoryBuilder.BuildFromArchivePaths(inventoryPaths);
+        return new ScannedArchiveData(index, fileCount, modelInventory: inventory);
     }
 
     /// <summary>Index all .zip/.jar files in <paramref name="directory"/> (non-recursive). Root shows one folder per pack; inner paths are <c>{packRoot}/assets/...</c>.</summary>
@@ -42,6 +45,7 @@ internal static class PackScannerService
 
         var childLists = new Dictionary<string, List<ArchiveChildEntry>>(StringComparer.OrdinalIgnoreCase);
         var seenChildren = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+        var inventoryPaths = new List<string>();
         var rootList = new List<ArchiveChildEntry>();
         childLists[""] = rootList;
         var rootSeen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -62,16 +66,18 @@ internal static class PackScannerService
             batchMap[uniqueRoot] = packPath;
             rootList.Add(new ArchiveChildEntry(uniqueRoot, uniqueRoot, true));
             rootSeen.Add(uniqueRoot);
-            AddZipToIndex(packPath, uniqueRoot, childLists, seenChildren, ref fileCount, progress, cancellationToken);
+            AddZipToIndex(packPath, uniqueRoot, childLists, seenChildren, inventoryPaths, ref fileCount, progress, cancellationToken);
         }
 
         var index = ToReadOnlyIndex(childLists);
+        var inventory = ArchiveModelInventoryBuilder.BuildFromArchivePaths(inventoryPaths);
         return new ScannedArchiveData(
             index,
             fileCount,
             isBatch: true,
             batchFolderPath: Path.GetFullPath(directory),
-            batchPackRootToPath: batchMap);
+            batchPackRootToPath: batchMap,
+            modelInventory: inventory);
     }
 
     private static Dictionary<string, IReadOnlyList<ArchiveChildEntry>> ToReadOnlyIndex(
@@ -85,6 +91,7 @@ internal static class PackScannerService
         string pathPrefix,
         Dictionary<string, List<ArchiveChildEntry>> childLists,
         Dictionary<string, HashSet<string>> seenChildren,
+        List<string> inventoryPaths,
         ref int fileCount,
         IProgress<(int completed, int total)>? progress,
         CancellationToken cancellationToken)
@@ -107,6 +114,12 @@ internal static class PackScannerService
             var isEntryFolder = entry.FullName.EndsWith('/');
             if (!isEntryFolder && !full.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
             {
+                if (full.Contains("/models/block/", StringComparison.OrdinalIgnoreCase) &&
+                    full.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+                {
+                    inventoryPaths.Add(string.IsNullOrEmpty(pathPrefix) ? full : $"{pathPrefix}/{full}");
+                }
+
                 progress?.Report((completed, total));
                 completed++;
                 continue;
@@ -156,6 +169,10 @@ internal static class PackScannerService
                 if (isFile)
                 {
                     fileCount++;
+                    if (full.Contains("/textures/block/", StringComparison.OrdinalIgnoreCase))
+                    {
+                        inventoryPaths.Add(string.IsNullOrEmpty(pathPrefix) ? full : $"{pathPrefix}/{full}");
+                    }
                 }
 
                 current = path;

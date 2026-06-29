@@ -154,67 +154,28 @@ public static class ResourcePackConverter
             using (var zip = ZipFile.OpenRead(inputZipPath))
             {
                 var zipSource = new ZipAssetSource(zip);
-                var nativeProfile = previewNativeProfile;
-                var nativeRoot = nativeProfile?.RootDirectory;
-                var previewAssetSource = nativeRoot is not null && Directory.Exists(nativeRoot)
-                    ? new CompositeAssetSource(zipSource, new DirectoryAssetSource(nativeRoot))
-                    : new CompositeAssetSource(zipSource);
-                if (JavaModelPathResolver.TryResolveModelJsonFromTexture(previewAssetSource, archivePath, out var modelJsonPath,
-                        out var ns) &&
-                    MinecraftModelMerger.TryMerge(previewAssetSource, modelJsonPath, out var merged))
-                {
-                    var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(merged, ns);
-                    if (ordered.Count > 0)
-                    {
-                        foreach (var asset in ordered)
-                        {
-                            AssetSourceMaterializer.Materialize(previewAssetSource, asset, extracted);
-                        }
-
-                        mergedModel = merged;
-                        orderedModelTextures = ordered;
-                        modelDefaultNs = ns;
-                        meshProvenance = new(PreviewMeshDriverKind.PackModelJson, modelJsonPath);
-                    }
-                }
-
-                // Vanilla entities are often code-driven; if no JSON model exists, use clean-room runtime fallback.
-                if (mergedModel is null && IsEntityTextureArchivePath(archivePath))
-                {
-                    var runtime = EntityModelRuntimeFactory.Create();
-                    var profile = ResolvePreviewMeshNativeProfile(previewNativeProfile);
-                    var idlePhase = ComputeDeterministicIdlePhase(archivePath, profile.Name);
-                    var animTime = ComputeDeterministicAnimationTimeSeconds(archivePath, profile.Name);
-                    if (runtime.TryBuildStaticMesh(
-                            archivePath,
-                            profile,
-                            idlePhase,
-                            animTime,
-                            out var emuModel,
-                            out meshProvenance,
-                            applyGeometryIrSetupAnimMotion: false))
-                    {
-                        var entityNs = TryGetAssetNamespace(archivePath) ?? "minecraft";
-                        var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(emuModel, entityNs);
-                        if (ordered.Count > 0)
-                        {
-                            foreach (var asset in ordered)
-                            {
-                                AssetSourceMaterializer.Materialize(previewAssetSource, asset, extracted);
-                            }
-
-                            mergedModel = emuModel;
-                            orderedModelTextures = ordered;
-                            modelDefaultNs = entityNs;
-                            isEmulatedEntityModel = true;
-                        }
-                    }
-                }
+                var nativeRoot = previewNativeProfile?.RootDirectory;
+                var assetSources = PreviewAssetSourceFactory.Create(
+                    zipSource,
+                    options.MinecraftAssetsDirectory,
+                    nativeRoot);
+                var resolved = RuntimeBlockPreviewModelResolver.Resolve(
+                    zipSource,
+                    assetSources,
+                    archivePath,
+                    extracted,
+                    previewNativeProfile,
+                    options);
+                mergedModel = resolved.MergedModel;
+                orderedModelTextures = resolved.OrderedModelTextures;
+                modelDefaultNs = resolved.ModelDefaultNamespace;
+                isEmulatedEntityModel = resolved.IsEmulatedEntityModel;
+                meshProvenance = resolved.MeshProvenance;
             }
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var textures = TextureScanner.ScanTextures(
+            IReadOnlyList<TextureWorkItem> textures = TextureScanner.ScanTextures(
                 extracted,
                 options,
                 cachePackPath: inputZipPath,
@@ -249,6 +210,43 @@ public static class ResourcePackConverter
                     }
 
                     workOrdered.Add(w);
+                }
+
+                if (workOrdered is null &&
+                    TryRecoverBlockPreviewMaterials(
+                        inputZipPath,
+                        archivePath,
+                        extracted,
+                        previewNativeProfile,
+                        options,
+                        cancellationToken,
+                        ref mergedModel,
+                        ref orderedModelTextures,
+                        ref modelDefaultNs,
+                        ref textures,
+                        ref meshProvenance,
+                        out workOrdered))
+                {
+                    // Kept pack JSON geometry; filled missing sibling textures from install/native/catalog.
+                }
+
+                if (workOrdered is null &&
+                    TryRecoverBlockPreviewWithVanillaParity(
+                        inputZipPath,
+                        archivePath,
+                        extracted,
+                        previewNativeProfile,
+                        options,
+                        cancellationToken,
+                        ref mergedModel,
+                        ref orderedModelTextures,
+                        ref modelDefaultNs,
+                        ref meshProvenance,
+                        ref isEmulatedEntityModel,
+                        ref textures,
+                        out workOrdered))
+                {
+                    // Recovered via block texture parity catalog after pack JSON material gaps.
                 }
 
                 if (workOrdered is not null)
@@ -349,6 +347,7 @@ public static class ResourcePackConverter
                             Indices = indices,
                             DrawBatches = batchesList.ToArray(),
                             Materials = materials,
+                            MaterialArchivePaths = orderedModelTextures.ToArray(),
                             PrimaryMaterialIndex = primIdx,
                             Sprite2DFoliageTarget = sprite,
                             EnableRenderTimeAnimation = isEmulatedEntityModel && !isParityCatalogEntity,
@@ -397,6 +396,135 @@ public static class ResourcePackConverter
                 /* best-effort */
             }
         }
+    }
+
+    private static bool TryRecoverBlockPreviewMaterials(
+        string inputZipPath,
+        string archivePath,
+        string extracted,
+        MinecraftNativeProfile? previewNativeProfile,
+        AutoPbrOptions options,
+        CancellationToken cancellationToken,
+        ref MergedJavaBlockModel? mergedModel,
+        ref List<string>? orderedModelTextures,
+        ref string? modelDefaultNs,
+        ref IReadOnlyList<TextureWorkItem> textures,
+        ref PreviewMeshProvenance meshProvenance,
+        out List<TextureWorkItem>? workOrdered)
+    {
+        workOrdered = null;
+        if (mergedModel is null || orderedModelTextures is null || modelDefaultNs is null)
+        {
+            return false;
+        }
+
+        using var zip = ZipFile.OpenRead(inputZipPath);
+        var assetSources = PreviewAssetSourceFactory.Create(
+            new ZipAssetSource(zip),
+            options.MinecraftAssetsDirectory,
+            previewNativeProfile?.RootDirectory);
+        var ordered = orderedModelTextures;
+        if (!BlockPreviewMaterialRecovery.TryRecoverBlockPreviewMaterials(
+                assetSources,
+                archivePath,
+                extracted,
+                mergedModel,
+                modelDefaultNs,
+                ref ordered,
+                ref textures,
+                options,
+                cancellationToken))
+        {
+            return false;
+        }
+
+        orderedModelTextures = ordered;
+        meshProvenance = PreviewProvenanceFormatter.WithTag(meshProvenance, "material-recovery");
+        workOrdered = new List<TextureWorkItem>(ordered.Count);
+        foreach (var zpath in ordered)
+        {
+            var w = JavaModelPreviewPipeline.FindWorkItemByDiffuseZipPath(textures, extracted, zpath);
+            if (w is null)
+            {
+                workOrdered = null;
+                return false;
+            }
+
+            workOrdered.Add(w);
+        }
+
+        return true;
+    }
+
+    private static bool TryRecoverBlockPreviewWithVanillaParity(
+        string inputZipPath,
+        string archivePath,
+        string extracted,
+        MinecraftNativeProfile? previewNativeProfile,
+        AutoPbrOptions options,
+        CancellationToken cancellationToken,
+        ref MergedJavaBlockModel mergedModel,
+        ref List<string> orderedModelTextures,
+        ref string modelDefaultNs,
+        ref PreviewMeshProvenance meshProvenance,
+        ref bool isEmulatedEntityModel,
+        ref IReadOnlyList<TextureWorkItem> textures,
+        out List<TextureWorkItem>? workOrdered)
+    {
+        workOrdered = null;
+        if (!VanillaBlockPreviewRuntime.IsBlockTextureArchivePath(archivePath) ||
+            !VanillaBlockPreviewRuntime.TryBuildSyntheticMesh(
+                archivePath,
+                out var parityModel,
+                out var parityProvenance,
+                out var parityOrdered,
+                out var parityNs))
+        {
+            return false;
+        }
+
+        using (var zip = ZipFile.OpenRead(inputZipPath))
+        {
+            var zipSource = new ZipAssetSource(zip);
+            var nativeRoot = previewNativeProfile?.RootDirectory;
+            var assetSources = PreviewAssetSourceFactory.Create(
+                zipSource,
+                options.MinecraftAssetsDirectory,
+                nativeRoot);
+            foreach (var asset in parityOrdered)
+            {
+                if (assetSources.Composite.Exists(asset))
+                {
+                    AssetSourceMaterializer.Materialize(assetSources.Composite, asset, extracted);
+                }
+            }
+        }
+
+        textures = TextureScanner.ScanTextures(
+            extracted,
+            options,
+            cancellationToken: cancellationToken);
+        mergedModel = parityModel;
+        orderedModelTextures = parityOrdered;
+        modelDefaultNs = parityNs;
+        meshProvenance = parityProvenance;
+        meshProvenance = PreviewProvenanceFormatter.WithTag(meshProvenance, "parity-recovery");
+        isEmulatedEntityModel = false;
+
+        var assembled = new List<TextureWorkItem>(parityOrdered.Count);
+        foreach (var zpath in parityOrdered)
+        {
+            var w = JavaModelPreviewPipeline.FindWorkItemByDiffuseZipPath(textures, extracted, zpath);
+            if (w is null)
+            {
+                return false;
+            }
+
+            assembled.Add(w);
+        }
+
+        workOrdered = assembled;
+        return true;
     }
 
     private static MinecraftNativeProfile? ResolveNativeMinecraftDataProfile(string inputZipPath, string extractedPackDir)

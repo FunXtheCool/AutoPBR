@@ -41,6 +41,9 @@ public sealed class PreviewModelSubject
     public required PreviewDrawBatch[] DrawBatches { get; init; }
     public required PreviewTextureMaps[] Materials { get; init; }
 
+    /// <summary>Parallel to <see cref="Materials"/>; archive paths for per-slot colormap tint rules.</summary>
+    public string[]? MaterialArchivePaths { get; init; }
+
     /// <summary>Which <see cref="Materials"/> slot matches the user-selected texture (for 2D composite / flags).</summary>
     public int PrimaryMaterialIndex { get; init; }
 

@@ -1461,6 +1461,39 @@
                                               IsVisible="{Binding IsPreview3D}">
                                             <TextBlock Grid.Column="0"
                                                        VerticalAlignment="Center"
+                                                       Text="{Binding Strings.Preview3DAtmosphereSunDiscBrightness}"
+                                                       TextWrapping="Wrap"
+                                                       ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSunDiscBrightnessTooltip}" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                <Slider Width="220"
+                                                        Minimum="0.0"
+                                                        Maximum="4.0"
+                                                        SmallChange="0.05"
+                                                        LargeChange="0.25"
+                                                        TickFrequency="0.5"
+                                                        IsEnabled="{Binding Preview3DEnableAtmosphericSky}"
+                                                        Value="{Binding Preview3DAtmosphereSunDiscBrightness, Mode=TwoWay}"
+                                                        ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSunDiscBrightnessTooltip}" />
+                                                <NumericUpDown Minimum="0.0"
+                                                               Maximum="4.0"
+                                                               Increment="0.05"
+                                                               FormatString="F2"
+                                                               HorizontalAlignment="Left"
+                                                               MinWidth="92"
+                                                               MaxWidth="120"
+                                                               ShowButtonSpinner="False"
+                                                               AllowSpin="False"
+                                                               IsEnabled="{Binding Preview3DEnableAtmosphericSky}"
+                                                               Value="{Binding Preview3DAtmosphereSunDiscBrightness, Mode=TwoWay}"
+                                                               ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSunDiscBrightnessTooltip}" />
+                                            </StackPanel>
+                                        </Grid>
+                                        <Grid ColumnDefinitions="Auto,*"
+                                              ColumnSpacing="10"
+                                              MinWidth="0"
+                                              IsVisible="{Binding IsPreview3D}">
+                                            <TextBlock Grid.Column="0"
+                                                       VerticalAlignment="Center"
                                                        Text="{Binding Strings.Preview3DAtmosphereSunDiscStrength}"
                                                        TextWrapping="Wrap"
                                                        ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSunDiscStrengthTooltip}" />
@@ -1521,6 +1554,174 @@
                                                                ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSunDiscSizeTooltip}" />
                                             </StackPanel>
                                         </Grid>
+                                        <Grid ColumnDefinitions="Auto,*"
+                                              ColumnSpacing="10"
+                                              MinWidth="0"
+                                              IsVisible="{Binding IsPreview3D}">
+                                            <TextBlock Grid.Column="0"
+                                                       VerticalAlignment="Center"
+                                                       Text="{Binding Strings.Preview3DAtmosphereMoonDiscStrength}"
+                                                       TextWrapping="Wrap"
+                                                       ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonDiscStrengthTooltip}" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                <Slider Width="220"
+                                                        Minimum="0.0"
+                                                        Maximum="4.0"
+                                                        SmallChange="0.05"
+                                                        LargeChange="0.25"
+                                                        TickFrequency="0.5"
+                                                        IsEnabled="{Binding Preview3DEnableAtmosphericSky}"
+                                                        Value="{Binding Preview3DAtmosphereMoonDiscStrength, Mode=TwoWay}"
+                                                        ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonDiscStrengthTooltip}" />
+                                                <NumericUpDown Minimum="0.0"
+                                                               Maximum="4.0"
+                                                               Increment="0.05"
+                                                               FormatString="F2"
+                                                               HorizontalAlignment="Left"
+                                                               MinWidth="92"
+                                                               MaxWidth="120"
+                                                               ShowButtonSpinner="False"
+                                                               AllowSpin="False"
+                                                               IsEnabled="{Binding Preview3DEnableAtmosphericSky}"
+                                                               Value="{Binding Preview3DAtmosphereMoonDiscStrength, Mode=TwoWay}"
+                                                               ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonDiscStrengthTooltip}" />
+                                            </StackPanel>
+                                        </Grid>
+                                        <Grid ColumnDefinitions="Auto,*"
+                                              ColumnSpacing="10"
+                                              MinWidth="0"
+                                              IsVisible="{Binding IsPreview3D}">
+                                            <TextBlock Grid.Column="0"
+                                                       VerticalAlignment="Center"
+                                                       Text="{Binding Strings.Preview3DAtmosphereMoonDiscSize}"
+                                                       TextWrapping="Wrap"
+                                                       ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonDiscSizeTooltip}" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                <Slider Width="220"
+                                                        Minimum="0.05"
+                                                        Maximum="3.0"
+                                                        SmallChange="0.05"
+                                                        LargeChange="0.25"
+                                                        TickFrequency="0.5"
+                                                        IsEnabled="{Binding Preview3DEnableAtmosphericSky}"
+                                                        Value="{Binding Preview3DAtmosphereMoonDiscSize, Mode=TwoWay}"
+                                                        ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonDiscSizeTooltip}" />
+                                                <NumericUpDown Minimum="0.05"
+                                                               Maximum="3.0"
+                                                               Increment="0.05"
+                                                               FormatString="F2"
+                                                               HorizontalAlignment="Left"
+                                                               MinWidth="92"
+                                                               MaxWidth="120"
+                                                               ShowButtonSpinner="False"
+                                                               AllowSpin="False"
+                                                               IsEnabled="{Binding Preview3DEnableAtmosphericSky}"
+                                                               Value="{Binding Preview3DAtmosphereMoonDiscSize, Mode=TwoWay}"
+                                                               ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonDiscSizeTooltip}" />
+                                            </StackPanel>
+                                        </Grid>
+                                        <Grid ColumnDefinitions="Auto,*"
+                                              ColumnSpacing="10"
+                                              MinWidth="0"
+                                              IsVisible="{Binding IsPreview3D}">
+                                            <TextBlock Grid.Column="0"
+                                                       VerticalAlignment="Center"
+                                                       Text="{Binding Strings.Preview3DAtmosphereMoonGlowStrength}"
+                                                       TextWrapping="Wrap"
+                                                       ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonGlowStrengthTooltip}" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                <Slider Width="220"
+                                                        Minimum="0.0"
+                                                        Maximum="4.0"
+                                                        SmallChange="0.05"
+                                                        LargeChange="0.25"
+                                                        TickFrequency="0.5"
+                                                        IsEnabled="{Binding Preview3DEnableAtmosphericSky}"
+                                                        Value="{Binding Preview3DAtmosphereMoonGlowStrength, Mode=TwoWay}"
+                                                        ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonGlowStrengthTooltip}" />
+                                                <NumericUpDown Minimum="0.0"
+                                                               Maximum="4.0"
+                                                               Increment="0.05"
+                                                               FormatString="F2"
+                                                               HorizontalAlignment="Left"
+                                                               MinWidth="92"
+                                                               MaxWidth="120"
+                                                               ShowButtonSpinner="False"
+                                                               AllowSpin="False"
+                                                               IsEnabled="{Binding Preview3DEnableAtmosphericSky}"
+                                                               Value="{Binding Preview3DAtmosphereMoonGlowStrength, Mode=TwoWay}"
+                                                               ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonGlowStrengthTooltip}" />
+                                            </StackPanel>
+                                        </Grid>
+                                        <Grid ColumnDefinitions="Auto,*"
+                                              ColumnSpacing="10"
+                                              MinWidth="0"
+                                              IsVisible="{Binding IsPreview3D}">
+                                            <TextBlock Grid.Column="0"
+                                                       VerticalAlignment="Center"
+                                                       Text="{Binding Strings.Preview3DAtmosphereMoonTextureSharpness}"
+                                                       TextWrapping="Wrap"
+                                                       ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonTextureSharpnessTooltip}" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                <Slider Width="220"
+                                                        Minimum="0.0"
+                                                        Maximum="4.0"
+                                                        SmallChange="0.05"
+                                                        LargeChange="0.25"
+                                                        TickFrequency="0.5"
+                                                        IsEnabled="{Binding Preview3DEnableAtmosphericSky}"
+                                                        Value="{Binding Preview3DAtmosphereMoonTextureSharpness, Mode=TwoWay}"
+                                                        ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonTextureSharpnessTooltip}" />
+                                                <NumericUpDown Minimum="0.0"
+                                                               Maximum="4.0"
+                                                               Increment="0.05"
+                                                               FormatString="F2"
+                                                               HorizontalAlignment="Left"
+                                                               MinWidth="92"
+                                                               MaxWidth="120"
+                                                               ShowButtonSpinner="False"
+                                                               AllowSpin="False"
+                                                               IsEnabled="{Binding Preview3DEnableAtmosphericSky}"
+                                                               Value="{Binding Preview3DAtmosphereMoonTextureSharpness, Mode=TwoWay}"
+                                                               ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonTextureSharpnessTooltip}" />
+                                            </StackPanel>
+                                        </Grid>
+                                        <Grid ColumnDefinitions="Auto,*"
+                                              ColumnSpacing="10"
+                                              MinWidth="0"
+                                              IsVisible="{Binding IsPreview3D}">
+                                            <TextBlock Grid.Column="0"
+                                                       VerticalAlignment="Center"
+                                                       Text="{Binding Strings.Preview3DMoonWorldLightIntensity}"
+                                                       TextWrapping="Wrap"
+                                                       ToolTip.Tip="{Binding Strings.Preview3DMoonWorldLightIntensityTooltip}" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                <Slider Width="220"
+                                                        Minimum="0.0"
+                                                        Maximum="8.0"
+                                                        SmallChange="0.05"
+                                                        LargeChange="0.25"
+                                                        TickFrequency="1.0"
+                                                        Value="{Binding Preview3DMoonWorldLightIntensity, Mode=TwoWay}"
+                                                        ToolTip.Tip="{Binding Strings.Preview3DMoonWorldLightIntensityTooltip}" />
+                                                <NumericUpDown Minimum="0.0"
+                                                               Maximum="8.0"
+                                                               Increment="0.05"
+                                                               FormatString="F2"
+                                                               HorizontalAlignment="Left"
+                                                               MinWidth="92"
+                                                               MaxWidth="120"
+                                                               ShowButtonSpinner="False"
+                                                               AllowSpin="False"
+                                                               Value="{Binding Preview3DMoonWorldLightIntensity, Mode=TwoWay}"
+                                                               ToolTip.Tip="{Binding Strings.Preview3DMoonWorldLightIntensityTooltip}" />
+                                            </StackPanel>
+                                        </Grid>
+                                        <CheckBox IsChecked="{Binding Preview3DShowCelestialDebug, Mode=TwoWay}"
+                                                  IsVisible="{Binding IsPreview3D}"
+                                                  ToolTip.Tip="{Binding Strings.Preview3DShowCelestialDebugTooltip}">
+                                            <TextBlock Text="{Binding Strings.Preview3DShowCelestialDebug}" TextWrapping="Wrap" />
+                                        </CheckBox>
                                         <Grid ColumnDefinitions="Auto,*"
                                               ColumnSpacing="10"
                                               MinWidth="0"
@@ -2267,7 +2468,7 @@
                             <StackPanel Spacing="10" MinWidth="0">
                                 <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding Strings.Engine}" TextWrapping="Wrap" />
 
-                                <Grid RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="10" MinWidth="0">
+                                <Grid RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="10" MinWidth="0">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" MinWidth="0" MaxWidth="720" />
@@ -2289,6 +2490,17 @@
                                              Text="{Binding TempDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                              ToolTip.Tip="{Binding Strings.TempFolderTooltip}" />
                                     <TextBlock Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Text=" " />
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.MinecraftAssetsFolder}"
+                                               ToolTip.Tip="{Binding Strings.MinecraftAssetsFolderTooltip}" />
+                                    <TextBox Grid.Row="2" Grid.Column="1" Classes="path-entry" MinWidth="0" Margin="0,2,0,0"
+                                             Watermark="{Binding Strings.MinecraftAssetsFolderWatermark}"
+                                             Text="{Binding MinecraftAssetsDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip.Tip="{Binding Strings.MinecraftAssetsFolderTooltip}" />
+                                    <Button Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" Margin="8,2,0,0"
+                                            Content="{Binding Strings.Browse}"
+                                            Click="BrowseMinecraftAssets_Click"
+                                            ToolTip.Tip="{Binding Strings.MinecraftAssetsFolderTooltip}" />
                                 </Grid>
 
                                 <CheckBox IsChecked="{Binding UseLegacyExtractor, Mode=TwoWay}"
@@ -2751,6 +2963,55 @@
                                                ToolTip.Tip="{Binding Strings.Preview3DSpriteThicknessTooltip}" />
                             </StackPanel>
                         </Grid>
+                        <StackPanel Orientation="Vertical"
+                                    Spacing="6"
+                                    IsVisible="{Binding IsPreview3DGrassColormapVisible}">
+                            <TextBlock Text="Grass colormap"
+                                       Foreground="{Binding ForegroundBrush}"
+                                       Opacity="0.85" />
+                            <Image Source="{Binding Preview3DGrassColormapImage}"
+                                   Stretch="Uniform"
+                                   MaxHeight="72"
+                                   HorizontalAlignment="Stretch" />
+                            <Grid ColumnDefinitions="Auto,*"
+                                  ColumnSpacing="10"
+                                  MinWidth="0">
+                                <TextBlock Grid.Column="0"
+                                           VerticalAlignment="Center"
+                                           Text="Temperature"
+                                           Foreground="{Binding ForegroundBrush}"
+                                           Opacity="0.85" />
+                                <Slider Grid.Column="1"
+                                        Minimum="0"
+                                        Maximum="1"
+                                        SmallChange="0.01"
+                                        LargeChange="0.1"
+                                        TickFrequency="0.1"
+                                        Value="{Binding Preview3DGrassColormapTemperature, Mode=TwoWay}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto,*"
+                                  ColumnSpacing="10"
+                                  MinWidth="0">
+                                <TextBlock Grid.Column="0"
+                                           VerticalAlignment="Center"
+                                           Text="Downfall"
+                                           Foreground="{Binding ForegroundBrush}"
+                                           Opacity="0.85" />
+                                <Slider Grid.Column="1"
+                                        Minimum="0"
+                                        Maximum="1"
+                                        SmallChange="0.01"
+                                        LargeChange="0.1"
+                                        TickFrequency="0.1"
+                                        Value="{Binding Preview3DGrassColormapDownfall, Mode=TwoWay}" />
+                            </Grid>
+                            <TextBlock Text="{Binding Preview3DGrassColormapSampleText}"
+                                       FontFamily="Consolas"
+                                       FontSize="11"
+                                       Foreground="{Binding ForegroundBrush}"
+                                       Opacity="0.85"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
                         <StackPanel Orientation="Horizontal"
                                     Spacing="8"
                                     VerticalAlignment="Center"

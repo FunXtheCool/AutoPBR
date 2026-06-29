@@ -35,6 +35,10 @@ internal sealed class ConversionSettingsModel
     public double PlantMaterialPorosityExtra { get; set; } = AutoPbrDefaults.DefaultPlantMaterialPorosityExtra;
     public int MaxThreads { get; set; }
     public string? TempDirectory { get; set; }
+
+    /// <summary>Optional local Minecraft install/version folder for block model JSON fallback during 3D preview.</summary>
+    public string? MinecraftAssetsDirectory { get; set; }
+
     public bool ProcessBlocks { get; set; } = true;
     public bool ProcessItems { get; set; } = true;
     public bool ProcessArmor { get; set; } = true;
@@ -166,6 +170,9 @@ internal sealed class ConversionSettingsModel
             SpecularDebugVerboseSpecularMl = SpecularDebugVerboseSpecularMl,
             MaxThreads = MaxThreads,
             TempDirectory = string.IsNullOrWhiteSpace(TempDirectory) ? null : TempDirectory,
+            MinecraftAssetsDirectory = string.IsNullOrWhiteSpace(MinecraftAssetsDirectory)
+                ? null
+                : MinecraftAssetsDirectory,
             ProcessBlocks = ProcessBlocks,
             ProcessItems = ProcessItems,
             ProcessArmor = ProcessArmor,

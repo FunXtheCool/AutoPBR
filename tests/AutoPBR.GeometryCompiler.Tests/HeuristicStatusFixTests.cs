@@ -164,8 +164,9 @@ public sealed class HeuristicStatusFixTests
         id.Length > prefix.Length &&
         id.AsSpan(prefix.Length).IndexOfAnyExcept("0123456789".AsSpan()) < 0;
 
-    private static string? ResolveClientJar() =>
-        GeometryIrTestTierSupport.TryClientJarPath(FindRepoRoot());
+    private static string ResolveClientJar() =>
+        GeometryIrTestTierSupport.TryClientJarPath(FindRepoRoot())
+        ?? throw new InvalidOperationException("Minecraft client jar not found.");
 
     private static string FindRepoRoot()
     {

@@ -84,6 +84,7 @@ public partial class MainWindowViewModel
             SpecularDebugVerboseSpecularMl = SpecularDebugVerboseSpecularMl,
             MaxThreads = MaxThreads,
             TempDirectory = TempDirectory,
+            MinecraftAssetsDirectory = MinecraftAssetsDirectory,
             ProcessBlocks = ProcessBlocks,
             ProcessItems = ProcessItems,
             ProcessArmor = ProcessArmor,

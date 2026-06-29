@@ -31,6 +31,13 @@ public sealed partial class PreviewRenderingTests
         Assert.Equal(2.6f, s.AtmosphereTurbidity);
         Assert.Equal(10f, s.AtmosphereSunIntensity);
         Assert.Equal(1.35f, s.AtmosphereHorizonFalloff);
+        Assert.Equal(0.35f, s.AtmosphereSunDiscStrength);
+        Assert.Equal(1f, s.AtmosphereSunDiscBrightness);
+        Assert.Equal(1.35f, s.AtmosphereMoonDiscStrength);
+        Assert.Equal(1f, s.AtmosphereMoonDiscSize);
+        Assert.Equal(0.7f, s.AtmosphereMoonGlowStrength);
+        Assert.Equal(1.25f, s.AtmosphereMoonTextureSharpness);
+        Assert.Equal(1f, s.MoonWorldLightIntensity);
         Assert.Equal(1f, s.SssStrength);
         Assert.Equal(0.6f, s.IblStrength);
         Assert.Equal(1f, s.EmissionStrength);

@@ -157,7 +157,8 @@ internal static partial class MinecraftModelBaker
                 CloseBatchIfNeeded(matIdx, ResolveElementLayerPolicy(el, texZip, model.Textures));
 
                 _ = TryEmitFace(effectiveFaceName, fx, fy, fz, tx, ty, tz, face, wh.w, wh.h, el.LocalToParent, v, idx,
-                    appendBoneIndex, appendBoneIndex ? elementIndex : 0, skipPreviewCuboidScale, in uvPolicy, el.MirrorCuboidUv);
+                    appendBoneIndex, appendBoneIndex ? elementIndex : 0, skipPreviewCuboidScale, in uvPolicy, el.MirrorCuboidUv,
+                    el.RescaleRotation);
             }
 
             elementIndex++;

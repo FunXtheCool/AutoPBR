@@ -1,7 +1,5 @@
 using AutoPBR.Tests.TestSupport;
-using AutoPBR.Tools.GeometryCompiler;
 using System.Text.Json.Nodes;
-using System.Text.Json.Nodes;  using AutoPBR.Tools.GeometryCompiler;  using Xunit;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 

@@ -52,6 +52,19 @@ public partial class MainWindowViewModel
         SaveSettings();
     }
 
+    partial void OnMinecraftAssetsDirectoryChanged(string? value)
+    {
+        _ = value;
+        SaveSettings();
+        if (_loadingSettings || !IsPreview3D || string.IsNullOrWhiteSpace(PreviewArchivePath))
+        {
+            return;
+        }
+
+        RefreshPreviewGrassColormapState();
+        Push3DPreviewStateToGpu();
+    }
+
     partial void OnDebugModeChanged(bool value)
     {
         _ = value;

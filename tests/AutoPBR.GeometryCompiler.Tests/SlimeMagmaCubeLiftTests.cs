@@ -54,8 +54,9 @@ public sealed class SlimeMagmaCubeLiftTests
         Assert.Equal(24, to[1]!.GetValue<int>());
     }
 
-    private static string? ResolveClientJar() =>
-        GeometryIrTestTierSupport.TryClientJarPath(Program.FindRepoRoot());
+    private static string ResolveClientJar() =>
+        GeometryIrTestTierSupport.TryClientJarPath(Program.FindRepoRoot())
+        ?? throw new InvalidOperationException("Minecraft client jar not found.");
 
     private static JsonObject? FindPartById(JsonArray parts, string id)
     {

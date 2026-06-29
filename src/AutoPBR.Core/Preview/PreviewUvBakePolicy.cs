@@ -16,6 +16,8 @@ internal readonly struct PreviewUvBakePolicy
     public bool PreserveDirectionalBounds { get; init; }
     public bool UseBottomLeftUvOrigin { get; init; }
     public bool MapJavaCuboidFaceCorners { get; init; }
+    /// <summary>Swap triangle index order so outward faces are CCW for GL back-face cull (block/item JSON quads).</summary>
+    public bool ReverseFaceWinding { get; init; }
     public int UvCornerOrderMode { get; init; }
     public float OffsetUPixels { get; init; }
     public float OffsetVPixels { get; init; }
@@ -30,11 +32,12 @@ internal readonly struct PreviewUvBakePolicy
         PreserveDirectionalBounds = true,
     };
 
-    /// <summary>Block/item JSON models use bbox UV corners until audited separately.</summary>
+    /// <summary>Block/item JSON models use bbox UV corners; quads need reversed winding vs Java corner order for GL CCW cull.</summary>
     public static PreviewUvBakePolicy BlockOrItemBaseline { get; } = new()
     {
         FlipV = true,
         PreserveDirectionalBounds = true,
+        ReverseFaceWinding = true,
     };
 
     public static PreviewUvBakePolicy Resolve(MergedJavaBlockModel model)

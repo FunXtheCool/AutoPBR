@@ -90,14 +90,16 @@ public sealed partial class OpenGlPreviewBackend
             nearPlane,
             farPlane);
         frame.View = PreviewGlMatrices.CreateLookAtRhOpenGlRowStorage(frame.Eye, frame.LookTarget, Vector3.UnitY);
+        frame.NearPlane = nearPlane;
+        frame.FarPlane = farPlane;
 
-        frame.LightDir = frame.WorldLightDir;
-        if (frame.LightDir.LengthSquared() < 1e-8f)
+        if (frame.WorldLightDir.LengthSquared() < 1e-8f)
         {
-            frame.LightDir = frame.Scene.Light.Direction.LengthSquared() < 1e-8f
+            frame.WorldLightDir = frame.Scene.Light.Direction.LengthSquared() < 1e-8f
                 ? new Vector3(-0.35f, -0.85f, -0.4f)
                 : Vector3.Normalize(frame.Scene.Light.Direction);
         }
+        frame.LightDir = PreviewLightMath.SceneLightDirectionFromCelestialCycle(frame.WorldLightDir);
 
         var lutSkyReady = _atmoLutsValid && _atmoSkyViewTex != 0;
         var drawSky = frame.Settings.EnableAtmosphericSky && _atmoQuadVao != 0 &&
@@ -127,8 +129,12 @@ public sealed partial class OpenGlPreviewBackend
         // remains a billboard, drawn before opaque geometry so depth testing hides it.
         frame.Gl.Enable(EnableCap.DepthTest);
         frame.Gl.DepthFunc(GLEnum.Lequal);
-        DrawMoonBillboard(frame.Gl, frame.Proj, frame.View, frame.Eye, frame.LightDir,
-            frame.Settings.AtmosphereSunDiscStrength * 0.85f,
+        DrawMoonBillboard(frame.Gl, frame.Proj, frame.View, frame.Eye, frame.WorldLightDir,
+            farPlane,
+            frame.Settings.AtmosphereMoonDiscStrength,
+            frame.Settings.AtmosphereMoonDiscSize,
+            frame.Settings.AtmosphereMoonGlowStrength,
+            frame.Settings.AtmosphereMoonTextureSharpness,
             ShouldCullSolidBackFaces(frame.Scene.SceneKind, frame.BlockModel));
 
         _program.Use();
@@ -138,7 +144,10 @@ public sealed partial class OpenGlPreviewBackend
 
         SetVec3("uCameraPos", frame.Eye);
         SetVec3("uLightDir", frame.LightDir);
-        SetVec3("uLightColor", frame.Scene.Light.Color);
+        SetVec3("uLightColor", PreviewLightMath.SceneLightColorFromCelestialCycle(
+            frame.WorldLightDir,
+            frame.Scene.Light.Color,
+            frame.Settings.MoonWorldLightIntensity));
         SetFloat("uAmbient", frame.Settings.AmbientStrength);
         SetFloat("uNormalStrength", frame.Settings.NormalStrength);
         SetFloat("uHeightStrength", frame.Settings.HeightStrength);
@@ -230,7 +239,7 @@ public sealed partial class OpenGlPreviewBackend
         SetInt("uEnableNormalMap", frame.EnableNormalMapEff ? 1 : 0);
         SetInt("uEnableSpecularMap", frame.EnableSpecularMapEff ? 1 : 0);
         SetInt("uSceneKind", frame.Scene.SceneKind == PreviewSceneKind.ItemPlane ? 1 : 0);
-        SetInt("uEntityAlphaMode", frame.EntityEmulatedPreview ? frame.EntityAlphaModeUniform : 0);
+        SetInt("uEntityAlphaMode", frame.EntityAlphaModeUniform);
         if (_atmoSkyViewTex != 0)
         {
             frame.Gl.ActiveTexture(TextureUnit.Texture5);
@@ -273,9 +282,7 @@ public sealed partial class OpenGlPreviewBackend
                     batch.LayerPolicy.Kind == PreviewDepthLayerKind.TranslucentOverlay;
                 var batchAlphaMode = batchUsesTranslucentOverlay
                     ? (int)PreviewEntityAlphaMode.Blend
-                    : frame.EntityEmulatedPreview
-                        ? frame.EntityAlphaModeUniform
-                        : 0;
+                    : frame.EntityAlphaModeUniform;
                 var batchBlend = frame.EntityBlendDraw || batchUsesTranslucentOverlay;
                 if (batchBlend)
                 {
@@ -337,7 +344,7 @@ public sealed partial class OpenGlPreviewBackend
                 frame.Gl.Enable(EnableCap.Blend);
             }
 
-            SetInt("uEntityAlphaMode", frame.EntityEmulatedPreview ? frame.EntityAlphaModeUniform : 0);
+            SetInt("uEntityAlphaMode", frame.EntityAlphaModeUniform);
         }
         else
         {

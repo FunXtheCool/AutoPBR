@@ -77,6 +77,12 @@ public sealed class AutoPbrOptions
     /// </summary>
     public string? TempDirectory { get; init; }
 
+    /// <summary>
+    /// Optional local Minecraft install or extracted version folder used to resolve missing
+    /// <c>assets/minecraft/models/block/*.json</c> during 3D preview (pack zip takes priority).
+    /// </summary>
+    public string? MinecraftAssetsDirectory { get; init; }
+
     /// <summary>Scale for dielectric smoothness (R channel). 1 = unchanged; 0.5–1.5 typical.</summary>
     public float SmoothnessScale { get; init; } = AutoPbrDefaults.DefaultSmoothnessScale;
 

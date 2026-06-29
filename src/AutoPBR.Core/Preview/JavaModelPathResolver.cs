@@ -12,6 +12,19 @@ internal static class JavaModelPathResolver
         out string defaultNamespace)
     {
         modelJsonZipPath = string.Empty;
+        return TryResolveModelJsonPathsFromTexture(source, textureArchivePath, out var paths, out defaultNamespace) &&
+               paths.Count > 0 &&
+               (modelJsonZipPath = paths[0]).Length > 0;
+    }
+
+    /// <summary>Resolve one or more model JSON paths (multipart blockstates may yield several).</summary>
+    public static bool TryResolveModelJsonPathsFromTexture(
+        IAssetSource source,
+        string textureArchivePath,
+        out List<string> modelJsonZipPaths,
+        out string defaultNamespace)
+    {
+        modelJsonZipPaths = [];
         defaultNamespace = "minecraft";
         var norm = textureArchivePath.Replace('\\', '/').TrimStart('/');
         if (!norm.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
@@ -50,7 +63,6 @@ internal static class JavaModelPathResolver
                 ? "entity"
                 : "block";
 
-        // 1) Heuristic stem (door lower -> bottom model name).
         var mapped = MapTextureStemToModelStem(stem);
         var relMapped = MapTextureRelPathToModelRelPath(relStem);
         var candidates = new List<string>
@@ -58,29 +70,45 @@ internal static class JavaModelPathResolver
             $"assets/{defaultNamespace}/models/{modelsFolder}/{relMapped}.json",
             $"assets/{defaultNamespace}/models/{modelsFolder}/{relStem}.json",
             $"assets/{defaultNamespace}/models/{modelsFolder}/{mapped}.json",
-            $"assets/{defaultNamespace}/models/{modelsFolder}/{stem}.json"
+            $"assets/{defaultNamespace}/models/{modelsFolder}/{stem}.json",
         };
 
         foreach (var c in candidates)
         {
             if (source.Exists(c))
             {
-                modelJsonZipPath = c;
+                modelJsonZipPaths.Add(c);
+                BlockDoorPreviewPairing.TryAppendDoorPairModelPaths(source, stem, defaultNamespace, modelJsonZipPaths);
                 return true;
             }
         }
 
-        // 2) Blockstates (blocks only): assets/ns/blockstates/<stem>.json
         if (category.Equals("block", StringComparison.OrdinalIgnoreCase))
         {
             var bsStem = BlockstateStem(stem);
+            var familyStem = BlockPreviewBlockstateDefaults.ResolveFamilyStem(stem);
             var bsPath = $"assets/{defaultNamespace}/blockstates/{bsStem}.json";
             if (source.Exists(bsPath) && source.TryReadText(bsPath, out var bsText) &&
-                TryPickModelFromBlockstate(bsText, out var modelNotation) &&
-                ModelNotationToZipPath(modelNotation, out modelJsonZipPath) &&
-                source.Exists(modelJsonZipPath))
+                TryPickModelPathsFromBlockstate(bsText, familyStem, stem, out var fromBlockstate))
             {
-                return true;
+                foreach (var notation in fromBlockstate)
+                {
+                    if (!ModelNotationToZipPath(notation, out var zipPath) || !source.Exists(zipPath))
+                    {
+                        continue;
+                    }
+
+                    if (!modelJsonZipPaths.Contains(zipPath, StringComparer.OrdinalIgnoreCase))
+                    {
+                        modelJsonZipPaths.Add(zipPath);
+                    }
+                }
+
+                if (modelJsonZipPaths.Count > 0)
+                {
+                    BlockDoorPreviewPairing.TryAppendDoorPairModelPaths(source, stem, defaultNamespace, modelJsonZipPaths);
+                    return true;
+                }
             }
         }
 
@@ -144,7 +172,7 @@ internal static class JavaModelPathResolver
 
     internal static string BlockstateStem(string stemNoExt)
     {
-        foreach (var suf in new[] { "_lower", "_upper", "_bottom", "_top", "_side" })
+        foreach (var suf in new[] { "_lower", "_upper", "_bottom", "_top", "_inner", "_side" })
         {
             if (stemNoExt.EndsWith(suf, StringComparison.OrdinalIgnoreCase) && stemNoExt.Length > suf.Length)
             {
@@ -158,48 +186,159 @@ internal static class JavaModelPathResolver
     internal static bool TryPickModelFromBlockstate(string json, out string modelNotation)
     {
         modelNotation = string.Empty;
+        return TryPickModelPathsFromBlockstate(json, string.Empty, null, out var paths) &&
+               paths.Count > 0 &&
+               (modelNotation = paths[0]).Length > 0;
+    }
+
+    internal static bool TryPickModelPathsFromBlockstate(
+        string json,
+        string familyStem,
+        string? textureStem,
+        out List<string> modelNotations)
+    {
+        modelNotations = [];
         using var doc = JsonDocument.Parse(json,
             new JsonDocumentOptions { CommentHandling = JsonCommentHandling.Skip });
         var root = doc.RootElement;
         if (root.TryGetProperty("variants", out var variants) && variants.ValueKind == JsonValueKind.Object)
         {
-            string? bestKey = null;
-            foreach (var prop in variants.EnumerateObject())
+            var keys = variants.EnumerateObject().Select(p => p.Name).ToList();
+            if (BlockDoorPreviewPairing.IsDoorHalfTextureStem(familyStem) ||
+                familyStem.EndsWith("_door", StringComparison.Ordinal))
             {
-                if (prop.Name.Contains("half=lower", StringComparison.OrdinalIgnoreCase) &&
-                    !prop.Name.Contains("half=upper", StringComparison.OrdinalIgnoreCase))
-                {
-                    bestKey = prop.Name;
-                    break;
-                }
+                return TryPickDoorPairVariantModels(variants, keys, modelNotations);
             }
 
-            bestKey ??= variants.EnumerateObject().FirstOrDefault().Name;
-            if (string.IsNullOrEmpty(bestKey) || !variants.TryGetProperty(bestKey, out var vObj))
+            if (!BlockPreviewBlockstateDefaults.TryPickPreferredVariantKey(keys, familyStem, textureStem, out var bestKey) ||
+                !TryGetVariantValue(variants, bestKey, out var vObj))
             {
                 return false;
             }
 
-            return TryGetModelProperty(vObj, out modelNotation);
+            return TryAppendModelNotation(vObj, modelNotations);
         }
 
         if (root.TryGetProperty("multipart", out var mp) && mp.ValueKind == JsonValueKind.Array)
         {
+            var collectAll = BlockPreviewBlockstateDefaults.ShouldCollectAllMultipartApplies(familyStem);
             foreach (var part in mp.EnumerateArray())
             {
+                if (part.TryGetProperty("when", out _))
+                {
+                    if (!collectAll)
+                    {
+                        continue;
+                    }
+                }
+
                 if (!part.TryGetProperty("apply", out var apply))
                 {
                     continue;
                 }
 
-                if (TryGetModelProperty(apply, out modelNotation))
+                if (apply.ValueKind == JsonValueKind.Array)
                 {
-                    return true;
+                    foreach (var entry in apply.EnumerateArray())
+                    {
+                        TryAppendModelNotation(entry, modelNotations);
+                    }
                 }
+                else
+                {
+                    TryAppendModelNotation(apply, modelNotations);
+                }
+            }
+
+            return modelNotations.Count > 0;
+        }
+
+        return false;
+    }
+
+    private static bool TryPickDoorPairVariantModels(
+        JsonElement variants,
+        IReadOnlyList<string> variantKeys,
+        List<string> modelNotations)
+    {
+        string? lowerKey = null;
+        string? upperKey = null;
+        foreach (var key in variantKeys)
+        {
+            if (key.Contains("half=lower", StringComparison.OrdinalIgnoreCase) &&
+                !key.Contains("half=upper", StringComparison.OrdinalIgnoreCase))
+            {
+                lowerKey ??= key;
+            }
+
+            if (key.Contains("half=upper", StringComparison.OrdinalIgnoreCase) &&
+                !key.Contains("half=lower", StringComparison.OrdinalIgnoreCase))
+            {
+                upperKey ??= key;
+            }
+        }
+
+        lowerKey ??= variantKeys.FirstOrDefault(k =>
+            k.Contains("half=lower", StringComparison.OrdinalIgnoreCase));
+        upperKey ??= variantKeys.FirstOrDefault(k =>
+            k.Contains("half=upper", StringComparison.OrdinalIgnoreCase));
+
+        var picked = false;
+        if (!string.IsNullOrEmpty(lowerKey) &&
+            TryGetVariantValue(variants, lowerKey, out var lowerObj) &&
+            TryAppendModelNotation(lowerObj, modelNotations))
+        {
+            picked = true;
+        }
+
+        if (!string.IsNullOrEmpty(upperKey) &&
+            TryGetVariantValue(variants, upperKey, out var upperObj) &&
+            TryAppendModelNotation(upperObj, modelNotations))
+        {
+            picked = true;
+        }
+
+        return picked;
+    }
+
+    private static bool TryGetVariantValue(JsonElement variants, string? key, out JsonElement value)
+    {
+        value = default;
+        if (key is null)
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrEmpty(key) && variants.TryGetProperty(key, out value))
+        {
+            return true;
+        }
+
+        foreach (var prop in variants.EnumerateObject())
+        {
+            if (string.Equals(prop.Name, key, StringComparison.Ordinal))
+            {
+                value = prop.Value;
+                return true;
             }
         }
 
         return false;
+    }
+
+    private static bool TryAppendModelNotation(JsonElement vObj, List<string> modelNotations)
+    {
+        if (!TryGetModelProperty(vObj, out var modelNotation) || string.IsNullOrEmpty(modelNotation))
+        {
+            return false;
+        }
+
+        if (!modelNotations.Contains(modelNotation, StringComparer.OrdinalIgnoreCase))
+        {
+            modelNotations.Add(modelNotation);
+        }
+
+        return true;
     }
 
     private static bool TryGetModelProperty(JsonElement vObj, out string modelNotation)
@@ -220,5 +359,4 @@ internal static class JavaModelPathResolver
 
         return false;
     }
-
 }

@@ -334,7 +334,7 @@ public sealed partial class OpenGlPreviewBackend
 
         var aspect = frame.Vw / (float)Math.Max(frame.Vh, 1);
         var coneScale = Math.Max(frame.Settings.GodRayConeScale, 0.05f);
-        var towardSun = -frame.LightDir;
+        var towardSun = -frame.WorldLightDir;
         var tls = towardSun.LengthSquared();
         if (tls < 1e-12f)
         {
@@ -348,14 +348,14 @@ public sealed partial class OpenGlPreviewBackend
         float coneRadiusUv;
         if (towardSun.Y < 0.04f)
         {
-            PreviewSunScreenProjection.ComputeMoon(frame.Eye, frame.LightDir, frame.View, frame.Proj, aspect,
+            PreviewSunScreenProjection.ComputeMoon(frame.Eye, frame.WorldLightDir, frame.View, frame.Proj, aspect,
                 out lightUv, out discRadiusUv, out _);
             coneRadiusUv = Math.Max(discRadiusUv * PreviewSunScreenProjection.ShaftScale * coneScale,
                 PreviewSunScreenProjection.MinShaftRadiusUv * coneScale);
         }
         else
         {
-            PreviewSunScreenProjection.Compute(frame.Eye, frame.LightDir, frame.View, frame.Proj, aspect, coneScale,
+            PreviewSunScreenProjection.Compute(frame.Eye, frame.WorldLightDir, frame.View, frame.Proj, aspect, coneScale,
                 frame.Settings.AtmosphereSunDiscSize, out lightUv, out discRadiusUv, out coneRadiusUv, out _);
         }
 
@@ -409,7 +409,7 @@ public sealed partial class OpenGlPreviewBackend
 
         var aspect = frame.Vw / (float)Math.Max(frame.Vh, 1);
         var coneScale = Math.Max(frame.Settings.GodRayConeScale, 0.05f);
-        var towardSun = -frame.LightDir;
+        var towardSun = -frame.WorldLightDir;
         var tls = towardSun.LengthSquared();
         if (tls < 1e-12f)
         {
@@ -423,14 +423,14 @@ public sealed partial class OpenGlPreviewBackend
         float coneRadiusUv;
         if (towardSun.Y < 0.04f)
         {
-            PreviewSunScreenProjection.ComputeMoon(frame.Eye, frame.LightDir, frame.View, frame.Proj, aspect,
+            PreviewSunScreenProjection.ComputeMoon(frame.Eye, frame.WorldLightDir, frame.View, frame.Proj, aspect,
                 out lightUv, out discRadiusUv, out _);
             coneRadiusUv = Math.Max(discRadiusUv * PreviewSunScreenProjection.ShaftScale * coneScale,
                 PreviewSunScreenProjection.MinShaftRadiusUv * coneScale);
         }
         else
         {
-            PreviewSunScreenProjection.Compute(frame.Eye, frame.LightDir, frame.View, frame.Proj, aspect, coneScale,
+            PreviewSunScreenProjection.Compute(frame.Eye, frame.WorldLightDir, frame.View, frame.Proj, aspect, coneScale,
                 frame.Settings.AtmosphereSunDiscSize, out lightUv, out discRadiusUv, out coneRadiusUv, out _);
         }
 

@@ -128,6 +128,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [ObservableProperty] private int _maxThreads; // 0 = auto
     [ObservableProperty] private int _maxThreadsMax = Math.Max(1, Environment.ProcessorCount);
     [ObservableProperty] private string? _tempDirectory;
+    [ObservableProperty] private string? _minecraftAssetsDirectory;
     [ObservableProperty] private bool _debugMode;
     [ObservableProperty] private bool _processBlocks = true;
     [ObservableProperty] private bool _processItems = true;

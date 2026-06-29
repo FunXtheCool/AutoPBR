@@ -62,6 +62,8 @@ public sealed partial class OpenGlPreviewBackend
         public Vector3 LookTarget;
         public Matrix4x4 Proj;
         public Matrix4x4 View;
+        public float NearPlane;
+        public float FarPlane;
         public Vector3 LightDir;
         public bool GodRayCaptureActive;
         public double LastVolumeInjectMs;

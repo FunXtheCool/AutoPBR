@@ -27,6 +27,12 @@
     <Content Include="Data\minecraft-native\minecraft_26.1.2_entity_texture_model_manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Data\minecraft-native\minecraft_26.1.2_block_textures.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\minecraft-native\minecraft_26.1.2_block_texture_model_manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Data\minecraft-native\minecraft_26.1.2_geometry_ir_parity_policy.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

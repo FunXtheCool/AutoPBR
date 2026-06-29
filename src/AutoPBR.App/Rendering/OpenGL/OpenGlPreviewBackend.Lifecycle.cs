@@ -70,7 +70,11 @@ public sealed partial class OpenGlPreviewBackend
             }
             else
             {
-                _albedo.UploadRgba(albW, albH, alb[..albPx], nearest);
+                var albSpan = alb[..albPx];
+                var albUpload = material.GlUploadFlipRows
+                    ? OpenGlRgbaUpload.EnsureBottomRowFirst(albSpan, albW, albH)
+                    : albSpan.ToArray();
+                _albedo.UploadRgba(albW, albH, albUpload, nearest);
             }
 
             if (material.NormalRgba is { Length: >= 4 } nr)
@@ -79,7 +83,11 @@ public sealed partial class OpenGlPreviewBackend
                 var nPx = nw * nh * 4;
                 if (nr.Length >= nPx)
                 {
-                    _normal.UploadRgba(nw, nh, nr[..nPx].Span, nearest);
+                    var nSpan = nr[..nPx].Span;
+                    var nUpload = material.GlUploadFlipRows
+                        ? OpenGlRgbaUpload.EnsureBottomRowFirst(nSpan, nw, nh)
+                        : nSpan.ToArray();
+                    _normal.UploadRgba(nw, nh, nUpload, nearest);
                 }
                 else
                 {
@@ -97,7 +105,11 @@ public sealed partial class OpenGlPreviewBackend
                 var sPx = sw * sh * 4;
                 if (sr.Length >= sPx)
                 {
-                    _spec.UploadRgba(sw, sh, sr[..sPx].Span, nearest);
+                    var sSpan = sr[..sPx].Span;
+                    var sUpload = material.GlUploadFlipRows
+                        ? OpenGlRgbaUpload.EnsureBottomRowFirst(sSpan, sw, sh)
+                        : sSpan.ToArray();
+                    _spec.UploadRgba(sw, sh, sUpload, nearest);
                 }
                 else
                 {
@@ -115,7 +127,11 @@ public sealed partial class OpenGlPreviewBackend
                 var hPx = hw * hh * 4;
                 if (hr.Length >= hPx)
                 {
-                    _height.UploadRgba(hw, hh, hr[..hPx].Span, nearest);
+                    var hSpan = hr[..hPx].Span;
+                    var hUpload = material.GlUploadFlipRows
+                        ? OpenGlRgbaUpload.EnsureBottomRowFirst(hSpan, hw, hh)
+                        : hSpan.ToArray();
+                    _height.UploadRgba(hw, hh, hUpload, nearest);
                 }
                 else
                 {

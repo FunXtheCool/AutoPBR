@@ -43,8 +43,9 @@ public sealed class NautilusBabyBodyLayerLiftTests
         Assert.Equal(64, shard["textureHeight"]!.GetValue<int>());
     }
 
-    private static string? ResolveClientJar() =>
-        GeometryIrTestTierSupport.TryClientJarPath(Program.FindRepoRoot());
+    private static string ResolveClientJar() =>
+        GeometryIrTestTierSupport.TryClientJarPath(Program.FindRepoRoot())
+        ?? throw new InvalidOperationException("Minecraft client jar not found.");
 
     private static JsonObject? FindPartById(JsonArray parts, string id)
     {

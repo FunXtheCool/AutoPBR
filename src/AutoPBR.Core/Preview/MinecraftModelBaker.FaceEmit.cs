@@ -11,28 +11,12 @@ internal static partial class MinecraftModelBaker
         out string textureZipPath)
     {
         textureZipPath = string.Empty;
-        var key = faceTextureKey.Trim();
-        if (key.StartsWith('#'))
-        {
-            key = key[1..];
-        }
-
-        if (!textures.TryGetValue(key, out var texVal))
-        {
-            if (!textures.TryGetValue("#" + key, out texVal))
-            {
-                return false;
-            }
-        }
-
-        texVal = texVal.Trim();
-        if (string.IsNullOrEmpty(texVal))
+        if (!TryResolveTextureNotation(faceTextureKey, textures, defaultNamespace, out var notation, out var ns))
         {
             return false;
         }
 
-        var ns = defaultNamespace;
-        var path = texVal.Replace('\\', '/');
+        var path = notation.Replace('\\', '/');
         if (path.Contains(':', StringComparison.Ordinal))
         {
             var c = path.IndexOf(':');
@@ -54,6 +38,54 @@ internal static partial class MinecraftModelBaker
         return true;
     }
 
+    /// <summary>Follows Java model <c>#alias</c> texture chains (e.g. <c>#down</c> → <c>#end</c> → <c>minecraft:block/oak_log_top</c>).</summary>
+    internal static bool TryResolveTextureNotation(
+        string faceTextureKey,
+        Dictionary<string, string> textures,
+        string defaultNamespace,
+        out string notation,
+        out string resolvedNamespace,
+        int depth = 0)
+    {
+        notation = string.Empty;
+        resolvedNamespace = defaultNamespace;
+        if (depth > 12)
+        {
+            return false;
+        }
+
+        var key = faceTextureKey.Trim();
+        if (key.StartsWith('#'))
+        {
+            key = key[1..];
+        }
+
+        if (!textures.TryGetValue(key, out var texVal) &&
+            !textures.TryGetValue("#" + key, out texVal))
+        {
+            return false;
+        }
+
+        texVal = texVal.Trim();
+        if (string.IsNullOrEmpty(texVal))
+        {
+            return false;
+        }
+
+        if (texVal.StartsWith('#'))
+        {
+            return TryResolveTextureNotation(texVal, textures, defaultNamespace, out notation, out resolvedNamespace, depth + 1);
+        }
+
+        notation = texVal;
+        if (notation.Contains(':', StringComparison.Ordinal))
+        {
+            resolvedNamespace = notation[..notation.IndexOf(':')];
+        }
+
+        return true;
+    }
+
     private static bool TryEmitFace(
         string faceName,
         float fx,
@@ -72,7 +104,8 @@ internal static partial class MinecraftModelBaker
         int boneElementIndex,
         bool skipPreviewCuboidScale,
         in PreviewUvBakePolicy uvPolicy,
-        bool mirrorCuboidUv)
+        bool mirrorCuboidUv,
+        bool rescaleRotation)
     {
         mirrorCuboidUv &= uvPolicy.MapJavaCuboidFaceCorners;
         if (mirrorCuboidUv)
@@ -120,6 +153,18 @@ internal static partial class MinecraftModelBaker
             v0 = 0;
             u1 = 16;
             v1 = 16;
+        }
+
+        if (rescaleRotation)
+        {
+            var cu = (u0 + u1) * 0.5f;
+            var cv = (v0 + v1) * 0.5f;
+            var hu = (u1 - u0) * 0.5f * MathF.Sqrt(2f);
+            var hv = (v1 - v0) * 0.5f * MathF.Sqrt(2f);
+            u0 = cu - hu;
+            u1 = cu + hu;
+            v0 = cv - hv;
+            v1 = cv + hv;
         }
 
         ApplyPolicyUvSettings(ref u0, ref v0, ref u1, ref v1, ref face, in uvPolicy);
@@ -179,12 +224,25 @@ internal static partial class MinecraftModelBaker
         AddVert(v, c2, n, uvC, tang, wSign, appendBoneIndex, boneElementIndex);
         AddVert(v, c3, n, uvD, tang, wSign, appendBoneIndex, boneElementIndex);
 
-        idx.Add(baseIndex);
-        idx.Add(baseIndex + 1);
-        idx.Add(baseIndex + 2);
-        idx.Add(baseIndex);
-        idx.Add(baseIndex + 2);
-        idx.Add(baseIndex + 3);
+        if (uvPolicy.ReverseFaceWinding)
+        {
+            idx.Add(baseIndex);
+            idx.Add(baseIndex + 2);
+            idx.Add(baseIndex + 1);
+            idx.Add(baseIndex);
+            idx.Add(baseIndex + 3);
+            idx.Add(baseIndex + 2);
+        }
+        else
+        {
+            idx.Add(baseIndex);
+            idx.Add(baseIndex + 1);
+            idx.Add(baseIndex + 2);
+            idx.Add(baseIndex);
+            idx.Add(baseIndex + 2);
+            idx.Add(baseIndex + 3);
+        }
+
         return true;
     }
 

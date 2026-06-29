@@ -61,6 +61,48 @@ public sealed class PreviewLightMathTimeOfDayTests
     }
 
     [Fact]
+    public void SceneLightDirection_UsesSunByDayAndMoonByNight()
+    {
+        var (noonYaw, noonPitch) = PreviewLightMath.LightYawPitchFromTimeOfDay(12.0);
+        var noonCycleDir = PreviewLightMath.LightDirectionFromYawPitch(noonYaw, noonPitch);
+        var noonSceneDir = PreviewLightMath.SceneLightDirectionFromCelestialCycle(noonCycleDir);
+        Assert.Equal(noonCycleDir, noonSceneDir);
+        Assert.True((-noonSceneDir).Y > 0f);
+
+        var (midnightYaw, midnightPitch) = PreviewLightMath.LightYawPitchFromTimeOfDay(0.0);
+        var midnightCycleDir = PreviewLightMath.LightDirectionFromYawPitch(midnightYaw, midnightPitch);
+        var midnightSceneDir = PreviewLightMath.SceneLightDirectionFromCelestialCycle(midnightCycleDir);
+        Assert.Equal(-midnightCycleDir, midnightSceneDir);
+        Assert.True((-midnightSceneDir).Y > 0f);
+    }
+
+    [Fact]
+    public void SceneLightColor_DimsAndCoolsMoonlight()
+    {
+        var (yaw, pitch) = PreviewLightMath.LightYawPitchFromTimeOfDay(0.0);
+        var cycleDir = PreviewLightMath.LightDirectionFromYawPitch(yaw, pitch);
+        var moonColor = PreviewLightMath.SceneLightColorFromCelestialCycle(cycleDir, new(1f, 1f, 1f));
+
+        Assert.InRange(moonColor.X, 0.02f, 0.12f);
+        Assert.True(moonColor.Z > moonColor.X);
+    }
+
+    [Fact]
+    public void SceneLightColor_MoonWorldLightIntensityScalesOnlyMoonlight()
+    {
+        var (midnightYaw, midnightPitch) = PreviewLightMath.LightYawPitchFromTimeOfDay(0.0);
+        var midnightDir = PreviewLightMath.LightDirectionFromYawPitch(midnightYaw, midnightPitch);
+        var baseMoon = PreviewLightMath.SceneLightColorFromCelestialCycle(midnightDir, new(1f, 1f, 1f), 1f);
+        var boostedMoon = PreviewLightMath.SceneLightColorFromCelestialCycle(midnightDir, new(1f, 1f, 1f), 3f);
+        Assert.True(boostedMoon.X > baseMoon.X * 2.9f);
+
+        var (noonYaw, noonPitch) = PreviewLightMath.LightYawPitchFromTimeOfDay(12.0);
+        var noonDir = PreviewLightMath.LightDirectionFromYawPitch(noonYaw, noonPitch);
+        var dayColor = PreviewLightMath.SceneLightColorFromCelestialCycle(noonDir, new(1f, 0.9f, 0.8f), 8f);
+        Assert.Equal(new(1f, 0.9f, 0.8f), dayColor);
+    }
+
+    [Fact]
     public void EffectiveTimeOfDayHours_AdvancesWithRenderTime()
     {
         var settings = new PreviewRenderSettings

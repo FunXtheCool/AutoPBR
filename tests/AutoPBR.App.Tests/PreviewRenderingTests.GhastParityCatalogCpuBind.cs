@@ -133,7 +133,7 @@ public sealed partial class PreviewRenderingTests
     }
 
     private static PreviewMaterial[] CreateGhastSlotMaterials(PreviewTextureMaps[] textureMaps) =>
-        textureMaps.Select(PreviewMaterialMapper.FromCoreMaps).ToArray();
+        textureMaps.Select(m => PreviewMaterialMapper.FromCoreMaps(m)).ToArray();
 
     private static EntityEmulatedPreviewRebakeContext CreateGhastRebakeContext(string texturePath, ulong packFingerprint) =>
         new()

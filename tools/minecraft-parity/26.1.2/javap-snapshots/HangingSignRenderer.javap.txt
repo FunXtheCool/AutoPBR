@@ -1,0 +1,472 @@
+Compiled from "HangingSignRenderer.java"
+public class net.minecraft.client.renderer.blockentity.HangingSignRenderer extends net.minecraft.client.renderer.blockentity.AbstractSignRenderer<net.minecraft.client.renderer.blockentity.state.HangingSignRenderState> {
+  private static final java.lang.String PLANK = "plank";
+
+  private static final java.lang.String V_CHAINS = "vChains";
+
+  private static final java.lang.String NORMAL_CHAINS = "normalChains";
+
+  private static final java.lang.String CHAIN_L_1 = "chainL1";
+
+  private static final java.lang.String CHAIN_L_2 = "chainL2";
+
+  private static final java.lang.String CHAIN_R_1 = "chainR1";
+
+  private static final java.lang.String CHAIN_R_2 = "chainR2";
+
+  private static final java.lang.String BOARD = "board";
+
+  private static final float MODEL_RENDER_SCALE = 1.0f;
+
+  private static final float TEXT_RENDER_SCALE = 0.9f;
+
+  private static final org.joml.Vector3fc TEXT_OFFSET;
+
+  public static final net.minecraft.client.renderer.blockentity.WallAndGroundTransformations<net.minecraft.client.renderer.blockentity.state.SignRenderState$SignTransformations> TRANSFORMATIONS;
+
+  private final java.util.Map<net.minecraft.world.level.block.state.properties.WoodType, net.minecraft.client.renderer.blockentity.HangingSignRenderer$Models> signModels;
+
+  public net.minecraft.client.renderer.blockentity.HangingSignRenderer(net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider$Context);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokespecial #1                  // Method net/minecraft/client/renderer/blockentity/AbstractSignRenderer."<init>":(Lnet/minecraft/client/renderer/blockentity/BlockEntityRendererProvider$Context;)V
+       5: aload_0
+       6: invokestatic  #7                  // Method net/minecraft/world/level/block/state/properties/WoodType.values:()Ljava/util/stream/Stream;
+       9: invokedynamic #13,  0             // InvokeDynamic #0:apply:()Ljava/util/function/Function;
+      14: aload_1
+      15: invokedynamic #17,  0             // InvokeDynamic #1:apply:(Lnet/minecraft/client/renderer/blockentity/BlockEntityRendererProvider$Context;)Ljava/util/function/Function;
+      20: invokestatic  #20                 // Method com/google/common/collect/ImmutableMap.toImmutableMap:(Ljava/util/function/Function;Ljava/util/function/Function;)Ljava/util/stream/Collector;
+      23: invokeinterface #26,  2           // InterfaceMethod java/util/stream/Stream.collect:(Ljava/util/stream/Collector;)Ljava/lang/Object;
+      28: checkcast     #32                 // class java/util/Map
+      31: putfield      #34                 // Field signModels:Ljava/util/Map;
+      34: return
+
+  public net.minecraft.client.renderer.blockentity.state.HangingSignRenderState createRenderState();
+    Code:
+       0: new           #40                 // class net/minecraft/client/renderer/blockentity/state/HangingSignRenderState
+       3: dup
+       4: invokespecial #42                 // Method net/minecraft/client/renderer/blockentity/state/HangingSignRenderState."<init>":()V
+       7: areturn
+
+  public void extractRenderState(net.minecraft.world.level.block.entity.SignBlockEntity, net.minecraft.client.renderer.blockentity.state.HangingSignRenderState, float, net.minecraft.world.phys.Vec3, net.minecraft.client.renderer.feature.ModelFeatureRenderer$CrumblingOverlay);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: aload_2
+       3: fload_3
+       4: aload         4
+       6: aload         5
+       8: invokespecial #45                 // Method net/minecraft/client/renderer/blockentity/AbstractSignRenderer.extractRenderState:(Lnet/minecraft/world/level/block/entity/SignBlockEntity;Lnet/minecraft/client/renderer/blockentity/state/SignRenderState;FLnet/minecraft/world/phys/Vec3;Lnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V
+      11: aload_1
+      12: invokevirtual #49                 // Method net/minecraft/world/level/block/entity/SignBlockEntity.getBlockState:()Lnet/minecraft/world/level/block/state/BlockState;
+      15: astore        6
+      17: aload_2
+      18: aload         6
+      20: invokestatic  #55                 // InterfaceMethod net/minecraft/world/level/block/HangingSignBlock.getAttachmentPoint:(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/level/block/HangingSignBlock$Attachment;
+      23: putfield      #61                 // Field net/minecraft/client/renderer/blockentity/state/HangingSignRenderState.attachmentType:Lnet/minecraft/world/level/block/HangingSignBlock$Attachment;
+      26: aload         6
+      28: invokevirtual #65                 // Method net/minecraft/world/level/block/state/BlockState.getBlock:()Lnet/minecraft/world/level/block/Block;
+      31: instanceof    #71                 // class net/minecraft/world/level/block/WallHangingSignBlock
+      34: ifeq          64
+      37: aload_2
+      38: getstatic     #73                 // Field TRANSFORMATIONS:Lnet/minecraft/client/renderer/blockentity/WallAndGroundTransformations;
+      41: aload         6
+      43: getstatic     #77                 // Field net/minecraft/world/level/block/WallHangingSignBlock.FACING:Lnet/minecraft/world/level/block/state/properties/EnumProperty;
+      46: invokevirtual #81                 // Method net/minecraft/world/level/block/state/BlockState.getValue:(Lnet/minecraft/world/level/block/state/properties/Property;)Ljava/lang/Comparable;
+      49: checkcast     #85                 // class net/minecraft/core/Direction
+      52: invokevirtual #87                 // Method net/minecraft/client/renderer/blockentity/WallAndGroundTransformations.wallTransformation:(Lnet/minecraft/core/Direction;)Ljava/lang/Object;
+      55: checkcast     #93                 // class net/minecraft/client/renderer/blockentity/state/SignRenderState$SignTransformations
+      58: putfield      #95                 // Field net/minecraft/client/renderer/blockentity/state/HangingSignRenderState.transformations:Lnet/minecraft/client/renderer/blockentity/state/SignRenderState$SignTransformations;
+      61: goto          91
+      64: aload_2
+      65: getstatic     #73                 // Field TRANSFORMATIONS:Lnet/minecraft/client/renderer/blockentity/WallAndGroundTransformations;
+      68: aload         6
+      70: getstatic     #99                 // Field net/minecraft/world/level/block/CeilingHangingSignBlock.ROTATION:Lnet/minecraft/world/level/block/state/properties/IntegerProperty;
+      73: invokevirtual #81                 // Method net/minecraft/world/level/block/state/BlockState.getValue:(Lnet/minecraft/world/level/block/state/properties/Property;)Ljava/lang/Comparable;
+      76: checkcast     #105                // class java/lang/Integer
+      79: invokevirtual #107                // Method java/lang/Integer.intValue:()I
+      82: invokevirtual #111                // Method net/minecraft/client/renderer/blockentity/WallAndGroundTransformations.freeTransformations:(I)Ljava/lang/Object;
+      85: checkcast     #93                 // class net/minecraft/client/renderer/blockentity/state/SignRenderState$SignTransformations
+      88: putfield      #95                 // Field net/minecraft/client/renderer/blockentity/state/HangingSignRenderState.transformations:Lnet/minecraft/client/renderer/blockentity/state/SignRenderState$SignTransformations;
+      91: return
+
+  public static net.minecraft.client.model.Model$Simple createSignModel(net.minecraft.client.model.geom.EntityModelSet, net.minecraft.world.level.block.state.properties.WoodType, net.minecraft.world.level.block.HangingSignBlock$Attachment);
+    Code:
+       0: new           #115                // class net/minecraft/client/model/Model$Simple
+       3: dup
+       4: aload_0
+       5: aload_1
+       6: aload_2
+       7: invokestatic  #117                // Method net/minecraft/client/model/geom/ModelLayers.createHangingSignModelName:(Lnet/minecraft/world/level/block/state/properties/WoodType;Lnet/minecraft/world/level/block/HangingSignBlock$Attachment;)Lnet/minecraft/client/model/geom/ModelLayerLocation;
+      10: invokevirtual #123                // Method net/minecraft/client/model/geom/EntityModelSet.bakeLayer:(Lnet/minecraft/client/model/geom/ModelLayerLocation;)Lnet/minecraft/client/model/geom/ModelPart;
+      13: invokedynamic #129,  0            // InvokeDynamic #2:apply:()Ljava/util/function/Function;
+      18: invokespecial #130                // Method net/minecraft/client/model/Model$Simple."<init>":(Lnet/minecraft/client/model/geom/ModelPart;Ljava/util/function/Function;)V
+      21: areturn
+
+  private static org.joml.Matrix4f baseTransformation(float);
+    Code:
+       0: new           #133                // class org/joml/Matrix4f
+       3: dup
+       4: invokespecial #135                // Method org/joml/Matrix4f."<init>":()V
+       7: ldc           #136                // float 0.5f
+       9: ldc           #137                // float 0.9375f
+      11: ldc           #136                // float 0.5f
+      13: invokevirtual #138                // Method org/joml/Matrix4f.translation:(FFF)Lorg/joml/Matrix4f;
+      16: getstatic     #142                // Field com/mojang/math/Axis.YP:Lcom/mojang/math/Axis;
+      19: fload_0
+      20: fneg
+      21: invokeinterface #148,  2          // InterfaceMethod com/mojang/math/Axis.rotationDegrees:(F)Lorg/joml/Quaternionf;
+      26: invokevirtual #152                // Method org/joml/Matrix4f.rotate:(Lorg/joml/Quaternionfc;)Lorg/joml/Matrix4f;
+      29: fconst_0
+      30: ldc           #156                // float -0.3125f
+      32: fconst_0
+      33: invokevirtual #157                // Method org/joml/Matrix4f.translate:(FFF)Lorg/joml/Matrix4f;
+      36: areturn
+
+  private static com.mojang.math.Transformation bodyTransformation(float);
+    Code:
+       0: new           #160                // class com/mojang/math/Transformation
+       3: dup
+       4: fload_0
+       5: invokestatic  #162                // Method baseTransformation:(F)Lorg/joml/Matrix4f;
+       8: fconst_1
+       9: ldc           #166                // float -1.0f
+      11: ldc           #166                // float -1.0f
+      13: invokevirtual #167                // Method org/joml/Matrix4f.scale:(FFF)Lorg/joml/Matrix4f;
+      16: invokespecial #170                // Method com/mojang/math/Transformation."<init>":(Lorg/joml/Matrix4fc;)V
+      19: areturn
+
+  private static com.mojang.math.Transformation textTransformation(float, boolean);
+    Code:
+       0: fload_0
+       1: invokestatic  #162                // Method baseTransformation:(F)Lorg/joml/Matrix4f;
+       4: astore_2
+       5: iload_1
+       6: ifne          24
+       9: aload_2
+      10: getstatic     #142                // Field com/mojang/math/Axis.YP:Lcom/mojang/math/Axis;
+      13: ldc           #173                // float 180.0f
+      15: invokeinterface #148,  2          // InterfaceMethod com/mojang/math/Axis.rotationDegrees:(F)Lorg/joml/Quaternionf;
+      20: invokevirtual #152                // Method org/joml/Matrix4f.rotate:(Lorg/joml/Quaternionfc;)Lorg/joml/Matrix4f;
+      23: pop
+      24: ldc           #174                // float 0.0140625f
+      26: fstore_3
+      27: aload_2
+      28: getstatic     #175                // Field TEXT_OFFSET:Lorg/joml/Vector3fc;
+      31: invokevirtual #179                // Method org/joml/Matrix4f.translate:(Lorg/joml/Vector3fc;)Lorg/joml/Matrix4f;
+      34: pop
+      35: aload_2
+      36: ldc           #174                // float 0.0140625f
+      38: ldc           #182                // float -0.0140625f
+      40: ldc           #174                // float 0.0140625f
+      42: invokevirtual #167                // Method org/joml/Matrix4f.scale:(FFF)Lorg/joml/Matrix4f;
+      45: pop
+      46: new           #160                // class com/mojang/math/Transformation
+      49: dup
+      50: aload_2
+      51: invokespecial #170                // Method com/mojang/math/Transformation."<init>":(Lorg/joml/Matrix4fc;)V
+      54: areturn
+
+  private static net.minecraft.client.renderer.blockentity.state.SignRenderState$SignTransformations createTransformations(float);
+    Code:
+       0: new           #93                 // class net/minecraft/client/renderer/blockentity/state/SignRenderState$SignTransformations
+       3: dup
+       4: fload_0
+       5: invokestatic  #183                // Method bodyTransformation:(F)Lcom/mojang/math/Transformation;
+       8: fload_0
+       9: iconst_1
+      10: invokestatic  #187                // Method textTransformation:(FZ)Lcom/mojang/math/Transformation;
+      13: fload_0
+      14: iconst_0
+      15: invokestatic  #187                // Method textTransformation:(FZ)Lcom/mojang/math/Transformation;
+      18: invokespecial #191                // Method net/minecraft/client/renderer/blockentity/state/SignRenderState$SignTransformations."<init>":(Lcom/mojang/math/Transformation;Lcom/mojang/math/Transformation;Lcom/mojang/math/Transformation;)V
+      21: areturn
+
+  private static net.minecraft.client.renderer.blockentity.state.SignRenderState$SignTransformations createGroundTransformation(int);
+    Code:
+       0: iload_0
+       1: invokestatic  #194                // Method net/minecraft/world/level/block/state/properties/RotationSegment.convertToDegrees:(I)F
+       4: invokestatic  #200                // Method createTransformations:(F)Lnet/minecraft/client/renderer/blockentity/state/SignRenderState$SignTransformations;
+       7: areturn
+
+  private static net.minecraft.client.renderer.blockentity.state.SignRenderState$SignTransformations createWallTransformation(net.minecraft.core.Direction);
+    Code:
+       0: aload_0
+       1: invokevirtual #204                // Method net/minecraft/core/Direction.toYRot:()F
+       4: invokestatic  #200                // Method createTransformations:(F)Lnet/minecraft/client/renderer/blockentity/state/SignRenderState$SignTransformations;
+       7: areturn
+
+  protected net.minecraft.client.model.Model$Simple getSignModel(net.minecraft.client.renderer.blockentity.state.HangingSignRenderState);
+    Code:
+       0: aload_0
+       1: getfield      #34                 // Field signModels:Ljava/util/Map;
+       4: aload_1
+       5: getfield      #208                // Field net/minecraft/client/renderer/blockentity/state/HangingSignRenderState.woodType:Lnet/minecraft/world/level/block/state/properties/WoodType;
+       8: invokeinterface #212,  2          // InterfaceMethod java/util/Map.get:(Ljava/lang/Object;)Ljava/lang/Object;
+      13: checkcast     #216                // class net/minecraft/client/renderer/blockentity/HangingSignRenderer$Models
+      16: aload_1
+      17: getfield      #61                 // Field net/minecraft/client/renderer/blockentity/state/HangingSignRenderState.attachmentType:Lnet/minecraft/world/level/block/HangingSignBlock$Attachment;
+      20: invokevirtual #218                // Method net/minecraft/client/renderer/blockentity/HangingSignRenderer$Models.get:(Lnet/minecraft/world/level/block/HangingSignBlock$Attachment;)Lnet/minecraft/client/model/Model$Simple;
+      23: areturn
+
+  protected net.minecraft.client.resources.model.sprite.SpriteId getSignSprite(net.minecraft.world.level.block.state.properties.WoodType);
+    Code:
+       0: aload_1
+       1: invokestatic  #221                // Method net/minecraft/client/renderer/Sheets.getHangingSignSprite:(Lnet/minecraft/world/level/block/state/properties/WoodType;)Lnet/minecraft/client/resources/model/sprite/SpriteId;
+       4: areturn
+
+  public static void submitSpecial(net.minecraft.client.resources.model.sprite.SpriteGetter, com.mojang.blaze3d.vertex.PoseStack, net.minecraft.client.renderer.SubmitNodeCollector, int, int, net.minecraft.client.model.Model$Simple, net.minecraft.client.resources.model.sprite.SpriteId);
+    Code:
+       0: aload_2
+       1: aload         5
+       3: getstatic     #227                // Field net/minecraft/util/Unit.INSTANCE:Lnet/minecraft/util/Unit;
+       6: aload_1
+       7: iload_3
+       8: iload         4
+      10: iconst_m1
+      11: aload         6
+      13: aload_0
+      14: iconst_0
+      15: aconst_null
+      16: invokeinterface #237,  11         // InterfaceMethod net/minecraft/client/renderer/SubmitNodeCollector.submitModel:(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;IIILnet/minecraft/client/resources/model/sprite/SpriteId;Lnet/minecraft/client/resources/model/sprite/SpriteGetter;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V
+      21: return
+
+  public static net.minecraft.client.model.geom.builders.LayerDefinition createHangingSignLayer(net.minecraft.world.level.block.HangingSignBlock$Attachment);
+    Code:
+       0: new           #243                // class net/minecraft/client/model/geom/builders/MeshDefinition
+       3: dup
+       4: invokespecial #245                // Method net/minecraft/client/model/geom/builders/MeshDefinition."<init>":()V
+       7: astore_1
+       8: aload_1
+       9: invokevirtual #246                // Method net/minecraft/client/model/geom/builders/MeshDefinition.getRoot:()Lnet/minecraft/client/model/geom/builders/PartDefinition;
+      12: astore_2
+      13: aload_2
+      14: ldc           #250                // String board
+      16: invokestatic  #252                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.create:()Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+      19: iconst_0
+      20: bipush        12
+      22: invokevirtual #258                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.texOffs:(II)Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+      25: ldc_w         #262                // float -7.0f
+      28: fconst_0
+      29: ldc           #166                // float -1.0f
+      31: ldc_w         #263                // float 14.0f
+      34: ldc_w         #264                // float 10.0f
+      37: fconst_2
+      38: invokevirtual #265                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.addBox:(FFFFFF)Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+      41: getstatic     #269                // Field net/minecraft/client/model/geom/PartPose.ZERO:Lnet/minecraft/client/model/geom/PartPose;
+      44: invokevirtual #275                // Method net/minecraft/client/model/geom/builders/PartDefinition.addOrReplaceChild:(Ljava/lang/String;Lnet/minecraft/client/model/geom/builders/CubeListBuilder;Lnet/minecraft/client/model/geom/PartPose;)Lnet/minecraft/client/model/geom/builders/PartDefinition;
+      47: pop
+      48: aload_0
+      49: getstatic     #281                // Field net/minecraft/world/level/block/HangingSignBlock$Attachment.WALL:Lnet/minecraft/world/level/block/HangingSignBlock$Attachment;
+      52: if_acmpne     93
+      55: aload_2
+      56: ldc_w         #286                // String plank
+      59: invokestatic  #252                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.create:()Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+      62: iconst_0
+      63: iconst_0
+      64: invokevirtual #258                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.texOffs:(II)Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+      67: ldc_w         #288                // float -8.0f
+      70: ldc_w         #289                // float -6.0f
+      73: ldc_w         #290                // float -2.0f
+      76: ldc_w         #291                // float 16.0f
+      79: fconst_2
+      80: ldc_w         #292                // float 4.0f
+      83: invokevirtual #265                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.addBox:(FFFFFF)Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+      86: getstatic     #269                // Field net/minecraft/client/model/geom/PartPose.ZERO:Lnet/minecraft/client/model/geom/PartPose;
+      89: invokevirtual #275                // Method net/minecraft/client/model/geom/builders/PartDefinition.addOrReplaceChild:(Ljava/lang/String;Lnet/minecraft/client/model/geom/builders/CubeListBuilder;Lnet/minecraft/client/model/geom/PartPose;)Lnet/minecraft/client/model/geom/builders/PartDefinition;
+      92: pop
+      93: aload_0
+      94: getstatic     #281                // Field net/minecraft/world/level/block/HangingSignBlock$Attachment.WALL:Lnet/minecraft/world/level/block/HangingSignBlock$Attachment;
+      97: if_acmpeq     107
+     100: aload_0
+     101: getstatic     #293                // Field net/minecraft/world/level/block/HangingSignBlock$Attachment.CEILING:Lnet/minecraft/world/level/block/HangingSignBlock$Attachment;
+     104: if_acmpne     311
+     107: aload_2
+     108: ldc_w         #296                // String normalChains
+     111: invokestatic  #252                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.create:()Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+     114: getstatic     #269                // Field net/minecraft/client/model/geom/PartPose.ZERO:Lnet/minecraft/client/model/geom/PartPose;
+     117: invokevirtual #275                // Method net/minecraft/client/model/geom/builders/PartDefinition.addOrReplaceChild:(Ljava/lang/String;Lnet/minecraft/client/model/geom/builders/CubeListBuilder;Lnet/minecraft/client/model/geom/PartPose;)Lnet/minecraft/client/model/geom/builders/PartDefinition;
+     120: astore_3
+     121: aload_3
+     122: ldc_w         #298                // String chainL1
+     125: invokestatic  #252                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.create:()Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+     128: iconst_0
+     129: bipush        6
+     131: invokevirtual #258                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.texOffs:(II)Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+     134: ldc_w         #300                // float -1.5f
+     137: fconst_0
+     138: fconst_0
+     139: ldc_w         #301                // float 3.0f
+     142: ldc_w         #302                // float 6.0f
+     145: fconst_0
+     146: invokevirtual #265                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.addBox:(FFFFFF)Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+     149: ldc_w         #303                // float -5.0f
+     152: ldc_w         #289                // float -6.0f
+     155: fconst_0
+     156: fconst_0
+     157: ldc_w         #306                // float -0.7853982f
+     160: fconst_0
+     161: invokestatic  #307                // Method net/minecraft/client/model/geom/PartPose.offsetAndRotation:(FFFFFF)Lnet/minecraft/client/model/geom/PartPose;
+     164: invokevirtual #275                // Method net/minecraft/client/model/geom/builders/PartDefinition.addOrReplaceChild:(Ljava/lang/String;Lnet/minecraft/client/model/geom/builders/CubeListBuilder;Lnet/minecraft/client/model/geom/PartPose;)Lnet/minecraft/client/model/geom/builders/PartDefinition;
+     167: pop
+     168: aload_3
+     169: ldc_w         #311                // String chainL2
+     172: invokestatic  #252                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.create:()Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+     175: bipush        6
+     177: bipush        6
+     179: invokevirtual #258                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.texOffs:(II)Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+     182: ldc_w         #300                // float -1.5f
+     185: fconst_0
+     186: fconst_0
+     187: ldc_w         #301                // float 3.0f
+     190: ldc_w         #302                // float 6.0f
+     193: fconst_0
+     194: invokevirtual #265                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.addBox:(FFFFFF)Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+     197: ldc_w         #303                // float -5.0f
+     200: ldc_w         #289                // float -6.0f
+     203: fconst_0
+     204: fconst_0
+     205: ldc_w         #313                // float 0.7853982f
+     208: fconst_0
+     209: invokestatic  #307                // Method net/minecraft/client/model/geom/PartPose.offsetAndRotation:(FFFFFF)Lnet/minecraft/client/model/geom/PartPose;
+     212: invokevirtual #275                // Method net/minecraft/client/model/geom/builders/PartDefinition.addOrReplaceChild:(Ljava/lang/String;Lnet/minecraft/client/model/geom/builders/CubeListBuilder;Lnet/minecraft/client/model/geom/PartPose;)Lnet/minecraft/client/model/geom/builders/PartDefinition;
+     215: pop
+     216: aload_3
+     217: ldc_w         #314                // String chainR1
+     220: invokestatic  #252                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.create:()Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+     223: iconst_0
+     224: bipush        6
+     226: invokevirtual #258                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.texOffs:(II)Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+     229: ldc_w         #300                // float -1.5f
+     232: fconst_0
+     233: fconst_0
+     234: ldc_w         #301                // float 3.0f
+     237: ldc_w         #302                // float 6.0f
+     240: fconst_0
+     241: invokevirtual #265                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.addBox:(FFFFFF)Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+     244: ldc_w         #316                // float 5.0f
+     247: ldc_w         #289                // float -6.0f
+     250: fconst_0
+     251: fconst_0
+     252: ldc_w         #306                // float -0.7853982f
+     255: fconst_0
+     256: invokestatic  #307                // Method net/minecraft/client/model/geom/PartPose.offsetAndRotation:(FFFFFF)Lnet/minecraft/client/model/geom/PartPose;
+     259: invokevirtual #275                // Method net/minecraft/client/model/geom/builders/PartDefinition.addOrReplaceChild:(Ljava/lang/String;Lnet/minecraft/client/model/geom/builders/CubeListBuilder;Lnet/minecraft/client/model/geom/PartPose;)Lnet/minecraft/client/model/geom/builders/PartDefinition;
+     262: pop
+     263: aload_3
+     264: ldc_w         #317                // String chainR2
+     267: invokestatic  #252                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.create:()Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+     270: bipush        6
+     272: bipush        6
+     274: invokevirtual #258                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.texOffs:(II)Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+     277: ldc_w         #300                // float -1.5f
+     280: fconst_0
+     281: fconst_0
+     282: ldc_w         #301                // float 3.0f
+     285: ldc_w         #302                // float 6.0f
+     288: fconst_0
+     289: invokevirtual #265                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.addBox:(FFFFFF)Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+     292: ldc_w         #316                // float 5.0f
+     295: ldc_w         #289                // float -6.0f
+     298: fconst_0
+     299: fconst_0
+     300: ldc_w         #313                // float 0.7853982f
+     303: fconst_0
+     304: invokestatic  #307                // Method net/minecraft/client/model/geom/PartPose.offsetAndRotation:(FFFFFF)Lnet/minecraft/client/model/geom/PartPose;
+     307: invokevirtual #275                // Method net/minecraft/client/model/geom/builders/PartDefinition.addOrReplaceChild:(Ljava/lang/String;Lnet/minecraft/client/model/geom/builders/CubeListBuilder;Lnet/minecraft/client/model/geom/PartPose;)Lnet/minecraft/client/model/geom/builders/PartDefinition;
+     310: pop
+     311: aload_0
+     312: getstatic     #319                // Field net/minecraft/world/level/block/HangingSignBlock$Attachment.CEILING_MIDDLE:Lnet/minecraft/world/level/block/HangingSignBlock$Attachment;
+     315: if_acmpne     356
+     318: aload_2
+     319: ldc_w         #322                // String vChains
+     322: invokestatic  #252                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.create:()Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+     325: bipush        14
+     327: bipush        6
+     329: invokevirtual #258                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.texOffs:(II)Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+     332: ldc_w         #289                // float -6.0f
+     335: ldc_w         #289                // float -6.0f
+     338: fconst_0
+     339: ldc_w         #324                // float 12.0f
+     342: ldc_w         #302                // float 6.0f
+     345: fconst_0
+     346: invokevirtual #265                // Method net/minecraft/client/model/geom/builders/CubeListBuilder.addBox:(FFFFFF)Lnet/minecraft/client/model/geom/builders/CubeListBuilder;
+     349: getstatic     #269                // Field net/minecraft/client/model/geom/PartPose.ZERO:Lnet/minecraft/client/model/geom/PartPose;
+     352: invokevirtual #275                // Method net/minecraft/client/model/geom/builders/PartDefinition.addOrReplaceChild:(Ljava/lang/String;Lnet/minecraft/client/model/geom/builders/CubeListBuilder;Lnet/minecraft/client/model/geom/PartPose;)Lnet/minecraft/client/model/geom/builders/PartDefinition;
+     355: pop
+     356: aload_1
+     357: bipush        64
+     359: bipush        32
+     361: invokestatic  #325                // Method net/minecraft/client/model/geom/builders/LayerDefinition.create:(Lnet/minecraft/client/model/geom/builders/MeshDefinition;II)Lnet/minecraft/client/model/geom/builders/LayerDefinition;
+     364: areturn
+
+  public void extractRenderState(net.minecraft.world.level.block.entity.SignBlockEntity, net.minecraft.client.renderer.blockentity.state.SignRenderState, float, net.minecraft.world.phys.Vec3, net.minecraft.client.renderer.feature.ModelFeatureRenderer$CrumblingOverlay);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: aload_2
+       3: checkcast     #40                 // class net/minecraft/client/renderer/blockentity/state/HangingSignRenderState
+       6: fload_3
+       7: aload         4
+       9: aload         5
+      11: invokevirtual #330                // Method extractRenderState:(Lnet/minecraft/world/level/block/entity/SignBlockEntity;Lnet/minecraft/client/renderer/blockentity/state/HangingSignRenderState;FLnet/minecraft/world/phys/Vec3;Lnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V
+      14: return
+
+  protected net.minecraft.client.model.Model$Simple getSignModel(net.minecraft.client.renderer.blockentity.state.SignRenderState);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: checkcast     #40                 // class net/minecraft/client/renderer/blockentity/state/HangingSignRenderState
+       5: invokevirtual #333                // Method getSignModel:(Lnet/minecraft/client/renderer/blockentity/state/HangingSignRenderState;)Lnet/minecraft/client/model/Model$Simple;
+       8: areturn
+
+  public void extractRenderState(net.minecraft.world.level.block.entity.BlockEntity, net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState, float, net.minecraft.world.phys.Vec3, net.minecraft.client.renderer.feature.ModelFeatureRenderer$CrumblingOverlay);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: checkcast     #50                 // class net/minecraft/world/level/block/entity/SignBlockEntity
+       5: aload_2
+       6: checkcast     #40                 // class net/minecraft/client/renderer/blockentity/state/HangingSignRenderState
+       9: fload_3
+      10: aload         4
+      12: aload         5
+      14: invokevirtual #330                // Method extractRenderState:(Lnet/minecraft/world/level/block/entity/SignBlockEntity;Lnet/minecraft/client/renderer/blockentity/state/HangingSignRenderState;FLnet/minecraft/world/phys/Vec3;Lnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V
+      17: return
+
+  public net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState createRenderState();
+    Code:
+       0: aload_0
+       1: invokevirtual #337                // Method createRenderState:()Lnet/minecraft/client/renderer/blockentity/state/HangingSignRenderState;
+       4: areturn
+
+  private static net.minecraft.client.renderer.blockentity.HangingSignRenderer$Models lambda$new$1(net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider$Context, net.minecraft.world.level.block.state.properties.WoodType);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokestatic  #341                // Method net/minecraft/client/renderer/blockentity/HangingSignRenderer$Models.create:(Lnet/minecraft/client/renderer/blockentity/BlockEntityRendererProvider$Context;Lnet/minecraft/world/level/block/state/properties/WoodType;)Lnet/minecraft/client/renderer/blockentity/HangingSignRenderer$Models;
+       5: areturn
+
+  private static net.minecraft.world.level.block.state.properties.WoodType lambda$new$0(net.minecraft.world.level.block.state.properties.WoodType);
+    Code:
+       0: aload_0
+       1: areturn
+
+  static {};
+    Code:
+       0: new           #344                // class org/joml/Vector3f
+       3: dup
+       4: fconst_0
+       5: ldc_w         #346                // float -0.32f
+       8: ldc_w         #347                // float 0.073f
+      11: invokespecial #348                // Method org/joml/Vector3f."<init>":(FFF)V
+      14: putstatic     #175                // Field TEXT_OFFSET:Lorg/joml/Vector3fc;
+      17: new           #88                 // class net/minecraft/client/renderer/blockentity/WallAndGroundTransformations
+      20: dup
+      21: invokedynamic #351,  0            // InvokeDynamic #3:apply:()Ljava/util/function/Function;
+      26: invokedynamic #352,  0            // InvokeDynamic #4:apply:()Ljava/util/function/IntFunction;
+      31: bipush        16
+      33: invokespecial #355                // Method net/minecraft/client/renderer/blockentity/WallAndGroundTransformations."<init>":(Ljava/util/function/Function;Ljava/util/function/IntFunction;I)V
+      36: putstatic     #73                 // Field TRANSFORMATIONS:Lnet/minecraft/client/renderer/blockentity/WallAndGroundTransformations;
+      39: return
+}

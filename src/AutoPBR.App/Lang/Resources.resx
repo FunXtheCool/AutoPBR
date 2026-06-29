@@ -937,6 +937,15 @@
   <data name="TempFolderWatermark" xml:space="preserve">
     <value>Leave empty for system temp</value>
   </data>
+  <data name="MinecraftAssetsFolder" xml:space="preserve">
+    <value>Minecraft assets</value>
+  </data>
+  <data name="MinecraftAssetsFolderTooltip" xml:space="preserve">
+    <value>Optional path to a Minecraft version folder or extracted assets/ root. Used to resolve vanilla block models for texture-only pack preview.</value>
+  </data>
+  <data name="MinecraftAssetsFolderWatermark" xml:space="preserve">
+    <value>Auto-detected from .minecraft when empty</value>
+  </data>
   <data name="CustomThreadedExtraction" xml:space="preserve">
     <value>Custom Threaded Extraction</value>
   </data>
@@ -1229,13 +1238,55 @@
     <value>Sun disc bloom</value>
   </data>
   <data name="Preview3DAtmosphereSunDiscStrengthTooltip" xml:space="preserve">
-    <value>Additive glare around the sun disc on top of the LUT. Lower for a softer sun; higher for a sharper bloom.</value>
+    <value>Additive glare around the sun disc on top of the LUT. Lower for a softer halo; higher for a wider bloom.</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscBrightness" xml:space="preserve">
+    <value>Sun brightness</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscBrightnessTooltip" xml:space="preserve">
+    <value>Limb-darkened sun disc surface brightness. Does not affect the outer bloom halo.</value>
   </data>
   <data name="Preview3DAtmosphereSunDiscSize" xml:space="preserve">
     <value>Sun size</value>
   </data>
   <data name="Preview3DAtmosphereSunDiscSizeTooltip" xml:space="preserve">
     <value>Sun angular-size multiplier. 1.0 = stylized default; ~0.07 matches the real sun (0.27 degrees). Also scales the aureole and god-ray cone.</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscStrength" xml:space="preserve">
+    <value>Moon brightness</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscStrengthTooltip" xml:space="preserve">
+    <value>Surface brightness multiplier for the textured moon disc.</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscSize" xml:space="preserve">
+    <value>Moon size</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscSizeTooltip" xml:space="preserve">
+    <value>Moon angular-size multiplier for the sky billboard.</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonGlowStrength" xml:space="preserve">
+    <value>Moon glow</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonGlowStrengthTooltip" xml:space="preserve">
+    <value>Outer blue-white glow around the moon limb.</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonTextureSharpness" xml:space="preserve">
+    <value>Moon sharpness</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonTextureSharpnessTooltip" xml:space="preserve">
+    <value>Shader-side sharpening for the generated lunar texture.</value>
+  </data>
+  <data name="Preview3DMoonWorldLightIntensity" xml:space="preserve">
+    <value>Moon world light</value>
+  </data>
+  <data name="Preview3DMoonWorldLightIntensityTooltip" xml:space="preserve">
+    <value>Direct moonlight multiplier for lighting preview geometry at night. Does not change sky exposure or atmospheric fill.</value>
+  </data>
+  <data name="Preview3DShowCelestialDebug" xml:space="preserve">
+    <value>Sun/moon markers</value>
+  </data>
+  <data name="Preview3DShowCelestialDebugTooltip" xml:space="preserve">
+    <value>Draw square and crosshair markers at the sun and moon disc positions.</value>
   </data>
   <data name="Preview3DHorizonFogStrength" xml:space="preserve">
     <value>Horizon fog</value>
@@ -1529,5 +1580,3 @@
     <value>Right-drag: look · WASD while right held: fly · R: reset orbit and fly offset</value>
   </data>
 </root>
-
-

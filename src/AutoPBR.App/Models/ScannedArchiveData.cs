@@ -1,16 +1,22 @@
 namespace AutoPBR.App.Models;
 
+using AutoPBR.Core.Models;
+
 /// <summary>Result of scanning an archive: child index (path → immediate children) and total file count. No full tree in memory.</summary>
 public sealed class ScannedArchiveData(
     IReadOnlyDictionary<string, IReadOnlyList<ArchiveChildEntry>> childIndex,
     int fileCount,
     bool isBatch = false,
     string? batchFolderPath = null,
-    IReadOnlyDictionary<string, string>? batchPackRootToPath = null)
+    IReadOnlyDictionary<string, string>? batchPackRootToPath = null,
+    ArchiveModelInventory? modelInventory = null)
 {
     public IReadOnlyDictionary<string, IReadOnlyList<ArchiveChildEntry>> ChildIndex => childIndex;
 
     public int FileCount => fileCount;
+
+    /// <summary>Block model JSON paths and block texture preview coverage hints from the scan.</summary>
+    public ArchiveModelInventory ModelInventory => modelInventory ?? ArchiveModelInventory.Empty;
 
     /// <summary>True when the index merges multiple packs under a folder (each top-level name maps to a .zip/.jar).</summary>
     public bool IsBatch => isBatch;

@@ -97,9 +97,9 @@ vec3 skyTonemapLum(vec3 c)
 // by atmospheric seeing. Aureole: tight circumsolar glow plus a wide 1/theta^2 glare
 // skirt (CIE-like) that fades below visibility instead of hitting a circular boundary.
 vec3 skySunDiscAureole(vec3 viewDir, vec3 lightPropagationDir, float cosDiscEdge,
-    float bloomRadiusUv, float strength, float turbidity)
+    float bloomRadiusUv, float bloomStrength, float discBrightness, float turbidity)
 {
-    if (strength <= 0.0)
+    if (bloomStrength <= 0.0 && discBrightness <= 0.0)
     {
         return vec3(0.0);
     }
@@ -141,7 +141,9 @@ vec3 skySunDiscAureole(vec3 viewDir, vec3 lightPropagationDir, float cosDiscEdge
 
     // Disc amplitude is HDR (tone-mapped to near-white); aureole stays in sky range.
     vec3 glow = glowCol * (circumsolar * 1.6 + skirt * 0.35) * glowCut;
-    return (discCol * disc * 22.0 + glow) * strength;
+    float discBright = max(discBrightness, 0.0);
+    float bloom = max(bloomStrength, 0.0);
+    return (discCol * disc * 22.0 * discBright + glow) * bloom;
 }
 
 vec3 skyNightZenith(vec3 viewDir)

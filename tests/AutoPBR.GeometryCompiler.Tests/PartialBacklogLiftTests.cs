@@ -76,8 +76,9 @@ public sealed class PartialBacklogLiftTests
     public static IEnumerable<object[]> PartialBacklogCases() =>
         PartialBacklogJvmNames.Select(j => new object[] { j });
 
-    private static string? ResolveClientJar() =>
-        GeometryIrTestTierSupport.TryClientJarPath(FindRepoRoot());
+    private static string ResolveClientJar() =>
+        GeometryIrTestTierSupport.TryClientJarPath(FindRepoRoot())
+        ?? throw new InvalidOperationException("Minecraft client jar not found.");
 
     private static string FindRepoRoot()
     {

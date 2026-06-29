@@ -1,6 +1,5 @@
 using AutoPBR.Tests.TestSupport;
 using System.Text.Json.Nodes;
-using System.Text.Json.Nodes; using AutoPBR.Tools.GeometryCompiler;
 
 namespace AutoPBR.GeometryCompiler.Tests;
 

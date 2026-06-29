@@ -16,10 +16,12 @@ uniform vec3 uMoonRight;
 uniform vec3 uMoonUp;
 uniform float uRadius;
 out vec2 vTexCoord;
+out vec3 vWorldPos;
 void main()
 {
     vTexCoord = aCorner * 0.5 + 0.5;
     vec3 worldPos = uMoonCenter + uMoonRight * (aCorner.x * uRadius) + uMoonUp * (aCorner.y * uRadius);
+    vWorldPos = worldPos;
     gl_Position = uViewProj * vec4(worldPos, 1.0);
 }
 """;
@@ -27,25 +29,72 @@ void main()
     private const string Frag330 = """
 #version 330 core
 in vec2 vTexCoord;
+in vec3 vWorldPos;
 uniform sampler2D uMoonAlbedo;
 uniform float uDiscStrength;
+uniform vec3 uCameraPos;
+uniform vec3 uMoonRight;
+uniform vec3 uMoonUp;
+uniform vec3 uMoonFacing;
+uniform float uMoonCosDiscEdge;
+uniform float uGlowStrength;
+uniform float uTextureSharpness;
 out vec4 FragColor;
 void main()
 {
     vec2 centered = vTexCoord * 2.0 - 1.0;
     float d = length(centered);
-    if (d > 1.0)
+    if (d > 1.22)
     {
         discard;
     }
 
-    vec3 albedo = texture(uMoonAlbedo, vTexCoord).rgb;
-    float limb = 1.0 - smoothstep(0.72, 1.0, d) * 0.38;
-    albedo *= limb;
+    vec3 viewDir = normalize(vWorldPos - uCameraPos);
+    float thetaDisc = max(acos(clamp(uMoonCosDiscEdge, -1.0, 1.0)), 1e-3);
+    float pixelElev = asin(clamp(viewDir.y, -1.0, 1.0)) / thetaDisc;
+    float discCut = smoothstep(-0.22, 0.1, pixelElev);
+    float glowCut = discCut * discCut;
+
     float strength = max(uDiscStrength, 0.35);
-    albedo *= strength;
-    float alpha = texture(uMoonAlbedo, vTexCoord).a;
-    alpha *= 1.0 - smoothstep(0.92, 1.0, d);
+
+    if (d > 1.0)
+    {
+        float outerCut = 1.0 - smoothstep(1.03, 1.20, d);
+        float halo = exp(-pow((d - 1.0) * 7.0, 1.45)) * outerCut * glowCut * max(uGlowStrength, 0.0);
+        vec3 haloCol = vec3(0.58, 0.68, 1.0) * halo * strength * 0.42;
+        float haloAlpha = clamp(halo * strength * 0.16, 0.0, 0.18);
+        if (haloAlpha < 0.004)
+        {
+            discard;
+        }
+
+        FragColor = vec4(haloCol, haloAlpha);
+        return;
+    }
+
+    vec4 texel = texture(uMoonAlbedo, vTexCoord);
+    vec2 texelStep = vec2(1.0 / 1024.0, 1.0 / 1024.0);
+    vec3 blur = (
+        texture(uMoonAlbedo, vTexCoord + vec2(texelStep.x, 0.0)).rgb +
+        texture(uMoonAlbedo, vTexCoord - vec2(texelStep.x, 0.0)).rgb +
+        texture(uMoonAlbedo, vTexCoord + vec2(0.0, texelStep.y)).rgb +
+        texture(uMoonAlbedo, vTexCoord - vec2(0.0, texelStep.y)).rgb) * 0.25;
+    float sharpen = clamp(uTextureSharpness, 0.0, 4.0);
+    texel.rgb = clamp((texel.rgb - vec3(0.5)) * 1.28 + vec3(0.5), 0.0, 1.0);
+    texel.rgb = clamp(texel.rgb + (texel.rgb - blur) * sharpen * 0.28, 0.0, 1.0);
+
+    float z = sqrt(max(1.0 - d * d, 0.0));
+    vec3 sphereNormal = normalize(uMoonRight * centered.x + uMoonUp * centered.y - uMoonFacing * z);
+    float fullMoonLight = clamp(dot(sphereNormal, -uMoonFacing), 0.0, 1.0);
+    float surface = 0.42 + 0.58 * pow(fullMoonLight, 0.58);
+    float grazing = pow(1.0 - max(fullMoonLight, 0.0), 2.2);
+    float limb = 1.0 - smoothstep(0.62, 1.0, d) * 0.34;
+    vec3 coolRim = vec3(0.64, 0.72, 0.95) * grazing * 0.08;
+
+    vec3 albedo = texel.rgb * surface * limb + coolRim;
+    albedo = mix(albedo, texel.rgb, 0.46);
+    albedo *= strength * discCut;
+    float alpha = texel.a * (1.0 - smoothstep(0.992, 1.0, d)) * discCut;
     if (alpha < 0.01)
     {
         discard;

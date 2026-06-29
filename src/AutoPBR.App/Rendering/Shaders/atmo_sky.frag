@@ -13,6 +13,7 @@ uniform float uSunIntensity;
 uniform float uHorizonFogStrength;
 uniform float uSkyExposure;
 uniform float uSunDiscStrength;
+uniform float uSunDiscBrightness;
 uniform float uSunCosDiscEdge;
 uniform float uMoonCosDiscEdge;
 uniform float uRenderTime;
@@ -62,7 +63,7 @@ void main()
     if (sunVis > 0.001)
     {
         sky += skySunDiscAureole(viewDir, uLightDir, uSunCosDiscEdge, uSunDiscRadiusUv,
-            uSunDiscStrength, uTurbidity) * sunVis;
+            uSunDiscStrength, uSunDiscBrightness, uTurbidity) * sunVis;
     }
 
     sky *= uSkyExposure * 1.4;

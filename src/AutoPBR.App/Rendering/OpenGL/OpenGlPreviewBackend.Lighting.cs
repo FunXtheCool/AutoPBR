@@ -10,6 +10,14 @@ namespace AutoPBR.App.Rendering.OpenGL;
 /// <summary>OpenGL implementation of <see cref="IRenderPreviewBackend"/>; GPU entry points must run on the OpenGL thread (Avalonia <see cref="AutoPBR.App.Controls.GlPbrPreviewControl"/> callbacks).</summary>
 public sealed partial class OpenGlPreviewBackend
 {
+    private readonly record struct MoonBillboardPlacement(
+        Vector3 Center,
+        Vector3 Right,
+        Vector3 Up,
+        Vector3 Facing,
+        float Radius,
+        float CosDiscEdge);
+
     private void TryInitMoonBillboard(GL gl, bool useOpenGlEs)
     {
         DestroyMoonBillboard();
@@ -87,7 +95,8 @@ public sealed partial class OpenGlPreviewBackend
     /// Textured moon disc along <c>lightPropagationDir</c> (antipodal to the sun).
     /// </summary>
     private void DrawMoonBillboard(GL gl, Matrix4x4 proj, Matrix4x4 view, Vector3 eye, Vector3 lightPropagationDir,
-        float discStrength, bool restoreSolidBackFaceCull)
+        float farPlane, float discStrength, float discSize, float glowStrength, float textureSharpness,
+        bool restoreSolidBackFaceCull)
     {
         if (_moonProgram is null || !_moonProgram.IsValid || _moonVao == 0 || _moonAlbedo is null)
         {
@@ -113,23 +122,10 @@ public sealed partial class OpenGlPreviewBackend
             }
         }
 
-        if (towardMoon.Y < -0.03f)
+        if (!TryComputeMoonBillboardPlacement(eye, lightPropagationDir, farPlane, discSize, out var placement))
         {
             return;
         }
-
-        var moonDist = PreviewSunScreenProjection.SunDistance;
-        var moonRadius = PreviewSunScreenProjection.MoonRadius;
-        var moonCenter = eye + towardMoon * moonDist;
-
-        var worldUp = Vector3.UnitY;
-        var right = Vector3.Normalize(Vector3.Cross(worldUp, towardMoon));
-        if (right.LengthSquared() < 1e-10f)
-        {
-            right = Vector3.Normalize(Vector3.Cross(Vector3.UnitZ, towardMoon));
-        }
-
-        var moonBillboardUp = Vector3.Normalize(Vector3.Cross(towardMoon, right));
 
         var viewProj = proj * view;
         _moonProgram.Use();
@@ -140,19 +136,39 @@ public sealed partial class OpenGlPreviewBackend
             gl.UniformMatrix4(vpLoc, 1, false, in vpT.M11);
         }
 
-        SetMoonVec3(gl, "uMoonCenter", moonCenter);
-        SetMoonVec3(gl, "uMoonRight", right);
-        SetMoonVec3(gl, "uMoonUp", moonBillboardUp);
+        SetMoonVec3(gl, "uMoonCenter", placement.Center);
+        SetMoonVec3(gl, "uMoonRight", placement.Right);
+        SetMoonVec3(gl, "uMoonUp", placement.Up);
+        SetMoonVec3(gl, "uMoonFacing", placement.Facing);
+        SetMoonVec3(gl, "uCameraPos", eye);
         var rLoc = _moonProgram.GetUniformLocation("uRadius");
         if (rLoc >= 0)
         {
-            gl.Uniform1(rLoc, moonRadius);
+            gl.Uniform1(rLoc, placement.Radius);
+        }
+
+        var moonCosLoc = _moonProgram.GetUniformLocation("uMoonCosDiscEdge");
+        if (moonCosLoc >= 0)
+        {
+            gl.Uniform1(moonCosLoc, placement.CosDiscEdge);
         }
 
         var strengthLoc = _moonProgram.GetUniformLocation("uDiscStrength");
         if (strengthLoc >= 0)
         {
             gl.Uniform1(strengthLoc, Math.Max(discStrength, 0f));
+        }
+
+        var glowLoc = _moonProgram.GetUniformLocation("uGlowStrength");
+        if (glowLoc >= 0)
+        {
+            gl.Uniform1(glowLoc, Math.Max(glowStrength, 0f));
+        }
+
+        var sharpLoc = _moonProgram.GetUniformLocation("uTextureSharpness");
+        if (sharpLoc >= 0)
+        {
+            gl.Uniform1(sharpLoc, Math.Clamp(textureSharpness, 0f, 4f));
         }
 
         gl.ActiveTexture(TextureUnit.Texture0);
@@ -164,10 +180,11 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         var blendWasEnabled = gl.IsEnabled(EnableCap.Blend);
-        gl.Enable(EnableCap.DepthTest);
-        gl.DepthFunc(GLEnum.Lequal);
+        var depthTestWasEnabled = gl.IsEnabled(EnableCap.DepthTest);
+        gl.Disable(EnableCap.DepthTest);
         gl.Enable(EnableCap.Blend);
-        gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+        gl.BlendFuncSeparate(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha,
+            BlendingFactor.One, BlendingFactor.OneMinusSrcAlpha);
         gl.DepthMask(false);
         gl.Disable(EnableCap.CullFace);
 
@@ -181,12 +198,73 @@ public sealed partial class OpenGlPreviewBackend
             gl.Disable(EnableCap.Blend);
         }
 
+        if (depthTestWasEnabled)
+        {
+            gl.Enable(EnableCap.DepthTest);
+            gl.DepthFunc(GLEnum.Lequal);
+        }
+        else
+        {
+            gl.Disable(EnableCap.DepthTest);
+        }
+
         if (restoreSolidBackFaceCull)
         {
             gl.Enable(EnableCap.CullFace);
             gl.CullFace(GLEnum.Back);
             gl.FrontFace(GLEnum.Ccw);
         }
+    }
+
+    private static bool TryComputeMoonBillboardPlacement(
+        Vector3 eye,
+        Vector3 lightPropagationDir,
+        float farPlane,
+        float discSize,
+        out MoonBillboardPlacement placement)
+    {
+        placement = default;
+        var towardMoon = lightPropagationDir;
+        var tlm = towardMoon.LengthSquared();
+        if (tlm < 1e-12f)
+        {
+            return false;
+        }
+
+        towardMoon /= MathF.Sqrt(tlm);
+        var moonDist = Math.Clamp(farPlane * 0.72f, 1f, PreviewSunScreenProjection.SunDistance);
+        var moonRadius = moonDist * (PreviewSunScreenProjection.MoonRadius / PreviewSunScreenProjection.SunDistance) *
+                         Math.Clamp(discSize, 0.05f, 3f);
+        var moonCenter = eye + towardMoon * moonDist;
+
+        var right = Vector3.Cross(Vector3.UnitY, towardMoon);
+        if (right.LengthSquared() < 1e-10f)
+        {
+            right = Vector3.Cross(Vector3.UnitZ, towardMoon);
+        }
+
+        if (right.LengthSquared() < 1e-10f)
+        {
+            return false;
+        }
+
+        right = Vector3.Normalize(right);
+        var up = Vector3.Normalize(Vector3.Cross(towardMoon, right));
+
+        var moonEdgeDir = moonCenter + right * moonRadius - eye;
+        var moonEdgeLen2 = moonEdgeDir.LengthSquared();
+        var moonCosDiscEdge = moonEdgeLen2 < 1e-12f
+            ? 0.9995f
+            : Math.Clamp(Vector3.Dot(towardMoon, moonEdgeDir / MathF.Sqrt(moonEdgeLen2)), 0.92f, 0.99998f);
+
+        placement = new MoonBillboardPlacement(
+            moonCenter,
+            right,
+            up,
+            towardMoon,
+            moonRadius,
+            moonCosDiscEdge);
+        return true;
     }
 
     private void SetMoonVec3(GL gl, string name, Vector3 v)
@@ -488,10 +566,10 @@ public sealed partial class OpenGlPreviewBackend
             invViewProj = Matrix4x4.Identity;
         }
 
-        PreviewSunScreenProjection.Compute(frame.Eye, frame.LightDir, frame.View, frame.Proj, aspect,
+        PreviewSunScreenProjection.Compute(frame.Eye, frame.WorldLightDir, frame.View, frame.Proj, aspect,
             frame.Settings.GodRayConeScale, frame.Settings.AtmosphereSunDiscSize,
             out _, out var sunDiscRadiusUv, out _, out var sunCosDiscEdge);
-        PreviewSunScreenProjection.ComputeMoon(frame.Eye, frame.LightDir, frame.View, frame.Proj, aspect,
+        PreviewSunScreenProjection.ComputeMoon(frame.Eye, frame.WorldLightDir, frame.View, frame.Proj, aspect,
             out _, out _, out var moonCosDiscEdge);
 
         if (_atmoSkyProgram is { IsValid: true })
@@ -513,13 +591,14 @@ public sealed partial class OpenGlPreviewBackend
             SetFloatOnProgram(_atmoSkyProgram, "uHorizonFalloff", frame.Settings.AtmosphereHorizonFalloff);
             SetMatrixOnProgram(_atmoSkyProgram, "uInvViewProj", invViewProj);
             SetVec3OnProgram(_atmoSkyProgram, "uCameraPos", frame.Eye);
-            SetVec3OnProgram(_atmoSkyProgram, "uLightDir", frame.LightDir);
+            SetVec3OnProgram(_atmoSkyProgram, "uLightDir", frame.WorldLightDir);
             SetFloatOnProgram(_atmoSkyProgram, "uSunIntensity", frame.Settings.AtmosphereSunIntensity);
             SetFloatOnProgram(_atmoSkyProgram, "uHorizonFogStrength",
                 frame.Settings.EnableAtmosphericSky ? frame.Settings.AerialFogStrength : 0f);
             SetFloatOnProgram(_atmoSkyProgram, "uGroundWorldY", PreviewStageConstants.GroundPlaneWorldY);
             SetFloatOnProgram(_atmoSkyProgram, "uSkyExposure", frame.Settings.AtmosphereSkyExposure);
             SetFloatOnProgram(_atmoSkyProgram, "uSunDiscStrength", frame.Settings.AtmosphereSunDiscStrength);
+            SetFloatOnProgram(_atmoSkyProgram, "uSunDiscBrightness", frame.Settings.AtmosphereSunDiscBrightness);
             SetFloatOnProgram(_atmoSkyProgram, "uSunCosDiscEdge", sunCosDiscEdge);
             SetFloatOnProgram(_atmoSkyProgram, "uMoonCosDiscEdge", moonCosDiscEdge);
             SetFloatOnProgram(_atmoSkyProgram, "uRenderTime", (float)frame.RenderTime);
@@ -543,7 +622,7 @@ public sealed partial class OpenGlPreviewBackend
             _proceduralSkyProgram!.Use();
             SetMatrixOnProgram(_proceduralSkyProgram, "uInvViewProj", invViewProj);
             SetVec3OnProgram(_proceduralSkyProgram, "uCameraPos", frame.Eye);
-            SetVec3OnProgram(_proceduralSkyProgram, "uLightDir", frame.LightDir);
+            SetVec3OnProgram(_proceduralSkyProgram, "uLightDir", frame.WorldLightDir);
             SetFloatOnProgram(_proceduralSkyProgram, "uSunIntensity", frame.Settings.AtmosphereSunIntensity);
             SetFloatOnProgram(_proceduralSkyProgram, "uSkyExposure", frame.Settings.AtmosphereSkyExposure);
             SetFloatOnProgram(_proceduralSkyProgram, "uRenderTime", (float)frame.RenderTime);
@@ -553,12 +632,13 @@ public sealed partial class OpenGlPreviewBackend
                 frame.Settings.EnableAtmosphericSky ? frame.Settings.AerialFogStrength : 0f);
             SetFloatOnProgram(_proceduralSkyProgram, "uGroundWorldY", PreviewStageConstants.GroundPlaneWorldY);
             SetFloatOnProgram(_proceduralSkyProgram, "uSunDiscStrength", frame.Settings.AtmosphereSunDiscStrength);
+            SetFloatOnProgram(_proceduralSkyProgram, "uSunDiscBrightness", frame.Settings.AtmosphereSunDiscBrightness);
             SetFloatOnProgram(_proceduralSkyProgram, "uSunCosDiscEdge", sunCosDiscEdge);
             SetFloatOnProgram(_proceduralSkyProgram, "uMoonCosDiscEdge", moonCosDiscEdge);
             SetFloatOnProgram(_proceduralSkyProgram, "uViewportAspect", aspect);
             SetFloatOnProgram(_proceduralSkyProgram, "uSunDiscRadiusUv", sunDiscRadiusUv);
-            var sunElev = frame.LightDir.LengthSquared() > 1e-12f
-                ? Math.Max(Vector3.Normalize(-frame.LightDir).Y, 0f)
+            var sunElev = frame.WorldLightDir.LengthSquared() > 1e-12f
+                ? Math.Max(Vector3.Normalize(-frame.WorldLightDir).Y, 0f)
                 : 0f;
             SetFloatOnProgram(_proceduralSkyProgram, "uSunElevation", sunElev);
             gl.BindVertexArray(_atmoQuadVao);

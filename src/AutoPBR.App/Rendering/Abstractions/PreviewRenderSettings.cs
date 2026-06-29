@@ -96,8 +96,26 @@ public sealed class PreviewRenderSettings
     /// <summary>Atmospheric sky: additive glare around the sun disc (separate from scatter intensity).</summary>
     public float AtmosphereSunDiscStrength { get; init; } = 0.35f;
 
+    /// <summary>Atmospheric sky: limb-darkened sun disc surface brightness (bloom is separate).</summary>
+    public float AtmosphereSunDiscBrightness { get; init; } = 1f;
+
     /// <summary>Atmospheric sky: sun angular-size multiplier (1 = legacy stylized size; ~0.07 = real sun).</summary>
     public float AtmosphereSunDiscSize { get; init; } = 1f;
+
+    /// <summary>Moon billboard: surface brightness multiplier.</summary>
+    public float AtmosphereMoonDiscStrength { get; init; } = 1.35f;
+
+    /// <summary>Moon billboard: angular-size multiplier.</summary>
+    public float AtmosphereMoonDiscSize { get; init; } = 1f;
+
+    /// <summary>Moon billboard: outer glow/aureole multiplier.</summary>
+    public float AtmosphereMoonGlowStrength { get; init; } = 0.7f;
+
+    /// <summary>Moon billboard: shader texture sharpen amount.</summary>
+    public float AtmosphereMoonTextureSharpness { get; init; } = 1.25f;
+
+    /// <summary>Moonlight: multiplier for direct world lighting at night; does not affect sky/atmosphere fill.</summary>
+    public float MoonWorldLightIntensity { get; init; } = 1f;
 
     /// <summary>Horizon fog on sky dome below horizon and aerial perspective on geometry.</summary>
     public float AerialFogStrength { get; init; } = 1f;
