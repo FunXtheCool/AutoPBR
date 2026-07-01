@@ -359,6 +359,11 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         {
             _loadingSettings = false;
         }
+
+        if (IsPreview3D)
+        {
+            RefreshPreviewGrassColormapState();
+        }
     }
 
 

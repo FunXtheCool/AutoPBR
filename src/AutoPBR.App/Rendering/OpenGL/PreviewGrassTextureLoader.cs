@@ -12,7 +12,14 @@ internal static class PreviewGrassTextureLoader
     /// <summary>Approximate plains biome grass tint applied when the texture reads as grayscale.</summary>
     private static readonly Rgba32 PlainsGrassTint = new(91, 139, 54, 255);
 
-    public static bool TryDecodeTinted(Stream pngStream, out byte[] rgba, out int width, out int height)
+    public static bool TryDecodeRgba(Stream pngStream, out byte[] rgba, out int width, out int height) =>
+        TryDecodeCore(pngStream, applyPlainsTint: false, out rgba, out width, out height);
+
+    public static bool TryDecodeTinted(Stream pngStream, out byte[] rgba, out int width, out int height) =>
+        TryDecodeCore(pngStream, applyPlainsTint: true, out rgba, out width, out height);
+
+    private static bool TryDecodeCore(Stream pngStream, bool applyPlainsTint, out byte[] rgba, out int width,
+        out int height)
     {
         rgba = [];
         width = height = 0;
@@ -36,7 +43,7 @@ internal static class PreviewGrassTextureLoader
                 {
                     var p = image[x, y];
                     byte rr, gg, bb;
-                    if (LooksGrayscale(p))
+                    if (applyPlainsTint && LooksGrayscale(p))
                     {
                         var lum = (p.R + p.G + p.B) / (3f * 255f);
                         rr = (byte)Math.Clamp(MathF.Round(lum * PlainsGrassTint.R), 0f, 255f);

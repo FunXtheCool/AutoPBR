@@ -23,10 +23,42 @@ public sealed class BlockTextureParityMeshTests
     public void Grass_block_top_keeps_selected_texture_on_up_face()
     {
         const string path = "assets/minecraft/textures/block/grass_block_top.png";
-        Assert.True(VanillaBlockPreviewRuntime.TryBuildSyntheticMesh(path, out var merged, out _, out _, out _));
+        Assert.True(VanillaBlockPreviewRuntime.TryBuildSyntheticMesh(path, out var merged, out _, out var ordered, out _));
         Assert.Contains("grass_block_top", merged.Textures["up"]);
         Assert.Contains("grass_block_side", merged.Textures["north"]);
         Assert.Contains("dirt", merged.Textures["down"]);
+        Assert.Equal(2, merged.Elements.Count);
+        Assert.Contains(ordered, p => p.Contains("grass_block_side_overlay", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void Grass_block_side_overlay_synthesizes_paired_grass_cube()
+    {
+        const string path = "assets/minecraft/textures/block/grass_block_side_overlay.png";
+        var rule = BlockTextureParityCatalog.ResolveRule(path);
+        Assert.NotNull(rule);
+        Assert.Equal(BlockTextureParityPreviewShape.CubeDirectional, rule!.PreviewShape);
+        Assert.True(VanillaBlockPreviewRuntime.TryBuildSyntheticMesh(path, out var merged, out _, out var ordered, out _));
+        Assert.Equal(2, merged.Elements.Count);
+        Assert.Contains(ordered, p => p.Contains("grass_block_top", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(ordered, p => p.Contains("grass_block_side_overlay", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void Grass_block_snow_keeps_pack_json_top_and_appends_snow_cap()
+    {
+        const string path = "assets/minecraft/textures/block/grass_block_snow.png";
+        var rule = BlockTextureParityCatalog.ResolveRule(path);
+        Assert.NotNull(rule);
+        Assert.Equal(BlockTextureParityPreviewShape.CubeDirectional, rule!.PreviewShape);
+        Assert.True(VanillaBlockPreviewRuntime.TryBuildSyntheticMesh(path, out var merged, out var provenance, out var ordered, out _));
+        Assert.Equal(2, merged.Elements.Count);
+        Assert.Contains("grass_block_top", merged.Textures["up"]);
+        Assert.Contains("dirt", merged.Textures["down"]);
+        Assert.Contains("grass_block_snow", merged.Textures["north"]);
+        Assert.Contains("snow-cap", provenance.Detail, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(ordered, p => p.Contains("snow.png", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(ordered, p => p.Contains("grass_block_snow", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]

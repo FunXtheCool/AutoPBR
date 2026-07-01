@@ -185,6 +185,7 @@ public partial class MainWindowViewModel
         glPreview.Backend.GpuInitProgressChanged += OnPreviewGpuInitProgressChanged;
         ApplyPreviewGpuInitOverlay(glPreview.Backend.GpuInitProgress);
         PushPreview3DCamera();
+        RefreshPreviewGrassColormapState();
         Apply3DPreviewIfNeeded();
         EnsurePreview3DCameraPoseTimer();
     }
@@ -224,7 +225,9 @@ public partial class MainWindowViewModel
 
         if (IsPreview3D)
         {
+            RefreshPreviewGrassColormapState();
             Apply3DPreviewIfNeeded();
+            SchedulePreviewGroundTextureRefresh();
             if (_glPreview is not null)
             {
                 ApplyPreviewGpuInitOverlay(_glPreview.Backend.GpuInitProgress);
@@ -728,6 +731,9 @@ public partial class MainWindowViewModel
         _preview3DSpriteThicknessDebounceCts?.Cancel();
         _preview3DSpriteThicknessDebounceCts?.Dispose();
         _preview3DSpriteThicknessDebounceCts = null;
+        _previewGrassColormapDebounceCts?.Cancel();
+        _previewGrassColormapDebounceCts?.Dispose();
+        _previewGrassColormapDebounceCts = null;
 
         if (_preview3DCameraPoseTimer is { } timer)
         {

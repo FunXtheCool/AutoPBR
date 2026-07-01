@@ -1,12 +1,12 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
+using AutoPBR.App.Rendering;
 using AutoPBR.App.Rendering.Abstractions;
 using AutoPBR.Core.Models;
 using AutoPBR.Core.Preview;
 
 using Avalonia.OpenGL;
-using Avalonia.Platform;
 
 using Silk.NET.OpenGL;
 
@@ -15,48 +15,71 @@ namespace AutoPBR.App.Rendering.OpenGL;
 /// <summary>OpenGL implementation of <see cref="IRenderPreviewBackend"/>; GPU entry points must run on the OpenGL thread (Avalonia <see cref="AutoPBR.App.Controls.GlPbrPreviewControl"/> callbacks).</summary>
 public sealed partial class OpenGlPreviewBackend
 {
-    private bool TryUploadGrassGroundTexture(GL gl)
+    private bool TryUploadBundledGroundFallback(GL gl)
     {
-        _ = gl;
-        try
+        if (!PreviewBundledGroundMapsLoader.TryLoad(out var material))
         {
-            var uri = new Uri("avares://AutoPBR.App/Assets/Preview/grass_block_top.png");
-            if (!AssetLoader.Exists(uri))
-            {
-                EmitDiagnostic("[3D preview] Grass ground texture asset missing.");
-                return false;
-            }
-
-            using var stream = AssetLoader.Open(uri);
-            if (!PreviewGrassTextureLoader.TryDecodeTinted(stream, out var rgba, out var w, out var h) || w < 1 ||
-                h < 1)
-            {
-                EmitDiagnostic("[3D preview] Grass ground texture decode failed.");
-                return false;
-            }
-
-            _grassGroundAlbedo!.UploadRgba(w, h, rgba, nearestFilter: true);
-            return true;
-        }
-        catch (Exception ex)
-        {
-            EmitDiagnostic("[3D preview] Grass ground texture load failed: " + ex.Message);
+            EmitDiagnostic("[3D preview] Bundled grass ground fallback missing or invalid.");
             return false;
         }
+
+        lock (_sync)
+        {
+            _grassGroundMaterial = material;
+            _grassGroundMaterialDirty = true;
+        }
+
+        UploadGroundMaterial(gl, material, nearest: true);
+        return true;
+    }
+
+    private void UploadGroundMaterial(GL gl, PreviewMaterial? material, bool nearest)
+    {
+        Debug.Assert(_grassGroundAlbedo is not null && _grassGroundNormal is not null &&
+                     _grassGroundSpec is not null && _grassGroundHeight is not null);
+        UploadMaterialToTextures(
+            gl,
+            material,
+            nearest,
+            _grassGroundAlbedo,
+            _grassGroundNormal,
+            _grassGroundSpec,
+            _grassGroundHeight,
+            out _grassGroundHasNormal,
+            out _grassGroundHasSpecular,
+            out _grassGroundHasHeight);
     }
 
     private void UploadMaterial(GL gl, PreviewMaterial? material, bool nearest)
     {
         Debug.Assert(_albedo is not null && _normal is not null && _spec is not null && _height is not null);
+        UploadMaterialToTextures(gl, material, nearest, _albedo, _normal, _spec, _height, out _, out _, out _);
+    }
+
+    private static void UploadMaterialToTextures(
+        GL gl,
+        PreviewMaterial? material,
+        bool nearest,
+        GlTexture2D albedo,
+        GlTexture2D normal,
+        GlTexture2D spec,
+        GlTexture2D height,
+        out bool hasNormal,
+        out bool hasSpecular,
+        out bool hasHeight)
+    {
+        hasNormal = false;
+        hasSpecular = false;
+        hasHeight = false;
         gl.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
         try
         {
             if (material is null || material.AlbedoRgba.Length < 4)
             {
-                _albedo.UploadRgba(1, 1, [180, 180, 190, 255], nearest);
-                _normal.UploadRgba(1, 1, [128, 128, 255, 255], nearest);
-                _spec.UploadRgba(1, 1, [120, 60, 40, 255], nearest);
-                _height.UploadRgba(1, 1, [128, 128, 128, 255], nearest);
+                albedo.UploadRgba(1, 1, [180, 180, 190, 255], nearest);
+                normal.UploadRgba(1, 1, [128, 128, 255, 255], nearest);
+                spec.UploadRgba(1, 1, [120, 60, 40, 255], nearest);
+                height.UploadRgba(1, 1, [128, 128, 128, 255], nearest);
                 return;
             }
 
@@ -66,7 +89,7 @@ public sealed partial class OpenGlPreviewBackend
             var albPx = albW * albH * 4;
             if (alb.Length < albPx)
             {
-                _albedo.UploadRgba(1, 1, [180, 180, 190, 255], nearest);
+                albedo.UploadRgba(1, 1, [180, 180, 190, 255], nearest);
             }
             else
             {
@@ -74,7 +97,7 @@ public sealed partial class OpenGlPreviewBackend
                 var albUpload = material.GlUploadFlipRows
                     ? OpenGlRgbaUpload.EnsureBottomRowFirst(albSpan, albW, albH)
                     : albSpan.ToArray();
-                _albedo.UploadRgba(albW, albH, albUpload, nearest);
+                albedo.UploadRgba(albW, albH, albUpload, nearest);
             }
 
             if (material.NormalRgba is { Length: >= 4 } nr)
@@ -87,16 +110,17 @@ public sealed partial class OpenGlPreviewBackend
                     var nUpload = material.GlUploadFlipRows
                         ? OpenGlRgbaUpload.EnsureBottomRowFirst(nSpan, nw, nh)
                         : nSpan.ToArray();
-                    _normal.UploadRgba(nw, nh, nUpload, nearest);
+                    normal.UploadRgba(nw, nh, nUpload, nearest);
+                    hasNormal = true;
                 }
                 else
                 {
-                    _normal.UploadRgba(1, 1, [128, 128, 255, 255], nearest);
+                    normal.UploadRgba(1, 1, [128, 128, 255, 255], nearest);
                 }
             }
             else
             {
-                _normal.UploadRgba(1, 1, [128, 128, 255, 255], nearest);
+                normal.UploadRgba(1, 1, [128, 128, 255, 255], nearest);
             }
 
             if (material.SpecularRgba is { Length: >= 4 } sr)
@@ -109,16 +133,17 @@ public sealed partial class OpenGlPreviewBackend
                     var sUpload = material.GlUploadFlipRows
                         ? OpenGlRgbaUpload.EnsureBottomRowFirst(sSpan, sw, sh)
                         : sSpan.ToArray();
-                    _spec.UploadRgba(sw, sh, sUpload, nearest);
+                    spec.UploadRgba(sw, sh, sUpload, nearest);
+                    hasSpecular = true;
                 }
                 else
                 {
-                    _spec.UploadRgba(1, 1, [120, 60, 40, 255], nearest);
+                    spec.UploadRgba(1, 1, [120, 60, 40, 255], nearest);
                 }
             }
             else
             {
-                _spec.UploadRgba(1, 1, [120, 60, 40, 255], nearest);
+                spec.UploadRgba(1, 1, [120, 60, 40, 255], nearest);
             }
 
             if (material.HeightRgba is { Length: >= 4 } hr)
@@ -131,16 +156,17 @@ public sealed partial class OpenGlPreviewBackend
                     var hUpload = material.GlUploadFlipRows
                         ? OpenGlRgbaUpload.EnsureBottomRowFirst(hSpan, hw, hh)
                         : hSpan.ToArray();
-                    _height.UploadRgba(hw, hh, hUpload, nearest);
+                    height.UploadRgba(hw, hh, hUpload, nearest);
+                    hasHeight = true;
                 }
                 else
                 {
-                    _height.UploadRgba(1, 1, [128, 128, 128, 255], nearest);
+                    height.UploadRgba(1, 1, [128, 128, 128, 255], nearest);
                 }
             }
             else
             {
-                _height.UploadRgba(1, 1, [128, 128, 128, 255], nearest);
+                height.UploadRgba(1, 1, [128, 128, 128, 255], nearest);
             }
         }
         finally
@@ -536,6 +562,12 @@ public sealed partial class OpenGlPreviewBackend
             _groundMesh = null;
             _grassGroundAlbedo?.Dispose();
             _grassGroundAlbedo = null;
+            _grassGroundNormal?.Dispose();
+            _grassGroundNormal = null;
+            _grassGroundSpec?.Dispose();
+            _grassGroundSpec = null;
+            _grassGroundHeight?.Dispose();
+            _grassGroundHeight = null;
             _neutralNormal?.Dispose();
             _neutralNormal = null;
             _neutralSpec?.Dispose();

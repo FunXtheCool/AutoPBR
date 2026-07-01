@@ -1,9 +1,8 @@
-using System.IO;
-
-using Avalonia.Media.Imaging;
-
+using AutoPBR.App.Rendering.Scene;
 using AutoPBR.Core.Models;
 using AutoPBR.Core.Preview;
+
+using Avalonia.Media.Imaging;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -15,9 +14,10 @@ namespace AutoPBR.App.ViewModels;
 public partial class MainWindowViewModel
 {
     private PreviewColormapImage? _previewGrassColormap;
+    private CancellationTokenSource? _previewGrassColormapDebounceCts;
 
-    [ObservableProperty] private double _preview3DGrassColormapTemperature = 0.72;
-    [ObservableProperty] private double _preview3DGrassColormapDownfall = 0.45;
+    [ObservableProperty] private double _preview3DGrassColormapTemperature = PreviewStageConstants.DefaultGrassColormapTemperature;
+    [ObservableProperty] private double _preview3DGrassColormapDownfall = PreviewStageConstants.DefaultGrassColormapDownfall;
     [ObservableProperty] private Bitmap? _preview3DGrassColormapImage;
     [ObservableProperty] private string? _preview3DGrassColormapSampleText;
 
@@ -37,9 +37,10 @@ public partial class MainWindowViewModel
         return PreviewGrassColormapTint.NeedsGrassColormapTint(PreviewArchivePath);
     }
 
+    /// <summary>Load grass colormap from the scanned pack, install path, or native catalogs and refresh ground tint.</summary>
     private void RefreshPreviewGrassColormapState()
     {
-        _exploreController.TryGetDiskPackAndEntryPath(PreviewArchivePath ?? "", out var diskPack, out _);
+        var diskPack = TryResolveGrassColormapPackZipPath();
         if (!PreviewColormapLoader.TryLoadGrassColormap(diskPack, MinecraftAssetsDirectory, null, out var image) ||
             image is null)
         {
@@ -47,6 +48,7 @@ public partial class MainWindowViewModel
             Preview3DGrassColormapImage = null;
             Preview3DGrassColormapSampleText = null;
             OnPropertyChanged(nameof(IsPreview3DGrassColormapVisible));
+            PushPreviewGroundMaterialToGpu();
             return;
         }
 
@@ -54,6 +56,42 @@ public partial class MainWindowViewModel
         Preview3DGrassColormapImage = TryBuildColormapBitmap(image);
         UpdateGrassColormapSampleText();
         OnPropertyChanged(nameof(IsPreview3DGrassColormapVisible));
+        PushPreviewGroundMaterialToGpu();
+    }
+
+    private string? TryResolveGrassColormapPackZipPath()
+    {
+        if (_exploreController.TryGetDiskPackAndEntryPath(PreviewArchivePath ?? "", out var pack, out _) &&
+            !string.IsNullOrWhiteSpace(pack))
+        {
+            return pack;
+        }
+
+        if (HasScannedArchive && !IsBatchScanActive &&
+            _exploreController.TryGetDiskPackAndEntryPath(string.Empty, out pack, out _) &&
+            !string.IsNullOrWhiteSpace(pack))
+        {
+            return pack;
+        }
+
+        return null;
+    }
+
+    private void EnsurePreviewGrassColormapLoaded()
+    {
+        if (_previewGrassColormap is not null)
+        {
+            return;
+        }
+
+        var diskPack = TryResolveGrassColormapPackZipPath();
+        if (!PreviewColormapLoader.TryLoadGrassColormap(diskPack, MinecraftAssetsDirectory, null, out var image) ||
+            image is null)
+        {
+            return;
+        }
+
+        _previewGrassColormap = image;
     }
 
     private void UpdateGrassColormapSampleText()
@@ -79,9 +117,20 @@ public partial class MainWindowViewModel
 
     private PreviewTextureMaps ApplyGrassColormapTintIfNeeded(PreviewTextureMaps maps, string? archivePath)
     {
-        if (_previewGrassColormap is null)
+        if (!PreviewGrassColormapTint.NeedsGrassColormapTint(archivePath))
         {
             return maps;
+        }
+
+        EnsurePreviewGrassColormapLoaded();
+        if (_previewGrassColormap is not null)
+        {
+            return PreviewGrassColormapTint.WithGrassTint(
+                maps,
+                archivePath,
+                _previewGrassColormap,
+                Preview3DGrassColormapTemperature,
+                Preview3DGrassColormapDownfall);
         }
 
         return PreviewGrassColormapTint.WithGrassTint(maps, archivePath, SamplePreviewGrassTint());
@@ -108,10 +157,12 @@ public partial class MainWindowViewModel
         _ = value;
         UpdateGrassColormapSampleText();
         OnPropertyChanged(nameof(IsPreview3DGrassColormapVisible));
-        if (IsPreview3D)
+        if (!_loadingSettings)
         {
-            Push3DPreviewStateToGpu();
+            SaveSettings();
         }
+
+        ScheduleDebouncedGrassColormapGpuRefresh();
     }
 
     partial void OnPreview3DGrassColormapDownfallChanged(double value)
@@ -119,9 +170,54 @@ public partial class MainWindowViewModel
         _ = value;
         UpdateGrassColormapSampleText();
         OnPropertyChanged(nameof(IsPreview3DGrassColormapVisible));
-        if (IsPreview3D)
+        if (!_loadingSettings)
         {
-            Push3DPreviewStateToGpu();
+            SaveSettings();
         }
+
+        ScheduleDebouncedGrassColormapGpuRefresh();
+    }
+
+    private void ScheduleDebouncedGrassColormapGpuRefresh()
+    {
+        if (!IsPreview3D)
+        {
+            return;
+        }
+
+        _previewGrassColormapDebounceCts?.Cancel();
+        _previewGrassColormapDebounceCts?.Dispose();
+        var cts = new CancellationTokenSource();
+        _previewGrassColormapDebounceCts = cts;
+        _ = RunDebouncedGrassColormapGpuRefreshAsync(cts);
+    }
+
+    private async Task RunDebouncedGrassColormapGpuRefreshAsync(CancellationTokenSource debounceCts)
+    {
+        try
+        {
+            await Task.Delay(PreviewStageConstants.GrassColormapTintDebounceMs, debounceCts.Token)
+                .ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        if (!ReferenceEquals(_previewGrassColormapDebounceCts, debounceCts))
+        {
+            return;
+        }
+
+        await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            if (!ReferenceEquals(_previewGrassColormapDebounceCts, debounceCts) || !IsPreview3D)
+            {
+                return;
+            }
+
+            Push3DPreviewStateToGpu();
+            PushPreviewGroundMaterialToGpu();
+        });
     }
 }

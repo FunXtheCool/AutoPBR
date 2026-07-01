@@ -1,0 +1,45 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AutoPBR.App.Controls.OverlaySlider"
+             x:Name="Root">
+    <NumericUpDown x:Name="ValueBox"
+                   Width="{Binding BoxWidth, ElementName=Root}"
+                   MinWidth="{Binding BoxMinWidth, ElementName=Root}"
+                   MaxWidth="{Binding BoxMaxWidth, ElementName=Root}"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Center"
+                   HorizontalContentAlignment="Right"
+                   ShowButtonSpinner="False"
+                   AllowSpin="False"
+                   Minimum="{Binding Minimum, ElementName=Root}"
+                   Maximum="{Binding Maximum, ElementName=Root}"
+                   Increment="{Binding Increment, ElementName=Root}"
+                   FormatString="{Binding FormatString, ElementName=Root}"
+                   Value="{Binding Value, ElementName=Root, Mode=TwoWay}"
+                   IsEnabled="{Binding IsEnabled, ElementName=Root}"
+                   Classes="overlay-slider-box">
+        <FlyoutBase.AttachedFlyout>
+            <Flyout Placement="BottomEdgeAlignedLeft"
+                    ShowMode="Standard">
+                <Border MinWidth="240"
+                        Padding="12,10"
+                        CornerRadius="8"
+                        Background="{DynamicResource SystemChromeLowColor}"
+                        BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                        BorderThickness="1"
+                        BoxShadow="0 8 24 0 #48000000">
+                    <Slider x:Name="ValueSlider"
+                            Width="{Binding SliderWidth, ElementName=Root}"
+                            Minimum="{Binding Minimum, ElementName=Root}"
+                            Maximum="{Binding Maximum, ElementName=Root}"
+                            SmallChange="{Binding SmallChange, ElementName=Root}"
+                            LargeChange="{Binding LargeChange, ElementName=Root}"
+                            TickFrequency="{Binding TickFrequency, ElementName=Root}"
+                            IsSnapToTickEnabled="{Binding IsSnapToTickEnabled, ElementName=Root}"
+                            Value="{Binding Value, ElementName=Root, Mode=TwoWay}"
+                            IsEnabled="{Binding IsEnabled, ElementName=Root}" />
+                </Border>
+            </Flyout>
+        </FlyoutBase.AttachedFlyout>
+    </NumericUpDown>
+</UserControl>

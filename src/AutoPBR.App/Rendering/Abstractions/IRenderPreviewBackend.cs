@@ -17,6 +17,7 @@ public interface IRenderPreviewBackend : IDisposable
     void Resize(int width, int height);
     void SetScene(IRenderPreviewScene scene);
     void SetMaterial(PreviewMaterial? material);
+    void SetGroundMaterial(PreviewMaterial? material);
     void SetBlockModelPreview(PreviewModelSubject? subject, PreviewMaterial[]? slotMaterials);
     void SetRenderSettings(PreviewRenderSettings settings);
     void RenderFrame(TimeSpan elapsed);

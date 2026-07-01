@@ -46,6 +46,14 @@ internal static class UserSettingsSynchronizer
         vm.Preview3DPauseEntityIdleAnimation = settings.Preview3DPauseEntityIdleAnimation;
         vm.Preview3DShowGrid = settings.Preview3DShowGrid;
         vm.Preview3DShowGroundMesh = settings.Preview3DShowGroundMesh;
+        vm.Preview3DGrassColormapTemperature = Math.Clamp(
+            settings.Preview3DGrassColormapTemperature ?? PreviewStageConstants.DefaultGrassColormapTemperature,
+            0.0,
+            1.0);
+        vm.Preview3DGrassColormapDownfall = Math.Clamp(
+            settings.Preview3DGrassColormapDownfall ?? PreviewStageConstants.DefaultGrassColormapDownfall,
+            0.0,
+            1.0);
         vm.Preview3DShowAxes = settings.Preview3DShowAxes;
         vm.Preview3DEnableParallax = settings.Preview3DEnableParallax;
         vm.Preview3DEnableNormalMap = settings.Preview3DEnableNormalMap;
@@ -332,6 +340,8 @@ internal static class UserSettingsSynchronizer
         settings.Preview3DPauseEntityIdleAnimation = vm.Preview3DPauseEntityIdleAnimation;
         settings.Preview3DShowGrid = vm.Preview3DShowGrid;
         settings.Preview3DShowGroundMesh = vm.Preview3DShowGroundMesh;
+        settings.Preview3DGrassColormapTemperature = Math.Clamp(vm.Preview3DGrassColormapTemperature, 0.0, 1.0);
+        settings.Preview3DGrassColormapDownfall = Math.Clamp(vm.Preview3DGrassColormapDownfall, 0.0, 1.0);
         settings.Preview3DShowAxes = vm.Preview3DShowAxes;
         settings.Preview3DEnableParallax = vm.Preview3DEnableParallax;
         settings.Preview3DEnableNormalMap = vm.Preview3DEnableNormalMap;

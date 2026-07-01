@@ -239,6 +239,8 @@ public partial class MainWindowViewModel
             ScanCurrentInputCommand.NotifyCanExecuteChanged();
             ConvertCommand.NotifyCanExecuteChanged();
             ClearTagOverridesCommand.NotifyCanExecuteChanged();
+            RefreshPreviewGrassColormapState();
+            SchedulePreviewGroundTextureRefresh();
         });
     }
 

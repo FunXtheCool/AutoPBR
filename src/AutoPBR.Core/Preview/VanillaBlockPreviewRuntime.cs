@@ -31,6 +31,11 @@ internal static class VanillaBlockPreviewRuntime
             return false;
         }
 
+        if (string.Equals(rule.FamilyId, "grass_block", StringComparison.OrdinalIgnoreCase))
+        {
+            VanillaBlockGrassCubeBuilder.AddOverlaySlot(slotToZipPath, defaultNamespace);
+        }
+
         mergedModel = rule.PreviewShape switch
         {
             BlockTextureParityPreviewShape.UniformCube or BlockTextureParityPreviewShape.CubeDirectional
@@ -58,15 +63,42 @@ internal static class VanillaBlockPreviewRuntime
             return false;
         }
 
-        orderedTextureZipPaths = BlockTextureSlotResolver.CollectOrderedDistinctZipPaths(slotToZipPath);
+        if (string.Equals(rule.FamilyId, "grass_block_snow", StringComparison.OrdinalIgnoreCase))
+        {
+            var snowCapped = BlockGrassSnowPreviewPairing.TryAppendSnowCapForGrassBlockSnow(
+                normalizedBlockTexturePath,
+                defaultNamespace,
+                ref mergedModel);
+            orderedTextureZipPaths =
+                JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(mergedModel, defaultNamespace);
+            if (snowCapped)
+            {
+                meshProvenance = PreviewProvenanceFormatter.WithTag(
+                    PreviewProvenanceFormatter.WithTag(
+                        new PreviewMeshProvenance(PreviewMeshDriverKind.VanillaBlockParity, rule.PreviewShape.ToString()),
+                        "parity-synthesis"),
+                    "snow-cap");
+            }
+            else
+            {
+                meshProvenance = PreviewProvenanceFormatter.WithTag(
+                    new PreviewMeshProvenance(PreviewMeshDriverKind.VanillaBlockParity, rule.PreviewShape.ToString()),
+                    "parity-synthesis");
+            }
+        }
+        else
+        {
+            orderedTextureZipPaths = BlockTextureSlotResolver.CollectOrderedDistinctZipPaths(slotToZipPath);
+            meshProvenance = PreviewProvenanceFormatter.WithTag(
+                new PreviewMeshProvenance(PreviewMeshDriverKind.VanillaBlockParity, rule.PreviewShape.ToString()),
+                "parity-synthesis");
+        }
+
         if (orderedTextureZipPaths.Count == 0)
         {
             return false;
         }
 
-        meshProvenance = PreviewProvenanceFormatter.WithTag(
-            new PreviewMeshProvenance(PreviewMeshDriverKind.VanillaBlockParity, rule.PreviewShape.ToString()),
-            "parity-synthesis");
         return true;
     }
 
@@ -78,6 +110,11 @@ internal static class VanillaBlockPreviewRuntime
         IReadOnlyDictionary<string, string> slotToZipPath,
         string defaultNamespace)
     {
+        if (string.Equals(rule.FamilyId, "grass_block", StringComparison.OrdinalIgnoreCase))
+        {
+            return VanillaBlockGrassCubeBuilder.Build(rule, slotToZipPath, defaultNamespace);
+        }
+
         var textures = BlockTextureSlotResolver.BuildTextureDictionary(rule, slotToZipPath, defaultNamespace);
         var faceKeys = VanillaBlockCubeBuilder.BuildFaceTextureKeys(slotToZipPath);
         return VanillaBlockCubeBuilder.Build(faceKeys, textures);

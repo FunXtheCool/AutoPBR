@@ -85,7 +85,9 @@ public sealed partial class OpenGlPreviewBackend
             }
             else if (_program is null || !_program.IsValid || _albedo is null ||
                      _normal is null || _spec is null || _height is null || _mesh is null || _groundMesh is null ||
-                     _neutralNormal is null || _neutralSpec is null || _neutralHeight is null)
+                     _grassGroundAlbedo is null || _grassGroundNormal is null || _grassGroundSpec is null ||
+                     _grassGroundHeight is null || _neutralNormal is null || _neutralSpec is null ||
+                     _neutralHeight is null)
             {
                 return;
             }

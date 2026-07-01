@@ -28,71 +28,14 @@ internal static class RuntimeBlockPreviewModelResolver
         AutoPbrOptions options)
     {
         var result = new BlockPreviewResolveResult { AssetSources = assetSources };
-        if (JavaModelPathResolver.TryResolveModelJsonPathsFromTexture(
-                assetSources.Composite,
-                archivePath,
-                out var modelJsonPaths,
-                out var ns) &&
-            MinecraftModelMerger.TryMergeMany(assetSources.Composite, modelJsonPaths, out var merged))
+        if (TryResolvePackModelJson(assetSources, archivePath, extracted, out var packJson))
         {
-            var doorRebaked = BlockDoorPreviewPairing.TryNormalizeMergedDoorToPreviewPair(archivePath, ns, ref merged);
-            var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(merged, ns);
-            if (ordered.Count > 0)
-            {
-                foreach (var asset in ordered)
-                {
-                    AssetSourceMaterializer.Materialize(assetSources.Composite, asset, extracted);
-                }
-
-                var primaryModelPath = modelJsonPaths[0];
-                var origin = assetSources.ResolveModelJsonOrigin(primaryModelPath);
-                var detail = PreviewAssetSources.FormatModelJsonDetail(
-                    modelJsonPaths.Count > 1
-                        ? $"{primaryModelPath} +{modelJsonPaths.Count - 1}"
-                        : primaryModelPath,
-                    origin);
-                var provenance = new PreviewMeshProvenance(PreviewMeshDriverKind.PackModelJson, detail);
-                if (doorRebaked)
-                {
-                    provenance = PreviewProvenanceFormatter.WithTag(provenance, "door-rebake");
-                }
-
-                return new BlockPreviewResolveResult
-                {
-                    MergedModel = merged,
-                    OrderedModelTextures = ordered,
-                    ModelDefaultNamespace = ns,
-                    MeshProvenance = provenance,
-                    AssetSources = assetSources,
-                };
-            }
+            return packJson;
         }
 
-        if (VanillaBlockPreviewRuntime.IsBlockTextureArchivePath(archivePath) &&
-            BlockTextureParityCatalog.IsCatalogued(archivePath) &&
-            VanillaBlockPreviewRuntime.TryBuildSyntheticMesh(
-                archivePath,
-                out var blockModel,
-                out var blockProvenance,
-                out var blockOrdered,
-                out var blockNs))
+        if (TryResolveParitySynthesis(assetSources, archivePath, extracted, out var parity))
         {
-            foreach (var asset in blockOrdered)
-            {
-                if (assetSources.Composite.Exists(asset))
-                {
-                    AssetSourceMaterializer.Materialize(assetSources.Composite, asset, extracted);
-                }
-            }
-
-            return new BlockPreviewResolveResult
-            {
-                MergedModel = blockModel,
-                OrderedModelTextures = blockOrdered,
-                ModelDefaultNamespace = blockNs,
-                MeshProvenance = blockProvenance,
-                AssetSources = assetSources,
-            };
+            return parity;
         }
 
         if (IsEntityTextureArchivePath(archivePath))
@@ -133,6 +76,103 @@ internal static class RuntimeBlockPreviewModelResolver
         }
 
         return result;
+    }
+
+    private static bool TryResolvePackModelJson(
+        PreviewAssetSources assetSources,
+        string archivePath,
+        string extracted,
+        out BlockPreviewResolveResult result)
+    {
+        result = null!;
+        if (!JavaModelPathResolver.TryResolveModelJsonPathsFromTexture(
+                assetSources.Composite,
+                archivePath,
+                out var modelJsonPaths,
+                out var ns) ||
+            !MinecraftModelMerger.TryMergeMany(assetSources.Composite, modelJsonPaths, out var merged))
+        {
+            return false;
+        }
+
+        var doorRebaked = BlockDoorPreviewPairing.TryNormalizeMergedDoorToPreviewPair(archivePath, ns, ref merged);
+        var snowCapped = BlockGrassSnowPreviewPairing.TryAppendSnowCapForGrassBlockSnow(archivePath, ns, ref merged);
+        var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(merged, ns);
+        if (ordered.Count == 0)
+        {
+            return false;
+        }
+
+        foreach (var asset in ordered)
+        {
+            AssetSourceMaterializer.Materialize(assetSources.Composite, asset, extracted);
+        }
+
+        var primaryModelPath = modelJsonPaths[0];
+        var origin = assetSources.ResolveModelJsonOrigin(primaryModelPath);
+        var detail = PreviewAssetSources.FormatModelJsonDetail(
+            modelJsonPaths.Count > 1
+                ? $"{primaryModelPath} +{modelJsonPaths.Count - 1}"
+                : primaryModelPath,
+            origin);
+        var provenance = new PreviewMeshProvenance(PreviewMeshDriverKind.PackModelJson, detail);
+        if (doorRebaked)
+        {
+            provenance = PreviewProvenanceFormatter.WithTag(provenance, "door-rebake");
+        }
+
+        if (snowCapped)
+        {
+            provenance = PreviewProvenanceFormatter.WithTag(provenance, "snow-cap");
+        }
+
+        result = new BlockPreviewResolveResult
+        {
+            MergedModel = merged,
+            OrderedModelTextures = ordered,
+            ModelDefaultNamespace = ns,
+            MeshProvenance = provenance,
+            AssetSources = assetSources,
+        };
+        return true;
+    }
+
+    private static bool TryResolveParitySynthesis(
+        PreviewAssetSources assetSources,
+        string archivePath,
+        string extracted,
+        out BlockPreviewResolveResult result)
+    {
+        result = null!;
+        if (!VanillaBlockPreviewRuntime.IsBlockTextureArchivePath(archivePath) ||
+            !BlockTextureParityCatalog.IsCatalogued(archivePath) ||
+            !VanillaBlockPreviewRuntime.TryBuildSyntheticMesh(
+                archivePath,
+                out var blockModel,
+                out var blockProvenance,
+                out var blockOrdered,
+                out var blockNs))
+        {
+            return false;
+        }
+
+        foreach (var asset in blockOrdered)
+        {
+            if (assetSources.Composite.Exists(asset))
+            {
+                AssetSourceMaterializer.Materialize(assetSources.Composite, asset, extracted);
+            }
+        }
+
+        result = new BlockPreviewResolveResult
+        {
+            MergedModel = blockModel,
+            OrderedModelTextures = blockOrdered,
+            ModelDefaultNamespace = blockNs,
+            MeshProvenance = blockProvenance,
+            AssetSources = assetSources,
+        };
+        return true;
     }
 
     private static bool IsEntityTextureArchivePath(string archivePath) =>

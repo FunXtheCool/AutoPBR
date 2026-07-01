@@ -11,5 +11,11 @@
   
     <Application.Styles>
         <FluentTheme />
+        <Style Selector="NumericUpDown.overlay-slider-box">
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style Selector="NumericUpDown.overlay-slider-box:pointerover">
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlHighlightBaseMediumBrush}" />
+        </Style>
     </Application.Styles>
 </Application>

@@ -157,6 +157,25 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         }
     }
 
+    /// <summary>Updates the LabPBR ground plane material (grass_block_top).</summary>
+    public void SetGroundMaterial(PreviewMaterial? material)
+    {
+        void Core()
+        {
+            _backend.SetGroundMaterial(material);
+            RequestNextFrameRendering();
+        }
+
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            Core();
+        }
+        else
+        {
+            Dispatcher.UIThread.Post(Core);
+        }
+    }
+
     protected override void OnOpenGlInit(GlInterface gl)
     {
         _backend.Initialize(new RenderPreviewInitializationOptions());

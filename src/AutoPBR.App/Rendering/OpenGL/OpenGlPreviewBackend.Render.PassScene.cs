@@ -195,26 +195,29 @@ public sealed partial class OpenGlPreviewBackend
             SetInt("uShadowMap", 4);
         }
 
-        // Tinted vanilla grass plane sits under the grid; one texture tile per world unit (nearest + repeat).
+        // LabPBR grass plane under the grid; one texture tile per world unit (nearest + repeat).
         if (frame.Settings.ShowGroundMesh &&
             _grassGroundReady && _grassGroundAlbedo is not null && _groundMesh!.IndexCount > 0)
         {
             var restoreCull = frame.Gl.IsEnabled(EnableCap.CullFace);
             frame.Gl.Disable(EnableCap.CullFace);
             SetMatrix("uModel", Matrix4x4.Identity);
-            SetInt("uEnableParallax", 0);
-            SetInt("uEnableNormalMap", 0);
-            SetInt("uEnableSpecularMap", 0);
+            var groundParallax = frame.EnableParallaxEff && _grassGroundHasHeight;
+            var groundNormal = frame.EnableNormalMapEff && _grassGroundHasNormal;
+            var groundSpec = frame.EnableSpecularMapEff && _grassGroundHasSpecular;
+            SetInt("uEnableParallax", groundParallax ? 1 : 0);
+            SetInt("uEnableNormalMap", groundNormal ? 1 : 0);
+            SetInt("uEnableSpecularMap", groundSpec ? 1 : 0);
             SetInt("uSceneKind", 0);
             SetInt("uEntityAlphaMode", 0);
             ApplyEntitySkinningUniforms(_program, 0, 0, 0f);
-            SetInt("uHasNormal", 0);
-            SetInt("uHasSpecular", 0);
-            SetInt("uHasHeight", 0);
+            SetInt("uHasNormal", _grassGroundHasNormal ? 1 : 0);
+            SetInt("uHasSpecular", _grassGroundHasSpecular ? 1 : 0);
+            SetInt("uHasHeight", _grassGroundHasHeight ? 1 : 0);
             _grassGroundAlbedo.Bind(0);
-            _neutralNormal!.Bind(1);
-            _neutralSpec!.Bind(2);
-            _neutralHeight!.Bind(3);
+            _grassGroundNormal!.Bind(1);
+            _grassGroundSpec!.Bind(2);
+            _grassGroundHeight!.Bind(3);
             SetInt("uAlbedo", 0);
             SetInt("uNormal", 1);
             SetInt("uSpecular", 2);

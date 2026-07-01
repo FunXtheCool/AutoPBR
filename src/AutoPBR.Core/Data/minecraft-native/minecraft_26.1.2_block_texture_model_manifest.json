@@ -5694,15 +5694,23 @@
     {
       "path_prefix": "assets/minecraft/textures/block/grass_block_side_overlay",
       "family_id": "grass_block",
-      "preview_shape": "PackModelJsonOnly"
+      "preview_shape": "CubeDirectional",
+      "texture_slots": {
+        "up": "grass_block_top",
+        "down": "dirt",
+        "north": "grass_block_side",
+        "south": "grass_block_side",
+        "east": "grass_block_side",
+        "west": "grass_block_side"
+      }
     },
     {
       "path_prefix": "assets/minecraft/textures/block/grass_block_snow",
       "family_id": "grass_block_snow",
-      "preview_shape": "UniformCube",
+      "preview_shape": "CubeDirectional",
       "texture_slots": {
-        "up": "grass_block_snow",
-        "down": "grass_block_snow",
+        "up": "grass_block_top",
+        "down": "dirt",
         "north": "grass_block_snow",
         "south": "grass_block_snow",
         "east": "grass_block_snow",

@@ -205,6 +205,12 @@ public sealed class UserSettings
     /// <summary>Draw the textured grass ground plane in 3D preview.</summary>
     public bool Preview3DShowGroundMesh { get; set; } = true;
 
+    /// <summary>Grass colormap temperature slider (0–1) for 3D preview biome tint.</summary>
+    public double? Preview3DGrassColormapTemperature { get; set; }
+
+    /// <summary>Grass colormap downfall/rain slider (0–1) for 3D preview biome tint.</summary>
+    public double? Preview3DGrassColormapDownfall { get; set; }
+
     /// <summary>Draw X/Y/Z axis reference in the corner of the 3D preview.</summary>
     public bool Preview3DShowAxes { get; set; } = true;
 

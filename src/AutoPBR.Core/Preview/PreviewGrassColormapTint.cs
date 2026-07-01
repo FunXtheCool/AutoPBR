@@ -21,25 +21,59 @@ public static class PreviewGrassColormapTint
 
         var norm = archivePath.Replace('\\', '/').TrimStart('/').ToLowerInvariant();
         return norm.EndsWith("/grass_block_top.png", StringComparison.Ordinal) ||
-               norm.EndsWith("/grass_block_side_overlay.png", StringComparison.Ordinal) ||
-               norm.EndsWith("/grass_block_snow.png", StringComparison.Ordinal);
+               norm.EndsWith("/grass_block_side_overlay.png", StringComparison.Ordinal);
+    }
+
+    /// <summary>Snowy grass sides (<c>grass_block_snow</c>) sample the cold/snow region of <c>grass.png</c>.</summary>
+    public static bool IsGrassSnowSideColormapTintIndexPath(string? archivePath)
+    {
+        if (string.IsNullOrWhiteSpace(archivePath))
+        {
+            return false;
+        }
+
+        return archivePath.Replace('\\', '/').TrimStart('/').ToLowerInvariant()
+            .EndsWith("/grass_block_snow.png", StringComparison.Ordinal);
     }
 
     public static bool NeedsGrassColormapTint(IReadOnlyList<string>? materialArchivePaths) =>
         materialArchivePaths is not null &&
-        materialArchivePaths.Any(IsGrassColormapTintIndexPath);
+        materialArchivePaths.Any(NeedsGrassColormapTint);
 
     public static bool NeedsGrassColormapTint(string? archivePath) =>
-        IsGrassColormapTintIndexPath(archivePath);
+        IsGrassColormapTintIndexPath(archivePath) || IsGrassSnowSideColormapTintIndexPath(archivePath);
 
+    /// <summary>Vanilla grass colormap lookup: triangular downfall, inverted axes.</summary>
     public static Rgba32 SampleGrassTint(PreviewColormapImage colormap, double temperature01, double downfall01)
     {
-        var x = (int)Math.Clamp(MathF.Round((float)temperature01 * (colormap.Width - 1)), 0f, colormap.Width - 1);
-        var y = (int)Math.Clamp(MathF.Round((float)downfall01 * (colormap.Height - 1)), 0f, colormap.Height - 1);
+        var temperature = Math.Clamp(temperature01, 0.0, 1.0);
+        var downfall = Math.Clamp(downfall01, 0.0, 1.0);
+        downfall *= temperature;
+
+        var x = (int)Math.Clamp(MathF.Round((float)((1.0 - temperature) * (colormap.Width - 1))), 0f, colormap.Width - 1);
+        var y = (int)Math.Clamp(MathF.Round((float)((1.0 - downfall) * (colormap.Height - 1))), 0f, colormap.Height - 1);
         var i = (y * colormap.Width + x) * 4;
         var rgba = colormap.Rgba;
         return new Rgba32(rgba[i], rgba[i + 1], rgba[i + 2], rgba[i + 3]);
     }
+
+    /// <summary>
+    /// Snowy grass sides mirror temperature so the UI's warm/cold slider moves along the snow edge of <c>grass.png</c>.
+    /// </summary>
+    public static Rgba32 SampleSnowSideGrassTint(
+        PreviewColormapImage colormap,
+        double temperature01,
+        double downfall01) =>
+        SampleGrassTint(colormap, 1.0 - temperature01, downfall01);
+
+    public static Rgba32 SampleTintForArchivePath(
+        PreviewColormapImage colormap,
+        string? archivePath,
+        double temperature01,
+        double downfall01) =>
+        IsGrassSnowSideColormapTintIndexPath(archivePath)
+            ? SampleSnowSideGrassTint(colormap, temperature01, downfall01)
+            : SampleGrassTint(colormap, temperature01, downfall01);
 
     public static byte[] ApplyTintToDiffuse(ReadOnlySpan<byte> diffuseRgba, int width, int height, Rgba32 tint)
     {
@@ -75,9 +109,25 @@ public static class PreviewGrassColormapTint
         return outBytes;
     }
 
+    public static PreviewTextureMaps WithGrassTint(
+        PreviewTextureMaps maps,
+        string? archivePath,
+        PreviewColormapImage colormap,
+        double temperature01,
+        double downfall01)
+    {
+        if (!NeedsGrassColormapTint(archivePath))
+        {
+            return maps;
+        }
+
+        var tint = SampleTintForArchivePath(colormap, archivePath, temperature01, downfall01);
+        return WithGrassTint(maps, archivePath, tint);
+    }
+
     public static PreviewTextureMaps WithGrassTint(PreviewTextureMaps maps, string? archivePath, Rgba32 tint)
     {
-        if (!IsGrassColormapTintIndexPath(archivePath))
+        if (!NeedsGrassColormapTint(archivePath))
         {
             return maps;
         }

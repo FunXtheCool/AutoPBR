@@ -83,6 +83,12 @@ public sealed partial class OpenGlPreviewBackend
         _groundMesh = null;
         _grassGroundAlbedo?.Dispose();
         _grassGroundAlbedo = null;
+        _grassGroundNormal?.Dispose();
+        _grassGroundNormal = null;
+        _grassGroundSpec?.Dispose();
+        _grassGroundSpec = null;
+        _grassGroundHeight?.Dispose();
+        _grassGroundHeight = null;
         _neutralNormal?.Dispose();
         _neutralNormal = null;
         _neutralSpec?.Dispose();
@@ -197,7 +203,10 @@ public sealed partial class OpenGlPreviewBackend
                 _neutralHeight = new GlTexture2D(gl);
                 _neutralHeight.UploadRgba(1, 1, [128, 128, 128, 255]);
                 _grassGroundAlbedo = new GlTexture2D(gl);
-                _grassGroundReady = TryUploadGrassGroundTexture(gl);
+                _grassGroundNormal = new GlTexture2D(gl);
+                _grassGroundSpec = new GlTexture2D(gl);
+                _grassGroundHeight = new GlTexture2D(gl);
+                _grassGroundReady = TryUploadBundledGroundFallback(gl);
                 return true;
 
             case 4:

@@ -30,6 +30,12 @@ public static class PreviewStageConstants
     /// <summary>Debounce before rebuilding per-texel sprite voxel meshes after slider drags.</summary>
     public const int SpriteThicknessMeshDebounceMs = 200;
 
+    /// <summary>Debounce before re-tinting grass colormap preview materials after slider drags.</summary>
+    public const int GrassColormapTintDebounceMs = 200;
+
+    public const double DefaultGrassColormapTemperature = 0.72;
+    public const double DefaultGrassColormapDownfall = 0.45;
+
     /// <summary>Base Y for the volumetric cloud layer before user height offset.</summary>
     public const float CloudLayerBaseY = 18f;
 

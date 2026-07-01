@@ -78,17 +78,19 @@ public sealed partial class OpenGlPreviewBackend
 
         var viewProj = frame.Proj * frame.View;
         var towardSun = NormalizeOrDefault(-frame.WorldLightDir, Vector3.UnitY);
-        var sunCenter = frame.Eye + towardSun * PreviewSunScreenProjection.SunDistance;
+        var celestialFarPlane = frame.FarPlane > 1f ? frame.FarPlane : PreviewSunScreenProjection.SunDistance;
+        var sunDist = Math.Clamp(celestialFarPlane * 0.72f, 1f, PreviewSunScreenProjection.SunDistance);
+        var sunCenter = frame.Eye + towardSun * sunDist;
         var sunRight = CelestialBillboardRight(towardSun);
         var sunUp = Vector3.Normalize(Vector3.Cross(towardSun, sunRight));
-        var sunRadius = PreviewSunScreenProjection.SunRadius * Math.Clamp(frame.Settings.AtmosphereSunDiscSize, 0.05f, 2f);
+        var sunRadius = sunDist * (PreviewSunScreenProjection.SunRadius / PreviewSunScreenProjection.SunDistance) *
+                        Math.Clamp(frame.Settings.AtmosphereSunDiscSize, 0.05f, 2f);
 
         MoonBillboardPlacement moonPlacement = default;
-        var moonFarPlane = frame.FarPlane > 1f ? frame.FarPlane : PreviewSunScreenProjection.SunDistance;
         var drawMoonMarker = TryComputeMoonBillboardPlacement(
             frame.Eye,
             frame.WorldLightDir,
-            moonFarPlane,
+            celestialFarPlane,
             frame.Settings.AtmosphereMoonDiscSize,
             out moonPlacement);
 

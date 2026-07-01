@@ -538,6 +538,23 @@ public sealed partial class OpenGlPreviewBackend
             }
         }
 
+        bool groundMaterialDirty;
+        PreviewMaterial? groundMaterial;
+        lock (_sync)
+        {
+            groundMaterialDirty = _grassGroundMaterialDirty;
+            groundMaterial = _grassGroundMaterial;
+        }
+
+        if (groundMaterialDirty)
+        {
+            UploadGroundMaterial(frame.Gl, groundMaterial, nearest: true);
+            lock (_sync)
+            {
+                _grassGroundMaterialDirty = false;
+            }
+        }
+
         frame.EntityBoneSnapshotValid = false;
         frame.EntityBoneSnapshotCount = 0;
         frame.EntityBonePaletteUploaded = false;

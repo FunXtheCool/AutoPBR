@@ -1157,7 +1157,49 @@
     <value>Focus the preview for keyboard shortcuts.</value>
   </data>
   <data name="ShaderPreviewLabPbrSection" xml:space="preserve">
-    <value>LabPBR preview (OpenGL)</value>
+    <value>General</value>
+  </data>
+  <data name="Preview3DSkyDomeSection" xml:space="preserve">
+    <value>Sky Dome</value>
+  </data>
+  <data name="Preview3DAtmosphereSection" xml:space="preserve">
+    <value>Atmosphere</value>
+  </data>
+  <data name="Preview3DSunSection" xml:space="preserve">
+    <value>Sun</value>
+  </data>
+  <data name="Preview3DMoonSection" xml:space="preserve">
+    <value>Moon</value>
+  </data>
+  <data name="Preview3DGodRayDebugSection" xml:space="preserve">
+    <value>God ray debug (froxel)</value>
+  </data>
+  <data name="Preview3DGodRayStabilizeDebug" xml:space="preserve">
+    <value>Stabilize (no temporal/jitter)</value>
+  </data>
+  <data name="Preview3DGodRayStabilizeDebugTooltip" xml:space="preserve">
+    <value>Disables froxel/integrate/upsample temporal reuse and freezes march jitter. Turn on to stop pulsing while tuning god rays.</value>
+  </data>
+  <data name="Preview3DGodRayDebugDensity" xml:space="preserve">
+    <value>Debug density</value>
+  </data>
+  <data name="Preview3DGodRayDebugDensityTooltip" xml:space="preserve">
+    <value>Uniform participating-medium density injected into the froxel volume so god rays are visible without height fog or clouds. 0 = production behaviour. Try 0.10–0.30.</value>
+  </data>
+  <data name="Preview3DGodRayScatterGain" xml:space="preserve">
+    <value>Scatter gain</value>
+  </data>
+  <data name="Preview3DGodRayScatterGainTooltip" xml:space="preserve">
+    <value>In-scatter accumulation gain in the integrate march (shader default 3.4). Higher = brighter shafts.</value>
+  </data>
+  <data name="Preview3DGodRayExtinction" xml:space="preserve">
+    <value>Extinction</value>
+  </data>
+  <data name="Preview3DGodRayExtinctionTooltip" xml:space="preserve">
+    <value>Beer-Lambert extinction coefficient for transmittance falloff along the view ray (shader default 1.15). Higher = denser/shorter shafts.</value>
+  </data>
+  <data name="Preview3DPreviewDebugSection" xml:space="preserve">
+    <value>3D preview debug</value>
   </data>
   <data name="ShaderPreviewLabPbrDescription" xml:space="preserve">
     <value>These options apply when the right-hand preview is in 3D mode. 2D Sprite flagged textures use foliage-style crossed planes automatically; all other textures use the cube. The preview shader follows LabPBR channel conventions: height from _h (red), normals from _n, smoothness / metal flags from _s (green metal threshold matches common packs).</value>
@@ -1309,8 +1351,11 @@
   <data name="Preview3DEnableVolumetricCloudsTooltip" xml:space="preserve">
     <value>Procedural cloud layer in the sky pass (quality follows the preset below).</value>
   </data>
+  <data name="Preview3DShadersSection" xml:space="preserve">
+    <value>Shaders</value>
+  </data>
   <data name="Preview3DVolumetricQuality" xml:space="preserve">
-    <value>Quality preset</value>
+    <value>Froxel Quality</value>
   </data>
   <data name="Preview3DVolumetricQualityTooltip" xml:space="preserve">
     <value>Low / medium / high froxel resolution, slice count, cloud detail, and temporal filtering.</value>
@@ -1322,7 +1367,7 @@
     <value>Intensity of the additive god-ray composite (0 = off).</value>
   </data>
   <data name="Preview3DCloudSection" xml:space="preserve">
-    <value>Cloud layer</value>
+    <value>Cloud Layer</value>
   </data>
   <data name="Preview3DCloudDensity" xml:space="preserve">
     <value>Density</value>
@@ -1486,6 +1531,12 @@
   <data name="Preview3DEnableParallaxAoTooltip" xml:space="preserve">
     <value>Enable local ambient occlusion darkening from the parallax height field.</value>
   </data>
+  <data name="Preview3DWorldSection" xml:space="preserve">
+    <value>World</value>
+  </data>
+  <data name="Preview3DAnimationSection" xml:space="preserve">
+    <value>Animation</value>
+  </data>
   <data name="Preview3DShowGrid" xml:space="preserve">
     <value>Ground grid (3D)</value>
   </data>
@@ -1530,6 +1581,33 @@
   </data>
   <data name="Preview3DEntityAnimationAmplitudeTooltip" xml:space="preserve">
     <value>Render-time amplitude multiplier for emulated entity idle motion.</value>
+  </data>
+  <data name="Preview3DEntitiesSection" xml:space="preserve">
+    <value>Entities</value>
+  </data>
+  <data name="Preview3DViewportSection" xml:space="preserve">
+    <value>Viewport</value>
+  </data>
+  <data name="Preview3DSpritesSection" xml:space="preserve">
+    <value>Sprites</value>
+  </data>
+  <data name="Preview3DGrassSection" xml:space="preserve">
+    <value>Grass</value>
+  </data>
+  <data name="Preview3DGrassColormap" xml:space="preserve">
+    <value>Grass colormap</value>
+  </data>
+  <data name="Preview3DGrassColormapTemperature" xml:space="preserve">
+    <value>Temperature</value>
+  </data>
+  <data name="Preview3DGrassColormapTemperatureTooltip" xml:space="preserve">
+    <value>Biome temperature (0 = cold, 1 = warm) used to sample the grass colormap for preview tinting.</value>
+  </data>
+  <data name="Preview3DGrassColormapDownfall" xml:space="preserve">
+    <value>Downfall</value>
+  </data>
+  <data name="Preview3DGrassColormapDownfallTooltip" xml:space="preserve">
+    <value>Biome humidity / rainfall (0 = dry, 1 = wet) used to sample the grass colormap for preview tinting.</value>
   </data>
   <data name="Preview3DShowAxes" xml:space="preserve">
     <value>3D XYZ axes</value>

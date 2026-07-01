@@ -30,10 +30,18 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private GlMeshBuffer? _mesh;
     private GlMeshBuffer? _groundMesh;
     private GlTexture2D? _grassGroundAlbedo;
+    private GlTexture2D? _grassGroundNormal;
+    private GlTexture2D? _grassGroundSpec;
+    private GlTexture2D? _grassGroundHeight;
     private GlTexture2D? _neutralNormal;
     private GlTexture2D? _neutralSpec;
     private GlTexture2D? _neutralHeight;
     private bool _grassGroundReady;
+    private PreviewMaterial? _grassGroundMaterial;
+    private bool _grassGroundMaterialDirty = true;
+    private bool _grassGroundHasNormal;
+    private bool _grassGroundHasSpecular;
+    private bool _grassGroundHasHeight;
     private GlLineShaderProgram? _lineProgram;
     private uint _gridVao;
     private uint _gridVbo;
@@ -280,6 +288,15 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         {
             _material = material;
             _materialDirty = true;
+        }
+    }
+
+    public void SetGroundMaterial(PreviewMaterial? material)
+    {
+        lock (_sync)
+        {
+            _grassGroundMaterial = material;
+            _grassGroundMaterialDirty = true;
         }
     }
 

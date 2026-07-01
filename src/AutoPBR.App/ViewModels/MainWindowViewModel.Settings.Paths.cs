@@ -56,12 +56,13 @@ public partial class MainWindowViewModel
     {
         _ = value;
         SaveSettings();
-        if (_loadingSettings || !IsPreview3D || string.IsNullOrWhiteSpace(PreviewArchivePath))
+        if (_loadingSettings || !IsPreview3D)
         {
             return;
         }
 
         RefreshPreviewGrassColormapState();
+        SchedulePreviewGroundTextureRefresh();
         Push3DPreviewStateToGpu();
     }
 

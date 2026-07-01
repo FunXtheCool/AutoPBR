@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:AutoPBR.App.ViewModels"
+        xmlns:ctrls="using:AutoPBR.App.Controls"
         x:Class="AutoPBR.App.Views.UvDebugWindow"
         x:DataType="vm:UvDebugWindowViewModel"
         Width="760"
@@ -77,21 +78,27 @@
                         <TextBlock Text="U offset (px)"
                                    VerticalAlignment="Center"
                                    Foreground="{Binding ForegroundBrush}" />
-                        <NumericUpDown Width="120"
-                                       Increment="1"
-                                       Minimum="-128"
-                                       Maximum="128"
-                                       Value="{Binding OffsetUPixels, Mode=TwoWay}" />
+                        <ctrls:OverlaySlider Width="120"
+                                               Minimum="-128"
+                                               Maximum="128"
+                                               SmallChange="1"
+                                               LargeChange="8"
+                                               Increment="1"
+                                               FormatString="0"
+                                               Value="{Binding OffsetUPixels, Mode=TwoWay}" />
 
                         <TextBlock Text="V offset (px)"
                                    VerticalAlignment="Center"
                                    Margin="10,0,0,0"
                                    Foreground="{Binding ForegroundBrush}" />
-                        <NumericUpDown Width="120"
-                                       Increment="1"
-                                       Minimum="-128"
-                                       Maximum="128"
-                                       Value="{Binding OffsetVPixels, Mode=TwoWay}" />
+                        <ctrls:OverlaySlider Width="120"
+                                               Minimum="-128"
+                                               Maximum="128"
+                                               SmallChange="1"
+                                               LargeChange="8"
+                                               Increment="1"
+                                               FormatString="0"
+                                               Value="{Binding OffsetVPixels, Mode=TwoWay}" />
                     </StackPanel>
 
                     <TextBlock Text="Face semantic routing (post-transform face semantics)"
