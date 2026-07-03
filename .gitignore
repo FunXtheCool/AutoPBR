@@ -81,6 +81,7 @@ tools/MlSpecularTrainer/stylized_dataset/
 tools/MlSpecularTrainer/shuffle_dataset/
 
 # Local scratch / agent export (root + nested)
+.build-out/
 .build-verify/
 .build-test-out/
 .tmpbuild/

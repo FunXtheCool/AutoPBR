@@ -58,6 +58,11 @@ public partial class MainWindowViewModel
     [ObservableProperty] private bool _preview3DEnableNormalMap = true;
     [ObservableProperty] private bool _preview3DEnableSpecularMap = true;
     [ObservableProperty] private double _preview3DParallaxHeightStrength = 0.05;
+    [ObservableProperty] private double _preview3DParallaxTraceLayers = 64;
+    [ObservableProperty] private double _preview3DParallaxRefineSteps = 5;
+    [ObservableProperty] private double _preview3DParallaxShadowSamples = 24;
+    [ObservableProperty] private double _preview3DParallaxShadowSoftness = 1.25;
+    [ObservableProperty] private double _preview3DParallaxMaxUvShift = 0.45;
     [ObservableProperty] private bool _preview3DEnableSss = true;
     [ObservableProperty] private bool _preview3DEnableParallaxShadow = true;
     [ObservableProperty] private bool _preview3DEnableParallaxAo = true;
@@ -152,8 +157,8 @@ public partial class MainWindowViewModel
     {
         Preview3DGpuInitOverlayVisible = true;
         Preview3DGpuInitOverlayText = PreviewShaderPrewarm.IsComplete
-            ? "Starting GPU preview…"
-            : "Preparing shader sources…";
+            ? PreviewGpuInitPhases.Starting
+            : PreviewGpuInitPhases.PreparingShaderSources;
         Preview3DGpuInitProgressFraction = Math.Clamp(PreviewShaderPrewarm.Fraction * 0.18, 0.0, 0.18);
         Preview3DGpuInitProgressIndeterminate = Preview3DGpuInitProgressFraction <= 0.001;
     }
@@ -268,6 +273,11 @@ public partial class MainWindowViewModel
     partial void OnPreview3DEnableNormalMapChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEnableSpecularMapChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DParallaxHeightStrengthChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DParallaxTraceLayersChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DParallaxRefineStepsChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DParallaxShadowSamplesChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DParallaxShadowSoftnessChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DParallaxMaxUvShiftChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEnableSssChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEnableParallaxShadowChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEnableParallaxAoChanged(bool value) => OnPreview3DGpuSettingChanged(value);
@@ -495,6 +505,11 @@ public partial class MainWindowViewModel
             DrawPreviewSubject = _lastPreviewTextureMaps is not null,
             EnableSss = Preview3DEnableSss,
             EnableParallaxShadow = Preview3DEnableParallaxShadow,
+            ParallaxTraceLayers = (int)Math.Round(Math.Clamp(Preview3DParallaxTraceLayers, 8.0, 128.0)),
+            ParallaxRefineSteps = (int)Math.Round(Math.Clamp(Preview3DParallaxRefineSteps, 0.0, 8.0)),
+            ParallaxShadowSamples = (int)Math.Round(Math.Clamp(Preview3DParallaxShadowSamples, 4.0, 64.0)),
+            ParallaxShadowSoftness = (float)Math.Clamp(Preview3DParallaxShadowSoftness, 0.0, 4.0),
+            ParallaxMaxUvShift = (float)Math.Clamp(Preview3DParallaxMaxUvShift, 0.05, 0.75),
             EnableParallaxAo = Preview3DEnableParallaxAo,
             ParallaxAoStrength = (float)Preview3DParallaxAoStrength,
             EnableIbl = Preview3DEnableIbl,

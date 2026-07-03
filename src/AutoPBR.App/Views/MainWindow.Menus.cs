@@ -123,7 +123,7 @@ public partial class MainWindow : Window
             {
                 var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
                 {
-                    Title = "Select resource pack (.zip or .jar)",
+                    Title = Lang.Resources.SelectResourcePackTitle,
                     AllowMultiple = false,
                     FileTypeFilter =
                     [
@@ -157,7 +157,7 @@ public partial class MainWindow : Window
 
             var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
             {
-                Title = "Select output folder",
+                Title = Lang.Resources.SelectOutputFolderTitle,
                 AllowMultiple = false
             });
 
@@ -192,7 +192,7 @@ public partial class MainWindow : Window
 
             var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
             {
-                Title = "Select Minecraft version or assets folder",
+                Title = Lang.Resources.SelectMinecraftAssetsTitle,
                 AllowMultiple = false
             });
 

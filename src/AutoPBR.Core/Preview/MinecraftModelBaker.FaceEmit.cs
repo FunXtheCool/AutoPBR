@@ -217,6 +217,8 @@ internal static partial class MinecraftModelBaker
             }
         }
 
+        DeriveTangentBasis(c0, c1, c2, c3, uvA, uvB, uvC, uvD, n, tang, wSign, out tang, out wSign);
+
         var stride = appendBoneIndex ? FloatsPerSkinnedVertex : FloatsPerVertex;
         var baseIndex = (uint)(v.Count / stride);
         AddVert(v, c0, n, uvA, tang, wSign, appendBoneIndex, boneElementIndex);
@@ -243,6 +245,94 @@ internal static partial class MinecraftModelBaker
             idx.Add(baseIndex + 3);
         }
 
+        return true;
+    }
+
+    private static void DeriveTangentBasis(
+        Vector3 c0,
+        Vector3 c1,
+        Vector3 c2,
+        Vector3 c3,
+        Vector2 uv0,
+        Vector2 uv1,
+        Vector2 uv2,
+        Vector2 uv3,
+        Vector3 normal,
+        Vector3 fallbackTangent,
+        float fallbackWSign,
+        out Vector3 tangent,
+        out float wSign)
+    {
+        if (TryDeriveTangentBasis(c0, c1, c2, uv0, uv1, uv2, normal, out tangent, out wSign) ||
+            TryDeriveTangentBasis(c0, c2, c3, uv0, uv2, uv3, normal, out tangent, out wSign))
+        {
+            return;
+        }
+
+        tangent = OrthogonalizeOrFallback(fallbackTangent, normal);
+        wSign = fallbackWSign;
+    }
+
+    private static bool TryDeriveTangentBasis(
+        Vector3 p0,
+        Vector3 p1,
+        Vector3 p2,
+        Vector2 uv0,
+        Vector2 uv1,
+        Vector2 uv2,
+        Vector3 normal,
+        out Vector3 tangent,
+        out float wSign)
+    {
+        tangent = default;
+        wSign = 1f;
+
+        var edge1 = p1 - p0;
+        var edge2 = p2 - p0;
+        var duv1 = uv1 - uv0;
+        var duv2 = uv2 - uv0;
+        var det = duv1.X * duv2.Y - duv1.Y * duv2.X;
+        if (MathF.Abs(det) < 1e-8f)
+        {
+            return false;
+        }
+
+        var invDet = 1f / det;
+        var rawTangent = (edge1 * duv2.Y - edge2 * duv1.Y) * invDet;
+        var rawBitangent = (edge2 * duv1.X - edge1 * duv2.X) * invDet;
+        tangent = rawTangent - normal * Vector3.Dot(normal, rawTangent);
+        if (!TryNormalize(tangent, out tangent) || !TryNormalize(rawBitangent, out var bitangent))
+        {
+            return false;
+        }
+
+        wSign = Vector3.Dot(Vector3.Cross(normal, tangent), bitangent) < 0f ? -1f : 1f;
+        return true;
+    }
+
+    private static Vector3 OrthogonalizeOrFallback(Vector3 tangent, Vector3 normal)
+    {
+        var ortho = tangent - normal * Vector3.Dot(normal, tangent);
+        if (TryNormalize(ortho, out ortho))
+        {
+            return ortho;
+        }
+
+        var axis = MathF.Abs(normal.Y) < 0.9f ? Vector3.UnitY : Vector3.UnitX;
+        ortho = Vector3.Cross(axis, normal);
+        return TryNormalize(ortho, out ortho) ? ortho : Vector3.UnitX;
+    }
+
+    private static bool TryNormalize(Vector3 v, out Vector3 normalized)
+    {
+        var lenSq = v.LengthSquared();
+        if (lenSq < 1e-12f || float.IsNaN(lenSq) || float.IsInfinity(lenSq))
+        {
+            normalized = default;
+            return false;
+        }
+
+        normalized = v / MathF.Sqrt(lenSq);
         return true;
     }
 

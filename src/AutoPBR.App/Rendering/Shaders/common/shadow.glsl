@@ -1,7 +1,7 @@
 // Genesis preview shader - directional shadow sampling helpers.
 // Compatible with desktop GLSL 330 core and GLSL ES 300 (after GlslSourceAdapter).
-// Hardware shadow comparison via sampler2DShadow + 3x3 PCF (9 taps), slope-scaled bias,
-// and a manual border check (ES 300 has no CLAMP_TO_BORDER).
+// Hardware shadow comparison via sampler2DShadow + PCF, slope-scaled bias, and a
+// manual border check (ES 300 has no CLAMP_TO_BORDER).
 
 #ifndef GENESIS_SHADOW_GLSL
 #define GENESIS_SHADOW_GLSL
@@ -50,6 +50,47 @@ float sampleShadowPcf3x3(sampler2DShadow shadowTex, vec3 shadowUv, vec2 texelSiz
     }
 
     return sum * (1.0 / 9.0);
+}
+
+float sampleShadowBordered(sampler2DShadow shadowTex, vec3 shadowUv)
+{
+    if (shadowUv.x < 0.0 || shadowUv.x > 1.0 || shadowUv.y < 0.0 || shadowUv.y > 1.0)
+    {
+        return 1.0;
+    }
+
+    return texture(shadowTex, shadowUv);
+}
+
+float sampleShadowPcfSoft(sampler2DShadow shadowTex, vec3 shadowUv, vec2 texelSize, float softnessTexels)
+{
+    float radius = max(softnessTexels, 0.0);
+    if (radius <= 1.0)
+    {
+        return sampleShadowPcf3x3(shadowTex, shadowUv, texelSize);
+    }
+
+    vec2 disk[16] = vec2[16](
+        vec2(-0.942016, -0.399062), vec2( 0.945586, -0.768907),
+        vec2(-0.094184, -0.929389), vec2( 0.344959,  0.293878),
+        vec2(-0.915886,  0.457714), vec2(-0.815442, -0.879125),
+        vec2(-0.382775,  0.276768), vec2( 0.974844,  0.756484),
+        vec2( 0.443233, -0.975116), vec2( 0.537430, -0.473734),
+        vec2(-0.264969, -0.418930), vec2( 0.791975,  0.190902),
+        vec2(-0.241888,  0.997065), vec2(-0.814100,  0.914376),
+        vec2( 0.199841,  0.786414), vec2( 0.143832, -0.141008)
+    );
+
+    float sum = sampleShadowBordered(shadowTex, shadowUv) * 2.0;
+    float totalWeight = 2.0;
+    for (int i = 0; i < 16; ++i)
+    {
+        vec2 off = disk[i] * texelSize * radius;
+        sum += sampleShadowBordered(shadowTex, vec3(shadowUv.xy + off, shadowUv.z));
+        totalWeight += 1.0;
+    }
+
+    return sum / totalWeight;
 }
 
 #endif // GENESIS_SHADOW_GLSL

@@ -26,6 +26,11 @@ public sealed partial class PreviewRenderingTests
         var s = new PreviewRenderSettings();
         Assert.True(s.EnableSss);
         Assert.True(s.EnableParallaxShadow);
+        Assert.Equal(64, s.ParallaxTraceLayers);
+        Assert.Equal(5, s.ParallaxRefineSteps);
+        Assert.Equal(24, s.ParallaxShadowSamples);
+        Assert.Equal(1.25f, s.ParallaxShadowSoftness);
+        Assert.Equal(0.45f, s.ParallaxMaxUvShift);
         Assert.True(s.EnableIbl);
         Assert.True(s.EnableAtmosphericSky);
         Assert.Equal(2.6f, s.AtmosphereTurbidity);
@@ -51,6 +56,7 @@ public sealed partial class PreviewRenderingTests
         Assert.Equal(1024, s.ShadowMapResolution);
         Assert.Equal(0.0008f, s.ShadowMinBias);
         Assert.Equal(0.005f, s.ShadowMaxBias);
+        Assert.Equal(2.25f, s.ShadowSoftnessTexels);
         // Phase 3 stub: persisted boolean only, defaults to false in Phase 2.
         Assert.False(s.EnableShadowCascades);
     }

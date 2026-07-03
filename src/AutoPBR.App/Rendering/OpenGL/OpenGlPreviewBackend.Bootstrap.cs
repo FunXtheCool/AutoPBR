@@ -1,5 +1,7 @@
 using AutoPBR.App.Rendering.Scene;
 
+using AutoPBR.App.Lang;
+
 namespace AutoPBR.App.Rendering.OpenGL;
 
 public sealed partial class OpenGlPreviewBackend
@@ -17,18 +19,7 @@ public sealed partial class OpenGlPreviewBackend
 
         public double Fraction => Math.Clamp((double)_step / StepCount, 0.0, 1.0);
 
-        public string Phase => _step switch
-        {
-            0 => "Compiling main preview shaders…",
-            1 => "Compiling shadow shaders…",
-            2 => "Creating shadow maps…",
-            3 => "Uploading preview meshes…",
-            4 => "Initializing line overlay…",
-            5 => "Initializing sky dome…",
-            6 => "Initializing atmosphere…",
-            >= 7 => "Finalizing preview…",
-            _ => "Preparing GPU preview…",
-        };
+        public string Phase => PreviewGpuInitPhases.BootstrapPhase(_step);
 
         public void Advance(OpenGlPreviewBackend backend, double maxMilliseconds)
         {
@@ -58,7 +49,7 @@ public sealed partial class OpenGlPreviewBackend
 
             _pendingShaderReload = true;
             _gpuInitStopwatch.Restart();
-            RaiseGpuInitProgress("Clearing shader cache…", _settings);
+            RaiseGpuInitProgress(PreviewGpuInitPhases.ClearingShaderCache, _settings);
         }
     }
 

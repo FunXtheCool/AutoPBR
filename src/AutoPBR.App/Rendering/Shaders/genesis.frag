@@ -46,6 +46,7 @@ uniform int   uHasNormal;
 uniform int   uHasSpecular;
 uniform int   uHasHeight;
 uniform int   uSceneKind;
+uniform int   uIsGroundPass;
 uniform float uAlphaCutoff;
 uniform int   uItemAlphaBlend;
 // 0 = off, 1 = cutout, 2 = blend - batched block/item models and entity emulated rigs.
@@ -74,17 +75,18 @@ uniform int   uEnableShadowMap;
 uniform float uShadowMinBias;
 uniform float uShadowMaxBias;
 uniform vec2  uShadowTexelSize;
+uniform float uShadowSoftnessTexels;
 
 out vec4 FragColor;
 
-vec3 sampleNormal(vec2 uv, vec3 Nw, vec3 Tw, vec3 Bw)
+vec3 sampleNormal(vec2 uv, vec2 dx, vec2 dy, vec3 Nw, vec3 Tw, vec3 Bw)
 {
     if (uEnableNormalMap < 1 || uHasNormal < 1)
     {
         return normalize(Nw);
     }
 
-    vec3 tn = texture(uNormal, uv).xyz * 2.0 - 1.0;
+    vec3 tn = textureGrad(uNormal, uv, dx, dy).xyz * 2.0 - 1.0;
     tn.xy *= uNormalStrength;
     tn = normalize(tn);
     mat3 tbn = mat3(normalize(Tw), normalize(Bw), normalize(Nw));
@@ -94,6 +96,20 @@ vec3 sampleNormal(vec2 uv, vec3 Nw, vec3 Tw, vec3 Bw)
 float metalPreviewBaseVisibility(float roughness)
 {
     return mix(0.22, 0.38, saturate1(roughness));
+}
+
+float groundSpecularReceiverFade(vec3 worldPos, vec3 N, vec3 V)
+{
+    if (uIsGroundPass < 1)
+    {
+        return 1.0;
+    }
+
+    float dist = length(worldPos - uCameraPos);
+    float distFade = 1.0 - smoothstep(18.0, 48.0, dist);
+    float noV = max(dot(normalize(N), normalize(V)), 0.0);
+    float grazingFade = smoothstep(0.045, 0.22, noV);
+    return clamp(mix(0.08, 1.0, distFade * grazingFade), 0.08, 1.0);
 }
 
 void main()
@@ -124,22 +140,20 @@ void main()
     // Parallax occlusion mapping in tangent space.
     vec2 uvDisp = vUv;
     vec2 uv = vUv;
+    vec2 uvDx = dFdx(vUv);
+    vec2 uvDy = dFdy(vUv);
     float pomDepth = 0.0;
     float pomStrengthTrace = uHeightStrength;
     bool  pomActive = (uEnableParallax > 0 && uHasHeight > 0 && uHeightStrength > 0.0);
     if (pomActive)
     {
-        // Fade POM near UV seams so adjacent cube faces do not fight each other's tangent march at corners.
-        float pomBorderDist = min(min(vUv.x, 1.0 - vUv.x), min(vUv.y, 1.0 - vUv.y));
-        pomStrengthTrace *= smoothstep(0.0, 0.09, pomBorderDist);
-
-        uvDisp = traceParallaxPom(uHeight, vUv, Vtan, pomStrengthTrace, pomDepth);
-        // Clamp for sampling only. Mixing back toward vUv when OOB caused visible swimming as the camera moved.
-        uv = clamp(uvDisp, vec2(0.0), vec2(1.0));
+        // Trace in tile-local space; height/albedo/normal/spec samples wrap so repeated ground tiles and cube-face edges stay seamless.
+        uvDisp = traceParallaxPom(uHeight, vUv, Vtan, pomStrengthTrace, uvDx, uvDy, pomDepth);
+        uv = uvDisp;
     }
 
     // Re-sample albedo at displaced UV when POM is on.
-    vec4 alb = pomActive ? texture(uAlbedo, uv) : albRaw;
+    vec4 alb = pomActive ? textureGrad(uAlbedo, uv, uvDx, uvDy) : albRaw;
     if (uEntityAlphaMode == 1 && alb.a < uAlphaCutoff)
     {
         discard;
@@ -152,7 +166,7 @@ void main()
     }
 
     // Surface normal.
-    vec3 N = sampleNormal(uv, Nw, Tw, Bw);
+    vec3 N = sampleNormal(uv, uvDx, uvDy, Nw, Tw, Bw);
     vec3 V = Vw;
     vec3 L = normalize(-uLightDir); // uLightDir points where the light goes; flip for incoming direction.
     vec3 Ltan = normalize(worldToTan * L);
@@ -161,7 +175,7 @@ void main()
     LabPbrMaterial mat;
     if (uEnableSpecularMap > 0 && uHasSpecular > 0)
     {
-        vec4 sp = texture(uSpecular, uv);
+        vec4 sp = textureGrad(uSpecular, uv, uvDx, uvDy);
         mat = decodeLabPbrSpec(sp, albedoLinear, uRoughnessScale, uSpecularStrength);
     }
     else
@@ -178,22 +192,15 @@ void main()
     // Porosity cosmetic darkening (only visible when LabPBR _s.b <= 64).
     albedoLinear *= porosityAlbedoMultiplier(mat.porosity);
 
-    // Cheap cavity/contrast boost from POM depth (screen shaders often combine AO + POM for perceived thickness).
-    if (pomActive && pomDepth > 1e-4)
-    {
-        float cavityAmt = clamp(pomDepth * pomStrengthTrace * 1.68, 0.0, 0.34);
-        albedoLinear *= (1.0 - cavityAmt);
-    }
-
     // Parallax self-shadow trace toward the light (fragment-local; complements the directional shadow map).
     float pomShadow = 1.0;
     float pomAo = 1.0;
     if (pomActive && uEnableParallaxShadow > 0 && uHasHeight > 0)
     {
-        pomShadow = traceParallaxShadow(uHeight, uv, Ltan, pomDepth, pomStrengthTrace);
+        pomShadow = traceParallaxShadow(uHeight, uv, Ltan, pomDepth, pomStrengthTrace, uvDx, uvDy);
         if (uEnableParallaxAo > 0)
         {
-            pomAo = traceParallaxAo(uHeight, uv, pomDepth, pomStrengthTrace, uParallaxAoStrength);
+            pomAo = traceParallaxAo(uHeight, uv, pomDepth, pomStrengthTrace, uParallaxAoStrength, uvDx, uvDy);
         }
     }
 
@@ -215,7 +222,7 @@ void main()
             {
                 float bias = computeShadowBias(N, L, uShadowMinBias, uShadowMaxBias);
                 sUv.z = clamp(sUv.z - bias, 0.0, 1.0);
-                shadowVis = sampleShadowPcf3x3(uShadowMap, sUv, uShadowTexelSize);
+                shadowVis = sampleShadowPcfSoft(uShadowMap, sUv, uShadowTexelSize, uShadowSoftnessTexels);
             }
         }
     }
@@ -225,6 +232,8 @@ void main()
 
     // Direct lighting: Cook-Torrance.
     BrdfResult br = cookTorrance(N, V, L, albedoLinear, mat.f0, mat.roughness, mat.metallic);
+    float groundSpecFade = groundSpecularReceiverFade(vWorldPos, N, V);
+    br.specular *= groundSpecFade;
     vec3 direct = (br.diffuse + br.specular) * uLightColor * lightVis;
 
     // Subsurface scattering contribution (gated; cheap front-wrap + back-translucency).
@@ -250,7 +259,7 @@ void main()
         indirect += metalPreviewIrradiance * albedoLinear * metalBaseVisibility * uIblStrength;
         indirect += fakeIblSpecular(N, V, mat.f0, mat.roughness, mat.metallic, uSkyTint, uGroundTint,
                            uLightDir, uLightColor, uAtmosphereSunIntensity, uEnableAtmosphericSky, uAtmoSkyViewLut) *
-                    uIblStrength;
+                    uIblStrength * groundSpecFade;
     }
     else
     {

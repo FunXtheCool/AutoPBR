@@ -3,6 +3,8 @@ using AutoPBR.App.Rendering.Abstractions;
 using AutoPBR.App.Rendering.Scene;
 using AutoPBR.Core.Models;
 
+using System.Numerics;
+
 namespace AutoPBR.App.Tests;
 
 public sealed partial class PreviewRenderingTests
@@ -104,6 +106,22 @@ public sealed partial class PreviewRenderingTests
     }
 
     [Fact]
+    public void PreviewGroundPlaneTangentBasisMatchesUvAxes()
+    {
+        var mesh = PreviewMeshFactory.CreatePreviewGroundPlane(halfExtent: 1f, worldY: -1f, metersPerTile: 1f);
+        var bitangent = ReadBitangent(mesh.InterleavedVertices, 0);
+        AssertVectorNear(Vector3.UnitZ, bitangent);
+    }
+
+    [Fact]
+    public void ItemPlaneTangentBasisMatchesUvAxes()
+    {
+        var mesh = PreviewMeshFactory.CreateItemPlane();
+        var bitangent = ReadBitangent(mesh.InterleavedVertices, 0);
+        AssertVectorNear(-Vector3.UnitY, bitangent);
+    }
+
+    [Fact]
     public void GridLinesFactoryVertexBuffersAreSevenFloatsPerVertex()
     {
         var grid = PreviewGridLinesFactory.BuildGrid(1f, 0.5f, -0.5f, 1, 1, 1, 1);
@@ -111,5 +129,22 @@ public sealed partial class PreviewRenderingTests
         var axes = PreviewGridLinesFactory.BuildAxes(1f, 1, 0, 0, 0, 1, 0, 0, 0, 1);
         Assert.Equal(0, axes.Length % PreviewGridLinesFactory.FloatsPerVertex);
         Assert.Equal(6 * PreviewGridLinesFactory.FloatsPerVertex, axes.Length);
+    }
+
+    private static Vector3 ReadBitangent(float[] verts, int vertexIndex)
+    {
+        const int s = PreviewMesh.FloatsPerVertex;
+        var o = vertexIndex * s;
+        var normal = new Vector3(verts[o + 3], verts[o + 4], verts[o + 5]);
+        var tangent = new Vector3(verts[o + 8], verts[o + 9], verts[o + 10]);
+        var wSign = verts[o + 11];
+        return Vector3.Cross(normal, tangent) * wSign;
+    }
+
+    private static void AssertVectorNear(Vector3 expected, Vector3 actual, float tolerance = 1e-5f)
+    {
+        Assert.InRange(MathF.Abs(actual.X - expected.X), 0f, tolerance);
+        Assert.InRange(MathF.Abs(actual.Y - expected.Y), 0f, tolerance);
+        Assert.InRange(MathF.Abs(actual.Z - expected.Z), 0f, tolerance);
     }
 }

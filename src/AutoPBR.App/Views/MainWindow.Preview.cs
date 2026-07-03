@@ -45,7 +45,7 @@ public partial class MainWindow : Window
     {
         var window = new Window
         {
-            Title = "MiniLM Semantic Match Debug",
+            Title = Lang.Resources.SemanticDebugWindowTitle,
             Width = 620,
             Height = 520,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,

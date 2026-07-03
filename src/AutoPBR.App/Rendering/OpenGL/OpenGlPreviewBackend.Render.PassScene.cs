@@ -155,11 +155,17 @@ public sealed partial class OpenGlPreviewBackend
         SetFloat("uRoughnessScale", frame.Settings.RoughnessScale);
         SetFloat("uExposure", frame.Settings.Exposure);
         SetFloat("uParallaxAoStrength", frame.Settings.ParallaxAoStrength);
+        SetInt("uParallaxTraceLayers", Math.Clamp(frame.Settings.ParallaxTraceLayers, 8, 128));
+        SetInt("uParallaxRefineSteps", Math.Clamp(frame.Settings.ParallaxRefineSteps, 0, 8));
+        SetInt("uParallaxShadowSamples", Math.Clamp(frame.Settings.ParallaxShadowSamples, 4, 64));
+        SetFloat("uParallaxShadowSoftness", Math.Clamp(frame.Settings.ParallaxShadowSoftness, 0f, 4f));
+        SetFloat("uParallaxMaxUvShift", Math.Clamp(frame.Settings.ParallaxMaxUvShift, 0.05f, 0.75f));
         SetInt("uEnableParallax", frame.EnableParallaxEff ? 1 : 0);
         SetInt("uEnableParallaxAo", frame.EnableParallaxAoEff ? 1 : 0);
         SetInt("uEnableNormalMap", frame.EnableNormalMapEff ? 1 : 0);
         SetInt("uEnableSpecularMap", frame.EnableSpecularMapEff ? 1 : 0);
         SetInt("uSceneKind", frame.Scene.SceneKind == PreviewSceneKind.ItemPlane ? 1 : 0);
+        SetInt("uIsGroundPass", 0);
         SetFloat("uAlphaCutoff", frame.Settings.AlphaCutoff);
         SetInt("uItemAlphaBlend", frame.Settings.ItemUseAlphaBlend ? 1 : 0);
         SetInt("uEntityAlphaMode", 0);
@@ -186,6 +192,7 @@ public sealed partial class OpenGlPreviewBackend
         SetInt("uEnableShadowMap", shadowEnabledForShader ? 1 : 0);
         SetFloat("uShadowMinBias", frame.Settings.ShadowMinBias);
         SetFloat("uShadowMaxBias", frame.Settings.ShadowMaxBias);
+        SetFloat("uShadowSoftnessTexels", Math.Clamp(frame.Settings.ShadowSoftnessTexels, 0f, 8f));
         var shadowRes = _shadowTarget?.Resolution ?? Math.Clamp(frame.Settings.ShadowMapResolution, 256, 4096);
         SetVec2("uShadowTexelSize", new Vector2(1f / shadowRes, 1f / shadowRes));
         if (_shadowTarget is not null)
@@ -209,6 +216,7 @@ public sealed partial class OpenGlPreviewBackend
             SetInt("uEnableNormalMap", groundNormal ? 1 : 0);
             SetInt("uEnableSpecularMap", groundSpec ? 1 : 0);
             SetInt("uSceneKind", 0);
+            SetInt("uIsGroundPass", 1);
             SetInt("uEntityAlphaMode", 0);
             ApplyEntitySkinningUniforms(_program, 0, 0, 0f);
             SetInt("uHasNormal", _grassGroundHasNormal ? 1 : 0);
@@ -223,6 +231,7 @@ public sealed partial class OpenGlPreviewBackend
             SetInt("uSpecular", 2);
             SetInt("uHeight", 3);
             _groundMesh.Draw();
+            SetInt("uIsGroundPass", 0);
             if (restoreCull)
             {
                 frame.Gl.Enable(EnableCap.CullFace);
@@ -242,6 +251,7 @@ public sealed partial class OpenGlPreviewBackend
         SetInt("uEnableNormalMap", frame.EnableNormalMapEff ? 1 : 0);
         SetInt("uEnableSpecularMap", frame.EnableSpecularMapEff ? 1 : 0);
         SetInt("uSceneKind", frame.Scene.SceneKind == PreviewSceneKind.ItemPlane ? 1 : 0);
+        SetInt("uIsGroundPass", 0);
         SetInt("uEntityAlphaMode", frame.EntityAlphaModeUniform);
         if (_atmoSkyViewTex != 0)
         {

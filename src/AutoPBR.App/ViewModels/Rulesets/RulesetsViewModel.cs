@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 
+using AutoPBR.App.Lang;
 using AutoPBR.App.Services.Rulesets;
 using AutoPBR.Core.Models;
 using AutoPBR.Core.Models.RuleExpressions;
@@ -77,7 +78,7 @@ public partial class RulesetsViewModel : ObservableObject
         CustomTagRules.Add(new CustomTagRuleEntry
         {
             Id = BuildUniqueId("custom_tag"),
-            DisplayName = "Custom Tag",
+            DisplayName = Resources.CustomTagDefaultDisplayName,
             Kind = nameof(TagRuleKind.Material),
             Keywords = "keyword"
         });
@@ -93,12 +94,12 @@ public partial class RulesetsViewModel : ObservableObject
         var entry = new CustomTagRuleEntry
         {
             Id = id,
-            DisplayName = "Custom Rule",
+            DisplayName = Resources.CustomRuleDefaultDisplayName,
             Kind = nameof(TagRuleKind.Flag),
             Expression = new RuleExpressionDefinition
             {
                 Id = $"{id}_expr",
-                DisplayName = "Custom Rule",
+                DisplayName = Resources.CustomRuleDefaultDisplayName,
                 Condition = new RuleConditionNode
                 {
                     Type = RuleConditionNodeType.All,

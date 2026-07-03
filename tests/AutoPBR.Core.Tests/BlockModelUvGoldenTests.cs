@@ -1,6 +1,8 @@
 using AutoPBR.Core.Models;
 using AutoPBR.Core.Preview;
 
+using System.Numerics;
+
 namespace AutoPBR.Core.Tests;
 
 public sealed class BlockModelUvGoldenTests
@@ -83,6 +85,50 @@ public sealed class BlockModelUvGoldenTests
         Assert.False(policy.MapJavaCuboidFaceCorners);
     }
 
+    [Fact]
+    public void BlockJson_rotated_face_tangent_follows_final_uv_u_axis()
+    {
+        using var fixture = new BlockModelMergerTests.BlockModelFixture();
+        fixture.Write(
+            "assets/minecraft/models/block/rotated_panel.json",
+            """
+            {
+              "elements": [
+                {
+                  "from": [0, 0, 0],
+                  "to": [16, 16, 16],
+                  "faces": {
+                    "north": { "texture": "#tex", "uv": [0, 0, 16, 16], "rotation": 90 }
+                  }
+                }
+              ],
+              "textures": { "tex": "minecraft:block/stone" }
+            }
+            """);
+
+        var source = new DirectoryAssetSource(fixture.Root);
+        Assert.True(MinecraftModelMerger.TryMerge(
+            source,
+            "assets/minecraft/models/block/rotated_panel.json",
+            out var merged));
+        const string texPath = "assets/minecraft/textures/block/stone.png";
+        var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase) { [texPath] = 0 };
+        var texSizes = new Dictionary<string, (int W, int H)>(StringComparer.OrdinalIgnoreCase)
+        {
+            [texPath] = (16, 16),
+        };
+        Assert.True(MinecraftModelBaker.TryBake(merged, "minecraft", pathToIdx, texSizes, out var verts, out _, out _));
+
+        const int stride = MinecraftModelBaker.FloatsPerVertex;
+        for (var i = 0; i < verts.Length / stride; i++)
+        {
+            var o = i * stride;
+            var tangent = new Vector3(verts[o + 8], verts[o + 9], verts[o + 10]);
+            AssertVectorNear(new Vector3(0f, -1f, 0f), tangent);
+            Assert.Equal(-1f, verts[o + 11]);
+        }
+    }
+
     private static List<System.Numerics.Vector2> CollectAllUvs(float[] verts)
     {
         const int stride = MinecraftModelBaker.FloatsPerVertex;
@@ -93,5 +139,12 @@ public sealed class BlockModelUvGoldenTests
         }
 
         return uvs;
+    }
+
+    private static void AssertVectorNear(Vector3 expected, Vector3 actual, float tolerance = 1e-5f)
+    {
+        Assert.InRange(MathF.Abs(actual.X - expected.X), 0f, tolerance);
+        Assert.InRange(MathF.Abs(actual.Y - expected.Y), 0f, tolerance);
+        Assert.InRange(MathF.Abs(actual.Z - expected.Z), 0f, tolerance);
     }
 }

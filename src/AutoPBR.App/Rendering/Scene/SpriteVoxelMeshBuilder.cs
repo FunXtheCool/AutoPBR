@@ -101,13 +101,15 @@ internal static class SpriteVoxelMeshBuilder
 
     private static void AddSolidFace(
         Vector3 normal,
-        Vector3 tangent,
-        float wSign,
+        Vector3 fallbackTangent,
+        float fallbackWSign,
         ReadOnlySpan<Vector3> corners,
         Vector2 uv,
         List<float> verts,
         List<uint> indices)
     {
+        Vector2[] uvs = [uv, uv, uv, uv];
+        PreviewTangentBasis.Derive(corners, uvs, normal, fallbackTangent, fallbackWSign, out var tangent, out var wSign);
         var baseIndex = (uint)(verts.Count / PreviewMesh.FloatsPerVertex);
         for (var i = 0; i < 4; i++)
         {

@@ -69,6 +69,21 @@ public sealed class PreviewRenderSettings
     /// <summary>Genesis: parallax self-shadow trace toward the light from the POM hit point.</summary>
     public bool EnableParallaxShadow { get; init; } = true;
 
+    /// <summary>Genesis POM: primary height-field march layers. Higher is more accurate at grazing angles.</summary>
+    public int ParallaxTraceLayers { get; init; } = 64;
+
+    /// <summary>Genesis POM: binary/secant refinement steps after the primary layer hit.</summary>
+    public int ParallaxRefineSteps { get; init; } = 5;
+
+    /// <summary>Genesis POM: self-shadow ray samples from the POM hit point toward the light.</summary>
+    public int ParallaxShadowSamples { get; init; } = 24;
+
+    /// <summary>Genesis POM: receiver-side softness for parallax self-shadow visibility.</summary>
+    public float ParallaxShadowSoftness { get; init; } = 1.25f;
+
+    /// <summary>Genesis POM: maximum UV travel allowed for one parallax trace.</summary>
+    public float ParallaxMaxUvShift { get; init; } = 0.45f;
+
     /// <summary>Genesis: toggle for POM-derived contact ambient occlusion.</summary>
     public bool EnableParallaxAo { get; init; } = true;
 
@@ -175,6 +190,9 @@ public sealed class PreviewRenderSettings
 
     /// <summary>Genesis Shadows Phase 2: maximum slope-scaled depth bias (used at grazing N.L).</summary>
     public float ShadowMaxBias { get; init; } = 0.005f;
+
+    /// <summary>Genesis Shadows: receiver-side PCF disk radius in shadow-map texels.</summary>
+    public float ShadowSoftnessTexels { get; init; } = 2.25f;
 
     /// <summary>
     /// PHASE3-CSM stub: persisted boolean so Phase 3 can light up cascades without restructuring.

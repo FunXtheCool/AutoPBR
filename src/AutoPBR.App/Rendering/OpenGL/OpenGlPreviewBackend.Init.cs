@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
+using AutoPBR.App.Lang;
 using AutoPBR.App.Rendering.Abstractions;
 
 using Silk.NET.OpenGL;
@@ -138,7 +139,7 @@ public sealed partial class OpenGlPreviewBackend
         // the first combined draw never runs with capture ready but cloud shaders/textures missing.
         if ((desired & PreviewGpuInitTier.GodRays) != 0 && !_gpuInitTier.HasAll(PreviewGpuInitTier.GodRays))
         {
-            RaiseGpuInitProgress("Loading god rays…", settings);
+            RaiseGpuInitProgress(PreviewGpuInitPhases.LoadingGodRays, settings);
             TryInitGodRaysCore(_gl, _useOpenGlEs);
             TryInitVolume(_gl, _useOpenGlEs);
             _gpuInitTier |= PreviewGpuInitTier.GodRays;
@@ -147,25 +148,25 @@ public sealed partial class OpenGlPreviewBackend
                 TryInitCloudGpuTierIfNeeded(settings, _previewPixelWidth, _previewPixelHeight);
             }
 
-            RaiseGpuInitProgress(_gpuInitTier.HasAll(desired) ? "Ready" : "Preview ready", settings);
+            RaiseGpuInitProgress(_gpuInitTier.HasAll(desired) ? PreviewGpuInitPhases.Ready : PreviewGpuInitPhases.PreviewReady, settings);
             return;
         }
 
         if ((desired & PreviewGpuInitTier.Clouds) != 0 && !_gpuInitTier.HasAll(PreviewGpuInitTier.Clouds))
         {
             TryInitCloudGpuTierIfNeeded(settings, _previewPixelWidth, _previewPixelHeight);
-            RaiseGpuInitProgress(_gpuInitTier.HasAll(desired) ? "Ready" : "Preview ready", settings);
+            RaiseGpuInitProgress(_gpuInitTier.HasAll(desired) ? PreviewGpuInitPhases.Ready : PreviewGpuInitPhases.PreviewReady, settings);
             return;
         }
 
         if ((desired & PreviewGpuInitTier.PreviewTaa) != 0 && !_gpuInitTier.HasAll(PreviewGpuInitTier.PreviewTaa))
         {
-            RaiseGpuInitProgress("Loading preview TAA…", settings);
+            RaiseGpuInitProgress(PreviewGpuInitPhases.LoadingTaa, settings);
             TryInitPreviewTaa(_gl, _useOpenGlEs);
             _gpuInitTier |= PreviewGpuInitTier.PreviewTaa;
         }
 
-        RaiseGpuInitProgress(_gpuInitTier.HasAll(desired) ? "Ready" : "Preview ready", settings);
+        RaiseGpuInitProgress(_gpuInitTier.HasAll(desired) ? PreviewGpuInitPhases.Ready : PreviewGpuInitPhases.PreviewReady, settings);
     }
 
     private void InitShaderCompileContext(GL gl, bool useOpenGlEs)

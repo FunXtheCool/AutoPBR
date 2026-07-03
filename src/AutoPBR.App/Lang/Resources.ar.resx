@@ -102,7 +102,7 @@
   <data name="ExploreCollapseAll" xml:space="preserve"><value>طي الكل</value></data>
   <data name="ExploreBack" xml:space="preserve"><value>رجوع</value></data>
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
-  <data name="TabNormals" xml:space="preserve"><value>المعتدلات</value></data>
+  <data name="TabNormals" xml:space="preserve"><value>ضبط</value></data>
   <data name="TabShader" xml:space="preserve"><value>العرض</value></data>
   <data name="TabSettings" xml:space="preserve"><value>الإعدادات</value></data>
   <data name="Input" xml:space="preserve"><value>الإدخال</value></data>
@@ -185,11 +185,11 @@
   <data name="PreprocessFrequencySplit" xml:space="preserve"><value>فصل التردد (ماكرو + تفاصيل)</value></data>
   <data name="PreprocessFrequencyRadius" xml:space="preserve"><value>نصف قطر التردد</value></data>
   <data name="PreprocessFrequencyDetailStrength" xml:space="preserve"><value>قوة التفاصيل</value></data>
-  <data name="SpecularAdvanced" xml:space="preserve"><value>اللمعان (متقدم)</value></data>
+  <data name="SpecularAdvanced" xml:space="preserve"><value>القنوات</value></data>
   <data name="SpecularPercentileRemap" xml:space="preserve"><value>إعادة تعيين النعومة (R) حسب المئينات</value></data>
   <data name="SpecularRemapLowPercentile" xml:space="preserve"><value>المئين المنخفض</value></data>
   <data name="SpecularRemapHighPercentile" xml:space="preserve"><value>المئين العالي</value></data>
-  <data name="AoAdvanced" xml:space="preserve"><value>الإطباق المحيط (AO)</value></data>
+  <data name="AoAdvanced" xml:space="preserve"><value>الإطباق المحيط</value></data>
   <data name="GenerateAo" xml:space="preserve"><value>دمج AO في الخريطة العادية (القناة الزرقاء)</value></data>
   <data name="AoRadius" xml:space="preserve"><value>نصف قطر AO</value></data>
   <data name="AoStrength" xml:space="preserve"><value>قوة AO</value></data>
@@ -303,6 +303,1260 @@
   <data name="Preview3DSpritePlaneCount" xml:space="preserve"><value>عدد مستويات السبرايت</value></data>
   <data name="Preview3DSpritePlaneCountTooltip" xml:space="preserve"><value>عدد المستويات المتقاطعة المستخدمة للقوامات ذات علم 2D Sprite في معاينة 3D.</value></data>
   <data name="Preview3DCameraDebugFlyHint" xml:space="preserve"><value>سحب بزر الفأرة الأيمن: نظر · WASD مع الضغط على الأيمن: طيران · R: إعادة ضبط المدار والإزاحة</value></data>
+  <data name="ClearTagOverrides" xml:space="preserve">
+    <value>مسح تجاوزات العلامات</value>
+  </data>
+  <data name="ClearTagOverridesTooltip" xml:space="preserve">
+    <value>إعادة تعيين كل إضافة/إزالة العلامات اليدوية لهذه الحزمة.</value>
+  </data>
+  <data name="TagMenuDontApply" xml:space="preserve">
+    <value>لا تقم بتطبيق "{0}" هنا</value>
+  </data>
+  <data name="TagMenuApply" xml:space="preserve">
+    <value>قم بتطبيق "{0}" هنا</value>
+  </data>
+  <data name="TagRules" xml:space="preserve">
+    <value>قواعد العلامة</value>
+  </data>
+  <data name="TagRulesCustomDescription" xml:space="preserve">
+    <value>قم بتحرير مجموعات القواعد الخاصة بك لتوجيه المعالجة الإرشادية و/أو الذكاء الاصطناعي</value>
+  </data>
+  <data name="RulesetsBuiltInTags" xml:space="preserve">
+    <value>العلامات المضمنة</value>
+  </data>
+  <data name="RulesetsBuiltInFlags" xml:space="preserve">
+    <value>أعلام مدمجة</value>
+  </data>
+  <data name="RulesetsBuiltInExpressions" xml:space="preserve">
+    <value>القواعد المضمنة</value>
+  </data>
+  <data name="RulesetsSystemRules" xml:space="preserve">
+    <value>القواعد المحسوبة للنظام</value>
+  </data>
+  <data name="RulesetsSystemRulesDescription" xml:space="preserve">
+    <value>يتم حساب "المرجح" و"غير الموزون" من خلال الدقة الدلالية في وقت التشغيل ولا يمكن تحريرهما.</value>
+  </data>
+  <data name="RulesetsCustomExpressions" xml:space="preserve">
+    <value>القواعد المخصصة</value>
+  </data>
+  <data name="RulesetsKeywords" xml:space="preserve">
+    <value>الكلمات الرئيسية</value>
+  </data>
+  <data name="RulesetsSemanticHints" xml:space="preserve">
+    <value>تلميحات الدلالية</value>
+  </data>
+  <data name="RulesetsManageTokens" xml:space="preserve">
+    <value>إدارة الرموز</value>
+  </data>
+  <data name="RulesetsAddCondition" xml:space="preserve">
+    <value>إضافة شرط</value>
+  </data>
+  <data name="RulesetsAddAction" xml:space="preserve">
+    <value>أضف الإجراء</value>
+  </data>
+  <data name="RulesetsEnableExpression" xml:space="preserve">
+    <value>تمكين التعبير</value>
+  </data>
+  <data name="RulesetsExpression" xml:space="preserve">
+    <value>تعبير</value>
+  </data>
+  <data name="RulesetsConditions" xml:space="preserve">
+    <value>شروط</value>
+  </data>
+  <data name="RulesetsActions" xml:space="preserve">
+    <value>الإجراءات</value>
+  </data>
+  <data name="RulesetsRemove" xml:space="preserve">
+    <value>يزيل</value>
+  </data>
+  <data name="RulesetsRemoveLast" xml:space="preserve">
+    <value>إزالة الأخير</value>
+  </data>
+  <data name="RulesetsValueWatermark" xml:space="preserve">
+    <value>قيمة</value>
+  </data>
+  <data name="RulesetsShowLess" xml:space="preserve">
+    <value>عرض أقل</value>
+  </data>
+  <data name="RulesetsMoreCount" xml:space="preserve">
+    <value>{0} المزيد</value>
+  </data>
+  <data name="TagRuleId" xml:space="preserve">
+    <value>بطاقة تعريف</value>
+  </data>
+  <data name="TagRuleDisplayName" xml:space="preserve">
+    <value>اسم العرض</value>
+  </data>
+  <data name="TagRuleKeywords" xml:space="preserve">
+    <value>الكلمات الرئيسية</value>
+  </data>
+  <data name="TagRuleSemanticHints" xml:space="preserve">
+    <value>تلميحات دلالية (مفصولة بفواصل، اختيارية)</value>
+  </data>
+  <data name="MaterialTagSemanticMlDescription" xml:space="preserve">
+    <value>يستخدم نموذج ONNX المضمن ضمن Data/ONNX-AI/all-MiniLM-L6-v2-onnx (يتطلب model.onnx). عند التمكين، تأتي العلامات التلقائية فقط من MiniLM (لا يتم استخدام قواعد الكلمات الأساسية لوضع العلامات التلقائي). لا تزال إضافة/إزالة العلامة اليدوية مطبقة في الأعلى.</value>
+  </data>
+  <data name="MaterialTagMaxCountTooltip" xml:space="preserve">
+    <value>الحد الأقصى لعلامات المواد التي يتم إرجاعها عن طريق المطابقة الدلالية. قد تستمر بعض قواعد الاقتران الخام/المواد المضمنة والعلامات التلقائية في إضافة العلامات المطلوبة بما يتجاوز هذه القيمة.</value>
+  </data>
+  <data name="MaterialTagCertaintyThresholdTooltip" xml:space="preserve">
+    <value>إذا كانت أفضل مطابقة دلالية أقل من هذه النتيجة، فسيتم اقتراح غير معروف فقط (تشابه جيب التمام 0-1).</value>
+  </data>
+  <data name="TagLegendMaterials" xml:space="preserve">
+    <value>مواد</value>
+  </data>
+  <data name="TagLegendFlags" xml:space="preserve">
+    <value>أعلام</value>
+  </data>
+  <data name="ExploreColumnResource" xml:space="preserve">
+    <value>الموارد</value>
+  </data>
+  <data name="TagRuleKindLabel" xml:space="preserve">
+    <value>عطوف</value>
+  </data>
+  <data name="AddCustomTag" xml:space="preserve">
+    <value>إضافة علامة مخصصة</value>
+  </data>
+  <data name="AddCustomRule" xml:space="preserve">
+    <value>إضافة قاعدة مخصصة</value>
+  </data>
+  <data name="RemoveTagRule" xml:space="preserve">
+    <value>يزيل</value>
+  </data>
+  <data name="RefreshTagRules" xml:space="preserve">
+    <value>ينعش</value>
+  </data>
+  <data name="InvertHeight" xml:space="preserve">
+    <value>عكس الارتفاع</value>
+  </data>
+  <data name="InvertSpecular" xml:space="preserve">
+    <value>عكس براق</value>
+  </data>
+  <data name="TagRuleNormalIntensityOpt" xml:space="preserve">
+    <value>عادي × (اختياري)</value>
+  </data>
+  <data name="TagRuleHeightIntensityOpt" xml:space="preserve">
+    <value>الارتفاع × (اختياري)</value>
+  </data>
+  <data name="TagRuleIntensityTooltip" xml:space="preserve">
+    <value>اتركه فارغًا لاستخدام قيم Tune العامة. مثال: 0.85 من المستويات الطبيعية الأكثر ليونة، و0.07 من الارتفاع الأقل.</value>
+  </data>
+  <data name="TagRuleInvertNormalX" xml:space="preserve">
+    <value>عكس العادي X</value>
+  </data>
+  <data name="TagRuleInvertNormalY" xml:space="preserve">
+    <value>عكس العادي Y</value>
+  </data>
+  <data name="TagRuleEnabled" xml:space="preserve">
+    <value>استخدم هذه القاعدة</value>
+  </data>
+  <data name="TagRuleEnabledTooltip" xml:space="preserve">
+    <value>عند إلغاء تحديدها، يتم استبعاد هذه القاعدة من وسيلة الإيضاح والاستكشاف. انقر فوق تحديث للتحديث.</value>
+  </data>
+  <data name="TagRuleMoveUp" xml:space="preserve">
+    <value>↑</value>
+  </data>
+  <data name="TagRuleMoveDown" xml:space="preserve">
+    <value>↓</value>
+  </data>
+  <data name="TagRuleMoveUpTooltip" xml:space="preserve">
+    <value>نقل القاعدة لأعلى (ترتيب الدمج)</value>
+  </data>
+  <data name="TagRuleMoveDownTooltip" xml:space="preserve">
+    <value>نقل القاعدة لأسفل (ترتيب الدمج)</value>
+  </data>
+  <data name="ExportTagRules" xml:space="preserve">
+    <value>قواعد التصدير...</value>
+  </data>
+  <data name="ImportTagRules" xml:space="preserve">
+    <value>قواعد الاستيراد...</value>
+  </data>
+  <data name="ExportTagRulesTooltip" xml:space="preserve">
+    <value>احفظ قواعد العلامات المخصصة بتنسيق JSON (للنسخ الاحتياطي أو CLI --tag-rules).</value>
+  </data>
+  <data name="ImportTagRulesTooltip" xml:space="preserve">
+    <value>استبدل القواعد المخصصة من ملف JSON.</value>
+  </data>
+  <data name="RefreshTagRulesTooltip" xml:space="preserve">
+    <value>قم بتحديث شجرة الاستكشاف والأسطورة بالقواعد الحالية.</value>
+  </data>
+  <data name="Log_TagRulesExported" xml:space="preserve">
+    <value>قواعد العلامات المخصصة المصدرة.</value>
+  </data>
+  <data name="Log_TagRulesImported" xml:space="preserve">
+    <value>تم استيراد قاعدة (قواعد) العلامات المخصصة {0}.</value>
+  </data>
+  <data name="Log_TagRulesImportFailed" xml:space="preserve">
+    <value>فشل استيراد قواعد العلامات: {0}</value>
+  </data>
+  <data name="TabRulesets" xml:space="preserve">
+    <value>مجموعات القواعد</value>
+  </data>
+  <data name="TabDebug" xml:space="preserve">
+    <value>تصحيح</value>
+  </data>
+  <data name="BrickProbeTuning" xml:space="preserve">
+    <value>ضبط مسبار الطوب</value>
+  </data>
+  <data name="BrickProbeEnable" xml:space="preserve">
+    <value>تمكين عكس مسبار الطوب</value>
+  </data>
+  <data name="BrickProbeMinStructure" xml:space="preserve">
+    <value>الحد الأدنى من الثقة في الهيكل</value>
+  </data>
+  <data name="BrickProbeInvertDelta" xml:space="preserve">
+    <value>عكس عتبة دلتا</value>
+  </data>
+  <data name="BrickProbeLightGroutDelta" xml:space="preserve">
+    <value>دلتا الإنارة الجص الخفيفة</value>
+  </data>
+  <data name="BrickProbeEnableTooltip" xml:space="preserve">
+    <value>بالنسبة للأنسجة الموسومة بالطوب، قرر ما إذا كنت تريد عكس خريطة الارتفاع عالميًا عندما يكتشف المسبار ملاطًا خفيفًا يجب أن يكون غائرًا. يتطلب علامة مادة الطوب (الكلمة الرئيسية أو الدلالية).</value>
+  </data>
+  <data name="BrickProbeMinStructureTooltip" xml:space="preserve">
+    <value>الحد الأدنى لمتوسط ​​استجابة الملاط الهيكلي (0-1) للمسار العكسي القوي (دلتا ارتفاع كبيرة مع ثقة مشتركة عالية). غالبًا ما تبقى المفاصل الرقيقة تحت هذا ؛ لا يستخدم مسار الجص الخفيف هذه العتبة.</value>
+  </data>
+  <data name="BrickProbeInvertDeltaTooltip" xml:space="preserve">
+    <value>المسار القوي فقط: يجب أن يتجاوز متوسط ​​ارتفاع الملاط مطروحًا منه متوسط ​​ارتفاع الطوب هذا (مقياس 0-255) قبل الانقلاب الشامل. يتم تشغيل القيم المنخفضة بسهولة أكبر عند فصل الارتفاع الدقيق.</value>
+  </data>
+  <data name="BrickProbeLightGroutDeltaTooltip" xml:space="preserve">
+    <value>مسار الجص الخفيف: يجب أن يتجاوز النصوع المنتشر الموزون على الملاط مطروحًا منه الطوب هذا (0-1). أقل إذا كان الملاط والطوب متشابهين في السطوع. عندما يمر Δ&gt;0، يتم قلب خريطة الارتفاع بحيث تقرأ الوجوه أعلى من المفاصل.</value>
+  </data>
+  <data name="PreviewBrickProbeDebug" xml:space="preserve">
+    <value>إظهار تصحيح مسبار الطوب (معاينة)</value>
+  </data>
+  <data name="PreviewBrickProbeDebugTooltip" xml:space="preserve">
+    <value>عند التمكين، تعرض لوحة المعاينة مقاييس المسبار (القناع، المتوسط، دلتا الارتفاع، فجوة المساحة، التي تعمل على عكس المسار) للنسيج المحدد. التحويل لم يتغير.</value>
+  </data>
+  <data name="PlantMaterialPorosityExtra" xml:space="preserve">
+    <value>المواد العضوية المسامية الزائدة</value>
+  </data>
+  <data name="PlantMaterialPorosityExtraTooltip" xml:space="preserve">
+    <value>إزاحة قناة B إضافية للأنسجة التي تحمل علامة المادة العضوية (أو مسارات نبات OptiFine). تمت إضافته على رأس انحياز المسامية.</value>
+  </data>
+  <data name="MlSpecularHeuristicBlend" xml:space="preserve">
+    <value>ارشادي / مزيج الذكاء الاصطناعي</value>
+  </data>
+  <data name="MlSpecularHeuristicBlendTooltip" xml:space="preserve">
+    <value>0 = براق إرشادي خالص عند تشغيل نموذج الذكاء الاصطناعي؛ 1 = مساهمة الذكاء الاصطناعي الكاملة. القيم المتوسطة تمزج بين الاثنين.</value>
+  </data>
+  <data name="MlSpecularBlendMode" xml:space="preserve">
+    <value>وضع القناة</value>
+  </data>
+  <data name="MlSpecularBlendModeTooltip" xml:space="preserve">
+    <value>يحدد القنوات التي تتلقى مساهمة إرشادية عند المزج مع الذكاء الاصطناعي.</value>
+  </data>
+  <data name="MlSpecularBlendMath" xml:space="preserve">
+    <value>وضع المزج</value>
+  </data>
+  <data name="MlSpecularBlendMathTooltip" xml:space="preserve">
+    <value>يحدد الرياضيات المختلطة المستخدمة للجمع بين القيم الإرشادية وقيم الذكاء الاصطناعي للقنوات التي تم مزجها.</value>
+  </data>
+  <data name="MlSpecularBlendMathLinear" xml:space="preserve">
+    <value>خطي</value>
+  </data>
+  <data name="MlSpecularBlendMathSoftLight" xml:space="preserve">
+    <value>ضوء ناعم</value>
+  </data>
+  <data name="MlSpecularBlendMathOverlay" xml:space="preserve">
+    <value>تراكب</value>
+  </data>
+  <data name="MlSpecularBlendMathScreen" xml:space="preserve">
+    <value>شاشة</value>
+  </data>
+  <data name="MlSpecularBlendMathBiasGain" xml:space="preserve">
+    <value>التحيز/الربح</value>
+  </data>
+  <data name="MlSpecularBlendMathSigmoidCrossfade" xml:space="preserve">
+    <value>التلاشي السيني المتقاطع</value>
+  </data>
+  <data name="MlSpecularBlendModeSmoothnessOnly" xml:space="preserve">
+    <value>نعومة فقط</value>
+  </data>
+  <data name="MlSpecularBlendModeFull" xml:space="preserve">
+    <value>ممتلىء</value>
+  </data>
+  <data name="MlSpecularBlendModeAiMetalAndEmissive" xml:space="preserve">
+    <value>الذكاء الاصطناعي للمعادن والانبعاث</value>
+  </data>
+  <data name="SpecularForceNoEmissive" xml:space="preserve">
+    <value>قوة لا انبعاثية (مرآة A)</value>
+  </data>
+  <data name="SpecularForceNoEmissiveTooltip" xml:space="preserve">
+    <value>التجاوز: قم بتعيين خريطة LabPBR المرآوية ألفا على 255 (بدون انبعاث) لجميع وحدات البكسل. كتل انبعاث لوحة الكشف عن مجريات الأمور والتنبؤات الانبعاثية ML.</value>
+  </data>
+  <data name="DeepBumpNormalIntensity" xml:space="preserve">
+    <value>قوة DeepBump العادية</value>
+  </data>
+  <data name="DeepBumpNormalIntensityTooltip" xml:space="preserve">
+    <value>DeepBump مضاعف قوة XY العادي فقط. 1 = لم يتغير، الأعلى = تفاصيل أقوى، الأدنى = المعايير العادية المسطحة.</value>
+  </data>
+  <data name="DeepBumpNormalSoftClamp" xml:space="preserve">
+    <value>DeepBump لينة المشبك</value>
+  </data>
+  <data name="DeepBumpNormalSoftClampTooltip" xml:space="preserve">
+    <value>0 = مقياس القوة الخطية. تطبق القيم الأعلى مشبك تانه ناعم على حجم XY، مع الحفاظ على التفاصيل القوية مع تقليل آثار التشبع التي تصل إلى 90 درجة تقريبًا.</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedEnhance" xml:space="preserve">
+    <value>تحسين DeepBump الموجه بالحافة</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedStrength" xml:space="preserve">
+    <value>قوة توجيه الحافة</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedStrengthTooltip" xml:space="preserve">
+    <value>يضخم حجم XY العادي للنموذج بشكل أكبر على الحواف المنتشرة القوية. 0 = معطل، 1 = معتدل، أعلى = حواف حادة.</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedGamma" xml:space="preserve">
+    <value>حافة التوجيه جاما</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedGammaTooltip" xml:space="preserve">
+    <value>الضوابط حيث يتركز التحسين. تركز القيم الأعلى على أقوى الحواف؛ تنتشر القيم المنخفضة عبر الحواف الأكثر نعومة.</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedDirectionMix" xml:space="preserve">
+    <value>مزيج اتجاه الحافة</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedDirectionMixTooltip" xml:space="preserve">
+    <value>يمزج اتجاه DeepBump الطبيعي نحو اتجاه التدرج المشتق منتشر على الحواف. 0 = الحفاظ على اتجاه النموذج، 1 = محاذاة كاملة للحواف القوية.</value>
+  </data>
+  <data name="NormalHeightTransparentAlphaClampMax" xml:space="preserve">
+    <value>عادي/ارتفاع شفاف ألفا المشبك ماكس</value>
+  </data>
+  <data name="NormalHeightTransparentAlphaClampMaxTooltip" xml:space="preserve">
+    <value>مشبك ما بعد العملية: إذا كانت ألفا منتشرة ≥ هذه القيمة، فافرض RGBA العادي/الارتفاع على 0 لتجنب القطع الأثرية في المناطق الشفافة. قبعات المنزلق عند 16؛ يمكنك كتابة ما يصل إلى 255.</value>
+  </data>
+  <data name="UseMlSpecularPredictor" xml:space="preserve">
+    <value>استخدم مولد/تنبؤ ML Specular (ONNX)</value>
+  </data>
+  <data name="UseMlSpecularPredictorTooltip" xml:space="preserve">
+    <value>عند التمكين ويكون مسار النموذج الافتراضي أو لكل دقة صالحًا، يتم توقع RGBA المباشر لكل بكسل من الانتشار. المسارات الاختيارية لكل دقة (أو نماذج البيانات/ONNX-AI/SpecLab المجمعة) اختر ONNX حسب حجم المادة (السقف). يتحكم شريط تمرير مزيج الذكاء الاصطناعي/الاسترشادي في مقدار النموذج المستخدم مقابل الاستدلال الكلاسيكي. تحقق من السجل لتشخيصات ML.</value>
+  </data>
+  <data name="MlSpecularModelPath" xml:space="preserve">
+    <value>مسار النموذج المرآوي</value>
+  </data>
+  <data name="MlSpecularModelPathWatermark" xml:space="preserve">
+    <value>المسار إلى ملف ONNX للمولد/المتوقع</value>
+  </data>
+  <data name="MlSpecularPerResolutionHeader" xml:space="preserve">
+    <value>النماذج المرآوية لكل دقة (اختياري)</value>
+  </data>
+  <data name="MlSpecularPerResolutionTooltip" xml:space="preserve">
+    <value>تجاوز ONNX لكل دقة تدريب. اتركه فارغًا لاستخدام الملفات المجمعة ضمن Data/ONNX-AI/SpecLab عند وجودها. يختار وقت التشغيل أصغر دقة تم تكوينها ≥ حجم المادة (السقف)؛ إذا كان النسيج أكبر من كافة المفاتيح، يتم استخدام المفتاح الأكبر. ينطبق المسار الافتراضي الاحتياطي أعلاه فقط في حالة عدم توفر خريطة لكل دقة.</value>
+  </data>
+  <data name="MlSpecularUseEdgeChannel" xml:space="preserve">
+    <value>تضمين قناة الحافة لإدخال النموذج المرآوي (إذا كان النموذج يتوقع 4 قنوات)</value>
+  </data>
+  <data name="MlSpecularTransparentAlphaClampMax" xml:space="preserve">
+    <value>شفاف ألفا المشبك ماكس</value>
+  </data>
+  <data name="MlSpecularTransparentAlphaClampMaxTooltip" xml:space="preserve">
+    <value>مشبك ما بعد العملية: إذا كانت ألفا منتشرة ≥ هذه القيمة، فافرض RGBA المرآوي على 0 لتجنب آثار ML في المناطق الشفافة. قبعات المنزلق عند 16؛ يمكنك كتابة ما يصل إلى 255.</value>
+  </data>
+  <data name="SpecularDebugSection" xml:space="preserve">
+    <value>تصحيح ML خاص</value>
+  </data>
+  <data name="SpecularDebugDisableHeuristicSpecular" xml:space="preserve">
+    <value>تعطيل التراجع الإرشادي (أرجواني = غير ML)</value>
+  </data>
+  <data name="SpecularDebugDisableHeuristicSpecularTooltip" xml:space="preserve">
+    <value>يتم إجبار وحدات البكسل التي تستخدم المسار المرآوي الكلاسيكي على اللون الأرجواني (255،0،255). إذا فشل ML تمامًا، فسيكون النسيج بأكمله أرجوانيًا. يجعل من الواضح ما إذا كان النموذج يقود وحدات البكسل.</value>
+  </data>
+  <data name="SpecularDebugSkipSpecularRemap" xml:space="preserve">
+    <value>تخطي إعادة رسم خريطة النسبة المئوية للنعومة (R).</value>
+  </data>
+  <data name="SpecularDebugSkipSpecularRemapTooltip" xml:space="preserve">
+    <value>يقوم بتعطيل الخطوة اللاحقة التي تعيد تعيين R إلى النطاق 10–200 حتى تتمكن من الحكم على مخرجات النموذج مباشرة.</value>
+  </data>
+  <data name="SpecularDebugVerboseSpecularMl" xml:space="preserve">
+    <value>تشخيص ML المطول (السجل)</value>
+  </data>
+  <data name="SpecularDebugVerboseSpecularMlTooltip" xml:space="preserve">
+    <value>لكل مادة، يتم تسجيل تفاصيل التحميل/وقت التشغيل وعينة البكسل الأول عند نجاح الاستدلال. يقوم أيضًا بتسجيل الأخطاء الدقيقة عندما يفشل النموذج في تحميل أو إخراج عدم تطابق الأشكال.</value>
+  </data>
+  <data name="ForceShaderCacheInvalidation" xml:space="preserve">
+    <value>فرض إبطال ذاكرة التخزين المؤقت للتظليل</value>
+  </data>
+  <data name="ForceShaderCacheInvalidationTooltip" xml:space="preserve">
+    <value>يحذف ذاكرة التخزين المؤقت الثنائية لتظليل وحدة معالجة الرسومات (GPU) الموجودة على القرص ويعيد ترجمة تظليلات المعاينة. يُستخدم بعد تعديلات التظليل عندما تبدو المعاينة قديمة.</value>
+  </data>
+  <data name="ShaderCacheInvalidatedLog" xml:space="preserve">
+    <value>[الإعدادات] تم مسح ذاكرة التخزين المؤقت للتظليل؛ سيتم إعادة ترجمة تظليل المعاينة.</value>
+  </data>
+  <data name="MinecraftAssetsFolder" xml:space="preserve">
+    <value>أصول ماينكرافت</value>
+  </data>
+  <data name="MinecraftAssetsFolderTooltip" xml:space="preserve">
+    <value>مسار اختياري لمجلد إصدار Minecraft أو الأصول/الجذر المستخرج. يُستخدم لحل نماذج كتلة الفانيليا لمعاينة حزمة النسيج فقط.</value>
+  </data>
+  <data name="MinecraftAssetsFolderWatermark" xml:space="preserve">
+    <value>تم اكتشافه تلقائيًا من .minecraft عندما يكون فارغًا</value>
+  </data>
+  <data name="Preview3DCameraFlyLookSensitivity" xml:space="preserve">
+    <value>يطير نظرة الحساسية</value>
+  </data>
+  <data name="Preview3DCameraFlyMoveSpeed" xml:space="preserve">
+    <value>سرعة التحرك بالطيران</value>
+  </data>
+  <data name="Preview3DCameraFlyMoveSpeedTooltip" xml:space="preserve">
+    <value>سرعة الطيران الأساسية لـ WASD أثناء الضغط على الماوس الأيمن. استخدم عجلة الماوس أثناء الطيران لضبط السرعة مؤقتًا.</value>
+  </data>
+  <data name="Preview3DCameraInvertLookY" xml:space="preserve">
+    <value>عكس نظرة Y</value>
+  </data>
+  <data name="Preview3DCameraInvertLookYTooltip" xml:space="preserve">
+    <value>عكس الماوس العمودي للبحث عن الكاميرات المدارية والطيران.</value>
+  </data>
+  <data name="Preview3DCameraFlySmoothAcceleration" xml:space="preserve">
+    <value>حركة طيران سلسة</value>
+  </data>
+  <data name="Preview3DCameraFlySmoothAccelerationTooltip" xml:space="preserve">
+    <value>سهولة حركة طيران WASD للداخل والخارج بدلاً من البدء والتوقف الفوري.</value>
+  </data>
+  <data name="Preview3DCameraHelpOrbitPanSection" xml:space="preserve">
+    <value>المدار وعموم</value>
+  </data>
+  <data name="Preview3DCameraHelpFlySection" xml:space="preserve">
+    <value>كاميرا الطيران</value>
+  </data>
+  <data name="Preview3DCameraHelpFramingSection" xml:space="preserve">
+    <value>تأطير</value>
+  </data>
+  <data name="Preview3DCameraHelpItemOrbitInput" xml:space="preserve">
+    <value>Alt + السحب (يسار أو وسط)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemOrbitDesc" xml:space="preserve">
+    <value>مدار حول المحور.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemPanInput" xml:space="preserve">
+    <value>اسحب بدون Alt (يسار أو وسط)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemPanDesc" xml:space="preserve">
+    <value>عموم العرض.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemZoomInput" xml:space="preserve">
+    <value>عجلة الفأرة</value>
+  </data>
+  <data name="Preview3DCameraHelpItemZoomDesc" xml:space="preserve">
+    <value>التكبير والتصغير.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyLookInput" xml:space="preserve">
+    <value>اسحب لليمين</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyLookDesc" xml:space="preserve">
+    <value>انظر حولك (الكاميرا الطائرة).</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWasdInput" xml:space="preserve">
+    <value>W / A / S / D (أثناء الإمساك باليمين)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWasdDesc" xml:space="preserve">
+    <value>تحرك للأمام، وقصف اليسار، والخلف، وقصف اليمين.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyQeInput" xml:space="preserve">
+    <value>س/ه (أثناء الاحتفاظ بالحق)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyQeDesc" xml:space="preserve">
+    <value>تحرك للأسفل وللأعلى.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyShiftInput" xml:space="preserve">
+    <value>التحول (أثناء الطيران)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyShiftDesc" xml:space="preserve">
+    <value>التحرك بشكل أسرع.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyCtrlInput" xml:space="preserve">
+    <value>Ctrl (أثناء الطيران)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyCtrlDesc" xml:space="preserve">
+    <value>التحرك بشكل أبطأ (الدقة).</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWheelInput" xml:space="preserve">
+    <value>عجلة الفأرة (أثناء الطيران)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWheelDesc" xml:space="preserve">
+    <value>اضبط سرعة الطيران مؤقتًا.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFrameInput" xml:space="preserve">
+    <value>انقر نقرا مزدوجا</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFrameDesc" xml:space="preserve">
+    <value>تأطير الموضوع الحالي.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemResetDesc" xml:space="preserve">
+    <value>استعادة إطار الكاميرا الافتراضي.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFocusInput" xml:space="preserve">
+    <value>انقر فوق معاينة</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFocusDesc" xml:space="preserve">
+    <value>قم بتركيز المعاينة على اختصارات لوحة المفاتيح.</value>
+  </data>
+  <data name="Preview3DSkyDomeSection" xml:space="preserve">
+    <value>قبة السماء</value>
+  </data>
+  <data name="Preview3DAtmosphereSection" xml:space="preserve">
+    <value>أَجواء</value>
+  </data>
+  <data name="Preview3DSunSection" xml:space="preserve">
+    <value>شمس</value>
+  </data>
+  <data name="Preview3DMoonSection" xml:space="preserve">
+    <value>قمر</value>
+  </data>
+  <data name="Preview3DGodRayDebugSection" xml:space="preserve">
+    <value>تصحيح شعاع الله (فروكسل)</value>
+  </data>
+  <data name="Preview3DGodRayStabilizeDebug" xml:space="preserve">
+    <value>الاستقرار (لا يوجد مؤقت/ارتعاش)</value>
+  </data>
+  <data name="Preview3DGodRayStabilizeDebugTooltip" xml:space="preserve">
+    <value>تعطيل إعادة الاستخدام الزمني لـ froxel/integrate/upsample وتجميد ارتعاش المسيرة. قم بالتشغيل لإيقاف النبض أثناء ضبط أشعة الله.</value>
+  </data>
+  <data name="Preview3DGodRayDebugDensity" xml:space="preserve">
+    <value>كثافة التصحيح</value>
+  </data>
+  <data name="Preview3DGodRayDebugDensityTooltip" xml:space="preserve">
+    <value>كثافة متوسطة المشاركة موحدة يتم حقنها في حجم الفروكسل بحيث تكون أشعة الله مرئية بدون ضباب أو سحب عالية. 0 = سلوك الإنتاج. حاول 0.10-0.30.</value>
+  </data>
+  <data name="Preview3DGodRayScatterGain" xml:space="preserve">
+    <value>مكاسب مبعثر</value>
+  </data>
+  <data name="Preview3DGodRayScatterGainTooltip" xml:space="preserve">
+    <value>كسب التراكم المبعثر في مسيرة التكامل (التظليل الافتراضي 3.4). أعلى = مهاوي أكثر إشراقا.</value>
+  </data>
+  <data name="Preview3DGodRayExtinction" xml:space="preserve">
+    <value>الانقراض</value>
+  </data>
+  <data name="Preview3DGodRayExtinctionTooltip" xml:space="preserve">
+    <value>معامل انقراض بير لامبرت لانخفاض النفاذية على طول شعاع العرض (التظليل الافتراضي 1.15). أعلى = مهاوي أكثر كثافة / أقصر.</value>
+  </data>
+  <data name="Preview3DPreviewDebugSection" xml:space="preserve">
+    <value>تصحيح المعاينة ثلاثية الأبعاد</value>
+  </data>
+  <data name="Preview3DIblStrength" xml:space="preserve">
+    <value>قوة اي بي ال</value>
+  </data>
+  <data name="Preview3DIblStrengthTooltip" xml:space="preserve">
+    <value>شدة مسبار البيئة (المحيط غير المباشر + الانعكاسات). أقل إذا التقط النموذج الكثير من صبغة السماء؛ 0 يعود إلى المظهر المحيط المسطح.</value>
+  </data>
+  <data name="Preview3DEnableAtmosphericSky" xml:space="preserve">
+    <value>السماء الجوية (LUT)</value>
+  </data>
+  <data name="Preview3DEnableAtmosphericSkyTooltip" xml:space="preserve">
+    <value>تمكين خلفية السماء الجوية المستندة إلى LUT والاستجابة المحيطة.</value>
+  </data>
+  <data name="Preview3DAtmosphereTurbidity" xml:space="preserve">
+    <value>تعكر الجو</value>
+  </data>
+  <data name="Preview3DAtmosphereTurbidityTooltip" xml:space="preserve">
+    <value>وكيل كثافة الهباء الجوي. القيم الأعلى تجعل الأفق أكثر ضبابية وغروب الشمس أكثر دفئا.</value>
+  </data>
+  <data name="Preview3DAtmosphereSunIntensity" xml:space="preserve">
+    <value>شدة أشعة الشمس الجوية</value>
+  </data>
+  <data name="Preview3DAtmosphereSunIntensityTooltip" xml:space="preserve">
+    <value>مقاييس إشعاع الشمس الجوي التي يستخدمها ممر السماء والمسابير غير المباشرة.</value>
+  </data>
+  <data name="Preview3DAtmosphereHorizonFalloff" xml:space="preserve">
+    <value>هبوط الأفق الجوي</value>
+  </data>
+  <data name="Preview3DAtmosphereHorizonFalloffTooltip" xml:space="preserve">
+    <value>يتحكم في تراجع الانقراض بالقرب من الأفق (أقل = توهج أوسع، أعلى = نطاق أكثر إحكامًا).</value>
+  </data>
+  <data name="Preview3DAtmosphereSkyExposure" xml:space="preserve">
+    <value>التعرض للسماء</value>
+  </data>
+  <data name="Preview3DAtmosphereSkyExposureTooltip" xml:space="preserve">
+    <value>إتقان السطوع على ممر السماء المركب. أقل لتقليل الإزهار.</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscStrength" xml:space="preserve">
+    <value>قرص الشمس يزهر</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscStrengthTooltip" xml:space="preserve">
+    <value>وهج إضافي حول قرص الشمس أعلى LUT. أقل للحصول على هالة أكثر نعومة؛ أعلى لإزهار أوسع.</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscBrightness" xml:space="preserve">
+    <value>سطوع الشمس</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscBrightnessTooltip" xml:space="preserve">
+    <value>سطوع سطح قرص الشمس داكن الأطراف. لا يؤثر على هالة الإزهار الخارجية.</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscSize" xml:space="preserve">
+    <value>حجم الشمس</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscSizeTooltip" xml:space="preserve">
+    <value>مضاعف الحجم الزاوي للشمس. 1.0 = افتراضي منمق؛ ~0.07 يطابق الشمس الحقيقية (0.27 درجة). يقيس أيضًا الهالة ومخروط شعاع الإله.</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscStrength" xml:space="preserve">
+    <value>سطوع القمر</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscStrengthTooltip" xml:space="preserve">
+    <value>مضاعف سطوع السطح لقرص القمر المحكم.</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscSize" xml:space="preserve">
+    <value>حجم القمر</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscSizeTooltip" xml:space="preserve">
+    <value>القمر الزاوي الحجم المضاعف للوحة السماء.</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonGlowStrength" xml:space="preserve">
+    <value>توهج القمر</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonGlowStrengthTooltip" xml:space="preserve">
+    <value>توهج خارجي باللون الأزرق والأبيض حول طرف القمر.</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonTextureSharpness" xml:space="preserve">
+    <value>حدة القمر</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonTextureSharpnessTooltip" xml:space="preserve">
+    <value>شحذ جانب التظليل للنسيج القمري الناتج.</value>
+  </data>
+  <data name="Preview3DMoonWorldLightIntensity" xml:space="preserve">
+    <value>ضوء القمر العالمي</value>
+  </data>
+  <data name="Preview3DMoonWorldLightIntensityTooltip" xml:space="preserve">
+    <value>مضاعف ضوء القمر المباشر لهندسة معاينة الإضاءة في الليل. لا يغير تعرض السماء أو ملء الغلاف الجوي.</value>
+  </data>
+  <data name="Preview3DShowCelestialDebug" xml:space="preserve">
+    <value>علامات الشمس/القمر</value>
+  </data>
+  <data name="Preview3DShowCelestialDebugTooltip" xml:space="preserve">
+    <value>ارسم علامات مربعة ومتقاطعة على مواضع قرص الشمس والقمر.</value>
+  </data>
+  <data name="Preview3DHorizonFogStrength" xml:space="preserve">
+    <value>ضباب الأفق</value>
+  </data>
+  <data name="Preview3DHorizonFogStrengthTooltip" xml:space="preserve">
+    <value>يمتلئ الضباب أسفل الأفق في قبة السماء ومنظور جوي على الشكل الهندسي (0 = إيقاف).</value>
+  </data>
+  <data name="Preview3DVolumetricSection" xml:space="preserve">
+    <value>التأثيرات الحجمية</value>
+  </data>
+  <data name="Preview3DEnableGodRays" xml:space="preserve">
+    <value>أشعة الله</value>
+  </data>
+  <data name="Preview3DEnableGodRaysTooltip" xml:space="preserve">
+    <value>أعمدة ضوء حجم فروكسل باتجاه الشمس (حقن + دمج + تكبير العينة).</value>
+  </data>
+  <data name="Preview3DEnableVolumetricClouds" xml:space="preserve">
+    <value>السحب الحجمية</value>
+  </data>
+  <data name="Preview3DEnableVolumetricCloudsTooltip" xml:space="preserve">
+    <value>طبقة سحابة إجرائية في ممر السماء (الجودة تتبع الإعداد المسبق أدناه).</value>
+  </data>
+  <data name="Preview3DShadersSection" xml:space="preserve">
+    <value>تظليل</value>
+  </data>
+  <data name="Preview3DVolumetricQuality" xml:space="preserve">
+    <value>جودة فروكسل</value>
+  </data>
+  <data name="Preview3DVolumetricQualityTooltip" xml:space="preserve">
+    <value>دقة فروكسل منخفضة / متوسطة / عالية، وعدد الشرائح، وتفاصيل السحابة، والتصفية الزمنية.</value>
+  </data>
+  <data name="Preview3DGodRayStrength" xml:space="preserve">
+    <value>قوة شعاع الله</value>
+  </data>
+  <data name="Preview3DGodRayStrengthTooltip" xml:space="preserve">
+    <value>شدة مركب أشعة الله المضافة (0 = إيقاف).</value>
+  </data>
+  <data name="Preview3DCloudSection" xml:space="preserve">
+    <value>طبقة السحابة</value>
+  </data>
+  <data name="Preview3DCloudDensity" xml:space="preserve">
+    <value>كثافة</value>
+  </data>
+  <data name="Preview3DCloudDensityTooltip" xml:space="preserve">
+    <value>يقيس الكثافة الحجمية داخل لوح السحابة (أعلى = نفث أكثر سمكًا وأكثر عتامة).</value>
+  </data>
+  <data name="Preview3DCloudCoverageScale" xml:space="preserve">
+    <value>التغطية</value>
+  </data>
+  <data name="Preview3DCloudCoverageScaleTooltip" xml:space="preserve">
+    <value>مقياس تغطية خريطة الطقس الإقليمية (0 = سماء صافية، 1 = الخريطة مخبأة).</value>
+  </data>
+  <data name="Preview3DCloudLayerHeight" xml:space="preserve">
+    <value>ارتفاع الطبقة</value>
+  </data>
+  <data name="Preview3DCloudLayerHeightTooltip" xml:space="preserve">
+    <value>تمت إضافة الإزاحة الرأسية إلى الارتفاع الأساسي لقاعدة لوح السحابة (الوحدات العالمية).</value>
+  </data>
+  <data name="Preview3DCloudVolumeHeight" xml:space="preserve">
+    <value>سمك الطبقة</value>
+  </data>
+  <data name="Preview3DCloudVolumeHeightTooltip" xml:space="preserve">
+    <value>المدى الرأسي للبلاطة الركامية الرئيسية (وحدات العالم).</value>
+  </data>
+  <data name="Preview3DCloudVolumeSize" xml:space="preserve">
+    <value>مقياس الميزة</value>
+  </data>
+  <data name="Preview3DCloudVolumeSizeTooltip" xml:space="preserve">
+    <value>الحجم العالمي لدورة بلاط ضوضاء واحدة (أكبر = أشكال سحابة أوسع).</value>
+  </data>
+  <data name="Preview3DCloudWindSpeed" xml:space="preserve">
+    <value>سرعة الرياح</value>
+  </data>
+  <data name="Preview3DCloudWindSpeedTooltip" xml:space="preserve">
+    <value>سرعة انجراف المجال السحابي بالوحدات العالمية في الثانية.</value>
+  </data>
+  <data name="Preview3DCloudWindHeading" xml:space="preserve">
+    <value>عنوان الرياح</value>
+  </data>
+  <data name="Preview3DCloudWindHeadingTooltip" xml:space="preserve">
+    <value>اتجاه الرياح على المستوى الأرضي بالدرجات (0 = +X).</value>
+  </data>
+  <data name="Preview3DCloudCirrusStrength" xml:space="preserve">
+    <value>طبقة سيروس</value>
+  </data>
+  <data name="Preview3DCloudCirrusStrengthTooltip" xml:space="preserve">
+    <value>عتامة طبقة المعلاق الرفيعة العالية فوق الطبقة الرئيسية (0 = إيقاف).</value>
+  </data>
+  <data name="Preview3DCloudDebugSection" xml:space="preserve">
+    <value>تصحيح الأخطاء السحابية</value>
+  </data>
+  <data name="Preview3DCloudDebugView" xml:space="preserve">
+    <value>عرض التصحيح</value>
+  </data>
+  <data name="Preview3DCloudDebugViewTooltip" xml:space="preserve">
+    <value>استبدل السحب المضيئة بخريطة تغطية أو تراكب شريحة ذات كثافة متوسطة الطبقة.</value>
+  </data>
+  <data name="Preview3DCloudDebugViewOff" xml:space="preserve">
+    <value>عن</value>
+  </data>
+  <data name="Preview3DCloudDebugViewCoverage" xml:space="preserve">
+    <value>خريطة التغطية</value>
+  </data>
+  <data name="Preview3DCloudDebugViewDensitySlice" xml:space="preserve">
+    <value>شريحة الكثافة</value>
+  </data>
+  <data name="Preview3DCloudDisableTemporal" xml:space="preserve">
+    <value>تعطيل المؤقتة</value>
+  </data>
+  <data name="Preview3DCloudDisableTemporalTooltip" xml:space="preserve">
+    <value>قم بإيقاف تشغيل إعادة عرض سجل السحابة (مفيد أثناء فحص الضوضاء أو خطوات المسيرة).</value>
+  </data>
+  <data name="Preview3DCloudMarchSteps" xml:space="preserve">
+    <value>خطوات مارس</value>
+  </data>
+  <data name="Preview3DCloudMarchStepsTooltip" xml:space="preserve">
+    <value>تجاوز خطوة Ray-march (0 = اتبع الإعداد المسبق للجودة).</value>
+  </data>
+  <data name="Preview3DCloudFreezeWind" xml:space="preserve">
+    <value>تجميد الرياح</value>
+  </data>
+  <data name="Preview3DCloudFreezeWindTooltip" xml:space="preserve">
+    <value>حافظ على التصاق السحابة عند الوقت صفر حتى تظل الأشكال ثابتة أثناء ضبط الإضاءة.</value>
+  </data>
+  <data name="Preview3DEnablePreviewTaa" xml:space="preserve">
+    <value>معاينة TAA</value>
+  </data>
+  <data name="Preview3DEnablePreviewTaaTooltip" xml:space="preserve">
+    <value>الصقل الزمني النهائي على الإطار المركب. يستخدم مساعدي الإسقاط المشترك؛ تدرك الحركة عندما توفر أشعة الله عمق المشهد. يتم تقليل الوقت الزمني لكل تمريرة إلى النصف أثناء تشغيل هذا.</value>
+  </data>
+  <data name="Preview3DTimeOfDayHours" xml:space="preserve">
+    <value>الوقت من اليوم</value>
+  </data>
+  <data name="Preview3DTimeOfDayHoursTooltip" xml:space="preserve">
+    <value>وقت الساعة (0–24 ساعة) لدورة الشمس/القمر: 6 ≈ شروق الشمس، 12 ≈ ظهرًا، 18 ≈ غروب الشمس، 0/24 ≈ منتصف الليل مع النجوم.</value>
+  </data>
+  <data name="Preview3DAnimateTimeOfDay" xml:space="preserve">
+    <value>الرسوم المتحركة الوقت من اليوم</value>
+  </data>
+  <data name="Preview3DAnimateTimeOfDayTooltip" xml:space="preserve">
+    <value>تقدم دورة الشمس/القمر من ساعة عرض المعاينة (يوم كامل خلال 24 ثانية / سرعة).</value>
+  </data>
+  <data name="Preview3DTimeOfDaySpeed" xml:space="preserve">
+    <value>سرعة الدورة</value>
+  </data>
+  <data name="Preview3DTimeOfDaySpeedTooltip" xml:space="preserve">
+    <value>ساعات اللعب متقدمة في الثانية الحقيقية أثناء تشغيل الرسوم المتحركة (1 = 24 ثانية في اليوم الكامل).</value>
+  </data>
+  <data name="Preview3DEnableShadowCascades" xml:space="preserve">
+    <value>شلالات الظل</value>
+  </data>
+  <data name="Preview3DEnableShadowCascadesTooltip" xml:space="preserve">
+    <value>خرائط الظل الاتجاهية القريبة والبعيدة؛ تلتقط أشعة إله الحجم الشلال عن طريق المسافة من الكاميرا.</value>
+  </data>
+  <data name="Preview3DVolumetricQualityLow" xml:space="preserve">
+    <value>قليل</value>
+  </data>
+  <data name="Preview3DVolumetricQualityMedium" xml:space="preserve">
+    <value>واسطة</value>
+  </data>
+  <data name="Preview3DVolumetricQualityHigh" xml:space="preserve">
+    <value>عالي</value>
+  </data>
+  <data name="Preview3DParallaxAoStrength" xml:space="preserve">
+    <value>بوم الاتصال AO</value>
+  </data>
+  <data name="Preview3DParallaxAoStrengthTooltip" xml:space="preserve">
+    <value>قوة الانسداد المحيط بالتلامس المحلي المستمدة من مجال ارتفاع POM.</value>
+  </data>
+  <data name="Preview3DEnableParallaxAo" xml:space="preserve">
+    <value>بوم الاتصال AO</value>
+  </data>
+  <data name="Preview3DEnableParallaxAoTooltip" xml:space="preserve">
+    <value>تمكين سواد الانسداد المحيطي المحلي من حقل ارتفاع المنظر.</value>
+  </data>
+  <data name="Preview3DWorldSection" xml:space="preserve">
+    <value>عالم</value>
+  </data>
+  <data name="Preview3DAnimationSection" xml:space="preserve">
+    <value>الرسوم المتحركة</value>
+  </data>
+  <data name="Preview3DShowGroundMesh" xml:space="preserve">
+    <value>شبكة أرضية (ثلاثية الأبعاد)</value>
+  </data>
+  <data name="Preview3DShowGroundMeshTooltip" xml:space="preserve">
+    <value>أظهر مستوى الأرض العشبي المزخرف أسفل الكائن في معاينة ثلاثية الأبعاد.</value>
+  </data>
+  <data name="Preview3DEnableEntityAnimation" xml:space="preserve">
+    <value>تحريك الكيانات التي تمت محاكاتها</value>
+  </data>
+  <data name="Preview3DEnableEntityAnimationTooltip" xml:space="preserve">
+    <value>تمكين الرسوم المتحركة الخاملة في وقت العرض لمعاينات نموذج الكيان الذي تمت محاكاته.</value>
+  </data>
+  <data name="Preview3DPauseEntityIdleAnimation" xml:space="preserve">
+    <value>إيقاف الرسوم المتحركة الرأسية الخاملة مؤقتًا</value>
+  </data>
+  <data name="Preview3DPauseEntityIdleAnimationTooltip" xml:space="preserve">
+    <value>عند التمكين، تتجمد الرسوم المتحركة لشبكة الكيان التي تمت محاكاتها في الوضع الحالي حتى يتم إيقاف تشغيلها. تمايل الإرث منفصل (انظر أدناه).</value>
+  </data>
+  <data name="Preview3DEnableLegacyEntityWobble" xml:space="preserve">
+    <value>تمايل الشبكة القديمة</value>
+  </data>
+  <data name="Preview3DEnableLegacyEntityWobbleTooltip" xml:space="preserve">
+    <value>يتم تطبيق بوب/انعراج/لفة ما قبل الأشعة تحت الحمراء على مصفوفة النموذج. معطل بشكل افتراضي - استخدم مقاطع setupAnim / Definition المرفوعة بدلاً من ذلك.</value>
+  </data>
+  <data name="Preview3DEntityAnimationSpeed" xml:space="preserve">
+    <value>سرعة الرسوم المتحركة للكيان</value>
+  </data>
+  <data name="Preview3DEntityAnimationSpeedTooltip" xml:space="preserve">
+    <value>مضاعف سرعة العرض لحركة الخمول للكيان الذي تمت محاكاته.</value>
+  </data>
+  <data name="Preview3DEntityAnimationAmplitude" xml:space="preserve">
+    <value>سعة الرسوم المتحركة للكيان</value>
+  </data>
+  <data name="Preview3DEntityAnimationAmplitudeTooltip" xml:space="preserve">
+    <value>مضاعف سعة وقت العرض لحركة الخمول للكيان الذي تمت محاكاته.</value>
+  </data>
+  <data name="Preview3DEntitiesSection" xml:space="preserve">
+    <value>الكيانات</value>
+  </data>
+  <data name="Preview3DViewportSection" xml:space="preserve">
+    <value>البارالاكس</value>
+  </data>
+  <data name="Preview3DSpritesSection" xml:space="preserve">
+    <value>العفاريت</value>
+  </data>
+  <data name="Preview3DGrassSection" xml:space="preserve">
+    <value>عشب</value>
+  </data>
+  <data name="Preview3DGrassColormap" xml:space="preserve">
+    <value>خريطة ألوان العشب</value>
+  </data>
+  <data name="Preview3DGrassColormapTemperature" xml:space="preserve">
+    <value>درجة حرارة</value>
+  </data>
+  <data name="Preview3DGrassColormapTemperatureTooltip" xml:space="preserve">
+    <value>درجة حرارة المنطقة الأحيائية (0 = بارد، 1 = دافئ) تُستخدم لأخذ عينات من خريطة ألوان العشب لمعاينة التلوين.</value>
+  </data>
+  <data name="Preview3DGrassColormapDownfall" xml:space="preserve">
+    <value>سقوط</value>
+  </data>
+  <data name="Preview3DGrassColormapDownfallTooltip" xml:space="preserve">
+    <value>الرطوبة الأحيائية / هطول الأمطار (0 = جاف، 1 = رطب) تستخدم لأخذ عينات من خريطة ألوان العشب لمعاينة التلوين.</value>
+  </data>
+  <data name="Preview3DEntityAlphaMode" xml:space="preserve">
+    <value>وضع ألفا الكيان</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeTooltip" xml:space="preserve">
+    <value>بالنسبة إلى منصات الغوغاء في وقت التشغيل التي يتم رسمها عبر شبكات مخبأة ذات شفافية PNG منتشرة - يتجاهل اللون المعتم ألفا المنتشر؛ يتجاهل الفصل تقنية التكسيلات الرفيعة/المنخفضة ألفا (الافتراضي الموصى به)؛ مزيج المركبات تدريجيا.</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeOpaque" xml:space="preserve">
+    <value>معتم</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeCutout" xml:space="preserve">
+    <value>انقطاع</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeBlend" xml:space="preserve">
+    <value>يمزج</value>
+  </data>
+  <data name="Preview3DEnableEntityLabPbrShading" xml:space="preserve">
+    <value>خرائط الكيان العادية والمرآة</value>
+  </data>
+  <data name="Preview3DEnableEntityLabPbrShadingTooltip" xml:space="preserve">
+    <value>بالنسبة لمعاينات الغوغاء في وقت التشغيل، استخدم خرائط LabPBR العادية والمرآة التي تم إنشاؤها. قم بالتعطيل إذا كانت الإضاءة تبدو خاطئة على جهاز معين.</value>
+  </data>
+  <data name="Preview3DEnableEntityParallax" xml:space="preserve">
+    <value>اختلاف منظر الكيان (POM)</value>
+  </data>
+  <data name="Preview3DEnableEntityParallaxTooltip" xml:space="preserve">
+    <value>بالنسبة لمعاينات الغوغاء في وقت التشغيل، قم بتمكين اختلاف اختلاف المنظر في خريطة الارتفاع، واختلاف المنظر AO، والظل الذاتي للمنظر. معطل بشكل افتراضي؛ يمكن أن يلمع عند طبقات الأشعة فوق البنفسجية.</value>
+  </data>
+  <data name="Preview3DSpriteThickness" xml:space="preserve">
+    <value>سمك العفريت</value>
+  </data>
+  <data name="Preview3DSpriteThicknessTooltip" xml:space="preserve">
+    <value>يقذف كل كائن تيكسل معتم إلى شكل مكعب (سماكة العنصر على طراز ماين كرافت). 0 = بطاقة مسطحة؛ ما يصل إلى 0.25 عمقًا للبثق - عند الحد الأقصى، يتطابق العمق مع حجم تيكسل للفوكسلات المكعبة. تستخدم الوجوه الجانبية لون تيكسل مسطح، وليس الأشعة فوق البنفسجية الممتدة.</value>
+  </data>
+  <data name="WindowMinimize" xml:space="preserve">
+    <value>تصغير</value>
+  </data>
+  <data name="WindowMaximize" xml:space="preserve">
+    <value>تعظيم</value>
+  </data>
+  <data name="WindowClose" xml:space="preserve">
+    <value>يغلق</value>
+  </data>
+  <data name="DebugMlMatch" xml:space="preserve">
+    <value>تصحيح أخطاء مطابقة ML...</value>
+  </data>
+  <data name="ExploreManualOverrideTooltip" xml:space="preserve">
+    <value>محدد = تضمين، غير محدد = استبعاد، غير محدد = استخدم قواعد أخرى</value>
+  </data>
+  <data name="SetAsPreview" xml:space="preserve">
+    <value>تعيين كمعاينة</value>
+  </data>
+  <data name="TagRuleIdWatermark" xml:space="preserve">
+    <value>على سبيل المثال mytag</value>
+  </data>
+  <data name="TagRuleDisplayNameWatermark" xml:space="preserve">
+    <value>على سبيل المثال علامتي</value>
+  </data>
+  <data name="EditAiModels" xml:space="preserve">
+    <value>تحرير نماذج الذكاء الاصطناعي</value>
+  </data>
+  <data name="EditAiModelsWarning" xml:space="preserve">
+    <value>تحذير: لا تقم بتحرير مسارات النماذج هذه إلا إذا كنت تعرف ما تفعله.</value>
+  </data>
+  <data name="MlResolution16x16" xml:space="preserve">
+    <value>16×16</value>
+  </data>
+  <data name="MlResolution32x32" xml:space="preserve">
+    <value>32×32</value>
+  </data>
+  <data name="MlResolution64x64" xml:space="preserve">
+    <value>64×64</value>
+  </data>
+  <data name="MlResolution128x128" xml:space="preserve">
+    <value>128×128</value>
+  </data>
+  <data name="MlResolution256x256" xml:space="preserve">
+    <value>256×256</value>
+  </data>
+  <data name="UvDebugButton" xml:space="preserve">
+    <value>تصحيح الأشعة فوق البنفسجية</value>
+  </data>
+  <data name="EntityDebugButton" xml:space="preserve">
+    <value>تصحيح الكيان</value>
+  </data>
+  <data name="PreviewPoseLabel" xml:space="preserve">
+    <value>أَثَار</value>
+  </data>
+  <data name="PreviewSizeLabel" xml:space="preserve">
+    <value>مقاس</value>
+  </data>
+  <data name="PreviewContextTypeLabel" xml:space="preserve">
+    <value>نوع السياق</value>
+  </data>
+  <data name="SelectResourcePackTitle" xml:space="preserve">
+    <value>حدد حزمة الموارد (.zip أو .jar)</value>
+  </data>
+  <data name="SelectOutputFolderTitle" xml:space="preserve">
+    <value>حدد مجلد الإخراج</value>
+  </data>
+  <data name="SelectMinecraftAssetsTitle" xml:space="preserve">
+    <value>حدد إصدار Minecraft أو مجلد الأصول</value>
+  </data>
+  <data name="SemanticDebugWindowTitle" xml:space="preserve">
+    <value>تصحيح أخطاء المطابقة الدلالية MiniLM</value>
+  </data>
+  <data name="Preview3DCameraResetKeyFormat" xml:space="preserve">
+    <value>{0} مفتاح</value>
+  </data>
+  <data name="CustomTagDefaultDisplayName" xml:space="preserve">
+    <value>علامة مخصصة</value>
+  </data>
+  <data name="CustomRuleDefaultDisplayName" xml:space="preserve">
+    <value>القاعدة المخصصة</value>
+  </data>
+  <data name="Status_GpuPreviewStarting" xml:space="preserve">
+    <value>جارٍ بدء معاينة وحدة معالجة الرسومات…</value>
+  </data>
+  <data name="Status_GpuPreviewPreparingShaderSources" xml:space="preserve">
+    <value>جارٍ تحضير مصادر التظليل…</value>
+  </data>
+  <data name="Status_GpuPreviewPreparing" xml:space="preserve">
+    <value>جارٍ تحضير معاينة وحدة معالجة الرسومات…</value>
+  </data>
+  <data name="Status_GpuPreviewClearingShaderCache" xml:space="preserve">
+    <value>جارٍ مسح ذاكرة التخزين المؤقت للتظليل...</value>
+  </data>
+  <data name="Status_GpuPreviewCompilingMainShaders" xml:space="preserve">
+    <value>جارٍ تجميع تظليلات المعاينة الرئيسية...</value>
+  </data>
+  <data name="Status_GpuPreviewCompilingShadowShaders" xml:space="preserve">
+    <value>جارٍ تجميع تظليلات الظل…</value>
+  </data>
+  <data name="Status_GpuPreviewCreatingShadowMaps" xml:space="preserve">
+    <value>إنشاء خرائط الظل...</value>
+  </data>
+  <data name="Status_GpuPreviewUploadingMeshes" xml:space="preserve">
+    <value>جارٍ تحميل شبكات المعاينة…</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingLineOverlay" xml:space="preserve">
+    <value>جارٍ تهيئة تراكب الخط…</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingSkyDome" xml:space="preserve">
+    <value>جارٍ تهيئة قبة السماء…</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingAtmosphere" xml:space="preserve">
+    <value>تهيئة الأجواء…</value>
+  </data>
+  <data name="Status_GpuPreviewFinalizing" xml:space="preserve">
+    <value>جارٍ إنهاء المعاينة…</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingGodRays" xml:space="preserve">
+    <value>جارٍ تحميل أشعة الله…</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingClouds" xml:space="preserve">
+    <value>جارٍ تحميل السحب الحجمية…</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingTaa" xml:space="preserve">
+    <value>جارٍ تحميل معاينة TAA...</value>
+  </data>
+  <data name="Status_GpuPreviewReady" xml:space="preserve">
+    <value>مستعد</value>
+  </data>
+  <data name="Status_GpuPreviewPreviewReady" xml:space="preserve">
+    <value>المعاينة جاهزة</value>
+  </data>
+  <data name="Status_GpuPreviewCoreReady" xml:space="preserve">
+    <value>المعاينة الأساسية جاهزة</value>
+  </data>
+  <data name="UvDebugTitle" xml:space="preserve">
+    <value>تصحيح الأشعة فوق البنفسجية</value>
+  </data>
+  <data name="UvDebugGlobalControls" xml:space="preserve">
+    <value>ضوابط تصحيح الأخطاء العالمية للأشعة فوق البنفسجية</value>
+  </data>
+  <data name="UvDebugGlobalControlsDescription" xml:space="preserve">
+    <value>تتجاوز هذه السياسة سياسة خبز الأشعة فوق البنفسجية للإنتاج عند التبديل. تستخدم مكعبات الكيان تماثل Java المضمن بشكل افتراضي.</value>
+  </data>
+  <data name="UvDebugResetOverrides" xml:space="preserve">
+    <value>إعادة تعيين التجاوزات (افتراضيات الإنتاج)</value>
+  </data>
+  <data name="UvDebugFlipU" xml:space="preserve">
+    <value>الوجه U (مبادلة u0/u1)</value>
+  </data>
+  <data name="UvDebugFlipV" xml:space="preserve">
+    <value>Flip V (مبادلة v0/v1)</value>
+  </data>
+  <data name="UvDebugOffsetU" xml:space="preserve">
+    <value>إزاحة U (بكسل)</value>
+  </data>
+  <data name="UvDebugOffsetV" xml:space="preserve">
+    <value>إزاحة V (بكسل)</value>
+  </data>
+  <data name="UvDebugFaceSemanticRouting" xml:space="preserve">
+    <value>التوجيه الدلالي للوجه (دلالات الوجه بعد التحويل)</value>
+  </data>
+  <data name="UvDebugSwapNorthSouth" xml:space="preserve">
+    <value>مبادلة توجيه الوجه شمال / جنوب</value>
+  </data>
+  <data name="UvDebugSwapEastWest" xml:space="preserve">
+    <value>تبديل توجيه الوجه شرقًا/غربًا</value>
+  </data>
+  <data name="UvDebugSwapUpDown" xml:space="preserve">
+    <value>مبادلة توجيه الوجه لأعلى / لأسفل</value>
+  </data>
+  <data name="UvDebugBakerConversion" xml:space="preserve">
+    <value>تحويل بيكر للأشعة فوق البنفسجية</value>
+  </data>
+  <data name="UvDebugPreserveDirectionalBounds" xml:space="preserve">
+    <value>الحفاظ على حدود الأشعة فوق البنفسجية الاتجاهية (تعطيل التطبيع الأدنى/الحد الأقصى)</value>
+  </data>
+  <data name="UvDebugUseBottomLeftUvOrigin" xml:space="preserve">
+    <value>استخدم تحويل أصل الأشعة فوق البنفسجية من أسفل اليسار (نمط GL)</value>
+  </data>
+  <data name="UvDebugFaceCornerOrdering" xml:space="preserve">
+    <value>ترتيب زاوية الوجه / لف</value>
+  </data>
+  <data name="UvDebugCornerOrderDefault" xml:space="preserve">
+    <value>تقصير</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate90" xml:space="preserve">
+    <value>تدوير 90</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate180" xml:space="preserve">
+    <value>تدوير 180</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate270" xml:space="preserve">
+    <value>تدوير 270</value>
+  </data>
+  <data name="UvDebugCornerOrderReverseWinding" xml:space="preserve">
+    <value>عكس اللف</value>
+  </data>
+  <data name="UvDebugGlobalFaceRotation" xml:space="preserve">
+    <value>دوران الوجه العالمي</value>
+  </data>
+  <data name="UvDebugRotation0" xml:space="preserve">
+    <value>0 درجة</value>
+  </data>
+  <data name="UvDebugRotation90" xml:space="preserve">
+    <value>90 درجة</value>
+  </data>
+  <data name="UvDebugRotation180" xml:space="preserve">
+    <value>180 درجة</value>
+  </data>
+  <data name="UvDebugRotation270" xml:space="preserve">
+    <value>270 درجة</value>
+  </data>
+  <data name="UvDebugLiveChangesHint" xml:space="preserve">
+    <value>يتم تطبيق التغييرات بشكل مباشر وتشغيل تحديث المعاينة. استخدمها لعزل مشكلات تحويل texOffs مقابل الخباز مقابل مشكلات ترتيب الزوايا.</value>
+  </data>
+  <data name="EntityPreviewDebugTitle" xml:space="preserve">
+    <value>تصحيح معاينة الكيان</value>
+  </data>
+  <data name="EntityPreviewDebugBabyFixesSection" xml:space="preserve">
+    <value>معاينة الطفل للإصلاحات الحية</value>
+  </data>
+  <data name="EntityPreviewDebugBabyFixesDescription" xml:space="preserve">
+    <value>مفاتيح التجربة/الخطأ لفصل جسم الطفل/رأسه/ساقه في الاستكشاف. قم بتغيير الشبكة على الفور - قم بتحميل نسيج صغير (fox_baby، Cow_temperate_baby، donkey_baby، ...) وقم بتبديل إصلاح واحد في كل مرة.</value>
+  </data>
+  <data name="EntityPreviewDebugBaselineCompare" xml:space="preserve">
+    <value>مقارنة خط الأساس</value>
+  </data>
+  <data name="EntityPreviewDebugForceCpuSkinning" xml:space="preserve">
+    <value>فرض سلخ وحدة المعالجة المركزية (معاينة 12 عائمة VBO)</value>
+  </data>
+  <data name="EntityPreviewDebugForceCpuSkinningTooltip" xml:space="preserve">
+    <value>شبكة صحيحة على وحدة المعالجة المركزية ولكن منفصلة على مسار GPU ⇒ GPU bind/W()، وليس مسار الأشعة تحت الحمراء.</value>
+  </data>
+  <data name="EntityPreviewDebugLogDrawContract" xml:space="preserve">
+    <value>كيان السجل يرسم العقد في كل إطار</value>
+  </data>
+  <data name="EntityPreviewDebugLogDrawContractTooltip" xml:space="preserve">
+    <value>شاهد bodyY/headY/legY في سجل المعاينة أثناء تبديل الإصلاحات.</value>
+  </data>
+  <data name="EntityPreviewDebugLayerDebugFalseColor" xml:space="preserve">
+    <value>تصحيح أخطاء الطبقة ذات الألوان الزائفة (دفعات العمق)</value>
+  </data>
+  <data name="EntityPreviewDebugLayerDebugFalseColorTooltip" xml:space="preserve">
+    <value>قم بتلوين كل دفعة رسم بواسطة PreviewDepthLayerKind (رمادي أساسي، سماوي مقطوع، أرجواني تجميلي، أصفر منبعث).</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseCompose" xml:space="preserve">
+    <value>وضع الجزء يؤلف (شبكة إعادة الخبز)</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseErTimesT" xml:space="preserve">
+    <value>إيه × تي (الإنتاج)</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseLegacyTxEr" xml:space="preserve">
+    <value>T × Er (ينفجر البالغ القديم)</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseLegacyTxErTooltip" xml:space="preserve">
+    <value>عادة ما تكون خاطئة للبالغين؛ جرب الأطفال إذا انفصلت أطرافهم أثناء دوران الوالدين.</value>
+  </data>
+  <data name="EntityPreviewDebugLerFold" xml:space="preserve">
+    <value>طية LER (شبكة إعادة الخبز)</value>
+  </data>
+  <data name="EntityPreviewDebugLerPolicyDefault" xml:space="preserve">
+    <value>السياسة الافتراضية</value>
+  </data>
+  <data name="EntityPreviewDebugLerStandardWorldRoot" xml:space="preserve">
+    <value>StandardWorldRoot (العمود S·M)</value>
+  </data>
+  <data name="EntityPreviewDebugLerRightComposeLocalChain" xml:space="preserve">
+    <value>RightComposeLocalChain (M·S)</value>
+  </data>
+  <data name="EntityPreviewDebugLerRightComposeLocalChainTooltip" xml:space="preserve">
+    <value>لكل عنصر M×S - يمكن فصل الجسم المكعب المستدير عن رباعي الأرجل.</value>
+  </data>
+  <data name="EntityPreviewDebugLerSkip" xml:space="preserve">
+    <value>تخطي لير</value>
+  </data>
+  <data name="EntityPreviewDebugPartTreeRepair" xml:space="preserve">
+    <value>إصلاح جزء من الشجرة</value>
+  </data>
+  <data name="EntityPreviewDebugSkipAllPartTreeRepair" xml:space="preserve">
+    <value>تخطي جميع عمليات إصلاح الشجرة الجزئية (الأشعة تحت الحمراء المرفوعة الخام)</value>
+  </data>
+  <data name="EntityPreviewDebugSkipAllPartTreeRepairTooltip" xml:space="preserve">
+    <value>تجاوز GeometryIrPartTreeRepair بالكامل - راجع مخرجات الرافعة قبل أي إصلاحات للأطفال.</value>
+  </data>
+  <data name="EntityPreviewDebugIndividualRepairSteps" xml:space="preserve">
+    <value>خطوات الإصلاح الفردية (تشغيل إعدادات الإنتاج الافتراضية)</value>
+  </data>
+  <data name="EntityPreviewDebugIndividualRepairStepsDescription" xml:space="preserve">
+    <value>قم بإلغاء تحديد الخطوة لمعرفة ما إذا كانت تساعد الطفل الحالي أم تؤذيه. تخطي الكل يتجاوز هذه.</value>
+  </data>
+  <data name="EntityPreviewDebugRepairGlobalReparent" xml:space="preserve">
+    <value>إعادة الوالد العالمي (الأذنين، الرأس → أجزاء الرأس، القرون، ريح النسيم، …)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairQuadrupedLegReparent" xml:space="preserve">
+    <value>توجد أرجل رباعية الأرجل تحت الجسم</value>
+  </data>
+  <data name="EntityPreviewDebugRepairQuadrupedLegReparentTooltip" xml:space="preserve">
+    <value>عندما لا يكون خبز الجذر مسطحًا - تستخدم فئة كومة رأس الحمار/الحصان قاعدة كومة الرأس أدناه.</value>
+  </data>
+  <data name="EntityPreviewDebugRepairForceLegReparent" xml:space="preserve">
+    <value>فرض إعادة بناء الساق على خبز مسطح رباعي الأرجل (تجريبي)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairForceLegReparentTooltip" xml:space="preserve">
+    <value>جرب صغار الثعلب/البقرة/الدجاج حيث تظل الأرجل أشقاء مع إزاحات نسبية للجسم.</value>
+  </data>
+  <data name="EntityPreviewDebugRepairHeadStackLegReparent" xml:space="preserve">
+    <value>كومة الرأس متداخلة: أرجل جذر مسطحة متكررة (الخيول الصغيرة)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairHeadStackLegReparentTooltip" xml:space="preserve">
+    <value>BabyHorseModel / BabyDonkeyModel — الرأس أسفل الجسم لكن الساقين لا تزالان في الجذر.</value>
+  </data>
+  <data name="EntityPreviewDebugRepairRemoveDuplicateRootSiblings" xml:space="preserve">
+    <value>إزالة الأخوة الجذر المكررة</value>
+  </data>
+  <data name="EntityPreviewDebugRepairCollapseInnerBody" xml:space="preserve">
+    <value>طي الجزء الداخلي من الجسم / زخرفة من الصوف أسفل الجسم</value>
+  </data>
+  <data name="EntityPreviewDebugRepairDeduplicateNestedPartIds" xml:space="preserve">
+    <value>إلغاء تكرار معرفات الأجزاء المتداخلة</value>
+  </data>
+  <data name="EntityPreviewDebugRepairZeroEquineRootOffset" xml:space="preserve">
+    <value>صفر إزاحة جذر createBodyLayer للخيول (الحصان/الحمار)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairZeroEquineRootOffsetTooltip" xml:space="preserve">
+    <value>يسقط مرساة الجذر T(0,24,0) على خبز الخيول createBodyLayer/createBabyLayer.</value>
+  </data>
+  <data name="EntityPreviewDebugSuggestedWorkflow" xml:space="preserve">
+    <value>سير عمل الطفل المقترح: (1) إصلاح تخطي الكل لرؤية الأشعة تحت الحمراء الأولية، (2) إعادة تمكين خطوات الإنتاج واحدة تلو الأخرى، (3) تجربة فرض إعادة بناء الساق أو قاعدة كومة الرأس على أطفال الخيول، (4) مقارنة مظهر وحدة المعالجة المركزية مقابل واجهة وحدة معالجة الرسومات، (5) فقط بعد ذلك جرب T×Er أو RightCompose LER إذا كانت المجموعات لا تزال تنجرف.</value>
+  </data>
+  <data name="AiTaggingSection" xml:space="preserve">
+    <value>وضع العلامات على الذكاء الاصطناعي</value>
+  </data>
+  <data name="NormalsAndHeightSection" xml:space="preserve">
+    <value>الأعراف والارتفاع</value>
+  </data>
+  <data name="NormalsSection" xml:space="preserve">
+    <value>الأعراف</value>
+  </data>
+  <data name="SpecularSection" xml:space="preserve">
+    <value>النعومة</value>
+  </data>
+  <data name="MetalnessSection" xml:space="preserve">
+    <value>معدنة</value>
+  </data>
+  <data name="SpecularPorositySection" xml:space="preserve">
+    <value>المسامية</value>
+  </data>
+  <data name="AiDrivenPbrSection" xml:space="preserve">
+    <value>AI مدفوعة PBR</value>
+  </data>
+  <data name="AiNormalsSection" xml:space="preserve">
+    <value>معايير الذكاء الاصطناعي</value>
+  </data>
+  <data name="AiSpecularSection" xml:space="preserve">
+    <value>منظمة العفو الدولية براق</value>
+  </data>
+  <data name="Preview3DCameraExpanderSection" xml:space="preserve">
+    <value>الكاميرا</value>
+  </data>
 </root>
 
 

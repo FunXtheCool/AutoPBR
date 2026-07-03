@@ -1,5 +1,6 @@
 using System.Numerics;
 
+using AutoPBR.App.Lang;
 using AutoPBR.App.Rendering.Abstractions;
 using AutoPBR.Core.Models;
 using AutoPBR.Core.Preview;
@@ -215,8 +216,8 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
 
             RaiseGpuInitProgress(
                 PreviewShaderPrewarm.IsComplete
-                    ? (_gpuBootstrap is not null ? _gpuBootstrap.Phase : "Preparing GPU preview…")
-                    : "Preparing shader sources…",
+                    ? (_gpuBootstrap is not null ? _gpuBootstrap.Phase : PreviewGpuInitPhases.Preparing)
+                    : PreviewGpuInitPhases.PreparingShaderSources,
                 _settings);
         }
     }
@@ -1118,6 +1119,11 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         DrawPreviewSubject = s.DrawPreviewSubject,
         EnableSss = s.EnableSss,
         EnableParallaxShadow = s.EnableParallaxShadow,
+        ParallaxTraceLayers = s.ParallaxTraceLayers,
+        ParallaxRefineSteps = s.ParallaxRefineSteps,
+        ParallaxShadowSamples = s.ParallaxShadowSamples,
+        ParallaxShadowSoftness = s.ParallaxShadowSoftness,
+        ParallaxMaxUvShift = s.ParallaxMaxUvShift,
         EnableParallaxAo = s.EnableParallaxAo,
         ParallaxAoStrength = s.ParallaxAoStrength,
         EnableIbl = s.EnableIbl,
@@ -1152,6 +1158,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         ShadowMapResolution = s.ShadowMapResolution,
         ShadowMinBias = s.ShadowMinBias,
         ShadowMaxBias = s.ShadowMaxBias,
+        ShadowSoftnessTexels = s.ShadowSoftnessTexels,
         EnableShadowCascades = s.EnableShadowCascades,
         EnableGodRays = s.EnableGodRays,
         EnableVolumeGodRays = s.EnableVolumeGodRays,

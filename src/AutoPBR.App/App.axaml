@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="AutoPBR.App.App"
              xmlns:local="using:AutoPBR.App"
+             xmlns:ctrls="using:AutoPBR.App.Controls"
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
@@ -16,6 +17,127 @@
         </Style>
         <Style Selector="NumericUpDown.overlay-slider-box:pointerover">
             <Setter Property="BorderBrush" Value="{DynamicResource SystemControlHighlightBaseMediumBrush}" />
+        </Style>
+        <Style Selector="Button.flyout-expander-header">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="RootBorder"
+                            Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="12,8"
+                            MinHeight="32">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <ContentPresenter Grid.Column="0"
+                                              Content="{TemplateBinding Content}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Stretch"
+                                              RecognizesAccessKey="True" />
+                            <Path Grid.Column="1"
+                                  Margin="12,0,0,0"
+                                  Width="10"
+                                  Height="10"
+                                  VerticalAlignment="Center"
+                                  Data="M 0 0 L 4 4 L 0 8 Z"
+                                  Fill="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                                  Stretch="Uniform" />
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.flyout-expander-header:pointerover /template/ Border#RootBorder">
+            <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundListLowBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlHighlightBaseMediumBrush}" />
+        </Style>
+        <Style Selector="Button.flyout-expander-header:pressed /template/ Border#RootBorder">
+            <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundListMediumBrush}" />
+        </Style>
+        <Style Selector="ctrls|FlyoutSection">
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="Template">
+                <ControlTemplate TargetType="ctrls:FlyoutSection">
+                    <Button Classes="flyout-expander-header"
+                            MinWidth="{TemplateBinding ButtonMinWidth}"
+                            HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                            VerticalAlignment="Center"
+                            Content="{TemplateBinding Header}"
+                            ToolTip.Tip="{TemplateBinding HeaderToolTip}"
+                            IsEnabled="{TemplateBinding IsEnabled}">
+                        <Button.Flyout>
+                            <Flyout Placement="BottomEdgeAlignedLeft"
+                                    ShowMode="Standard"
+                                    FlyoutPresenterClasses="flyout-section-presenter">
+                                <!-- Border is the outer width authority (Min/MaxWidth) so the flyout grows to fit wrapped content; ScrollViewer sits inside and only scrolls vertically. The presenter itself is neutralized (see FlyoutPresenter.flyout-section-presenter) so it doesn't cap width or scroll horizontally. -->
+                                <Border MinWidth="{TemplateBinding FlyoutMinWidth}"
+                                        MaxWidth="{TemplateBinding FlyoutMaxWidth}"
+                                        Padding="12"
+                                        MinHeight="0"
+                                        x:CompileBindings="False"
+                                        Background="{Binding CardBackground}"
+                                        BorderBrush="{Binding CardBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="8">
+                                    <ScrollViewer MaxHeight="{TemplateBinding FlyoutMaxHeight}"
+                                                  HorizontalAlignment="Stretch"
+                                                  VerticalScrollBarVisibility="Auto"
+                                                  HorizontalScrollBarVisibility="Disabled">
+                                        <ContentPresenter MinWidth="0"
+                                                          HorizontalAlignment="Stretch"
+                                                          Content="{TemplateBinding FlyoutContent}" />
+                                    </ScrollViewer>
+                                </Border>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <!-- Neutralize Avalonia's auto-inserted FlyoutPresenter wrapper: remove its default MaxWidth cap, padding, chrome, and internal horizontal scrolling so our inner Border controls sizing and content wraps instead of scrolling. -->
+        <Style Selector="FlyoutPresenter.flyout-section-presenter">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="MaxWidth" Value="10000" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="MaxHeight" Value="10000" />
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+        </Style>
+        <Style Selector="ctrls|FlyoutSection /template/ Border TextBlock">
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style Selector="ctrls|FlyoutSection /template/ Border CheckBox">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
+        <Style Selector="ctrls|FlyoutSection /template/ Border CheckBox TextBlock">
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style Selector="Border.tune-specular-divider">
+            <Setter Property="BorderThickness" Value="1,0,0,0" />
+            <Setter Property="Margin" Value="12,0,0,0" />
+            <Setter Property="Padding" Value="12,0,0,0" />
+        </Style>
+        <Style Selector="Border.tune-specular-divider.reflow-wrapped-row">
+            <Setter Property="BorderThickness" Value="0,1,0,0" />
+            <Setter Property="Margin" Value="0,12,0,0" />
+            <Setter Property="Padding" Value="0,12,0,0" />
+        </Style>
+        <Style Selector="StackPanel.reflow-wrapped-row Border.tune-specular-divider">
+            <Setter Property="BorderThickness" Value="0,1,0,0" />
+            <Setter Property="Margin" Value="0,12,0,0" />
+            <Setter Property="Padding" Value="0,12,0,0" />
         </Style>
     </Application.Styles>
 </Application>

@@ -20,8 +20,10 @@ public static class PreviewMeshFactory
         var v = new List<float>(24 * PreviewMesh.FloatsPerVertex);
         var idx = new List<uint>(36);
 
-        void AddQuad(Vector3 n, Vector3 t, float wSign, ReadOnlySpan<Vector3> corners, ReadOnlySpan<Vector2> uvs)
+        void AddQuad(Vector3 n, Vector3 fallbackTangent, float fallbackWSign, ReadOnlySpan<Vector3> corners,
+            ReadOnlySpan<Vector2> uvs)
         {
+            PreviewTangentBasis.Derive(corners, uvs, n, fallbackTangent, fallbackWSign, out var t, out var wSign);
             var baseIndex = (uint)(v.Count / PreviewMesh.FloatsPerVertex);
             for (var i = 0; i < 4; i++)
             {
@@ -92,16 +94,23 @@ public static class PreviewMeshFactory
     {
         var h = halfSize;
         var n = new Vector3(0, 0, 1);
-        var t = new Vector3(1, 0, 0);
-        float[] flatVerts =
+        Vector3[] corners =
         [
-            -h, -h, 0, n.X, n.Y, n.Z, 0, 1, t.X, t.Y, t.Z, 1f,
-            h, -h, 0, n.X, n.Y, n.Z, 1, 1, t.X, t.Y, t.Z, 1f,
-            h, h, 0, n.X, n.Y, n.Z, 1, 0, t.X, t.Y, t.Z, 1f,
-            -h, h, 0, n.X, n.Y, n.Z, 0, 0, t.X, t.Y, t.Z, 1f
+            new(-h, -h, 0),
+            new(h, -h, 0),
+            new(h, h, 0),
+            new(-h, h, 0)
         ];
+        Vector2[] uvs = [new(0, 1), new(1, 1), new(1, 0), new(0, 0)];
+        PreviewTangentBasis.Derive(corners, uvs, n, Vector3.UnitX, 1f, out var t, out var wSign);
+        var verts = new List<float>(4 * PreviewMesh.FloatsPerVertex);
+        for (var i = 0; i < 4; i++)
+        {
+            AddVertex(verts, corners[i], n, uvs[i], t, wSign);
+        }
+
         uint[] flatIndices = [0u, 1u, 2u, 0u, 2u, 3u];
-        return new PreviewMesh { Name = name, InterleavedVertices = flatVerts, Indices = flatIndices };
+        return new PreviewMesh { Name = name, InterleavedVertices = verts.ToArray(), Indices = flatIndices };
     }
 
     /// <summary>Per-texel cuboid extrusion for thickened 2D sprite preview.</summary>
@@ -133,11 +142,15 @@ public static class PreviewMeshFactory
             var c2 = Vector3.Transform(new Vector3(h, h, 0), rot);
             var c3 = Vector3.Transform(new Vector3(-h, h, 0), rot);
 
+            Vector3[] corners = [c0, c1, c2, c3];
+            Vector2[] uvs = [new(0, 1), new(1, 1), new(1, 0), new(0, 0)];
+            PreviewTangentBasis.Derive(corners, uvs, n, t, 1f, out var tangent, out var wSign);
+
             var baseIndex = (uint)(v.Count / PreviewMesh.FloatsPerVertex);
-            AddVertex(c0, n, t, new Vector2(0, 1));
-            AddVertex(c1, n, t, new Vector2(1, 1));
-            AddVertex(c2, n, t, new Vector2(1, 0));
-            AddVertex(c3, n, t, new Vector2(0, 0));
+            for (var j = 0; j < 4; j++)
+            {
+                AddVertex(v, corners[j], n, uvs[j], tangent, wSign);
+            }
 
             idx.Add(baseIndex);
             idx.Add(baseIndex + 1);
@@ -148,22 +161,6 @@ public static class PreviewMeshFactory
         }
 
         return new PreviewMesh { Name = name, InterleavedVertices = v.ToArray(), Indices = idx.ToArray() };
-
-        void AddVertex(Vector3 p, Vector3 normal, Vector3 tangent, Vector2 uv)
-        {
-            v.Add(p.X);
-            v.Add(p.Y);
-            v.Add(p.Z);
-            v.Add(normal.X);
-            v.Add(normal.Y);
-            v.Add(normal.Z);
-            v.Add(uv.X);
-            v.Add(uv.Y);
-            v.Add(tangent.X);
-            v.Add(tangent.Y);
-            v.Add(tangent.Z);
-            v.Add(1f);
-        }
     }
 
     /// <summary>
@@ -183,37 +180,40 @@ public static class PreviewMeshFactory
         }
 
         var n = Vector3.UnitY;
-        var t = Vector3.UnitX;
         Vector2 Uv(float x, float z) => new((x + h) / metersPerTile, (z + h) / metersPerTile);
 
         var verts = new List<float>(4 * PreviewMesh.FloatsPerVertex);
-        void V(Vector3 p, Vector2 uv)
-        {
-            verts.Add(p.X);
-            verts.Add(p.Y);
-            verts.Add(p.Z);
-            verts.Add(n.X);
-            verts.Add(n.Y);
-            verts.Add(n.Z);
-            verts.Add(uv.X);
-            verts.Add(uv.Y);
-            verts.Add(t.X);
-            verts.Add(t.Y);
-            verts.Add(t.Z);
-            verts.Add(1f);
-        }
 
         // CCW when viewed from +Y.
         var p00 = new Vector3(-h, y, -h);
         var p10 = new Vector3(h, y, -h);
         var p11 = new Vector3(h, y, h);
         var p01 = new Vector3(-h, y, h);
-        V(p00, Uv(p00.X, p00.Z));
-        V(p10, Uv(p10.X, p10.Z));
-        V(p11, Uv(p11.X, p11.Z));
-        V(p01, Uv(p01.X, p01.Z));
+        Vector3[] corners = [p00, p10, p11, p01];
+        Vector2[] uvs = [Uv(p00.X, p00.Z), Uv(p10.X, p10.Z), Uv(p11.X, p11.Z), Uv(p01.X, p01.Z)];
+        PreviewTangentBasis.Derive(corners, uvs, n, Vector3.UnitX, 1f, out var t, out var wSign);
+        for (var i = 0; i < 4; i++)
+        {
+            AddVertex(verts, corners[i], n, uvs[i], t, wSign);
+        }
 
         uint[] indices = [0u, 1u, 2u, 0u, 2u, 3u];
         return new PreviewMesh { Name = name, InterleavedVertices = verts.ToArray(), Indices = indices };
+    }
+
+    private static void AddVertex(List<float> verts, Vector3 p, Vector3 normal, Vector2 uv, Vector3 tangent, float wSign)
+    {
+        verts.Add(p.X);
+        verts.Add(p.Y);
+        verts.Add(p.Z);
+        verts.Add(normal.X);
+        verts.Add(normal.Y);
+        verts.Add(normal.Z);
+        verts.Add(uv.X);
+        verts.Add(uv.Y);
+        verts.Add(tangent.X);
+        verts.Add(tangent.Y);
+        verts.Add(tangent.Z);
+        verts.Add(wSign);
     }
 }

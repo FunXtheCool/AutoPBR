@@ -8,28 +8,42 @@
 
 //!include "common.glsl"
 
-const int GEN_POM_TRACE_LAYERS = 40;
-const int GEN_POM_REFINE_STEPS = 6;
-const int GEN_POM_SHADOW_TAPS = 16;
+const int GEN_POM_TRACE_LAYERS_MAX = 128;
+const int GEN_POM_REFINE_STEPS_MAX = 8;
+const int GEN_POM_SHADOW_TAPS_MAX = 64;
 const int GEN_POM_AO_TAPS = 8;
-const float GEN_POM_MAX_UV_SHIFT = 0.22;
-// Below this tangent-space view Z (cos angle to normal), POM is unstable / silhouette - skip.
-const float GEN_POM_MIN_VIEW_Z = 0.055;
+// Tangent-space view-Z floor used for grazing rays. Do not use this as a hard cutoff:
+// close, low-angle ground views can legitimately sit below this value and should still
+// show relief; the steer/UV caps below keep those rays bounded.
+const float GEN_POM_MIN_VIEW_Z = 0.012;
 // Soft cap on |tan(theta)| = |V.xy|/V.z before parallax scale (preserves direction; avoids bent rays).
 const float GEN_POM_STEER_TAN_CAP = 6.0;
 
-// Preview meshes use GL_REPEAT; sampling height outside [0,1] during POM wraps to the opposite edge and
-// reads the wrong texels on single-tile UVs (cube/item). Clamp UV for height reads only.
-float sampleHeight01(sampler2D heightTex, vec2 uv)
+uniform int   uParallaxTraceLayers;
+uniform int   uParallaxRefineSteps;
+uniform int   uParallaxShadowSamples;
+uniform float uParallaxShadowSoftness;
+uniform float uParallaxMaxUvShift;
+
+vec2 pomTileLocal(vec2 uv)
 {
-    vec2 uvc = clamp(uv, vec2(0.0), vec2(1.0));
-    return 1.0 - texture(heightTex, uvc).r;
+    return fract(uv);
+}
+
+vec2 pomTileUv(vec2 tileBase, vec2 localUv)
+{
+    return tileBase + fract(localUv);
+}
+
+float sampleHeight01Grad(sampler2D heightTex, vec2 uv, vec2 dx, vec2 dy)
+{
+    return 1.0 - textureGrad(heightTex, uv, dx, dy).r;
 }
 
 // Matches UV displacement scale used for the view-ray march (also applied to parallax self-shadow).
 float pomUvDisplacementScale(float strength)
 {
-    return clamp(strength, 0.0, 0.35) * 0.92;
+    return clamp(strength, 0.0, 1.0) * 0.92;
 }
 
 // Trace POM from sampled height map. Returns the displaced UV; writes the surface depth at that hit
@@ -37,7 +51,7 @@ float pomUvDisplacementScale(float strength)
 //   uv0      : original surface UV
 //   Vtan     : view direction in tangent space (normalized)
 //   strength : height scale in 0..1 of layer thickness
-vec2 traceParallaxPom(sampler2D heightTex, vec2 uv0, vec3 Vtan, float strength, out float hitDepth)
+vec2 traceParallaxPom(sampler2D heightTex, vec2 uv0, vec3 Vtan, float strength, vec2 dx, vec2 dy, out float hitDepth)
 {
     hitDepth = 0.0;
     if (strength <= 0.0)
@@ -46,17 +60,16 @@ vec2 traceParallaxPom(sampler2D heightTex, vec2 uv0, vec3 Vtan, float strength, 
     }
 
     // Front-facing hemisphere only (view exits +N side). Using abs(z) or bending xy/z breaks coherent motion.
-    if (Vtan.z < GEN_POM_MIN_VIEW_Z)
+    if (Vtan.z <= 0.0)
     {
         return uv0;
     }
 
-    // Fixed layer count to avoid angle-driven popping/swimming from per-frame layer quantization.
-    int layers = GEN_POM_TRACE_LAYERS;
-    float layerStep = 1.0 / float(GEN_POM_TRACE_LAYERS);
+    int layers = clamp(uParallaxTraceLayers, 8, GEN_POM_TRACE_LAYERS_MAX);
+    float layerStep = 1.0 / float(layers);
 
     // Classic parallax ray on the tangent plane: delta_uv proportional to V.xy/V.z (unnormalized steer ok up to cap).
-    vec2 steer = Vtan.xy / max(Vtan.z, GEN_EPS);
+    vec2 steer = Vtan.xy / max(Vtan.z, GEN_POM_MIN_VIEW_Z);
     float tanMag = length(steer);
     if (tanMag > GEN_POM_STEER_TAN_CAP)
     {
@@ -65,67 +78,106 @@ vec2 traceParallaxPom(sampler2D heightTex, vec2 uv0, vec3 Vtan, float strength, 
 
     float parallaxScale = pomUvDisplacementScale(strength);
     vec2 totalOffset = steer * parallaxScale;
+    float maxUvShift = clamp(uParallaxMaxUvShift, 0.05, 0.75);
     float totalLen = length(totalOffset);
-    if (totalLen > GEN_POM_MAX_UV_SHIFT)
+    if (totalLen > maxUvShift)
     {
-        totalOffset *= GEN_POM_MAX_UV_SHIFT / max(totalLen, GEN_EPS);
+        totalOffset *= maxUvShift / max(totalLen, GEN_EPS);
     }
 
     vec2 deltaUv = totalOffset * layerStep;
 
-    vec2  curUv  = uv0;
+    vec2 tileBase = floor(uv0);
+    vec2 curLocal = pomTileLocal(uv0);
+    vec2 curUv = pomTileUv(tileBase, curLocal);
     float curLayer = 0.0;
-    float curHeightSample = sampleHeight01(heightTex, curUv);
+    float curHeightSample = sampleHeight01Grad(heightTex, curUv, dx, dy);
 
     // Linear march until ray depth crosses sampled height.
     int marchSteps = 0;
-    for (int i = 0; i < GEN_POM_TRACE_LAYERS; ++i)
+    for (int i = 0; i < GEN_POM_TRACE_LAYERS_MAX; ++i)
     {
+        if (i >= layers)
+        {
+            break;
+        }
+
         if (curLayer >= curHeightSample)
         {
             break;
         }
 
-        curUv -= deltaUv;
+        curLocal -= deltaUv;
+        curUv = pomTileUv(tileBase, curLocal);
         curLayer += layerStep;
         marchSteps++;
-        curHeightSample = sampleHeight01(heightTex, curUv);
+        curHeightSample = sampleHeight01Grad(heightTex, curUv, dx, dy);
     }
 
-    // Binary refinement only after at least one linear step. Zero-step hits sit exactly on the surface;
-    // refinement used prevLayer < 0 and moved UV away from the correct texel (visible smear on peaks).
     if (marchSteps > 0)
     {
-        vec2  prevUv    = curUv + deltaUv;
+        vec2  prevLocal = curLocal + deltaUv;
         float prevLayer = curLayer - layerStep;
+        float prevHeight = sampleHeight01Grad(heightTex, pomTileUv(tileBase, prevLocal), dx, dy);
 
-        for (int i = 0; i < GEN_POM_REFINE_STEPS; ++i)
+        float afterDelta = curLayer - curHeightSample;
+        float beforeDelta = prevLayer - prevHeight;
+        float denom = max(afterDelta - beforeDelta, GEN_EPS);
+        vec2 loLocal = prevLocal;
+        float loLayer = prevLayer;
+        vec2 hiLocal = curLocal;
+        float hiLayer = curLayer;
+
+        float secantT = clamp(-beforeDelta / denom, 0.0, 1.0);
+        vec2 secantLocal = mix(prevLocal, curLocal, secantT);
+        float secantLayer = mix(prevLayer, curLayer, secantT);
+        float secantHeight = sampleHeight01Grad(heightTex, pomTileUv(tileBase, secantLocal), dx, dy);
+        if (secantLayer >= secantHeight)
         {
-            vec2  midUv    = 0.5 * (prevUv + curUv);
-            float midLayer = 0.5 * (prevLayer + curLayer);
-            float midH     = sampleHeight01(heightTex, midUv);
+            hiLocal = secantLocal;
+            hiLayer = secantLayer;
+        }
+        else
+        {
+            loLocal = secantLocal;
+            loLayer = secantLayer;
+        }
+
+        int refineSteps = clamp(uParallaxRefineSteps, 0, GEN_POM_REFINE_STEPS_MAX);
+        for (int i = 0; i < GEN_POM_REFINE_STEPS_MAX; ++i)
+        {
+            if (i >= refineSteps)
+            {
+                break;
+            }
+
+            vec2  midLocal = 0.5 * (loLocal + hiLocal);
+            float midLayer = 0.5 * (loLayer + hiLayer);
+            float midH = sampleHeight01Grad(heightTex, pomTileUv(tileBase, midLocal), dx, dy);
             if (midLayer >= midH)
             {
-                curUv = midUv;
-                curLayer = midLayer;
-                curHeightSample = midH;
+                hiLocal = midLocal;
+                hiLayer = midLayer;
             }
             else
             {
-                prevUv = midUv;
-                prevLayer = midLayer;
+                loLocal = midLocal;
+                loLayer = midLayer;
             }
         }
+
+        curLocal = hiLocal;
+        curLayer = hiLayer;
     }
 
     hitDepth = clamp(curLayer, 0.0, 1.0);
-    return curUv;
+    return pomTileUv(tileBase, curLocal);
 }
 
 // Cheap parallax self-shadow: march toward the light from the hit point and accumulate the
 // largest height-above-ray difference. Returns 1.0 (lit) .. 0.0 (fully shadowed); already gated
 // to 1.0 if the light is below the surface in tangent space.
-float traceParallaxShadow(sampler2D heightTex, vec2 uvHit, vec3 Ltan, float refDepth, float strength)
+float traceParallaxShadow(sampler2D heightTex, vec2 uvHit, vec3 Ltan, float refDepth, float strength, vec2 dx, vec2 dy)
 {
     if (Ltan.z <= 0.0 || strength <= 0.0)
     {
@@ -133,7 +185,7 @@ float traceParallaxShadow(sampler2D heightTex, vec2 uvHit, vec3 Ltan, float refD
     }
 
     float lz = max(Ltan.z, GEN_EPS);
-    int   taps = GEN_POM_SHADOW_TAPS;
+    int   taps = clamp(uParallaxShadowSamples, 4, GEN_POM_SHADOW_TAPS_MAX);
     float stepLen = refDepth / float(taps);
     if (stepLen <= 0.0)
     {
@@ -141,46 +193,57 @@ float traceParallaxShadow(sampler2D heightTex, vec2 uvHit, vec3 Ltan, float refD
     }
 
     float uvScale = pomUvDisplacementScale(strength);
-    vec2  uvStep = (Ltan.xy / lz) * uvScale * stepLen;
-    vec2  uv = uvHit;
+    vec2 tileBase = floor(uvHit);
+    vec2 localUv = pomTileLocal(uvHit);
+    vec2 uvStep = (Ltan.xy / lz) * uvScale * stepLen;
     float curLayer = refDepth;
     float maxOcclusion = 0.0;
+    float sumOcclusion = 0.0;
+    float occlusionWeight = 0.0;
+    float softWidth = max(stepLen * mix(0.35, 5.0, clamp(uParallaxShadowSoftness, 0.0, 4.0) * 0.25), 0.0015);
 
-    for (int i = 0; i < GEN_POM_SHADOW_TAPS; ++i)
+    for (int i = 0; i < GEN_POM_SHADOW_TAPS_MAX; ++i)
     {
         if (i >= taps || curLayer <= 0.0)
         {
             break;
         }
 
-        uv += uvStep;
+        localUv += uvStep;
         curLayer -= stepLen;
-        float sampleH = sampleHeight01(heightTex, uv);
-        if (curLayer > sampleH)
+        float sampleH = sampleHeight01Grad(heightTex, pomTileUv(tileBase, localUv), dx, dy);
+        if (curLayer < sampleH)
         {
             // Ray is above the surface here; no occluder.
             continue;
         }
 
-        float delta = sampleH - curLayer;
-        maxOcclusion = max(maxOcclusion, delta);
+        float delta = curLayer - sampleH;
+        float occlusion = smoothstep(0.0, softWidth, delta);
+        maxOcclusion = max(maxOcclusion, occlusion);
+        sumOcclusion += occlusion;
+        occlusionWeight += 1.0;
     }
 
-    return clamp(1.0 - maxOcclusion * 6.25, 0.0, 1.0);
+    float avgOcclusion = occlusionWeight > 0.0 ? sumOcclusion / occlusionWeight : 0.0;
+    float occlusion = mix(maxOcclusion, avgOcclusion, 0.28);
+    return clamp(1.0 - occlusion, 0.0, 1.0);
 }
 
 // Contact AO from local height neighborhood around the POM hit point.
 // This targets the "grounded" crevice darkening many packs pair with POM.
-float traceParallaxAo(sampler2D heightTex, vec2 uvHit, float refDepth, float strength, float aoStrength)
+float traceParallaxAo(sampler2D heightTex, vec2 uvHit, float refDepth, float strength, float aoStrength, vec2 dx, vec2 dy)
 {
     if (refDepth <= 0.0 || strength <= 0.0 || aoStrength <= 0.0)
     {
         return 1.0;
     }
 
-    float uvScale = pomUvDisplacementScale(strength);
-    float radius = uvScale * mix(0.22, 0.72, clamp(refDepth, 0.0, 1.0));
-    if (radius <= GEN_EPS)
+    vec2 tileBase = floor(uvHit);
+    vec2 localHit = pomTileLocal(uvHit);
+    vec2 texelSize = 1.0 / vec2(textureSize(heightTex, 0));
+    float radiusTexels = mix(0.75, 2.25, clamp(refDepth, 0.0, 1.0)) * clamp(strength, 0.0, 1.0);
+    if (radiusTexels <= GEN_EPS)
     {
         return 1.0;
     }
@@ -194,14 +257,14 @@ float traceParallaxAo(sampler2D heightTex, vec2 uvHit, float refDepth, float str
     for (int i = 0; i < GEN_POM_AO_TAPS; ++i)
     {
         float ring = (float(i) + 1.0) / float(GEN_POM_AO_TAPS);
-        vec2 uv = uvHit + tapDirs[i] * radius * ring;
-        float sampleH = sampleHeight01(heightTex, uv);
+        vec2 uv = pomTileUv(tileBase, localHit + tapDirs[i] * texelSize * radiusTexels * ring);
+        float sampleH = sampleHeight01Grad(heightTex, uv, dx, dy);
         occ += max(0.0, sampleH - refDepth);
     }
 
     occ /= float(GEN_POM_AO_TAPS);
-    // AO should mostly affect indirect/cavity lighting; keep it subtle.
-    return clamp(1.0 - occ * 2.7 * aoStrength, 0.55, 1.0);
+    // AO should ground local crevices, not replace normal/specular lighting response.
+    return clamp(1.0 - occ * 1.35 * aoStrength, 0.78, 1.0);
 }
 
 #endif // GENESIS_PARALLAX_GLSL

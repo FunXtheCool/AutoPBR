@@ -92,9 +92,51 @@ public class PreviewGlslEsAdaptTests
         Assert.Contains("previewEnvSunRadiance", adapted, StringComparison.Ordinal);
         Assert.Contains("previewEnvCubemapRadiance", adapted, StringComparison.Ordinal);
         Assert.Contains("previewAmbientProbeIrradiance", adapted, StringComparison.Ordinal);
+        Assert.Contains("groundSpecularReceiverFade", adapted, StringComparison.Ordinal);
+        Assert.Contains("uIsGroundPass", adapted, StringComparison.Ordinal);
         Assert.Contains("uLightDir, uLightColor, uAtmosphereSunIntensity", adapted, StringComparison.Ordinal);
         Assert.DoesNotContain("Sun / punctual highlights come from direct lighting only", adapted, StringComparison.Ordinal);
         Assert.DoesNotContain("iblPrefilteredSkyRadianceFallback", adapted, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GenesisShadowSampling_UsesSoftPcfKernel()
+    {
+        var src = GlslIncludeResolver.Resolve("genesis.frag", LoadShader);
+        var adapted = GlslSourceAdapter.Adapt(src, ShaderType.FragmentShader, useOpenGlEs: true);
+
+        Assert.Contains("sampleShadowPcfSoft", adapted, StringComparison.Ordinal);
+        Assert.Contains("uShadowSoftnessTexels", adapted, StringComparison.Ordinal);
+        Assert.Contains("vec2[16]", adapted, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GenesisParallax_UsesTileLocalPomWithoutPostClamp()
+    {
+        var src = GlslIncludeResolver.Resolve("genesis.frag", LoadShader);
+        var adapted = GlslSourceAdapter.Adapt(src, ShaderType.FragmentShader, useOpenGlEs: true);
+
+        Assert.Contains("textureGrad(heightTex", adapted, StringComparison.Ordinal);
+        Assert.Contains("textureGrad(uAlbedo, uv, uvDx, uvDy)", adapted, StringComparison.Ordinal);
+        Assert.Contains("textureGrad(uNormal, uv, dx, dy)", adapted, StringComparison.Ordinal);
+        Assert.Contains("textureGrad(uSpecular, uv, uvDx, uvDy)", adapted, StringComparison.Ordinal);
+        Assert.Contains("pomTileUv(tileBase", adapted, StringComparison.Ordinal);
+        Assert.Contains("tileBase + fract(localUv)", adapted, StringComparison.Ordinal);
+        Assert.Contains("uParallaxTraceLayers", adapted, StringComparison.Ordinal);
+        Assert.Contains("uParallaxRefineSteps", adapted, StringComparison.Ordinal);
+        Assert.Contains("uParallaxShadowSamples", adapted, StringComparison.Ordinal);
+        Assert.Contains("uParallaxShadowSoftness", adapted, StringComparison.Ordinal);
+        Assert.Contains("textureSize(heightTex, 0)", adapted, StringComparison.Ordinal);
+        Assert.Contains("if (Vtan.z <= 0.0)", adapted, StringComparison.Ordinal);
+        Assert.Contains("Vtan.xy / max(Vtan.z, GEN_POM_MIN_VIEW_Z)", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("if (Vtan.z < GEN_POM_MIN_VIEW_Z)", adapted, StringComparison.Ordinal);
+        Assert.Contains("if (curLayer < sampleH)", adapted, StringComparison.Ordinal);
+        Assert.Contains("float delta = curLayer - sampleH;", adapted, StringComparison.Ordinal);
+        Assert.Contains("smoothstep(0.0, softWidth, delta)", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("uv = clamp(uvDisp", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("clamp(localUv", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("cavityAmt", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("sampleHeight01(sampler2D heightTex, vec2 uv)", adapted, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -106,10 +148,31 @@ public class PreviewGlslEsAdaptTests
         Assert.Contains("// plain ascii", adapted, StringComparison.Ordinal);
     }
 
-    private static string LoadShader(string fileName)
+    private static string LoadShader(string fileName) => LoadShaderCore(fileName, ThisFilePath());
+
+    private static string ThisFilePath([System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "") =>
+        sourceFilePath;
+
+    private static string LoadShaderCore(string fileName, string sourceFilePath)
     {
-        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..",
-            "src", "AutoPBR.App", "Rendering", "Shaders"));
-        return File.ReadAllText(Path.Combine(root, fileName.Replace('/', Path.DirectorySeparatorChar)));
+        var relative = fileName.Replace('/', Path.DirectorySeparatorChar);
+        var sourceDir = Path.GetDirectoryName(sourceFilePath) ?? string.Empty;
+        foreach (var start in new[] { sourceDir, AppContext.BaseDirectory, Directory.GetCurrentDirectory() })
+        {
+            var dir = new DirectoryInfo(start);
+            while (dir is not null)
+            {
+                var root = Path.Combine(dir.FullName, "src", "AutoPBR.App", "Rendering", "Shaders");
+                var path = Path.Combine(root, relative);
+                if (File.Exists(path))
+                {
+                    return File.ReadAllText(path);
+                }
+
+                dir = dir.Parent;
+            }
+        }
+
+        throw new FileNotFoundException($"Could not locate shader source '{fileName}'.");
     }
 }

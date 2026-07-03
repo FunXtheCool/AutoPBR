@@ -1,3 +1,4 @@
+using AutoPBR.App.Lang;
 using AutoPBR.Core.Models;
 
 using Avalonia.Media;
@@ -32,11 +33,7 @@ public partial class EntityPreviewDebugWindowViewModel : ViewModelBase
         _repairZeroEquineRootOffset = EntityPreviewDebugSettings.RepairZeroEquineRootOffset;
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Performance",
-        "CA1822:Mark members as static",
-        Justification = "Avalonia binding ({Binding HeaderTitle}) requires an instance member.")]
-    public string HeaderTitle => "Entity Preview Debug";
+    public LocalizedStrings Strings => _main.Strings;
 
     public IBrush WindowBackground => _main.WindowBackground;
     public IBrush CardBackground => _main.CardBackground;
@@ -250,7 +247,11 @@ public partial class EntityPreviewDebugWindowViewModel : ViewModelBase
 
     private void MainOnPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(MainWindowViewModel.WindowBackground) or
+        if (e.PropertyName is nameof(MainWindowViewModel.Strings))
+        {
+            OnPropertyChanged(nameof(Strings));
+        }
+        else if (e.PropertyName is nameof(MainWindowViewModel.WindowBackground) or
             nameof(MainWindowViewModel.CardBackground) or
             nameof(MainWindowViewModel.CardBorderBrush) or
             nameof(MainWindowViewModel.ForegroundBrush) or

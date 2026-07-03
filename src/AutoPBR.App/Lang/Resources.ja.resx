@@ -102,7 +102,7 @@
   <data name="ExploreCollapseAll" xml:space="preserve"><value>すべて折りたたむ</value></data>
   <data name="ExploreBack" xml:space="preserve"><value>戻る</value></data>
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
-  <data name="TabNormals" xml:space="preserve"><value>法線</value></data>
+  <data name="TabNormals" xml:space="preserve"><value>調整</value></data>
   <data name="TabShader" xml:space="preserve"><value>レンダー</value></data>
   <data name="TabSettings" xml:space="preserve"><value>設定</value></data>
   <data name="Input" xml:space="preserve"><value>入力</value></data>
@@ -185,11 +185,11 @@
   <data name="PreprocessFrequencySplit" xml:space="preserve"><value>周波数分離（マクロ＋ディテール）</value></data>
   <data name="PreprocessFrequencyRadius" xml:space="preserve"><value>周波数半径</value></data>
   <data name="PreprocessFrequencyDetailStrength" xml:space="preserve"><value>ディテール強度</value></data>
-  <data name="SpecularAdvanced" xml:space="preserve"><value>スペキュラ（詳細）</value></data>
+  <data name="SpecularAdvanced" xml:space="preserve"><value>チャンネル</value></data>
   <data name="SpecularPercentileRemap" xml:space="preserve"><value>滑らかさ（R）のパーセンタイル補正</value></data>
   <data name="SpecularRemapLowPercentile" xml:space="preserve"><value>低パーセンタイル</value></data>
   <data name="SpecularRemapHighPercentile" xml:space="preserve"><value>高パーセンタイル</value></data>
-  <data name="AoAdvanced" xml:space="preserve"><value>アンビエントオクルージョン（AO）</value></data>
+  <data name="AoAdvanced" xml:space="preserve"><value>アンビエントオクルージョン</value></data>
   <data name="GenerateAo" xml:space="preserve"><value>AOを法線マップ（青チャンネル）に焼き込む</value></data>
   <data name="AoRadius" xml:space="preserve"><value>AO半径</value></data>
   <data name="AoStrength" xml:space="preserve"><value>AO強度</value></data>
@@ -303,6 +303,1260 @@
   <data name="Preview3DSpritePlaneCount" xml:space="preserve"><value>スプライト平面数</value></data>
   <data name="Preview3DSpritePlaneCountTooltip" xml:space="preserve"><value>3D プレビューで 2D Sprite フラグ付きテクスチャに使う交差平面の枚数。</value></data>
   <data name="Preview3DCameraDebugFlyHint" xml:space="preserve"><value>右ドラッグ: 視点操作 · 右押し中 WASD: 飛行 · R: オービットとオフセットをリセット</value></data>
+  <data name="ClearTagOverrides" xml:space="preserve">
+    <value>タグの上書きをクリア</value>
+  </data>
+  <data name="ClearTagOverridesTooltip" xml:space="preserve">
+    <value>このパックの手動タグの追加/削除をすべてリセットします。</value>
+  </data>
+  <data name="TagMenuDontApply" xml:space="preserve">
+    <value>ここでは「{0}」を適用しないでください</value>
+  </data>
+  <data name="TagMenuApply" xml:space="preserve">
+    <value>ここに「{0}」を適用してください</value>
+  </data>
+  <data name="TagRules" xml:space="preserve">
+    <value>タグのルール</value>
+  </data>
+  <data name="TagRulesCustomDescription" xml:space="preserve">
+    <value>独自のルールセットを編集して、ヒューリスティック処理や AI 処理をガイドします。</value>
+  </data>
+  <data name="RulesetsBuiltInTags" xml:space="preserve">
+    <value>組み込みタグ</value>
+  </data>
+  <data name="RulesetsBuiltInFlags" xml:space="preserve">
+    <value>内蔵フラグ</value>
+  </data>
+  <data name="RulesetsBuiltInExpressions" xml:space="preserve">
+    <value>組み込みルール</value>
+  </data>
+  <data name="RulesetsSystemRules" xml:space="preserve">
+    <value>システムが計算したルール</value>
+  </data>
+  <data name="RulesetsSystemRulesDescription" xml:space="preserve">
+    <value>Weighted と Unweighted は実行時のセマンティック解決によって計算され、編集できません。</value>
+  </data>
+  <data name="RulesetsCustomExpressions" xml:space="preserve">
+    <value>カスタムルール</value>
+  </data>
+  <data name="RulesetsKeywords" xml:space="preserve">
+    <value>キーワード</value>
+  </data>
+  <data name="RulesetsSemanticHints" xml:space="preserve">
+    <value>セマンティックヒント</value>
+  </data>
+  <data name="RulesetsManageTokens" xml:space="preserve">
+    <value>トークンの管理</value>
+  </data>
+  <data name="RulesetsAddCondition" xml:space="preserve">
+    <value>条件の追加</value>
+  </data>
+  <data name="RulesetsAddAction" xml:space="preserve">
+    <value>アクションの追加</value>
+  </data>
+  <data name="RulesetsEnableExpression" xml:space="preserve">
+    <value>式を有効にする</value>
+  </data>
+  <data name="RulesetsExpression" xml:space="preserve">
+    <value>表現</value>
+  </data>
+  <data name="RulesetsConditions" xml:space="preserve">
+    <value>条件</value>
+  </data>
+  <data name="RulesetsActions" xml:space="preserve">
+    <value>アクション</value>
+  </data>
+  <data name="RulesetsRemove" xml:space="preserve">
+    <value>取り除く</value>
+  </data>
+  <data name="RulesetsRemoveLast" xml:space="preserve">
+    <value>最後を削除</value>
+  </data>
+  <data name="RulesetsValueWatermark" xml:space="preserve">
+    <value>価値</value>
+  </data>
+  <data name="RulesetsShowLess" xml:space="preserve">
+    <value>表示を減らす</value>
+  </data>
+  <data name="RulesetsMoreCount" xml:space="preserve">
+    <value>{0} 詳細</value>
+  </data>
+  <data name="TagRuleId" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="TagRuleDisplayName" xml:space="preserve">
+    <value>表示名</value>
+  </data>
+  <data name="TagRuleKeywords" xml:space="preserve">
+    <value>キーワード</value>
+  </data>
+  <data name="TagRuleSemanticHints" xml:space="preserve">
+    <value>セマンティックヒント (カンマ区切り、オプション)</value>
+  </data>
+  <data name="MaterialTagSemanticMlDescription" xml:space="preserve">
+    <value>Data/ONNX-AI/all-MiniLM-L6-v2-onnx の下にバンドルされている ONNX モデルを使用します (model.onnx が必要)。有効にすると、自動タグは MiniLM からのみ取得されます (自動タグ付けにはキーワード ルールは使用されません)。手動でのタグの追加/削除は引き続き上部に適用されます。</value>
+  </data>
+  <data name="MaterialTagMaxCountTooltip" xml:space="preserve">
+    <value>セマンティックマッチングによって返されるマテリアルタグの最大数。一部の組み込みの鉱石/材料ペアリング ルールと自動フラグでは、この値を超えて必要なタグが追加される場合があります。</value>
+  </data>
+  <data name="MaterialTagCertaintyThresholdTooltip" xml:space="preserve">
+    <value>最良のセマンティック一致がこのスコアを下回る場合、不明のみが提案されます (コサイン類似度 0 ～ 1)。</value>
+  </data>
+  <data name="TagLegendMaterials" xml:space="preserve">
+    <value>材料</value>
+  </data>
+  <data name="TagLegendFlags" xml:space="preserve">
+    <value>フラグ</value>
+  </data>
+  <data name="ExploreColumnResource" xml:space="preserve">
+    <value>リソース</value>
+  </data>
+  <data name="TagRuleKindLabel" xml:space="preserve">
+    <value>親切</value>
+  </data>
+  <data name="AddCustomTag" xml:space="preserve">
+    <value>カスタムタグの追加</value>
+  </data>
+  <data name="AddCustomRule" xml:space="preserve">
+    <value>カスタムルールの追加</value>
+  </data>
+  <data name="RemoveTagRule" xml:space="preserve">
+    <value>取り除く</value>
+  </data>
+  <data name="RefreshTagRules" xml:space="preserve">
+    <value>リフレッシュ</value>
+  </data>
+  <data name="InvertHeight" xml:space="preserve">
+    <value>高さを反転</value>
+  </data>
+  <data name="InvertSpecular" xml:space="preserve">
+    <value>鏡面反射光を反転</value>
+  </data>
+  <data name="TagRuleNormalIntensityOpt" xml:space="preserve">
+    <value>通常×（オプション）</value>
+  </data>
+  <data name="TagRuleHeightIntensityOpt" xml:space="preserve">
+    <value>高さ×（任意）</value>
+  </data>
+  <data name="TagRuleIntensityTooltip" xml:space="preserve">
+    <value>グローバルな調整値を使用するには、空のままにします。例: 0.85 より柔らかい法線、0.07 より繊細な高さ。</value>
+  </data>
+  <data name="TagRuleInvertNormalX" xml:space="preserve">
+    <value>通常の X を反転</value>
+  </data>
+  <data name="TagRuleInvertNormalY" xml:space="preserve">
+    <value>通常の Y を反転</value>
+  </data>
+  <data name="TagRuleEnabled" xml:space="preserve">
+    <value>このルールを使用してください</value>
+  </data>
+  <data name="TagRuleEnabledTooltip" xml:space="preserve">
+    <value>チェックを外すと、このルールは凡例と探索から除外されます。 「更新」をクリックして更新します。</value>
+  </data>
+  <data name="TagRuleMoveUp" xml:space="preserve">
+    <value>↑</value>
+  </data>
+  <data name="TagRuleMoveDown" xml:space="preserve">
+    <value>↓</value>
+  </data>
+  <data name="TagRuleMoveUpTooltip" xml:space="preserve">
+    <value>ルールを上に移動 (マージ順序)</value>
+  </data>
+  <data name="TagRuleMoveDownTooltip" xml:space="preserve">
+    <value>ルールを下に移動 (マージ順序)</value>
+  </data>
+  <data name="ExportTagRules" xml:space="preserve">
+    <value>エクスポートルール…</value>
+  </data>
+  <data name="ImportTagRules" xml:space="preserve">
+    <value>インポートルール…</value>
+  </data>
+  <data name="ExportTagRulesTooltip" xml:space="preserve">
+    <value>カスタム タグ ルールを JSON として保存します (バックアップまたは CLI --tag-rules 用)。</value>
+  </data>
+  <data name="ImportTagRulesTooltip" xml:space="preserve">
+    <value>JSON ファイルからカスタム ルールを置き換えます。</value>
+  </data>
+  <data name="RefreshTagRulesTooltip" xml:space="preserve">
+    <value>現在のルールで探索ツリーと凡例を更新します。</value>
+  </data>
+  <data name="Log_TagRulesExported" xml:space="preserve">
+    <value>エクスポートされたカスタム タグ ルール。</value>
+  </data>
+  <data name="Log_TagRulesImported" xml:space="preserve">
+    <value>{0} カスタム タグ ルールをインポートしました。</value>
+  </data>
+  <data name="Log_TagRulesImportFailed" xml:space="preserve">
+    <value>タグルールのインポートに失敗しました: {0}</value>
+  </data>
+  <data name="TabRulesets" xml:space="preserve">
+    <value>ルールセット</value>
+  </data>
+  <data name="TabDebug" xml:space="preserve">
+    <value>デバッグ</value>
+  </data>
+  <data name="BrickProbeTuning" xml:space="preserve">
+    <value>ブリックプローブのチューニング</value>
+  </data>
+  <data name="BrickProbeEnable" xml:space="preserve">
+    <value>ブリック プローブの反転を有効にする</value>
+  </data>
+  <data name="BrickProbeMinStructure" xml:space="preserve">
+    <value>最小構造信頼度</value>
+  </data>
+  <data name="BrickProbeInvertDelta" xml:space="preserve">
+    <value>逆デルタしきい値</value>
+  </data>
+  <data name="BrickProbeLightGroutDelta" xml:space="preserve">
+    <value>ライトグラウトの輝度デルタ</value>
+  </data>
+  <data name="BrickProbeEnableTooltip" xml:space="preserve">
+    <value>レンガのタグが付けられたテクスチャの場合、プローブが凹ませるべき軽いモルタルを検出したときに、高さマップを全体的に反転するかどうかを決定します。レンガ マテリアル タグ (キーワードまたはセマンティック) が必要です。</value>
+  </data>
+  <data name="BrickProbeMinStructureTooltip" xml:space="preserve">
+    <value>強い反転パス（ジョイントの信頼性が高い大きな高さデルタ）の最小平均構造モルタル応答（0 ～ 1）。細いジョイントは多くの場合、これより下に留まります。ライトグラウト パスではこのしきい値は使用されません。</value>
+  </data>
+  <data name="BrickProbeInvertDeltaTooltip" xml:space="preserve">
+    <value>強力なパスのみ: モルタルの平均高さからレンガの平均高さを引いた値は、グローバル反転の前にこれ (0 ～ 255 スケール) を超える必要があります。値を低くすると、微妙な高さの分離でトリガーされやすくなります。</value>
+  </data>
+  <data name="BrickProbeLightGroutDeltaTooltip" xml:space="preserve">
+    <value>ライトグラウトパス: モルタルからレンガを引いた加重拡散輝度は、これ (0 ～ 1) を超える必要があります。モルタルとレンガの明るさが同程度の場合は低くなります。 Δ&gt;0 でこれが通過すると、高さマップが反転され、面がジョイントよりも高く読み取られます。</value>
+  </data>
+  <data name="PreviewBrickProbeDebug" xml:space="preserve">
+    <value>ブリック プローブのデバッグを表示 (プレビュー)</value>
+  </data>
+  <data name="PreviewBrickProbeDebugTooltip" xml:space="preserve">
+    <value>有効にすると、プレビュー パネルには、選択したテクスチャのプローブ メトリクス (マスク、平均値、高さデルタ、パスの実行を反転するラム ギャップ) が表示されます。変換は変更されません。</value>
+  </data>
+  <data name="PlantMaterialPorosityExtra" xml:space="preserve">
+    <value>有機材料の多孔性</value>
+  </data>
+  <data name="PlantMaterialPorosityExtraTooltip" xml:space="preserve">
+    <value>有機マテリアル タグ (または OptiFine プラント パス) を持つテクスチャの追加の B チャネル オフセット。空隙率バイアスの上に追加。</value>
+  </data>
+  <data name="MlSpecularHeuristicBlend" xml:space="preserve">
+    <value>ヒューリスティック / AI ブレンド</value>
+  </data>
+  <data name="MlSpecularHeuristicBlendTooltip" xml:space="preserve">
+    <value>0 = AI モデル実行時の純粋なヒューリスティック鏡面反射光。 1 = AI の完全な貢献。中間値は両方を混合します。</value>
+  </data>
+  <data name="MlSpecularBlendMode" xml:space="preserve">
+    <value>チャンネルモード</value>
+  </data>
+  <data name="MlSpecularBlendModeTooltip" xml:space="preserve">
+    <value>AI とブレンドするときにどのチャネルがヒューリスティックな貢献を受け取るかを決定します。</value>
+  </data>
+  <data name="MlSpecularBlendMath" xml:space="preserve">
+    <value>ブレンドモード</value>
+  </data>
+  <data name="MlSpecularBlendMathTooltip" xml:space="preserve">
+    <value>ブレンドされるチャンネルのヒューリスティック値と AI 値を組み合わせるために使用されるブレンド演算を選択します。</value>
+  </data>
+  <data name="MlSpecularBlendMathLinear" xml:space="preserve">
+    <value>リニア</value>
+  </data>
+  <data name="MlSpecularBlendMathSoftLight" xml:space="preserve">
+    <value>柔らかな光</value>
+  </data>
+  <data name="MlSpecularBlendMathOverlay" xml:space="preserve">
+    <value>かぶせる</value>
+  </data>
+  <data name="MlSpecularBlendMathScreen" xml:space="preserve">
+    <value>画面</value>
+  </data>
+  <data name="MlSpecularBlendMathBiasGain" xml:space="preserve">
+    <value>バイアス/ゲイン</value>
+  </data>
+  <data name="MlSpecularBlendMathSigmoidCrossfade" xml:space="preserve">
+    <value>S字状クロスフェード</value>
+  </data>
+  <data name="MlSpecularBlendModeSmoothnessOnly" xml:space="preserve">
+    <value>滑らかさのみ</value>
+  </data>
+  <data name="MlSpecularBlendModeFull" xml:space="preserve">
+    <value>満杯</value>
+  </data>
+  <data name="MlSpecularBlendModeAiMetalAndEmissive" xml:space="preserve">
+    <value>AI メタル &amp; エミッシブ</value>
+  </data>
+  <data name="SpecularForceNoEmissive" xml:space="preserve">
+    <value>エミッシブを強制しません (鏡面反射光 A)</value>
+  </data>
+  <data name="SpecularForceNoEmissiveTooltip" xml:space="preserve">
+    <value>オーバーライド: すべてのピクセルの LabPBR スペキュラ マップ アルファを 255 (放出なし) に設定します。ヒューリスティックなパレットの放出と ML の放出予測をブロックします。</value>
+  </data>
+  <data name="DeepBumpNormalIntensity" xml:space="preserve">
+    <value>ディープバンプ通常強度</value>
+  </data>
+  <data name="DeepBumpNormalIntensityTooltip" xml:space="preserve">
+    <value>DeepBump 専用の通常の XY 強度乗数。 1 = 変更なし、高い = より強力なディテール、低い = 平坦な法線。</value>
+  </data>
+  <data name="DeepBumpNormalSoftClamp" xml:space="preserve">
+    <value>ディープバンプ ソフト クランプ</value>
+  </data>
+  <data name="DeepBumpNormalSoftClampTooltip" xml:space="preserve">
+    <value>0 = 線形強度スケーリング。値を高くすると、XY 振幅にソフト Tanh クランプが適用され、90° 付近の飽和アーティファクトを軽減しながら強力なディテールが維持されます。</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedEnhance" xml:space="preserve">
+    <value>エッジガイドによる DeepBump 強化</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedStrength" xml:space="preserve">
+    <value>エッジガイダンス強度</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedStrengthTooltip" xml:space="preserve">
+    <value>強い拡散エッジでモデルの法線 XY の大きさをさらに増幅します。 0 = 無効、1 = 中、高い = エッジがシャープになります。</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedGamma" xml:space="preserve">
+    <value>エッジガイダンスガンマ</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedGammaTooltip" xml:space="preserve">
+    <value>強化が集中する場所を制御します。値を大きくすると、最も強いエッジに焦点が当てられます。値が低いほど、ソフトなエッジ全体に広がります。</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedDirectionMix" xml:space="preserve">
+    <value>エッジ方向ミックス</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedDirectionMixTooltip" xml:space="preserve">
+    <value>DeepBump の法線方向をエッジ上の拡散由来のグラデーション方向にブレンドします。 0 = モデルの方向を維持、1 = 強いエッジに完全に位置合わせします。</value>
+  </data>
+  <data name="NormalHeightTransparentAlphaClampMax" xml:space="preserve">
+    <value>通常/高さ透明アルファクランプ最大</value>
+  </data>
+  <data name="NormalHeightTransparentAlphaClampMaxTooltip" xml:space="preserve">
+    <value>ポストプロセス クランプ: 拡散アルファ ≤ この値の場合、透明領域でのアーチファクトを避けるために法線/高さ RGBA を強制的に 0 に設定します。スライダーキャップは 16 にあります。最大 255 まで入力できます。</value>
+  </data>
+  <data name="UseMlSpecularPredictor" xml:space="preserve">
+    <value>ML Specular Generator/Predictor (ONNX) を使用する</value>
+  </data>
+  <data name="UseMlSpecularPredictorTooltip" xml:space="preserve">
+    <value>有効で、デフォルトまたは解像度ごとのモデル パスが有効な場合、ピクセルごとの直接鏡面 RGBA が拡散から予測されます。オプションの解像度ごとのパス (またはバンドルされた Data/ONNX-AI/SpecLab モデル) は、テクスチャ サイズ (ceil) によって ONNX を選択します。ヒューリスティック/AI ブレンド スライダーは、クラシック ヒューリスティックと比較して使用されるモデルの量を制御します。 ML 診断のログを確認します。</value>
+  </data>
+  <data name="MlSpecularModelPath" xml:space="preserve">
+    <value>鏡面モデルのパス</value>
+  </data>
+  <data name="MlSpecularModelPathWatermark" xml:space="preserve">
+    <value>スペキュラー ジェネレーター/プレディクター ONNX ファイルへのパス</value>
+  </data>
+  <data name="MlSpecularPerResolutionHeader" xml:space="preserve">
+    <value>解像度ごとの鏡面モデル (オプション)</value>
+  </data>
+  <data name="MlSpecularPerResolutionTooltip" xml:space="preserve">
+    <value>トレーニング解像度ごとに ONNX をオーバーライドします。 Data/ONNX-AI/SpecLab の下にバンドルされたファイルが存在する場合は、それを使用するには空白のままにします。ランタイムは、設定された最小の解像度 ≥ テクスチャ サイズ (ceil) を選択します。テクスチャがすべてのキーよりも大きい場合は、最大のキーが使用されます。上記のフォールバック デフォルト パスは、解像度ごとのマップが利用できない場合にのみ適用されます。</value>
+  </data>
+  <data name="MlSpecularUseEdgeChannel" xml:space="preserve">
+    <value>鏡面モデル入力にエッジ チャネルを含める (モデルが 4 チャネルを想定している場合)</value>
+  </data>
+  <data name="MlSpecularTransparentAlphaClampMax" xml:space="preserve">
+    <value>透明アルファクランプ最大</value>
+  </data>
+  <data name="MlSpecularTransparentAlphaClampMaxTooltip" xml:space="preserve">
+    <value>ポストプロセス クランプ: 拡散アルファ ≤ この値の場合、透明領域での ML アーティファクトを避けるために鏡面反射光 RGBA を強制的に 0 に設定します。スライダーキャップは 16 にあります。最大 255 まで入力できます。</value>
+  </data>
+  <data name="SpecularDebugSection" xml:space="preserve">
+    <value>スペキュラ ML デバッグ</value>
+  </data>
+  <data name="SpecularDebugDisableHeuristicSpecular" xml:space="preserve">
+    <value>ヒューリスティックフォールバックを無効にする (マゼンタ = 非 ML)</value>
+  </data>
+  <data name="SpecularDebugDisableHeuristicSpecularTooltip" xml:space="preserve">
+    <value>従来の鏡面パスを使用するピクセルは強制的にマゼンタ (255,0,255) になります。 ML が完全に失敗した場合、テクスチャ全体はマゼンタになります。モデルがピクセルを駆動しているかどうかを明確にします。</value>
+  </data>
+  <data name="SpecularDebugSkipSpecularRemap" xml:space="preserve">
+    <value>スキップスムーズネス (R) パーセンタイルリマップ</value>
+  </data>
+  <data name="SpecularDebugSkipSpecularRemapTooltip" xml:space="preserve">
+    <value>R を 10 ～ 200 の範囲に再マップするポストステップを無効にし、モデルの出力を直接判断できるようにします。</value>
+  </data>
+  <data name="SpecularDebugVerboseSpecularMl" xml:space="preserve">
+    <value>詳細な ML 診断 (ログ)</value>
+  </data>
+  <data name="SpecularDebugVerboseSpecularMlTooltip" xml:space="preserve">
+    <value>テクスチャごとに、ロード/ランタイムの詳細と、推論が成功したときの最初のピクセルのサンプルをログに記録します。また、モデルのロードに失敗したり、形状の不一致を出力したりした場合の正確なエラーもログに記録します。</value>
+  </data>
+  <data name="ForceShaderCacheInvalidation" xml:space="preserve">
+    <value>シェーダキャッシュの無効化を強制する</value>
+  </data>
+  <data name="ForceShaderCacheInvalidationTooltip" xml:space="preserve">
+    <value>ディスク上の GPU シェーダーのバイナリ キャッシュを削除し、プレビュー シェーダーを再コンパイルします。シェーダー編集後にプレビューが古く見える場合に使用します。</value>
+  </data>
+  <data name="ShaderCacheInvalidatedLog" xml:space="preserve">
+    <value>[設定] シェーダーキャッシュがクリアされました。プレビュー シェーダーは再コンパイルされます。</value>
+  </data>
+  <data name="MinecraftAssetsFolder" xml:space="preserve">
+    <value>Minecraft アセット</value>
+  </data>
+  <data name="MinecraftAssetsFolderTooltip" xml:space="preserve">
+    <value>Minecraft バージョンのフォルダーまたは抽出されたアセット/ルートへのオプションのパス。テクスチャのみのパックのプレビュー用にバニラ ブロック モデルを解決するために使用されます。</value>
+  </data>
+  <data name="MinecraftAssetsFolderWatermark" xml:space="preserve">
+    <value>空の場合は .minecraft から自動検出されます</value>
+  </data>
+  <data name="Preview3DCameraFlyLookSensitivity" xml:space="preserve">
+    <value>フライルック感度</value>
+  </data>
+  <data name="Preview3DCameraFlyMoveSpeed" xml:space="preserve">
+    <value>飛行移動速度</value>
+  </data>
+  <data name="Preview3DCameraFlyMoveSpeedTooltip" xml:space="preserve">
+    <value>右マウスを押したままにしたときの基本 WASD 飛行速度。飛行中にマウスホイールを使用して、速度を一時的に調整します。</value>
+  </data>
+  <data name="Preview3DCameraInvertLookY" xml:space="preserve">
+    <value>反転ルック Y</value>
+  </data>
+  <data name="Preview3DCameraInvertLookYTooltip" xml:space="preserve">
+    <value>垂直マウスを反転すると、軌道カメラと飛行カメラが表示されます。</value>
+  </data>
+  <data name="Preview3DCameraFlySmoothAcceleration" xml:space="preserve">
+    <value>スムーズな飛行動作</value>
+  </data>
+  <data name="Preview3DCameraFlySmoothAccelerationTooltip" xml:space="preserve">
+    <value>即座に開始および停止する代わりに、WASD フライの出入りを容易にします。</value>
+  </data>
+  <data name="Preview3DCameraHelpOrbitPanSection" xml:space="preserve">
+    <value>オービットとパン</value>
+  </data>
+  <data name="Preview3DCameraHelpFlySection" xml:space="preserve">
+    <value>フライカメラ</value>
+  </data>
+  <data name="Preview3DCameraHelpFramingSection" xml:space="preserve">
+    <value>フレーミング</value>
+  </data>
+  <data name="Preview3DCameraHelpItemOrbitInput" xml:space="preserve">
+    <value>Alt + ドラッグ (左または中央)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemOrbitDesc" xml:space="preserve">
+    <value>ピボットを中心に周回します。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemPanInput" xml:space="preserve">
+    <value>Alt を使用せずにドラッグ (左または中央)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemPanDesc" xml:space="preserve">
+    <value>ビューをパンします。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemZoomInput" xml:space="preserve">
+    <value>マウスホイール</value>
+  </data>
+  <data name="Preview3DCameraHelpItemZoomDesc" xml:space="preserve">
+    <value>ズームインまたはズームアウトします。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyLookInput" xml:space="preserve">
+    <value>右ドラッグ</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyLookDesc" xml:space="preserve">
+    <value>周りを見回してください（フライカメラ）。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWasdInput" xml:space="preserve">
+    <value>W/A/S/D(右押し中)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWasdDesc" xml:space="preserve">
+    <value>前進し、左に掃射し、後進し、右に掃射します。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyQeInput" xml:space="preserve">
+    <value>Q/E（右押し中）</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyQeDesc" xml:space="preserve">
+    <value>上下に移動します。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyShiftInput" xml:space="preserve">
+    <value>シフト（飛行中）</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyShiftDesc" xml:space="preserve">
+    <value>より速く動きましょう。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyCtrlInput" xml:space="preserve">
+    <value>Ctrl (飛行中)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyCtrlDesc" xml:space="preserve">
+    <value>ゆっくりと（正確に）動かします。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWheelInput" xml:space="preserve">
+    <value>マウス ホイール (飛行中)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWheelDesc" xml:space="preserve">
+    <value>飛行速度を一時的に調整します。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFrameInput" xml:space="preserve">
+    <value>ダブルクリック</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFrameDesc" xml:space="preserve">
+    <value>現在の被写体をフレームに収めます。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemResetDesc" xml:space="preserve">
+    <value>デフォルトのカメラ フレームを復元します。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFocusInput" xml:space="preserve">
+    <value>プレビューをクリックします</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFocusDesc" xml:space="preserve">
+    <value>キーボード ショートカットのプレビューに焦点を当てます。</value>
+  </data>
+  <data name="Preview3DSkyDomeSection" xml:space="preserve">
+    <value>スカイドーム</value>
+  </data>
+  <data name="Preview3DAtmosphereSection" xml:space="preserve">
+    <value>雰囲気</value>
+  </data>
+  <data name="Preview3DSunSection" xml:space="preserve">
+    <value>太陽</value>
+  </data>
+  <data name="Preview3DMoonSection" xml:space="preserve">
+    <value>月</value>
+  </data>
+  <data name="Preview3DGodRayDebugSection" xml:space="preserve">
+    <value>ゴッドレイデバッグ（フロクセル）</value>
+  </data>
+  <data name="Preview3DGodRayStabilizeDebug" xml:space="preserve">
+    <value>安定化 (一時的/ジッターなし)</value>
+  </data>
+  <data name="Preview3DGodRayStabilizeDebugTooltip" xml:space="preserve">
+    <value>フロクセル/統合/アップサンプルの時間的再利用を無効にし、マーチ ジッターをフリーズします。オンにすると、ゴッド レイの調整中にパルスが停止します。</value>
+  </data>
+  <data name="Preview3DGodRayDebugDensity" xml:space="preserve">
+    <value>デバッグ密度</value>
+  </data>
+  <data name="Preview3DGodRayDebugDensityTooltip" xml:space="preserve">
+    <value>均一な参加中密度がフロクセル ボリュームに注入されるため、高さの霧や雲がなくてもゴッド レイが表示されます。 0 = 本番動作。 0.10 ～ 0.30 を試してください。</value>
+  </data>
+  <data name="Preview3DGodRayScatterGain" xml:space="preserve">
+    <value>散乱ゲイン</value>
+  </data>
+  <data name="Preview3DGodRayScatterGainTooltip" xml:space="preserve">
+    <value>統合行進におけるスキャッター内累積ゲイン (シェーダーのデフォルト 3.4)。高い = 明るいシャフト。</value>
+  </data>
+  <data name="Preview3DGodRayExtinction" xml:space="preserve">
+    <value>絶滅</value>
+  </data>
+  <data name="Preview3DGodRayExtinctionTooltip" xml:space="preserve">
+    <value>ビュー レイに沿った透過率減衰のビールランバート減衰係数 (シェーダーのデフォルトは 1.15)。高い = シャフトの密度が高く、シャフトが短い。</value>
+  </data>
+  <data name="Preview3DPreviewDebugSection" xml:space="preserve">
+    <value>3D プレビューのデバッグ</value>
+  </data>
+  <data name="Preview3DIblStrength" xml:space="preserve">
+    <value>IBLの強さ</value>
+  </data>
+  <data name="Preview3DIblStrengthTooltip" xml:space="preserve">
+    <value>環境プローブの強度 (間接的な周囲 + 反射)。モデルが空の色合いを拾いすぎる場合は低くなります。 0 はフラットなアンビエントの外観に戻ります。</value>
+  </data>
+  <data name="Preview3DEnableAtmosphericSky" xml:space="preserve">
+    <value>大気空（LUT）</value>
+  </data>
+  <data name="Preview3DEnableAtmosphericSkyTooltip" xml:space="preserve">
+    <value>LUT による大気の空の背景と周囲の応答を有効にします。</value>
+  </data>
+  <data name="Preview3DAtmosphereTurbidity" xml:space="preserve">
+    <value>大気の濁度</value>
+  </data>
+  <data name="Preview3DAtmosphereTurbidityTooltip" xml:space="preserve">
+    <value>エアロゾル密度プロキシ。値を高くすると、地平線がより霞み、夕焼けが暖かくなります。</value>
+  </data>
+  <data name="Preview3DAtmosphereSunIntensity" xml:space="preserve">
+    <value>大気の太陽の強さ</value>
+  </data>
+  <data name="Preview3DAtmosphereSunIntensityTooltip" xml:space="preserve">
+    <value>スカイパスおよび間接プローブによって使用される大気の太陽の放射輝度をスケールします。</value>
+  </data>
+  <data name="Preview3DAtmosphereHorizonFalloff" xml:space="preserve">
+    <value>大気の地平線減衰</value>
+  </data>
+  <data name="Preview3DAtmosphereHorizonFalloffTooltip" xml:space="preserve">
+    <value>地平線付近での消光ロールオフを制御します (低い = より広いグロー、高い = より狭いバンド)。</value>
+  </data>
+  <data name="Preview3DAtmosphereSkyExposure" xml:space="preserve">
+    <value>空の露出</value>
+  </data>
+  <data name="Preview3DAtmosphereSkyExposureTooltip" xml:space="preserve">
+    <value>空の合成パスの明るさをマスターします。ブルームを抑えるには低くします。</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscStrength" xml:space="preserve">
+    <value>サンディスクブルーム</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscStrengthTooltip" xml:space="preserve">
+    <value>LUT 上の太陽ディスクの周囲に追加されたグレア。低くすると柔らかいハローになります。より広い花を咲かせるには、より高くします。</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscBrightness" xml:space="preserve">
+    <value>太陽の明るさ</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscBrightnessTooltip" xml:space="preserve">
+    <value>縁が暗くなった太陽円盤の表面の明るさ。外側のブルームハローには影響しません。</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscSize" xml:space="preserve">
+    <value>太陽のサイズ</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscSizeTooltip" xml:space="preserve">
+    <value>太陽の角サイズ乗数。 1.0 = 様式化されたデフォルト。 ~0.07 は実際の太陽 (0.27 度) に一致します。オーレオールとゴッドレイコーンもスケーリングします。</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscStrength" xml:space="preserve">
+    <value>月の明るさ</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscStrengthTooltip" xml:space="preserve">
+    <value>テクスチャードムーンディスクの表面輝度乗数。</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscSize" xml:space="preserve">
+    <value>月の大きさ</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscSizeTooltip" xml:space="preserve">
+    <value>空の看板の月の角度サイズの乗数。</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonGlowStrength" xml:space="preserve">
+    <value>月の輝き</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonGlowStrengthTooltip" xml:space="preserve">
+    <value>月の縁の外側の青白い輝き。</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonTextureSharpness" xml:space="preserve">
+    <value>月の鮮明さ</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonTextureSharpnessTooltip" xml:space="preserve">
+    <value>生成された月のテクスチャのシェーダー側のシャープ化。</value>
+  </data>
+  <data name="Preview3DMoonWorldLightIntensity" xml:space="preserve">
+    <value>月世界の光</value>
+  </data>
+  <data name="Preview3DMoonWorldLightIntensityTooltip" xml:space="preserve">
+    <value>夜間にプレビュー ジオメトリを照明するための直接月光乗数。空の露出や大気の塗りつぶしは変更されません。</value>
+  </data>
+  <data name="Preview3DShowCelestialDebug" xml:space="preserve">
+    <value>太陽/月マーカー</value>
+  </data>
+  <data name="Preview3DShowCelestialDebugTooltip" xml:space="preserve">
+    <value>太陽と月の円盤の位置に四角形と十字線のマーカーを描きます。</value>
+  </data>
+  <data name="Preview3DHorizonFogStrength" xml:space="preserve">
+    <value>地平線の霧</value>
+  </data>
+  <data name="Preview3DHorizonFogStrengthTooltip" xml:space="preserve">
+    <value>スカイ ドームの地平線の下に霧が満ち、ジオメトリに空気遠近法が適用されます (0 = オフ)。</value>
+  </data>
+  <data name="Preview3DVolumetricSection" xml:space="preserve">
+    <value>体積効果</value>
+  </data>
+  <data name="Preview3DEnableGodRays" xml:space="preserve">
+    <value>神の光線</value>
+  </data>
+  <data name="Preview3DEnableGodRaysTooltip" xml:space="preserve">
+    <value>Froxel ボリューム ライトは太陽に向かって進みます (注入 + 統合 + アップサンプル)。</value>
+  </data>
+  <data name="Preview3DEnableVolumetricClouds" xml:space="preserve">
+    <value>体積雲</value>
+  </data>
+  <data name="Preview3DEnableVolumetricCloudsTooltip" xml:space="preserve">
+    <value>空パスのプロシージャル雲レイヤー (品質は以下のプリセットに従います)。</value>
+  </data>
+  <data name="Preview3DShadersSection" xml:space="preserve">
+    <value>シェーダ</value>
+  </data>
+  <data name="Preview3DVolumetricQuality" xml:space="preserve">
+    <value>フロクセルの品質</value>
+  </data>
+  <data name="Preview3DVolumetricQualityTooltip" xml:space="preserve">
+    <value>低/中/高フロクセル解像度、スライス数、雲の詳細、時間フィルタリング。</value>
+  </data>
+  <data name="Preview3DGodRayStrength" xml:space="preserve">
+    <value>神光線の強さ</value>
+  </data>
+  <data name="Preview3DGodRayStrengthTooltip" xml:space="preserve">
+    <value>加法的なゴッドレイ合成の強度 (0 = オフ)。</value>
+  </data>
+  <data name="Preview3DCloudSection" xml:space="preserve">
+    <value>クラウド層</value>
+  </data>
+  <data name="Preview3DCloudDensity" xml:space="preserve">
+    <value>密度</value>
+  </data>
+  <data name="Preview3DCloudDensityTooltip" xml:space="preserve">
+    <value>雲スラブ内の体積密度をスケールします (高い = より厚く、より不透明なパフ)。</value>
+  </data>
+  <data name="Preview3DCloudCoverageScale" xml:space="preserve">
+    <value>カバレッジ</value>
+  </data>
+  <data name="Preview3DCloudCoverageScaleTooltip" xml:space="preserve">
+    <value>地域の天気図の範囲スケール (0 = 晴天、1 = 焼き付けられた状態の地図)。</value>
+  </data>
+  <data name="Preview3DCloudLayerHeight" xml:space="preserve">
+    <value>レイヤーの高さ</value>
+  </data>
+  <data name="Preview3DCloudLayerHeightTooltip" xml:space="preserve">
+    <value>デフォルトの雲スラブのベースの高さ (ワールド単位) に垂直オフセットが追加されました。</value>
+  </data>
+  <data name="Preview3DCloudVolumeHeight" xml:space="preserve">
+    <value>層の厚さ</value>
+  </data>
+  <data name="Preview3DCloudVolumeHeightTooltip" xml:space="preserve">
+    <value>メイン積雲スラブの垂直方向の範囲 (ワールド単位)。</value>
+  </data>
+  <data name="Preview3DCloudVolumeSize" xml:space="preserve">
+    <value>特徴スケール</value>
+  </data>
+  <data name="Preview3DCloudVolumeSizeTooltip" xml:space="preserve">
+    <value>1 つのノイズ タイル サイクルのワールド サイズ (大きい = より幅広い雲の形状)。</value>
+  </data>
+  <data name="Preview3DCloudWindSpeed" xml:space="preserve">
+    <value>風速</value>
+  </data>
+  <data name="Preview3DCloudWindSpeedTooltip" xml:space="preserve">
+    <value>雲場のドリフト速度 (世界単位/秒)。</value>
+  </data>
+  <data name="Preview3DCloudWindHeading" xml:space="preserve">
+    <value>風向き</value>
+  </data>
+  <data name="Preview3DCloudWindHeadingTooltip" xml:space="preserve">
+    <value>地表上の風向き (度単位) (0 = +X)。</value>
+  </data>
+  <data name="Preview3DCloudCirrusStrength" xml:space="preserve">
+    <value>巻雲層</value>
+  </data>
+  <data name="Preview3DCloudCirrusStrengthTooltip" xml:space="preserve">
+    <value>メイン層の上の薄くて高い巻雲シートの不透明度 (0 = オフ)。</value>
+  </data>
+  <data name="Preview3DCloudDebugSection" xml:space="preserve">
+    <value>クラウドデバッグ</value>
+  </data>
+  <data name="Preview3DCloudDebugView" xml:space="preserve">
+    <value>デバッグビュー</value>
+  </data>
+  <data name="Preview3DCloudDebugViewTooltip" xml:space="preserve">
+    <value>照らされた雲をカバレッジ マップまたは中間層密度スライス オーバーレイに置き換えます。</value>
+  </data>
+  <data name="Preview3DCloudDebugViewOff" xml:space="preserve">
+    <value>オフ</value>
+  </data>
+  <data name="Preview3DCloudDebugViewCoverage" xml:space="preserve">
+    <value>カバレッジマップ</value>
+  </data>
+  <data name="Preview3DCloudDebugViewDensitySlice" xml:space="preserve">
+    <value>密度スライス</value>
+  </data>
+  <data name="Preview3DCloudDisableTemporal" xml:space="preserve">
+    <value>一時的な無効化</value>
+  </data>
+  <data name="Preview3DCloudDisableTemporalTooltip" xml:space="preserve">
+    <value>雲履歴の再投影をオフにします (ノイズや行進のステップを検査するときに役立ちます)。</value>
+  </data>
+  <data name="Preview3DCloudMarchSteps" xml:space="preserve">
+    <value>行進の歩数</value>
+  </data>
+  <data name="Preview3DCloudMarchStepsTooltip" xml:space="preserve">
+    <value>レイマーチ ステップ オーバーライド (0 = 品質プリセットに従います)。</value>
+  </data>
+  <data name="Preview3DCloudFreezeWind" xml:space="preserve">
+    <value>凍てつく風</value>
+  </data>
+  <data name="Preview3DCloudFreezeWindTooltip" xml:space="preserve">
+    <value>時間ゼロで雲の移流を保持することで、照明を調整している間形状が固定されたままになります。</value>
+  </data>
+  <data name="Preview3DEnablePreviewTaa" xml:space="preserve">
+    <value>TAA をプレビューする</value>
+  </data>
+  <data name="Preview3DEnablePreviewTaaTooltip" xml:space="preserve">
+    <value>合成されたフレームの最終的な時間的アンチエイリアシング。共有再投影ヘルパーを使用します。ゴッド レイがシーンの深さを提供するときにモーションを認識します。これがオンの間、パスごとの時間的速度は半分になります。</value>
+  </data>
+  <data name="Preview3DTimeOfDayHours" xml:space="preserve">
+    <value>時刻</value>
+  </data>
+  <data name="Preview3DTimeOfDayHoursTooltip" xml:space="preserve">
+    <value>太陽/月周期の時計時間 (0 ～ 24 時間): 6 ≈ 日の出、12 ≈ 正午、18 ≈ 日没、0/24 ≈ 星が輝く真夜中。</value>
+  </data>
+  <data name="Preview3DAnimateTimeOfDay" xml:space="preserve">
+    <value>時刻をアニメーション化する</value>
+  </data>
+  <data name="Preview3DAnimateTimeOfDayTooltip" xml:space="preserve">
+    <value>プレビューのレンダリング クロックから太陽/月のサイクルを進めます (24 秒あたりの丸一日)。</value>
+  </data>
+  <data name="Preview3DTimeOfDaySpeed" xml:space="preserve">
+    <value>サイクル速度</value>
+  </data>
+  <data name="Preview3DTimeOfDaySpeedTooltip" xml:space="preserve">
+    <value>アニメーションがオンになっている間の実際の 1 秒あたりのゲーム時間の進行数 (1 = 1 日あたり 24 秒)。</value>
+  </data>
+  <data name="Preview3DEnableShadowCascades" xml:space="preserve">
+    <value>影のカスケード</value>
+  </data>
+  <data name="Preview3DEnableShadowCascadesTooltip" xml:space="preserve">
+    <value>近距離 + 遠距離指向性シャドウ マップ。ボリューム ゴッド レイは、カメラからの距離に基づいてカスケードを選択します。</value>
+  </data>
+  <data name="Preview3DVolumetricQualityLow" xml:space="preserve">
+    <value>低い</value>
+  </data>
+  <data name="Preview3DVolumetricQualityMedium" xml:space="preserve">
+    <value>中くらい</value>
+  </data>
+  <data name="Preview3DVolumetricQualityHigh" xml:space="preserve">
+    <value>高い</value>
+  </data>
+  <data name="Preview3DParallaxAoStrength" xml:space="preserve">
+    <value>POMコンタクトAO</value>
+  </data>
+  <data name="Preview3DParallaxAoStrengthTooltip" xml:space="preserve">
+    <value>POM ハイト フィールドから導出されたローカル コンタクト アンビエント オクルージョンの強度。</value>
+  </data>
+  <data name="Preview3DEnableParallaxAo" xml:space="preserve">
+    <value>POMコンタクトAO</value>
+  </data>
+  <data name="Preview3DEnableParallaxAoTooltip" xml:space="preserve">
+    <value>視差高さフィールドからのローカル アンビエント オクルージョンの暗化を有効にします。</value>
+  </data>
+  <data name="Preview3DWorldSection" xml:space="preserve">
+    <value>世界</value>
+  </data>
+  <data name="Preview3DAnimationSection" xml:space="preserve">
+    <value>アニメーション</value>
+  </data>
+  <data name="Preview3DShowGroundMesh" xml:space="preserve">
+    <value>グラウンドメッシュ(3D)</value>
+  </data>
+  <data name="Preview3DShowGroundMeshTooltip" xml:space="preserve">
+    <value>3D プレビューでオブジェクトの下にテクスチャ付きの草地面を表示します。</value>
+  </data>
+  <data name="Preview3DEnableEntityAnimation" xml:space="preserve">
+    <value>エミュレートされたエンティティをアニメーション化する</value>
+  </data>
+  <data name="Preview3DEnableEntityAnimationTooltip" xml:space="preserve">
+    <value>エミュレートされたエンティティ モデル プレビューのレンダリング時のアイドル アニメーションを有効にします。</value>
+  </data>
+  <data name="Preview3DPauseEntityIdleAnimation" xml:space="preserve">
+    <value>アイドル状態の頂点アニメーションを一時停止する</value>
+  </data>
+  <data name="Preview3DPauseEntityIdleAnimationTooltip" xml:space="preserve">
+    <value>有効にすると、エミュレートされたエンティティ メッシュ アニメーションは、オフになるまで現在のポーズでフリーズします。従来のウォブルは別のものです (下記を参照)。</value>
+  </data>
+  <data name="Preview3DEnableLegacyEntityWobble" xml:space="preserve">
+    <value>従来のメッシュのぐらつき</value>
+  </data>
+  <data name="Preview3DEnableLegacyEntityWobbleTooltip" xml:space="preserve">
+    <value>モデル マトリックスに IR 前のメッシュ全体のボブ/ヨー/ロールを適用します。デフォルトではオフ — 代わりにリフトされた setupAnim / 定義クリップを使用します。</value>
+  </data>
+  <data name="Preview3DEntityAnimationSpeed" xml:space="preserve">
+    <value>エンティティのアニメーション速度</value>
+  </data>
+  <data name="Preview3DEntityAnimationSpeedTooltip" xml:space="preserve">
+    <value>エミュレートされたエンティティのアイドル モーションのレンダリング時間の速度乗数。</value>
+  </data>
+  <data name="Preview3DEntityAnimationAmplitude" xml:space="preserve">
+    <value>エンティティアニメーションの振幅</value>
+  </data>
+  <data name="Preview3DEntityAnimationAmplitudeTooltip" xml:space="preserve">
+    <value>エミュレートされたエンティティのアイドル モーションのレンダリング時の振幅乗数。</value>
+  </data>
+  <data name="Preview3DEntitiesSection" xml:space="preserve">
+    <value>エンティティ</value>
+  </data>
+  <data name="Preview3DViewportSection" xml:space="preserve">
+    <value>パララックス</value>
+  </data>
+  <data name="Preview3DSpritesSection" xml:space="preserve">
+    <value>スプライト</value>
+  </data>
+  <data name="Preview3DGrassSection" xml:space="preserve">
+    <value>草</value>
+  </data>
+  <data name="Preview3DGrassColormap" xml:space="preserve">
+    <value>草のカラーマップ</value>
+  </data>
+  <data name="Preview3DGrassColormapTemperature" xml:space="preserve">
+    <value>温度</value>
+  </data>
+  <data name="Preview3DGrassColormapTemperatureTooltip" xml:space="preserve">
+    <value>プレビューの色合いのために草のカラーマップをサンプリングするために使用されるバイオームの温度 (0 = 寒く、1 = 暖かい)。</value>
+  </data>
+  <data name="Preview3DGrassColormapDownfall" xml:space="preserve">
+    <value>没落</value>
+  </data>
+  <data name="Preview3DGrassColormapDownfallTooltip" xml:space="preserve">
+    <value>バイオームの湿度 / 降雨量 (0 = 乾燥、1 = 湿潤) は、プレビューの色合い付けのために草のカラーマップをサンプリングするために使用されます。</value>
+  </data>
+  <data name="Preview3DEntityAlphaMode" xml:space="preserve">
+    <value>エンティティアルファモード</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeTooltip" xml:space="preserve">
+    <value>拡散 PNG 透明度を使用してベイクしたメッシュを介して描画されたランタイム モブリグの場合、不透明は拡散アルファを無視します。カットアウトは薄い/低アルファのテクセルを破棄します (デフォルトを推奨)。複合材料を段階的にブレンドします。</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeOpaque" xml:space="preserve">
+    <value>不透明</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeCutout" xml:space="preserve">
+    <value>切り取る</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeBlend" xml:space="preserve">
+    <value>ブレンド</value>
+  </data>
+  <data name="Preview3DEnableEntityLabPbrShading" xml:space="preserve">
+    <value>エンティティの法線マップと鏡面反射光マップ</value>
+  </data>
+  <data name="Preview3DEnableEntityLabPbrShadingTooltip" xml:space="preserve">
+    <value>ランタイム モブ プレビューの場合は、生成された LabPBR 法線マップと鏡面反射光マップを使用します。特定のリグでライティングが間違っているように見える場合は無効にします。</value>
+  </data>
+  <data name="Preview3DEnableEntityParallax" xml:space="preserve">
+    <value>エンティティ視差 (POM)</value>
+  </data>
+  <data name="Preview3DEnableEntityParallaxTooltip" xml:space="preserve">
+    <value>ランタイム モブ プレビューの場合、高さマップ視差、視差 AO、および視差セルフシャドウを有効にします。デフォルトではオフです。 UV の継ぎ目でチラチラ光ることがあります。</value>
+  </data>
+  <data name="Preview3DSpriteThickness" xml:space="preserve">
+    <value>スプライトの厚さ</value>
+  </data>
+  <data name="Preview3DSpriteThicknessTooltip" xml:space="preserve">
+    <value>各不透明なスプライト テクセルを直方体に押し出します (Minecraft スタイルのアイテムの厚み付け)。 0 = フラットカード。最大 0.25 で深さを押し出します。最大では、深さは立方体ボクセルのテクセル サイズと一致します。側面には、ストレッチされた UV ではなく、フラット テクセル カラーが使用されます。</value>
+  </data>
+  <data name="WindowMinimize" xml:space="preserve">
+    <value>最小化する</value>
+  </data>
+  <data name="WindowMaximize" xml:space="preserve">
+    <value>最大化する</value>
+  </data>
+  <data name="WindowClose" xml:space="preserve">
+    <value>近い</value>
+  </data>
+  <data name="DebugMlMatch" xml:space="preserve">
+    <value>ML マッチをデバッグ…</value>
+  </data>
+  <data name="ExploreManualOverrideTooltip" xml:space="preserve">
+    <value>チェックあり = 含める、チェックなし = 除外、不確定 = 他のルールを使用する</value>
+  </data>
+  <data name="SetAsPreview" xml:space="preserve">
+    <value>プレビューとして設定</value>
+  </data>
+  <data name="TagRuleIdWatermark" xml:space="preserve">
+    <value>例えばマイタグ</value>
+  </data>
+  <data name="TagRuleDisplayNameWatermark" xml:space="preserve">
+    <value>例えば私のタグ</value>
+  </data>
+  <data name="EditAiModels" xml:space="preserve">
+    <value>AI モデルの編集</value>
+  </data>
+  <data name="EditAiModelsWarning" xml:space="preserve">
+    <value>警告: 何をしようとしているのか理解していない限り、これらのモデル パスを編集しないでください。</value>
+  </data>
+  <data name="MlResolution16x16" xml:space="preserve">
+    <value>16×16</value>
+  </data>
+  <data name="MlResolution32x32" xml:space="preserve">
+    <value>32×32</value>
+  </data>
+  <data name="MlResolution64x64" xml:space="preserve">
+    <value>64×64</value>
+  </data>
+  <data name="MlResolution128x128" xml:space="preserve">
+    <value>128×128</value>
+  </data>
+  <data name="MlResolution256x256" xml:space="preserve">
+    <value>256×256</value>
+  </data>
+  <data name="UvDebugButton" xml:space="preserve">
+    <value>UVデバッグ</value>
+  </data>
+  <data name="EntityDebugButton" xml:space="preserve">
+    <value>エンティティのデバッグ</value>
+  </data>
+  <data name="PreviewPoseLabel" xml:space="preserve">
+    <value>ポーズ</value>
+  </data>
+  <data name="PreviewSizeLabel" xml:space="preserve">
+    <value>サイズ</value>
+  </data>
+  <data name="PreviewContextTypeLabel" xml:space="preserve">
+    <value>コンテキストタイプ</value>
+  </data>
+  <data name="SelectResourcePackTitle" xml:space="preserve">
+    <value>リソース パック (.zip または .jar) を選択します</value>
+  </data>
+  <data name="SelectOutputFolderTitle" xml:space="preserve">
+    <value>出力フォルダーの選択</value>
+  </data>
+  <data name="SelectMinecraftAssetsTitle" xml:space="preserve">
+    <value>Minecraft のバージョンまたはアセット フォルダーを選択してください</value>
+  </data>
+  <data name="SemanticDebugWindowTitle" xml:space="preserve">
+    <value>MiniLM セマンティック マッチのデバッグ</value>
+  </data>
+  <data name="Preview3DCameraResetKeyFormat" xml:space="preserve">
+    <value>{0} キー</value>
+  </data>
+  <data name="CustomTagDefaultDisplayName" xml:space="preserve">
+    <value>カスタムタグ</value>
+  </data>
+  <data name="CustomRuleDefaultDisplayName" xml:space="preserve">
+    <value>カスタムルール</value>
+  </data>
+  <data name="Status_GpuPreviewStarting" xml:space="preserve">
+    <value>GPU プレビューを開始しています…</value>
+  </data>
+  <data name="Status_GpuPreviewPreparingShaderSources" xml:space="preserve">
+    <value>シェーダソースを準備しています…</value>
+  </data>
+  <data name="Status_GpuPreviewPreparing" xml:space="preserve">
+    <value>GPU プレビューを準備しています…</value>
+  </data>
+  <data name="Status_GpuPreviewClearingShaderCache" xml:space="preserve">
+    <value>シェーダ キャッシュをクリアしています…</value>
+  </data>
+  <data name="Status_GpuPreviewCompilingMainShaders" xml:space="preserve">
+    <value>メイン プレビュー シェーダーをコンパイルしています…</value>
+  </data>
+  <data name="Status_GpuPreviewCompilingShadowShaders" xml:space="preserve">
+    <value>シャドウ シェーダをコンパイルしています…</value>
+  </data>
+  <data name="Status_GpuPreviewCreatingShadowMaps" xml:space="preserve">
+    <value>シャドウ マップを作成しています…</value>
+  </data>
+  <data name="Status_GpuPreviewUploadingMeshes" xml:space="preserve">
+    <value>プレビュー メッシュをアップロードしています…</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingLineOverlay" xml:space="preserve">
+    <value>ラインオーバーレイを初期化しています…</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingSkyDome" xml:space="preserve">
+    <value>スカイドームを初期化しています…</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingAtmosphere" xml:space="preserve">
+    <value>大気を初期化しています…</value>
+  </data>
+  <data name="Status_GpuPreviewFinalizing" xml:space="preserve">
+    <value>プレビューを終了しています…</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingGodRays" xml:space="preserve">
+    <value>神光線を読み込んでいます…</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingClouds" xml:space="preserve">
+    <value>ボリュームクラウドを読み込み中…</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingTaa" xml:space="preserve">
+    <value>プレビュー TAA を読み込み中…</value>
+  </data>
+  <data name="Status_GpuPreviewReady" xml:space="preserve">
+    <value>準備ができて</value>
+  </data>
+  <data name="Status_GpuPreviewPreviewReady" xml:space="preserve">
+    <value>プレビューの準備ができました</value>
+  </data>
+  <data name="Status_GpuPreviewCoreReady" xml:space="preserve">
+    <value>コアプレビューの準備完了</value>
+  </data>
+  <data name="UvDebugTitle" xml:space="preserve">
+    <value>UVデバッグ</value>
+  </data>
+  <data name="UvDebugGlobalControls" xml:space="preserve">
+    <value>グローバル UV デバッグ コントロール</value>
+  </data>
+  <data name="UvDebugGlobalControlsDescription" xml:space="preserve">
+    <value>これらは、切り替え時にプロダクション UV ベイク ポリシーをオーバーライドします。エンティティ直方体は、デフォルトでベイクイン Java パリティを使用します。</value>
+  </data>
+  <data name="UvDebugResetOverrides" xml:space="preserve">
+    <value>オーバーライドのリセット (本番環境のデフォルト)</value>
+  </data>
+  <data name="UvDebugFlipU" xml:space="preserve">
+    <value>U を反転 (u0/u1 を入れ替え)</value>
+  </data>
+  <data name="UvDebugFlipV" xml:space="preserve">
+    <value>V を反転 (v0/v1 を入れ替え)</value>
+  </data>
+  <data name="UvDebugOffsetU" xml:space="preserve">
+    <value>U オフセット (ピクセル)</value>
+  </data>
+  <data name="UvDebugOffsetV" xml:space="preserve">
+    <value>垂直オフセット (ピクセル)</value>
+  </data>
+  <data name="UvDebugFaceSemanticRouting" xml:space="preserve">
+    <value>顔セマンティック ルーティング (変換後の顔セマンティクス)</value>
+  </data>
+  <data name="UvDebugSwapNorthSouth" xml:space="preserve">
+    <value>北/南の面ルーティングを交換</value>
+  </data>
+  <data name="UvDebugSwapEastWest" xml:space="preserve">
+    <value>面ルーティングの東/西を交換</value>
+  </data>
+  <data name="UvDebugSwapUpDown" xml:space="preserve">
+    <value>面ルーティングを上/下に切り替える</value>
+  </data>
+  <data name="UvDebugBakerConversion" xml:space="preserve">
+    <value>ベイカー UV 変換</value>
+  </data>
+  <data name="UvDebugPreserveDirectionalBounds" xml:space="preserve">
+    <value>方向性 UV 境界を保持します (最小/最大正規化を無効にします)</value>
+  </data>
+  <data name="UvDebugUseBottomLeftUvOrigin" xml:space="preserve">
+    <value>左下の UV 原点変換 (GL スタイル) を使用する</value>
+  </data>
+  <data name="UvDebugFaceCornerOrdering" xml:space="preserve">
+    <value>フェースコーナーの並び・巻き方</value>
+  </data>
+  <data name="UvDebugCornerOrderDefault" xml:space="preserve">
+    <value>デフォルト</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate90" xml:space="preserve">
+    <value>90度回転</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate180" xml:space="preserve">
+    <value>180度回転</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate270" xml:space="preserve">
+    <value>270度回転</value>
+  </data>
+  <data name="UvDebugCornerOrderReverseWinding" xml:space="preserve">
+    <value>逆巻き</value>
+  </data>
+  <data name="UvDebugGlobalFaceRotation" xml:space="preserve">
+    <value>グローバルな顔の回転</value>
+  </data>
+  <data name="UvDebugRotation0" xml:space="preserve">
+    <value>0°</value>
+  </data>
+  <data name="UvDebugRotation90" xml:space="preserve">
+    <value>90°</value>
+  </data>
+  <data name="UvDebugRotation180" xml:space="preserve">
+    <value>180°</value>
+  </data>
+  <data name="UvDebugRotation270" xml:space="preserve">
+    <value>270°</value>
+  </data>
+  <data name="UvDebugLiveChangesHint" xml:space="preserve">
+    <value>変更はライブに適用され、プレビューの更新がトリガーされます。これらを使用して、texOffs、ベイカー変換、コーナーオーダーの問題を分離します。</value>
+  </data>
+  <data name="EntityPreviewDebugTitle" xml:space="preserve">
+    <value>エンティティのプレビューのデバッグ</value>
+  </data>
+  <data name="EntityPreviewDebugBabyFixesSection" xml:space="preserve">
+    <value>Baby プレビューのライブ修正</value>
+  </data>
+  <data name="EntityPreviewDebugBabyFixesDescription" xml:space="preserve">
+    <value>Explore で赤ちゃんの体、頭、脚を分離するためのトライ/エラー スイッチ。変更はメッシュをすぐにリベイクします。赤ちゃんテクスチャ (fox_baby、cow_temperate_baby、donkey_baby など) をロードし、一度に 1 つの修正を切り替えます。</value>
+  </data>
+  <data name="EntityPreviewDebugBaselineCompare" xml:space="preserve">
+    <value>ベースライン比較</value>
+  </data>
+  <data name="EntityPreviewDebugForceCpuSkinning" xml:space="preserve">
+    <value>強制 CPU スキニング (12 フロート プレビュー VBO)</value>
+  </data>
+  <data name="EntityPreviewDebugForceCpuSkinningTooltip" xml:space="preserve">
+    <value>CPU では正しいメッシュですが、GPU では分離 ⇒ IR ウォークではなく、GPU バインド/W() パス。</value>
+  </data>
+  <data name="EntityPreviewDebugLogDrawContract" xml:space="preserve">
+    <value>ログエンティティはフレームごとにコントラクトを描画します</value>
+  </data>
+  <data name="EntityPreviewDebugLogDrawContractTooltip" xml:space="preserve">
+    <value>修正を切り替えながら、プレビュー ログで bodyY/headY/legY を確認します。</value>
+  </data>
+  <data name="EntityPreviewDebugLayerDebugFalseColor" xml:space="preserve">
+    <value>レイヤーデバッグフォールスカラー（深度バッチ）</value>
+  </data>
+  <data name="EntityPreviewDebugLayerDebugFalseColorTooltip" xml:space="preserve">
+    <value>PreviewDepthLayerKind によって各描画バッチに色合いを付けます (ベース グレー、カットアウト シアン、装飾用マゼンタ、発光イエロー)。</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseCompose" xml:space="preserve">
+    <value>パーツポーズ合成（メッシュのリベイク）</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseErTimesT" xml:space="preserve">
+    <value>Er×T（プロダクション）</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseLegacyTxEr" xml:space="preserve">
+    <value>T×Er（レガシーアダルトエクスプローバル）</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseLegacyTxErTooltip" xml:space="preserve">
+    <value>通常、大人にとっては間違いです。親の回転に沿って手足が外れた場合は、赤ちゃんを試着してください。</value>
+  </data>
+  <data name="EntityPreviewDebugLerFold" xml:space="preserve">
+    <value>LER フォールド (メッシュをリベイク)</value>
+  </data>
+  <data name="EntityPreviewDebugLerPolicyDefault" xml:space="preserve">
+    <value>ポリシーのデフォルト</value>
+  </data>
+  <data name="EntityPreviewDebugLerStandardWorldRoot" xml:space="preserve">
+    <value>StandardWorldRoot (S・M列)</value>
+  </data>
+  <data name="EntityPreviewDebugLerRightComposeLocalChain" xml:space="preserve">
+    <value>RightComposeLocalChain (M・S)</value>
+  </data>
+  <data name="EntityPreviewDebugLerRightComposeLocalChainTooltip" xml:space="preserve">
+    <value>要素ごとの M×S — 四足動物の回転した直方体の本体を切り離すことができます。</value>
+  </data>
+  <data name="EntityPreviewDebugLerSkip" xml:space="preserve">
+    <value>LERをスキップ</value>
+  </data>
+  <data name="EntityPreviewDebugPartTreeRepair" xml:space="preserve">
+    <value>パーツツリーの修理</value>
+  </data>
+  <data name="EntityPreviewDebugSkipAllPartTreeRepair" xml:space="preserve">
+    <value>すべてのパートツリー修復をスキップ (生のリフトされた IR)</value>
+  </data>
+  <data name="EntityPreviewDebugSkipAllPartTreeRepairTooltip" xml:space="preserve">
+    <value>GeometryIrPartTreeRepair を完全にバイパスします。ベイビーフィックスの前にリフターの出力を参照してください。</value>
+  </data>
+  <data name="EntityPreviewDebugIndividualRepairSteps" xml:space="preserve">
+    <value>個別の修復手順 (製造デフォルトはオン)</value>
+  </data>
+  <data name="EntityPreviewDebugIndividualRepairStepsDescription" xml:space="preserve">
+    <value>ステップのチェックを外して、それが現在の赤ちゃんに役立つか害を与えるかを確認します。すべてスキップはこれらをオーバーライドします。</value>
+  </data>
+  <data name="EntityPreviewDebugRepairGlobalReparent" xml:space="preserve">
+    <value>グローバル リペアレント (耳、頭→ヘッドパーツ、角、そよ風、…)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairQuadrupedLegReparent" xml:space="preserve">
+    <value>四足の脚は体の下にあります</value>
+  </data>
+  <data name="EntityPreviewDebugRepairQuadrupedLegReparentTooltip" xml:space="preserve">
+    <value>フラット ルート ベイクではない場合 — 赤ちゃんロバ/馬のヘッドスタック クラスは、以下のヘッドスタック ルールを使用します。</value>
+  </data>
+  <data name="EntityPreviewDebugRepairForceLegReparent" xml:space="preserve">
+    <value>フラット四足ベイクで脚の親を強制的に再親化します (実験的)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairForceLegReparentTooltip" xml:space="preserve">
+    <value>キツネ/ウシ/ニワトリの赤ちゃんを試してみてください。脚は体と相対的なオフセットを持つルート兄弟のままです。</value>
+  </data>
+  <data name="EntityPreviewDebugRepairHeadStackLegReparent" xml:space="preserve">
+    <value>ネストされたヘッドスタック: 平らな根の脚を再親化します (赤ちゃんウマ)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairHeadStackLegReparentTooltip" xml:space="preserve">
+    <value>BabyHorseModel / BabyDonkeyModel — 頭は体の下にありますが、足はまだ根元にあります。</value>
+  </data>
+  <data name="EntityPreviewDebugRepairRemoveDuplicateRootSiblings" xml:space="preserve">
+    <value>重複したルート兄弟を削除する</value>
+  </data>
+  <data name="EntityPreviewDebugRepairCollapseInnerBody" xml:space="preserve">
+    <value>インナーボディを折りたたむ / ボディの下にフリーストリム</value>
+  </data>
+  <data name="EntityPreviewDebugRepairDeduplicateNestedPartIds" xml:space="preserve">
+    <value>ネストされたパーツ ID の重複を排除する</value>
+  </data>
+  <data name="EntityPreviewDebugRepairZeroEquineRootOffset" xml:space="preserve">
+    <value>ゼロ equine createBodyLayer ルート オフセット (馬/ロバ)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairZeroEquineRootOffsetTooltip" xml:space="preserve">
+    <value>馬の createBodyLayer/createBabyLayer ベイクにルート T(0,24,0) アンカーをドロップします。</value>
+  </data>
+  <data name="EntityPreviewDebugSuggestedWorkflow" xml:space="preserve">
+    <value>推奨される赤ちゃんワークフロー: (1) すべてスキップして生の IR を確認する、(2) 本番ステップを 1 つずつ再度有効にする、(3) 馬の赤ちゃんに脚の再ペアレントまたはヘッドスタック ルールを強制的に試す、(4) CPU と GPU スキニングを比較する、(5) クラスターがまだドリフトしている場合にのみ、T×Er または RightCompose LER を試す。</value>
+  </data>
+  <data name="AiTaggingSection" xml:space="preserve">
+    <value>AI タグ付け</value>
+  </data>
+  <data name="NormalsAndHeightSection" xml:space="preserve">
+    <value>法線と高さ</value>
+  </data>
+  <data name="NormalsSection" xml:space="preserve">
+    <value>法線</value>
+  </data>
+  <data name="SpecularSection" xml:space="preserve">
+    <value>滑らかさ</value>
+  </data>
+  <data name="MetalnessSection" xml:space="preserve">
+    <value>金属性</value>
+  </data>
+  <data name="SpecularPorositySection" xml:space="preserve">
+    <value>気孔率</value>
+  </data>
+  <data name="AiDrivenPbrSection" xml:space="preserve">
+    <value>AI 主導の PBR</value>
+  </data>
+  <data name="AiNormalsSection" xml:space="preserve">
+    <value>AI 法線</value>
+  </data>
+  <data name="AiSpecularSection" xml:space="preserve">
+    <value>AI スペキュラー</value>
+  </data>
+  <data name="Preview3DCameraExpanderSection" xml:space="preserve">
+    <value>カメラ</value>
+  </data>
 </root>
 
 

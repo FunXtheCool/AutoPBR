@@ -102,7 +102,7 @@
   <data name="ExploreCollapseAll" xml:space="preserve"><value>सभी संक्षिप्त करें</value></data>
   <data name="ExploreBack" xml:space="preserve"><value>वापस</value></data>
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
-  <data name="TabNormals" xml:space="preserve"><value>नॉर्मल</value></data>
+  <data name="TabNormals" xml:space="preserve"><value>समायोजन</value></data>
   <data name="TabShader" xml:space="preserve"><value>रेंडर</value></data>
   <data name="TabSettings" xml:space="preserve"><value>सेटिंग्स</value></data>
   <data name="Input" xml:space="preserve"><value>इनपुट</value></data>
@@ -185,11 +185,11 @@
   <data name="PreprocessFrequencySplit" xml:space="preserve"><value>फ्रीक्वेंसी स्प्लिट (मैक्रो + डिटेल)</value></data>
   <data name="PreprocessFrequencyRadius" xml:space="preserve"><value>फ्रीक्वेंसी रेडियस</value></data>
   <data name="PreprocessFrequencyDetailStrength" xml:space="preserve"><value>डिटेल स्ट्रेंथ</value></data>
-  <data name="SpecularAdvanced" xml:space="preserve"><value>स्पेक्युलर (उन्नत)</value></data>
+  <data name="SpecularAdvanced" xml:space="preserve"><value>चैनल</value></data>
   <data name="SpecularPercentileRemap" xml:space="preserve"><value>स्मूथनेस (R) को परसेंटाइल रीमैप करें</value></data>
   <data name="SpecularRemapLowPercentile" xml:space="preserve"><value>लो परसेंटाइल</value></data>
   <data name="SpecularRemapHighPercentile" xml:space="preserve"><value>हाई परसेंटाइल</value></data>
-  <data name="AoAdvanced" xml:space="preserve"><value>एंबियंट ऑक्लूज़न (AO)</value></data>
+  <data name="AoAdvanced" xml:space="preserve"><value>एम्बिएंट ऑक्लूजन</value></data>
   <data name="GenerateAo" xml:space="preserve"><value>नॉर्मल (ब्लू चैनल) में AO बेक करें</value></data>
   <data name="AoRadius" xml:space="preserve"><value>AO रेडियस</value></data>
   <data name="AoStrength" xml:space="preserve"><value>AO स्ट्रेंथ</value></data>
@@ -303,6 +303,1260 @@
   <data name="Preview3DSpritePlaneCount" xml:space="preserve"><value>स्प्राइट प्लेन संख्या</value></data>
   <data name="Preview3DSpritePlaneCountTooltip" xml:space="preserve"><value>3D पूर्वावलोकन में 2D Sprite फ्लैग वाली टेक्सचर के लिए क्रॉस्ड प्लेन्स की संख्या।</value></data>
   <data name="Preview3DCameraDebugFlyHint" xml:space="preserve"><value>राइट-ड्रैग: देखें · राइट होल्ड + WASD: फ्लाई · R: ऑर्बिट और ऑफसेट रीसेट</value></data>
+  <data name="ClearTagOverrides" xml:space="preserve">
+    <value>टैग ओवरराइड साफ़ करें</value>
+  </data>
+  <data name="ClearTagOverridesTooltip" xml:space="preserve">
+    <value>इस पैक के लिए सभी मैन्युअल टैग जोड़ें/निकालें को रीसेट करें।</value>
+  </data>
+  <data name="TagMenuDontApply" xml:space="preserve">
+    <value>यहां '{0}' लागू न करें</value>
+  </data>
+  <data name="TagMenuApply" xml:space="preserve">
+    <value>यहां '{0}' लागू करें</value>
+  </data>
+  <data name="TagRules" xml:space="preserve">
+    <value>टैग नियम</value>
+  </data>
+  <data name="TagRulesCustomDescription" xml:space="preserve">
+    <value>अनुमानी और/या एआई प्रसंस्करण का मार्गदर्शन करने के लिए अपने स्वयं के नियम-सेट संपादित करें</value>
+  </data>
+  <data name="RulesetsBuiltInTags" xml:space="preserve">
+    <value>अंतर्निर्मित टैग</value>
+  </data>
+  <data name="RulesetsBuiltInFlags" xml:space="preserve">
+    <value>अंतर्निर्मित झंडे</value>
+  </data>
+  <data name="RulesetsBuiltInExpressions" xml:space="preserve">
+    <value>अंतर्निहित नियम</value>
+  </data>
+  <data name="RulesetsSystemRules" xml:space="preserve">
+    <value>सिस्टम-गणना नियम</value>
+  </data>
+  <data name="RulesetsSystemRulesDescription" xml:space="preserve">
+    <value>भारित और अभारित की गणना रनटाइम पर सिमेंटिक रिज़ॉल्यूशन द्वारा की जाती है और संपादन योग्य नहीं होती है।</value>
+  </data>
+  <data name="RulesetsCustomExpressions" xml:space="preserve">
+    <value>कस्टम नियम</value>
+  </data>
+  <data name="RulesetsKeywords" xml:space="preserve">
+    <value>कीवर्ड</value>
+  </data>
+  <data name="RulesetsSemanticHints" xml:space="preserve">
+    <value>अर्थ संबंधी संकेत</value>
+  </data>
+  <data name="RulesetsManageTokens" xml:space="preserve">
+    <value>टोकन प्रबंधित करें</value>
+  </data>
+  <data name="RulesetsAddCondition" xml:space="preserve">
+    <value>शर्त जोड़ें</value>
+  </data>
+  <data name="RulesetsAddAction" xml:space="preserve">
+    <value>क्रिया जोड़ें</value>
+  </data>
+  <data name="RulesetsEnableExpression" xml:space="preserve">
+    <value>अभिव्यक्ति सक्षम करें</value>
+  </data>
+  <data name="RulesetsExpression" xml:space="preserve">
+    <value>अभिव्यक्ति</value>
+  </data>
+  <data name="RulesetsConditions" xml:space="preserve">
+    <value>स्थितियाँ</value>
+  </data>
+  <data name="RulesetsActions" xml:space="preserve">
+    <value>कार्रवाई</value>
+  </data>
+  <data name="RulesetsRemove" xml:space="preserve">
+    <value>निकालना</value>
+  </data>
+  <data name="RulesetsRemoveLast" xml:space="preserve">
+    <value>अंतिम हटाएँ</value>
+  </data>
+  <data name="RulesetsValueWatermark" xml:space="preserve">
+    <value>कीमत</value>
+  </data>
+  <data name="RulesetsShowLess" xml:space="preserve">
+    <value>कम दिखाएँ</value>
+  </data>
+  <data name="RulesetsMoreCount" xml:space="preserve">
+    <value>{0} अधिक</value>
+  </data>
+  <data name="TagRuleId" xml:space="preserve">
+    <value>पहचान</value>
+  </data>
+  <data name="TagRuleDisplayName" xml:space="preserve">
+    <value>प्रदर्शित होने वाला नाम</value>
+  </data>
+  <data name="TagRuleKeywords" xml:space="preserve">
+    <value>कीवर्ड</value>
+  </data>
+  <data name="TagRuleSemanticHints" xml:space="preserve">
+    <value>अर्थ संबंधी संकेत (अल्पविराम से अलग, वैकल्पिक)</value>
+  </data>
+  <data name="MaterialTagSemanticMlDescription" xml:space="preserve">
+    <value>Data/ONNX-AI/all-MiniLM-L6-v2-onnx के अंतर्गत बंडल किए गए ONNX मॉडल का उपयोग करता है (model.onnx की आवश्यकता है)। सक्षम होने पर, स्वचालित टैग केवल MiniLM से आते हैं (कीवर्ड नियमों का उपयोग ऑटो-टैगिंग के लिए नहीं किया जाता है)। मैन्युअल टैग जोड़ना/निकालना अभी भी शीर्ष पर लागू होता है।</value>
+  </data>
+  <data name="MaterialTagMaxCountTooltip" xml:space="preserve">
+    <value>सिमेंटिक मिलान द्वारा लौटाए गए अधिकतम सामग्री टैग। कुछ अंतर्निहित अयस्क/सामग्री युग्मन नियम और स्वचालित झंडे अभी भी इस मूल्य से परे आवश्यक टैग जोड़ सकते हैं।</value>
+  </data>
+  <data name="MaterialTagCertaintyThresholdTooltip" xml:space="preserve">
+    <value>यदि सर्वोत्तम सिमेंटिक मिलान इस स्कोर से नीचे है, तो केवल अज्ञात का सुझाव दिया जाता है (कोसाइन समानता 0-1)।</value>
+  </data>
+  <data name="TagLegendMaterials" xml:space="preserve">
+    <value>सामग्री</value>
+  </data>
+  <data name="TagLegendFlags" xml:space="preserve">
+    <value>झंडे</value>
+  </data>
+  <data name="ExploreColumnResource" xml:space="preserve">
+    <value>संसाधन</value>
+  </data>
+  <data name="TagRuleKindLabel" xml:space="preserve">
+    <value>दयालु</value>
+  </data>
+  <data name="AddCustomTag" xml:space="preserve">
+    <value>कस्टम टैग जोड़ें</value>
+  </data>
+  <data name="AddCustomRule" xml:space="preserve">
+    <value>कस्टम नियम जोड़ें</value>
+  </data>
+  <data name="RemoveTagRule" xml:space="preserve">
+    <value>निकालना</value>
+  </data>
+  <data name="RefreshTagRules" xml:space="preserve">
+    <value>ताज़ा करना</value>
+  </data>
+  <data name="InvertHeight" xml:space="preserve">
+    <value>उलटी ऊंचाई</value>
+  </data>
+  <data name="InvertSpecular" xml:space="preserve">
+    <value>उलटा स्पेक्युलर</value>
+  </data>
+  <data name="TagRuleNormalIntensityOpt" xml:space="preserve">
+    <value>सामान्य × (ऑप्ट.)</value>
+  </data>
+  <data name="TagRuleHeightIntensityOpt" xml:space="preserve">
+    <value>ऊँचाई × (ऑप्ट.)</value>
+  </data>
+  <data name="TagRuleIntensityTooltip" xml:space="preserve">
+    <value>वैश्विक ट्यून मानों का उपयोग करने के लिए खाली छोड़ें। उदाहरण: 0.85 नरम सामान्य, 0.07 सूक्ष्म ऊँचाई।</value>
+  </data>
+  <data name="TagRuleInvertNormalX" xml:space="preserve">
+    <value>सामान्य X को उलटा करें</value>
+  </data>
+  <data name="TagRuleInvertNormalY" xml:space="preserve">
+    <value>सामान्य Y को उल्टा करें</value>
+  </data>
+  <data name="TagRuleEnabled" xml:space="preserve">
+    <value>इस नियम का प्रयोग करें</value>
+  </data>
+  <data name="TagRuleEnabledTooltip" xml:space="preserve">
+    <value>अनियंत्रित होने पर, इस नियम को लेजेंड और एक्सप्लोर से बाहर कर दिया जाता है। अद्यतन करने के लिए ताज़ा करें पर क्लिक करें।</value>
+  </data>
+  <data name="TagRuleMoveUp" xml:space="preserve">
+    <value>↑</value>
+  </data>
+  <data name="TagRuleMoveDown" xml:space="preserve">
+    <value>↓</value>
+  </data>
+  <data name="TagRuleMoveUpTooltip" xml:space="preserve">
+    <value>नियम को ऊपर ले जाएं (विलय आदेश)</value>
+  </data>
+  <data name="TagRuleMoveDownTooltip" xml:space="preserve">
+    <value>नियम को नीचे ले जाएँ (विलय आदेश)</value>
+  </data>
+  <data name="ExportTagRules" xml:space="preserve">
+    <value>निर्यात नियम...</value>
+  </data>
+  <data name="ImportTagRules" xml:space="preserve">
+    <value>आयात नियम…</value>
+  </data>
+  <data name="ExportTagRulesTooltip" xml:space="preserve">
+    <value>कस्टम टैग नियमों को JSON के रूप में सहेजें (बैकअप या CLI --टैग-नियमों के लिए)।</value>
+  </data>
+  <data name="ImportTagRulesTooltip" xml:space="preserve">
+    <value>JSON फ़ाइल से कस्टम नियम बदलें।</value>
+  </data>
+  <data name="RefreshTagRulesTooltip" xml:space="preserve">
+    <value>मौजूदा नियमों के साथ पेड़ और किंवदंती को अपडेट करें।</value>
+  </data>
+  <data name="Log_TagRulesExported" xml:space="preserve">
+    <value>निर्यातित कस्टम टैग नियम.</value>
+  </data>
+  <data name="Log_TagRulesImported" xml:space="preserve">
+    <value>आयातित {0} कस्टम टैग नियम।</value>
+  </data>
+  <data name="Log_TagRulesImportFailed" xml:space="preserve">
+    <value>टैग नियम आयात विफल: {0}</value>
+  </data>
+  <data name="TabRulesets" xml:space="preserve">
+    <value>नियम-सेट</value>
+  </data>
+  <data name="TabDebug" xml:space="preserve">
+    <value>डिबग</value>
+  </data>
+  <data name="BrickProbeTuning" xml:space="preserve">
+    <value>ईंट जांच ट्यूनिंग</value>
+  </data>
+  <data name="BrickProbeEnable" xml:space="preserve">
+    <value>ईंट जांच उलटा सक्षम करें</value>
+  </data>
+  <data name="BrickProbeMinStructure" xml:space="preserve">
+    <value>न्यूनतम संरचना आत्मविश्वास</value>
+  </data>
+  <data name="BrickProbeInvertDelta" xml:space="preserve">
+    <value>डेल्टा थ्रेशोल्ड को उल्टा करें</value>
+  </data>
+  <data name="BrickProbeLightGroutDelta" xml:space="preserve">
+    <value>लाइट ग्राउट ल्यूमिनेंस डेल्टा</value>
+  </data>
+  <data name="BrickProbeEnableTooltip" xml:space="preserve">
+    <value>टैग की गई ईंट की बनावट के लिए, यह तय करें कि जब जांच हल्के मोर्टार का पता लगाती है तो ऊंचाई मानचित्र को विश्व स्तर पर उलटा किया जाना चाहिए या नहीं। ईंट सामग्री टैग (कीवर्ड या सिमेंटिक) की आवश्यकता है।</value>
+  </data>
+  <data name="BrickProbeMinStructureTooltip" xml:space="preserve">
+    <value>मजबूत उलटा पथ (उच्च संयुक्त आत्मविश्वास के साथ बड़ी ऊंचाई का डेल्टा) के लिए न्यूनतम औसत संरचनात्मक मोर्टार प्रतिक्रिया (0-1)। पतले जोड़ अक्सर इसके नीचे रहते हैं; लाइट-ग्राउट पथ इस सीमा का उपयोग नहीं करता है।</value>
+  </data>
+  <data name="BrickProbeInvertDeltaTooltip" xml:space="preserve">
+    <value>केवल मजबूत पथ: मोर्टार माध्य ऊंचाई शून्य से ईंट माध्य ऊंचाई वैश्विक उलटा से पहले इस (0-255 स्केल) से अधिक होनी चाहिए। सूक्ष्म ऊंचाई पृथक्करण पर कम मान अधिक आसानी से ट्रिगर होते हैं।</value>
+  </data>
+  <data name="BrickProbeLightGroutDeltaTooltip" xml:space="preserve">
+    <value>लाइट-ग्राउट पथ: मोर्टार माइनस ईंट पर भारित विसरित चमक इस (0-1) से अधिक होनी चाहिए। यदि मोर्टार और ईंट की चमक समान हो तो कम करें। जब Δ&gt;0 और यह गुजरता है, तो ऊंचाई का नक्शा उलटा हो जाता है ताकि चेहरे जोड़ों की तुलना में ऊंचे दिखें।</value>
+  </data>
+  <data name="PreviewBrickProbeDebug" xml:space="preserve">
+    <value>ईंट जांच डिबग दिखाएँ (पूर्वावलोकन)</value>
+  </data>
+  <data name="PreviewBrickProbeDebugTooltip" xml:space="preserve">
+    <value>सक्षम होने पर, पूर्वावलोकन पैनल चयनित बनावट के लिए जांच मेट्रिक्स (मास्क, माध्य, ऊंचाई डेल्टा, लम गैप, कौन सा उलटा पथ चला) दिखाता है। रूपांतरण अपरिवर्तित है.</value>
+  </data>
+  <data name="PlantMaterialPorosityExtra" xml:space="preserve">
+    <value>जैविक सामग्री अतिरिक्त सरंध्रता</value>
+  </data>
+  <data name="PlantMaterialPorosityExtraTooltip" xml:space="preserve">
+    <value>ऑर्गेनिक सामग्री टैग (या ऑप्टिफाइन प्लांट पथ) के साथ बनावट के लिए अतिरिक्त बी-चैनल ऑफसेट। सरंध्रता पूर्वाग्रह के शीर्ष पर जोड़ा गया।</value>
+  </data>
+  <data name="MlSpecularHeuristicBlend" xml:space="preserve">
+    <value>ह्यूरिस्टिक/एआई ब्लेंड</value>
+  </data>
+  <data name="MlSpecularHeuristicBlendTooltip" xml:space="preserve">
+    <value>0 = जब एआई मॉडल चलता है तो शुद्ध अनुमानी स्पेक्युलर; 1 = पूर्ण एआई योगदान। मध्यवर्ती मान दोनों को मिलाते हैं।</value>
+  </data>
+  <data name="MlSpecularBlendMode" xml:space="preserve">
+    <value>चैनल मोड</value>
+  </data>
+  <data name="MlSpecularBlendModeTooltip" xml:space="preserve">
+    <value>यह निर्धारित करता है कि एआई के साथ मिश्रण करते समय कौन से चैनल अनुमानी योगदान प्राप्त करते हैं।</value>
+  </data>
+  <data name="MlSpecularBlendMath" xml:space="preserve">
+    <value>ब्लेंड मोड</value>
+  </data>
+  <data name="MlSpecularBlendMathTooltip" xml:space="preserve">
+    <value>मिश्रित किए गए चैनलों के लिए अनुमानी और एआई मानों को संयोजित करने के लिए उपयोग किए जाने वाले मिश्रण गणित का चयन करता है।</value>
+  </data>
+  <data name="MlSpecularBlendMathLinear" xml:space="preserve">
+    <value>रेखीय</value>
+  </data>
+  <data name="MlSpecularBlendMathSoftLight" xml:space="preserve">
+    <value>नरम रोशनी</value>
+  </data>
+  <data name="MlSpecularBlendMathOverlay" xml:space="preserve">
+    <value>उपरिशायी</value>
+  </data>
+  <data name="MlSpecularBlendMathScreen" xml:space="preserve">
+    <value>स्क्रीन</value>
+  </data>
+  <data name="MlSpecularBlendMathBiasGain" xml:space="preserve">
+    <value>पूर्वाग्रह/लाभ</value>
+  </data>
+  <data name="MlSpecularBlendMathSigmoidCrossfade" xml:space="preserve">
+    <value>सिग्मॉइड क्रॉसफ़ेड</value>
+  </data>
+  <data name="MlSpecularBlendModeSmoothnessOnly" xml:space="preserve">
+    <value>केवल चिकनाई</value>
+  </data>
+  <data name="MlSpecularBlendModeFull" xml:space="preserve">
+    <value>भरा हुआ</value>
+  </data>
+  <data name="MlSpecularBlendModeAiMetalAndEmissive" xml:space="preserve">
+    <value>एआई मेटल और एमिसिव</value>
+  </data>
+  <data name="SpecularForceNoEmissive" xml:space="preserve">
+    <value>बल कोई उत्सर्जक नहीं (स्पेक्युलर ए)</value>
+  </data>
+  <data name="SpecularForceNoEmissiveTooltip" xml:space="preserve">
+    <value>ओवरराइड: सभी पिक्सेल के लिए LabPBR स्पेक्युलर मैप अल्फा को 255 (कोई उत्सर्जन नहीं) पर सेट करें। अनुमानी पैलेट उत्सर्जन और एमएल उत्सर्जक भविष्यवाणियों को रोकता है।</value>
+  </data>
+  <data name="DeepBumpNormalIntensity" xml:space="preserve">
+    <value>डीपबम्प सामान्य शक्ति</value>
+  </data>
+  <data name="DeepBumpNormalIntensityTooltip" xml:space="preserve">
+    <value>डीपबम्प-केवल सामान्य XY शक्ति गुणक। 1 = अपरिवर्तित, उच्चतर = मजबूत विवरण, निचला = सपाट सामान्य।</value>
+  </data>
+  <data name="DeepBumpNormalSoftClamp" xml:space="preserve">
+    <value>डीपबम्प सॉफ्ट क्लैंप</value>
+  </data>
+  <data name="DeepBumpNormalSoftClampTooltip" xml:space="preserve">
+    <value>0 = रैखिक शक्ति स्केलिंग। उच्च मान XY परिमाण के लिए एक नरम टैन क्लैंप लागू करते हैं, जो लगभग 90° संतृप्ति कलाकृतियों को कम करते हुए मजबूत विवरण रखते हैं।</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedEnhance" xml:space="preserve">
+    <value>एज-गाइडेड डीपबम्प एन्हांसमेंट</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedStrength" xml:space="preserve">
+    <value>धार मार्गदर्शन शक्ति</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedStrengthTooltip" xml:space="preserve">
+    <value>मजबूत विसरित किनारों पर मॉडल के सामान्य XY परिमाण को अधिक बढ़ाता है। 0 = अक्षम, 1 = मध्यम, उच्चतर = तेज़ किनारे।</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedGamma" xml:space="preserve">
+    <value>एज गाइडेंस गामा</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedGammaTooltip" xml:space="preserve">
+    <value>नियंत्रित करता है कि एन्हांसमेंट कहाँ केंद्रित है। उच्च मूल्य सबसे मजबूत किनारों पर ध्यान केंद्रित करते हैं; निम्न मान नरम किनारों पर फैलते हैं।</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedDirectionMix" xml:space="preserve">
+    <value>एज डायरेक्शन मिक्स</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedDirectionMixTooltip" xml:space="preserve">
+    <value>डीपबम्प सामान्य दिशा को किनारों पर विसरित-व्युत्पन्न ढाल दिशा की ओर मिश्रित करता है। 0 = मॉडल की दिशा बनाए रखें, 1 = मजबूत किनारों पर पूरी तरह से संरेखित करें।</value>
+  </data>
+  <data name="NormalHeightTransparentAlphaClampMax" xml:space="preserve">
+    <value>सामान्य/ऊंचाई पारदर्शी अल्फा क्लैंप मैक्स</value>
+  </data>
+  <data name="NormalHeightTransparentAlphaClampMaxTooltip" xml:space="preserve">
+    <value>पोस्ट-प्रोसेस क्लैंप: यदि फैलाना अल्फा ≤ यह मान है, तो पारदर्शी क्षेत्रों में कलाकृतियों से बचने के लिए सामान्य/ऊंचाई आरजीबीए को 0 पर मजबूर करें। 16 पर स्लाइडर कैप्स; आप 255 तक टाइप कर सकते हैं।</value>
+  </data>
+  <data name="UseMlSpecularPredictor" xml:space="preserve">
+    <value>एमएल स्पेक्युलर जेनरेटर/प्रेडिक्टर (ONNX) का उपयोग करें</value>
+  </data>
+  <data name="UseMlSpecularPredictorTooltip" xml:space="preserve">
+    <value>जब सक्षम किया जाता है और एक डिफ़ॉल्ट या प्रति-रिज़ॉल्यूशन मॉडल पथ मान्य होता है, तो प्रत्यक्ष प्रति-पिक्सेल स्पेक्युलर आरजीबीए का प्रसार से अनुमान लगाया जाता है। वैकल्पिक प्रति-रिज़ॉल्यूशन पथ (या बंडल किए गए डेटा/ONNX-AI/SpecLab मॉडल) बनावट आकार (सीआईएल) द्वारा ONNX चुनें। ह्यूरिस्टिक/एआई ब्लेंड स्लाइडर नियंत्रित करता है कि क्लासिक ह्यूरिस्टिक की तुलना में मॉडल का कितना उपयोग किया जाता है। एमएल डायग्नोस्टिक्स के लिए लॉग की जाँच करें।</value>
+  </data>
+  <data name="MlSpecularModelPath" xml:space="preserve">
+    <value>स्पेक्युलर मॉडल पथ</value>
+  </data>
+  <data name="MlSpecularModelPathWatermark" xml:space="preserve">
+    <value>स्पेक्युलर जनरेटर/भविष्यवक्ता ONNX फ़ाइल का पथ</value>
+  </data>
+  <data name="MlSpecularPerResolutionHeader" xml:space="preserve">
+    <value>प्रति-रिज़ॉल्यूशन स्पेक्युलर मॉडल (वैकल्पिक)</value>
+  </data>
+  <data name="MlSpecularPerResolutionTooltip" xml:space="preserve">
+    <value>प्रति प्रशिक्षण संकल्प ONNX को ओवरराइड करें। मौजूद होने पर Data/ONNX-AI/SpecLab के अंतर्गत बंडल की गई फ़ाइलों का उपयोग करने के लिए खाली छोड़ दें। रनटाइम सबसे छोटा कॉन्फ़िगर किया गया रिज़ॉल्यूशन ≥ बनावट आकार (सील) चुनता है; यदि बनावट सभी कुंजियों से बड़ी है, तो सबसे बड़ी कुंजी का उपयोग किया जाता है। उपरोक्त फ़ॉलबैक डिफ़ॉल्ट पथ केवल तभी लागू होता है जब कोई प्रति-रिज़ॉल्यूशन मानचित्र उपलब्ध नहीं होता है।</value>
+  </data>
+  <data name="MlSpecularUseEdgeChannel" xml:space="preserve">
+    <value>स्पेक्युलर मॉडल इनपुट के लिए एज चैनल शामिल करें (यदि मॉडल 4 चैनलों की अपेक्षा करता है)</value>
+  </data>
+  <data name="MlSpecularTransparentAlphaClampMax" xml:space="preserve">
+    <value>पारदर्शी अल्फा क्लैंप मैक्स</value>
+  </data>
+  <data name="MlSpecularTransparentAlphaClampMaxTooltip" xml:space="preserve">
+    <value>पोस्ट-प्रोसेस क्लैंप: यदि फैलाना अल्फा ≤ यह मान है, तो पारदर्शी क्षेत्रों में एमएल कलाकृतियों से बचने के लिए स्पेक्युलर आरजीबीए को 0 पर मजबूर करें। 16 पर स्लाइडर कैप्स; आप 255 तक टाइप कर सकते हैं।</value>
+  </data>
+  <data name="SpecularDebugSection" xml:space="preserve">
+    <value>स्पेक्युलर एमएल डिबग</value>
+  </data>
+  <data name="SpecularDebugDisableHeuristicSpecular" xml:space="preserve">
+    <value>अनुमानी फ़ॉलबैक अक्षम करें (मैजेंटा = गैर-एमएल)</value>
+  </data>
+  <data name="SpecularDebugDisableHeuristicSpecularTooltip" xml:space="preserve">
+    <value>जो पिक्सेल क्लासिक स्पेक्युलर पथ का उपयोग करेंगे उन्हें मैजेंटा (255,0,255) पर मजबूर किया जाएगा। यदि एमएल पूरी तरह से विफल हो गया, तो पूरी बनावट मैजेंटा है। यह स्पष्ट करता है कि मॉडल पिक्सेल चला रहा है या नहीं।</value>
+  </data>
+  <data name="SpecularDebugSkipSpecularRemap" xml:space="preserve">
+    <value>चिकनाई (आर) प्रतिशतक रीमैप छोड़ें</value>
+  </data>
+  <data name="SpecularDebugSkipSpecularRemapTooltip" xml:space="preserve">
+    <value>पोस्ट-स्टेप को अक्षम कर देता है जो R को 10-200 रेंज पर रीमैप करता है ताकि आप सीधे मॉडल आउटपुट का आकलन कर सकें।</value>
+  </data>
+  <data name="SpecularDebugVerboseSpecularMl" xml:space="preserve">
+    <value>वर्बोज़ एमएल डायग्नोस्टिक्स (लॉग)</value>
+  </data>
+  <data name="SpecularDebugVerboseSpecularMlTooltip" xml:space="preserve">
+    <value>प्रति बनावट, अनुमान सफल होने पर लोड/रनटाइम विवरण और पहला-पिक्सेल नमूना लॉग करता है। जब मॉडल लोड करने में विफल रहता है या आउटपुट आकार बेमेल होता है तो सटीक त्रुटियां भी लॉग करता है।</value>
+  </data>
+  <data name="ForceShaderCacheInvalidation" xml:space="preserve">
+    <value>शेडर कैश को बलपूर्वक अमान्य करना</value>
+  </data>
+  <data name="ForceShaderCacheInvalidationTooltip" xml:space="preserve">
+    <value>ऑन-डिस्क जीपीयू शेडर बाइनरी कैश को हटाता है और पूर्वावलोकन शेडर्स को पुन: संकलित करता है। जब पूर्वावलोकन पुराना लगे तो शेडर संपादन के बाद उपयोग करें।</value>
+  </data>
+  <data name="ShaderCacheInvalidatedLog" xml:space="preserve">
+    <value>[सेटिंग्स] शेडर कैश साफ़ किया गया; पूर्वावलोकन शेडर्स पुन: संकलित होंगे।</value>
+  </data>
+  <data name="MinecraftAssetsFolder" xml:space="preserve">
+    <value>Minecraft संपत्ति</value>
+  </data>
+  <data name="MinecraftAssetsFolderTooltip" xml:space="preserve">
+    <value>Minecraft संस्करण फ़ोल्डर या निकाली गई संपत्तियों/रूट के लिए वैकल्पिक पथ। केवल-बनावट पैक पूर्वावलोकन के लिए वेनिला ब्लॉक मॉडल को हल करने के लिए उपयोग किया जाता है।</value>
+  </data>
+  <data name="MinecraftAssetsFolderWatermark" xml:space="preserve">
+    <value>खाली होने पर .माइनक्राफ्ट से स्वतः पता लगाया गया</value>
+  </data>
+  <data name="Preview3DCameraFlyLookSensitivity" xml:space="preserve">
+    <value>फ्लाई लुक सेंसिटिविटी</value>
+  </data>
+  <data name="Preview3DCameraFlyMoveSpeed" xml:space="preserve">
+    <value>उड़ने की गति</value>
+  </data>
+  <data name="Preview3DCameraFlyMoveSpeedTooltip" xml:space="preserve">
+    <value>दायां माउस पकड़ते समय बेस WASD फ्लाई स्पीड। गति को अस्थायी रूप से समायोजित करने के लिए उड़ान के दौरान माउस व्हील का उपयोग करें।</value>
+  </data>
+  <data name="Preview3DCameraInvertLookY" xml:space="preserve">
+    <value>उलटा देखो वाई</value>
+  </data>
+  <data name="Preview3DCameraInvertLookYTooltip" xml:space="preserve">
+    <value>ऑर्बिट और फ्लाई कैमरों के लिए वर्टिकल माउस लुक को उल्टा करें।</value>
+  </data>
+  <data name="Preview3DCameraFlySmoothAcceleration" xml:space="preserve">
+    <value>चिकनी मक्खी चाल</value>
+  </data>
+  <data name="Preview3DCameraFlySmoothAccelerationTooltip" xml:space="preserve">
+    <value>तुरंत शुरू और रुकने के बजाय WASD फ़्लाई मूवमेंट को अंदर और बाहर आसान बनाएं।</value>
+  </data>
+  <data name="Preview3DCameraHelpOrbitPanSection" xml:space="preserve">
+    <value>कक्षा और पैन</value>
+  </data>
+  <data name="Preview3DCameraHelpFlySection" xml:space="preserve">
+    <value>कैमरा उड़ाओ</value>
+  </data>
+  <data name="Preview3DCameraHelpFramingSection" xml:space="preserve">
+    <value>फ्रेमिंग</value>
+  </data>
+  <data name="Preview3DCameraHelpItemOrbitInput" xml:space="preserve">
+    <value>Alt + खींचें (बाएँ या मध्य)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemOrbitDesc" xml:space="preserve">
+    <value>धुरी के चारों ओर परिक्रमा करें.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemPanInput" xml:space="preserve">
+    <value>Alt के बिना खींचें (बाएँ या मध्य)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemPanDesc" xml:space="preserve">
+    <value>दृश्य को पैन करें.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemZoomInput" xml:space="preserve">
+    <value>माउस व्हील</value>
+  </data>
+  <data name="Preview3DCameraHelpItemZoomDesc" xml:space="preserve">
+    <value>ज़ूम इन और ज़ूम आउट करें.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyLookInput" xml:space="preserve">
+    <value>सही खींचें</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyLookDesc" xml:space="preserve">
+    <value>चारों ओर देखो (कैमरा उड़ाओ)।</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWasdInput" xml:space="preserve">
+    <value>डब्ल्यू / ए / एस / डी (दाएं पकड़े हुए)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWasdDesc" xml:space="preserve">
+    <value>आगे बढ़ें, बाएँ, पीछे, और दाएँ प्रहार करें।</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyQeInput" xml:space="preserve">
+    <value>Q/E (जबकि दाएँ रखा गया)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyQeDesc" xml:space="preserve">
+    <value>नीचे और ऊपर ले जाएँ.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyShiftInput" xml:space="preserve">
+    <value>शिफ्ट (उड़ान के दौरान)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyShiftDesc" xml:space="preserve">
+    <value>तेज़ी से चले।</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyCtrlInput" xml:space="preserve">
+    <value>Ctrl (उड़ान भरते समय)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyCtrlDesc" xml:space="preserve">
+    <value>धीमी गति से आगे बढ़ें (सटीक)।</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWheelInput" xml:space="preserve">
+    <value>माउस व्हील (उड़ते समय)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWheelDesc" xml:space="preserve">
+    <value>उड़ान की गति को अस्थायी रूप से समायोजित करें।</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFrameInput" xml:space="preserve">
+    <value>डबल क्लिक करें</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFrameDesc" xml:space="preserve">
+    <value>वर्तमान विषय को फ़्रेम करें.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemResetDesc" xml:space="preserve">
+    <value>डिफ़ॉल्ट कैमरा फ़्रेमिंग पुनर्स्थापित करें.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFocusInput" xml:space="preserve">
+    <value>पूर्वावलोकन पर क्लिक करें</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFocusDesc" xml:space="preserve">
+    <value>कीबोर्ड शॉर्टकट के लिए पूर्वावलोकन पर ध्यान केंद्रित करें.</value>
+  </data>
+  <data name="Preview3DSkyDomeSection" xml:space="preserve">
+    <value>स्काई डोम</value>
+  </data>
+  <data name="Preview3DAtmosphereSection" xml:space="preserve">
+    <value>वायुमंडल</value>
+  </data>
+  <data name="Preview3DSunSection" xml:space="preserve">
+    <value>सूरज</value>
+  </data>
+  <data name="Preview3DMoonSection" xml:space="preserve">
+    <value>चंद्रमा</value>
+  </data>
+  <data name="Preview3DGodRayDebugSection" xml:space="preserve">
+    <value>गॉड रे डिबग (फ्रॉक्सेल)</value>
+  </data>
+  <data name="Preview3DGodRayStabilizeDebug" xml:space="preserve">
+    <value>स्थिर करें (कोई अस्थायी/घबराहट नहीं)</value>
+  </data>
+  <data name="Preview3DGodRayStabilizeDebugTooltip" xml:space="preserve">
+    <value>फ्रॉक्सेल/एकीकृत/अपसैंपल अस्थायी पुन: उपयोग को अक्षम करता है और मार्च जिटर को रोकता है। देव किरणों को ट्यून करते समय स्पंदन रोकने के लिए चालू करें।</value>
+  </data>
+  <data name="Preview3DGodRayDebugDensity" xml:space="preserve">
+    <value>डीबग घनत्व</value>
+  </data>
+  <data name="Preview3DGodRayDebugDensityTooltip" xml:space="preserve">
+    <value>समान भाग लेने वाले-मध्यम घनत्व को फ्रॉक्सेल वॉल्यूम में इंजेक्ट किया जाता है ताकि भगवान की किरणें ऊंचाई के कोहरे या बादलों के बिना दिखाई दे सकें। 0 = उत्पादन व्यवहार. 0.10–0.30 आज़माएँ।</value>
+  </data>
+  <data name="Preview3DGodRayScatterGain" xml:space="preserve">
+    <value>लाभ बिखेरो</value>
+  </data>
+  <data name="Preview3DGodRayScatterGainTooltip" xml:space="preserve">
+    <value>एकीकृत मार्च में इन-स्कैटर संचय लाभ (शेडर डिफ़ॉल्ट 3.4)। उच्चतर = उज्जवल शाफ्ट।</value>
+  </data>
+  <data name="Preview3DGodRayExtinction" xml:space="preserve">
+    <value>विलुप्त होने</value>
+  </data>
+  <data name="Preview3DGodRayExtinctionTooltip" xml:space="preserve">
+    <value>दृश्य किरण के साथ संप्रेषण फ़ॉलऑफ़ के लिए बीयर-लैंबर्ट विलुप्त होने का गुणांक (शेडर डिफ़ॉल्ट 1.15)। उच्चतर = सघन/छोटा शाफ्ट।</value>
+  </data>
+  <data name="Preview3DPreviewDebugSection" xml:space="preserve">
+    <value>3डी पूर्वावलोकन डिबग</value>
+  </data>
+  <data name="Preview3DIblStrength" xml:space="preserve">
+    <value>आईबीएल ताकत</value>
+  </data>
+  <data name="Preview3DIblStrengthTooltip" xml:space="preserve">
+    <value>पर्यावरण जांच की तीव्रता (अप्रत्यक्ष परिवेश + प्रतिबिंब)। यदि मॉडल बहुत अधिक स्काई टिंट उठाता है तो कम करें; 0 वापस सपाट परिवेश वाले लुक में आ जाता है।</value>
+  </data>
+  <data name="Preview3DEnableAtmosphericSky" xml:space="preserve">
+    <value>वायुमंडलीय आकाश (LUT)</value>
+  </data>
+  <data name="Preview3DEnableAtmosphericSkyTooltip" xml:space="preserve">
+    <value>LUT-संचालित वायुमंडलीय आकाश पृष्ठभूमि और परिवेश प्रतिक्रिया सक्षम करें।</value>
+  </data>
+  <data name="Preview3DAtmosphereTurbidity" xml:space="preserve">
+    <value>वातावरण में गंदलापन</value>
+  </data>
+  <data name="Preview3DAtmosphereTurbidityTooltip" xml:space="preserve">
+    <value>एरोसोल घनत्व प्रॉक्सी। उच्च मान क्षितिज को धुंधला और सूर्यास्त को गर्म बनाते हैं।</value>
+  </data>
+  <data name="Preview3DAtmosphereSunIntensity" xml:space="preserve">
+    <value>वातावरण सूर्य की तीव्रता</value>
+  </data>
+  <data name="Preview3DAtmosphereSunIntensityTooltip" xml:space="preserve">
+    <value>स्काई पास और अप्रत्यक्ष जांच द्वारा उपयोग किए जाने वाले वायुमंडलीय सूर्य की चमक को मापता है।</value>
+  </data>
+  <data name="Preview3DAtmosphereHorizonFalloff" xml:space="preserve">
+    <value>वायुमंडल क्षितिज का पतन</value>
+  </data>
+  <data name="Preview3DAtmosphereHorizonFalloffTooltip" xml:space="preserve">
+    <value>क्षितिज के निकट विलुप्त होने वाले रोलऑफ़ को नियंत्रित करता है (निचली = चौड़ी चमक, उच्चतर = सख्त बैंड)।</value>
+  </data>
+  <data name="Preview3DAtmosphereSkyExposure" xml:space="preserve">
+    <value>आकाश प्रदर्शन</value>
+  </data>
+  <data name="Preview3DAtmosphereSkyExposureTooltip" xml:space="preserve">
+    <value>आकाश समग्र पास पर मास्टर चमक। फूल कम करने के लिए कम करें।</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscStrength" xml:space="preserve">
+    <value>सन डिस्क ब्लूम</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscStrengthTooltip" xml:space="preserve">
+    <value>LUT के शीर्ष पर सूर्य डिस्क के चारों ओर अतिरिक्त चमक। नरम प्रभामंडल के लिए निचला; व्यापक खिलने के लिए उच्चतर।</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscBrightness" xml:space="preserve">
+    <value>सूर्य की चमक</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscBrightnessTooltip" xml:space="preserve">
+    <value>अंग-अंधेरे सूरज डिस्क सतह चमक। बाहरी खिले हुए प्रभामंडल को प्रभावित नहीं करता.</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscSize" xml:space="preserve">
+    <value>सूर्य का आकार</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscSizeTooltip" xml:space="preserve">
+    <value>सूर्य कोणीय आकार गुणक। 1.0 = शैलीगत डिफ़ॉल्ट; ~0.07 वास्तविक सूर्य (0.27 डिग्री) से मेल खाता है। ऑरियोल और गॉड-रे शंकु को भी मापता है।</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscStrength" xml:space="preserve">
+    <value>चंद्रमा की चमक</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscStrengthTooltip" xml:space="preserve">
+    <value>बनावट वाली चंद्रमा डिस्क के लिए सतह चमक गुणक।</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscSize" xml:space="preserve">
+    <value>चंद्रमा का आकार</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscSizeTooltip" xml:space="preserve">
+    <value>आकाश बिलबोर्ड के लिए चंद्रमा कोणीय आकार गुणक।</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonGlowStrength" xml:space="preserve">
+    <value>चाँद की चमक</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonGlowStrengthTooltip" xml:space="preserve">
+    <value>चंद्रमा के अंग के चारों ओर बाहरी नीली-सफ़ेद चमक।</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonTextureSharpness" xml:space="preserve">
+    <value>चंद्रमा का तेज</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonTextureSharpnessTooltip" xml:space="preserve">
+    <value>उत्पन्न चंद्र बनावट के लिए शेडर-साइड शार्पनिंग।</value>
+  </data>
+  <data name="Preview3DMoonWorldLightIntensity" xml:space="preserve">
+    <value>चन्द्रमा जग उजियारा</value>
+  </data>
+  <data name="Preview3DMoonWorldLightIntensityTooltip" xml:space="preserve">
+    <value>रात में प्रकाश पूर्वावलोकन ज्यामिति के लिए प्रत्यक्ष चांदनी गुणक। आकाश का प्रदर्शन या वायुमंडलीय भराव नहीं बदलता है।</value>
+  </data>
+  <data name="Preview3DShowCelestialDebug" xml:space="preserve">
+    <value>सूर्य/चंद्रमा मार्कर</value>
+  </data>
+  <data name="Preview3DShowCelestialDebugTooltip" xml:space="preserve">
+    <value>सूर्य और चंद्रमा डिस्क स्थिति पर वर्गाकार और क्रॉसहेयर मार्कर बनाएं।</value>
+  </data>
+  <data name="Preview3DHorizonFogStrength" xml:space="preserve">
+    <value>क्षितिज कोहरा</value>
+  </data>
+  <data name="Preview3DHorizonFogStrengthTooltip" xml:space="preserve">
+    <value>आकाश गुंबद में क्षितिज के नीचे कोहरा भरा हुआ है और ज्यामिति पर हवाई परिप्रेक्ष्य (0 = बंद)।</value>
+  </data>
+  <data name="Preview3DVolumetricSection" xml:space="preserve">
+    <value>बड़ा प्रभाव</value>
+  </data>
+  <data name="Preview3DEnableGodRays" xml:space="preserve">
+    <value>भगवान किरणें</value>
+  </data>
+  <data name="Preview3DEnableGodRaysTooltip" xml:space="preserve">
+    <value>फ्रॉक्सेल वॉल्यूम प्रकाश सूर्य की ओर बढ़ता है (इंजेक्ट + इंटीग्रेट + अपसैंपल)।</value>
+  </data>
+  <data name="Preview3DEnableVolumetricClouds" xml:space="preserve">
+    <value>वॉल्यूमेट्रिक बादल</value>
+  </data>
+  <data name="Preview3DEnableVolumetricCloudsTooltip" xml:space="preserve">
+    <value>आकाश में प्रक्रियात्मक बादल परत गुजरती है (गुणवत्ता नीचे पूर्व निर्धारित के अनुसार होती है)।</value>
+  </data>
+  <data name="Preview3DShadersSection" xml:space="preserve">
+    <value>शेडर्स</value>
+  </data>
+  <data name="Preview3DVolumetricQuality" xml:space="preserve">
+    <value>फ्रोक्सेल गुणवत्ता</value>
+  </data>
+  <data name="Preview3DVolumetricQualityTooltip" xml:space="preserve">
+    <value>निम्न/मध्यम/उच्च फ्रॉक्सल रिज़ॉल्यूशन, स्लाइस गिनती, क्लाउड विवरण, और अस्थायी फ़िल्टरिंग।</value>
+  </data>
+  <data name="Preview3DGodRayStrength" xml:space="preserve">
+    <value>ईश्वर-किरण शक्ति</value>
+  </data>
+  <data name="Preview3DGodRayStrengthTooltip" xml:space="preserve">
+    <value>एडिटिव गॉड-रे कंपोजिट की तीव्रता (0 = बंद)।</value>
+  </data>
+  <data name="Preview3DCloudSection" xml:space="preserve">
+    <value>बादल की परत</value>
+  </data>
+  <data name="Preview3DCloudDensity" xml:space="preserve">
+    <value>घनत्व</value>
+  </data>
+  <data name="Preview3DCloudDensityTooltip" xml:space="preserve">
+    <value>क्लाउड स्लैब के अंदर वॉल्यूमेट्रिक घनत्व को मापता है (उच्च = मोटा, अधिक अपारदर्शी कश)।</value>
+  </data>
+  <data name="Preview3DCloudCoverageScale" xml:space="preserve">
+    <value>कवरेज</value>
+  </data>
+  <data name="Preview3DCloudCoverageScaleTooltip" xml:space="preserve">
+    <value>क्षेत्रीय मौसम-मानचित्र कवरेज स्केल (0 = साफ़ आसमान, 1 = पका हुआ नक्शा)।</value>
+  </data>
+  <data name="Preview3DCloudLayerHeight" xml:space="preserve">
+    <value>परत की ऊंचाई</value>
+  </data>
+  <data name="Preview3DCloudLayerHeightTooltip" xml:space="preserve">
+    <value>डिफ़ॉल्ट क्लाउड स्लैब बेस ऊंचाई (विश्व इकाइयां) में लंबवत ऑफसेट जोड़ा गया।</value>
+  </data>
+  <data name="Preview3DCloudVolumeHeight" xml:space="preserve">
+    <value>परत की मोटाई</value>
+  </data>
+  <data name="Preview3DCloudVolumeHeightTooltip" xml:space="preserve">
+    <value>मुख्य क्यूम्यलस स्लैब (विश्व इकाइयाँ) की ऊर्ध्वाधर सीमा।</value>
+  </data>
+  <data name="Preview3DCloudVolumeSize" xml:space="preserve">
+    <value>फ़ीचर स्केल</value>
+  </data>
+  <data name="Preview3DCloudVolumeSizeTooltip" xml:space="preserve">
+    <value>एक शोर टाइल चक्र का विश्व आकार (बड़ा = व्यापक बादल आकार)।</value>
+  </data>
+  <data name="Preview3DCloudWindSpeed" xml:space="preserve">
+    <value>हवा की गति</value>
+  </data>
+  <data name="Preview3DCloudWindSpeedTooltip" xml:space="preserve">
+    <value>प्रति सेकंड विश्व इकाइयों में बादल क्षेत्र बहाव की गति।</value>
+  </data>
+  <data name="Preview3DCloudWindHeading" xml:space="preserve">
+    <value>हवा का रुख</value>
+  </data>
+  <data name="Preview3DCloudWindHeadingTooltip" xml:space="preserve">
+    <value>ज़मीनी सतह पर हवा की दिशा डिग्री में (0 = +X)।</value>
+  </data>
+  <data name="Preview3DCloudCirrusStrength" xml:space="preserve">
+    <value>सिरस परत</value>
+  </data>
+  <data name="Preview3DCloudCirrusStrengthTooltip" xml:space="preserve">
+    <value>मुख्य परत के ऊपर ऊंची पतली सिरस शीट की अपारदर्शिता (0 = बंद)।</value>
+  </data>
+  <data name="Preview3DCloudDebugSection" xml:space="preserve">
+    <value>क्लाउड डीबग</value>
+  </data>
+  <data name="Preview3DCloudDebugView" xml:space="preserve">
+    <value>डिबग दृश्य</value>
+  </data>
+  <data name="Preview3DCloudDebugViewTooltip" xml:space="preserve">
+    <value>रोशनी वाले बादलों को कवरेज मानचित्र या मध्य-परत घनत्व स्लाइस ओवरले से बदलें।</value>
+  </data>
+  <data name="Preview3DCloudDebugViewOff" xml:space="preserve">
+    <value>बंद</value>
+  </data>
+  <data name="Preview3DCloudDebugViewCoverage" xml:space="preserve">
+    <value>कवरेज मानचित्र</value>
+  </data>
+  <data name="Preview3DCloudDebugViewDensitySlice" xml:space="preserve">
+    <value>घनत्व टुकड़ा</value>
+  </data>
+  <data name="Preview3DCloudDisableTemporal" xml:space="preserve">
+    <value>अस्थायी अक्षम करें</value>
+  </data>
+  <data name="Preview3DCloudDisableTemporalTooltip" xml:space="preserve">
+    <value>क्लाउड हिस्ट्री रिप्रोजेक्शन बंद करें (शोर या मार्च चरणों का निरीक्षण करते समय उपयोगी)।</value>
+  </data>
+  <data name="Preview3DCloudMarchSteps" xml:space="preserve">
+    <value>मार्च कदम</value>
+  </data>
+  <data name="Preview3DCloudMarchStepsTooltip" xml:space="preserve">
+    <value>रे-मार्च चरण ओवरराइड (0 = गुणवत्ता पूर्व निर्धारित का पालन करें)।</value>
+  </data>
+  <data name="Preview3DCloudFreezeWind" xml:space="preserve">
+    <value>ठंडी हवा</value>
+  </data>
+  <data name="Preview3DCloudFreezeWindTooltip" xml:space="preserve">
+    <value>शून्य समय पर बादल संवहन को पकड़ें ताकि प्रकाश को ट्यून करते समय आकृतियाँ स्थिर रहें।</value>
+  </data>
+  <data name="Preview3DEnablePreviewTaa" xml:space="preserve">
+    <value>टीएए का पूर्वावलोकन करें</value>
+  </data>
+  <data name="Preview3DEnablePreviewTaaTooltip" xml:space="preserve">
+    <value>मिश्रित फ्रेम पर अंतिम टेम्पोरल एंटी-अलियासिंग। साझा पुनर्प्रक्षेपण सहायकों का उपयोग करता है; गति-जागरूक जब देव किरणें दृश्य को गहराई प्रदान करती हैं। इसके चालू रहने पर प्रति-पास टेम्पोरल आधा हो जाता है।</value>
+  </data>
+  <data name="Preview3DTimeOfDayHours" xml:space="preserve">
+    <value>अपना समय</value>
+  </data>
+  <data name="Preview3DTimeOfDayHoursTooltip" xml:space="preserve">
+    <value>सूर्य/चंद्रमा चक्र के लिए घड़ी का समय (0-24 घंटे): 6≈ सूर्योदय, 12≈ दोपहर, 18≈ सूर्यास्त, 0/24≈ तारों के साथ आधी रात।</value>
+  </data>
+  <data name="Preview3DAnimateTimeOfDay" xml:space="preserve">
+    <value>दिन का चेतन समय</value>
+  </data>
+  <data name="Preview3DAnimateTimeOfDayTooltip" xml:space="preserve">
+    <value>पूर्वावलोकन रेंडर घड़ी से सूर्य/चंद्रमा चक्र को आगे बढ़ाएं (24/गति सेकंड में पूरा दिन)।</value>
+  </data>
+  <data name="Preview3DTimeOfDaySpeed" xml:space="preserve">
+    <value>साइकिल की गति</value>
+  </data>
+  <data name="Preview3DTimeOfDaySpeedTooltip" xml:space="preserve">
+    <value>जब एनीमेशन चालू होता है तो खेल के घंटे प्रति वास्तविक सेकंड में बढ़ जाते हैं (प्रति दिन 1 = 24 सेकंड)।</value>
+  </data>
+  <data name="Preview3DEnableShadowCascades" xml:space="preserve">
+    <value>छाया झरना</value>
+  </data>
+  <data name="Preview3DEnableShadowCascadesTooltip" xml:space="preserve">
+    <value>निकट + दूर दिशात्मक छाया मानचित्र; वॉल्यूम देव किरणें कैमरे से दूरी के अनुसार कैस्केड चुनती हैं।</value>
+  </data>
+  <data name="Preview3DVolumetricQualityLow" xml:space="preserve">
+    <value>कम</value>
+  </data>
+  <data name="Preview3DVolumetricQualityMedium" xml:space="preserve">
+    <value>मध्यम</value>
+  </data>
+  <data name="Preview3DVolumetricQualityHigh" xml:space="preserve">
+    <value>उच्च</value>
+  </data>
+  <data name="Preview3DParallaxAoStrength" xml:space="preserve">
+    <value>पोम, एओ से संपर्क करें</value>
+  </data>
+  <data name="Preview3DParallaxAoStrengthTooltip" xml:space="preserve">
+    <value>पीओएम ऊंचाई क्षेत्र से प्राप्त स्थानीय संपर्क परिवेश रोड़ा की ताकत।</value>
+  </data>
+  <data name="Preview3DEnableParallaxAo" xml:space="preserve">
+    <value>पोम, एओ से संपर्क करें</value>
+  </data>
+  <data name="Preview3DEnableParallaxAoTooltip" xml:space="preserve">
+    <value>लंबन ऊंचाई क्षेत्र से स्थानीय परिवेश अवरोधन को काला करने में सक्षम करें।</value>
+  </data>
+  <data name="Preview3DWorldSection" xml:space="preserve">
+    <value>दुनिया</value>
+  </data>
+  <data name="Preview3DAnimationSection" xml:space="preserve">
+    <value>एनिमेशन</value>
+  </data>
+  <data name="Preview3DShowGroundMesh" xml:space="preserve">
+    <value>ग्राउंड मेश (3डी)</value>
+  </data>
+  <data name="Preview3DShowGroundMeshTooltip" xml:space="preserve">
+    <value>3डी पूर्वावलोकन में ऑब्जेक्ट के नीचे बनावट वाले घास के मैदान को दिखाएं।</value>
+  </data>
+  <data name="Preview3DEnableEntityAnimation" xml:space="preserve">
+    <value>अनुकरणित संस्थाओं को चेतन करें</value>
+  </data>
+  <data name="Preview3DEnableEntityAnimationTooltip" xml:space="preserve">
+    <value>अनुकरणीय इकाई मॉडल पूर्वावलोकन के लिए रेंडर-टाइम निष्क्रिय एनीमेशन सक्षम करें।</value>
+  </data>
+  <data name="Preview3DPauseEntityIdleAnimation" xml:space="preserve">
+    <value>निष्क्रिय वर्टेक्स एनीमेशन रोकें</value>
+  </data>
+  <data name="Preview3DPauseEntityIdleAnimationTooltip" xml:space="preserve">
+    <value>सक्षम होने पर, अनुकरणित इकाई जाल एनीमेशन बंद होने तक वर्तमान स्थिति में रुक जाता है। विरासती डगमगाहट अलग है (नीचे देखें)।</value>
+  </data>
+  <data name="Preview3DEnableLegacyEntityWobble" xml:space="preserve">
+    <value>विरासती जाल डगमगा गया</value>
+  </data>
+  <data name="Preview3DEnableLegacyEntityWobbleTooltip" xml:space="preserve">
+    <value>मॉडल मैट्रिक्स पर प्री-आईआर होल-मेश बॉब/यॉ/रोल लागू करता है। डिफ़ॉल्ट रूप से बंद - इसके बजाय उठाए गए setupAnim / परिभाषा क्लिप का उपयोग करें।</value>
+  </data>
+  <data name="Preview3DEntityAnimationSpeed" xml:space="preserve">
+    <value>इकाई एनीमेशन गति</value>
+  </data>
+  <data name="Preview3DEntityAnimationSpeedTooltip" xml:space="preserve">
+    <value>अनुकरणीय इकाई निष्क्रिय गति के लिए रेंडर-टाइम स्पीड गुणक।</value>
+  </data>
+  <data name="Preview3DEntityAnimationAmplitude" xml:space="preserve">
+    <value>इकाई एनीमेशन आयाम</value>
+  </data>
+  <data name="Preview3DEntityAnimationAmplitudeTooltip" xml:space="preserve">
+    <value>अनुकरणीय इकाई निष्क्रिय गति के लिए रेंडर-टाइम आयाम गुणक।</value>
+  </data>
+  <data name="Preview3DEntitiesSection" xml:space="preserve">
+    <value>इकाइयां,</value>
+  </data>
+  <data name="Preview3DViewportSection" xml:space="preserve">
+    <value>पैरालैक्स</value>
+  </data>
+  <data name="Preview3DSpritesSection" xml:space="preserve">
+    <value>स्प्राइट</value>
+  </data>
+  <data name="Preview3DGrassSection" xml:space="preserve">
+    <value>घास</value>
+  </data>
+  <data name="Preview3DGrassColormap" xml:space="preserve">
+    <value>घास का रंग मानचित्र</value>
+  </data>
+  <data name="Preview3DGrassColormapTemperature" xml:space="preserve">
+    <value>तापमान</value>
+  </data>
+  <data name="Preview3DGrassColormapTemperatureTooltip" xml:space="preserve">
+    <value>पूर्वावलोकन टिनिंग के लिए घास के रंग मानचित्र का नमूना लेने के लिए बायोम तापमान (0 = ठंडा, 1 = गर्म) का उपयोग किया जाता है।</value>
+  </data>
+  <data name="Preview3DGrassColormapDownfall" xml:space="preserve">
+    <value>पतन</value>
+  </data>
+  <data name="Preview3DGrassColormapDownfallTooltip" xml:space="preserve">
+    <value>बायोम आर्द्रता/वर्षा (0 = सूखा, 1 = गीला) का उपयोग पूर्वावलोकन टिंटिंग के लिए घास रंग मानचित्र का नमूना लेने के लिए किया जाता है।</value>
+  </data>
+  <data name="Preview3DEntityAlphaMode" xml:space="preserve">
+    <value>इकाई अल्फा मोड</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeTooltip" xml:space="preserve">
+    <value>डिफ्यूज़ पीएनजी पारदर्शिता के साथ बेक्ड मेश के माध्यम से खींचे गए रनटाइम मोब रिग्स के लिए - अपारदर्शी डिफ्यूज़ अल्फा को अनदेखा करता है; कटआउट पतले/निम्न-अल्फा टेक्सल्स को हटा देता है (अनुशंसित डिफ़ॉल्ट); कंपोजिट को उत्तरोत्तर मिश्रित करें।</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeOpaque" xml:space="preserve">
+    <value>अस्पष्ट</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeCutout" xml:space="preserve">
+    <value>कट आउट</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeBlend" xml:space="preserve">
+    <value>मिलाना</value>
+  </data>
+  <data name="Preview3DEnableEntityLabPbrShading" xml:space="preserve">
+    <value>इकाई सामान्य और स्पेक्युलर मानचित्र</value>
+  </data>
+  <data name="Preview3DEnableEntityLabPbrShadingTooltip" xml:space="preserve">
+    <value>रनटाइम मॉब पूर्वावलोकन के लिए, जेनरेट किए गए लैबपीबीआर सामान्य और स्पेक्युलर मानचित्रों का उपयोग करें। यदि किसी विशिष्ट रिग पर प्रकाश व्यवस्था गलत दिखती है तो उसे अक्षम कर दें।</value>
+  </data>
+  <data name="Preview3DEnableEntityParallax" xml:space="preserve">
+    <value>इकाई लंबन (POM)</value>
+  </data>
+  <data name="Preview3DEnableEntityParallaxTooltip" xml:space="preserve">
+    <value>रनटाइम मॉब पूर्वावलोकन के लिए, ऊंचाई-मानचित्र लंबन, लंबन एओ और लंबन स्व-छाया सक्षम करें। डिफ़ॉल्ट रूप से बंद; यूवी सीम पर चमक सकता है।</value>
+  </data>
+  <data name="Preview3DSpriteThickness" xml:space="preserve">
+    <value>स्प्राइट की मोटाई</value>
+  </data>
+  <data name="Preview3DSpriteThicknessTooltip" xml:space="preserve">
+    <value>प्रत्येक अपारदर्शी स्प्राइट टेक्सल को एक घनाकार (माइनक्राफ्ट-शैली आइटम मोटा होना) में बाहर निकालता है। 0 = फ्लैट कार्ड; 0.25 एक्सट्रूड्स गहराई तक - अधिकतम, गहराई क्यूबिक वोक्सल्स के लिए टेक्सल आकार से मेल खाती है। पार्श्व चेहरों पर सपाट टेक्सल रंग का उपयोग किया गया है, खिंचे हुए यूवी का नहीं।</value>
+  </data>
+  <data name="WindowMinimize" xml:space="preserve">
+    <value>छोटा करना</value>
+  </data>
+  <data name="WindowMaximize" xml:space="preserve">
+    <value>अधिकतम</value>
+  </data>
+  <data name="WindowClose" xml:space="preserve">
+    <value>बंद करना</value>
+  </data>
+  <data name="DebugMlMatch" xml:space="preserve">
+    <value>डीबग एमएल मैच…</value>
+  </data>
+  <data name="ExploreManualOverrideTooltip" xml:space="preserve">
+    <value>चेक किया गया = शामिल किया गया, अनचेक किया गया = बहिष्कृत किया गया, अनिश्चित किया गया = अन्य नियमों का उपयोग किया गया</value>
+  </data>
+  <data name="SetAsPreview" xml:space="preserve">
+    <value>पूर्वावलोकन के रूप में सेट करें</value>
+  </data>
+  <data name="TagRuleIdWatermark" xml:space="preserve">
+    <value>जैसे mytag</value>
+  </data>
+  <data name="TagRuleDisplayNameWatermark" xml:space="preserve">
+    <value>जैसे मेरा टैग</value>
+  </data>
+  <data name="EditAiModels" xml:space="preserve">
+    <value>एआई मॉडल संपादित करें</value>
+  </data>
+  <data name="EditAiModelsWarning" xml:space="preserve">
+    <value>चेतावनी: इन मॉडल पथों को तब तक संपादित न करें जब तक आप नहीं जानते कि आप क्या कर रहे हैं।</value>
+  </data>
+  <data name="MlResolution16x16" xml:space="preserve">
+    <value>16×16</value>
+  </data>
+  <data name="MlResolution32x32" xml:space="preserve">
+    <value>32×32</value>
+  </data>
+  <data name="MlResolution64x64" xml:space="preserve">
+    <value>64×64</value>
+  </data>
+  <data name="MlResolution128x128" xml:space="preserve">
+    <value>128×128</value>
+  </data>
+  <data name="MlResolution256x256" xml:space="preserve">
+    <value>256×256</value>
+  </data>
+  <data name="UvDebugButton" xml:space="preserve">
+    <value>यूवी डिबग</value>
+  </data>
+  <data name="EntityDebugButton" xml:space="preserve">
+    <value>इकाई डीबग</value>
+  </data>
+  <data name="PreviewPoseLabel" xml:space="preserve">
+    <value>खड़ा करना</value>
+  </data>
+  <data name="PreviewSizeLabel" xml:space="preserve">
+    <value>आकार</value>
+  </data>
+  <data name="PreviewContextTypeLabel" xml:space="preserve">
+    <value>प्रसंग प्रकार</value>
+  </data>
+  <data name="SelectResourcePackTitle" xml:space="preserve">
+    <value>संसाधन पैक चुनें (.zip या .jar)</value>
+  </data>
+  <data name="SelectOutputFolderTitle" xml:space="preserve">
+    <value>आउटपुट फ़ोल्डर चुनें</value>
+  </data>
+  <data name="SelectMinecraftAssetsTitle" xml:space="preserve">
+    <value>Minecraft संस्करण या संपत्ति फ़ोल्डर का चयन करें</value>
+  </data>
+  <data name="SemanticDebugWindowTitle" xml:space="preserve">
+    <value>मिनीएलएम सिमेंटिक मैच डिबग</value>
+  </data>
+  <data name="Preview3DCameraResetKeyFormat" xml:space="preserve">
+    <value>{0} कुंजी</value>
+  </data>
+  <data name="CustomTagDefaultDisplayName" xml:space="preserve">
+    <value>कस्टम टैग</value>
+  </data>
+  <data name="CustomRuleDefaultDisplayName" xml:space="preserve">
+    <value>कस्टम नियम</value>
+  </data>
+  <data name="Status_GpuPreviewStarting" xml:space="preserve">
+    <value>GPU पूर्वावलोकन प्रारंभ हो रहा है…</value>
+  </data>
+  <data name="Status_GpuPreviewPreparingShaderSources" xml:space="preserve">
+    <value>शेडर स्रोत तैयार किए जा रहे हैं...</value>
+  </data>
+  <data name="Status_GpuPreviewPreparing" xml:space="preserve">
+    <value>GPU पूर्वावलोकन तैयार किया जा रहा है...</value>
+  </data>
+  <data name="Status_GpuPreviewClearingShaderCache" xml:space="preserve">
+    <value>शेडर कैश साफ़ किया जा रहा है…</value>
+  </data>
+  <data name="Status_GpuPreviewCompilingMainShaders" xml:space="preserve">
+    <value>मुख्य पूर्वावलोकन शेडर्स संकलित किया जा रहा है...</value>
+  </data>
+  <data name="Status_GpuPreviewCompilingShadowShaders" xml:space="preserve">
+    <value>शैडो शेडर्स का संकलन…</value>
+  </data>
+  <data name="Status_GpuPreviewCreatingShadowMaps" xml:space="preserve">
+    <value>छाया मानचित्र बनाये जा रहे हैं...</value>
+  </data>
+  <data name="Status_GpuPreviewUploadingMeshes" xml:space="preserve">
+    <value>पूर्वावलोकन मेश अपलोड हो रहा है...</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingLineOverlay" xml:space="preserve">
+    <value>आरंभिक लाइन ओवरले…</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingSkyDome" xml:space="preserve">
+    <value>आरंभिक आकाश गुंबद…</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingAtmosphere" xml:space="preserve">
+    <value>शुरुआती माहौल...</value>
+  </data>
+  <data name="Status_GpuPreviewFinalizing" xml:space="preserve">
+    <value>पूर्वावलोकन को अंतिम रूप दिया जा रहा है...</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingGodRays" xml:space="preserve">
+    <value>देव किरणें लोड हो रही हैं...</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingClouds" xml:space="preserve">
+    <value>वॉल्यूमेट्रिक बादल लोड हो रहे हैं...</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingTaa" xml:space="preserve">
+    <value>पूर्वावलोकन TAA लोड हो रहा है...</value>
+  </data>
+  <data name="Status_GpuPreviewReady" xml:space="preserve">
+    <value>तैयार</value>
+  </data>
+  <data name="Status_GpuPreviewPreviewReady" xml:space="preserve">
+    <value>पूर्वावलोकन तैयार है</value>
+  </data>
+  <data name="Status_GpuPreviewCoreReady" xml:space="preserve">
+    <value>कोर पूर्वावलोकन तैयार</value>
+  </data>
+  <data name="UvDebugTitle" xml:space="preserve">
+    <value>यूवी डिबग</value>
+  </data>
+  <data name="UvDebugGlobalControls" xml:space="preserve">
+    <value>वैश्विक यूवी डिबग नियंत्रण</value>
+  </data>
+  <data name="UvDebugGlobalControlsDescription" xml:space="preserve">
+    <value>टॉगल करने पर ये उत्पादन यूवी बेक नीति को ओवरराइड कर देते हैं। एंटिटी क्यूबॉइड्स डिफ़ॉल्ट रूप से बेक्ड-इन जावा समता का उपयोग करते हैं।</value>
+  </data>
+  <data name="UvDebugResetOverrides" xml:space="preserve">
+    <value>ओवरराइड रीसेट करें (उत्पादन डिफ़ॉल्ट)</value>
+  </data>
+  <data name="UvDebugFlipU" xml:space="preserve">
+    <value>फ्लिप यू (स्वैप यू0/यू1)</value>
+  </data>
+  <data name="UvDebugFlipV" xml:space="preserve">
+    <value>फ्लिप वी (स्वैप v0/v1)</value>
+  </data>
+  <data name="UvDebugOffsetU" xml:space="preserve">
+    <value>यू ऑफसेट (पीएक्स)</value>
+  </data>
+  <data name="UvDebugOffsetV" xml:space="preserve">
+    <value>वी ऑफसेट (पीएक्स)</value>
+  </data>
+  <data name="UvDebugFaceSemanticRouting" xml:space="preserve">
+    <value>फेस सिमेंटिक रूटिंग (पोस्ट-ट्रांसफॉर्म फेस सिमेंटिक्स)</value>
+  </data>
+  <data name="UvDebugSwapNorthSouth" xml:space="preserve">
+    <value>उत्तर/दक्षिण दिशा की ओर मुख करके स्वैप करें</value>
+  </data>
+  <data name="UvDebugSwapEastWest" xml:space="preserve">
+    <value>पूर्व/पश्चिम मार्ग की ओर मुख करके स्वैप करें</value>
+  </data>
+  <data name="UvDebugSwapUpDown" xml:space="preserve">
+    <value>फेस रूटिंग को ऊपर/नीचे स्वैप करें</value>
+  </data>
+  <data name="UvDebugBakerConversion" xml:space="preserve">
+    <value>बेकर यूवी रूपांतरण</value>
+  </data>
+  <data name="UvDebugPreserveDirectionalBounds" xml:space="preserve">
+    <value>दिशात्मक यूवी सीमाएं सुरक्षित रखें (न्यूनतम/अधिकतम सामान्यीकरण अक्षम करें)</value>
+  </data>
+  <data name="UvDebugUseBottomLeftUvOrigin" xml:space="preserve">
+    <value>नीचे-बाएँ UV मूल रूपांतरण (GL शैली) का उपयोग करें</value>
+  </data>
+  <data name="UvDebugFaceCornerOrdering" xml:space="preserve">
+    <value>फेस कॉर्नर ऑर्डरिंग/वाइंडिंग</value>
+  </data>
+  <data name="UvDebugCornerOrderDefault" xml:space="preserve">
+    <value>गलती करना</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate90" xml:space="preserve">
+    <value>90 घुमाएँ</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate180" xml:space="preserve">
+    <value>180 घुमाएँ</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate270" xml:space="preserve">
+    <value>270 घुमाएँ</value>
+  </data>
+  <data name="UvDebugCornerOrderReverseWinding" xml:space="preserve">
+    <value>उलटी वाइंडिंग</value>
+  </data>
+  <data name="UvDebugGlobalFaceRotation" xml:space="preserve">
+    <value>ग्लोबल फेस रोटेशन</value>
+  </data>
+  <data name="UvDebugRotation0" xml:space="preserve">
+    <value>0°</value>
+  </data>
+  <data name="UvDebugRotation90" xml:space="preserve">
+    <value>90°</value>
+  </data>
+  <data name="UvDebugRotation180" xml:space="preserve">
+    <value>180°</value>
+  </data>
+  <data name="UvDebugRotation270" xml:space="preserve">
+    <value>270°</value>
+  </data>
+  <data name="UvDebugLiveChangesHint" xml:space="preserve">
+    <value>परिवर्तन लाइव लागू होते हैं और पूर्वावलोकन ताज़ा हो जाते हैं। टेक्सऑफ़्स बनाम बेकर रूपांतरण बनाम कॉर्नर-ऑर्डर मुद्दों को अलग करने के लिए इनका उपयोग करें।</value>
+  </data>
+  <data name="EntityPreviewDebugTitle" xml:space="preserve">
+    <value>निकाय पूर्वावलोकन डीबग</value>
+  </data>
+  <data name="EntityPreviewDebugBabyFixesSection" xml:space="preserve">
+    <value>बेबी पूर्वावलोकन लाइव फिक्स</value>
+  </data>
+  <data name="EntityPreviewDebugBabyFixesDescription" xml:space="preserve">
+    <value>एक्सप्लोर में शिशु के शरीर/सिर/पैर को अलग करने के लिए परीक्षण/त्रुटि स्विच। रीबेक मेश को तुरंत बदलें - एक बेबी टेक्सचर लोड करें (फॉक्स_बेबी, काउ_टेम्परेट_बेबी, गधा_बेबी, ...) और एक समय में एक फिक्स को टॉगल करें।</value>
+  </data>
+  <data name="EntityPreviewDebugBaselineCompare" xml:space="preserve">
+    <value>बेसलाइन तुलना</value>
+  </data>
+  <data name="EntityPreviewDebugForceCpuSkinning" xml:space="preserve">
+    <value>फोर्स सीपीयू स्किनिंग (12-फ्लोट पूर्वावलोकन वीबीओ)</value>
+  </data>
+  <data name="EntityPreviewDebugForceCpuSkinningTooltip" xml:space="preserve">
+    <value>सीपीयू पर सही जाल लेकिन जीपीयू पर अलग ⇒ जीपीयू बाइंड/डब्ल्यू() पथ, आईआर वॉक नहीं।</value>
+  </data>
+  <data name="EntityPreviewDebugLogDrawContract" xml:space="preserve">
+    <value>लॉग इकाई प्रत्येक फ्रेम में अनुबंध तैयार करती है</value>
+  </data>
+  <data name="EntityPreviewDebugLogDrawContractTooltip" xml:space="preserve">
+    <value>सुधारों को टॉगल करते समय पूर्वावलोकन लॉग में बॉडीवाई/हेडवाई/लेगवाई देखें।</value>
+  </data>
+  <data name="EntityPreviewDebugLayerDebugFalseColor" xml:space="preserve">
+    <value>परत डीबग झूठा रंग (गहराई बैच)</value>
+  </data>
+  <data name="EntityPreviewDebugLayerDebugFalseColorTooltip" xml:space="preserve">
+    <value>प्रत्येक ड्रा बैच को PreviewDepthLayerKind (बेस ग्रे, कटआउट सियान, कॉस्मेटिक मैजेंटा, एमिसिव येलो) द्वारा रंगें।</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseCompose" xml:space="preserve">
+    <value>भाग मुद्रा रचना (रिबेक जाल)</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseErTimesT" xml:space="preserve">
+    <value>एर × टी (उत्पादन)</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseLegacyTxEr" xml:space="preserve">
+    <value>टी × एर (विरासत वयस्क विस्फोट)</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseLegacyTxErTooltip" xml:space="preserve">
+    <value>आमतौर पर वयस्कों के लिए गलत; यदि माता-पिता के घुमाव के साथ अंग अलग हो जाते हैं तो शिशुओं पर प्रयास करें।</value>
+  </data>
+  <data name="EntityPreviewDebugLerFold" xml:space="preserve">
+    <value>एलईआर फोल्ड (रीबेक मेश)</value>
+  </data>
+  <data name="EntityPreviewDebugLerPolicyDefault" xml:space="preserve">
+    <value>नीति डिफ़ॉल्ट</value>
+  </data>
+  <data name="EntityPreviewDebugLerStandardWorldRoot" xml:space="preserve">
+    <value>स्टैंडर्डवर्ल्डरूट (कॉलम एस·एम)</value>
+  </data>
+  <data name="EntityPreviewDebugLerRightComposeLocalChain" xml:space="preserve">
+    <value>राइटकंपोज़लोकलचेन (एम·एस)</value>
+  </data>
+  <data name="EntityPreviewDebugLerRightComposeLocalChainTooltip" xml:space="preserve">
+    <value>प्रति-तत्व एम×एस - चौपायों पर घुमाए गए शरीर के घनाकार को अलग कर सकता है।</value>
+  </data>
+  <data name="EntityPreviewDebugLerSkip" xml:space="preserve">
+    <value>एलईआर छोड़ें</value>
+  </data>
+  <data name="EntityPreviewDebugPartTreeRepair" xml:space="preserve">
+    <value>भाग-वृक्ष की मरम्मत</value>
+  </data>
+  <data name="EntityPreviewDebugSkipAllPartTreeRepair" xml:space="preserve">
+    <value>सभी पार्ट-ट्री मरम्मत को छोड़ें (कच्चा उठा हुआ आईआर)</value>
+  </data>
+  <data name="EntityPreviewDebugSkipAllPartTreeRepairTooltip" xml:space="preserve">
+    <value>ज्योमेट्रीइरपार्टट्रीरिपेयर को पूरी तरह से बायपास करें - किसी भी बच्चे के ठीक होने से पहले लिफ्टर आउटपुट देखें।</value>
+  </data>
+  <data name="EntityPreviewDebugIndividualRepairSteps" xml:space="preserve">
+    <value>व्यक्तिगत मरम्मत चरण (उत्पादन डिफ़ॉल्ट चालू)</value>
+  </data>
+  <data name="EntityPreviewDebugIndividualRepairStepsDescription" xml:space="preserve">
+    <value>यह देखने के लिए किसी चरण को अनचेक करें कि इससे वर्तमान शिशु को मदद मिलती है या हानि पहुँचती है। स्किप-ऑल इन्हें ओवरराइड करता है।</value>
+  </data>
+  <data name="EntityPreviewDebugRepairGlobalReparent" xml:space="preserve">
+    <value>वैश्विक अभिभावक (कान, सिर→सिर_भाग, सींग, हवा की हवा,…)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairQuadrupedLegReparent" xml:space="preserve">
+    <value>शरीर के नीचे चौगुनी टाँगें</value>
+  </data>
+  <data name="EntityPreviewDebugRepairQuadrupedLegReparentTooltip" xml:space="preserve">
+    <value>जब एक सपाट जड़ बेक न हो - बच्चा गधा/घोड़ा हेड-स्टैक वर्ग नीचे दिए गए हेड-स्टैक नियम का उपयोग करता है।</value>
+  </data>
+  <data name="EntityPreviewDebugRepairForceLegReparent" xml:space="preserve">
+    <value>फ्लैट क्वाड्रुप्ड बेक पर फोर्स लेग रिपेरेंट (प्रायोगिक)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairForceLegReparentTooltip" xml:space="preserve">
+    <value>लोमड़ी/गाय/मुर्गी के बच्चों पर प्रयास करें जहां पैर शरीर-सापेक्ष ऑफसेट के साथ जड़ भाई-बहन रहते हैं।</value>
+  </data>
+  <data name="EntityPreviewDebugRepairHeadStackLegReparent" xml:space="preserve">
+    <value>हेड-स्टैक नेस्टेड: रिपेरेंट फ्लैट रूट लेग्स (बेबी इक्वाइन)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairHeadStackLegReparentTooltip" xml:space="preserve">
+    <value>बेबीहॉर्समॉडल / बेबीडोंकीमॉडल - सिर शरीर के नीचे लेकिन पैर अभी भी जड़ पर हैं।</value>
+  </data>
+  <data name="EntityPreviewDebugRepairRemoveDuplicateRootSiblings" xml:space="preserve">
+    <value>डुप्लिकेट रूट भाई-बहन हटाएँ</value>
+  </data>
+  <data name="EntityPreviewDebugRepairCollapseInnerBody" xml:space="preserve">
+    <value>आंतरिक शरीर को संक्षिप्त करें / शरीर के नीचे ऊन को ट्रिम करें</value>
+  </data>
+  <data name="EntityPreviewDebugRepairDeduplicateNestedPartIds" xml:space="preserve">
+    <value>नेस्टेड भाग आईडी को डीडुप्लिकेट करें</value>
+  </data>
+  <data name="EntityPreviewDebugRepairZeroEquineRootOffset" xml:space="preserve">
+    <value>जीरो इक्वाइन क्रिएटबॉडीलेयर रूट ऑफसेट (घोड़ा/गधा)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairZeroEquineRootOffsetTooltip" xml:space="preserve">
+    <value>इक्वाइन क्रिएटबॉडीलेयर/क्रिएटबेबीलेयर बेक पर रूट टी(0,24,0) एंकर को गिराता है।</value>
+  </data>
+  <data name="EntityPreviewDebugSuggestedWorkflow" xml:space="preserve">
+    <value>सुझाए गए बेबी वर्कफ़्लो: (1) कच्चे आईआर को देखने के लिए सभी मरम्मत को छोड़ें, (2) एक-एक करके उत्पादन चरणों को फिर से सक्षम करें, (3) इक्वाइन शिशुओं पर फोर्स लेग रिपेरेंट या हेड-स्टैक नियम का प्रयास करें, (4) सीपीयू बनाम जीपीयू स्किनिंग की तुलना करें, (5) यदि क्लस्टर अभी भी बहते हैं तो केवल टी×ईआर या राइटकंपोज़ एलईआर का प्रयास करें।</value>
+  </data>
+  <data name="AiTaggingSection" xml:space="preserve">
+    <value>एआई टैगिंग</value>
+  </data>
+  <data name="NormalsAndHeightSection" xml:space="preserve">
+    <value>सामान्य और ऊंचाई</value>
+  </data>
+  <data name="NormalsSection" xml:space="preserve">
+    <value>नॉर्मल्स</value>
+  </data>
+  <data name="SpecularSection" xml:space="preserve">
+    <value>चिकनाहट</value>
+  </data>
+  <data name="MetalnessSection" xml:space="preserve">
+    <value>धात्विकता</value>
+  </data>
+  <data name="SpecularPorositySection" xml:space="preserve">
+    <value>सरंध्रता</value>
+  </data>
+  <data name="AiDrivenPbrSection" xml:space="preserve">
+    <value>एआई संचालित पीबीआर</value>
+  </data>
+  <data name="AiNormalsSection" xml:space="preserve">
+    <value>एआई सामान्य</value>
+  </data>
+  <data name="AiSpecularSection" xml:space="preserve">
+    <value>एआई स्पेक्युलर</value>
+  </data>
+  <data name="Preview3DCameraExpanderSection" xml:space="preserve">
+    <value>कैमरा</value>
+  </data>
 </root>
 
 

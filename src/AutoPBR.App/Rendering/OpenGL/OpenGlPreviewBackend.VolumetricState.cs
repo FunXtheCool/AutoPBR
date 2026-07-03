@@ -1,5 +1,6 @@
 using System.Numerics;
 
+using AutoPBR.App.Lang;
 using AutoPBR.App.Rendering.Abstractions;
 
 namespace AutoPBR.App.Rendering.OpenGL;
@@ -65,7 +66,7 @@ public sealed partial class OpenGlPreviewBackend
             return;
         }
 
-        RaiseGpuInitProgress("Loading volumetric clouds…", settings);
+        RaiseGpuInitProgress(PreviewGpuInitPhases.LoadingClouds, settings);
         TryInitVolumetricClouds(_gl, _useOpenGlEs);
         if (CanDrawVolumetricClouds(settings))
         {

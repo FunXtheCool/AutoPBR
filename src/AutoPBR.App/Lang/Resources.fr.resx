@@ -102,7 +102,7 @@
   <data name="ExploreCollapseAll" xml:space="preserve"><value>Tout réduire</value></data>
   <data name="ExploreBack" xml:space="preserve"><value>Retour</value></data>
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
-  <data name="TabNormals" xml:space="preserve"><value>Normales</value></data>
+  <data name="TabNormals" xml:space="preserve"><value>Régler</value></data>
   <data name="TabShader" xml:space="preserve"><value>Rendu</value></data>
   <data name="TabSettings" xml:space="preserve"><value>Paramètres</value></data>
   <data name="Input" xml:space="preserve"><value>Entrée</value></data>
@@ -185,11 +185,11 @@
   <data name="PreprocessFrequencySplit" xml:space="preserve"><value>Découpage fréquentiel (macro + détail)</value></data>
   <data name="PreprocessFrequencyRadius" xml:space="preserve"><value>Rayon fréquentiel</value></data>
   <data name="PreprocessFrequencyDetailStrength" xml:space="preserve"><value>Force du détail</value></data>
-  <data name="SpecularAdvanced" xml:space="preserve"><value>Spéculaire (avancé)</value></data>
+  <data name="SpecularAdvanced" xml:space="preserve"><value>Canaux</value></data>
   <data name="SpecularPercentileRemap" xml:space="preserve"><value>Remap par percentiles de la brillance (R)</value></data>
   <data name="SpecularRemapLowPercentile" xml:space="preserve"><value>Percentile bas</value></data>
   <data name="SpecularRemapHighPercentile" xml:space="preserve"><value>Percentile haut</value></data>
-  <data name="AoAdvanced" xml:space="preserve"><value>Occlusion ambiante (AO)</value></data>
+  <data name="AoAdvanced" xml:space="preserve"><value>Occlusion ambiante</value></data>
   <data name="GenerateAo" xml:space="preserve"><value>Générer l’AO (canal bleu)</value></data>
   <data name="AoRadius" xml:space="preserve"><value>Rayon AO</value></data>
   <data name="AoStrength" xml:space="preserve"><value>Intensité AO</value></data>
@@ -303,6 +303,1260 @@
   <data name="Preview3DSpritePlaneCount" xml:space="preserve"><value>Nombre de plans sprite</value></data>
   <data name="Preview3DSpritePlaneCountTooltip" xml:space="preserve"><value>Nombre de plans croisés utilisés pour les textures marquées Sprite 2D en aperçu 3D.</value></data>
   <data name="Preview3DCameraDebugFlyHint" xml:space="preserve"><value>Clic droit + glisser : regarder · WASD en maintenant clic droit : voler · R : réinitialiser orbite et offset de vol</value></data>
+  <data name="ClearTagOverrides" xml:space="preserve">
+    <value>Effacer les remplacements de balises</value>
+  </data>
+  <data name="ClearTagOverridesTooltip" xml:space="preserve">
+    <value>Réinitialisez tous les ajouts/suppressions de balises manuelles pour ce pack.</value>
+  </data>
+  <data name="TagMenuDontApply" xml:space="preserve">
+    <value>N'appliquez pas '{0}' ici</value>
+  </data>
+  <data name="TagMenuApply" xml:space="preserve">
+    <value>Appliquez '{0}' ici</value>
+  </data>
+  <data name="TagRules" xml:space="preserve">
+    <value>Règles de balise</value>
+  </data>
+  <data name="TagRulesCustomDescription" xml:space="preserve">
+    <value>Modifiez vos propres ensembles de règles pour guider le traitement heuristique et/ou IA</value>
+  </data>
+  <data name="RulesetsBuiltInTags" xml:space="preserve">
+    <value>Balises intégrées</value>
+  </data>
+  <data name="RulesetsBuiltInFlags" xml:space="preserve">
+    <value>Drapeaux intégrés</value>
+  </data>
+  <data name="RulesetsBuiltInExpressions" xml:space="preserve">
+    <value>Règles intégrées</value>
+  </data>
+  <data name="RulesetsSystemRules" xml:space="preserve">
+    <value>Règles calculées par le système</value>
+  </data>
+  <data name="RulesetsSystemRulesDescription" xml:space="preserve">
+    <value>Les valeurs pondérées et non pondérées sont calculées par résolution sémantique au moment de l'exécution et ne sont pas modifiables.</value>
+  </data>
+  <data name="RulesetsCustomExpressions" xml:space="preserve">
+    <value>Règles personnalisées</value>
+  </data>
+  <data name="RulesetsKeywords" xml:space="preserve">
+    <value>Mots-clés</value>
+  </data>
+  <data name="RulesetsSemanticHints" xml:space="preserve">
+    <value>Conseils sémantiques</value>
+  </data>
+  <data name="RulesetsManageTokens" xml:space="preserve">
+    <value>Gérer les jetons</value>
+  </data>
+  <data name="RulesetsAddCondition" xml:space="preserve">
+    <value>Ajouter une condition</value>
+  </data>
+  <data name="RulesetsAddAction" xml:space="preserve">
+    <value>Ajouter une action</value>
+  </data>
+  <data name="RulesetsEnableExpression" xml:space="preserve">
+    <value>Activer l'expression</value>
+  </data>
+  <data name="RulesetsExpression" xml:space="preserve">
+    <value>Expression</value>
+  </data>
+  <data name="RulesetsConditions" xml:space="preserve">
+    <value>Conditions</value>
+  </data>
+  <data name="RulesetsActions" xml:space="preserve">
+    <value>Actes</value>
+  </data>
+  <data name="RulesetsRemove" xml:space="preserve">
+    <value>Retirer</value>
+  </data>
+  <data name="RulesetsRemoveLast" xml:space="preserve">
+    <value>Supprimer le dernier</value>
+  </data>
+  <data name="RulesetsValueWatermark" xml:space="preserve">
+    <value>Valeur</value>
+  </data>
+  <data name="RulesetsShowLess" xml:space="preserve">
+    <value>Afficher moins</value>
+  </data>
+  <data name="RulesetsMoreCount" xml:space="preserve">
+    <value>{0} plus</value>
+  </data>
+  <data name="TagRuleId" xml:space="preserve">
+    <value>Identifiant</value>
+  </data>
+  <data name="TagRuleDisplayName" xml:space="preserve">
+    <value>Nom d'affichage</value>
+  </data>
+  <data name="TagRuleKeywords" xml:space="preserve">
+    <value>Mots-clés</value>
+  </data>
+  <data name="TagRuleSemanticHints" xml:space="preserve">
+    <value>Conseils sémantiques (séparés par des virgules, facultatifs)</value>
+  </data>
+  <data name="MaterialTagSemanticMlDescription" xml:space="preserve">
+    <value>Utilise le modèle ONNX fourni sous Data/ONNX-AI/all-MiniLM-L6-v2-onnx (nécessite model.onnx). Lorsqu'elles sont activées, les balises automatiques proviennent uniquement de MiniLM (les règles de mots clés ne sont pas utilisées pour le balisage automatique). L'ajout/suppression manuel de balises s'applique toujours en haut.</value>
+  </data>
+  <data name="MaterialTagMaxCountTooltip" xml:space="preserve">
+    <value>Balises matérielles maximales renvoyées par correspondance sémantique. Certaines règles intégrées d'appariement minerai/matériau et certains indicateurs automatiques peuvent toujours ajouter des balises requises au-delà de cette valeur.</value>
+  </data>
+  <data name="MaterialTagCertaintyThresholdTooltip" xml:space="preserve">
+    <value>Si la meilleure correspondance sémantique est inférieure à ce score, seul Inconnu est suggéré (similitude cosinus 0–1).</value>
+  </data>
+  <data name="TagLegendMaterials" xml:space="preserve">
+    <value>Matériels</value>
+  </data>
+  <data name="TagLegendFlags" xml:space="preserve">
+    <value>Drapeaux</value>
+  </data>
+  <data name="ExploreColumnResource" xml:space="preserve">
+    <value>Ressource</value>
+  </data>
+  <data name="TagRuleKindLabel" xml:space="preserve">
+    <value>Gentil</value>
+  </data>
+  <data name="AddCustomTag" xml:space="preserve">
+    <value>Ajouter une balise personnalisée</value>
+  </data>
+  <data name="AddCustomRule" xml:space="preserve">
+    <value>Ajouter une règle personnalisée</value>
+  </data>
+  <data name="RemoveTagRule" xml:space="preserve">
+    <value>Retirer</value>
+  </data>
+  <data name="RefreshTagRules" xml:space="preserve">
+    <value>Rafraîchir</value>
+  </data>
+  <data name="InvertHeight" xml:space="preserve">
+    <value>Inverser la hauteur</value>
+  </data>
+  <data name="InvertSpecular" xml:space="preserve">
+    <value>Inverser le spéculaire</value>
+  </data>
+  <data name="TagRuleNormalIntensityOpt" xml:space="preserve">
+    <value>Normale × (opt.)</value>
+  </data>
+  <data name="TagRuleHeightIntensityOpt" xml:space="preserve">
+    <value>Hauteur × (opt.)</value>
+  </data>
+  <data name="TagRuleIntensityTooltip" xml:space="preserve">
+    <value>Laissez vide pour utiliser les valeurs globales de réglage. Exemple : 0,85 normales plus douces, 0,07 hauteur plus subtile.</value>
+  </data>
+  <data name="TagRuleInvertNormalX" xml:space="preserve">
+    <value>Inverser la normale X</value>
+  </data>
+  <data name="TagRuleInvertNormalY" xml:space="preserve">
+    <value>Inverser la normale Y</value>
+  </data>
+  <data name="TagRuleEnabled" xml:space="preserve">
+    <value>Utilisez cette règle</value>
+  </data>
+  <data name="TagRuleEnabledTooltip" xml:space="preserve">
+    <value>Lorsqu'elle n'est pas cochée, cette règle est exclue de la légende et de l'exploration. Cliquez sur Actualiser pour mettre à jour.</value>
+  </data>
+  <data name="TagRuleMoveUp" xml:space="preserve">
+    <value>↑</value>
+  </data>
+  <data name="TagRuleMoveDown" xml:space="preserve">
+    <value>↓</value>
+  </data>
+  <data name="TagRuleMoveUpTooltip" xml:space="preserve">
+    <value>Déplacer la règle vers le haut (ordre de fusion)</value>
+  </data>
+  <data name="TagRuleMoveDownTooltip" xml:space="preserve">
+    <value>Déplacer la règle vers le bas (ordre de fusion)</value>
+  </data>
+  <data name="ExportTagRules" xml:space="preserve">
+    <value>Règles d'exportation…</value>
+  </data>
+  <data name="ImportTagRules" xml:space="preserve">
+    <value>Règles d'importation…</value>
+  </data>
+  <data name="ExportTagRulesTooltip" xml:space="preserve">
+    <value>Enregistrez les règles de balises personnalisées au format JSON (pour la sauvegarde ou CLI --tag-rules).</value>
+  </data>
+  <data name="ImportTagRulesTooltip" xml:space="preserve">
+    <value>Remplacez les règles personnalisées d'un fichier JSON.</value>
+  </data>
+  <data name="RefreshTagRulesTooltip" xml:space="preserve">
+    <value>Mettez à jour l'arbre d'exploration et la légende avec les règles actuelles.</value>
+  </data>
+  <data name="Log_TagRulesExported" xml:space="preserve">
+    <value>Règles de balises personnalisées exportées.</value>
+  </data>
+  <data name="Log_TagRulesImported" xml:space="preserve">
+    <value>Règle(s) de balise personnalisée {0} importée(s).</value>
+  </data>
+  <data name="Log_TagRulesImportFailed" xml:space="preserve">
+    <value>Échec de l'importation des règles de balise : {0}</value>
+  </data>
+  <data name="TabRulesets" xml:space="preserve">
+    <value>Ensembles de règles</value>
+  </data>
+  <data name="TabDebug" xml:space="preserve">
+    <value>Déboguer</value>
+  </data>
+  <data name="BrickProbeTuning" xml:space="preserve">
+    <value>Réglage de la sonde de brique</value>
+  </data>
+  <data name="BrickProbeEnable" xml:space="preserve">
+    <value>Activer l'inversion de la sonde de brique</value>
+  </data>
+  <data name="BrickProbeMinStructure" xml:space="preserve">
+    <value>Confiance minimale dans la structure</value>
+  </data>
+  <data name="BrickProbeInvertDelta" xml:space="preserve">
+    <value>Inverser le seuil delta</value>
+  </data>
+  <data name="BrickProbeLightGroutDelta" xml:space="preserve">
+    <value>Delta de luminance du coulis léger</value>
+  </data>
+  <data name="BrickProbeEnableTooltip" xml:space="preserve">
+    <value>Pour les textures étiquetées brique, décidez s'il faut inverser globalement la carte de hauteur lorsque la sonde détecte du mortier léger qui doit être encastré. Nécessite la balise de matériau de brique (mot-clé ou sémantique).</value>
+  </data>
+  <data name="BrickProbeMinStructureTooltip" xml:space="preserve">
+    <value>Réponse moyenne minimale du mortier structurel (0–1) pour le chemin de radier fort (grand delta de hauteur avec une confiance élevée dans les joints). Les joints fins restent souvent en dessous ; le chemin de coulis léger n'utilise pas ce seuil.</value>
+  </data>
+  <data name="BrickProbeInvertDeltaTooltip" xml:space="preserve">
+    <value>Chemin fort uniquement : la hauteur moyenne du mortier moins la hauteur moyenne de la brique doit dépasser cette valeur (échelle 0-255) avant un inversion globale. Les valeurs inférieures se déclenchent plus facilement en cas de séparation subtile en hauteur.</value>
+  </data>
+  <data name="BrickProbeLightGroutDeltaTooltip" xml:space="preserve">
+    <value>Trajet lumière-coulis : la luminance diffuse pondérée sur le mortier moins la brique doit dépasser cette valeur (0–1). Réduire si le mortier et la brique ont une luminosité similaire. Lorsque Δ&gt;0 et que cela passe, la carte de hauteur est inversée afin que les faces soient lues plus haut que les articulations.</value>
+  </data>
+  <data name="PreviewBrickProbeDebug" xml:space="preserve">
+    <value>Afficher le débogage de la sonde de brique (aperçu)</value>
+  </data>
+  <data name="PreviewBrickProbeDebugTooltip" xml:space="preserve">
+    <value>Lorsqu'il est activé, le panneau d'aperçu affiche les métriques de la sonde (masque, moyenne, delta de hauteur, écart de luminosité, chemin inversé) pour la texture sélectionnée. La conversion est inchangée.</value>
+  </data>
+  <data name="PlantMaterialPorosityExtra" xml:space="preserve">
+    <value>Matière Organique Extra Porosité</value>
+  </data>
+  <data name="PlantMaterialPorosityExtraTooltip" xml:space="preserve">
+    <value>Décalage supplémentaire du canal B pour les textures avec la balise de matériau organique (ou les chemins de plantes OptiFine). Ajouté en plus du biais de porosité.</value>
+  </data>
+  <data name="MlSpecularHeuristicBlend" xml:space="preserve">
+    <value>Mélange heuristique/IA</value>
+  </data>
+  <data name="MlSpecularHeuristicBlendTooltip" xml:space="preserve">
+    <value>0 = spéculaire heuristique pur lorsque le modèle d'IA s'exécute ; 1 = contribution complète de l'IA. Les valeurs intermédiaires mélangent les deux.</value>
+  </data>
+  <data name="MlSpecularBlendMode" xml:space="preserve">
+    <value>Mode canal</value>
+  </data>
+  <data name="MlSpecularBlendModeTooltip" xml:space="preserve">
+    <value>Détermine quels canaux reçoivent une contribution heuristique lors de la fusion avec l'IA.</value>
+  </data>
+  <data name="MlSpecularBlendMath" xml:space="preserve">
+    <value>Mode de fusion</value>
+  </data>
+  <data name="MlSpecularBlendMathTooltip" xml:space="preserve">
+    <value>Sélectionne les calculs de mélange utilisés pour combiner les valeurs heuristiques et IA pour les canaux mélangés.</value>
+  </data>
+  <data name="MlSpecularBlendMathLinear" xml:space="preserve">
+    <value>Linéaire</value>
+  </data>
+  <data name="MlSpecularBlendMathSoftLight" xml:space="preserve">
+    <value>Lumière douce</value>
+  </data>
+  <data name="MlSpecularBlendMathOverlay" xml:space="preserve">
+    <value>Recouvrir</value>
+  </data>
+  <data name="MlSpecularBlendMathScreen" xml:space="preserve">
+    <value>Écran</value>
+  </data>
+  <data name="MlSpecularBlendMathBiasGain" xml:space="preserve">
+    <value>Biais/Gain</value>
+  </data>
+  <data name="MlSpecularBlendMathSigmoidCrossfade" xml:space="preserve">
+    <value>Fondu enchaîné sigmoïde</value>
+  </data>
+  <data name="MlSpecularBlendModeSmoothnessOnly" xml:space="preserve">
+    <value>Douceur uniquement</value>
+  </data>
+  <data name="MlSpecularBlendModeFull" xml:space="preserve">
+    <value>Complet</value>
+  </data>
+  <data name="MlSpecularBlendModeAiMetalAndEmissive" xml:space="preserve">
+    <value>IA Métal &amp; Émissif</value>
+  </data>
+  <data name="SpecularForceNoEmissive" xml:space="preserve">
+    <value>Force non émissive (spéculaire A)</value>
+  </data>
+  <data name="SpecularForceNoEmissiveTooltip" xml:space="preserve">
+    <value>Remplacer : définissez la carte spéculaire LabPBR alpha sur 255 (pas d'émission) pour tous les pixels. Bloque l’émission de la palette heuristique et les prédictions émissives ML.</value>
+  </data>
+  <data name="DeepBumpNormalIntensity" xml:space="preserve">
+    <value>Force normale DeepBump</value>
+  </data>
+  <data name="DeepBumpNormalIntensityTooltip" xml:space="preserve">
+    <value>Multiplicateur de force XY normal uniquement DeepBump. 1 = inchangé, plus élevé = détails plus forts, plus bas = normales plus plates.</value>
+  </data>
+  <data name="DeepBumpNormalSoftClamp" xml:space="preserve">
+    <value>Pince souple DeepBump</value>
+  </data>
+  <data name="DeepBumpNormalSoftClampTooltip" xml:space="preserve">
+    <value>0 = mise à l'échelle de la résistance linéaire. Des valeurs plus élevées appliquent une pince tanh douce à la magnitude XY, conservant des détails forts tout en réduisant les artefacts de saturation proches de 90°.</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedEnhance" xml:space="preserve">
+    <value>Amélioration du DeepBump guidé par les bords</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedStrength" xml:space="preserve">
+    <value>Force de guidage des bords</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedStrengthTooltip" xml:space="preserve">
+    <value>Amplifie davantage la magnitude XY normale du modèle sur les bords diffus forts. 0 = désactivé, 1 = modéré, plus élevé = bords plus nets.</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedGamma" xml:space="preserve">
+    <value>Gamma de guidage de bord</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedGammaTooltip" xml:space="preserve">
+    <value>Contrôle où l’amélioration est concentrée. Les valeurs plus élevées se concentrent sur les bords les plus forts ; les valeurs inférieures sont réparties sur des bords plus doux.</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedDirectionMix" xml:space="preserve">
+    <value>Mélange de direction de bord</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedDirectionMixTooltip" xml:space="preserve">
+    <value>Mélange la direction normale de DeepBump avec la direction du dégradé dérivé de la diffusion sur les bords. 0 = conserver la direction du modèle, 1 = aligner complètement sur les bords forts.</value>
+  </data>
+  <data name="NormalHeightTransparentAlphaClampMax" xml:space="preserve">
+    <value>Pince Alpha transparente normale/hauteur Max</value>
+  </data>
+  <data name="NormalHeightTransparentAlphaClampMaxTooltip" xml:space="preserve">
+    <value>Pince post-traitement : si alpha diffus ≤ cette valeur, forcez le RGBA normal/hauteur à 0 pour éviter les artefacts dans les régions transparentes. Bouchons coulissants à 16 ; vous pouvez taper jusqu'à 255.</value>
+  </data>
+  <data name="UseMlSpecularPredictor" xml:space="preserve">
+    <value>Utiliser le générateur/prédicteur spéculaire ML (ONNX)</value>
+  </data>
+  <data name="UseMlSpecularPredictorTooltip" xml:space="preserve">
+    <value>Lorsqu'il est activé et qu'un chemin de modèle par défaut ou par résolution est valide, le RGBA spéculaire direct par pixel est prédit à partir du diffus. Les chemins facultatifs par résolution (ou les modèles Data/ONNX-AI/SpecLab groupés) choisissent l'ONNX par taille de texture (plafond). Le curseur de mélange heuristique/IA contrôle la quantité de modèle utilisée par rapport à l'heuristique classique. Consultez le journal pour les diagnostics ML.</value>
+  </data>
+  <data name="MlSpecularModelPath" xml:space="preserve">
+    <value>Chemin du modèle spéculaire</value>
+  </data>
+  <data name="MlSpecularModelPathWatermark" xml:space="preserve">
+    <value>Chemin d'accès au fichier ONNX du générateur/prédicteur spéculaire</value>
+  </data>
+  <data name="MlSpecularPerResolutionHeader" xml:space="preserve">
+    <value>Modèles spéculaires par résolution (facultatif)</value>
+  </data>
+  <data name="MlSpecularPerResolutionTooltip" xml:space="preserve">
+    <value>Remplacez ONNX par résolution d’entraînement. Laissez vide pour utiliser les fichiers regroupés sous Data/ONNX-AI/SpecLab lorsqu'ils sont présents. Le runtime sélectionne la plus petite résolution configurée ≥ taille de texture (plafond) ; si la texture est plus grande que toutes les clés, la plus grande clé est utilisée. Le chemin par défaut de secours ci-dessus s’applique uniquement lorsqu’aucune carte par résolution n’est disponible.</value>
+  </data>
+  <data name="MlSpecularUseEdgeChannel" xml:space="preserve">
+    <value>Inclure le canal Edge pour l'entrée du modèle spéculaire (si le modèle attend 4 canaux)</value>
+  </data>
+  <data name="MlSpecularTransparentAlphaClampMax" xml:space="preserve">
+    <value>Pince Alpha transparente Max</value>
+  </data>
+  <data name="MlSpecularTransparentAlphaClampMaxTooltip" xml:space="preserve">
+    <value>Pince post-traitement : si alpha diffus ≤ cette valeur, forcez le RGBA spéculaire à 0 pour éviter les artefacts ML dans les régions transparentes. Bouchons coulissants à 16 ; vous pouvez taper jusqu'à 255.</value>
+  </data>
+  <data name="SpecularDebugSection" xml:space="preserve">
+    <value>Débogage spéculaire ML</value>
+  </data>
+  <data name="SpecularDebugDisableHeuristicSpecular" xml:space="preserve">
+    <value>Désactiver le repli heuristique (magenta = non-ML)</value>
+  </data>
+  <data name="SpecularDebugDisableHeuristicSpecularTooltip" xml:space="preserve">
+    <value>Les pixels qui utiliseraient le chemin spéculaire classique sont forcés au magenta (255,0,255). Si ML échoue complètement, toute la texture est magenta. Indique clairement si le modèle pilote des pixels.</value>
+  </data>
+  <data name="SpecularDebugSkipSpecularRemap" xml:space="preserve">
+    <value>Ignorer le remappage du centile de douceur (R)</value>
+  </data>
+  <data name="SpecularDebugSkipSpecularRemapTooltip" xml:space="preserve">
+    <value>Désactive la post-étape qui remappe R sur la plage 10-200 afin que vous puissiez juger directement la sortie du modèle.</value>
+  </data>
+  <data name="SpecularDebugVerboseSpecularMl" xml:space="preserve">
+    <value>Diagnostics ML détaillés (journal)</value>
+  </data>
+  <data name="SpecularDebugVerboseSpecularMlTooltip" xml:space="preserve">
+    <value>Par texture, enregistre les détails de chargement/d'exécution et un échantillon du premier pixel lorsque l'inférence réussit. Enregistre également des erreurs précises lorsque le modèle ne parvient pas à charger ou à générer des incompatibilités de forme.</value>
+  </data>
+  <data name="ForceShaderCacheInvalidation" xml:space="preserve">
+    <value>Forcer l'invalidation du cache du shader</value>
+  </data>
+  <data name="ForceShaderCacheInvalidationTooltip" xml:space="preserve">
+    <value>Supprime le cache binaire du shader GPU sur disque et recompile les shaders d'aperçu. À utiliser après les modifications du shader lorsque l'aperçu semble obsolète.</value>
+  </data>
+  <data name="ShaderCacheInvalidatedLog" xml:space="preserve">
+    <value>[Paramètres] Cache du shader vidé ; les shaders d’aperçu seront recompilés.</value>
+  </data>
+  <data name="MinecraftAssetsFolder" xml:space="preserve">
+    <value>Actifs Minecraft</value>
+  </data>
+  <data name="MinecraftAssetsFolderTooltip" xml:space="preserve">
+    <value>Chemin facultatif vers un dossier de version Minecraft ou des actifs/racine extraits. Utilisé pour résoudre les modèles de blocs Vanilla pour un aperçu du pack de texture uniquement.</value>
+  </data>
+  <data name="MinecraftAssetsFolderWatermark" xml:space="preserve">
+    <value>Détecté automatiquement à partir de .minecraft lorsqu'il est vide</value>
+  </data>
+  <data name="Preview3DCameraFlyLookSensitivity" xml:space="preserve">
+    <value>Sensibilité au regard des mouches</value>
+  </data>
+  <data name="Preview3DCameraFlyMoveSpeed" xml:space="preserve">
+    <value>Vitesse de déplacement de vol</value>
+  </data>
+  <data name="Preview3DCameraFlyMoveSpeedTooltip" xml:space="preserve">
+    <value>Vitesse de vol de base WASD tout en maintenant le bouton droit de la souris. Utilisez la molette de la souris pendant le vol pour ajuster temporairement la vitesse.</value>
+  </data>
+  <data name="Preview3DCameraInvertLookY" xml:space="preserve">
+    <value>Inverser le look Y</value>
+  </data>
+  <data name="Preview3DCameraInvertLookYTooltip" xml:space="preserve">
+    <value>Inversez la recherche verticale de la souris pour les caméras en orbite et en vol.</value>
+  </data>
+  <data name="Preview3DCameraFlySmoothAcceleration" xml:space="preserve">
+    <value>Mouvement de mouche fluide</value>
+  </data>
+  <data name="Preview3DCameraFlySmoothAccelerationTooltip" xml:space="preserve">
+    <value>Facilitez les mouvements d'entrée et de sortie des mouches WASD au lieu de démarrages et d'arrêts instantanés.</value>
+  </data>
+  <data name="Preview3DCameraHelpOrbitPanSection" xml:space="preserve">
+    <value>Orbite et panoramique</value>
+  </data>
+  <data name="Preview3DCameraHelpFlySection" xml:space="preserve">
+    <value>Caméra volante</value>
+  </data>
+  <data name="Preview3DCameraHelpFramingSection" xml:space="preserve">
+    <value>Encadrement</value>
+  </data>
+  <data name="Preview3DCameraHelpItemOrbitInput" xml:space="preserve">
+    <value>Alt + glisser (gauche ou milieu)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemOrbitDesc" xml:space="preserve">
+    <value>Orbitez autour du pivot.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemPanInput" xml:space="preserve">
+    <value>Faites glisser sans Alt (gauche ou milieu)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemPanDesc" xml:space="preserve">
+    <value>Faites un panoramique de la vue.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemZoomInput" xml:space="preserve">
+    <value>Molette de la souris</value>
+  </data>
+  <data name="Preview3DCameraHelpItemZoomDesc" xml:space="preserve">
+    <value>Zoomer et dézoomer.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyLookInput" xml:space="preserve">
+    <value>Faites glisser vers la droite</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyLookDesc" xml:space="preserve">
+    <value>Regardez autour de vous (caméra volante).</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWasdInput" xml:space="preserve">
+    <value>W / A / S / D (en maintenant la droite enfoncée)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWasdDesc" xml:space="preserve">
+    <value>Avancez, mitrailler à gauche, reculer et mitrailler à droite.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyQeInput" xml:space="preserve">
+    <value>Q/E (tout en maintenant la droite)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyQeDesc" xml:space="preserve">
+    <value>Déplacez-vous vers le bas et vers le haut.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyShiftInput" xml:space="preserve">
+    <value>Shift (en vol)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyShiftDesc" xml:space="preserve">
+    <value>Déplacez-vous plus vite.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyCtrlInput" xml:space="preserve">
+    <value>Ctrl (en vol)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyCtrlDesc" xml:space="preserve">
+    <value>Déplacez-vous plus lentement (précision).</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWheelInput" xml:space="preserve">
+    <value>Molette de la souris (en vol)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWheelDesc" xml:space="preserve">
+    <value>Ajustez temporairement la vitesse de vol.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFrameInput" xml:space="preserve">
+    <value>Double-cliquez</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFrameDesc" xml:space="preserve">
+    <value>Cadrez le sujet actuel.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemResetDesc" xml:space="preserve">
+    <value>Restaurez le cadrage par défaut de la caméra.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFocusInput" xml:space="preserve">
+    <value>Cliquez sur Aperçu</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFocusDesc" xml:space="preserve">
+    <value>Concentrez l'aperçu sur les raccourcis clavier.</value>
+  </data>
+  <data name="Preview3DSkyDomeSection" xml:space="preserve">
+    <value>Dôme céleste</value>
+  </data>
+  <data name="Preview3DAtmosphereSection" xml:space="preserve">
+    <value>Atmosphère</value>
+  </data>
+  <data name="Preview3DSunSection" xml:space="preserve">
+    <value>Soleil</value>
+  </data>
+  <data name="Preview3DMoonSection" xml:space="preserve">
+    <value>Lune</value>
+  </data>
+  <data name="Preview3DGodRayDebugSection" xml:space="preserve">
+    <value>Débogage de God Ray (froxel)</value>
+  </data>
+  <data name="Preview3DGodRayStabilizeDebug" xml:space="preserve">
+    <value>Stabiliser (pas de temporel/gigue)</value>
+  </data>
+  <data name="Preview3DGodRayStabilizeDebugTooltip" xml:space="preserve">
+    <value>Désactive la réutilisation temporelle froxel/integrate/upsample et gèle la gigue de marche. Allumez pour arrêter de pulser pendant le réglage des rayons divins.</value>
+  </data>
+  <data name="Preview3DGodRayDebugDensity" xml:space="preserve">
+    <value>Densité de débogage</value>
+  </data>
+  <data name="Preview3DGodRayDebugDensityTooltip" xml:space="preserve">
+    <value>Densité moyenne participante uniforme injectée dans le volume du froxel afin que les rayons divins soient visibles sans brouillard ni nuages ​​en hauteur. 0 = comportement de production. Essayez 0,10 à 0,30.</value>
+  </data>
+  <data name="Preview3DGodRayScatterGain" xml:space="preserve">
+    <value>Gain de dispersion</value>
+  </data>
+  <data name="Preview3DGodRayScatterGainTooltip" xml:space="preserve">
+    <value>Gain d'accumulation en diffusion dans la marche intégrée (shader par défaut 3.4). Plus haut = arbres plus brillants.</value>
+  </data>
+  <data name="Preview3DGodRayExtinction" xml:space="preserve">
+    <value>Extinction</value>
+  </data>
+  <data name="Preview3DGodRayExtinctionTooltip" xml:space="preserve">
+    <value>Coefficient d'extinction de Beer-Lambert pour la diminution de la transmission le long du rayon de vue (shader par défaut 1,15). Plus haut = tiges plus denses/plus courtes.</value>
+  </data>
+  <data name="Preview3DPreviewDebugSection" xml:space="preserve">
+    <value>Débogage de l'aperçu 3D</value>
+  </data>
+  <data name="Preview3DIblStrength" xml:space="preserve">
+    <value>Force IBL</value>
+  </data>
+  <data name="Preview3DIblStrengthTooltip" xml:space="preserve">
+    <value>Sonde d'intensité de l'environnement (ambiance indirecte + réflexions). Réduisez si le modèle capte trop de teinte du ciel ; 0 revient à un look ambiant plat.</value>
+  </data>
+  <data name="Preview3DEnableAtmosphericSky" xml:space="preserve">
+    <value>Ciel atmosphérique (LUT)</value>
+  </data>
+  <data name="Preview3DEnableAtmosphericSkyTooltip" xml:space="preserve">
+    <value>Activez l’arrière-plan du ciel atmosphérique et la réponse ambiante pilotés par LUT.</value>
+  </data>
+  <data name="Preview3DAtmosphereTurbidity" xml:space="preserve">
+    <value>Turbidité de l'atmosphère</value>
+  </data>
+  <data name="Preview3DAtmosphereTurbidityTooltip" xml:space="preserve">
+    <value>Indicateur de densité des aérosols. Des valeurs plus élevées rendent l’horizon plus brumeux et les couchers de soleil plus chauds.</value>
+  </data>
+  <data name="Preview3DAtmosphereSunIntensity" xml:space="preserve">
+    <value>Intensité du soleil de l'atmosphère</value>
+  </data>
+  <data name="Preview3DAtmosphereSunIntensityTooltip" xml:space="preserve">
+    <value>Échelle du rayonnement solaire atmosphérique utilisé par le passage aérien et les sondes indirectes.</value>
+  </data>
+  <data name="Preview3DAtmosphereHorizonFalloff" xml:space="preserve">
+    <value>Atténuation de l'horizon de l'atmosphère</value>
+  </data>
+  <data name="Preview3DAtmosphereHorizonFalloffTooltip" xml:space="preserve">
+    <value>Contrôle l'atténuation de l'extinction près de l'horizon (inférieur = lueur plus large, plus élevé = bande plus étroite).</value>
+  </data>
+  <data name="Preview3DAtmosphereSkyExposure" xml:space="preserve">
+    <value>Exposition au ciel</value>
+  </data>
+  <data name="Preview3DAtmosphereSkyExposureTooltip" xml:space="preserve">
+    <value>Maîtrisez la luminosité sur le passage composite du ciel. Abaissez pour réduire la floraison.</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscStrength" xml:space="preserve">
+    <value>Floraison du disque solaire</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscStrengthTooltip" xml:space="preserve">
+    <value>Éblouissement additif autour du disque solaire au-dessus de la LUT. Abaissez pour un halo plus doux ; plus haut pour une floraison plus large.</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscBrightness" xml:space="preserve">
+    <value>Luminosité du soleil</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscBrightnessTooltip" xml:space="preserve">
+    <value>Luminosité de la surface du disque solaire assombrie par les membres. N'affecte pas le halo de floraison externe.</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscSize" xml:space="preserve">
+    <value>Taille du soleil</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscSizeTooltip" xml:space="preserve">
+    <value>Multiplicateur de taille angulaire du soleil. 1.0 = stylisé par défaut ; ~0,07 correspond au soleil réel (0,27 degrés). Il met également à l'échelle l'auréole et le cône du rayon divin.</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscStrength" xml:space="preserve">
+    <value>Luminosité de la lune</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscStrengthTooltip" xml:space="preserve">
+    <value>Multiplicateur de luminosité de surface pour le disque lunaire texturé.</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscSize" xml:space="preserve">
+    <value>Taille de la lune</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscSizeTooltip" xml:space="preserve">
+    <value>Multiplicateur de taille angulaire de la lune pour le panneau d'affichage du ciel.</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonGlowStrength" xml:space="preserve">
+    <value>Lueur de la lune</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonGlowStrengthTooltip" xml:space="preserve">
+    <value>Lueur extérieure bleu-blanc autour du limbe lunaire.</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonTextureSharpness" xml:space="preserve">
+    <value>Netteté de la lune</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonTextureSharpnessTooltip" xml:space="preserve">
+    <value>Affûtage côté shader pour la texture lunaire générée.</value>
+  </data>
+  <data name="Preview3DMoonWorldLightIntensity" xml:space="preserve">
+    <value>Lumière du monde lunaire</value>
+  </data>
+  <data name="Preview3DMoonWorldLightIntensityTooltip" xml:space="preserve">
+    <value>Multiplicateur direct de clair de lune pour un aperçu de la géométrie de l'éclairage la nuit. Ne modifie pas l'exposition au ciel ou le remplissage atmosphérique.</value>
+  </data>
+  <data name="Preview3DShowCelestialDebug" xml:space="preserve">
+    <value>Marqueurs soleil/lune</value>
+  </data>
+  <data name="Preview3DShowCelestialDebugTooltip" xml:space="preserve">
+    <value>Dessinez des marqueurs carrés et en croix aux positions des disques solaire et lunaire.</value>
+  </data>
+  <data name="Preview3DHorizonFogStrength" xml:space="preserve">
+    <value>Brouillard d'horizon</value>
+  </data>
+  <data name="Preview3DHorizonFogStrengthTooltip" xml:space="preserve">
+    <value>Le brouillard se remplit sous l'horizon dans le dôme du ciel et la perspective aérienne sur la géométrie (0 = désactivé).</value>
+  </data>
+  <data name="Preview3DVolumetricSection" xml:space="preserve">
+    <value>Effets volumétriques</value>
+  </data>
+  <data name="Preview3DEnableGodRays" xml:space="preserve">
+    <value>Dieu rayons</value>
+  </data>
+  <data name="Preview3DEnableGodRaysTooltip" xml:space="preserve">
+    <value>Les puits de lumière du volume Froxel se dirigent vers le soleil (injection + intégration + suréchantillonnage).</value>
+  </data>
+  <data name="Preview3DEnableVolumetricClouds" xml:space="preserve">
+    <value>Nuages ​​volumétriques</value>
+  </data>
+  <data name="Preview3DEnableVolumetricCloudsTooltip" xml:space="preserve">
+    <value>Couche nuageuse procédurale dans le ciel (la qualité suit le préréglage ci-dessous).</value>
+  </data>
+  <data name="Preview3DShadersSection" xml:space="preserve">
+    <value>Shaders</value>
+  </data>
+  <data name="Preview3DVolumetricQuality" xml:space="preserve">
+    <value>Qualité Froxel</value>
+  </data>
+  <data name="Preview3DVolumetricQualityTooltip" xml:space="preserve">
+    <value>Résolution Froxel faible/moyenne/élevée, nombre de tranches, détails des nuages ​​et filtrage temporel.</value>
+  </data>
+  <data name="Preview3DGodRayStrength" xml:space="preserve">
+    <value>Force du rayon divin</value>
+  </data>
+  <data name="Preview3DGodRayStrengthTooltip" xml:space="preserve">
+    <value>Intensité du composite additif dieu-rayon (0 = désactivé).</value>
+  </data>
+  <data name="Preview3DCloudSection" xml:space="preserve">
+    <value>Couche Cloud</value>
+  </data>
+  <data name="Preview3DCloudDensity" xml:space="preserve">
+    <value>Densité</value>
+  </data>
+  <data name="Preview3DCloudDensityTooltip" xml:space="preserve">
+    <value>Met à l’échelle la densité volumétrique à l’intérieur de la dalle nuageuse (plus élevée = bouffées plus épaisses et plus opaques).</value>
+  </data>
+  <data name="Preview3DCloudCoverageScale" xml:space="preserve">
+    <value>Couverture</value>
+  </data>
+  <data name="Preview3DCloudCoverageScaleTooltip" xml:space="preserve">
+    <value>Échelle de couverture de la carte météo régionale (0 = ciel clair, 1 = carte telle que cuite).</value>
+  </data>
+  <data name="Preview3DCloudLayerHeight" xml:space="preserve">
+    <value>Hauteur de couche</value>
+  </data>
+  <data name="Preview3DCloudLayerHeightTooltip" xml:space="preserve">
+    <value>Décalage vertical ajouté à la hauteur de base de la dalle nuageuse par défaut (unités mondiales).</value>
+  </data>
+  <data name="Preview3DCloudVolumeHeight" xml:space="preserve">
+    <value>Épaisseur de couche</value>
+  </data>
+  <data name="Preview3DCloudVolumeHeightTooltip" xml:space="preserve">
+    <value>Étendue verticale de la dalle du cumulus principal (unités mondiales).</value>
+  </data>
+  <data name="Preview3DCloudVolumeSize" xml:space="preserve">
+    <value>Échelle des fonctionnalités</value>
+  </data>
+  <data name="Preview3DCloudVolumeSizeTooltip" xml:space="preserve">
+    <value>Taille mondiale d'un cycle de tuiles de bruit (plus grande = formes de nuages ​​plus larges).</value>
+  </data>
+  <data name="Preview3DCloudWindSpeed" xml:space="preserve">
+    <value>Vitesse du vent</value>
+  </data>
+  <data name="Preview3DCloudWindSpeedTooltip" xml:space="preserve">
+    <value>Vitesse de dérive du champ nuageux en unités mondiales par seconde.</value>
+  </data>
+  <data name="Preview3DCloudWindHeading" xml:space="preserve">
+    <value>Cap du vent</value>
+  </data>
+  <data name="Preview3DCloudWindHeadingTooltip" xml:space="preserve">
+    <value>Direction du vent sur le plan du sol en degrés (0 = +X).</value>
+  </data>
+  <data name="Preview3DCloudCirrusStrength" xml:space="preserve">
+    <value>Couche de cirrus</value>
+  </data>
+  <data name="Preview3DCloudCirrusStrengthTooltip" xml:space="preserve">
+    <value>Opacité de la feuille de cirrus très fine au-dessus de la couche principale (0 = off).</value>
+  </data>
+  <data name="Preview3DCloudDebugSection" xml:space="preserve">
+    <value>Débogage cloud</value>
+  </data>
+  <data name="Preview3DCloudDebugView" xml:space="preserve">
+    <value>Vue de débogage</value>
+  </data>
+  <data name="Preview3DCloudDebugViewTooltip" xml:space="preserve">
+    <value>Remplacez les nuages ​​éclairés par une carte de couverture ou une superposition de tranches de densité de couche intermédiaire.</value>
+  </data>
+  <data name="Preview3DCloudDebugViewOff" xml:space="preserve">
+    <value>Désactivé</value>
+  </data>
+  <data name="Preview3DCloudDebugViewCoverage" xml:space="preserve">
+    <value>Carte de couverture</value>
+  </data>
+  <data name="Preview3DCloudDebugViewDensitySlice" xml:space="preserve">
+    <value>Tranche de densité</value>
+  </data>
+  <data name="Preview3DCloudDisableTemporal" xml:space="preserve">
+    <value>Désactiver le temporel</value>
+  </data>
+  <data name="Preview3DCloudDisableTemporalTooltip" xml:space="preserve">
+    <value>Désactivez la reprojection de l'historique des nuages ​​(utile lors de l'inspection du bruit ou des pas de marche).</value>
+  </data>
+  <data name="Preview3DCloudMarchSteps" xml:space="preserve">
+    <value>Étapes de mars</value>
+  </data>
+  <data name="Preview3DCloudMarchStepsTooltip" xml:space="preserve">
+    <value>Remplacement du pas Ray-march (0 = suivre le préréglage de qualité).</value>
+  </data>
+  <data name="Preview3DCloudFreezeWind" xml:space="preserve">
+    <value>Vent glacial</value>
+  </data>
+  <data name="Preview3DCloudFreezeWindTooltip" xml:space="preserve">
+    <value>Maintenez l'advection des nuages ​​au temps zéro pour que les formes restent fixes lors du réglage de l'éclairage.</value>
+  </data>
+  <data name="Preview3DEnablePreviewTaa" xml:space="preserve">
+    <value>Aperçu du TAA</value>
+  </data>
+  <data name="Preview3DEnablePreviewTaaTooltip" xml:space="preserve">
+    <value>Anticrénelage temporel final sur la trame composite. Utilise des aides à la reprojection partagées ; sensible au mouvement lorsque les rayons divins fournissent de la profondeur à la scène. Le temps par passe est réduit de moitié lorsque cette option est activée.</value>
+  </data>
+  <data name="Preview3DTimeOfDayHours" xml:space="preserve">
+    <value>Heure de la journée</value>
+  </data>
+  <data name="Preview3DTimeOfDayHoursTooltip" xml:space="preserve">
+    <value>Heure (0–24 h) pour le cycle soleil/lune : 6 ≈ lever du soleil, 12 ≈ midi, 18 ≈ coucher du soleil, 0/24 ≈ minuit avec étoiles.</value>
+  </data>
+  <data name="Preview3DAnimateTimeOfDay" xml:space="preserve">
+    <value>Animer l'heure de la journée</value>
+  </data>
+  <data name="Preview3DAnimateTimeOfDayTooltip" xml:space="preserve">
+    <value>Avancez le cycle Soleil/Lune à partir de l'horloge de rendu d'aperçu (journée complète en 24 secondes/vitesse).</value>
+  </data>
+  <data name="Preview3DTimeOfDaySpeed" xml:space="preserve">
+    <value>Vitesse de cycle</value>
+  </data>
+  <data name="Preview3DTimeOfDaySpeedTooltip" xml:space="preserve">
+    <value>Heures de jeu avancées par seconde réelle pendant que l'animation est activée (1 = 24 s par journée complète).</value>
+  </data>
+  <data name="Preview3DEnableShadowCascades" xml:space="preserve">
+    <value>Cascades d'ombres</value>
+  </data>
+  <data name="Preview3DEnableShadowCascadesTooltip" xml:space="preserve">
+    <value>Cartes d'ombres directionnelles proches et lointaines ; Les rayons divins du volume choisissent la cascade en fonction de la distance de la caméra.</value>
+  </data>
+  <data name="Preview3DVolumetricQualityLow" xml:space="preserve">
+    <value>Faible</value>
+  </data>
+  <data name="Preview3DVolumetricQualityMedium" xml:space="preserve">
+    <value>Moyen</value>
+  </data>
+  <data name="Preview3DVolumetricQualityHigh" xml:space="preserve">
+    <value>Haut</value>
+  </data>
+  <data name="Preview3DParallaxAoStrength" xml:space="preserve">
+    <value>POM contacter AO</value>
+  </data>
+  <data name="Preview3DParallaxAoStrengthTooltip" xml:space="preserve">
+    <value>Force de l'occlusion ambiante de contact local dérivée du champ de hauteur POM.</value>
+  </data>
+  <data name="Preview3DEnableParallaxAo" xml:space="preserve">
+    <value>POM contacter AO</value>
+  </data>
+  <data name="Preview3DEnableParallaxAoTooltip" xml:space="preserve">
+    <value>Activez l’assombrissement de l’occlusion ambiante locale à partir du champ de hauteur de parallaxe.</value>
+  </data>
+  <data name="Preview3DWorldSection" xml:space="preserve">
+    <value>Monde</value>
+  </data>
+  <data name="Preview3DAnimationSection" xml:space="preserve">
+    <value>Animation</value>
+  </data>
+  <data name="Preview3DShowGroundMesh" xml:space="preserve">
+    <value>Maille de sol (3D)</value>
+  </data>
+  <data name="Preview3DShowGroundMeshTooltip" xml:space="preserve">
+    <value>Affichez le plan du sol de l'herbe texturée sous l'objet dans un aperçu 3D.</value>
+  </data>
+  <data name="Preview3DEnableEntityAnimation" xml:space="preserve">
+    <value>Animer des entités émulées</value>
+  </data>
+  <data name="Preview3DEnableEntityAnimationTooltip" xml:space="preserve">
+    <value>Activez l'animation inactive au moment du rendu pour les aperçus du modèle d'entité émulé.</value>
+  </data>
+  <data name="Preview3DPauseEntityIdleAnimation" xml:space="preserve">
+    <value>Suspendre l'animation des sommets inactifs</value>
+  </data>
+  <data name="Preview3DPauseEntityIdleAnimationTooltip" xml:space="preserve">
+    <value>Lorsqu'elle est activée, l'animation du maillage d'entité émulé se fige à la pose actuelle jusqu'à ce qu'elle soit désactivée. L'oscillation héritée est distincte (voir ci-dessous).</value>
+  </data>
+  <data name="Preview3DEnableLegacyEntityWobble" xml:space="preserve">
+    <value>Oscillation du maillage hérité</value>
+  </data>
+  <data name="Preview3DEnableLegacyEntityWobbleTooltip" xml:space="preserve">
+    <value>Applique le bob/yaw/roll à maillage entier pré-IR sur la matrice du modèle. Désactivé par défaut : utilisez plutôt les clips setupAnim/definition levés.</value>
+  </data>
+  <data name="Preview3DEntityAnimationSpeed" xml:space="preserve">
+    <value>Vitesse d'animation de l'entité</value>
+  </data>
+  <data name="Preview3DEntityAnimationSpeedTooltip" xml:space="preserve">
+    <value>Multiplicateur de vitesse de temps de rendu pour le mouvement inactif de l'entité émulée.</value>
+  </data>
+  <data name="Preview3DEntityAnimationAmplitude" xml:space="preserve">
+    <value>Amplitude d'animation d'entité</value>
+  </data>
+  <data name="Preview3DEntityAnimationAmplitudeTooltip" xml:space="preserve">
+    <value>Multiplicateur d'amplitude du temps de rendu pour le mouvement inactif de l'entité émulée.</value>
+  </data>
+  <data name="Preview3DEntitiesSection" xml:space="preserve">
+    <value>Entités</value>
+  </data>
+  <data name="Preview3DViewportSection" xml:space="preserve">
+    <value>Parallaxe</value>
+  </data>
+  <data name="Preview3DSpritesSection" xml:space="preserve">
+    <value>Lutins</value>
+  </data>
+  <data name="Preview3DGrassSection" xml:space="preserve">
+    <value>Herbe</value>
+  </data>
+  <data name="Preview3DGrassColormap" xml:space="preserve">
+    <value>Palette de couleurs de l'herbe</value>
+  </data>
+  <data name="Preview3DGrassColormapTemperature" xml:space="preserve">
+    <value>Température</value>
+  </data>
+  <data name="Preview3DGrassColormapTemperatureTooltip" xml:space="preserve">
+    <value>Température du biome (0 = froid, 1 = chaud) utilisée pour échantillonner la palette de couleurs de l'herbe pour un aperçu de la teinte.</value>
+  </data>
+  <data name="Preview3DGrassColormapDownfall" xml:space="preserve">
+    <value>Chute</value>
+  </data>
+  <data name="Preview3DGrassColormapDownfallTooltip" xml:space="preserve">
+    <value>Humidité/pluie du biome (0 = sec, 1 = humide) utilisée pour échantillonner la palette de couleurs de l'herbe pour un aperçu de la teinte.</value>
+  </data>
+  <data name="Preview3DEntityAlphaMode" xml:space="preserve">
+    <value>Mode alpha de l'entité</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeTooltip" xml:space="preserve">
+    <value>Pour les plates-formes de foule d'exécution dessinées via des maillages cuits avec une transparence PNG diffuse - opaque ignore l'alpha diffus ; la découpe supprime les texels fins/à alpha faible (valeur par défaut recommandée) ; mélanger progressivement les composites.</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeOpaque" xml:space="preserve">
+    <value>Opaque</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeCutout" xml:space="preserve">
+    <value>Découper</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeBlend" xml:space="preserve">
+    <value>Mélange</value>
+  </data>
+  <data name="Preview3DEnableEntityLabPbrShading" xml:space="preserve">
+    <value>Cartes normales et spéculaires d'entité</value>
+  </data>
+  <data name="Preview3DEnableEntityLabPbrShadingTooltip" xml:space="preserve">
+    <value>Pour les aperçus de foule à l'exécution, utilisez les cartes normales et spéculaires LabPBR générées. Désactivez-le si l'éclairage semble incorrect sur une plate-forme spécifique.</value>
+  </data>
+  <data name="Preview3DEnableEntityParallax" xml:space="preserve">
+    <value>Parallaxe d'entité (POM)</value>
+  </data>
+  <data name="Preview3DEnableEntityParallaxTooltip" xml:space="preserve">
+    <value>Pour les aperçus de la foule à l'exécution, activez la parallaxe de la carte de hauteur, la parallaxe AO et l'auto-ombre de parallaxe. Désactivé par défaut ; peut scintiller au niveau des coutures UV.</value>
+  </data>
+  <data name="Preview3DSpriteThickness" xml:space="preserve">
+    <value>Épaisseur des sprites</value>
+  </data>
+  <data name="Preview3DSpriteThicknessTooltip" xml:space="preserve">
+    <value>Extrude chaque texel de sprite opaque en un cuboïde (épaississement d'objet de style Minecraft). 0 = carte plate ; jusqu'à 0,25 de profondeur d'extrusion — au maximum, la profondeur correspond à la taille du texel pour les voxels cubiques. Les faces latérales utilisent une couleur texel plate, et non des UV étirés.</value>
+  </data>
+  <data name="WindowMinimize" xml:space="preserve">
+    <value>Minimiser</value>
+  </data>
+  <data name="WindowMaximize" xml:space="preserve">
+    <value>Maximiser</value>
+  </data>
+  <data name="WindowClose" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="DebugMlMatch" xml:space="preserve">
+    <value>Déboguer la correspondance ML…</value>
+  </data>
+  <data name="ExploreManualOverrideTooltip" xml:space="preserve">
+    <value>Coché = inclure, Décoché = exclure, Indéterminé = utiliser d'autres règles</value>
+  </data>
+  <data name="SetAsPreview" xml:space="preserve">
+    <value>Définir comme aperçu</value>
+  </data>
+  <data name="TagRuleIdWatermark" xml:space="preserve">
+    <value>par ex. montag</value>
+  </data>
+  <data name="TagRuleDisplayNameWatermark" xml:space="preserve">
+    <value>par ex. Mon tag</value>
+  </data>
+  <data name="EditAiModels" xml:space="preserve">
+    <value>Modifier les modèles d'IA</value>
+  </data>
+  <data name="EditAiModelsWarning" xml:space="preserve">
+    <value>Avertissement : Ne modifiez pas ces chemins de modèle à moins de savoir ce que vous faites.</value>
+  </data>
+  <data name="MlResolution16x16" xml:space="preserve">
+    <value>16×16</value>
+  </data>
+  <data name="MlResolution32x32" xml:space="preserve">
+    <value>32×32</value>
+  </data>
+  <data name="MlResolution64x64" xml:space="preserve">
+    <value>64×64</value>
+  </data>
+  <data name="MlResolution128x128" xml:space="preserve">
+    <value>128×128</value>
+  </data>
+  <data name="MlResolution256x256" xml:space="preserve">
+    <value>256×256</value>
+  </data>
+  <data name="UvDebugButton" xml:space="preserve">
+    <value>Débogage UV</value>
+  </data>
+  <data name="EntityDebugButton" xml:space="preserve">
+    <value>Débogage d'entité</value>
+  </data>
+  <data name="PreviewPoseLabel" xml:space="preserve">
+    <value>Pose</value>
+  </data>
+  <data name="PreviewSizeLabel" xml:space="preserve">
+    <value>Taille</value>
+  </data>
+  <data name="PreviewContextTypeLabel" xml:space="preserve">
+    <value>Type de contexte</value>
+  </data>
+  <data name="SelectResourcePackTitle" xml:space="preserve">
+    <value>Sélectionnez le pack de ressources (.zip ou .jar)</value>
+  </data>
+  <data name="SelectOutputFolderTitle" xml:space="preserve">
+    <value>Sélectionnez le dossier de sortie</value>
+  </data>
+  <data name="SelectMinecraftAssetsTitle" xml:space="preserve">
+    <value>Sélectionnez la version de Minecraft ou le dossier d'actifs</value>
+  </data>
+  <data name="SemanticDebugWindowTitle" xml:space="preserve">
+    <value>Débogage de la correspondance sémantique MiniLM</value>
+  </data>
+  <data name="Preview3DCameraResetKeyFormat" xml:space="preserve">
+    <value>Clé {0}</value>
+  </data>
+  <data name="CustomTagDefaultDisplayName" xml:space="preserve">
+    <value>Balise personnalisée</value>
+  </data>
+  <data name="CustomRuleDefaultDisplayName" xml:space="preserve">
+    <value>Règle personnalisée</value>
+  </data>
+  <data name="Status_GpuPreviewStarting" xml:space="preserve">
+    <value>Démarrage de l'aperçu du GPU…</value>
+  </data>
+  <data name="Status_GpuPreviewPreparingShaderSources" xml:space="preserve">
+    <value>Préparation des sources des shaders…</value>
+  </data>
+  <data name="Status_GpuPreviewPreparing" xml:space="preserve">
+    <value>Préparation de l'aperçu du GPU…</value>
+  </data>
+  <data name="Status_GpuPreviewClearingShaderCache" xml:space="preserve">
+    <value>Vider le cache des shaders…</value>
+  </data>
+  <data name="Status_GpuPreviewCompilingMainShaders" xml:space="preserve">
+    <value>Compilation des shaders d'aperçu principaux…</value>
+  </data>
+  <data name="Status_GpuPreviewCompilingShadowShaders" xml:space="preserve">
+    <value>Compilation de shaders d'ombre…</value>
+  </data>
+  <data name="Status_GpuPreviewCreatingShadowMaps" xml:space="preserve">
+    <value>Création de cartes d'ombres…</value>
+  </data>
+  <data name="Status_GpuPreviewUploadingMeshes" xml:space="preserve">
+    <value>Téléchargement des maillages d’aperçu…</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingLineOverlay" xml:space="preserve">
+    <value>Initialisation de la superposition de lignes…</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingSkyDome" xml:space="preserve">
+    <value>Initialisation du dôme céleste…</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingAtmosphere" xml:space="preserve">
+    <value>Ambiance d’initialisation…</value>
+  </data>
+  <data name="Status_GpuPreviewFinalizing" xml:space="preserve">
+    <value>Finalisation de l'aperçu…</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingGodRays" xml:space="preserve">
+    <value>Chargement des rayons divins…</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingClouds" xml:space="preserve">
+    <value>Chargement des nuages ​​volumétriques…</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingTaa" xml:space="preserve">
+    <value>Chargement de l'aperçu TAA…</value>
+  </data>
+  <data name="Status_GpuPreviewReady" xml:space="preserve">
+    <value>Prêt</value>
+  </data>
+  <data name="Status_GpuPreviewPreviewReady" xml:space="preserve">
+    <value>Aperçu prêt</value>
+  </data>
+  <data name="Status_GpuPreviewCoreReady" xml:space="preserve">
+    <value>Aperçu principal prêt</value>
+  </data>
+  <data name="UvDebugTitle" xml:space="preserve">
+    <value>Débogage UV</value>
+  </data>
+  <data name="UvDebugGlobalControls" xml:space="preserve">
+    <value>Contrôles de débogage UV globaux</value>
+  </data>
+  <data name="UvDebugGlobalControlsDescription" xml:space="preserve">
+    <value>Ceux-ci remplacent la politique de cuisson UV de production lorsqu’ils sont activés. Les cuboïdes d'entité utilisent par défaut la parité Java intégrée.</value>
+  </data>
+  <data name="UvDebugResetOverrides" xml:space="preserve">
+    <value>Réinitialiser les remplacements (valeurs par défaut de production)</value>
+  </data>
+  <data name="UvDebugFlipU" xml:space="preserve">
+    <value>Retourner U (échanger u0/u1)</value>
+  </data>
+  <data name="UvDebugFlipV" xml:space="preserve">
+    <value>Retourner V (échanger v0/v1)</value>
+  </data>
+  <data name="UvDebugOffsetU" xml:space="preserve">
+    <value>Décalage U (px)</value>
+  </data>
+  <data name="UvDebugOffsetV" xml:space="preserve">
+    <value>Décalage V (px)</value>
+  </data>
+  <data name="UvDebugFaceSemanticRouting" xml:space="preserve">
+    <value>Routage sémantique du visage (sémantique du visage post-transformation)</value>
+  </data>
+  <data name="UvDebugSwapNorthSouth" xml:space="preserve">
+    <value>Inverser le routage des faces Nord / Sud</value>
+  </data>
+  <data name="UvDebugSwapEastWest" xml:space="preserve">
+    <value>Inversion de face de routage Est/Ouest</value>
+  </data>
+  <data name="UvDebugSwapUpDown" xml:space="preserve">
+    <value>Permuter le routage des faces Haut/Bas</value>
+  </data>
+  <data name="UvDebugBakerConversion" xml:space="preserve">
+    <value>Conversion UV du boulanger</value>
+  </data>
+  <data name="UvDebugPreserveDirectionalBounds" xml:space="preserve">
+    <value>Préserver les limites UV directionnelles (désactiver la normalisation min/max)</value>
+  </data>
+  <data name="UvDebugUseBottomLeftUvOrigin" xml:space="preserve">
+    <value>Utiliser la conversion d'origine UV en bas à gauche (style GL)</value>
+  </data>
+  <data name="UvDebugFaceCornerOrdering" xml:space="preserve">
+    <value>Ordre / enroulement des coins de face</value>
+  </data>
+  <data name="UvDebugCornerOrderDefault" xml:space="preserve">
+    <value>Défaut</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate90" xml:space="preserve">
+    <value>Rotation 90</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate180" xml:space="preserve">
+    <value>Rotation 180</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate270" xml:space="preserve">
+    <value>Rotation 270</value>
+  </data>
+  <data name="UvDebugCornerOrderReverseWinding" xml:space="preserve">
+    <value>Enroulement inversé</value>
+  </data>
+  <data name="UvDebugGlobalFaceRotation" xml:space="preserve">
+    <value>Rotation globale du visage</value>
+  </data>
+  <data name="UvDebugRotation0" xml:space="preserve">
+    <value>0°</value>
+  </data>
+  <data name="UvDebugRotation90" xml:space="preserve">
+    <value>90°</value>
+  </data>
+  <data name="UvDebugRotation180" xml:space="preserve">
+    <value>180°</value>
+  </data>
+  <data name="UvDebugRotation270" xml:space="preserve">
+    <value>270°</value>
+  </data>
+  <data name="UvDebugLiveChangesHint" xml:space="preserve">
+    <value>Les modifications s’appliquent en direct et déclenchent l’actualisation de l’aperçu. Utilisez-les pour isoler les problèmes de conversion texOffs, boulanger et d'ordre des coins.</value>
+  </data>
+  <data name="EntityPreviewDebugTitle" xml:space="preserve">
+    <value>Débogage de l’aperçu de l’entité</value>
+  </data>
+  <data name="EntityPreviewDebugBabyFixesSection" xml:space="preserve">
+    <value>Aperçu des correctifs en direct pour bébé</value>
+  </data>
+  <data name="EntityPreviewDebugBabyFixesDescription" xml:space="preserve">
+    <value>Commutateurs d'essai/erreur pour la séparation corps/tête/jambe du bébé dans Explore. Modifie immédiatement le maillage de recuisson - chargez une texture bébé (fox_baby, cow_temperate_baby, donkey_baby, …) et activez un correctif à la fois.</value>
+  </data>
+  <data name="EntityPreviewDebugBaselineCompare" xml:space="preserve">
+    <value>Comparaison de référence</value>
+  </data>
+  <data name="EntityPreviewDebugForceCpuSkinning" xml:space="preserve">
+    <value>Forcer le skinning du processeur (aperçu VBO à 12 flotteurs)</value>
+  </data>
+  <data name="EntityPreviewDebugForceCpuSkinningTooltip" xml:space="preserve">
+    <value>Maillage correct sur le CPU mais séparé sur le GPU ⇒ Chemin de liaison GPU/W(), pas de marche IR.</value>
+  </data>
+  <data name="EntityPreviewDebugLogDrawContract" xml:space="preserve">
+    <value>L'entité de journal dessine un contrat à chaque image</value>
+  </data>
+  <data name="EntityPreviewDebugLogDrawContractTooltip" xml:space="preserve">
+    <value>Regardez bodyY/headY/legY dans le journal d’aperçu tout en basculant les correctifs.</value>
+  </data>
+  <data name="EntityPreviewDebugLayerDebugFalseColor" xml:space="preserve">
+    <value>Débogage des couches en fausses couleurs (lots de profondeur)</value>
+  </data>
+  <data name="EntityPreviewDebugLayerDebugFalseColorTooltip" xml:space="preserve">
+    <value>Teintez chaque lot de tirage par PreviewDepthLayerKind (gris de base, cyan découpé, magenta cosmétique, jaune émissif).</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseCompose" xml:space="preserve">
+    <value>Composition de la pose de la pièce (recuise le maillage)</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseErTimesT" xml:space="preserve">
+    <value>Er × T (production)</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseLegacyTxEr" xml:space="preserve">
+    <value>T × Er (l'adulte hérité explose)</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseLegacyTxErTooltip" xml:space="preserve">
+    <value>Généralement mauvais pour les adultes ; essayez les bébés si les membres se détachent lors de la rotation des parents.</value>
+  </data>
+  <data name="EntityPreviewDebugLerFold" xml:space="preserve">
+    <value>Pliage LER (maille recuite)</value>
+  </data>
+  <data name="EntityPreviewDebugLerPolicyDefault" xml:space="preserve">
+    <value>Valeur par défaut de la stratégie</value>
+  </data>
+  <data name="EntityPreviewDebugLerStandardWorldRoot" xml:space="preserve">
+    <value>StandardWorldRoot (colonne S·M)</value>
+  </data>
+  <data name="EntityPreviewDebugLerRightComposeLocalChain" xml:space="preserve">
+    <value>RightComposeLocalChain (M·S)</value>
+  </data>
+  <data name="EntityPreviewDebugLerRightComposeLocalChainTooltip" xml:space="preserve">
+    <value>Par élément M×S — peut détacher les cuboïdes du corps en rotation sur les quadrupèdes.</value>
+  </data>
+  <data name="EntityPreviewDebugLerSkip" xml:space="preserve">
+    <value>Passer le LER</value>
+  </data>
+  <data name="EntityPreviewDebugPartTreeRepair" xml:space="preserve">
+    <value>Réparation d'arbre partiel</value>
+  </data>
+  <data name="EntityPreviewDebugSkipAllPartTreeRepair" xml:space="preserve">
+    <value>Ignorer toutes les réparations d'arbre partiel (IR brut levé)</value>
+  </data>
+  <data name="EntityPreviewDebugSkipAllPartTreeRepairTooltip" xml:space="preserve">
+    <value>Contournez entièrement GeometryIrPartTreeRepair - consultez la sortie du lifter avant toute correction de bébé.</value>
+  </data>
+  <data name="EntityPreviewDebugIndividualRepairSteps" xml:space="preserve">
+    <value>Étapes de réparation individuelles (paramètres de production activés)</value>
+  </data>
+  <data name="EntityPreviewDebugIndividualRepairStepsDescription" xml:space="preserve">
+    <value>Décochez une étape pour voir si elle aide ou nuit au bébé actuel. Skip-all les remplace.</value>
+  </data>
+  <data name="EntityPreviewDebugRepairGlobalReparent" xml:space="preserve">
+    <value>Reparent global (oreilles, tête → parties_tête, cornes, brise vent, …)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairQuadrupedLegReparent" xml:space="preserve">
+    <value>Patte quadrupède réparée sous le corps</value>
+  </data>
+  <data name="EntityPreviewDebugRepairQuadrupedLegReparentTooltip" xml:space="preserve">
+    <value>Lorsqu'il ne s'agit pas d'une cuisson de racines plates, la classe de pile de tête de bébé âne/cheval utilise la règle de pile de tête ci-dessous.</value>
+  </data>
+  <data name="EntityPreviewDebugRepairForceLegReparent" xml:space="preserve">
+    <value>Forcer la réparation des pattes sur cuisson plate de quadrupède (expérimental)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairForceLegReparentTooltip" xml:space="preserve">
+    <value>Essayez des bébés renard/vache/poulet dont les pattes restent des frères et sœurs racines avec des décalages relatifs au corps.</value>
+  </data>
+  <data name="EntityPreviewDebugRepairHeadStackLegReparent" xml:space="preserve">
+    <value>Head-stack nested : réparer les pattes à racines plates (bébé équidé)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairHeadStackLegReparentTooltip" xml:space="preserve">
+    <value>BabyHorseModel / BabyDonkeyModel – tête sous le corps mais jambes toujours à la racine.</value>
+  </data>
+  <data name="EntityPreviewDebugRepairRemoveDuplicateRootSiblings" xml:space="preserve">
+    <value>Supprimer les frères et sœurs racines en double</value>
+  </data>
+  <data name="EntityPreviewDebugRepairCollapseInnerBody" xml:space="preserve">
+    <value>Réduire le corps intérieur / bordure en polaire sous le corps</value>
+  </data>
+  <data name="EntityPreviewDebugRepairDeduplicateNestedPartIds" xml:space="preserve">
+    <value>Dédupliquer les identifiants de pièces imbriquées</value>
+  </data>
+  <data name="EntityPreviewDebugRepairZeroEquineRootOffset" xml:space="preserve">
+    <value>Zéro décalage de racine équine createBodyLayer (cheval/âne)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairZeroEquineRootOffsetTooltip" xml:space="preserve">
+    <value>Supprime l'ancre racine T (0,24,0) sur les cuissons équines createBodyLayer/createBabyLayer.</value>
+  </data>
+  <data name="EntityPreviewDebugSuggestedWorkflow" xml:space="preserve">
+    <value>Flux de travail suggéré pour les bébés : (1) ignorer toutes les réparations pour voir l'IR brut, (2) réactiver les étapes de production une par une, (3) essayer de forcer la réparation des jambes ou la règle de pile de tête sur les bébés équins, (4) comparer le skinning CPU et GPU, (5) seulement ensuite essayer T×Er ou RightCompose LER si les clusters dérivent toujours.</value>
+  </data>
+  <data name="AiTaggingSection" xml:space="preserve">
+    <value>Marquage IA</value>
+  </data>
+  <data name="NormalsAndHeightSection" xml:space="preserve">
+    <value>Normales et hauteur</value>
+  </data>
+  <data name="NormalsSection" xml:space="preserve">
+    <value>Normales</value>
+  </data>
+  <data name="SpecularSection" xml:space="preserve">
+    <value>Lissage</value>
+  </data>
+  <data name="MetalnessSection" xml:space="preserve">
+    <value>Métallité</value>
+  </data>
+  <data name="SpecularPorositySection" xml:space="preserve">
+    <value>Porosité</value>
+  </data>
+  <data name="AiDrivenPbrSection" xml:space="preserve">
+    <value>PBR piloté par l'IA</value>
+  </data>
+  <data name="AiNormalsSection" xml:space="preserve">
+    <value>Normales de l'IA</value>
+  </data>
+  <data name="AiSpecularSection" xml:space="preserve">
+    <value>IA spéculaire</value>
+  </data>
+  <data name="Preview3DCameraExpanderSection" xml:space="preserve">
+    <value>Caméra</value>
+  </data>
 </root>
 
 

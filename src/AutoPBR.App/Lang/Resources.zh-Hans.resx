@@ -102,7 +102,7 @@
   <data name="ExploreCollapseAll" xml:space="preserve"><value>全部折叠</value></data>
   <data name="ExploreBack" xml:space="preserve"><value>返回</value></data>
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
-  <data name="TabNormals" xml:space="preserve"><value>法线</value></data>
+  <data name="TabNormals" xml:space="preserve"><value>调整</value></data>
   <data name="TabShader" xml:space="preserve"><value>渲染</value></data>
   <data name="TabSettings" xml:space="preserve"><value>设置</value></data>
   <data name="Input" xml:space="preserve"><value>输入</value></data>
@@ -185,11 +185,11 @@
   <data name="PreprocessFrequencySplit" xml:space="preserve"><value>频率分离（宏观 + 细节）</value></data>
   <data name="PreprocessFrequencyRadius" xml:space="preserve"><value>频率半径</value></data>
   <data name="PreprocessFrequencyDetailStrength" xml:space="preserve"><value>细节强度</value></data>
-  <data name="SpecularAdvanced" xml:space="preserve"><value>高光（高级）</value></data>
+  <data name="SpecularAdvanced" xml:space="preserve"><value>通道</value></data>
   <data name="SpecularPercentileRemap" xml:space="preserve"><value>平滑度（R）百分位重映射</value></data>
   <data name="SpecularRemapLowPercentile" xml:space="preserve"><value>低百分位</value></data>
   <data name="SpecularRemapHighPercentile" xml:space="preserve"><value>高百分位</value></data>
-  <data name="AoAdvanced" xml:space="preserve"><value>环境光遮蔽（AO）</value></data>
+  <data name="AoAdvanced" xml:space="preserve"><value>环境光遮蔽</value></data>
   <data name="GenerateAo" xml:space="preserve"><value>将 AO 烘焙到法线（蓝色通道）</value></data>
   <data name="AoRadius" xml:space="preserve"><value>AO 半径</value></data>
   <data name="AoStrength" xml:space="preserve"><value>AO 强度</value></data>
@@ -303,6 +303,1260 @@
   <data name="Preview3DSpritePlaneCount" xml:space="preserve"><value>精灵平面数量</value></data>
   <data name="Preview3DSpritePlaneCountTooltip" xml:space="preserve"><value>3D 预览中用于 2D Sprite 标记纹理的交叉平面数量。</value></data>
   <data name="Preview3DCameraDebugFlyHint" xml:space="preserve"><value>右键拖动：观察 · 右键按住 + WASD：飞行 · R：重置轨道与偏移</value></data>
+  <data name="ClearTagOverrides" xml:space="preserve">
+    <value>清除标签覆盖</value>
+  </data>
+  <data name="ClearTagOverridesTooltip" xml:space="preserve">
+    <value>重置此包的所有手动标签添加/删除。</value>
+  </data>
+  <data name="TagMenuDontApply" xml:space="preserve">
+    <value>不要在此处应用“{0}”</value>
+  </data>
+  <data name="TagMenuApply" xml:space="preserve">
+    <value>在此处应用“{0}”</value>
+  </data>
+  <data name="TagRules" xml:space="preserve">
+    <value>标签规则</value>
+  </data>
+  <data name="TagRulesCustomDescription" xml:space="preserve">
+    <value>编辑您自己的规则集以指导启发式和/或人工智能处理</value>
+  </data>
+  <data name="RulesetsBuiltInTags" xml:space="preserve">
+    <value>内置标签</value>
+  </data>
+  <data name="RulesetsBuiltInFlags" xml:space="preserve">
+    <value>内置标志</value>
+  </data>
+  <data name="RulesetsBuiltInExpressions" xml:space="preserve">
+    <value>内置规则</value>
+  </data>
+  <data name="RulesetsSystemRules" xml:space="preserve">
+    <value>系统计算的规则</value>
+  </data>
+  <data name="RulesetsSystemRulesDescription" xml:space="preserve">
+    <value>加权和未加权是在运行时通过语义解析计算的，并且不可编辑。</value>
+  </data>
+  <data name="RulesetsCustomExpressions" xml:space="preserve">
+    <value>自定义规则</value>
+  </data>
+  <data name="RulesetsKeywords" xml:space="preserve">
+    <value>关键词</value>
+  </data>
+  <data name="RulesetsSemanticHints" xml:space="preserve">
+    <value>语义提示</value>
+  </data>
+  <data name="RulesetsManageTokens" xml:space="preserve">
+    <value>管理代币</value>
+  </data>
+  <data name="RulesetsAddCondition" xml:space="preserve">
+    <value>添加条件</value>
+  </data>
+  <data name="RulesetsAddAction" xml:space="preserve">
+    <value>添加动作</value>
+  </data>
+  <data name="RulesetsEnableExpression" xml:space="preserve">
+    <value>启用表达式</value>
+  </data>
+  <data name="RulesetsExpression" xml:space="preserve">
+    <value>表达</value>
+  </data>
+  <data name="RulesetsConditions" xml:space="preserve">
+    <value>状况</value>
+  </data>
+  <data name="RulesetsActions" xml:space="preserve">
+    <value>行动</value>
+  </data>
+  <data name="RulesetsRemove" xml:space="preserve">
+    <value>消除</value>
+  </data>
+  <data name="RulesetsRemoveLast" xml:space="preserve">
+    <value>删除最后一个</value>
+  </data>
+  <data name="RulesetsValueWatermark" xml:space="preserve">
+    <value>价值</value>
+  </data>
+  <data name="RulesetsShowLess" xml:space="preserve">
+    <value>显示更少</value>
+  </data>
+  <data name="RulesetsMoreCount" xml:space="preserve">
+    <value>{0} 更多</value>
+  </data>
+  <data name="TagRuleId" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="TagRuleDisplayName" xml:space="preserve">
+    <value>显示名称</value>
+  </data>
+  <data name="TagRuleKeywords" xml:space="preserve">
+    <value>关键词</value>
+  </data>
+  <data name="TagRuleSemanticHints" xml:space="preserve">
+    <value>语义提示（逗号分隔，可选）</value>
+  </data>
+  <data name="MaterialTagSemanticMlDescription" xml:space="preserve">
+    <value>使用 Data/ONNX-AI/all-MiniLM-L6-v2-onnx 下捆绑的 ONNX 模型（需要 model.onnx）。启用后，自动标记仅来自 MiniLM（关键字规则不用于自动标记）。手动标签添加/删除仍然适用于顶部。</value>
+  </data>
+  <data name="MaterialTagMaxCountTooltip" xml:space="preserve">
+    <value>语义匹配返回的最大材质标签。某些内置矿石/材料配对规则和自动标记仍可能添加超出此值的所需标签。</value>
+  </data>
+  <data name="MaterialTagCertaintyThresholdTooltip" xml:space="preserve">
+    <value>如果最佳语义匹配低于此分数，则仅建议未知（余弦相似度 0-1）。</value>
+  </data>
+  <data name="TagLegendMaterials" xml:space="preserve">
+    <value>材料</value>
+  </data>
+  <data name="TagLegendFlags" xml:space="preserve">
+    <value>旗帜</value>
+  </data>
+  <data name="ExploreColumnResource" xml:space="preserve">
+    <value>资源</value>
+  </data>
+  <data name="TagRuleKindLabel" xml:space="preserve">
+    <value>种类</value>
+  </data>
+  <data name="AddCustomTag" xml:space="preserve">
+    <value>添加自定义标签</value>
+  </data>
+  <data name="AddCustomRule" xml:space="preserve">
+    <value>添加自定义规则</value>
+  </data>
+  <data name="RemoveTagRule" xml:space="preserve">
+    <value>消除</value>
+  </data>
+  <data name="RefreshTagRules" xml:space="preserve">
+    <value>刷新</value>
+  </data>
+  <data name="InvertHeight" xml:space="preserve">
+    <value>反转高度</value>
+  </data>
+  <data name="InvertSpecular" xml:space="preserve">
+    <value>反转镜面反射</value>
+  </data>
+  <data name="TagRuleNormalIntensityOpt" xml:space="preserve">
+    <value>正常×（可选）</value>
+  </data>
+  <data name="TagRuleHeightIntensityOpt" xml:space="preserve">
+    <value>高度×（可选）</value>
+  </data>
+  <data name="TagRuleIntensityTooltip" xml:space="preserve">
+    <value>留空以使用全局 Tune 值。示例：法线更柔和 0.85，高度更微妙 0.07。</value>
+  </data>
+  <data name="TagRuleInvertNormalX" xml:space="preserve">
+    <value>反转法线 X</value>
+  </data>
+  <data name="TagRuleInvertNormalY" xml:space="preserve">
+    <value>反转法线 Y</value>
+  </data>
+  <data name="TagRuleEnabled" xml:space="preserve">
+    <value>使用这个规则</value>
+  </data>
+  <data name="TagRuleEnabledTooltip" xml:space="preserve">
+    <value>未选中时，此规则将从图例和探索中排除。单击刷新进行更新。</value>
+  </data>
+  <data name="TagRuleMoveUp" xml:space="preserve">
+    <value>↑</value>
+  </data>
+  <data name="TagRuleMoveDown" xml:space="preserve">
+    <value>↓</value>
+  </data>
+  <data name="TagRuleMoveUpTooltip" xml:space="preserve">
+    <value>向上移动规则（合并顺序）</value>
+  </data>
+  <data name="TagRuleMoveDownTooltip" xml:space="preserve">
+    <value>下移规则（合并顺序）</value>
+  </data>
+  <data name="ExportTagRules" xml:space="preserve">
+    <value>导出规则...</value>
+  </data>
+  <data name="ImportTagRules" xml:space="preserve">
+    <value>导入规则...</value>
+  </data>
+  <data name="ExportTagRulesTooltip" xml:space="preserve">
+    <value>将自定义标记规则保存为 JSON（用于备份或 CLI --tag-rules）。</value>
+  </data>
+  <data name="ImportTagRulesTooltip" xml:space="preserve">
+    <value>替换 JSON 文件中的自定义规则。</value>
+  </data>
+  <data name="RefreshTagRulesTooltip" xml:space="preserve">
+    <value>使用当前规则更新探索树和图例。</value>
+  </data>
+  <data name="Log_TagRulesExported" xml:space="preserve">
+    <value>导出的自定义标签规则。</value>
+  </data>
+  <data name="Log_TagRulesImported" xml:space="preserve">
+    <value>已导入 {0} 自定义标记规则。</value>
+  </data>
+  <data name="Log_TagRulesImportFailed" xml:space="preserve">
+    <value>标记规则导入失败：{0}</value>
+  </data>
+  <data name="TabRulesets" xml:space="preserve">
+    <value>规则集</value>
+  </data>
+  <data name="TabDebug" xml:space="preserve">
+    <value>调试</value>
+  </data>
+  <data name="BrickProbeTuning" xml:space="preserve">
+    <value>砖式探头调谐</value>
+  </data>
+  <data name="BrickProbeEnable" xml:space="preserve">
+    <value>启用 Brick 探针反转</value>
+  </data>
+  <data name="BrickProbeMinStructure" xml:space="preserve">
+    <value>最小结构置信度</value>
+  </data>
+  <data name="BrickProbeInvertDelta" xml:space="preserve">
+    <value>反转增量阈值</value>
+  </data>
+  <data name="BrickProbeLightGroutDelta" xml:space="preserve">
+    <value>轻灌浆亮度增量</value>
+  </data>
+  <data name="BrickProbeEnableTooltip" xml:space="preserve">
+    <value>对于标记砖块的纹理，决定当探头检测到应凹入的轻质砂浆时是否全局反转高度图。需要砖块材质标签（关键字或语义）。</value>
+  </data>
+  <data name="BrickProbeMinStructureTooltip" xml:space="preserve">
+    <value>强反转路径的最小平均结构砂浆响应 (0–1)（具有高联合置信度的大高度增量）。薄接头通常低于此值；光灌浆路径不使用此阈值。</value>
+  </data>
+  <data name="BrickProbeInvertDeltaTooltip" xml:space="preserve">
+    <value>仅强路径：在全局反转之前，砂浆平均高度减去砖平均高度必须超过此值（0-255 比例）。较低的值更容易在细微的高度间隔上触发。</value>
+  </data>
+  <data name="BrickProbeLightGroutDeltaTooltip" xml:space="preserve">
+    <value>光灌浆路径：砂浆减去砖的加权漫射亮度必须超过此值 (0–1)。如果砂浆和砖的亮度相似，则较低。当 Δ&gt;0 并且通过时，高度图会反转，因此面部读数高于关节。</value>
+  </data>
+  <data name="PreviewBrickProbeDebug" xml:space="preserve">
+    <value>显示brick探针调试（预览）</value>
+  </data>
+  <data name="PreviewBrickProbeDebugTooltip" xml:space="preserve">
+    <value>启用后，预览面板会显示所选纹理的探测指标（掩模、均值、高度增量、亮度间隙、反转路径运行）。转换不变。</value>
+  </data>
+  <data name="PlantMaterialPorosityExtra" xml:space="preserve">
+    <value>有机材料额外孔隙率</value>
+  </data>
+  <data name="PlantMaterialPorosityExtraTooltip" xml:space="preserve">
+    <value>具有有机材质标签（或 OptiFine 植物路径）的纹理的附加 B 通道偏移。添加到孔隙率偏差之上。</value>
+  </data>
+  <data name="MlSpecularHeuristicBlend" xml:space="preserve">
+    <value>启发式/人工智能混合</value>
+  </data>
+  <data name="MlSpecularHeuristicBlendTooltip" xml:space="preserve">
+    <value>0 = AI模型运行时纯启发式镜面反射； 1 = 全部人工智能贡献。中间值混合了两者。</value>
+  </data>
+  <data name="MlSpecularBlendMode" xml:space="preserve">
+    <value>通道模式</value>
+  </data>
+  <data name="MlSpecularBlendModeTooltip" xml:space="preserve">
+    <value>确定与 AI 混合时哪些通道接收启发式贡献。</value>
+  </data>
+  <data name="MlSpecularBlendMath" xml:space="preserve">
+    <value>混合模式</value>
+  </data>
+  <data name="MlSpecularBlendMathTooltip" xml:space="preserve">
+    <value>选择用于组合混合通道的启发式值和 AI 值的混合数学。</value>
+  </data>
+  <data name="MlSpecularBlendMathLinear" xml:space="preserve">
+    <value>线性</value>
+  </data>
+  <data name="MlSpecularBlendMathSoftLight" xml:space="preserve">
+    <value>柔光</value>
+  </data>
+  <data name="MlSpecularBlendMathOverlay" xml:space="preserve">
+    <value>覆盖</value>
+  </data>
+  <data name="MlSpecularBlendMathScreen" xml:space="preserve">
+    <value>屏幕</value>
+  </data>
+  <data name="MlSpecularBlendMathBiasGain" xml:space="preserve">
+    <value>偏置/增益</value>
+  </data>
+  <data name="MlSpecularBlendMathSigmoidCrossfade" xml:space="preserve">
+    <value>S 形交叉淡入淡出</value>
+  </data>
+  <data name="MlSpecularBlendModeSmoothnessOnly" xml:space="preserve">
+    <value>仅平滑度</value>
+  </data>
+  <data name="MlSpecularBlendModeFull" xml:space="preserve">
+    <value>满的</value>
+  </data>
+  <data name="MlSpecularBlendModeAiMetalAndEmissive" xml:space="preserve">
+    <value>AI 金属和发光</value>
+  </data>
+  <data name="SpecularForceNoEmissive" xml:space="preserve">
+    <value>强制无发射（镜面反射 A）</value>
+  </data>
+  <data name="SpecularForceNoEmissiveTooltip" xml:space="preserve">
+    <value>覆盖：将所有像素的 LabPBR 镜面反射贴图 alpha 设置为 255（无发射）。阻止启发式调色板发射和 ML 发射预测。</value>
+  </data>
+  <data name="DeepBumpNormalIntensity" xml:space="preserve">
+    <value>DeepBump 正常强度</value>
+  </data>
+  <data name="DeepBumpNormalIntensityTooltip" xml:space="preserve">
+    <value>DeepBump-仅限正常 XY 强度乘数。 1 = 不变，较高 = 细节更强，较低 = 法线更平坦。</value>
+  </data>
+  <data name="DeepBumpNormalSoftClamp" xml:space="preserve">
+    <value>DeepBump 软夹</value>
+  </data>
+  <data name="DeepBumpNormalSoftClampTooltip" xml:space="preserve">
+    <value>0 = 线性强度缩放。较高的值对 XY 幅值应用软 tanh 钳位，保留强烈的细节，同时减少接近 90° 的饱和度伪影。</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedEnhance" xml:space="preserve">
+    <value>边缘引导 DeepBump 增强</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedStrength" xml:space="preserve">
+    <value>边缘引导强度</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedStrengthTooltip" xml:space="preserve">
+    <value>在强漫反射边缘上更多地放大模型法线 XY 幅度。 0 = 禁用，1 = 中等，较高 = 边缘更锐利。</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedGamma" xml:space="preserve">
+    <value>边缘引导伽玛</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedGammaTooltip" xml:space="preserve">
+    <value>控制增强集中的地方。较高的值集中于最强的边缘；较低的值分布在较软的边缘上。</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedDirectionMix" xml:space="preserve">
+    <value>边缘方向混合</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedDirectionMixTooltip" xml:space="preserve">
+    <value>将 DeepBump 法线方向混合到边缘上漫反射衍生的梯度方向。 0 = 保持模型方向，1 = 在强边缘上完全对齐。</value>
+  </data>
+  <data name="NormalHeightTransparentAlphaClampMax" xml:space="preserve">
+    <value>正常/高度透明 Alpha 夹最大</value>
+  </data>
+  <data name="NormalHeightTransparentAlphaClampMaxTooltip" xml:space="preserve">
+    <value>后处理钳位：如果漫反射 alpha ≤ 该值，则将法线/高度 RGBA 强制设置为 0，以避免透明区域出现伪影。滑块盖位于 16；您最多可以输入 255。</value>
+  </data>
+  <data name="UseMlSpecularPredictor" xml:space="preserve">
+    <value>使用 ML 镜面反射生成器/预测器 (ONNX)</value>
+  </data>
+  <data name="UseMlSpecularPredictorTooltip" xml:space="preserve">
+    <value>启用且默认或每分辨率模型路径有效时，将根据漫反射预测直接每像素镜面反射 RGBA。可选的每分辨率路径（或捆绑的 Data/ONNX-AI/SpecLab 模型）按纹理大小 (ceil) 选择 ONNX。启发式/AI 混合滑块控制模型相对于经典启发式的使用量。检查 ML 诊断日志。</value>
+  </data>
+  <data name="MlSpecularModelPath" xml:space="preserve">
+    <value>镜面模型路径</value>
+  </data>
+  <data name="MlSpecularModelPathWatermark" xml:space="preserve">
+    <value>镜面反射生成器/预测器 ONNX 文件的路径</value>
+  </data>
+  <data name="MlSpecularPerResolutionHeader" xml:space="preserve">
+    <value>每分辨率镜面模型（可选）</value>
+  </data>
+  <data name="MlSpecularPerResolutionTooltip" xml:space="preserve">
+    <value>根据训练分辨率覆盖 ONNX。留空以使用 Data/ONNX-AI/SpecLab 下存在的捆绑文件（如果存在）。运行时选择最小的配置分辨率≥纹理大小（ceil）；如果纹理大于所有键，则使用最大的键。仅当没有可用的每分辨率地图时，上述后备默认路径才适用。</value>
+  </data>
+  <data name="MlSpecularUseEdgeChannel" xml:space="preserve">
+    <value>包括镜面模型输入的边缘通道（如果模型需要 4 个通道）</value>
+  </data>
+  <data name="MlSpecularTransparentAlphaClampMax" xml:space="preserve">
+    <value>透明 Alpha 夹最大</value>
+  </data>
+  <data name="MlSpecularTransparentAlphaClampMaxTooltip" xml:space="preserve">
+    <value>后处理钳位：如果漫反射 alpha ≤ 该值，则将镜面反射 RGBA 强制设置为 0，以避免透明区域中的 ML 伪影。滑块盖位于 16；您最多可以输入 255。</value>
+  </data>
+  <data name="SpecularDebugSection" xml:space="preserve">
+    <value>镜面 ML 调试</value>
+  </data>
+  <data name="SpecularDebugDisableHeuristicSpecular" xml:space="preserve">
+    <value>禁用启发式回退（洋红色 = 非 ML）</value>
+  </data>
+  <data name="SpecularDebugDisableHeuristicSpecularTooltip" xml:space="preserve">
+    <value>使用经典镜面反射路径的像素将被强制设置为洋红色 (255,0,255)。如果 ML 完全失败，则整个纹理为洋红色。使模型是否在驱动像素变得显而易见。</value>
+  </data>
+  <data name="SpecularDebugSkipSpecularRemap" xml:space="preserve">
+    <value>跳过平滑度 (R) 百分位数重新映射</value>
+  </data>
+  <data name="SpecularDebugSkipSpecularRemapTooltip" xml:space="preserve">
+    <value>禁用将 R 重新映射到 10-200 范围的后步骤，以便您可以直接判断模型输出。</value>
+  </data>
+  <data name="SpecularDebugVerboseSpecularMl" xml:space="preserve">
+    <value>详细 ML 诊断（日志）</value>
+  </data>
+  <data name="SpecularDebugVerboseSpecularMlTooltip" xml:space="preserve">
+    <value>每个纹理记录加载/运行时详细信息以及推理成功时的第一个像素样本。当模型无法加载或输出形状不匹配时，还会记录精确的错误。</value>
+  </data>
+  <data name="ForceShaderCacheInvalidation" xml:space="preserve">
+    <value>强制着色器缓存失效</value>
+  </data>
+  <data name="ForceShaderCacheInvalidationTooltip" xml:space="preserve">
+    <value>删除磁盘上的 GPU 着色器二进制缓存并重新编译预览着色器。当预览看起来陈旧时，在着色器编辑后使用。</value>
+  </data>
+  <data name="ShaderCacheInvalidatedLog" xml:space="preserve">
+    <value>[设置] 着色器缓存已清除；预览着色器将重新编译。</value>
+  </data>
+  <data name="MinecraftAssetsFolder" xml:space="preserve">
+    <value>我的世界资产</value>
+  </data>
+  <data name="MinecraftAssetsFolderTooltip" xml:space="preserve">
+    <value>Minecraft 版本文件夹或提取的资产/根的可选路径。用于解析原始块模型以进行仅纹理包预览。</value>
+  </data>
+  <data name="MinecraftAssetsFolderWatermark" xml:space="preserve">
+    <value>当 .minecraft 为空时自动检测到</value>
+  </data>
+  <data name="Preview3DCameraFlyLookSensitivity" xml:space="preserve">
+    <value>飞视灵敏度</value>
+  </data>
+  <data name="Preview3DCameraFlyMoveSpeed" xml:space="preserve">
+    <value>飞行移动速度</value>
+  </data>
+  <data name="Preview3DCameraFlyMoveSpeedTooltip" xml:space="preserve">
+    <value>按住鼠标右键时的基本 WASD 飞行速度。飞行过程中使用鼠标滚轮临时调整速度。</value>
+  </data>
+  <data name="Preview3DCameraInvertLookY" xml:space="preserve">
+    <value>反转外观 Y</value>
+  </data>
+  <data name="Preview3DCameraInvertLookYTooltip" xml:space="preserve">
+    <value>反转垂直鼠标寻找轨道和飞行相机。</value>
+  </data>
+  <data name="Preview3DCameraFlySmoothAcceleration" xml:space="preserve">
+    <value>平滑的飞行动作</value>
+  </data>
+  <data name="Preview3DCameraFlySmoothAccelerationTooltip" xml:space="preserve">
+    <value>轻松进行 WASD 飞进和飞出运动，而不是立即启动和停止。</value>
+  </data>
+  <data name="Preview3DCameraHelpOrbitPanSection" xml:space="preserve">
+    <value>轨道和平移</value>
+  </data>
+  <data name="Preview3DCameraHelpFlySection" xml:space="preserve">
+    <value>飞行相机</value>
+  </data>
+  <data name="Preview3DCameraHelpFramingSection" xml:space="preserve">
+    <value>取景</value>
+  </data>
+  <data name="Preview3DCameraHelpItemOrbitInput" xml:space="preserve">
+    <value>Alt + 拖动（左​​或中）</value>
+  </data>
+  <data name="Preview3DCameraHelpItemOrbitDesc" xml:space="preserve">
+    <value>绕枢轴旋转。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemPanInput" xml:space="preserve">
+    <value>不使用 Alt（左或中）拖动</value>
+  </data>
+  <data name="Preview3DCameraHelpItemPanDesc" xml:space="preserve">
+    <value>平移视图。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemZoomInput" xml:space="preserve">
+    <value>鼠标滚轮</value>
+  </data>
+  <data name="Preview3DCameraHelpItemZoomDesc" xml:space="preserve">
+    <value>放大和缩小。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyLookInput" xml:space="preserve">
+    <value>右键拖动</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyLookDesc" xml:space="preserve">
+    <value>环顾四周（飞行相机）。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWasdInput" xml:space="preserve">
+    <value>W / A / S / D（右手握住时）</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWasdDesc" xml:space="preserve">
+    <value>向前移动，向左扫射，向后移动，向右扫射。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyQeInput" xml:space="preserve">
+    <value>Q / E（按住右手时）</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyQeDesc" xml:space="preserve">
+    <value>向下和向上移动。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyShiftInput" xml:space="preserve">
+    <value>移动（飞行时）</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyShiftDesc" xml:space="preserve">
+    <value>移动得更快。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyCtrlInput" xml:space="preserve">
+    <value>Ctrl（飞行时）</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyCtrlDesc" xml:space="preserve">
+    <value>移动速度较慢（精确）。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWheelInput" xml:space="preserve">
+    <value>鼠标滚轮（飞行时）</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWheelDesc" xml:space="preserve">
+    <value>暂时调整飞行速度。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFrameInput" xml:space="preserve">
+    <value>双击</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFrameDesc" xml:space="preserve">
+    <value>框住当前主题。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemResetDesc" xml:space="preserve">
+    <value>恢复默认相机取景。</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFocusInput" xml:space="preserve">
+    <value>点击预览</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFocusDesc" xml:space="preserve">
+    <value>聚焦键盘快捷键的预览。</value>
+  </data>
+  <data name="Preview3DSkyDomeSection" xml:space="preserve">
+    <value>天空穹顶</value>
+  </data>
+  <data name="Preview3DAtmosphereSection" xml:space="preserve">
+    <value>气氛</value>
+  </data>
+  <data name="Preview3DSunSection" xml:space="preserve">
+    <value>太阳</value>
+  </data>
+  <data name="Preview3DMoonSection" xml:space="preserve">
+    <value>月亮</value>
+  </data>
+  <data name="Preview3DGodRayDebugSection" xml:space="preserve">
+    <value>神射线调试（froxel）</value>
+  </data>
+  <data name="Preview3DGodRayStabilizeDebug" xml:space="preserve">
+    <value>稳定（无时间/抖动）</value>
+  </data>
+  <data name="Preview3DGodRayStabilizeDebugTooltip" xml:space="preserve">
+    <value>禁用 froxel/积分/上采样时间重用并冻结行进抖动。在调整神光时打开以停止脉冲。</value>
+  </data>
+  <data name="Preview3DGodRayDebugDensity" xml:space="preserve">
+    <value>调试密度</value>
+  </data>
+  <data name="Preview3DGodRayDebugDensityTooltip" xml:space="preserve">
+    <value>均匀的参与介质密度注入到 froxel 体积中，因此上帝射线在没有高度雾或云的情况下可见。 0 = 生产行为。尝试 0.10–0.30。</value>
+  </data>
+  <data name="Preview3DGodRayScatterGain" xml:space="preserve">
+    <value>分散增益</value>
+  </data>
+  <data name="Preview3DGodRayScatterGainTooltip" xml:space="preserve">
+    <value>积分行进中的分散累积增益（着色器默认值 3.4）。更高=轴更亮。</value>
+  </data>
+  <data name="Preview3DGodRayExtinction" xml:space="preserve">
+    <value>灭绝</value>
+  </data>
+  <data name="Preview3DGodRayExtinctionTooltip" xml:space="preserve">
+    <value>沿着视图光线的透射率衰减的比尔-朗伯消光系数（着色器默认值为 1.15）。更高=更密/更短的轴。</value>
+  </data>
+  <data name="Preview3DPreviewDebugSection" xml:space="preserve">
+    <value>3D预览调试</value>
+  </data>
+  <data name="Preview3DIblStrength" xml:space="preserve">
+    <value>IBL强度</value>
+  </data>
+  <data name="Preview3DIblStrengthTooltip" xml:space="preserve">
+    <value>环境探测的强度（间接环境+反射）。如果模型拾取过多的天空色调，则降低； 0 回落到平坦的环境外观。</value>
+  </data>
+  <data name="Preview3DEnableAtmosphericSky" xml:space="preserve">
+    <value>大气天空 (LUT)</value>
+  </data>
+  <data name="Preview3DEnableAtmosphericSkyTooltip" xml:space="preserve">
+    <value>启用 LUT 驱动的大气天空背景和环境响应。</value>
+  </data>
+  <data name="Preview3DAtmosphereTurbidity" xml:space="preserve">
+    <value>大气浊度</value>
+  </data>
+  <data name="Preview3DAtmosphereTurbidityTooltip" xml:space="preserve">
+    <value>气溶胶密度代理。值越高，地平线越模糊，日落越温暖。</value>
+  </data>
+  <data name="Preview3DAtmosphereSunIntensity" xml:space="preserve">
+    <value>大气日照强度</value>
+  </data>
+  <data name="Preview3DAtmosphereSunIntensityTooltip" xml:space="preserve">
+    <value>缩放天空通道和间接探测器使用的大气太阳辐射率。</value>
+  </data>
+  <data name="Preview3DAtmosphereHorizonFalloff" xml:space="preserve">
+    <value>大气地平线衰减</value>
+  </data>
+  <data name="Preview3DAtmosphereHorizonFalloffTooltip" xml:space="preserve">
+    <value>控制地平线附近的消光衰减（较低 = 更宽的辉光，较高 = 更窄的带）。</value>
+  </data>
+  <data name="Preview3DAtmosphereSkyExposure" xml:space="preserve">
+    <value>天空曝光</value>
+  </data>
+  <data name="Preview3DAtmosphereSkyExposureTooltip" xml:space="preserve">
+    <value>掌握天空合成通道的亮度。降低以减少开花。</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscStrength" xml:space="preserve">
+    <value>太阳盘绽放</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscStrengthTooltip" xml:space="preserve">
+    <value>LUT 顶部太阳盘周围的附加眩光。降低以获得更柔和的光晕；更高，花朵更宽。</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscBrightness" xml:space="preserve">
+    <value>太阳亮度</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscBrightnessTooltip" xml:space="preserve">
+    <value>肢体变暗的太阳盘表面亮度。不影响外层绽放光晕。</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscSize" xml:space="preserve">
+    <value>太阳大小</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscSizeTooltip" xml:space="preserve">
+    <value>太阳角大小乘数。 1.0 = 程式化默认值； ~0.07 与真实太阳相符（0.27 度）。还可以缩放光环和神光锥。</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscStrength" xml:space="preserve">
+    <value>月亮亮度</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscStrengthTooltip" xml:space="preserve">
+    <value>纹理月盘的表面亮度乘数。</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscSize" xml:space="preserve">
+    <value>月亮大小</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscSizeTooltip" xml:space="preserve">
+    <value>天空广告牌的月亮角度大小乘数。</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonGlowStrength" xml:space="preserve">
+    <value>月光</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonGlowStrengthTooltip" xml:space="preserve">
+    <value>月亮边缘周围的外部蓝白色光芒。</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonTextureSharpness" xml:space="preserve">
+    <value>月亮清晰度</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonTextureSharpnessTooltip" xml:space="preserve">
+    <value>生成的月球纹理的着色器端锐化。</value>
+  </data>
+  <data name="Preview3DMoonWorldLightIntensity" xml:space="preserve">
+    <value>月亮世界光</value>
+  </data>
+  <data name="Preview3DMoonWorldLightIntensityTooltip" xml:space="preserve">
+    <value>直接月光倍增器用于在夜间照明预览几何体。不改变天空曝光或大气填充。</value>
+  </data>
+  <data name="Preview3DShowCelestialDebug" xml:space="preserve">
+    <value>太阳/月亮标记</value>
+  </data>
+  <data name="Preview3DShowCelestialDebugTooltip" xml:space="preserve">
+    <value>在太阳和月亮圆盘位置绘制方形和十字线标记。</value>
+  </data>
+  <data name="Preview3DHorizonFogStrength" xml:space="preserve">
+    <value>地平线雾</value>
+  </data>
+  <data name="Preview3DHorizonFogStrengthTooltip" xml:space="preserve">
+    <value>天空穹顶中的地平线以下充满了雾气，几何形状上的空中透视（0 = 关闭）。</value>
+  </data>
+  <data name="Preview3DVolumetricSection" xml:space="preserve">
+    <value>体积效应</value>
+  </data>
+  <data name="Preview3DEnableGodRays" xml:space="preserve">
+    <value>神光</value>
+  </data>
+  <data name="Preview3DEnableGodRaysTooltip" xml:space="preserve">
+    <value>Froxel 体积光轴朝向太阳（注入 + 积分 + 上采样）。</value>
+  </data>
+  <data name="Preview3DEnableVolumetricClouds" xml:space="preserve">
+    <value>体积云</value>
+  </data>
+  <data name="Preview3DEnableVolumetricCloudsTooltip" xml:space="preserve">
+    <value>天空通道中的程序云层（质量遵循下面的预设）。</value>
+  </data>
+  <data name="Preview3DShadersSection" xml:space="preserve">
+    <value>着色器</value>
+  </data>
+  <data name="Preview3DVolumetricQuality" xml:space="preserve">
+    <value>福罗克塞尔品质</value>
+  </data>
+  <data name="Preview3DVolumetricQualityTooltip" xml:space="preserve">
+    <value>低/中/高冷冻素分辨率、切片计数、云细节和时间过滤。</value>
+  </data>
+  <data name="Preview3DGodRayStrength" xml:space="preserve">
+    <value>神光强度</value>
+  </data>
+  <data name="Preview3DGodRayStrengthTooltip" xml:space="preserve">
+    <value>加法神射线复合材料的强度（0 = 关闭）。</value>
+  </data>
+  <data name="Preview3DCloudSection" xml:space="preserve">
+    <value>云层</value>
+  </data>
+  <data name="Preview3DCloudDensity" xml:space="preserve">
+    <value>密度</value>
+  </data>
+  <data name="Preview3DCloudDensityTooltip" xml:space="preserve">
+    <value>缩放云板内部的体积密度（越高=越厚、越不透明）。</value>
+  </data>
+  <data name="Preview3DCloudCoverageScale" xml:space="preserve">
+    <value>覆盖范围</value>
+  </data>
+  <data name="Preview3DCloudCoverageScaleTooltip" xml:space="preserve">
+    <value>区域天气地图覆盖比例（0 = 晴朗的天空，1 = 烘焙后的地图）。</value>
+  </data>
+  <data name="Preview3DCloudLayerHeight" xml:space="preserve">
+    <value>层高</value>
+  </data>
+  <data name="Preview3DCloudLayerHeightTooltip" xml:space="preserve">
+    <value>添加到默认云板基础高度（世界单位）的垂直偏移。</value>
+  </data>
+  <data name="Preview3DCloudVolumeHeight" xml:space="preserve">
+    <value>层厚</value>
+  </data>
+  <data name="Preview3DCloudVolumeHeightTooltip" xml:space="preserve">
+    <value>主积云板的垂直范围（世界单位）。</value>
+  </data>
+  <data name="Preview3DCloudVolumeSize" xml:space="preserve">
+    <value>特征尺度</value>
+  </data>
+  <data name="Preview3DCloudVolumeSizeTooltip" xml:space="preserve">
+    <value>一个噪声瓦片周期的世界大小（较大=更宽的云形状）。</value>
+  </data>
+  <data name="Preview3DCloudWindSpeed" xml:space="preserve">
+    <value>风速</value>
+  </data>
+  <data name="Preview3DCloudWindSpeedTooltip" xml:space="preserve">
+    <value>云场漂移速度（以每秒世界单位为单位）。</value>
+  </data>
+  <data name="Preview3DCloudWindHeading" xml:space="preserve">
+    <value>风向</value>
+  </data>
+  <data name="Preview3DCloudWindHeadingTooltip" xml:space="preserve">
+    <value>地平面上的风向，以度为单位 (0 = +X)。</value>
+  </data>
+  <data name="Preview3DCloudCirrusStrength" xml:space="preserve">
+    <value>卷云层</value>
+  </data>
+  <data name="Preview3DCloudCirrusStrengthTooltip" xml:space="preserve">
+    <value>主层上方的高薄卷云片的不透明度（0 = 关闭）。</value>
+  </data>
+  <data name="Preview3DCloudDebugSection" xml:space="preserve">
+    <value>云端调试</value>
+  </data>
+  <data name="Preview3DCloudDebugView" xml:space="preserve">
+    <value>调试视图</value>
+  </data>
+  <data name="Preview3DCloudDebugViewTooltip" xml:space="preserve">
+    <value>用覆盖图或中间层密度切片叠加替换照亮的云。</value>
+  </data>
+  <data name="Preview3DCloudDebugViewOff" xml:space="preserve">
+    <value>离开</value>
+  </data>
+  <data name="Preview3DCloudDebugViewCoverage" xml:space="preserve">
+    <value>覆盖图</value>
+  </data>
+  <data name="Preview3DCloudDebugViewDensitySlice" xml:space="preserve">
+    <value>密度切片</value>
+  </data>
+  <data name="Preview3DCloudDisableTemporal" xml:space="preserve">
+    <value>禁用时间</value>
+  </data>
+  <data name="Preview3DCloudDisableTemporalTooltip" xml:space="preserve">
+    <value>关闭云历史记录重投影（在检查噪音或行进步骤时很有用）。</value>
+  </data>
+  <data name="Preview3DCloudMarchSteps" xml:space="preserve">
+    <value>三月脚步</value>
+  </data>
+  <data name="Preview3DCloudMarchStepsTooltip" xml:space="preserve">
+    <value>光线行进步进覆盖（0 = 遵循质量预设）。</value>
+  </data>
+  <data name="Preview3DCloudFreezeWind" xml:space="preserve">
+    <value>冻风</value>
+  </data>
+  <data name="Preview3DCloudFreezeWindTooltip" xml:space="preserve">
+    <value>在零时间保持云对流，以便在调整照明时形状保持固定。</value>
+  </data>
+  <data name="Preview3DEnablePreviewTaa" xml:space="preserve">
+    <value>预览 TAA</value>
+  </data>
+  <data name="Preview3DEnablePreviewTaaTooltip" xml:space="preserve">
+    <value>合成帧上的最终时间抗锯齿。使用共享重投影助手；当上帝光线提供场景深度时进行运动感知。启用此功能时，每次传递的时间会减半。</value>
+  </data>
+  <data name="Preview3DTimeOfDayHours" xml:space="preserve">
+    <value>一天中的时间</value>
+  </data>
+  <data name="Preview3DTimeOfDayHoursTooltip" xml:space="preserve">
+    <value>太阳/月亮周期的时钟时间（0-24 小时）：6 ≈ 日出，12 ≈ 中午，18 ≈ 日落，0/24 ≈ 午夜（有星星）。</value>
+  </data>
+  <data name="Preview3DAnimateTimeOfDay" xml:space="preserve">
+    <value>一天中的时间动画</value>
+  </data>
+  <data name="Preview3DAnimateTimeOfDayTooltip" xml:space="preserve">
+    <value>从预览渲染时钟提前太阳/月亮周期（24/速度秒为一整天）。</value>
+  </data>
+  <data name="Preview3DTimeOfDaySpeed" xml:space="preserve">
+    <value>循环速度</value>
+  </data>
+  <data name="Preview3DTimeOfDaySpeedTooltip" xml:space="preserve">
+    <value>动画开启时，游戏时间按实际秒数提前（1 = 每整天 24 秒）。</value>
+  </data>
+  <data name="Preview3DEnableShadowCascades" xml:space="preserve">
+    <value>阴影级联</value>
+  </data>
+  <data name="Preview3DEnableShadowCascadesTooltip" xml:space="preserve">
+    <value>近+远方向阴影贴图；体积神射线根据距相机的距离拾取级联。</value>
+  </data>
+  <data name="Preview3DVolumetricQualityLow" xml:space="preserve">
+    <value>低的</value>
+  </data>
+  <data name="Preview3DVolumetricQualityMedium" xml:space="preserve">
+    <value>中等的</value>
+  </data>
+  <data name="Preview3DVolumetricQualityHigh" xml:space="preserve">
+    <value>高的</value>
+  </data>
+  <data name="Preview3DParallaxAoStrength" xml:space="preserve">
+    <value>POM 联系 AO</value>
+  </data>
+  <data name="Preview3DParallaxAoStrengthTooltip" xml:space="preserve">
+    <value>从 POM 高度场导出的局部接触环境遮挡强度。</value>
+  </data>
+  <data name="Preview3DEnableParallaxAo" xml:space="preserve">
+    <value>POM 联系 AO</value>
+  </data>
+  <data name="Preview3DEnableParallaxAoTooltip" xml:space="preserve">
+    <value>从视差高度场启用局部环境光遮挡变暗。</value>
+  </data>
+  <data name="Preview3DWorldSection" xml:space="preserve">
+    <value>世界</value>
+  </data>
+  <data name="Preview3DAnimationSection" xml:space="preserve">
+    <value>动画片</value>
+  </data>
+  <data name="Preview3DShowGroundMesh" xml:space="preserve">
+    <value>地面网格 (3D)</value>
+  </data>
+  <data name="Preview3DShowGroundMeshTooltip" xml:space="preserve">
+    <value>在 3D 预览中显示对象下方的纹理草地平面。</value>
+  </data>
+  <data name="Preview3DEnableEntityAnimation" xml:space="preserve">
+    <value>对模拟实体进行动画处理</value>
+  </data>
+  <data name="Preview3DEnableEntityAnimationTooltip" xml:space="preserve">
+    <value>为模拟实体模型预览启用渲染时空闲动画。</value>
+  </data>
+  <data name="Preview3DPauseEntityIdleAnimation" xml:space="preserve">
+    <value>暂停空闲顶点动画</value>
+  </data>
+  <data name="Preview3DPauseEntityIdleAnimationTooltip" xml:space="preserve">
+    <value>启用后，模拟实体网格动画将冻结在当前姿势，直到关闭为止。传统摆动是独立的（见下文）。</value>
+  </data>
+  <data name="Preview3DEnableLegacyEntityWobble" xml:space="preserve">
+    <value>传统网格摆动</value>
+  </data>
+  <data name="Preview3DEnableLegacyEntityWobbleTooltip" xml:space="preserve">
+    <value>在模型矩阵上应用前红外全网格鲍勃/偏航/滚动。默认情况下关闭 - 使用提升的 setupAnim / 定义剪辑代替。</value>
+  </data>
+  <data name="Preview3DEntityAnimationSpeed" xml:space="preserve">
+    <value>实体动画速度</value>
+  </data>
+  <data name="Preview3DEntityAnimationSpeedTooltip" xml:space="preserve">
+    <value>用于模拟实体空闲运动的渲染时间速度倍增器。</value>
+  </data>
+  <data name="Preview3DEntityAnimationAmplitude" xml:space="preserve">
+    <value>实体动画幅度</value>
+  </data>
+  <data name="Preview3DEntityAnimationAmplitudeTooltip" xml:space="preserve">
+    <value>用于模拟实体空闲运动的渲染时间振幅倍增器。</value>
+  </data>
+  <data name="Preview3DEntitiesSection" xml:space="preserve">
+    <value>实体</value>
+  </data>
+  <data name="Preview3DViewportSection" xml:space="preserve">
+    <value>视差</value>
+  </data>
+  <data name="Preview3DSpritesSection" xml:space="preserve">
+    <value>精灵</value>
+  </data>
+  <data name="Preview3DGrassSection" xml:space="preserve">
+    <value>草</value>
+  </data>
+  <data name="Preview3DGrassColormap" xml:space="preserve">
+    <value>草颜色图</value>
+  </data>
+  <data name="Preview3DGrassColormapTemperature" xml:space="preserve">
+    <value>温度</value>
+  </data>
+  <data name="Preview3DGrassColormapTemperatureTooltip" xml:space="preserve">
+    <value>生物群落温度（0 = 冷，1 = 暖）用于对草颜色图进行采样以进行预览着色。</value>
+  </data>
+  <data name="Preview3DGrassColormapDownfall" xml:space="preserve">
+    <value>倒台</value>
+  </data>
+  <data name="Preview3DGrassColormapDownfallTooltip" xml:space="preserve">
+    <value>生物群落湿度/降雨量（0 = 干燥，1 = 潮湿）用于对草颜色图进行采样以进行预览着色。</value>
+  </data>
+  <data name="Preview3DEntityAlphaMode" xml:space="preserve">
+    <value>实体阿尔法模式</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeTooltip" xml:space="preserve">
+    <value>对于通过具有漫反射 PNG 透明度的烘焙网格绘制的运行时生物装备 - 不透明会忽略漫反射 alpha； cutout 丢弃薄/低 alpha 纹理像素（推荐默认值）；逐步混合复合材料。</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeOpaque" xml:space="preserve">
+    <value>不透明</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeCutout" xml:space="preserve">
+    <value>剪下</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeBlend" xml:space="preserve">
+    <value>混合</value>
+  </data>
+  <data name="Preview3DEnableEntityLabPbrShading" xml:space="preserve">
+    <value>实体法线和镜面反射贴图</value>
+  </data>
+  <data name="Preview3DEnableEntityLabPbrShadingTooltip" xml:space="preserve">
+    <value>对于运行时生物预览，请使用生成的 LabPBR 法线和镜面反射贴图。如果特定装备上的光照看起来不正确，则禁用。</value>
+  </data>
+  <data name="Preview3DEnableEntityParallax" xml:space="preserve">
+    <value>实体视差 (POM)</value>
+  </data>
+  <data name="Preview3DEnableEntityParallaxTooltip" xml:space="preserve">
+    <value>对于运行时生物预览，启用高度图视差、视差 AO 和视差自阴影。默认关闭；可以在紫外线接缝处闪烁。</value>
+  </data>
+  <data name="Preview3DSpriteThickness" xml:space="preserve">
+    <value>精灵厚度</value>
+  </data>
+  <data name="Preview3DSpriteThicknessTooltip" xml:space="preserve">
+    <value>将每个不透明的精灵纹理元素挤压成长方体（Minecraft 风格的物品加厚）。 0=平卡；高达 0.25 的挤出深度 - 最大时，深度与立方体素的纹素大小相匹配。侧面使用平面纹理像素颜色，而不是拉伸 UV。</value>
+  </data>
+  <data name="WindowMinimize" xml:space="preserve">
+    <value>最小化</value>
+  </data>
+  <data name="WindowMaximize" xml:space="preserve">
+    <value>最大化</value>
+  </data>
+  <data name="WindowClose" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="DebugMlMatch" xml:space="preserve">
+    <value>调试 ML 匹配...</value>
+  </data>
+  <data name="ExploreManualOverrideTooltip" xml:space="preserve">
+    <value>选中=包含，未选中=排除，不确定=使用其他规则</value>
+  </data>
+  <data name="SetAsPreview" xml:space="preserve">
+    <value>设置为预览</value>
+  </data>
+  <data name="TagRuleIdWatermark" xml:space="preserve">
+    <value>例如我的标签</value>
+  </data>
+  <data name="TagRuleDisplayNameWatermark" xml:space="preserve">
+    <value>例如我的标签</value>
+  </data>
+  <data name="EditAiModels" xml:space="preserve">
+    <value>编辑AI模型</value>
+  </data>
+  <data name="EditAiModelsWarning" xml:space="preserve">
+    <value>警告：除非您知道自己在做什么，否则请勿编辑这些模型路径。</value>
+  </data>
+  <data name="MlResolution16x16" xml:space="preserve">
+    <value>16×16</value>
+  </data>
+  <data name="MlResolution32x32" xml:space="preserve">
+    <value>32×32</value>
+  </data>
+  <data name="MlResolution64x64" xml:space="preserve">
+    <value>64×64</value>
+  </data>
+  <data name="MlResolution128x128" xml:space="preserve">
+    <value>128×128</value>
+  </data>
+  <data name="MlResolution256x256" xml:space="preserve">
+    <value>256×256</value>
+  </data>
+  <data name="UvDebugButton" xml:space="preserve">
+    <value>紫外线调试</value>
+  </data>
+  <data name="EntityDebugButton" xml:space="preserve">
+    <value>实体调试</value>
+  </data>
+  <data name="PreviewPoseLabel" xml:space="preserve">
+    <value>姿势</value>
+  </data>
+  <data name="PreviewSizeLabel" xml:space="preserve">
+    <value>尺寸</value>
+  </data>
+  <data name="PreviewContextTypeLabel" xml:space="preserve">
+    <value>上下文类型</value>
+  </data>
+  <data name="SelectResourcePackTitle" xml:space="preserve">
+    <value>选择资源包（.zip 或 .jar）</value>
+  </data>
+  <data name="SelectOutputFolderTitle" xml:space="preserve">
+    <value>选择输出文件夹</value>
+  </data>
+  <data name="SelectMinecraftAssetsTitle" xml:space="preserve">
+    <value>选择 Minecraft 版本或资产文件夹</value>
+  </data>
+  <data name="SemanticDebugWindowTitle" xml:space="preserve">
+    <value>MiniLM 语义匹配调试</value>
+  </data>
+  <data name="Preview3DCameraResetKeyFormat" xml:space="preserve">
+    <value>{0} 键</value>
+  </data>
+  <data name="CustomTagDefaultDisplayName" xml:space="preserve">
+    <value>自定义标签</value>
+  </data>
+  <data name="CustomRuleDefaultDisplayName" xml:space="preserve">
+    <value>自定义规则</value>
+  </data>
+  <data name="Status_GpuPreviewStarting" xml:space="preserve">
+    <value>开始 GPU 预览...</value>
+  </data>
+  <data name="Status_GpuPreviewPreparingShaderSources" xml:space="preserve">
+    <value>准备着色器源...</value>
+  </data>
+  <data name="Status_GpuPreviewPreparing" xml:space="preserve">
+    <value>正在准备 GPU 预览...</value>
+  </data>
+  <data name="Status_GpuPreviewClearingShaderCache" xml:space="preserve">
+    <value>清除着色器缓存...</value>
+  </data>
+  <data name="Status_GpuPreviewCompilingMainShaders" xml:space="preserve">
+    <value>编译主要预览着色器...</value>
+  </data>
+  <data name="Status_GpuPreviewCompilingShadowShaders" xml:space="preserve">
+    <value>编译阴影着色器...</value>
+  </data>
+  <data name="Status_GpuPreviewCreatingShadowMaps" xml:space="preserve">
+    <value>创建阴影贴图...</value>
+  </data>
+  <data name="Status_GpuPreviewUploadingMeshes" xml:space="preserve">
+    <value>正在上传预览网格...</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingLineOverlay" xml:space="preserve">
+    <value>正在初始化线覆盖...</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingSkyDome" xml:space="preserve">
+    <value>正在初始化天空穹顶...</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingAtmosphere" xml:space="preserve">
+    <value>正在初始化气氛...</value>
+  </data>
+  <data name="Status_GpuPreviewFinalizing" xml:space="preserve">
+    <value>正在完成预览…</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingGodRays" xml:space="preserve">
+    <value>加载神光…</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingClouds" xml:space="preserve">
+    <value>正在加载体积云...</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingTaa" xml:space="preserve">
+    <value>正在加载预览 TAA...</value>
+  </data>
+  <data name="Status_GpuPreviewReady" xml:space="preserve">
+    <value>准备好</value>
+  </data>
+  <data name="Status_GpuPreviewPreviewReady" xml:space="preserve">
+    <value>预览就绪</value>
+  </data>
+  <data name="Status_GpuPreviewCoreReady" xml:space="preserve">
+    <value>核心预览就绪</value>
+  </data>
+  <data name="UvDebugTitle" xml:space="preserve">
+    <value>紫外线调试</value>
+  </data>
+  <data name="UvDebugGlobalControls" xml:space="preserve">
+    <value>全局 UV 调试控制</value>
+  </data>
+  <data name="UvDebugGlobalControlsDescription" xml:space="preserve">
+    <value>切换时，这些会覆盖生产 UV 烘烤策略。实体立方体默认使用内置的 Java 奇偶校验。</value>
+  </data>
+  <data name="UvDebugResetOverrides" xml:space="preserve">
+    <value>重置覆盖（生产默认值）</value>
+  </data>
+  <data name="UvDebugFlipU" xml:space="preserve">
+    <value>翻转 U（交换 u0/u1）</value>
+  </data>
+  <data name="UvDebugFlipV" xml:space="preserve">
+    <value>翻转 V（交换 v0/v1）</value>
+  </data>
+  <data name="UvDebugOffsetU" xml:space="preserve">
+    <value>U 偏移（像素）</value>
+  </data>
+  <data name="UvDebugOffsetV" xml:space="preserve">
+    <value>垂直偏移 (px)</value>
+  </data>
+  <data name="UvDebugFaceSemanticRouting" xml:space="preserve">
+    <value>人脸语义路由（变换后人脸语义）</value>
+  </data>
+  <data name="UvDebugSwapNorthSouth" xml:space="preserve">
+    <value>交换面路由北/南</value>
+  </data>
+  <data name="UvDebugSwapEastWest" xml:space="preserve">
+    <value>交换面路由东/西</value>
+  </data>
+  <data name="UvDebugSwapUpDown" xml:space="preserve">
+    <value>交换面路由向上/向下</value>
+  </data>
+  <data name="UvDebugBakerConversion" xml:space="preserve">
+    <value>贝克紫外线转换</value>
+  </data>
+  <data name="UvDebugPreserveDirectionalBounds" xml:space="preserve">
+    <value>保留定向 UV 范围（禁用最小/最大标准化）</value>
+  </data>
+  <data name="UvDebugUseBottomLeftUvOrigin" xml:space="preserve">
+    <value>使用左下角UV原点转换（GL风格）</value>
+  </data>
+  <data name="UvDebugFaceCornerOrdering" xml:space="preserve">
+    <value>面角排序/缠绕</value>
+  </data>
+  <data name="UvDebugCornerOrderDefault" xml:space="preserve">
+    <value>默认</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate90" xml:space="preserve">
+    <value>旋转 90</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate180" xml:space="preserve">
+    <value>旋转180</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate270" xml:space="preserve">
+    <value>旋转270度</value>
+  </data>
+  <data name="UvDebugCornerOrderReverseWinding" xml:space="preserve">
+    <value>反绕</value>
+  </data>
+  <data name="UvDebugGlobalFaceRotation" xml:space="preserve">
+    <value>全局人脸旋转</value>
+  </data>
+  <data name="UvDebugRotation0" xml:space="preserve">
+    <value>0°</value>
+  </data>
+  <data name="UvDebugRotation90" xml:space="preserve">
+    <value>90°</value>
+  </data>
+  <data name="UvDebugRotation180" xml:space="preserve">
+    <value>180°</value>
+  </data>
+  <data name="UvDebugRotation270" xml:space="preserve">
+    <value>270°</value>
+  </data>
+  <data name="UvDebugLiveChangesHint" xml:space="preserve">
+    <value>更改实时应用并触发预览刷新。使用它们来隔离 texOffs 与 Baker 转换与角顺序问题。</value>
+  </data>
+  <data name="EntityPreviewDebugTitle" xml:space="preserve">
+    <value>实体预览调试</value>
+  </data>
+  <data name="EntityPreviewDebugBabyFixesSection" xml:space="preserve">
+    <value>宝贝预览实时修复</value>
+  </data>
+  <data name="EntityPreviewDebugBabyFixesDescription" xml:space="preserve">
+    <value>探索中婴儿身体/头部/腿部分离的试/错误开关。立即更改重新烘焙网格 - 加载婴儿纹理（fox_baby、cow_temperate_baby、donkey_baby 等）并一次切换一个修复。</value>
+  </data>
+  <data name="EntityPreviewDebugBaselineCompare" xml:space="preserve">
+    <value>基线比较</value>
+  </data>
+  <data name="EntityPreviewDebugForceCpuSkinning" xml:space="preserve">
+    <value>强制 CPU 换肤（12 浮点预览 VBO）</value>
+  </data>
+  <data name="EntityPreviewDebugForceCpuSkinningTooltip" xml:space="preserve">
+    <value>CPU 上的网格正确，但在 GPU 上分离 ⇒ GPU 绑定/W() 路径，而不是 IR 行走。</value>
+  </data>
+  <data name="EntityPreviewDebugLogDrawContract" xml:space="preserve">
+    <value>每帧记录实体绘制合约</value>
+  </data>
+  <data name="EntityPreviewDebugLogDrawContractTooltip" xml:space="preserve">
+    <value>切换修复时，在预览日志中观看 bodyY/headY/legY。</value>
+  </data>
+  <data name="EntityPreviewDebugLayerDebugFalseColor" xml:space="preserve">
+    <value>层调试假色（深度批次）</value>
+  </data>
+  <data name="EntityPreviewDebugLayerDebugFalseColorTooltip" xml:space="preserve">
+    <value>按 PreviewDepthLayerKind 对每个绘制批次进行着色（基灰色、剪切青色、化妆品洋红色、发光黄色）。</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseCompose" xml:space="preserve">
+    <value>部分姿势合成（重新烘焙网格）</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseErTimesT" xml:space="preserve">
+    <value>Er × T（生产）</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseLegacyTxEr" xml:space="preserve">
+    <value>T × Er（传统成人爆炸）</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseLegacyTxErTooltip" xml:space="preserve">
+    <value>对于成年人来说通常是错误的；如果四肢随着父母的旋转而分离，请尝试在婴儿身上进行。</value>
+  </data>
+  <data name="EntityPreviewDebugLerFold" xml:space="preserve">
+    <value>LER 折叠（重新烘焙网格）</value>
+  </data>
+  <data name="EntityPreviewDebugLerPolicyDefault" xml:space="preserve">
+    <value>政策默认</value>
+  </data>
+  <data name="EntityPreviewDebugLerStandardWorldRoot" xml:space="preserve">
+    <value>标准世界根（S·M 列）</value>
+  </data>
+  <data name="EntityPreviewDebugLerRightComposeLocalChain" xml:space="preserve">
+    <value>RightComposeLocalChain (M·S)</value>
+  </data>
+  <data name="EntityPreviewDebugLerRightComposeLocalChainTooltip" xml:space="preserve">
+    <value>每个元素 M×S — 可以分离四足动物上旋转的身体长方体。</value>
+  </data>
+  <data name="EntityPreviewDebugLerSkip" xml:space="preserve">
+    <value>跳过 LER</value>
+  </data>
+  <data name="EntityPreviewDebugPartTreeRepair" xml:space="preserve">
+    <value>部分树修复</value>
+  </data>
+  <data name="EntityPreviewDebugSkipAllPartTreeRepair" xml:space="preserve">
+    <value>跳过所有部分树修复（原始提升 IR）</value>
+  </data>
+  <data name="EntityPreviewDebugSkipAllPartTreeRepairTooltip" xml:space="preserve">
+    <value>完全绕过 GeometryIrPartTreeRepair - 在任何婴儿修复之前查看升降机输出。</value>
+  </data>
+  <data name="EntityPreviewDebugIndividualRepairSteps" xml:space="preserve">
+    <value>单独的修复步骤（生产默认开启）</value>
+  </data>
+  <data name="EntityPreviewDebugIndividualRepairStepsDescription" xml:space="preserve">
+    <value>取消选中某个步骤以查看它对当前婴儿是否有帮助或伤害。全部跳过会覆盖这些。</value>
+  </data>
+  <data name="EntityPreviewDebugRepairGlobalReparent" xml:space="preserve">
+    <value>全局 reparent（耳朵、头→head_parts、角、微风、……）</value>
+  </data>
+  <data name="EntityPreviewDebugRepairQuadrupedLegReparent" xml:space="preserve">
+    <value>四足腿重新位于身体下方</value>
+  </data>
+  <data name="EntityPreviewDebugRepairQuadrupedLegReparentTooltip" xml:space="preserve">
+    <value>当不是平根烘烤时 - 小驴/马头堆类使用下面的头堆规则。</value>
+  </data>
+  <data name="EntityPreviewDebugRepairForceLegReparent" xml:space="preserve">
+    <value>强制在扁平四足动物烘焙上重新调整腿部（实验性）</value>
+  </data>
+  <data name="EntityPreviewDebugRepairForceLegReparentTooltip" xml:space="preserve">
+    <value>尝试一下狐狸/牛/鸡的婴儿，其中腿保持根部兄弟姐妹的状态，并具有身体相对偏移。</value>
+  </data>
+  <data name="EntityPreviewDebugRepairHeadStackLegReparent" xml:space="preserve">
+    <value>头堆叠嵌套：重新调整平根腿（小马）</value>
+  </data>
+  <data name="EntityPreviewDebugRepairHeadStackLegReparentTooltip" xml:space="preserve">
+    <value>BabyHorseModel / BabyDonkeyModel — 头在身体下方，但腿仍在根部。</value>
+  </data>
+  <data name="EntityPreviewDebugRepairRemoveDuplicateRootSiblings" xml:space="preserve">
+    <value>删除重复的根同级</value>
+  </data>
+  <data name="EntityPreviewDebugRepairCollapseInnerBody" xml:space="preserve">
+    <value>折叠inner_body / 身体下方的羊毛饰边</value>
+  </data>
+  <data name="EntityPreviewDebugRepairDeduplicateNestedPartIds" xml:space="preserve">
+    <value>消除重复的嵌套零件 ID</value>
+  </data>
+  <data name="EntityPreviewDebugRepairZeroEquineRootOffset" xml:space="preserve">
+    <value>零马 createBodyLayer 根偏移（马/驴）</value>
+  </data>
+  <data name="EntityPreviewDebugRepairZeroEquineRootOffsetTooltip" xml:space="preserve">
+    <value>将根 T(0,24,0) 锚点放到马 createBodyLayer/createBabyLayer 烘焙上。</value>
+  </data>
+  <data name="EntityPreviewDebugSuggestedWorkflow" xml:space="preserve">
+    <value>建议的婴儿工作流程：（1）跳过所有修复以查看原始 IR，（2）一一重新启用生产步骤，（3）尝试对马婴儿强制腿部重新父级或头部堆栈规则，（4）比较 CPU 与 GPU 蒙皮，（5）如果集群仍然漂移，则仅尝试 T×Er 或 RightCompose LER。</value>
+  </data>
+  <data name="AiTaggingSection" xml:space="preserve">
+    <value>人工智能标签</value>
+  </data>
+  <data name="NormalsAndHeightSection" xml:space="preserve">
+    <value>法线和高度</value>
+  </data>
+  <data name="NormalsSection" xml:space="preserve">
+    <value>法线</value>
+  </data>
+  <data name="SpecularSection" xml:space="preserve">
+    <value>光滑度</value>
+  </data>
+  <data name="MetalnessSection" xml:space="preserve">
+    <value>金属性</value>
+  </data>
+  <data name="SpecularPorositySection" xml:space="preserve">
+    <value>孔隙率</value>
+  </data>
+  <data name="AiDrivenPbrSection" xml:space="preserve">
+    <value>AI驱动的PBR</value>
+  </data>
+  <data name="AiNormalsSection" xml:space="preserve">
+    <value>人工智能法线</value>
+  </data>
+  <data name="AiSpecularSection" xml:space="preserve">
+    <value>AI镜面反射</value>
+  </data>
+  <data name="Preview3DCameraExpanderSection" xml:space="preserve">
+    <value>相机</value>
+  </data>
 </root>
 
 

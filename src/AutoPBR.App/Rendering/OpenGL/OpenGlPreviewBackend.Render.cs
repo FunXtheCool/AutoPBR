@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
+using AutoPBR.App.Lang;
 using AutoPBR.App.Rendering.Abstractions;
 using AutoPBR.App.Rendering.Scene;
 using AutoPBR.Core.Models;
@@ -56,7 +57,7 @@ public sealed partial class OpenGlPreviewBackend
                     _gpuBootstrap.Advance(this, 14.0);
                 }
 
-                var phase = _gpuBootstrap.IsComplete ? "Core preview ready" : _gpuBootstrap.Phase;
+                var phase = _gpuBootstrap.IsComplete ? PreviewGpuInitPhases.CoreReady : _gpuBootstrap.Phase;
                 RaiseGpuInitProgress(phase, settings);
                 if (_gpuBootstrap.IsComplete)
                 {

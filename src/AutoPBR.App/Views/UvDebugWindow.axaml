@@ -26,7 +26,7 @@
                     BorderThickness="0,0,0,1"
                     PointerPressed="TitleBarDragRegion_PointerPressed">
                 <Grid ColumnDefinitions="*,Auto">
-                    <TextBlock Text="{Binding HeaderTitle}"
+                    <TextBlock Text="{Binding Strings.UvDebugTitle}"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
                                FontSize="16"
@@ -57,25 +57,25 @@
                               HorizontalScrollBarVisibility="Disabled"
                               MinHeight="220">
                     <StackPanel Spacing="10" Margin="12">
-                    <TextBlock Text="Global UV Debug Controls"
+                    <TextBlock Text="{Binding Strings.UvDebugGlobalControls}"
                                Foreground="{Binding ForegroundBrush}"
                                FontWeight="SemiBold" />
-                    <TextBlock Text="These override production UV bake policy when toggled. Entity cuboids use baked-in Java parity by default."
+                    <TextBlock Text="{Binding Strings.UvDebugGlobalControlsDescription}"
                                Foreground="{Binding ForegroundBrush}"
                                Opacity="0.8"
                                FontSize="12" />
 
-                    <Button Content="Reset overrides (production defaults)"
+                    <Button Content="{Binding Strings.UvDebugResetOverrides}"
                             HorizontalAlignment="Left"
                             Click="ResetOverrides_Click" />
 
-                    <CheckBox Content="Flip U (swap u0/u1)"
+                    <CheckBox Content="{Binding Strings.UvDebugFlipU}"
                               IsChecked="{Binding FlipU, Mode=TwoWay}" />
-                    <CheckBox Content="Flip V (swap v0/v1)"
+                    <CheckBox Content="{Binding Strings.UvDebugFlipV}"
                               IsChecked="{Binding FlipV, Mode=TwoWay}" />
 
                     <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                        <TextBlock Text="U offset (px)"
+                        <TextBlock Text="{Binding Strings.UvDebugOffsetU}"
                                    VerticalAlignment="Center"
                                    Foreground="{Binding ForegroundBrush}" />
                         <ctrls:OverlaySlider Width="120"
@@ -87,7 +87,7 @@
                                                FormatString="0"
                                                Value="{Binding OffsetUPixels, Mode=TwoWay}" />
 
-                        <TextBlock Text="V offset (px)"
+                        <TextBlock Text="{Binding Strings.UvDebugOffsetV}"
                                    VerticalAlignment="Center"
                                    Margin="10,0,0,0"
                                    Foreground="{Binding ForegroundBrush}" />
@@ -101,46 +101,46 @@
                                                Value="{Binding OffsetVPixels, Mode=TwoWay}" />
                     </StackPanel>
 
-                    <TextBlock Text="Face semantic routing (post-transform face semantics)"
+                    <TextBlock Text="{Binding Strings.UvDebugFaceSemanticRouting}"
                                Foreground="{Binding ForegroundBrush}"
                                FontWeight="SemiBold"
                                Margin="0,8,0,0" />
-                    <CheckBox Content="Swap face routing North / South"
+                    <CheckBox Content="{Binding Strings.UvDebugSwapNorthSouth}"
                               IsChecked="{Binding SwapFaceNorthSouth, Mode=TwoWay}" />
-                    <CheckBox Content="Swap face routing East / West"
+                    <CheckBox Content="{Binding Strings.UvDebugSwapEastWest}"
                               IsChecked="{Binding SwapFaceEastWest, Mode=TwoWay}" />
-                    <CheckBox Content="Swap face routing Up / Down"
+                    <CheckBox Content="{Binding Strings.UvDebugSwapUpDown}"
                               IsChecked="{Binding SwapFaceUpDown, Mode=TwoWay}" />
 
-                    <TextBlock Text="Baker UV conversion"
+                    <TextBlock Text="{Binding Strings.UvDebugBakerConversion}"
                                Foreground="{Binding ForegroundBrush}"
                                FontWeight="SemiBold"
                                Margin="0,8,0,0" />
-                    <CheckBox Content="Preserve directional UV bounds (disable min/max normalization)"
+                    <CheckBox Content="{Binding Strings.UvDebugPreserveDirectionalBounds}"
                               IsChecked="{Binding PreserveDirectionalBounds, Mode=TwoWay}" />
-                    <CheckBox Content="Use bottom-left UV origin conversion (GL style)"
+                    <CheckBox Content="{Binding Strings.UvDebugUseBottomLeftUvOrigin}"
                               IsChecked="{Binding UseBottomLeftUvOrigin, Mode=TwoWay}" />
 
-                    <TextBlock Text="Face corner ordering / winding"
+                    <TextBlock Text="{Binding Strings.UvDebugFaceCornerOrdering}"
                                Foreground="{Binding ForegroundBrush}"
                                FontWeight="SemiBold"
                                Margin="0,8,0,0" />
                     <WrapPanel ItemSpacing="8" LineSpacing="6">
-                        <RadioButton Content="Default" IsChecked="{Binding CornerOrderDefault, Mode=TwoWay}" GroupName="UvCornerOrder" />
-                        <RadioButton Content="Rotate 90" IsChecked="{Binding CornerOrderRotate90, Mode=TwoWay}" GroupName="UvCornerOrder" />
-                        <RadioButton Content="Rotate 180" IsChecked="{Binding CornerOrderRotate180, Mode=TwoWay}" GroupName="UvCornerOrder" />
-                        <RadioButton Content="Rotate 270" IsChecked="{Binding CornerOrderRotate270, Mode=TwoWay}" GroupName="UvCornerOrder" />
-                        <RadioButton Content="Reverse winding" IsChecked="{Binding CornerOrderReverseWinding, Mode=TwoWay}" GroupName="UvCornerOrder" />
+                        <RadioButton Content="{Binding Strings.UvDebugCornerOrderDefault}" IsChecked="{Binding CornerOrderDefault, Mode=TwoWay}" GroupName="UvCornerOrder" />
+                        <RadioButton Content="{Binding Strings.UvDebugCornerOrderRotate90}" IsChecked="{Binding CornerOrderRotate90, Mode=TwoWay}" GroupName="UvCornerOrder" />
+                        <RadioButton Content="{Binding Strings.UvDebugCornerOrderRotate180}" IsChecked="{Binding CornerOrderRotate180, Mode=TwoWay}" GroupName="UvCornerOrder" />
+                        <RadioButton Content="{Binding Strings.UvDebugCornerOrderRotate270}" IsChecked="{Binding CornerOrderRotate270, Mode=TwoWay}" GroupName="UvCornerOrder" />
+                        <RadioButton Content="{Binding Strings.UvDebugCornerOrderReverseWinding}" IsChecked="{Binding CornerOrderReverseWinding, Mode=TwoWay}" GroupName="UvCornerOrder" />
                     </WrapPanel>
 
                     <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                        <TextBlock Text="Global face rotation"
+                        <TextBlock Text="{Binding Strings.UvDebugGlobalFaceRotation}"
                                    VerticalAlignment="Center"
                                    Foreground="{Binding ForegroundBrush}" />
-                        <RadioButton Content="0°" IsChecked="{Binding Rotation0, Mode=TwoWay}" GroupName="UvRotation" />
-                        <RadioButton Content="90°" IsChecked="{Binding Rotation90, Mode=TwoWay}" GroupName="UvRotation" />
-                        <RadioButton Content="180°" IsChecked="{Binding Rotation180, Mode=TwoWay}" GroupName="UvRotation" />
-                        <RadioButton Content="270°" IsChecked="{Binding Rotation270, Mode=TwoWay}" GroupName="UvRotation" />
+                        <RadioButton Content="{Binding Strings.UvDebugRotation0}" IsChecked="{Binding Rotation0, Mode=TwoWay}" GroupName="UvRotation" />
+                        <RadioButton Content="{Binding Strings.UvDebugRotation90}" IsChecked="{Binding Rotation90, Mode=TwoWay}" GroupName="UvRotation" />
+                        <RadioButton Content="{Binding Strings.UvDebugRotation180}" IsChecked="{Binding Rotation180, Mode=TwoWay}" GroupName="UvRotation" />
+                        <RadioButton Content="{Binding Strings.UvDebugRotation270}" IsChecked="{Binding Rotation270, Mode=TwoWay}" GroupName="UvRotation" />
                     </StackPanel>
 
                     <Border Margin="0,8,0,0"
@@ -148,7 +148,7 @@
                             CornerRadius="4"
                             BorderBrush="{Binding CardBorderBrush}"
                             BorderThickness="1">
-                        <TextBlock Text="Changes apply live and trigger preview refresh. Use these to isolate texOffs vs baker conversion vs corner-order issues."
+                        <TextBlock Text="{Binding Strings.UvDebugLiveChangesHint}"
                                    Foreground="{Binding ForegroundBrush}"
                                    Opacity="0.8"
                                    FontSize="12" />
@@ -159,4 +159,3 @@
         </Grid>
     </Border>
 </Window>
-

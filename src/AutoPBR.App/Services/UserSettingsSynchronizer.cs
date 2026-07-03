@@ -60,7 +60,22 @@ internal static class UserSettingsSynchronizer
         vm.Preview3DEnableSpecularMap = settings.Preview3DEnableSpecularMap;
         vm.Preview3DParallaxHeightStrength = settings.Preview3DParallaxHeightStrength <= 0
             ? 0.05
-            : Math.Clamp(settings.Preview3DParallaxHeightStrength, 0.0, 0.35);
+            : Math.Clamp(settings.Preview3DParallaxHeightStrength, 0.0, 1.0);
+        vm.Preview3DParallaxTraceLayers = settings.Preview3DParallaxTraceLayers <= 0
+            ? 64
+            : Math.Clamp(settings.Preview3DParallaxTraceLayers, 8.0, 128.0);
+        vm.Preview3DParallaxRefineSteps = settings.Preview3DParallaxRefineSteps < 0
+            ? 5
+            : Math.Clamp(settings.Preview3DParallaxRefineSteps, 0.0, 8.0);
+        vm.Preview3DParallaxShadowSamples = settings.Preview3DParallaxShadowSamples <= 0
+            ? 24
+            : Math.Clamp(settings.Preview3DParallaxShadowSamples, 4.0, 64.0);
+        vm.Preview3DParallaxShadowSoftness = settings.Preview3DParallaxShadowSoftness < 0
+            ? 1.25
+            : Math.Clamp(settings.Preview3DParallaxShadowSoftness, 0.0, 4.0);
+        vm.Preview3DParallaxMaxUvShift = settings.Preview3DParallaxMaxUvShift <= 0
+            ? 0.45
+            : Math.Clamp(settings.Preview3DParallaxMaxUvShift, 0.05, 0.75);
         vm.Preview3DEnableSss = settings.Preview3DEnableSss;
         vm.Preview3DEnableParallaxShadow = settings.Preview3DEnableParallaxShadow;
         vm.Preview3DEnableParallaxAo = settings.Preview3DEnableParallaxAo;
@@ -346,7 +361,12 @@ internal static class UserSettingsSynchronizer
         settings.Preview3DEnableParallax = vm.Preview3DEnableParallax;
         settings.Preview3DEnableNormalMap = vm.Preview3DEnableNormalMap;
         settings.Preview3DEnableSpecularMap = vm.Preview3DEnableSpecularMap;
-        settings.Preview3DParallaxHeightStrength = Math.Clamp(vm.Preview3DParallaxHeightStrength, 0.0, 0.35);
+        settings.Preview3DParallaxHeightStrength = Math.Clamp(vm.Preview3DParallaxHeightStrength, 0.0, 1.0);
+        settings.Preview3DParallaxTraceLayers = Math.Clamp(vm.Preview3DParallaxTraceLayers, 8.0, 128.0);
+        settings.Preview3DParallaxRefineSteps = Math.Clamp(vm.Preview3DParallaxRefineSteps, 0.0, 8.0);
+        settings.Preview3DParallaxShadowSamples = Math.Clamp(vm.Preview3DParallaxShadowSamples, 4.0, 64.0);
+        settings.Preview3DParallaxShadowSoftness = Math.Clamp(vm.Preview3DParallaxShadowSoftness, 0.0, 4.0);
+        settings.Preview3DParallaxMaxUvShift = Math.Clamp(vm.Preview3DParallaxMaxUvShift, 0.05, 0.75);
         settings.Preview3DEnableSss = vm.Preview3DEnableSss;
         settings.Preview3DEnableParallaxShadow = vm.Preview3DEnableParallaxShadow;
         settings.Preview3DEnableParallaxAo = vm.Preview3DEnableParallaxAo;

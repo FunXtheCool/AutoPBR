@@ -102,7 +102,7 @@
   <data name="ExploreCollapseAll" xml:space="preserve"><value>Свернуть все</value></data>
   <data name="ExploreBack" xml:space="preserve"><value>Назад</value></data>
   <data name="ExploreFocusAssets" xml:space="preserve"><value>assets</value></data>
-  <data name="TabNormals" xml:space="preserve"><value>Нормали</value></data>
+  <data name="TabNormals" xml:space="preserve"><value>Настройка</value></data>
   <data name="TabShader" xml:space="preserve"><value>Рендер</value></data>
   <data name="TabSettings" xml:space="preserve"><value>Параметры</value></data>
   <data name="Input" xml:space="preserve"><value>Ввод</value></data>
@@ -185,11 +185,11 @@
   <data name="PreprocessFrequencySplit" xml:space="preserve"><value>Разделение частот (макро + детали)</value></data>
   <data name="PreprocessFrequencyRadius" xml:space="preserve"><value>Радиус частот</value></data>
   <data name="PreprocessFrequencyDetailStrength" xml:space="preserve"><value>Сила деталей</value></data>
-  <data name="SpecularAdvanced" xml:space="preserve"><value>Спекуляр (дополнительно)</value></data>
+  <data name="SpecularAdvanced" xml:space="preserve"><value>Каналы</value></data>
   <data name="SpecularPercentileRemap" xml:space="preserve"><value>Перцентильный ремап гладкости (R)</value></data>
   <data name="SpecularRemapLowPercentile" xml:space="preserve"><value>Нижний перцентиль</value></data>
   <data name="SpecularRemapHighPercentile" xml:space="preserve"><value>Верхний перцентиль</value></data>
-  <data name="AoAdvanced" xml:space="preserve"><value>Окклюзия окружения (AO)</value></data>
+  <data name="AoAdvanced" xml:space="preserve"><value>Окклюзия окружения</value></data>
   <data name="GenerateAo" xml:space="preserve"><value>Записать AO в нормаль (синий канал)</value></data>
   <data name="AoRadius" xml:space="preserve"><value>Радиус AO</value></data>
   <data name="AoStrength" xml:space="preserve"><value>Сила AO</value></data>
@@ -303,6 +303,1260 @@
   <data name="Preview3DSpritePlaneCount" xml:space="preserve"><value>Число спрайт-плоскостей</value></data>
   <data name="Preview3DSpritePlaneCountTooltip" xml:space="preserve"><value>Количество перекрещенных плоскостей для текстур с флагом 2D Sprite в 3D предпросмотре.</value></data>
   <data name="Preview3DCameraDebugFlyHint" xml:space="preserve"><value>ПКМ+движение: обзор · WASD при зажатой ПКМ: полёт · R: сброс орбиты и смещения</value></data>
+  <data name="ClearTagOverrides" xml:space="preserve">
+    <value>Очистить переопределения тегов</value>
+  </data>
+  <data name="ClearTagOverridesTooltip" xml:space="preserve">
+    <value>Сбросить все добавленные/удаленные теги вручную для этого пакета.</value>
+  </data>
+  <data name="TagMenuDontApply" xml:space="preserve">
+    <value>Не применяйте здесь «{0}»</value>
+  </data>
+  <data name="TagMenuApply" xml:space="preserve">
+    <value>Примените здесь «{0}»</value>
+  </data>
+  <data name="TagRules" xml:space="preserve">
+    <value>Правила тегов</value>
+  </data>
+  <data name="TagRulesCustomDescription" xml:space="preserve">
+    <value>Отредактируйте свои собственные наборы правил для управления эвристической и/или ИИ-обработкой.</value>
+  </data>
+  <data name="RulesetsBuiltInTags" xml:space="preserve">
+    <value>Встроенные теги</value>
+  </data>
+  <data name="RulesetsBuiltInFlags" xml:space="preserve">
+    <value>Встроенные флаги</value>
+  </data>
+  <data name="RulesetsBuiltInExpressions" xml:space="preserve">
+    <value>Встроенные правила</value>
+  </data>
+  <data name="RulesetsSystemRules" xml:space="preserve">
+    <value>Правила, вычисляемые системой</value>
+  </data>
+  <data name="RulesetsSystemRulesDescription" xml:space="preserve">
+    <value>Взвешенные и невзвешенные значения вычисляются с помощью семантического разрешения во время выполнения и не подлежат редактированию.</value>
+  </data>
+  <data name="RulesetsCustomExpressions" xml:space="preserve">
+    <value>Пользовательские правила</value>
+  </data>
+  <data name="RulesetsKeywords" xml:space="preserve">
+    <value>Ключевые слова</value>
+  </data>
+  <data name="RulesetsSemanticHints" xml:space="preserve">
+    <value>Семантические подсказки</value>
+  </data>
+  <data name="RulesetsManageTokens" xml:space="preserve">
+    <value>Управление токенами</value>
+  </data>
+  <data name="RulesetsAddCondition" xml:space="preserve">
+    <value>Добавить условие</value>
+  </data>
+  <data name="RulesetsAddAction" xml:space="preserve">
+    <value>Добавить действие</value>
+  </data>
+  <data name="RulesetsEnableExpression" xml:space="preserve">
+    <value>Включить выражение</value>
+  </data>
+  <data name="RulesetsExpression" xml:space="preserve">
+    <value>Выражение</value>
+  </data>
+  <data name="RulesetsConditions" xml:space="preserve">
+    <value>Условия</value>
+  </data>
+  <data name="RulesetsActions" xml:space="preserve">
+    <value>Действия</value>
+  </data>
+  <data name="RulesetsRemove" xml:space="preserve">
+    <value>Удалять</value>
+  </data>
+  <data name="RulesetsRemoveLast" xml:space="preserve">
+    <value>Удалить последний</value>
+  </data>
+  <data name="RulesetsValueWatermark" xml:space="preserve">
+    <value>Ценить</value>
+  </data>
+  <data name="RulesetsShowLess" xml:space="preserve">
+    <value>Показать меньше</value>
+  </data>
+  <data name="RulesetsMoreCount" xml:space="preserve">
+    <value>{0} подробнее</value>
+  </data>
+  <data name="TagRuleId" xml:space="preserve">
+    <value>Идентификатор</value>
+  </data>
+  <data name="TagRuleDisplayName" xml:space="preserve">
+    <value>Отображаемое имя</value>
+  </data>
+  <data name="TagRuleKeywords" xml:space="preserve">
+    <value>Ключевые слова</value>
+  </data>
+  <data name="TagRuleSemanticHints" xml:space="preserve">
+    <value>Семантические подсказки (через запятую, необязательно)</value>
+  </data>
+  <data name="MaterialTagSemanticMlDescription" xml:space="preserve">
+    <value>Использует встроенную модель ONNX в разделе Data/ONNX-AI/all-MiniLM-L6-v2-onnx (требуется model.onnx). Если эта функция включена, автоматические теги поступают только из MiniLM (правила ключевых слов для автоматической пометки не используются). Добавление/удаление тега вручную по-прежнему применяется сверху.</value>
+  </data>
+  <data name="MaterialTagMaxCountTooltip" xml:space="preserve">
+    <value>Максимальное количество тегов материала, возвращаемых семантическим сопоставлением. Некоторые встроенные правила сочетания руды и материала и автоматические флаги могут по-прежнему добавлять обязательные теги сверх этого значения.</value>
+  </data>
+  <data name="MaterialTagCertaintyThresholdTooltip" xml:space="preserve">
+    <value>Если лучшее семантическое соответствие ниже этого значения, предлагается только «Неизвестно» (косинусное сходство 0–1).</value>
+  </data>
+  <data name="TagLegendMaterials" xml:space="preserve">
+    <value>Материалы</value>
+  </data>
+  <data name="TagLegendFlags" xml:space="preserve">
+    <value>Флаги</value>
+  </data>
+  <data name="ExploreColumnResource" xml:space="preserve">
+    <value>Ресурс</value>
+  </data>
+  <data name="TagRuleKindLabel" xml:space="preserve">
+    <value>Добрый</value>
+  </data>
+  <data name="AddCustomTag" xml:space="preserve">
+    <value>Добавить пользовательский тег</value>
+  </data>
+  <data name="AddCustomRule" xml:space="preserve">
+    <value>Добавить пользовательское правило</value>
+  </data>
+  <data name="RemoveTagRule" xml:space="preserve">
+    <value>Удалять</value>
+  </data>
+  <data name="RefreshTagRules" xml:space="preserve">
+    <value>Обновить</value>
+  </data>
+  <data name="InvertHeight" xml:space="preserve">
+    <value>Инвертировать высоту</value>
+  </data>
+  <data name="InvertSpecular" xml:space="preserve">
+    <value>Инвертировать зеркальное отражение</value>
+  </data>
+  <data name="TagRuleNormalIntensityOpt" xml:space="preserve">
+    <value>Нормальный × (опция)</value>
+  </data>
+  <data name="TagRuleHeightIntensityOpt" xml:space="preserve">
+    <value>Высота × (опция)</value>
+  </data>
+  <data name="TagRuleIntensityTooltip" xml:space="preserve">
+    <value>Оставьте пустым, чтобы использовать глобальные значения настройки. Пример: нормали более мягкие на 0,85, высота более тонкая на 0,07.</value>
+  </data>
+  <data name="TagRuleInvertNormalX" xml:space="preserve">
+    <value>Инвертировать нормальный X</value>
+  </data>
+  <data name="TagRuleInvertNormalY" xml:space="preserve">
+    <value>Инвертировать нормальный Y</value>
+  </data>
+  <data name="TagRuleEnabled" xml:space="preserve">
+    <value>Используйте это правило</value>
+  </data>
+  <data name="TagRuleEnabledTooltip" xml:space="preserve">
+    <value>Если флажок снят, это правило исключается из легенды и просмотра. Нажмите «Обновить», чтобы обновить.</value>
+  </data>
+  <data name="TagRuleMoveUp" xml:space="preserve">
+    <value>↑</value>
+  </data>
+  <data name="TagRuleMoveDown" xml:space="preserve">
+    <value>↓</value>
+  </data>
+  <data name="TagRuleMoveUpTooltip" xml:space="preserve">
+    <value>Переместить правило вверх (порядок объединения)</value>
+  </data>
+  <data name="TagRuleMoveDownTooltip" xml:space="preserve">
+    <value>Переместить правило вниз (порядок объединения)</value>
+  </data>
+  <data name="ExportTagRules" xml:space="preserve">
+    <value>Правила экспорта…</value>
+  </data>
+  <data name="ImportTagRules" xml:space="preserve">
+    <value>Импортировать правила…</value>
+  </data>
+  <data name="ExportTagRulesTooltip" xml:space="preserve">
+    <value>Сохраните пользовательские правила тегов в формате JSON (для резервного копирования или CLI --tag-rules).</value>
+  </data>
+  <data name="ImportTagRulesTooltip" xml:space="preserve">
+    <value>Замените пользовательские правила из файла JSON.</value>
+  </data>
+  <data name="RefreshTagRulesTooltip" xml:space="preserve">
+    <value>Обновите дерево исследования и легенду в соответствии с текущими правилами.</value>
+  </data>
+  <data name="Log_TagRulesExported" xml:space="preserve">
+    <value>Экспортированные правила пользовательских тегов.</value>
+  </data>
+  <data name="Log_TagRulesImported" xml:space="preserve">
+    <value>Импортированы правила специальных тегов {0}.</value>
+  </data>
+  <data name="Log_TagRulesImportFailed" xml:space="preserve">
+    <value>Не удалось импортировать правила тегов: {0}.</value>
+  </data>
+  <data name="TabRulesets" xml:space="preserve">
+    <value>Наборы правил</value>
+  </data>
+  <data name="TabDebug" xml:space="preserve">
+    <value>Отлаживать</value>
+  </data>
+  <data name="BrickProbeTuning" xml:space="preserve">
+    <value>Настройка кирпичного зонда</value>
+  </data>
+  <data name="BrickProbeEnable" xml:space="preserve">
+    <value>Включить инверсию кирпичного зонда</value>
+  </data>
+  <data name="BrickProbeMinStructure" xml:space="preserve">
+    <value>Минимальная уверенность в структуре</value>
+  </data>
+  <data name="BrickProbeInvertDelta" xml:space="preserve">
+    <value>Инвертировать дельта-порог</value>
+  </data>
+  <data name="BrickProbeLightGroutDelta" xml:space="preserve">
+    <value>Дельта яркости светлого раствора</value>
+  </data>
+  <data name="BrickProbeEnableTooltip" xml:space="preserve">
+    <value>Для текстур с тегом «кирпич» решите, следует ли глобально инвертировать карту высот, когда зонд обнаруживает легкий раствор, который следует заглубить. Требуется тег материала кирпича (ключевое слово или семантика).</value>
+  </data>
+  <data name="BrickProbeMinStructureTooltip" xml:space="preserve">
+    <value>Минимальная средняя реакция структурного раствора (0–1) для сильного обратного пути (большая дельта высоты с высокой достоверностью соединения). Тонкие суставы часто остаются ниже этого уровня; путь легкого раствора не использует этот порог.</value>
+  </data>
+  <data name="BrickProbeInvertDeltaTooltip" xml:space="preserve">
+    <value>Только сильный путь: средняя высота раствора минус средняя высота кирпича должна превышать это значение (шкала 0–255) перед глобальным инвертированием. Более низкие значения легче срабатывают при тонком разделении по высоте.</value>
+  </data>
+  <data name="BrickProbeLightGroutDeltaTooltip" xml:space="preserve">
+    <value>Путь светлого раствора: взвешенная рассеянная яркость раствора минус кирпич должна превышать это значение (0–1). Меньше, если раствор и кирпич одинаковы по яркости. Когда Δ&gt;0 и это проходит, карта высот инвертируется, поэтому грани читаются выше суставов.</value>
+  </data>
+  <data name="PreviewBrickProbeDebug" xml:space="preserve">
+    <value>Показать отладку кирпичного зонда (предварительная версия)</value>
+  </data>
+  <data name="PreviewBrickProbeDebugTooltip" xml:space="preserve">
+    <value>Если этот параметр включен, на панели предварительного просмотра отображаются метрики зонда (маска, среднее значение S, дельта высоты, зазор между яркостью и пройденным инвертированным путем) для выбранной текстуры. Конверсия не меняется.</value>
+  </data>
+  <data name="PlantMaterialPorosityExtra" xml:space="preserve">
+    <value>Органический материал Дополнительная пористость</value>
+  </data>
+  <data name="PlantMaterialPorosityExtraTooltip" xml:space="preserve">
+    <value>Дополнительное смещение B-канала для текстур с тегом органического материала (или путей растений OptiFine). Добавлен поверх смещения пористости.</value>
+  </data>
+  <data name="MlSpecularHeuristicBlend" xml:space="preserve">
+    <value>Эвристика/смесь искусственного интеллекта</value>
+  </data>
+  <data name="MlSpecularHeuristicBlendTooltip" xml:space="preserve">
+    <value>0 = чистый эвристический зеркальный эффект при работе модели ИИ; 1 = полный вклад ИИ. Промежуточные значения сочетают в себе и то, и другое.</value>
+  </data>
+  <data name="MlSpecularBlendMode" xml:space="preserve">
+    <value>Режим канала</value>
+  </data>
+  <data name="MlSpecularBlendModeTooltip" xml:space="preserve">
+    <value>Определяет, какие каналы получают эвристический вклад при смешивании с ИИ.</value>
+  </data>
+  <data name="MlSpecularBlendMath" xml:space="preserve">
+    <value>Режим наложения</value>
+  </data>
+  <data name="MlSpecularBlendMathTooltip" xml:space="preserve">
+    <value>Выбирает математические методы смешивания, используемые для объединения эвристических значений и значений AI для смешиваемых каналов.</value>
+  </data>
+  <data name="MlSpecularBlendMathLinear" xml:space="preserve">
+    <value>Линейный</value>
+  </data>
+  <data name="MlSpecularBlendMathSoftLight" xml:space="preserve">
+    <value>Мягкий свет</value>
+  </data>
+  <data name="MlSpecularBlendMathOverlay" xml:space="preserve">
+    <value>Наложение</value>
+  </data>
+  <data name="MlSpecularBlendMathScreen" xml:space="preserve">
+    <value>Экран</value>
+  </data>
+  <data name="MlSpecularBlendMathBiasGain" xml:space="preserve">
+    <value>Смещение/усиление</value>
+  </data>
+  <data name="MlSpecularBlendMathSigmoidCrossfade" xml:space="preserve">
+    <value>Сигмовидное перекрестное затухание</value>
+  </data>
+  <data name="MlSpecularBlendModeSmoothnessOnly" xml:space="preserve">
+    <value>Только гладкость</value>
+  </data>
+  <data name="MlSpecularBlendModeFull" xml:space="preserve">
+    <value>Полный</value>
+  </data>
+  <data name="MlSpecularBlendModeAiMetalAndEmissive" xml:space="preserve">
+    <value>AI Металл и эмиссия</value>
+  </data>
+  <data name="SpecularForceNoEmissive" xml:space="preserve">
+    <value>Сила отсутствия излучения (зеркальный A)</value>
+  </data>
+  <data name="SpecularForceNoEmissiveTooltip" xml:space="preserve">
+    <value>Переопределить: установите альфа-карту отражений LabPBR на 255 (без излучения) для всех пикселей. Блокирует эмиссию эвристической палитры и эмиссионные прогнозы ML.</value>
+  </data>
+  <data name="DeepBumpNormalIntensity" xml:space="preserve">
+    <value>DeepBump Нормальная сила</value>
+  </data>
+  <data name="DeepBumpNormalIntensityTooltip" xml:space="preserve">
+    <value>Обычный множитель силы XY только для DeepBump. 1 = без изменений, выше = более выраженная детализация, ниже = более плоские нормали.</value>
+  </data>
+  <data name="DeepBumpNormalSoftClamp" xml:space="preserve">
+    <value>Мягкий зажим DeepBump</value>
+  </data>
+  <data name="DeepBumpNormalSoftClampTooltip" xml:space="preserve">
+    <value>0 = линейное масштабирование прочности. При более высоких значениях к величине XY применяется мягкое ограничение tanh, сохраняя четкие детали и уменьшая артефакты насыщенности около 90°.</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedEnhance" xml:space="preserve">
+    <value>Улучшение DeepBump с помощью Edge-Guided</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedStrength" xml:space="preserve">
+    <value>Сила наведения кромки</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedStrengthTooltip" xml:space="preserve">
+    <value>Усиливает нормальную величину XY модели на сильных размытых краях. 0 = отключено, 1 = умеренно, выше = более резкие края.</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedGamma" xml:space="preserve">
+    <value>Наведение по краю Гамма</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedGammaTooltip" xml:space="preserve">
+    <value>Контролирует, где сконцентрировано улучшение. Более высокие значения фокусируются на самых сильных краях; более низкие значения распределяются по более мягким краям.</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedDirectionMix" xml:space="preserve">
+    <value>Микс краевых направлений</value>
+  </data>
+  <data name="DeepBumpEdgeGuidedDirectionMixTooltip" xml:space="preserve">
+    <value>Смешивает нормальное направление DeepBump с направлением диффузного градиента на краях. 0 = сохранить направление модели, 1 = полностью выровнять по сильным краям.</value>
+  </data>
+  <data name="NormalHeightTransparentAlphaClampMax" xml:space="preserve">
+    <value>Нормальный/Высота Прозрачный Alpha Clamp Макс.</value>
+  </data>
+  <data name="NormalHeightTransparentAlphaClampMaxTooltip" xml:space="preserve">
+    <value>Фиксация постобработки: если диффузная альфа ≤ этого значения, установите для нормали/высоты RGBA значение 0, чтобы избежать артефактов в прозрачных областях. Заглушки слайдера на 16; вы можете ввести до 255.</value>
+  </data>
+  <data name="UseMlSpecularPredictor" xml:space="preserve">
+    <value>Используйте зеркальный генератор/предиктор ML (ONNX)</value>
+  </data>
+  <data name="UseMlSpecularPredictorTooltip" xml:space="preserve">
+    <value>Если этот параметр включен и путь модели по умолчанию или для каждого разрешения действителен, прямое попиксельное зеркальное RGBA прогнозируется на основе диффузного. Дополнительные пути для каждого разрешения (или объединенные модели Data/ONNX-AI/SpecLab) выбирают ONNX по размеру текстуры (ячейке). Ползунок смешения эвристики и искусственного интеллекта контролирует, какая часть модели используется по сравнению с классической эвристикой. Проверьте журнал диагностики ML.</value>
+  </data>
+  <data name="MlSpecularModelPath" xml:space="preserve">
+    <value>Зеркальный путь модели</value>
+  </data>
+  <data name="MlSpecularModelPathWatermark" xml:space="preserve">
+    <value>Путь к файлу ONNX зеркального генератора/предсказателя</value>
+  </data>
+  <data name="MlSpecularPerResolutionHeader" xml:space="preserve">
+    <value>Зеркальные модели для каждого разрешения (необязательно)</value>
+  </data>
+  <data name="MlSpecularPerResolutionTooltip" xml:space="preserve">
+    <value>Переопределить ONNX для каждого разрешения обучения. Оставьте пустым, чтобы использовать файлы в комплекте в Data/ONNX-AI/SpecLab, если они есть. Среда выполнения выбирает наименьшее настроенное разрешение ≥ размера текстуры (ячейки); если текстура больше всех ключей, используется самый большой ключ. Резервный путь по умолчанию, указанный выше, применяется только в том случае, если карта для каждого разрешения недоступна.</value>
+  </data>
+  <data name="MlSpecularUseEdgeChannel" xml:space="preserve">
+    <value>Включить краевой канал для входных данных зеркальной модели (если модель ожидает 4 канала)</value>
+  </data>
+  <data name="MlSpecularTransparentAlphaClampMax" xml:space="preserve">
+    <value>Прозрачный Alpha Clamp Max</value>
+  </data>
+  <data name="MlSpecularTransparentAlphaClampMaxTooltip" xml:space="preserve">
+    <value>Фиксация постобработки: если диффузная альфа ≤ этого значения, установите зеркальное значение RGBA на 0, чтобы избежать артефактов ML в прозрачных областях. Заглушки слайдера на 16; вы можете ввести до 255.</value>
+  </data>
+  <data name="SpecularDebugSection" xml:space="preserve">
+    <value>Зеркальная отладка машинного обучения</value>
+  </data>
+  <data name="SpecularDebugDisableHeuristicSpecular" xml:space="preserve">
+    <value>Отключить эвристический резерв (пурпурный = не ML)</value>
+  </data>
+  <data name="SpecularDebugDisableHeuristicSpecularTooltip" xml:space="preserve">
+    <value>Пиксели, которые использовали бы классический зеркальный путь, становятся пурпурными (255,0,255). Если ML полностью не удался, вся текстура станет пурпурной. Делает очевидным, управляет ли модель пикселями.</value>
+  </data>
+  <data name="SpecularDebugSkipSpecularRemap" xml:space="preserve">
+    <value>Пропустить переназначение процентиля гладкости (R)</value>
+  </data>
+  <data name="SpecularDebugSkipSpecularRemapTooltip" xml:space="preserve">
+    <value>Отключает пост-шаг, который переназначает R в диапазон 10–200, чтобы вы могли напрямую оценивать выходные данные модели.</value>
+  </data>
+  <data name="SpecularDebugVerboseSpecularMl" xml:space="preserve">
+    <value>Подробная диагностика машинного обучения (журнал)</value>
+  </data>
+  <data name="SpecularDebugVerboseSpecularMlTooltip" xml:space="preserve">
+    <value>Для каждой текстуры регистрируются подробности загрузки и выполнения, а также образец первого пикселя при успешном выводе. Также регистрируются точные ошибки, когда модель не загружается или выводятся несоответствия формы.</value>
+  </data>
+  <data name="ForceShaderCacheInvalidation" xml:space="preserve">
+    <value>Принудительное аннулирование кэша шейдеров</value>
+  </data>
+  <data name="ForceShaderCacheInvalidationTooltip" xml:space="preserve">
+    <value>Удаляет двоичный кэш шейдеров графического процессора на диске и перекомпилирует шейдеры предварительного просмотра. Используйте после редактирования шейдера, когда предварительный просмотр выглядит устаревшим.</value>
+  </data>
+  <data name="ShaderCacheInvalidatedLog" xml:space="preserve">
+    <value>[Настройки] Кеш шейдеров очищен; шейдеры предварительного просмотра будут перекомпилированы.</value>
+  </data>
+  <data name="MinecraftAssetsFolder" xml:space="preserve">
+    <value>Ресурсы Майнкрафт</value>
+  </data>
+  <data name="MinecraftAssetsFolderTooltip" xml:space="preserve">
+    <value>Необязательный путь к папке версии Minecraft или извлеченным ресурсам/корню. Используется для разрешения ванильных блочных моделей для предварительного просмотра пакета только с текстурами.</value>
+  </data>
+  <data name="MinecraftAssetsFolderWatermark" xml:space="preserve">
+    <value>Автоматически обнаруживается в .minecraft, когда он пуст</value>
+  </data>
+  <data name="Preview3DCameraFlyLookSensitivity" xml:space="preserve">
+    <value>Чувствительность Fly Look</value>
+  </data>
+  <data name="Preview3DCameraFlyMoveSpeed" xml:space="preserve">
+    <value>Скорость полета</value>
+  </data>
+  <data name="Preview3DCameraFlyMoveSpeedTooltip" xml:space="preserve">
+    <value>Базовая скорость полета WASD, удерживая правую кнопку мыши. Используйте колесо мыши во время полета, чтобы временно отрегулировать скорость.</value>
+  </data>
+  <data name="Preview3DCameraInvertLookY" xml:space="preserve">
+    <value>Инвертировать вид Y</value>
+  </data>
+  <data name="Preview3DCameraInvertLookYTooltip" xml:space="preserve">
+    <value>Инвертируйте вертикальную мышь для поиска орбитальных и летающих камер.</value>
+  </data>
+  <data name="Preview3DCameraFlySmoothAcceleration" xml:space="preserve">
+    <value>Плавное движение мухи</value>
+  </data>
+  <data name="Preview3DCameraFlySmoothAccelerationTooltip" xml:space="preserve">
+    <value>Упростите движение WASD в полете вместо мгновенных запусков и остановок.</value>
+  </data>
+  <data name="Preview3DCameraHelpOrbitPanSection" xml:space="preserve">
+    <value>Орбита и панорама</value>
+  </data>
+  <data name="Preview3DCameraHelpFlySection" xml:space="preserve">
+    <value>Летающая камера</value>
+  </data>
+  <data name="Preview3DCameraHelpFramingSection" xml:space="preserve">
+    <value>Обрамление</value>
+  </data>
+  <data name="Preview3DCameraHelpItemOrbitInput" xml:space="preserve">
+    <value>Alt + перетаскивание (влево или посередине)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemOrbitDesc" xml:space="preserve">
+    <value>Вращайтесь вокруг оси.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemPanInput" xml:space="preserve">
+    <value>Перетащите без Alt (влево или посередине)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemPanDesc" xml:space="preserve">
+    <value>Панорамируйте вид.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemZoomInput" xml:space="preserve">
+    <value>Колесо мыши</value>
+  </data>
+  <data name="Preview3DCameraHelpItemZoomDesc" xml:space="preserve">
+    <value>Увеличение и уменьшение масштаба.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyLookInput" xml:space="preserve">
+    <value>Перетащите правой кнопкой мыши</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyLookDesc" xml:space="preserve">
+    <value>Осмотритесь (флайд-камера).</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWasdInput" xml:space="preserve">
+    <value>W/A/S/D (удерживая правую руку)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWasdDesc" xml:space="preserve">
+    <value>Двигайтесь вперед, уклоняйтесь влево, назад и вправо.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyQeInput" xml:space="preserve">
+    <value>Вопрос/Ответ (удерживая правую руку)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyQeDesc" xml:space="preserve">
+    <value>Двигайтесь вниз и вверх.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyShiftInput" xml:space="preserve">
+    <value>Сдвиг (во время полета)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyShiftDesc" xml:space="preserve">
+    <value>Двигайтесь быстрее.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyCtrlInput" xml:space="preserve">
+    <value>Ctrl (во время полета)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyCtrlDesc" xml:space="preserve">
+    <value>Двигайтесь медленнее (точность).</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWheelInput" xml:space="preserve">
+    <value>Колесо мыши (во время полета)</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFlyWheelDesc" xml:space="preserve">
+    <value>Временно отрегулируйте скорость полета.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFrameInput" xml:space="preserve">
+    <value>Дважды щелкните</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFrameDesc" xml:space="preserve">
+    <value>Создайте текущий объект.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemResetDesc" xml:space="preserve">
+    <value>Восстановить кадр камеры по умолчанию.</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFocusInput" xml:space="preserve">
+    <value>Нажмите предварительный просмотр</value>
+  </data>
+  <data name="Preview3DCameraHelpItemFocusDesc" xml:space="preserve">
+    <value>Сфокусируйте предварительный просмотр на сочетаниях клавиш.</value>
+  </data>
+  <data name="Preview3DSkyDomeSection" xml:space="preserve">
+    <value>Небесный купол</value>
+  </data>
+  <data name="Preview3DAtmosphereSection" xml:space="preserve">
+    <value>Атмосфера</value>
+  </data>
+  <data name="Preview3DSunSection" xml:space="preserve">
+    <value>Солнце</value>
+  </data>
+  <data name="Preview3DMoonSection" xml:space="preserve">
+    <value>Луна</value>
+  </data>
+  <data name="Preview3DGodRayDebugSection" xml:space="preserve">
+    <value>Отладка God Ray (фроксель)</value>
+  </data>
+  <data name="Preview3DGodRayStabilizeDebug" xml:space="preserve">
+    <value>Стабилизация (без временных колебаний/дрожаний)</value>
+  </data>
+  <data name="Preview3DGodRayStabilizeDebugTooltip" xml:space="preserve">
+    <value>Отключает временное повторное использование froxel/интеграции/повышенной дискретизации и замораживает маршевый джиттер. Включите, чтобы прекратить пульсацию во время настройки божественных лучей.</value>
+  </data>
+  <data name="Preview3DGodRayDebugDensity" xml:space="preserve">
+    <value>Плотность отладки</value>
+  </data>
+  <data name="Preview3DGodRayDebugDensityTooltip" xml:space="preserve">
+    <value>Равномерная плотность участвующей среды введена в объем фрокселя, поэтому лучи света видны без высотного тумана или облаков. 0 = производственное поведение. Попробуйте 0,10–0,30.</value>
+  </data>
+  <data name="Preview3DGodRayScatterGain" xml:space="preserve">
+    <value>Разброс усиления</value>
+  </data>
+  <data name="Preview3DGodRayScatterGainTooltip" xml:space="preserve">
+    <value>Прирост накопления в рассеянии в интегрированном марше (шейдер по умолчанию 3.4). Выше = ярче валы.</value>
+  </data>
+  <data name="Preview3DGodRayExtinction" xml:space="preserve">
+    <value>Вымирание</value>
+  </data>
+  <data name="Preview3DGodRayExtinctionTooltip" xml:space="preserve">
+    <value>Коэффициент затухания Бера-Ламберта для спада пропускания вдоль луча обзора (шейдер по умолчанию 1,15). Выше = более плотные/более короткие стержни.</value>
+  </data>
+  <data name="Preview3DPreviewDebugSection" xml:space="preserve">
+    <value>Отладка предварительного просмотра 3D</value>
+  </data>
+  <data name="Preview3DIblStrength" xml:space="preserve">
+    <value>сила IBL</value>
+  </data>
+  <data name="Preview3DIblStrengthTooltip" xml:space="preserve">
+    <value>Интенсивность зонда окружающей среды (непрямое окружение + отражения). Уменьшите значение, если модель улавливает слишком сильный оттенок неба; 0 возвращает плоский внешний вид.</value>
+  </data>
+  <data name="Preview3DEnableAtmosphericSky" xml:space="preserve">
+    <value>Атмосферное небо (LUT)</value>
+  </data>
+  <data name="Preview3DEnableAtmosphericSkyTooltip" xml:space="preserve">
+    <value>Включите фон атмосферного неба и реакцию окружающей среды на основе LUT.</value>
+  </data>
+  <data name="Preview3DAtmosphereTurbidity" xml:space="preserve">
+    <value>Мутность атмосферы</value>
+  </data>
+  <data name="Preview3DAtmosphereTurbidityTooltip" xml:space="preserve">
+    <value>Прокси плотности аэрозоля. Более высокие значения делают горизонт более туманным, а закаты — теплее.</value>
+  </data>
+  <data name="Preview3DAtmosphereSunIntensity" xml:space="preserve">
+    <value>Интенсивность солнечного света в атмосфере</value>
+  </data>
+  <data name="Preview3DAtmosphereSunIntensityTooltip" xml:space="preserve">
+    <value>Масштабирует атмосферное солнечное излучение, используемое небесным проходом и непрямыми зондами.</value>
+  </data>
+  <data name="Preview3DAtmosphereHorizonFalloff" xml:space="preserve">
+    <value>Опускание горизонта атмосферы</value>
+  </data>
+  <data name="Preview3DAtmosphereHorizonFalloffTooltip" xml:space="preserve">
+    <value>Управляет спадом затухания вблизи горизонта (ниже = более широкое свечение, выше = более узкая полоса).</value>
+  </data>
+  <data name="Preview3DAtmosphereSkyExposure" xml:space="preserve">
+    <value>Воздействие неба</value>
+  </data>
+  <data name="Preview3DAtmosphereSkyExposureTooltip" xml:space="preserve">
+    <value>Мастер яркости на небе, композитный проход. Опустите, чтобы уменьшить цветение.</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscStrength" xml:space="preserve">
+    <value>Цветение солнечного диска</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscStrengthTooltip" xml:space="preserve">
+    <value>Аддитивные блики вокруг солнечного диска поверх LUT. Опустите, чтобы получить более мягкий ореол; выше для более широкого цветения.</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscBrightness" xml:space="preserve">
+    <value>Яркость Солнца</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscBrightnessTooltip" xml:space="preserve">
+    <value>Яркость поверхности солнечного диска затемнена по краям. Не влияет на внешний ореол цветения.</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscSize" xml:space="preserve">
+    <value>Размер Солнца</value>
+  </data>
+  <data name="Preview3DAtmosphereSunDiscSizeTooltip" xml:space="preserve">
+    <value>Множитель углового размера Солнца. 1.0 = стилизованный по умолчанию; ~0,07 соответствует реальному солнцу (0,27 градуса). Также масштабирует ореол и конус божественных лучей.</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscStrength" xml:space="preserve">
+    <value>Яркость луны</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscStrengthTooltip" xml:space="preserve">
+    <value>Множитель поверхностной яркости текстурированного лунного диска.</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscSize" xml:space="preserve">
+    <value>Размер Луны</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonDiscSizeTooltip" xml:space="preserve">
+    <value>Множитель углового размера Луны для рекламного щита неба.</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonGlowStrength" xml:space="preserve">
+    <value>Лунное сияние</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonGlowStrengthTooltip" xml:space="preserve">
+    <value>Внешнее сине-белое свечение вокруг края Луны.</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonTextureSharpness" xml:space="preserve">
+    <value>Резкость луны</value>
+  </data>
+  <data name="Preview3DAtmosphereMoonTextureSharpnessTooltip" xml:space="preserve">
+    <value>Повышение резкости на стороне шейдера для сгенерированной лунной текстуры.</value>
+  </data>
+  <data name="Preview3DMoonWorldLightIntensity" xml:space="preserve">
+    <value>Свет лунного мира</value>
+  </data>
+  <data name="Preview3DMoonWorldLightIntensityTooltip" xml:space="preserve">
+    <value>Множитель прямого лунного света для предварительного просмотра геометрии освещения в ночное время. Не меняет экспозицию неба или атмосферную заливку.</value>
+  </data>
+  <data name="Preview3DShowCelestialDebug" xml:space="preserve">
+    <value>Маркеры Солнца/Луны</value>
+  </data>
+  <data name="Preview3DShowCelestialDebugTooltip" xml:space="preserve">
+    <value>Нарисуйте квадратные маркеры и маркеры-перекрестия в местах расположения дисков Солнца и Луны.</value>
+  </data>
+  <data name="Preview3DHorizonFogStrength" xml:space="preserve">
+    <value>Туман горизонта</value>
+  </data>
+  <data name="Preview3DHorizonFogStrengthTooltip" xml:space="preserve">
+    <value>Туманная заливка под горизонтом в небесном куполе и воздушная перспектива геометрии (0 = выключено).</value>
+  </data>
+  <data name="Preview3DVolumetricSection" xml:space="preserve">
+    <value>Объемные эффекты</value>
+  </data>
+  <data name="Preview3DEnableGodRays" xml:space="preserve">
+    <value>Бог лучи</value>
+  </data>
+  <data name="Preview3DEnableGodRaysTooltip" xml:space="preserve">
+    <value>Объемный свет Фрокселя направляется к солнцу (введение + интеграция + повышение дискретизации).</value>
+  </data>
+  <data name="Preview3DEnableVolumetricClouds" xml:space="preserve">
+    <value>Объемные облака</value>
+  </data>
+  <data name="Preview3DEnableVolumetricCloudsTooltip" xml:space="preserve">
+    <value>Процедурный слой облаков на небесном проходе (качество соответствует предустановке ниже).</value>
+  </data>
+  <data name="Preview3DShadersSection" xml:space="preserve">
+    <value>Шейдеры</value>
+  </data>
+  <data name="Preview3DVolumetricQuality" xml:space="preserve">
+    <value>Качество Фрокселя</value>
+  </data>
+  <data name="Preview3DVolumetricQualityTooltip" xml:space="preserve">
+    <value>Низкое/среднее/высокое разрешение фрокселей, количество срезов, детализация облаков и временная фильтрация.</value>
+  </data>
+  <data name="Preview3DGodRayStrength" xml:space="preserve">
+    <value>Сила Божественного луча</value>
+  </data>
+  <data name="Preview3DGodRayStrengthTooltip" xml:space="preserve">
+    <value>Интенсивность аддитивного композита божественных лучей (0 = выключено).</value>
+  </data>
+  <data name="Preview3DCloudSection" xml:space="preserve">
+    <value>Облачный слой</value>
+  </data>
+  <data name="Preview3DCloudDensity" xml:space="preserve">
+    <value>Плотность</value>
+  </data>
+  <data name="Preview3DCloudDensityTooltip" xml:space="preserve">
+    <value>Масштабирует объемную плотность внутри облачной плиты (выше = более толстые и непрозрачные клубы).</value>
+  </data>
+  <data name="Preview3DCloudCoverageScale" xml:space="preserve">
+    <value>Покрытие</value>
+  </data>
+  <data name="Preview3DCloudCoverageScaleTooltip" xml:space="preserve">
+    <value>Масштаб покрытия региональной карты погоды (0 = ясное небо, 1 = карта в запеченном виде).</value>
+  </data>
+  <data name="Preview3DCloudLayerHeight" xml:space="preserve">
+    <value>Высота слоя</value>
+  </data>
+  <data name="Preview3DCloudLayerHeightTooltip" xml:space="preserve">
+    <value>К базовой высоте облачной плиты по умолчанию добавлено вертикальное смещение (мировые единицы).</value>
+  </data>
+  <data name="Preview3DCloudVolumeHeight" xml:space="preserve">
+    <value>Толщина слоя</value>
+  </data>
+  <data name="Preview3DCloudVolumeHeightTooltip" xml:space="preserve">
+    <value>Вертикальная протяженность основной плиты кучевых облаков (мировые единицы).</value>
+  </data>
+  <data name="Preview3DCloudVolumeSize" xml:space="preserve">
+    <value>Масштаб объекта</value>
+  </data>
+  <data name="Preview3DCloudVolumeSizeTooltip" xml:space="preserve">
+    <value>Размер мира в один цикл тайла шума (больше = более широкие формы облаков).</value>
+  </data>
+  <data name="Preview3DCloudWindSpeed" xml:space="preserve">
+    <value>Скорость ветра</value>
+  </data>
+  <data name="Preview3DCloudWindSpeedTooltip" xml:space="preserve">
+    <value>Скорость дрейфа облачного поля в мировых единицах в секунду.</value>
+  </data>
+  <data name="Preview3DCloudWindHeading" xml:space="preserve">
+    <value>Курс ветра</value>
+  </data>
+  <data name="Preview3DCloudWindHeadingTooltip" xml:space="preserve">
+    <value>Направление ветра на земле в градусах (0 = +X).</value>
+  </data>
+  <data name="Preview3DCloudCirrusStrength" xml:space="preserve">
+    <value>Перистый слой</value>
+  </data>
+  <data name="Preview3DCloudCirrusStrengthTooltip" xml:space="preserve">
+    <value>Непрозрачность высокого тонкого перистого листа над основным слоем (0 = выкл.).</value>
+  </data>
+  <data name="Preview3DCloudDebugSection" xml:space="preserve">
+    <value>Облачная отладка</value>
+  </data>
+  <data name="Preview3DCloudDebugView" xml:space="preserve">
+    <value>Представление отладки</value>
+  </data>
+  <data name="Preview3DCloudDebugViewTooltip" xml:space="preserve">
+    <value>Замените освещенные облака картой покрытия или наложением срезов плотности среднего слоя.</value>
+  </data>
+  <data name="Preview3DCloudDebugViewOff" xml:space="preserve">
+    <value>Выключенный</value>
+  </data>
+  <data name="Preview3DCloudDebugViewCoverage" xml:space="preserve">
+    <value>Карта покрытия</value>
+  </data>
+  <data name="Preview3DCloudDebugViewDensitySlice" xml:space="preserve">
+    <value>Срез плотности</value>
+  </data>
+  <data name="Preview3DCloudDisableTemporal" xml:space="preserve">
+    <value>Отключить временное</value>
+  </data>
+  <data name="Preview3DCloudDisableTemporalTooltip" xml:space="preserve">
+    <value>Отключите перепроецирование истории облаков (полезно при проверке шума или шагов марша).</value>
+  </data>
+  <data name="Preview3DCloudMarchSteps" xml:space="preserve">
+    <value>Мартовские шаги</value>
+  </data>
+  <data name="Preview3DCloudMarchStepsTooltip" xml:space="preserve">
+    <value>Переопределение шага луча (0 = следовать предустановке качества).</value>
+  </data>
+  <data name="Preview3DCloudFreezeWind" xml:space="preserve">
+    <value>Ледяной ветер</value>
+  </data>
+  <data name="Preview3DCloudFreezeWindTooltip" xml:space="preserve">
+    <value>Удерживайте адвекцию облаков в нулевом времени, чтобы формы оставались фиксированными при настройке освещения.</value>
+  </data>
+  <data name="Preview3DEnablePreviewTaa" xml:space="preserve">
+    <value>Предварительный просмотр TAA</value>
+  </data>
+  <data name="Preview3DEnablePreviewTaaTooltip" xml:space="preserve">
+    <value>Окончательное временное сглаживание на составном кадре. Использует общие помощники перепроецирования; с учетом движения, когда божественные лучи обеспечивают глубину сцены. Пока этот параметр включен, время на проход уменьшается вдвое.</value>
+  </data>
+  <data name="Preview3DTimeOfDayHours" xml:space="preserve">
+    <value>Время суток</value>
+  </data>
+  <data name="Preview3DTimeOfDayHoursTooltip" xml:space="preserve">
+    <value>Время на часах (0–24 ч) для цикла Солнца/Луны: 6 ≈ восход солнца, 12 ≈ полдень, 18 ≈ закат, 0/24 ≈ полночь со звездами.</value>
+  </data>
+  <data name="Preview3DAnimateTimeOfDay" xml:space="preserve">
+    <value>Анимировать время суток</value>
+  </data>
+  <data name="Preview3DAnimateTimeOfDayTooltip" xml:space="preserve">
+    <value>Увеличьте цикл солнца/луны по часам предварительного просмотра (полный день за 24 секунды).</value>
+  </data>
+  <data name="Preview3DTimeOfDaySpeed" xml:space="preserve">
+    <value>Скорость цикла</value>
+  </data>
+  <data name="Preview3DTimeOfDaySpeedTooltip" xml:space="preserve">
+    <value>Количество игровых часов увеличивается за реальную секунду при включенной анимации (1 = 24 секунды за полный день).</value>
+  </data>
+  <data name="Preview3DEnableShadowCascades" xml:space="preserve">
+    <value>Теневые каскады</value>
+  </data>
+  <data name="Preview3DEnableShadowCascadesTooltip" xml:space="preserve">
+    <value>Карты теней ближнего и дальнего направления; объемные лучи Бога выбирают каскад по расстоянию от камеры.</value>
+  </data>
+  <data name="Preview3DVolumetricQualityLow" xml:space="preserve">
+    <value>Низкий</value>
+  </data>
+  <data name="Preview3DVolumetricQualityMedium" xml:space="preserve">
+    <value>Середина</value>
+  </data>
+  <data name="Preview3DVolumetricQualityHigh" xml:space="preserve">
+    <value>Высокий</value>
+  </data>
+  <data name="Preview3DParallaxAoStrength" xml:space="preserve">
+    <value>ПОМ контакт АО</value>
+  </data>
+  <data name="Preview3DParallaxAoStrengthTooltip" xml:space="preserve">
+    <value>Сила локальной контактной окклюзии окружающей среды определяется по полю высот ПОМ.</value>
+  </data>
+  <data name="Preview3DEnableParallaxAo" xml:space="preserve">
+    <value>ПОМ контакт АО</value>
+  </data>
+  <data name="Preview3DEnableParallaxAoTooltip" xml:space="preserve">
+    <value>Включите локальное затемнение окружающей окклюзии из поля высоты параллакса.</value>
+  </data>
+  <data name="Preview3DWorldSection" xml:space="preserve">
+    <value>Мир</value>
+  </data>
+  <data name="Preview3DAnimationSection" xml:space="preserve">
+    <value>Анимация</value>
+  </data>
+  <data name="Preview3DShowGroundMesh" xml:space="preserve">
+    <value>Сетка земли (3D)</value>
+  </data>
+  <data name="Preview3DShowGroundMeshTooltip" xml:space="preserve">
+    <value>Покажите текстурированную поверхность травы под объектом в режиме 3D-предварительного просмотра.</value>
+  </data>
+  <data name="Preview3DEnableEntityAnimation" xml:space="preserve">
+    <value>Анимация эмулируемых объектов</value>
+  </data>
+  <data name="Preview3DEnableEntityAnimationTooltip" xml:space="preserve">
+    <value>Включите анимацию простоя во время рендеринга для предварительного просмотра модели эмулируемого объекта.</value>
+  </data>
+  <data name="Preview3DPauseEntityIdleAnimation" xml:space="preserve">
+    <value>Приостановить анимацию бездействующих вершин</value>
+  </data>
+  <data name="Preview3DPauseEntityIdleAnimationTooltip" xml:space="preserve">
+    <value>Если эта опция включена, эмулируемая анимация сетки объекта зависает в текущей позе, пока не будет отключена. Унаследованное колебание является отдельным (см. ниже).</value>
+  </data>
+  <data name="Preview3DEnableLegacyEntityWobble" xml:space="preserve">
+    <value>Устаревшее колебание сетки</value>
+  </data>
+  <data name="Preview3DEnableLegacyEntityWobbleTooltip" xml:space="preserve">
+    <value>Применяет покачивание/отклонение/крен всей сетки до IR к матрице модели. По умолчанию отключено — вместо этого используйте снятые клипы setupAnim/define.</value>
+  </data>
+  <data name="Preview3DEntityAnimationSpeed" xml:space="preserve">
+    <value>Скорость анимации сущности</value>
+  </data>
+  <data name="Preview3DEntityAnimationSpeedTooltip" xml:space="preserve">
+    <value>Множитель скорости рендеринга для эмулируемого движения объекта в режиме ожидания.</value>
+  </data>
+  <data name="Preview3DEntityAnimationAmplitude" xml:space="preserve">
+    <value>Амплитуда анимации объекта</value>
+  </data>
+  <data name="Preview3DEntityAnimationAmplitudeTooltip" xml:space="preserve">
+    <value>Множитель амплитуды времени рендеринга для эмулируемого движения объекта в режиме ожидания.</value>
+  </data>
+  <data name="Preview3DEntitiesSection" xml:space="preserve">
+    <value>Сущности</value>
+  </data>
+  <data name="Preview3DViewportSection" xml:space="preserve">
+    <value>Параллакс</value>
+  </data>
+  <data name="Preview3DSpritesSection" xml:space="preserve">
+    <value>Спрайты</value>
+  </data>
+  <data name="Preview3DGrassSection" xml:space="preserve">
+    <value>Трава</value>
+  </data>
+  <data name="Preview3DGrassColormap" xml:space="preserve">
+    <value>Цветовая карта травы</value>
+  </data>
+  <data name="Preview3DGrassColormapTemperature" xml:space="preserve">
+    <value>Температура</value>
+  </data>
+  <data name="Preview3DGrassColormapTemperatureTooltip" xml:space="preserve">
+    <value>Температура биома (0 = холодно, 1 = тепло), используемая для выборки цветовой карты травы для предварительного просмотра оттенка.</value>
+  </data>
+  <data name="Preview3DGrassColormapDownfall" xml:space="preserve">
+    <value>Падение</value>
+  </data>
+  <data name="Preview3DGrassColormapDownfallTooltip" xml:space="preserve">
+    <value>Влажность/осадки биома (0 = сухой, 1 = влажный), используемые для выборки цветовой карты травы для предварительного окрашивания.</value>
+  </data>
+  <data name="Preview3DEntityAlphaMode" xml:space="preserve">
+    <value>Альфа-режим объекта</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeTooltip" xml:space="preserve">
+    <value>Для ригов мобов во время выполнения, нарисованных с помощью запеченных сеток с диффузной прозрачностью PNG — непрозрачный игнорирует диффузную альфу; вырез отбрасывает тонкие текселы/текселы с низким содержанием альфа (рекомендуется по умолчанию); постепенно смешивайте композиты.</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeOpaque" xml:space="preserve">
+    <value>Непрозрачный</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeCutout" xml:space="preserve">
+    <value>Вырезать</value>
+  </data>
+  <data name="Preview3DEntityAlphaModeBlend" xml:space="preserve">
+    <value>Смешивать</value>
+  </data>
+  <data name="Preview3DEnableEntityLabPbrShading" xml:space="preserve">
+    <value>Карты нормалей и отражений сущностей</value>
+  </data>
+  <data name="Preview3DEnableEntityLabPbrShadingTooltip" xml:space="preserve">
+    <value>Для предварительного просмотра мобов во время выполнения используйте сгенерированные LabPBR карты нормалей и отражений. Отключите, если освещение выглядит неправильно на конкретной установке.</value>
+  </data>
+  <data name="Preview3DEnableEntityParallax" xml:space="preserve">
+    <value>Параллакс объекта (POM)</value>
+  </data>
+  <data name="Preview3DEnableEntityParallaxTooltip" xml:space="preserve">
+    <value>Для предварительного просмотра мобов во время выполнения включите параллакс карты высот, параллакс AO и самозатенение параллакса. По умолчанию выключено; может переливаться на УФ-швах.</value>
+  </data>
+  <data name="Preview3DSpriteThickness" xml:space="preserve">
+    <value>Толщина спрайта</value>
+  </data>
+  <data name="Preview3DSpriteThicknessTooltip" xml:space="preserve">
+    <value>Выдавливает каждый непрозрачный тексель спрайта в кубоид (утолщение предметов в стиле Minecraft). 0 = плоская карта; до 0,25 глубины вытягивания — при максимуме глубина соответствует размеру текселей для кубических вокселей. На боковых гранях используется плоский цвет текселя, а не растянутый УФ.</value>
+  </data>
+  <data name="WindowMinimize" xml:space="preserve">
+    <value>Свернуть</value>
+  </data>
+  <data name="WindowMaximize" xml:space="preserve">
+    <value>Максимизировать</value>
+  </data>
+  <data name="WindowClose" xml:space="preserve">
+    <value>Закрывать</value>
+  </data>
+  <data name="DebugMlMatch" xml:space="preserve">
+    <value>Отладка совпадения ML…</value>
+  </data>
+  <data name="ExploreManualOverrideTooltip" xml:space="preserve">
+    <value>Установлено = включить, Не отмечено = исключить, Неопределенно = использовать другие правила</value>
+  </data>
+  <data name="SetAsPreview" xml:space="preserve">
+    <value>Установить как предварительный просмотр</value>
+  </data>
+  <data name="TagRuleIdWatermark" xml:space="preserve">
+    <value>например мойтег</value>
+  </data>
+  <data name="TagRuleDisplayNameWatermark" xml:space="preserve">
+    <value>например Мой тег</value>
+  </data>
+  <data name="EditAiModels" xml:space="preserve">
+    <value>Редактировать модели ИИ</value>
+  </data>
+  <data name="EditAiModelsWarning" xml:space="preserve">
+    <value>Предупреждение. Не редактируйте эти пути модели, если вы не знаете, что делаете.</value>
+  </data>
+  <data name="MlResolution16x16" xml:space="preserve">
+    <value>16×16</value>
+  </data>
+  <data name="MlResolution32x32" xml:space="preserve">
+    <value>32х32</value>
+  </data>
+  <data name="MlResolution64x64" xml:space="preserve">
+    <value>64×64</value>
+  </data>
+  <data name="MlResolution128x128" xml:space="preserve">
+    <value>128×128</value>
+  </data>
+  <data name="MlResolution256x256" xml:space="preserve">
+    <value>256×256</value>
+  </data>
+  <data name="UvDebugButton" xml:space="preserve">
+    <value>УФ-отладка</value>
+  </data>
+  <data name="EntityDebugButton" xml:space="preserve">
+    <value>Отладка объекта</value>
+  </data>
+  <data name="PreviewPoseLabel" xml:space="preserve">
+    <value>Поза</value>
+  </data>
+  <data name="PreviewSizeLabel" xml:space="preserve">
+    <value>Размер</value>
+  </data>
+  <data name="PreviewContextTypeLabel" xml:space="preserve">
+    <value>Тип контекста</value>
+  </data>
+  <data name="SelectResourcePackTitle" xml:space="preserve">
+    <value>Выберите пакет ресурсов (.zip или .jar).</value>
+  </data>
+  <data name="SelectOutputFolderTitle" xml:space="preserve">
+    <value>Выберите выходную папку</value>
+  </data>
+  <data name="SelectMinecraftAssetsTitle" xml:space="preserve">
+    <value>Выберите версию Minecraft или папку с ресурсами.</value>
+  </data>
+  <data name="SemanticDebugWindowTitle" xml:space="preserve">
+    <value>Отладка семантического соответствия MiniLM</value>
+  </data>
+  <data name="Preview3DCameraResetKeyFormat" xml:space="preserve">
+    <value>ключ {0}</value>
+  </data>
+  <data name="CustomTagDefaultDisplayName" xml:space="preserve">
+    <value>Пользовательский тег</value>
+  </data>
+  <data name="CustomRuleDefaultDisplayName" xml:space="preserve">
+    <value>Пользовательское правило</value>
+  </data>
+  <data name="Status_GpuPreviewStarting" xml:space="preserve">
+    <value>Запускаем предварительный просмотр графического процессора…</value>
+  </data>
+  <data name="Status_GpuPreviewPreparingShaderSources" xml:space="preserve">
+    <value>Подготовка исходников шейдеров…</value>
+  </data>
+  <data name="Status_GpuPreviewPreparing" xml:space="preserve">
+    <value>Подготовка предварительного просмотра графического процессора…</value>
+  </data>
+  <data name="Status_GpuPreviewClearingShaderCache" xml:space="preserve">
+    <value>Очистка кэша шейдеров…</value>
+  </data>
+  <data name="Status_GpuPreviewCompilingMainShaders" xml:space="preserve">
+    <value>Компиляция основных шейдеров предварительного просмотра…</value>
+  </data>
+  <data name="Status_GpuPreviewCompilingShadowShaders" xml:space="preserve">
+    <value>Компиляция шейдеров теней…</value>
+  </data>
+  <data name="Status_GpuPreviewCreatingShadowMaps" xml:space="preserve">
+    <value>Создание карт теней…</value>
+  </data>
+  <data name="Status_GpuPreviewUploadingMeshes" xml:space="preserve">
+    <value>Загрузка сеток для предварительного просмотра…</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingLineOverlay" xml:space="preserve">
+    <value>Инициализация наложения линий…</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingSkyDome" xml:space="preserve">
+    <value>Инициализация небесного купола…</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingAtmosphere" xml:space="preserve">
+    <value>Инициализация атмосферы…</value>
+  </data>
+  <data name="Status_GpuPreviewFinalizing" xml:space="preserve">
+    <value>Завершение предварительного просмотра…</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingGodRays" xml:space="preserve">
+    <value>Загрузка лучей бога…</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingClouds" xml:space="preserve">
+    <value>Загрузка объемных облаков…</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingTaa" xml:space="preserve">
+    <value>Загрузка предварительного просмотра TAA…</value>
+  </data>
+  <data name="Status_GpuPreviewReady" xml:space="preserve">
+    <value>Готовый</value>
+  </data>
+  <data name="Status_GpuPreviewPreviewReady" xml:space="preserve">
+    <value>Предварительный просмотр готов</value>
+  </data>
+  <data name="Status_GpuPreviewCoreReady" xml:space="preserve">
+    <value>Предварительный просмотр ядра готов</value>
+  </data>
+  <data name="UvDebugTitle" xml:space="preserve">
+    <value>УФ-отладка</value>
+  </data>
+  <data name="UvDebugGlobalControls" xml:space="preserve">
+    <value>Глобальные элементы управления UV-отладкой</value>
+  </data>
+  <data name="UvDebugGlobalControlsDescription" xml:space="preserve">
+    <value>При переключении они переопределяют производственную политику УФ-запекания. Кубоиды сущностей по умолчанию используют встроенную четность Java.</value>
+  </data>
+  <data name="UvDebugResetOverrides" xml:space="preserve">
+    <value>Сброс переопределений (производственные настройки по умолчанию)</value>
+  </data>
+  <data name="UvDebugFlipU" xml:space="preserve">
+    <value>Перевернуть U (поменять местами u0/u1)</value>
+  </data>
+  <data name="UvDebugFlipV" xml:space="preserve">
+    <value>Перевернуть V (поменять местами v0/v1)</value>
+  </data>
+  <data name="UvDebugOffsetU" xml:space="preserve">
+    <value>Смещение U (пикселей)</value>
+  </data>
+  <data name="UvDebugOffsetV" xml:space="preserve">
+    <value>Смещение по вертикали (пикселей)</value>
+  </data>
+  <data name="UvDebugFaceSemanticRouting" xml:space="preserve">
+    <value>Семантическая маршрутизация лица (семантика лица после преобразования)</value>
+  </data>
+  <data name="UvDebugSwapNorthSouth" xml:space="preserve">
+    <value>Поменять местами маршрутизацию Север/Юг</value>
+  </data>
+  <data name="UvDebugSwapEastWest" xml:space="preserve">
+    <value>Поменять местами маршруты Восток/Запад</value>
+  </data>
+  <data name="UvDebugSwapUpDown" xml:space="preserve">
+    <value>Маршрутизация смены граней вверх/вниз</value>
+  </data>
+  <data name="UvDebugBakerConversion" xml:space="preserve">
+    <value>УФ-преобразование Бейкера</value>
+  </data>
+  <data name="UvDebugPreserveDirectionalBounds" xml:space="preserve">
+    <value>Сохранять направленные границы UV (отключить нормализацию мин/макс)</value>
+  </data>
+  <data name="UvDebugUseBottomLeftUvOrigin" xml:space="preserve">
+    <value>Использовать преобразование исходного UV-изображения в левом нижнем углу (стиль GL).</value>
+  </data>
+  <data name="UvDebugFaceCornerOrdering" xml:space="preserve">
+    <value>Заказ/намотка торцевого угла</value>
+  </data>
+  <data name="UvDebugCornerOrderDefault" xml:space="preserve">
+    <value>По умолчанию</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate90" xml:space="preserve">
+    <value>Повернуть на 90</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate180" xml:space="preserve">
+    <value>Повернуть на 180</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate270" xml:space="preserve">
+    <value>Повернуть на 270</value>
+  </data>
+  <data name="UvDebugCornerOrderReverseWinding" xml:space="preserve">
+    <value>Обратная намотка</value>
+  </data>
+  <data name="UvDebugGlobalFaceRotation" xml:space="preserve">
+    <value>Глобальное вращение лица</value>
+  </data>
+  <data name="UvDebugRotation0" xml:space="preserve">
+    <value>0°</value>
+  </data>
+  <data name="UvDebugRotation90" xml:space="preserve">
+    <value>90°</value>
+  </data>
+  <data name="UvDebugRotation180" xml:space="preserve">
+    <value>180°</value>
+  </data>
+  <data name="UvDebugRotation270" xml:space="preserve">
+    <value>270°</value>
+  </data>
+  <data name="UvDebugLiveChangesHint" xml:space="preserve">
+    <value>Изменения применяются в реальном времени и вызывают обновление предварительного просмотра. Используйте их, чтобы изолировать проблемы преобразования texOffs, Baker и углового порядка.</value>
+  </data>
+  <data name="EntityPreviewDebugTitle" xml:space="preserve">
+    <value>Отладка предварительного просмотра объекта</value>
+  </data>
+  <data name="EntityPreviewDebugBabyFixesSection" xml:space="preserve">
+    <value>Живые исправления предпросмотра ребенка</value>
+  </data>
+  <data name="EntityPreviewDebugBabyFixesDescription" xml:space="preserve">
+    <value>Переключатели проб/ошибок для разделения тела/головы/ножек ребенка в режиме Explore. Изменения немедленно перезапекают сетку — загружайте детскую текстуру (fox_baby, корова_temperate_baby, donkey_baby, …) и переключайте одно исправление за раз.</value>
+  </data>
+  <data name="EntityPreviewDebugBaselineCompare" xml:space="preserve">
+    <value>Базовое сравнение</value>
+  </data>
+  <data name="EntityPreviewDebugForceCpuSkinning" xml:space="preserve">
+    <value>Принудительное оформление оболочки ЦП (предварительный просмотр VBO с 12 плавающими числами)</value>
+  </data>
+  <data name="EntityPreviewDebugForceCpuSkinningTooltip" xml:space="preserve">
+    <value>Правильная сетка на ЦП, но разделенная на пути GPU ⇒ GPU Bind/W(), а не IR-обходе.</value>
+  </data>
+  <data name="EntityPreviewDebugLogDrawContract" xml:space="preserve">
+    <value>Объект журнала рисует контракт каждый кадр</value>
+  </data>
+  <data name="EntityPreviewDebugLogDrawContractTooltip" xml:space="preserve">
+    <value>Следите за теломY/headY/legY в журнале предварительного просмотра во время переключения исправлений.</value>
+  </data>
+  <data name="EntityPreviewDebugLayerDebugFalseColor" xml:space="preserve">
+    <value>Отладка слоя ложного цвета (пакеты глубины)</value>
+  </data>
+  <data name="EntityPreviewDebugLayerDebugFalseColorTooltip" xml:space="preserve">
+    <value>Оттените каждую партию рисования с помощью PreviewDepthLayerKind (основной серый, голубой с вырезами, косметический пурпурный, излучающий желтый).</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseCompose" xml:space="preserve">
+    <value>Составление части позы (перезапекание сетки)</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseErTimesT" xml:space="preserve">
+    <value>Эр × Т (производство)</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseLegacyTxEr" xml:space="preserve">
+    <value>T × Er (старый взрослый взрыв)</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseLegacyTxErTooltip" xml:space="preserve">
+    <value>Обычно неправильно для взрослых; примеряйте младенцев, если конечности отделяются по ходу вращения родителей.</value>
+  </data>
+  <data name="EntityPreviewDebugLerFold" xml:space="preserve">
+    <value>Сгиб LER (перезапекание сетки)</value>
+  </data>
+  <data name="EntityPreviewDebugLerPolicyDefault" xml:space="preserve">
+    <value>Политика по умолчанию</value>
+  </data>
+  <data name="EntityPreviewDebugLerStandardWorldRoot" xml:space="preserve">
+    <value>StandardWorldRoot (столбец S·M)</value>
+  </data>
+  <data name="EntityPreviewDebugLerRightComposeLocalChain" xml:space="preserve">
+    <value>Райткомпоузлокалчейн (M·S)</value>
+  </data>
+  <data name="EntityPreviewDebugLerRightComposeLocalChainTooltip" xml:space="preserve">
+    <value>Поэлементно M×S — может отделять повернутые кубоиды тела четвероногих.</value>
+  </data>
+  <data name="EntityPreviewDebugLerSkip" xml:space="preserve">
+    <value>Пропустить LER</value>
+  </data>
+  <data name="EntityPreviewDebugPartTreeRepair" xml:space="preserve">
+    <value>Частичный ремонт дерева</value>
+  </data>
+  <data name="EntityPreviewDebugSkipAllPartTreeRepair" xml:space="preserve">
+    <value>Пропустить весь ремонт частей дерева (необработанный IR)</value>
+  </data>
+  <data name="EntityPreviewDebugSkipAllPartTreeRepairTooltip" xml:space="preserve">
+    <value>Полностью обойти GeometryIrPartTreeRepair — просмотрите выходные данные подъемника, прежде чем вносить какие-либо дополнительные исправления.</value>
+  </data>
+  <data name="EntityPreviewDebugIndividualRepairSteps" xml:space="preserve">
+    <value>Отдельные этапы ремонта (по умолчанию включено)</value>
+  </data>
+  <data name="EntityPreviewDebugIndividualRepairStepsDescription" xml:space="preserve">
+    <value>Снимите флажок с шага, чтобы увидеть, помогает он или вредит текущему ребенку. Параметр «Пропустить все» переопределяет эти параметры.</value>
+  </data>
+  <data name="EntityPreviewDebugRepairGlobalReparent" xml:space="preserve">
+    <value>Глобальный репарент (уши, голова→head_parts, рога, легкий ветерок,…)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairQuadrupedLegReparent" xml:space="preserve">
+    <value>Четвероногий репарант ноги под телом</value>
+  </data>
+  <data name="EntityPreviewDebugRepairQuadrupedLegReparentTooltip" xml:space="preserve">
+    <value>Если это не запекание с плоским корнем - в классе укладки головы детеныша осла/лошади используется приведенное ниже правило.</value>
+  </data>
+  <data name="EntityPreviewDebugRepairForceLegReparent" xml:space="preserve">
+    <value>Принудительный репарент ноги на плоском четвероногом запекании (экспериментальный)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairForceLegReparentTooltip" xml:space="preserve">
+    <value>Попробуйте на детях лисицы/коровы/курицы, у которых ноги остаются корневыми братьями и сестрами со смещением относительно тела.</value>
+  </data>
+  <data name="EntityPreviewDebugRepairHeadStackLegReparent" xml:space="preserve">
+    <value>Вложенные головки: репарантные ноги с плоским корнем (детеныши лошадей)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairHeadStackLegReparentTooltip" xml:space="preserve">
+    <value>BabyHorseModel / BabyDonkeyModel — голова под телом, но ноги все еще у корня.</value>
+  </data>
+  <data name="EntityPreviewDebugRepairRemoveDuplicateRootSiblings" xml:space="preserve">
+    <value>Удалить повторяющиеся корневые братья и сестры</value>
+  </data>
+  <data name="EntityPreviewDebugRepairCollapseInnerBody" xml:space="preserve">
+    <value>Свернуть внутренний_боди / флисовая отделка под телом</value>
+  </data>
+  <data name="EntityPreviewDebugRepairDeduplicateNestedPartIds" xml:space="preserve">
+    <value>Дедупликация идентификаторов вложенных деталей</value>
+  </data>
+  <data name="EntityPreviewDebugRepairZeroEquineRootOffset" xml:space="preserve">
+    <value>Нулевое корневое смещение createBodyLayer для лошадей (лошадь/осел)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairZeroEquineRootOffsetTooltip" xml:space="preserve">
+    <value>Удаляет корневую привязку T(0,24,0) на запеканиях createBodyLayer/createBabyLayer для лошадей.</value>
+  </data>
+  <data name="EntityPreviewDebugSuggestedWorkflow" xml:space="preserve">
+    <value>Рекомендуемый рабочий процесс дочернего процесса: (1) пропустить весь ремонт, чтобы увидеть необработанный IR, (2) повторно включить производственные этапы один за другим, (3) попробовать принудительно использовать правило репарента ног или стека головы для лошадиных детенышей, (4) сравнить скининг ЦП и ГП, (5) только затем попробовать T×Er или RightCompose LER, если кластеры все еще смещаются.</value>
+  </data>
+  <data name="AiTaggingSection" xml:space="preserve">
+    <value>AI-теги</value>
+  </data>
+  <data name="NormalsAndHeightSection" xml:space="preserve">
+    <value>Нормали и высота</value>
+  </data>
+  <data name="NormalsSection" xml:space="preserve">
+    <value>Нормальные</value>
+  </data>
+  <data name="SpecularSection" xml:space="preserve">
+    <value>Гладкость</value>
+  </data>
+  <data name="MetalnessSection" xml:space="preserve">
+    <value>Металличность</value>
+  </data>
+  <data name="SpecularPorositySection" xml:space="preserve">
+    <value>Пористость</value>
+  </data>
+  <data name="AiDrivenPbrSection" xml:space="preserve">
+    <value>PBR, управляемый ИИ</value>
+  </data>
+  <data name="AiNormalsSection" xml:space="preserve">
+    <value>ИИ Нормали</value>
+  </data>
+  <data name="AiSpecularSection" xml:space="preserve">
+    <value>ИИ Зеркальный</value>
+  </data>
+  <data name="Preview3DCameraExpanderSection" xml:space="preserve">
+    <value>Камера</value>
+  </data>
 </root>
 
 

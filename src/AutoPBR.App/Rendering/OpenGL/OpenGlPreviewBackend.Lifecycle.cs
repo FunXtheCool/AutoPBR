@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
+using AutoPBR.App.Lang;
 using AutoPBR.App.Rendering;
 using AutoPBR.App.Rendering.Abstractions;
 using AutoPBR.Core.Models;
@@ -545,7 +546,7 @@ public sealed partial class OpenGlPreviewBackend
             _gpuInitStopwatch.Restart();
             PreviewShaderPrewarm.EnsureStarted();
             _gpuBootstrap = new GpuBootstrapRunner();
-            RaiseGpuInitProgress("Preparing GPU preview…", _settings);
+            RaiseGpuInitProgress(PreviewGpuInitPhases.Preparing, _settings);
         }
     }
 

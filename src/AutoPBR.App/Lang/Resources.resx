@@ -374,7 +374,7 @@
     <value>Assets</value>
   </data>
   <data name="TabNormals" xml:space="preserve">
-    <value>Normals</value>
+    <value>Tune</value>
   </data>
   <data name="TabRulesets" xml:space="preserve">
     <value>Rulesets</value>
@@ -779,7 +779,7 @@
     <value>Detail Strength</value>
   </data>
   <data name="SpecularAdvanced" xml:space="preserve">
-    <value>Specular (Advanced)</value>
+    <value>Channels</value>
   </data>
   <data name="SpecularPercentileRemap" xml:space="preserve">
     <value>Percentile Remap Smoothness (R)</value>
@@ -839,7 +839,7 @@
     <value>Per texture, logs load/runtime details and a first-pixel sample when inference succeeds. Also logs precise errors when the model fails to load or output shape mismatches.</value>
   </data>
   <data name="AoAdvanced" xml:space="preserve">
-    <value>Ambient Occlusion (AO)</value>
+    <value>Ambient Occlusion</value>
   </data>
   <data name="GenerateAo" xml:space="preserve">
     <value>Bake AO into normal (blue channel)</value>
@@ -1208,7 +1208,7 @@
     <value>Parallax occlusion mapping (POM)</value>
   </data>
   <data name="Preview3DEnableParallaxTooltip" xml:space="preserve">
-    <value>Uses the LabPBR height map for clamped relief so albedo and subsequent map samples match displaced UVs. Shift limits keep grazing angles and orbit stable.</value>
+    <value>Uses the LabPBR height map for tile-wrapped relief so albedo and subsequent map samples match displaced UVs. Shift limits keep grazing angles and orbit stable.</value>
   </data>
   <data name="Preview3DEnableNormalMap" xml:space="preserve">
     <value>Normal mapping (_n)</value>
@@ -1513,11 +1513,44 @@
   <data name="Preview3DVolumetricQualityHigh" xml:space="preserve">
     <value>High</value>
   </data>
+  <data name="Preview3DParallaxSection" xml:space="preserve">
+    <value>Parallax</value>
+  </data>
   <data name="Preview3DParallaxHeightStrength" xml:space="preserve">
     <value>POM displacement</value>
   </data>
   <data name="Preview3DParallaxHeightStrengthTooltip" xml:space="preserve">
-    <value>Shader-side parallax displacement strength (maps to uHeightStrength).</value>
+    <value>Shader-side parallax displacement strength (maps to uHeightStrength). Higher values create deeper relief but need more trace quality.</value>
+  </data>
+  <data name="Preview3DParallaxTraceLayers" xml:space="preserve">
+    <value>POM trace layers</value>
+  </data>
+  <data name="Preview3DParallaxTraceLayersTooltip" xml:space="preserve">
+    <value>Primary height-field ray-march layers. Higher values improve steep-angle accuracy at higher GPU cost.</value>
+  </data>
+  <data name="Preview3DParallaxRefineSteps" xml:space="preserve">
+    <value>POM refine steps</value>
+  </data>
+  <data name="Preview3DParallaxRefineStepsTooltip" xml:space="preserve">
+    <value>Binary refinement steps after the first height-field hit. Higher values reduce stair-stepping in the displaced UV.</value>
+  </data>
+  <data name="Preview3DParallaxMaxUvShift" xml:space="preserve">
+    <value>POM max UV shift</value>
+  </data>
+  <data name="Preview3DParallaxMaxUvShiftTooltip" xml:space="preserve">
+    <value>Caps how far one parallax trace may travel in UV space. Raise for deeper relief; lower to reduce grazing-angle stretching.</value>
+  </data>
+  <data name="Preview3DParallaxShadowSamples" xml:space="preserve">
+    <value>Self-shadow samples</value>
+  </data>
+  <data name="Preview3DParallaxShadowSamplesTooltip" xml:space="preserve">
+    <value>Samples used by the parallax self-shadow ray toward the sun or moon light. Higher values reduce aliasing.</value>
+  </data>
+  <data name="Preview3DParallaxShadowSoftness" xml:space="preserve">
+    <value>Self-shadow softness</value>
+  </data>
+  <data name="Preview3DParallaxShadowSoftnessTooltip" xml:space="preserve">
+    <value>Softens receiver-side parallax self-shadows so height-field shadows blend more like the main shadow filter.</value>
   </data>
   <data name="Preview3DParallaxAoStrength" xml:space="preserve">
     <value>POM contact AO</value>
@@ -1586,7 +1619,7 @@
     <value>Entities</value>
   </data>
   <data name="Preview3DViewportSection" xml:space="preserve">
-    <value>Viewport</value>
+    <value>Parallax</value>
   </data>
   <data name="Preview3DSpritesSection" xml:space="preserve">
     <value>Sprites</value>
@@ -1656,5 +1689,365 @@
   </data>
   <data name="Preview3DCameraDebugFlyHint" xml:space="preserve">
     <value>Right-drag: look · WASD while right held: fly · R: reset orbit and fly offset</value>
+  </data>
+  <data name="WindowMinimize" xml:space="preserve">
+    <value>Minimize</value>
+  </data>
+  <data name="WindowMaximize" xml:space="preserve">
+    <value>Maximize</value>
+  </data>
+  <data name="WindowClose" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="DebugMlMatch" xml:space="preserve">
+    <value>Debug ML Match…</value>
+  </data>
+  <data name="ExploreManualOverrideTooltip" xml:space="preserve">
+    <value>Checked = include, Unchecked = exclude, Indeterminate = use other rules</value>
+  </data>
+  <data name="SetAsPreview" xml:space="preserve">
+    <value>Set as Preview</value>
+  </data>
+  <data name="TagRuleIdWatermark" xml:space="preserve">
+    <value>e.g. mytag</value>
+  </data>
+  <data name="TagRuleDisplayNameWatermark" xml:space="preserve">
+    <value>e.g. My Tag</value>
+  </data>
+  <data name="EditAiModels" xml:space="preserve">
+    <value>Edit AI Models</value>
+  </data>
+  <data name="EditAiModelsWarning" xml:space="preserve">
+    <value>Warning: Do not edit these model paths unless you know what you are doing.</value>
+  </data>
+  <data name="MlResolution16x16" xml:space="preserve">
+    <value>16×16</value>
+  </data>
+  <data name="MlResolution32x32" xml:space="preserve">
+    <value>32×32</value>
+  </data>
+  <data name="MlResolution64x64" xml:space="preserve">
+    <value>64×64</value>
+  </data>
+  <data name="MlResolution128x128" xml:space="preserve">
+    <value>128×128</value>
+  </data>
+  <data name="MlResolution256x256" xml:space="preserve">
+    <value>256×256</value>
+  </data>
+  <data name="UvDebugButton" xml:space="preserve">
+    <value>UV Debug</value>
+  </data>
+  <data name="EntityDebugButton" xml:space="preserve">
+    <value>Entity Debug</value>
+  </data>
+  <data name="PreviewPoseLabel" xml:space="preserve">
+    <value>Pose</value>
+  </data>
+  <data name="PreviewSizeLabel" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="PreviewContextTypeLabel" xml:space="preserve">
+    <value>Context Type</value>
+  </data>
+  <data name="SelectResourcePackTitle" xml:space="preserve">
+    <value>Select resource pack (.zip or .jar)</value>
+  </data>
+  <data name="SelectOutputFolderTitle" xml:space="preserve">
+    <value>Select output folder</value>
+  </data>
+  <data name="SelectMinecraftAssetsTitle" xml:space="preserve">
+    <value>Select Minecraft version or assets folder</value>
+  </data>
+  <data name="SemanticDebugWindowTitle" xml:space="preserve">
+    <value>MiniLM Semantic Match Debug</value>
+  </data>
+  <data name="Preview3DCameraResetKeyFormat" xml:space="preserve">
+    <value>{0} key</value>
+  </data>
+  <data name="CustomTagDefaultDisplayName" xml:space="preserve">
+    <value>Custom Tag</value>
+  </data>
+  <data name="CustomRuleDefaultDisplayName" xml:space="preserve">
+    <value>Custom Rule</value>
+  </data>
+  <data name="Status_GpuPreviewStarting" xml:space="preserve">
+    <value>Starting GPU preview…</value>
+  </data>
+  <data name="Status_GpuPreviewPreparingShaderSources" xml:space="preserve">
+    <value>Preparing shader sources…</value>
+  </data>
+  <data name="Status_GpuPreviewPreparing" xml:space="preserve">
+    <value>Preparing GPU preview…</value>
+  </data>
+  <data name="Status_GpuPreviewClearingShaderCache" xml:space="preserve">
+    <value>Clearing shader cache…</value>
+  </data>
+  <data name="Status_GpuPreviewCompilingMainShaders" xml:space="preserve">
+    <value>Compiling main preview shaders…</value>
+  </data>
+  <data name="Status_GpuPreviewCompilingShadowShaders" xml:space="preserve">
+    <value>Compiling shadow shaders…</value>
+  </data>
+  <data name="Status_GpuPreviewCreatingShadowMaps" xml:space="preserve">
+    <value>Creating shadow maps…</value>
+  </data>
+  <data name="Status_GpuPreviewUploadingMeshes" xml:space="preserve">
+    <value>Uploading preview meshes…</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingLineOverlay" xml:space="preserve">
+    <value>Initializing line overlay…</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingSkyDome" xml:space="preserve">
+    <value>Initializing sky dome…</value>
+  </data>
+  <data name="Status_GpuPreviewInitializingAtmosphere" xml:space="preserve">
+    <value>Initializing atmosphere…</value>
+  </data>
+  <data name="Status_GpuPreviewFinalizing" xml:space="preserve">
+    <value>Finalizing preview…</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingGodRays" xml:space="preserve">
+    <value>Loading god rays…</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingClouds" xml:space="preserve">
+    <value>Loading volumetric clouds…</value>
+  </data>
+  <data name="Status_GpuPreviewLoadingTaa" xml:space="preserve">
+    <value>Loading preview TAA…</value>
+  </data>
+  <data name="Status_GpuPreviewReady" xml:space="preserve">
+    <value>Ready</value>
+  </data>
+  <data name="Status_GpuPreviewPreviewReady" xml:space="preserve">
+    <value>Preview ready</value>
+  </data>
+  <data name="Status_GpuPreviewCoreReady" xml:space="preserve">
+    <value>Core preview ready</value>
+  </data>
+  <data name="UvDebugTitle" xml:space="preserve">
+    <value>UV Debug</value>
+  </data>
+  <data name="UvDebugGlobalControls" xml:space="preserve">
+    <value>Global UV Debug Controls</value>
+  </data>
+  <data name="UvDebugGlobalControlsDescription" xml:space="preserve">
+    <value>These override production UV bake policy when toggled. Entity cuboids use baked-in Java parity by default.</value>
+  </data>
+  <data name="UvDebugResetOverrides" xml:space="preserve">
+    <value>Reset overrides (production defaults)</value>
+  </data>
+  <data name="UvDebugFlipU" xml:space="preserve">
+    <value>Flip U (swap u0/u1)</value>
+  </data>
+  <data name="UvDebugFlipV" xml:space="preserve">
+    <value>Flip V (swap v0/v1)</value>
+  </data>
+  <data name="UvDebugOffsetU" xml:space="preserve">
+    <value>U offset (px)</value>
+  </data>
+  <data name="UvDebugOffsetV" xml:space="preserve">
+    <value>V offset (px)</value>
+  </data>
+  <data name="UvDebugFaceSemanticRouting" xml:space="preserve">
+    <value>Face semantic routing (post-transform face semantics)</value>
+  </data>
+  <data name="UvDebugSwapNorthSouth" xml:space="preserve">
+    <value>Swap face routing North / South</value>
+  </data>
+  <data name="UvDebugSwapEastWest" xml:space="preserve">
+    <value>Swap face routing East / West</value>
+  </data>
+  <data name="UvDebugSwapUpDown" xml:space="preserve">
+    <value>Swap face routing Up / Down</value>
+  </data>
+  <data name="UvDebugBakerConversion" xml:space="preserve">
+    <value>Baker UV conversion</value>
+  </data>
+  <data name="UvDebugPreserveDirectionalBounds" xml:space="preserve">
+    <value>Preserve directional UV bounds (disable min/max normalization)</value>
+  </data>
+  <data name="UvDebugUseBottomLeftUvOrigin" xml:space="preserve">
+    <value>Use bottom-left UV origin conversion (GL style)</value>
+  </data>
+  <data name="UvDebugFaceCornerOrdering" xml:space="preserve">
+    <value>Face corner ordering / winding</value>
+  </data>
+  <data name="UvDebugCornerOrderDefault" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate90" xml:space="preserve">
+    <value>Rotate 90</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate180" xml:space="preserve">
+    <value>Rotate 180</value>
+  </data>
+  <data name="UvDebugCornerOrderRotate270" xml:space="preserve">
+    <value>Rotate 270</value>
+  </data>
+  <data name="UvDebugCornerOrderReverseWinding" xml:space="preserve">
+    <value>Reverse winding</value>
+  </data>
+  <data name="UvDebugGlobalFaceRotation" xml:space="preserve">
+    <value>Global face rotation</value>
+  </data>
+  <data name="UvDebugRotation0" xml:space="preserve">
+    <value>0°</value>
+  </data>
+  <data name="UvDebugRotation90" xml:space="preserve">
+    <value>90°</value>
+  </data>
+  <data name="UvDebugRotation180" xml:space="preserve">
+    <value>180°</value>
+  </data>
+  <data name="UvDebugRotation270" xml:space="preserve">
+    <value>270°</value>
+  </data>
+  <data name="UvDebugLiveChangesHint" xml:space="preserve">
+    <value>Changes apply live and trigger preview refresh. Use these to isolate texOffs vs baker conversion vs corner-order issues.</value>
+  </data>
+  <data name="EntityPreviewDebugTitle" xml:space="preserve">
+    <value>Entity Preview Debug</value>
+  </data>
+  <data name="EntityPreviewDebugBabyFixesSection" xml:space="preserve">
+    <value>Baby preview live fixes</value>
+  </data>
+  <data name="EntityPreviewDebugBabyFixesDescription" xml:space="preserve">
+    <value>Trial/error switches for baby body/head/leg separation in Explore. Changes rebake mesh immediately — load a baby texture (fox_baby, cow_temperate_baby, donkey_baby, …) and toggle one fix at a time.</value>
+  </data>
+  <data name="EntityPreviewDebugBaselineCompare" xml:space="preserve">
+    <value>Baseline compare</value>
+  </data>
+  <data name="EntityPreviewDebugForceCpuSkinning" xml:space="preserve">
+    <value>Force CPU skinning (12-float preview VBO)</value>
+  </data>
+  <data name="EntityPreviewDebugForceCpuSkinningTooltip" xml:space="preserve">
+    <value>Correct mesh on CPU but separated on GPU ⇒ GPU bind/W() path, not IR walk.</value>
+  </data>
+  <data name="EntityPreviewDebugLogDrawContract" xml:space="preserve">
+    <value>Log entity draw contract every frame</value>
+  </data>
+  <data name="EntityPreviewDebugLogDrawContractTooltip" xml:space="preserve">
+    <value>Watch bodyY/headY/legY in the preview log while toggling fixes.</value>
+  </data>
+  <data name="EntityPreviewDebugLayerDebugFalseColor" xml:space="preserve">
+    <value>Layer debug false-color (depth batches)</value>
+  </data>
+  <data name="EntityPreviewDebugLayerDebugFalseColorTooltip" xml:space="preserve">
+    <value>Tint each draw batch by PreviewDepthLayerKind (base gray, cutout cyan, cosmetic magenta, emissive yellow).</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseCompose" xml:space="preserve">
+    <value>Part pose compose (rebakes mesh)</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseErTimesT" xml:space="preserve">
+    <value>Er × T (production)</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseLegacyTxEr" xml:space="preserve">
+    <value>T × Er (legacy adult explode)</value>
+  </data>
+  <data name="EntityPreviewDebugPartPoseLegacyTxErTooltip" xml:space="preserve">
+    <value>Usually wrong for adults; try on babies if limbs detach along parent rotation.</value>
+  </data>
+  <data name="EntityPreviewDebugLerFold" xml:space="preserve">
+    <value>LER fold (rebakes mesh)</value>
+  </data>
+  <data name="EntityPreviewDebugLerPolicyDefault" xml:space="preserve">
+    <value>Policy default</value>
+  </data>
+  <data name="EntityPreviewDebugLerStandardWorldRoot" xml:space="preserve">
+    <value>StandardWorldRoot (column S·M)</value>
+  </data>
+  <data name="EntityPreviewDebugLerRightComposeLocalChain" xml:space="preserve">
+    <value>RightComposeLocalChain (M·S)</value>
+  </data>
+  <data name="EntityPreviewDebugLerRightComposeLocalChainTooltip" xml:space="preserve">
+    <value>Per-element M×S — can detach rotated body cuboids on quadrupeds.</value>
+  </data>
+  <data name="EntityPreviewDebugLerSkip" xml:space="preserve">
+    <value>Skip LER</value>
+  </data>
+  <data name="EntityPreviewDebugPartTreeRepair" xml:space="preserve">
+    <value>Part-tree repair</value>
+  </data>
+  <data name="EntityPreviewDebugSkipAllPartTreeRepair" xml:space="preserve">
+    <value>Skip all part-tree repair (raw lifted IR)</value>
+  </data>
+  <data name="EntityPreviewDebugSkipAllPartTreeRepairTooltip" xml:space="preserve">
+    <value>Bypass GeometryIrPartTreeRepair entirely — see lifter output before any baby fixes.</value>
+  </data>
+  <data name="EntityPreviewDebugIndividualRepairSteps" xml:space="preserve">
+    <value>Individual repair steps (production defaults ON)</value>
+  </data>
+  <data name="EntityPreviewDebugIndividualRepairStepsDescription" xml:space="preserve">
+    <value>Uncheck a step to see whether it helps or hurts the current baby. Skip-all overrides these.</value>
+  </data>
+  <data name="EntityPreviewDebugRepairGlobalReparent" xml:space="preserve">
+    <value>Global reparent (ears, head→head_parts, horns, breeze wind, …)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairQuadrupedLegReparent" xml:space="preserve">
+    <value>Quadruped leg reparent under body</value>
+  </data>
+  <data name="EntityPreviewDebugRepairQuadrupedLegReparentTooltip" xml:space="preserve">
+    <value>When not a flat root bake — baby donkey/horse head-stack class uses head-stack rule below.</value>
+  </data>
+  <data name="EntityPreviewDebugRepairForceLegReparent" xml:space="preserve">
+    <value>Force leg reparent on flat quadruped bake (experimental)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairForceLegReparentTooltip" xml:space="preserve">
+    <value>Try on fox/cow/chicken babies where legs stay root siblings with body-relative offsets.</value>
+  </data>
+  <data name="EntityPreviewDebugRepairHeadStackLegReparent" xml:space="preserve">
+    <value>Head-stack nested: reparent flat root legs (baby equine)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairHeadStackLegReparentTooltip" xml:space="preserve">
+    <value>BabyHorseModel / BabyDonkeyModel — head under body but legs still at root.</value>
+  </data>
+  <data name="EntityPreviewDebugRepairRemoveDuplicateRootSiblings" xml:space="preserve">
+    <value>Remove duplicate root siblings</value>
+  </data>
+  <data name="EntityPreviewDebugRepairCollapseInnerBody" xml:space="preserve">
+    <value>Collapse inner_body / fleece trim under body</value>
+  </data>
+  <data name="EntityPreviewDebugRepairDeduplicateNestedPartIds" xml:space="preserve">
+    <value>Deduplicate nested part ids</value>
+  </data>
+  <data name="EntityPreviewDebugRepairZeroEquineRootOffset" xml:space="preserve">
+    <value>Zero equine createBodyLayer root offset (horse/donkey)</value>
+  </data>
+  <data name="EntityPreviewDebugRepairZeroEquineRootOffsetTooltip" xml:space="preserve">
+    <value>Drops root T(0,24,0) anchor on equine createBodyLayer/createBabyLayer bakes.</value>
+  </data>
+  <data name="EntityPreviewDebugSuggestedWorkflow" xml:space="preserve">
+    <value>Suggested baby workflow: (1) skip-all repair to see raw IR, (2) re-enable production steps one by one, (3) try force leg reparent or head-stack rule on equine babies, (4) compare CPU vs GPU skinning, (5) only then try T×Er or RightCompose LER if clusters still drift.</value>
+  </data>
+  <data name="AiTaggingSection" xml:space="preserve">
+    <value>AI Tagging</value>
+  </data>
+  <data name="NormalsAndHeightSection" xml:space="preserve">
+    <value>Normals and Height</value>
+  </data>
+  <data name="NormalsSection" xml:space="preserve">
+    <value>Normals</value>
+  </data>
+  <data name="SpecularSection" xml:space="preserve">
+    <value>Smoothness</value>
+  </data>
+  <data name="MetalnessSection" xml:space="preserve">
+    <value>Metalness</value>
+  </data>
+  <data name="SpecularPorositySection" xml:space="preserve">
+    <value>Porosity</value>
+  </data>
+  <data name="AiDrivenPbrSection" xml:space="preserve">
+    <value>AI Driven PBR</value>
+  </data>
+  <data name="AiNormalsSection" xml:space="preserve">
+    <value>AI Normals</value>
+  </data>
+  <data name="AiSpecularSection" xml:space="preserve">
+    <value>AI Specular</value>
+  </data>
+  <data name="Preview3DCameraExpanderSection" xml:space="preserve">
+    <value>Camera</value>
   </data>
 </root>

@@ -214,7 +214,7 @@ public sealed class UserSettings
     /// <summary>Draw X/Y/Z axis reference in the corner of the 3D preview.</summary>
     public bool Preview3DShowAxes { get; set; } = true;
 
-    /// <summary>When true, 3D preview uses clamped parallax (POM) from the height map.</summary>
+    /// <summary>When true, 3D preview uses parallax occlusion mapping (POM) from the height map.</summary>
     public bool Preview3DEnableParallax { get; set; } = true;
 
     /// <summary>When true, 3D preview applies LabPBR-style normal mapping (_n).</summary>
@@ -223,8 +223,23 @@ public sealed class UserSettings
     /// <summary>When true, 3D preview applies LabPBR-style specular / metal interpretation (_s).</summary>
     public bool Preview3DEnableSpecularMap { get; set; } = true;
 
-    /// <summary>Genesis: shader-side parallax displacement scalar (height strength, 0..0.35).</summary>
+    /// <summary>Genesis: shader-side parallax displacement scalar (height strength, 0..1).</summary>
     public double Preview3DParallaxHeightStrength { get; set; } = 0.05;
+
+    /// <summary>Genesis POM: primary height-field march layers (8..128).</summary>
+    public double Preview3DParallaxTraceLayers { get; set; } = 64;
+
+    /// <summary>Genesis POM: binary/secant refinement steps after primary hit (0..8).</summary>
+    public double Preview3DParallaxRefineSteps { get; set; } = 5;
+
+    /// <summary>Genesis POM: self-shadow ray samples from hit point toward light (4..64).</summary>
+    public double Preview3DParallaxShadowSamples { get; set; } = 24;
+
+    /// <summary>Genesis POM: receiver-side self-shadow softness (0..4).</summary>
+    public double Preview3DParallaxShadowSoftness { get; set; } = 1.25;
+
+    /// <summary>Genesis POM: maximum UV travel allowed for one trace (0.05..0.75).</summary>
+    public double Preview3DParallaxMaxUvShift { get; set; } = 0.45;
 
     /// <summary>Genesis: enable cheap subsurface scattering approximation (LabPBR _s.b >= 65).</summary>
     public bool Preview3DEnableSss { get; set; } = true;

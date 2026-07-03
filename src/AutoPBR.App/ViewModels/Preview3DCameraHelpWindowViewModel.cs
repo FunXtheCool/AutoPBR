@@ -53,7 +53,10 @@ public sealed partial class Preview3DCameraHelpWindowViewModel : ViewModelBase
         new(LocalizedStrings.Preview3DCameraHelpItemFlyWheelInput, LocalizedStrings.Preview3DCameraHelpItemFlyWheelDesc),
     ];
 
-    public string ResetKeyInput => $"{_main.Preview3DCameraResetKey} key";
+    public string ResetKeyInput => string.Format(
+        System.Globalization.CultureInfo.CurrentUICulture,
+        LocalizedStrings.Preview3DCameraResetKeyFormat,
+        _main.Preview3DCameraResetKey);
 
     public IReadOnlyList<Preview3DCameraHelpItem> FramingItems =>
     [
@@ -79,6 +82,15 @@ public sealed partial class Preview3DCameraHelpWindowViewModel : ViewModelBase
                 break;
             case nameof(MainWindowViewModel.ForegroundBrush):
                 OnPropertyChanged(nameof(ForegroundBrush));
+                break;
+            case nameof(MainWindowViewModel.Strings):
+                OnPropertyChanged(nameof(OrbitPanSection));
+                OnPropertyChanged(nameof(FlySection));
+                OnPropertyChanged(nameof(FramingSection));
+                OnPropertyChanged(nameof(OrbitPanItems));
+                OnPropertyChanged(nameof(FlyItems));
+                OnPropertyChanged(nameof(ResetKeyInput));
+                OnPropertyChanged(nameof(FramingItems));
                 break;
             case nameof(MainWindowViewModel.Preview3DCameraResetKey):
                 OnPropertyChanged(nameof(ResetKeyInput));
