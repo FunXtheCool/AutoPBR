@@ -20,6 +20,8 @@ in vec3 vWorldNormal;
 in vec2 vUv;
 in vec4 vWorldTangent;
 in vec4 vLightClip;
+in vec4 vCurrClip;
+in vec4 vPrevClip;
 
 uniform sampler2D uAlbedo;
 uniform sampler2D uNormal;
@@ -77,7 +79,8 @@ uniform float uShadowMaxBias;
 uniform vec2  uShadowTexelSize;
 uniform float uShadowSoftnessTexels;
 
-out vec4 FragColor;
+layout(location = 0) out vec4 FragColor;
+layout(location = 1) out vec4 TaaSignal;
 
 vec3 sampleNormal(vec2 uv, vec2 dx, vec2 dy, vec3 Nw, vec3 Tw, vec3 Bw)
 {
@@ -299,5 +302,22 @@ void main()
         a = alb.a;
     }
 
+    float alphaSpan = max(fwidth(alb.a), 1.0 / 255.0);
+    float alphaEdge = 1.0 - smoothstep(1.0, 4.0, abs(alb.a - uAlphaCutoff) / alphaSpan);
+    float reactivity = 0.0;
+    reactivity = max(reactivity, uIsGroundPass > 0 ? 0.08 : 0.0);
+    reactivity = max(reactivity, uSceneKind == 1 ? 0.25 : 0.0);
+    reactivity = max(reactivity, uEntityAlphaMode == 1 ? mix(0.20, 0.72, alphaEdge) : 0.0);
+    reactivity = max(reactivity, uEntityAlphaMode == 2 ? max(0.65, 1.0 - alb.a) : 0.0);
+
     FragColor = vec4(srgb, a);
+    float motion = 0.0;
+    if (vCurrClip.w > 1e-6 && vPrevClip.w > 1e-6)
+    {
+        vec2 currUv = (vCurrClip.xy / vCurrClip.w) * 0.5 + 0.5;
+        vec2 prevUv = (vPrevClip.xy / vPrevClip.w) * 0.5 + 0.5;
+        motion = clamp(length(currUv - prevUv) * 64.0, 0.0, 1.0);
+    }
+
+    TaaSignal = vec4(clamp(reactivity, 0.0, 1.0), 1.0, motion, 1.0);
 }

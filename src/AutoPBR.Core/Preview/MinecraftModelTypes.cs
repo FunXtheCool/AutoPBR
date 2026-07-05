@@ -46,6 +46,11 @@ internal sealed class ModelElement
     public float ShellInflateTexels { get; init; }
 
     /// <summary>
+    /// Whether preview POM is allowed on this element. Entity face masks and sheet attachments opt out while normal block/model elements opt in.
+    /// </summary>
+    public bool EnableParallax { get; init; } = true;
+
+    /// <summary>
     /// True when the source Java cuboid used <c>CubeListBuilder.mirror()</c>. Java mirrors by swapping X endpoints before
     /// polygon construction and reversing polygon vertices after UV remap; it is not just a UV U-bound swap.
     /// </summary>

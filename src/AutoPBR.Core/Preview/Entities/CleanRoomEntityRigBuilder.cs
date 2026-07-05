@@ -85,6 +85,12 @@ internal sealed partial class CleanRoomEntityModelRuntime
             var extentX = MathF.Abs(x1 - x0);
             var extentY = MathF.Abs(y1 - y0);
             var extentZ = MathF.Abs(z1 - z0);
+            var enableParallax =
+                depthLayerKind == PreviewDepthLayerKind.Base &&
+                faceMask is null &&
+                extentX > 1e-5f &&
+                extentY > 1e-5f &&
+                extentZ > 1e-5f;
 
             // UV footprint follows vanilla texOffs + integer box dimensions on the skin atlas (model texels).
             // Geometry still scales for baby transforms — decouple UV sizes from scaled vertex extents.
@@ -244,6 +250,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 DepthLayerKind = depthLayerKind,
                 LayerOrdinal = layerOrdinal,
                 CastsShadow = castsShadow,
+                EnableParallax = enableParallax,
                 MirrorCuboidUv = mirrorCuboidUv,
             });
         }
@@ -284,6 +291,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
                     ["north"] = new() { TextureKey = texKey, Uv = uvNorth, RotationDegrees = 0 },
                     ["south"] = new() { TextureKey = texKey, Uv = uvSouth, RotationDegrees = 0 },
                 },
+                EnableParallax = false,
             });
         }
 

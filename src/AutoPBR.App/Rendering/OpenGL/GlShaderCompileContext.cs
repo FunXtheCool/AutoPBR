@@ -25,9 +25,40 @@ internal sealed class GlShaderCompileContext
     public GlShaderProgram CreateProgram(string vertexFile, string fragmentFile, out string? error,
         string? debugLabel = null)
     {
+        return CreateProgram(vertexFile, tessControlFile: null, tessEvaluationFile: null, fragmentFile, out error, debugLabel);
+    }
+
+    public GlShaderProgram CreateProgram(
+        string vertexFile,
+        string? tessControlFile,
+        string? tessEvaluationFile,
+        string fragmentFile,
+        out string? error,
+        string? debugLabel = null)
+    {
         error = null;
         var label = string.IsNullOrWhiteSpace(debugLabel) ? fragmentFile : debugLabel;
-        var programKey = GlslPreparedSourceCache.ComputeProgramKey(vertexFile, fragmentFile, _useOpenGlEs, _cacheIdentity);
+        var hasTessellation = !string.IsNullOrWhiteSpace(tessControlFile) && !string.IsNullOrWhiteSpace(tessEvaluationFile);
+        if (hasTessellation && _useOpenGlEs)
+        {
+            error = "Tessellation shaders require the desktop OpenGL preview path.";
+            return new GlShaderProgram(_gl, 0);
+        }
+
+        var stages = hasTessellation
+            ? new[]
+            {
+                (vertexFile, ShaderType.VertexShader),
+                (tessControlFile!, ShaderType.TessControlShader),
+                (tessEvaluationFile!, ShaderType.TessEvaluationShader),
+                (fragmentFile, ShaderType.FragmentShader)
+            }
+            : new[]
+            {
+                (vertexFile, ShaderType.VertexShader),
+                (fragmentFile, ShaderType.FragmentShader)
+            };
+        var programKey = GlslPreparedSourceCache.ComputeProgramKey(_useOpenGlEs, _cacheIdentity, stages);
 
         if (_binaryCache.TryLoad(programKey, out var binaryFormat, out var binaryBytes) &&
             TryLinkFromBinary(binaryBytes, binaryFormat, label, ref error, out var fromCache))
@@ -36,10 +67,18 @@ internal sealed class GlShaderCompileContext
         }
 
         string vSrc;
+        string? tcSrc = null;
+        string? teSrc = null;
         string fSrc;
         try
         {
             vSrc = GlslPreparedSourceCache.GetOrPrepare(vertexFile, ShaderType.VertexShader, _useOpenGlEs);
+            if (hasTessellation)
+            {
+                tcSrc = GlslPreparedSourceCache.GetOrPrepare(tessControlFile!, ShaderType.TessControlShader, _useOpenGlEs);
+                teSrc = GlslPreparedSourceCache.GetOrPrepare(tessEvaluationFile!, ShaderType.TessEvaluationShader, _useOpenGlEs);
+            }
+
             fSrc = GlslPreparedSourceCache.GetOrPrepare(fragmentFile, ShaderType.FragmentShader, _useOpenGlEs);
         }
         catch (Exception ex)
@@ -54,19 +93,65 @@ internal sealed class GlShaderCompileContext
             return new GlShaderProgram(_gl, 0);
         }
 
+        var tcs = 0u;
+        var tes = 0u;
+        if (hasTessellation)
+        {
+            tcs = CompileShader(ShaderType.TessControlShader, tcSrc!, label, ref error);
+            if (tcs == 0)
+            {
+                _gl.DeleteShader(vs);
+                return new GlShaderProgram(_gl, 0);
+            }
+
+            tes = CompileShader(ShaderType.TessEvaluationShader, teSrc!, label, ref error);
+            if (tes == 0)
+            {
+                _gl.DeleteShader(vs);
+                _gl.DeleteShader(tcs);
+                return new GlShaderProgram(_gl, 0);
+            }
+        }
+
         var fs = CompileShader(ShaderType.FragmentShader, fSrc, label, ref error);
         if (fs == 0)
         {
             _gl.DeleteShader(vs);
+            if (tcs != 0)
+            {
+                _gl.DeleteShader(tcs);
+            }
+
+            if (tes != 0)
+            {
+                _gl.DeleteShader(tes);
+            }
+
             return new GlShaderProgram(_gl, 0);
         }
 
         var program = _gl.CreateProgram();
         _gl.AttachShader(program, vs);
+        if (hasTessellation)
+        {
+            _gl.AttachShader(program, tcs);
+            _gl.AttachShader(program, tes);
+        }
+
         _gl.AttachShader(program, fs);
         _gl.LinkProgram(program);
         _gl.GetProgram(program, GLEnum.LinkStatus, out var ok);
         _gl.DeleteShader(vs);
+        if (tcs != 0)
+        {
+            _gl.DeleteShader(tcs);
+        }
+
+        if (tes != 0)
+        {
+            _gl.DeleteShader(tes);
+        }
+
         _gl.DeleteShader(fs);
         if (ok == 0)
         {

@@ -76,6 +76,13 @@ internal static class UserSettingsSynchronizer
         vm.Preview3DParallaxMaxUvShift = settings.Preview3DParallaxMaxUvShift <= 0
             ? 0.45
             : Math.Clamp(settings.Preview3DParallaxMaxUvShift, 0.05, 0.75);
+        vm.Preview3DEnableTessellationDisplacement = settings.Preview3DEnableTessellationDisplacement;
+        vm.Preview3DTessellationLevel = settings.Preview3DTessellationLevel <= 0
+            ? 8.0
+            : Math.Clamp(settings.Preview3DTessellationLevel, 1.0, 16.0);
+        vm.Preview3DTessellationDisplacementStrength = settings.Preview3DTessellationDisplacementStrength < 0
+            ? 0.06
+            : Math.Clamp(settings.Preview3DTessellationDisplacementStrength, 0.0, 0.20);
         vm.Preview3DEnableSss = settings.Preview3DEnableSss;
         vm.Preview3DEnableParallaxShadow = settings.Preview3DEnableParallaxShadow;
         vm.Preview3DEnableParallaxAo = settings.Preview3DEnableParallaxAo;
@@ -367,6 +374,9 @@ internal static class UserSettingsSynchronizer
         settings.Preview3DParallaxShadowSamples = Math.Clamp(vm.Preview3DParallaxShadowSamples, 4.0, 64.0);
         settings.Preview3DParallaxShadowSoftness = Math.Clamp(vm.Preview3DParallaxShadowSoftness, 0.0, 4.0);
         settings.Preview3DParallaxMaxUvShift = Math.Clamp(vm.Preview3DParallaxMaxUvShift, 0.05, 0.75);
+        settings.Preview3DEnableTessellationDisplacement = vm.Preview3DEnableTessellationDisplacement;
+        settings.Preview3DTessellationLevel = Math.Clamp(vm.Preview3DTessellationLevel, 1.0, 16.0);
+        settings.Preview3DTessellationDisplacementStrength = Math.Clamp(vm.Preview3DTessellationDisplacementStrength, 0.0, 0.20);
         settings.Preview3DEnableSss = vm.Preview3DEnableSss;
         settings.Preview3DEnableParallaxShadow = vm.Preview3DEnableParallaxShadow;
         settings.Preview3DEnableParallaxAo = vm.Preview3DEnableParallaxAo;

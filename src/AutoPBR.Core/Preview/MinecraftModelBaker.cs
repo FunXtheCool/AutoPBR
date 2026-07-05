@@ -79,18 +79,20 @@ internal static partial class MinecraftModelBaker
         var currentBatchStart = 0;
         int? currentMat = null;
         PreviewDrawLayerPolicy currentPolicy = PreviewDrawLayerPolicy.DefaultBase;
+        var currentParallax = true;
 
-        void CloseBatchIfNeeded(int newMat, PreviewDrawLayerPolicy newPolicy)
+        void CloseBatchIfNeeded(int newMat, PreviewDrawLayerPolicy newPolicy, bool newParallax)
         {
             if (currentMat is null)
             {
                 currentMat = newMat;
                 currentPolicy = newPolicy;
+                currentParallax = newParallax;
                 currentBatchStart = idx.Count;
                 return;
             }
 
-            if (newMat == currentMat.Value && newPolicy.Equals(currentPolicy))
+            if (newMat == currentMat.Value && newPolicy.Equals(currentPolicy) && newParallax == currentParallax)
             {
                 return;
             }
@@ -98,11 +100,16 @@ internal static partial class MinecraftModelBaker
             var count = idx.Count - currentBatchStart;
             if (count > 0)
             {
-                batchList.Add(new PreviewDrawBatch(currentBatchStart, count, currentMat.Value) { LayerPolicy = currentPolicy });
+                batchList.Add(new PreviewDrawBatch(currentBatchStart, count, currentMat.Value)
+                {
+                    LayerPolicy = currentPolicy,
+                    EnableParallax = currentParallax,
+                });
             }
 
             currentMat = newMat;
             currentPolicy = newPolicy;
+            currentParallax = newParallax;
             currentBatchStart = idx.Count;
         }
 
@@ -116,7 +123,11 @@ internal static partial class MinecraftModelBaker
             var count = idx.Count - currentBatchStart;
             if (count > 0)
             {
-                batchList.Add(new PreviewDrawBatch(currentBatchStart, count, currentMat.Value) { LayerPolicy = currentPolicy });
+                batchList.Add(new PreviewDrawBatch(currentBatchStart, count, currentMat.Value)
+                {
+                    LayerPolicy = currentPolicy,
+                    EnableParallax = currentParallax,
+                });
             }
         }
 
@@ -154,7 +165,7 @@ internal static partial class MinecraftModelBaker
                     continue;
                 }
 
-                CloseBatchIfNeeded(matIdx, ResolveElementLayerPolicy(el, texZip, model.Textures));
+                CloseBatchIfNeeded(matIdx, ResolveElementLayerPolicy(el, texZip, model.Textures), el.EnableParallax);
 
                 _ = TryEmitFace(effectiveFaceName, fx, fy, fz, tx, ty, tz, face, wh.w, wh.h, el.LocalToParent, v, idx,
                     appendBoneIndex, appendBoneIndex ? elementIndex : 0, skipPreviewCuboidScale, in uvPolicy, el.MirrorCuboidUv,

@@ -8,6 +8,9 @@ namespace AutoPBR.Core.Models;
 public readonly record struct PreviewDrawBatch(int FirstIndex, int IndexCount, int MaterialIndex)
 {
     public PreviewDrawLayerPolicy LayerPolicy { get; init; } = PreviewDrawLayerPolicy.DefaultBase;
+
+    /// <summary>Whether height-map POM/tessellated protrusion should run for this batch.</summary>
+    public bool EnableParallax { get; init; } = true;
 }
 
 /// <summary>

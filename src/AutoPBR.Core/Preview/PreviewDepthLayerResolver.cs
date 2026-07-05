@@ -274,6 +274,7 @@ internal static class PreviewDepthLayerResolver
             LayerOrdinal = layerOrdinal,
             CastsShadow = castsShadow,
             ShellInflateTexels = element.ShellInflateTexels,
+            EnableParallax = element.EnableParallax && kind == PreviewDepthLayerKind.Base,
             MirrorCuboidUv = element.MirrorCuboidUv,
         };
 

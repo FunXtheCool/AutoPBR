@@ -643,6 +643,7 @@ public sealed partial class OpenGlPreviewBackend
             if (frame.EntityBoneSnapshotValid &&
                 frame.EntityBoneSnapshotCount > 0)
             {
+                UploadPreviousEntitySkinningBoneMatrices(frame.Gl);
                 UploadEntitySkinningBoneMatrices(frame.Gl, frame.EntityBoneSnapshotCount);
                 bonePaletteUploaded = true;
             }

@@ -23,7 +23,8 @@ public static class PreviewDrawBatchDiagnostics
             sb.Append(
                 CultureInfo.InvariantCulture,
                 $"\n  [{i}] mat={b.MaterialIndex} kind={p.Kind} order={p.DrawOrder} bias={p.DepthBiasStep} " +
-                $"depthWrite={p.DepthWrite} shadow={p.ShadowMode} idx={b.FirstIndex}+{b.IndexCount}");
+                $"depthWrite={p.DepthWrite} shadow={p.ShadowMode} pom={(b.EnableParallax ? "On" : "Off")} " +
+                $"idx={b.FirstIndex}+{b.IndexCount}");
         }
 
         return sb.ToString();

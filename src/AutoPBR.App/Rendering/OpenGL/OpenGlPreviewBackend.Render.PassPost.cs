@@ -8,7 +8,7 @@ public sealed partial class OpenGlPreviewBackend
     private void GlRenderPassPost(ref GlRenderFrame frame)
     {
         var cloudsActive = frame.Settings.EnableVolumetricClouds && CanDrawVolumetricClouds(frame.Settings);
-        var godRaysActive = frame.GodRayCaptureActive && _sceneCapture is { IsValid: true };
+        var godRaysActive = frame.Settings.EnableGodRays && frame.GodRayCaptureActive && _sceneCapture is { IsValid: true };
         var bothVolumetrics = cloudsActive && godRaysActive;
         var cloudWarmupDirect = bothVolumetrics && _cloudTierReadyWarmupDraws > 0;
         var useDeferredCloudComposite = bothVolumetrics && !cloudWarmupDirect;
@@ -60,6 +60,8 @@ public sealed partial class OpenGlPreviewBackend
         {
             DrawCornerAxes(frame.Gl, frame.VpX, frame.VpY, frame.Vw, frame.Vh, frame.Proj, frame.View);
         }
+
+        DrawPreviewTaa(ref frame);
 
         MaybeLogPreviewFingerprint(ref frame);
     }

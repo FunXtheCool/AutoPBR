@@ -187,6 +187,48 @@ public sealed class CreakingMeshDiagnosticTests
     }
 
     [Fact]
+    public void Creaking_entity_pom_applies_to_cuboids_not_face_masks_or_sheets()
+    {
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(TexturePath, Profile26, 0f, 0f, out var mesh, out _), TexturePath);
+
+        var headCore = SkinElements(mesh).Single(el =>
+            el.Faces.Count >= 6 &&
+            MathF.Abs(el.To[1] - el.From[1] - 10f) < 0.01f &&
+            MathF.Abs(el.To[0] - el.From[0] - 6f) < 0.01f);
+        Assert.True(headCore.EnableParallax);
+
+        var headSheets = SkinElements(mesh)
+            .Where(el => el.Faces.ContainsKey("north") &&
+                         el.Faces.ContainsKey("south") &&
+                         !el.Faces.ContainsKey("east"))
+            .ToList();
+        Assert.Equal(2, headSheets.Count);
+        Assert.All(headSheets, sheet => Assert.False(sheet.EnableParallax));
+
+        var footDisks = SkinElements(mesh)
+            .Where(el => el.Faces.ContainsKey("up") &&
+                         el.Faces.ContainsKey("down") &&
+                         !el.Faces.ContainsKey("north"))
+            .ToList();
+        Assert.Equal(2, footDisks.Count);
+        Assert.All(footDisks, disk => Assert.False(disk.EnableParallax));
+
+        var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(mesh, "minecraft");
+        var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase);
+        for (var i = 0; i < ordered.Count; i++)
+        {
+            pathToIdx[ordered[i]] = i;
+            texSizes[ordered[i]] = (64, 64);
+        }
+
+        Assert.True(MinecraftModelBaker.TryBake(mesh, "minecraft", pathToIdx, texSizes, out _, out _, out var batches));
+        Assert.Contains(batches, b => b.EnableParallax);
+        Assert.Contains(batches, b => !b.EnableParallax);
+    }
+
+    [Fact]
     public void Creaking_preview_world_corners_match_reference_java()
     {
         var repo = GeometryIrTestTierSupport.FindRepoRoot();

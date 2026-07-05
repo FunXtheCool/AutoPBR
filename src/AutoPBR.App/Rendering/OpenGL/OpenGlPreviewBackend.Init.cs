@@ -185,6 +185,15 @@ public sealed partial class OpenGlPreviewBackend
         string? debugLabel = null) =>
         _shaderCtx!.CreateProgram(vertexFile, fragmentFile, out error, debugLabel);
 
+    private GlShaderProgram CreatePreviewProgram(
+        string vertexFile,
+        string tessControlFile,
+        string tessEvaluationFile,
+        string fragmentFile,
+        out string? error,
+        string? debugLabel = null) =>
+        _shaderCtx!.CreateProgram(vertexFile, tessControlFile, tessEvaluationFile, fragmentFile, out error, debugLabel);
+
     private bool TryEnsureProceduralSkyProgram()
     {
         if (_proceduralSkyProgram is { IsValid: true } || _gl is null)

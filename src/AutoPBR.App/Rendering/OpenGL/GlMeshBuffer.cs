@@ -77,19 +77,24 @@ internal sealed class GlMeshBuffer : IDisposable
         _indexCount = indices.Length;
     }
 
-    public void Draw()
+    public void Draw(bool patches = false)
     {
         _gl.BindVertexArray(_vao);
+        if (patches)
+        {
+            _gl.PatchParameter(PatchParameterName.Vertices, 3);
+        }
+
         unsafe
         {
-            _gl.DrawElements(PrimitiveType.Triangles, (uint)_indexCount, _indexElementType, (void*)0);
+            _gl.DrawElements(patches ? PrimitiveType.Patches : PrimitiveType.Triangles, (uint)_indexCount, _indexElementType, (void*)0);
         }
 
         _gl.BindVertexArray(0);
     }
 
     /// <summary>Draw a subrange of the index buffer (indices are measured in elements, not bytes).</summary>
-    public void DrawRange(int firstIndex, int indexCount)
+    public void DrawRange(int firstIndex, int indexCount, bool patches = false)
     {
         if (indexCount <= 0)
         {
@@ -97,12 +102,17 @@ internal sealed class GlMeshBuffer : IDisposable
         }
 
         _gl.BindVertexArray(_vao);
+        if (patches)
+        {
+            _gl.PatchParameter(PatchParameterName.Vertices, 3);
+        }
+
         unsafe
         {
             var byteOffset = _indexElementType == DrawElementsType.UnsignedShort
                 ? (void*)(firstIndex * sizeof(ushort))
                 : (void*)(firstIndex * sizeof(uint));
-            _gl.DrawElements(PrimitiveType.Triangles, (uint)indexCount, _indexElementType, byteOffset);
+            _gl.DrawElements(patches ? PrimitiveType.Patches : PrimitiveType.Triangles, (uint)indexCount, _indexElementType, byteOffset);
         }
 
         _gl.BindVertexArray(0);

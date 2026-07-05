@@ -134,6 +134,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             LayerOrdinal = reflected.LayerOrdinal,
             CastsShadow = reflected.CastsShadow,
             ShellInflateTexels = reflected.ShellInflateTexels,
+            EnableParallax = reflected.EnableParallax,
             MirrorCuboidUv = reflected.MirrorCuboidUv,
         };
     }
@@ -326,6 +327,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
                 LayerOrdinal = element.LayerOrdinal,
                 CastsShadow = element.CastsShadow,
                 ShellInflateTexels = element.ShellInflateTexels,
+                EnableParallax = element.EnableParallax,
                 MirrorCuboidUv = element.MirrorCuboidUv,
             });
         }
@@ -390,6 +392,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
             LayerOrdinal = element.LayerOrdinal,
             CastsShadow = element.CastsShadow,
             ShellInflateTexels = element.ShellInflateTexels,
+            EnableParallax = element.EnableParallax,
             MirrorCuboidUv = element.MirrorCuboidUv,
         };
     }

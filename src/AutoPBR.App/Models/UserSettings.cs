@@ -241,6 +241,15 @@ public sealed class UserSettings
     /// <summary>Genesis POM: maximum UV travel allowed for one trace (0.05..0.75).</summary>
     public double Preview3DParallaxMaxUvShift { get; set; } = 0.45;
 
+    /// <summary>Genesis high-end preview: tessellate triangles and displace height-map protrusions outward.</summary>
+    public bool Preview3DEnableTessellationDisplacement { get; set; } = true;
+
+    /// <summary>Genesis tessellation: fixed triangle tessellation level (1..16).</summary>
+    public double Preview3DTessellationLevel { get; set; } = 8;
+
+    /// <summary>Genesis tessellation: maximum outward protrusion in preview world units (0..0.20).</summary>
+    public double Preview3DTessellationDisplacementStrength { get; set; } = 0.06;
+
     /// <summary>Genesis: enable cheap subsurface scattering approximation (LabPBR _s.b >= 65).</summary>
     public bool Preview3DEnableSss { get; set; } = true;
 

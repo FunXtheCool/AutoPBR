@@ -1,0 +1,72 @@
+#version 400 core
+// Genesis high-end preview tessellation evaluation stage.
+// Outward protrusion is geometry; inward/cavity detail remains POM in genesis.frag.
+
+layout(triangles, equal_spacing, ccw) in;
+
+in vec3 tcWorldPos[];
+in vec3 tcWorldNormal[];
+in vec2 tcUv[];
+in vec4 tcWorldTangent[];
+in vec4 tcLightClip[];
+in vec4 tcCurrClip[];
+in vec4 tcPrevClip[];
+
+out vec3 vWorldPos;
+out vec3 vWorldNormal;
+out vec2 vUv;
+out vec4 vWorldTangent;
+out vec4 vLightClip;
+out vec4 vCurrClip;
+out vec4 vPrevClip;
+
+uniform mat4 uView;
+uniform mat4 uProj;
+uniform mat4 uLightViewProj;
+uniform sampler2D uHeight;
+uniform int   uEnableTessellationDisplacement;
+uniform int   uHasHeight;
+uniform float uHeightStrength;
+uniform float uTessellationDisplacementStrength;
+
+vec3 bary3(vec3 a, vec3 b, vec3 c)
+{
+    return (a * gl_TessCoord.x) + (b * gl_TessCoord.y) + (c * gl_TessCoord.z);
+}
+
+vec2 bary2(vec2 a, vec2 b, vec2 c)
+{
+    return (a * gl_TessCoord.x) + (b * gl_TessCoord.y) + (c * gl_TessCoord.z);
+}
+
+vec4 bary4(vec4 a, vec4 b, vec4 c)
+{
+    return (a * gl_TessCoord.x) + (b * gl_TessCoord.y) + (c * gl_TessCoord.z);
+}
+
+void main()
+{
+    vec3 worldPos = bary3(tcWorldPos[0], tcWorldPos[1], tcWorldPos[2]);
+    vec3 worldNormal = normalize(bary3(tcWorldNormal[0], tcWorldNormal[1], tcWorldNormal[2]));
+    vec2 uv = bary2(tcUv[0], tcUv[1], tcUv[2]);
+    vec4 tangent = bary4(tcWorldTangent[0], tcWorldTangent[1], tcWorldTangent[2]);
+    tangent.xyz = normalize(tangent.xyz - worldNormal * dot(worldNormal, tangent.xyz));
+    tangent.w = tangent.w < 0.0 ? -1.0 : 1.0;
+
+    if (uEnableTessellationDisplacement > 0 && uHasHeight > 0)
+    {
+        float rawHeight = textureLod(uHeight, uv, 0.0).r;
+        float protrusion = max(rawHeight - 0.5, 0.0) * 2.0;
+        float scale = clamp(uHeightStrength, 0.0, 1.0) * clamp(uTessellationDisplacementStrength, 0.0, 0.20);
+        worldPos += worldNormal * protrusion * scale;
+    }
+
+    vWorldPos = worldPos;
+    vWorldNormal = worldNormal;
+    vUv = uv;
+    vWorldTangent = tangent;
+    vLightClip = uLightViewProj * vec4(worldPos, 1.0);
+    vCurrClip = uProj * uView * vec4(worldPos, 1.0);
+    vPrevClip = bary4(tcPrevClip[0], tcPrevClip[1], tcPrevClip[2]);
+    gl_Position = vCurrClip;
+}

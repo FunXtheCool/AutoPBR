@@ -189,6 +189,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
                     LayerOrdinal = e.LayerOrdinal,
                     CastsShadow = e.CastsShadow,
                     ShellInflateTexels = e.ShellInflateTexels,
+                    EnableParallax = e.EnableParallax,
                     MirrorCuboidUv = e.MirrorCuboidUv,
                 };
             }

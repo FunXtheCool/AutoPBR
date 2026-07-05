@@ -89,6 +89,14 @@ public sealed partial class OpenGlPreviewBackend
             aspect,
             nearPlane,
             farPlane);
+        SyncPreviewTaaToggleState(frame.Settings);
+        if (IsPreviewTaaActive(frame.Settings))
+        {
+            frame.Proj = PreviewGlMatrices.ApplyProjectionJitter(
+                frame.Proj,
+                CurrentPreviewTaaJitter(frame.Vw, frame.Vh));
+        }
+
         frame.View = PreviewGlMatrices.CreateLookAtRhOpenGlRowStorage(frame.Eye, frame.LookTarget, Vector3.UnitY);
         frame.NearPlane = nearPlane;
         frame.FarPlane = farPlane;
@@ -138,6 +146,8 @@ public sealed partial class OpenGlPreviewBackend
             ShouldCullSolidBackFaces(frame.Scene.SceneKind, frame.BlockModel));
 
         _program.Use();
+        var currentViewProj = frame.Proj * frame.View;
+        SetMatrix("uPrevViewProj", ResolvePreviewTaaPrevViewProj(currentViewProj));
         SetMatrix("uView", frame.View);
         SetMatrix("uProj", frame.Proj);
         SetMatrix("uLightViewProj", frame.ShadowVp);
@@ -160,6 +170,11 @@ public sealed partial class OpenGlPreviewBackend
         SetInt("uParallaxShadowSamples", Math.Clamp(frame.Settings.ParallaxShadowSamples, 4, 64));
         SetFloat("uParallaxShadowSoftness", Math.Clamp(frame.Settings.ParallaxShadowSoftness, 0f, 4f));
         SetFloat("uParallaxMaxUvShift", Math.Clamp(frame.Settings.ParallaxMaxUvShift, 0.05f, 0.75f));
+        SetFloat("uParallaxUvScale", 1f);
+        SetInt("uEnableTessellationDisplacement",
+            _mainProgramUsesTessellation && frame.Settings.EnableTessellationDisplacement ? 1 : 0);
+        SetFloat("uTessellationLevel", Math.Clamp(frame.Settings.TessellationLevel, 1f, 16f));
+        SetFloat("uTessellationDisplacementStrength", Math.Clamp(frame.Settings.TessellationDisplacementStrength, 0f, 0.20f));
         SetInt("uEnableParallax", frame.EnableParallaxEff ? 1 : 0);
         SetInt("uEnableParallaxAo", frame.EnableParallaxAoEff ? 1 : 0);
         SetInt("uEnableNormalMap", frame.EnableNormalMapEff ? 1 : 0);
@@ -209,10 +224,14 @@ public sealed partial class OpenGlPreviewBackend
             var restoreCull = frame.Gl.IsEnabled(EnableCap.CullFace);
             frame.Gl.Disable(EnableCap.CullFace);
             SetMatrix("uModel", Matrix4x4.Identity);
-            var groundParallax = frame.EnableParallaxEff && _grassGroundHasHeight;
-            var groundNormal = frame.EnableNormalMapEff && _grassGroundHasNormal;
-            var groundSpec = frame.EnableSpecularMapEff && _grassGroundHasSpecular;
+            SetMatrix("uPrevModel", Matrix4x4.Identity);
+            var groundParallax = frame.Settings.EnableParallax && _grassGroundHasHeight;
+            var groundNormal = frame.Settings.EnableNormalMap && _grassGroundHasNormal;
+            var groundSpec = frame.Settings.EnableSpecularMap && _grassGroundHasSpecular;
             SetInt("uEnableParallax", groundParallax ? 1 : 0);
+            SetFloat("uParallaxUvScale", 1f);
+            SetInt("uEnableParallaxAo", groundParallax && frame.Settings.EnableParallaxAo ? 1 : 0);
+            SetInt("uEnableParallaxShadow", groundParallax && frame.Settings.EnableParallaxShadow ? 1 : 0);
             SetInt("uEnableNormalMap", groundNormal ? 1 : 0);
             SetInt("uEnableSpecularMap", groundSpec ? 1 : 0);
             SetInt("uSceneKind", 0);
@@ -230,7 +249,7 @@ public sealed partial class OpenGlPreviewBackend
             SetInt("uNormal", 1);
             SetInt("uSpecular", 2);
             SetInt("uHeight", 3);
-            _groundMesh.Draw();
+            _groundMesh.Draw(_mainProgramUsesTessellation);
             SetInt("uIsGroundPass", 0);
             if (restoreCull)
             {
@@ -247,7 +266,11 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         SetMatrix("uModel", frame.ModelMatrix);
+        SetMatrix("uPrevModel", ResolvePreviewTaaPrevSubjectModel(frame.ModelMatrix));
+        SetFloat("uParallaxUvScale", 1f);
         SetInt("uEnableParallax", frame.EnableParallaxEff ? 1 : 0);
+        SetInt("uEnableParallaxAo", frame.EnableParallaxAoEff ? 1 : 0);
+        SetInt("uEnableParallaxShadow", frame.EnableParallaxShadowEff ? 1 : 0);
         SetInt("uEnableNormalMap", frame.EnableNormalMapEff ? 1 : 0);
         SetInt("uEnableSpecularMap", frame.EnableSpecularMapEff ? 1 : 0);
         SetInt("uSceneKind", frame.Scene.SceneKind == PreviewSceneKind.ItemPlane ? 1 : 0);
@@ -314,6 +337,21 @@ public sealed partial class OpenGlPreviewBackend
                 var bHasN = slot.NormalRgba is { Length: > 0 };
                 var bHasS = slot.SpecularRgba is { Length: > 0 };
                 var bHasH = slot.HeightRgba is { Length: > 0 };
+                var batchAllowsParallax = !frame.EntityEmulatedPreview || batch.EnableParallax;
+                var batchParallax = frame.EnableParallaxEff && batchAllowsParallax && bHasH;
+                SetInt("uEnableParallax", batchParallax ? 1 : 0);
+                SetInt("uEnableParallaxAo", batchParallax && frame.EnableParallaxAoEff ? 1 : 0);
+                SetInt("uEnableParallaxShadow", batchParallax && frame.EnableParallaxShadowEff ? 1 : 0);
+                SetFloat("uParallaxUvScale", frame.EntityEmulatedPreview
+                    ? EntityParallaxUvScale(slot)
+                    : 1f);
+                SetInt("uEnableTessellationDisplacement",
+                    _mainProgramUsesTessellation &&
+                    frame.Settings.EnableTessellationDisplacement &&
+                    batchAllowsParallax &&
+                    bHasH
+                        ? 1
+                        : 0);
                 SetInt("uHasNormal", bHasN ? 1 : 0);
                 SetInt("uHasSpecular", bHasS ? 1 : 0);
                 SetInt("uHasHeight", bHasH ? 1 : 0);
@@ -344,7 +382,7 @@ public sealed partial class OpenGlPreviewBackend
                             PreviewDrawLayerPolicy.GetDebugTint(batch.LayerPolicy.Kind));
                     }
 
-                    _mesh.DrawRange(batch.FirstIndex, batch.IndexCount);
+                    _mesh.DrawRange(batch.FirstIndex, batch.IndexCount, _mainProgramUsesTessellation);
                 }
             }
 
@@ -364,6 +402,9 @@ public sealed partial class OpenGlPreviewBackend
             var hasN = frame.Material?.NormalRgba is { Length: > 0 };
             var hasS = frame.Material?.SpecularRgba is { Length: > 0 };
             var hasH = frame.Material?.HeightRgba is { Length: > 0 };
+            SetFloat("uParallaxUvScale", 1f);
+            SetInt("uEnableTessellationDisplacement",
+                _mainProgramUsesTessellation && frame.Settings.EnableTessellationDisplacement && hasH ? 1 : 0);
             SetInt("uHasNormal", hasN ? 1 : 0);
             SetInt("uHasSpecular", hasS ? 1 : 0);
             SetInt("uHasHeight", hasH ? 1 : 0);
@@ -383,9 +424,20 @@ public sealed partial class OpenGlPreviewBackend
             }
 
             ApplyEntitySkinningUniforms(_program, 0, 0, 0f);
-            _mesh.Draw();
+            _mesh.Draw(_mainProgramUsesTessellation);
         }
 
         FinishGodRaySceneRender(ref frame);
+    }
+
+    private static float EntityParallaxUvScale(PreviewMaterial slot)
+    {
+        var atlasMax = Math.Max(slot.Width, slot.Height);
+        if (atlasMax <= 16)
+        {
+            return 1f;
+        }
+
+        return Math.Clamp(16f / atlasMax, 0.02f, 1f);
     }
 }

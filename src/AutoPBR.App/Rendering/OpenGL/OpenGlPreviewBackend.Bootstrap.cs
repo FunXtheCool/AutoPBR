@@ -96,6 +96,7 @@ public sealed partial class OpenGlPreviewBackend
         _height = null;
         _program?.Dispose();
         _program = null;
+        _mainProgramUsesTessellation = false;
         _shadowProgram?.Dispose();
         _shadowProgram = null;
         _shadowTarget?.Dispose();
@@ -129,7 +130,31 @@ public sealed partial class OpenGlPreviewBackend
                 EmitDiagnostic(_useOpenGlEs
                     ? $"[3D preview] Context: {_glVersionString} (Genesis shader path, GLSL ES 3.0)."
                     : $"[3D preview] Context: {_glVersionString} (Genesis shader path, GLSL 330 core).");
-                _program = CreatePreviewProgram("genesis.vert", "genesis.frag", out var err);
+                _mainProgramUsesTessellation = false;
+                string? err = null;
+                if (!_useOpenGlEs)
+                {
+                    _program = CreatePreviewProgram(
+                        "genesis.vert",
+                        "genesis.tcs",
+                        "genesis.tes",
+                        "genesis.frag",
+                        out err,
+                        "genesis+tessellation");
+                    if (_program.IsValid)
+                    {
+                        _mainProgramUsesTessellation = true;
+                        EmitDiagnostic("[3D preview] Genesis tessellation program ready (triangle patches).");
+                    }
+                    else
+                    {
+                        EmitDiagnostic("[3D preview] Genesis tessellation unavailable; falling back. " + (err ?? "link failed"));
+                        _program.Dispose();
+                        _program = null;
+                    }
+                }
+
+                _program ??= CreatePreviewProgram("genesis.vert", "genesis.frag", out err);
                 if (!_program.IsValid)
                 {
                     _lastError = err ?? "Shader link failed.";

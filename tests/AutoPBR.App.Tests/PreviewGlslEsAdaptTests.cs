@@ -126,6 +126,11 @@ public class PreviewGlslEsAdaptTests
         Assert.Contains("uParallaxRefineSteps", adapted, StringComparison.Ordinal);
         Assert.Contains("uParallaxShadowSamples", adapted, StringComparison.Ordinal);
         Assert.Contains("uParallaxShadowSoftness", adapted, StringComparison.Ordinal);
+        Assert.Contains("uParallaxUvScale", adapted, StringComparison.Ordinal);
+        Assert.Contains(
+            "pomUvDisplacementScale(strength) * clamp(uParallaxUvScale, 0.02, 1.0)",
+            adapted,
+            StringComparison.Ordinal);
         Assert.Contains("textureSize(heightTex, 0)", adapted, StringComparison.Ordinal);
         Assert.Contains("if (Vtan.z <= 0.0)", adapted, StringComparison.Ordinal);
         Assert.Contains("Vtan.xy / max(Vtan.z, GEN_POM_MIN_VIEW_Z)", adapted, StringComparison.Ordinal);
@@ -137,6 +142,84 @@ public class PreviewGlslEsAdaptTests
         Assert.DoesNotContain("clamp(localUv", adapted, StringComparison.Ordinal);
         Assert.DoesNotContain("cavityAmt", adapted, StringComparison.Ordinal);
         Assert.DoesNotContain("sampleHeight01(sampler2D heightTex, vec2 uv)", adapted, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GenesisTessellation_UsesTrianglePatchDisplacementContract()
+    {
+        var control = GlslIncludeResolver.Resolve("genesis.tcs", LoadShader);
+        var evaluation = GlslIncludeResolver.Resolve("genesis.tes", LoadShader);
+
+        Assert.Contains("#version 400 core", control, StringComparison.Ordinal);
+        Assert.Contains("layout(vertices = 3) out;", control, StringComparison.Ordinal);
+        Assert.Contains("gl_TessLevelOuter", control, StringComparison.Ordinal);
+        Assert.Contains("uEnableTessellationDisplacement > 0 && uHasHeight > 0", control, StringComparison.Ordinal);
+        Assert.Contains("clamp(uTessellationLevel, 1.0, 16.0)", control, StringComparison.Ordinal);
+
+        Assert.Contains("#version 400 core", evaluation, StringComparison.Ordinal);
+        Assert.Contains("layout(triangles, equal_spacing, ccw) in;", evaluation, StringComparison.Ordinal);
+        Assert.Contains("textureLod(uHeight, uv, 0.0).r", evaluation, StringComparison.Ordinal);
+        Assert.Contains("max(rawHeight - 0.5, 0.0) * 2.0", evaluation, StringComparison.Ordinal);
+        Assert.Contains("uTessellationDisplacementStrength", evaluation, StringComparison.Ordinal);
+        Assert.Contains("uLightViewProj * vec4(worldPos, 1.0)", evaluation, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GenesisTaaResolve_UsesReactiveYcocgHistoryClip()
+    {
+        var src = GlslIncludeResolver.Resolve("genesis_taa_resolve.frag", LoadShader);
+        var adapted = GlslSourceAdapter.Adapt(src, ShaderType.FragmentShader, useOpenGlEs: true);
+
+        Assert.Contains("uTaaSignal", adapted, StringComparison.Ordinal);
+        Assert.Contains("uHasTaaSignal", adapted, StringComparison.Ordinal);
+        Assert.Contains("objectMotion", adapted, StringComparison.Ordinal);
+        Assert.Contains("smoothstep(0.08, 0.75, objectMotion)", adapted, StringComparison.Ordinal);
+        Assert.Contains("smoothstep(0.18, 0.90, reactivity)", adapted, StringComparison.Ordinal);
+        Assert.Contains("trNeighborhoodMinMax3YCoCg", adapted, StringComparison.Ordinal);
+        Assert.Contains("trClipHistoryToNeighborhoodYCoCg", adapted, StringComparison.Ordinal);
+        Assert.Contains("trLuminanceReactiveWeight", adapted, StringComparison.Ordinal);
+        Assert.Contains("trDepthEdgeWeight", adapted, StringComparison.Ordinal);
+        Assert.Contains("0.08 * stableW", adapted, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TemporalReproject_ProvidesYcocgAndReactiveHelpers()
+    {
+        var src = GlslIncludeResolver.Resolve("common/temporal_reproject.glsl", LoadShader);
+
+        Assert.Contains("vec3 trRgbToYCoCg", src, StringComparison.Ordinal);
+        Assert.Contains("vec3 trYCoCgToRgb", src, StringComparison.Ordinal);
+        Assert.Contains("float trLuminanceReactiveWeight", src, StringComparison.Ordinal);
+        Assert.Contains("float trDepthEdgeWeight", src, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GenesisFragment_WritesTaaSignalForGeometryReactivity()
+    {
+        var src = GlslIncludeResolver.Resolve("genesis.frag", LoadShader);
+        var adapted = GlslSourceAdapter.Adapt(src, ShaderType.FragmentShader, useOpenGlEs: true);
+
+        Assert.Contains("layout(location = 1) out vec4 TaaSignal", adapted, StringComparison.Ordinal);
+        Assert.Contains("alphaEdge", adapted, StringComparison.Ordinal);
+        Assert.Contains("vPrevClip", adapted, StringComparison.Ordinal);
+        Assert.Contains("motion = clamp", adapted, StringComparison.Ordinal);
+        Assert.Contains("uEntityAlphaMode == 1", adapted, StringComparison.Ordinal);
+        Assert.Contains("uEntityAlphaMode == 2", adapted, StringComparison.Ordinal);
+        Assert.Contains("TaaSignal = vec4", adapted, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GenesisVertex_EmitsPreviousClipForTaaMotionSignal()
+    {
+        var src = GlslIncludeResolver.Resolve("genesis.vert", LoadShader);
+
+        Assert.Contains("uniform mat4 uPrevModel", src, StringComparison.Ordinal);
+        Assert.Contains("uniform mat4 uPrevViewProj", src, StringComparison.Ordinal);
+        Assert.Contains("EntityPrevSkinningBones", src, StringComparison.Ordinal);
+        Assert.Contains("uEntityPrevBonePaletteValid", src, StringComparison.Ordinal);
+        Assert.Contains("prevEntityPos = prevBone * vec4(aPos, 1.0)", src, StringComparison.Ordinal);
+        Assert.Contains("out vec4 vPrevClip", src, StringComparison.Ordinal);
+        Assert.Contains("vPrevClip = uPrevViewProj * uPrevModel * prevEntityPos", src, StringComparison.Ordinal);
     }
 
     [Fact]

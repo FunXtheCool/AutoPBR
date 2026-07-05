@@ -16,6 +16,10 @@ public sealed partial class OpenGlPreviewBackend
     private int _taaHistoryW;
     private int _taaHistoryH;
     private bool _prevEnablePreviewTaa = true;
+    private bool _prevPreviewTaaActive;
+    private int _taaFrameIndex;
+    private Matrix4x4 _taaPrevSubjectModel = Matrix4x4.Identity;
+    private bool _taaPrevSubjectModelValid;
 
     private void TryInitPreviewTaa(GL gl, bool useOpenGlEs)
     {
@@ -32,6 +36,10 @@ public sealed partial class OpenGlPreviewBackend
 
         _taaScratchTarget = new GlColorRenderTarget(gl, useOpenGlEs);
         _taaHistoryTarget = new GlColorRenderTarget(gl, useOpenGlEs);
+        if (!TryInitSceneCaptureCore(gl, useOpenGlEs, out var sceneErr))
+        {
+            EmitDiagnostic("[3D preview] Preview TAA scene capture: " + TrimShaderDiagnostic(sceneErr));
+        }
     }
 
     private void DestroyPreviewTaaResources()
@@ -47,16 +55,20 @@ public sealed partial class OpenGlPreviewBackend
 
     private void SyncPreviewTaaToggleState(in PreviewRenderSettings settings)
     {
-        if (_prevEnablePreviewTaa == settings.EnablePreviewTaa)
+        var active = IsPreviewTaaActive(settings);
+        if (_prevEnablePreviewTaa == settings.EnablePreviewTaa &&
+            _prevPreviewTaaActive == active)
         {
             return;
         }
 
         _prevEnablePreviewTaa = settings.EnablePreviewTaa;
-        _taaHistoryValid = false;
+        _prevPreviewTaaActive = active;
+        InvalidatePreviewTaaHistory();
+        _taaFrameIndex = 0;
     }
 
-    private bool CanUsePreviewTaa(in PreviewRenderSettings settings)
+    private bool IsPreviewTaaActive(in PreviewRenderSettings settings)
     {
         if (!settings.EnablePreviewTaa || _taaResolveProgram is not { IsValid: true } ||
             _taaScratchTarget is null || _taaHistoryTarget is null || _godRayQuadVao == 0)
@@ -68,10 +80,47 @@ public sealed partial class OpenGlPreviewBackend
         return weight > 0f;
     }
 
+    private Vector2 CurrentPreviewTaaJitter(int width, int height)
+    {
+        var sample = (_taaFrameIndex & 7) + 1;
+        var pixelJitter = new Vector2(Halton(sample, 2) - 0.5f, Halton(sample, 3) - 0.5f);
+        return new Vector2(
+            2f * pixelJitter.X / Math.Max(1, width),
+            2f * pixelJitter.Y / Math.Max(1, height));
+    }
+
+    private static float Halton(int index, int radix)
+    {
+        var result = 0f;
+        var fraction = 1f / radix;
+        while (index > 0)
+        {
+            result += fraction * (index % radix);
+            index /= radix;
+            fraction /= radix;
+        }
+
+        return result;
+    }
+
+    private Matrix4x4 ResolvePreviewTaaPrevViewProj(Matrix4x4 currentViewProj) =>
+        _taaHistoryValid ? _taaPrevViewProj : currentViewProj;
+
+    private Matrix4x4 ResolvePreviewTaaPrevSubjectModel(Matrix4x4 currentModel) =>
+        _taaHistoryValid && _taaPrevSubjectModelValid ? _taaPrevSubjectModel : currentModel;
+
+    private void InvalidatePreviewTaaHistory()
+    {
+        _taaHistoryValid = false;
+        _taaPrevSubjectModel = Matrix4x4.Identity;
+        _taaPrevSubjectModelValid = false;
+        InvalidatePreviousEntitySkinningBones();
+    }
+
     private void DrawPreviewTaa(ref GlRenderFrame frame)
     {
         SyncPreviewTaaToggleState(frame.Settings);
-        if (!CanUsePreviewTaa(frame.Settings))
+        if (!IsPreviewTaaActive(frame.Settings))
         {
             return;
         }
@@ -82,6 +131,7 @@ public sealed partial class OpenGlPreviewBackend
         if (_taaHistoryW != w || _taaHistoryH != h)
         {
             _taaHistoryValid = false;
+            _taaPrevSubjectModelValid = false;
             _taaHistoryW = w;
             _taaHistoryH = h;
         }
@@ -106,6 +156,7 @@ public sealed partial class OpenGlPreviewBackend
 
         var quality = PreviewVolumetricQuality.Resolve(frame.Settings.VolumetricQuality);
         var hasSceneDepth = frame.GodRayCaptureActive && _sceneCapture is { IsValid: true };
+        var hasTaaSignal = hasSceneDepth && _sceneCapture!.TaaSignalTextureHandle != 0;
 
         BindDefaultFramebuffer(ref frame);
         var priorDepthTest = gl.IsEnabled(EnableCap.DepthTest);
@@ -127,7 +178,15 @@ public sealed partial class OpenGlPreviewBackend
             SetIntOnProgram(_taaResolveProgram, "uSceneDepth", 2);
         }
 
+        if (hasTaaSignal)
+        {
+            gl.ActiveTexture(TextureUnit.Texture3);
+            gl.BindTexture(TextureTarget.Texture2D, _sceneCapture!.TaaSignalTextureHandle);
+            SetIntOnProgram(_taaResolveProgram, "uTaaSignal", 3);
+        }
+
         SetIntOnProgram(_taaResolveProgram, "uHasSceneDepth", hasSceneDepth ? 1 : 0);
+        SetIntOnProgram(_taaResolveProgram, "uHasTaaSignal", hasTaaSignal ? 1 : 0);
         SetIntOnProgram(_taaResolveProgram, "uHasHistory", _taaHistoryValid ? 1 : 0);
         SetMatrixOnProgram(_taaResolveProgram, "uInvViewProj", invViewProj);
         SetMatrixOnProgram(_taaResolveProgram, "uPrevViewProj", _taaPrevViewProj);
@@ -148,6 +207,10 @@ public sealed partial class OpenGlPreviewBackend
 
         _taaHistoryTarget.CopyColorFromFramebuffer(readFbo, w, h);
         _taaPrevViewProj = viewProj;
+        _taaPrevSubjectModel = frame.ModelMatrix;
+        _taaPrevSubjectModelValid = true;
+        CapturePreviousEntitySkinningBones();
         _taaHistoryValid = true;
+        _taaFrameIndex++;
     }
 }

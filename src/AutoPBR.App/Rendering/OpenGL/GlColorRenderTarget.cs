@@ -100,7 +100,7 @@ internal sealed class GlColorRenderTarget(GL gl, bool useOpenGlEs) : IDisposable
         var priorRead = gl.GetInteger(GetPName.ReadFramebufferBinding);
         var priorDraw = gl.GetInteger(GetPName.DrawFramebufferBinding);
         gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, readFramebuffer);
-        gl.ReadBuffer(ReadBufferMode.ColorAttachment0);
+        gl.ReadBuffer(readFramebuffer == 0 ? ReadBufferMode.Back : ReadBufferMode.ColorAttachment0);
         gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, _fbo);
         gl.BlitFramebuffer(0, 0, width, height, 0, 0, width, height,
             ClearBufferMask.ColorBufferBit, GLEnum.Nearest);

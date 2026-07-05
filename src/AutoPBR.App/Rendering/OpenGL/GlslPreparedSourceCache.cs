@@ -16,6 +16,8 @@ internal static class GlslPreparedSourceCache
     private static readonly (string File, ShaderType Type)[] PreviewShaderEntries =
     [
         ("genesis.vert", ShaderType.VertexShader),
+        ("genesis.tcs", ShaderType.TessControlShader),
+        ("genesis.tes", ShaderType.TessEvaluationShader),
         ("genesis.frag", ShaderType.FragmentShader),
         ("genesis_shadow.vert", ShaderType.VertexShader),
         ("genesis_shadow.frag", ShaderType.FragmentShader),
@@ -70,11 +72,26 @@ internal static class GlslPreparedSourceCache
 
     public static string ComputeProgramKey(string vertexFile, string fragmentFile, bool useOpenGlEs, string cacheIdentity)
     {
+        return ComputeProgramKey(
+            useOpenGlEs,
+            cacheIdentity,
+            [(vertexFile, ShaderType.VertexShader), (fragmentFile, ShaderType.FragmentShader)]);
+    }
+
+    public static string ComputeProgramKey(
+        bool useOpenGlEs,
+        string cacheIdentity,
+        IReadOnlyList<(string File, ShaderType Type)> stages)
+    {
         // Hash adapted sources so include edits (e.g. common/sky_dome.glsl) invalidate disk program binaries.
-        var vSrc = GetOrPrepare(vertexFile, ShaderType.VertexShader, useOpenGlEs);
-        var fSrc = GetOrPrepare(fragmentFile, ShaderType.FragmentShader, useOpenGlEs);
-        var payload = $"{vSrc}\0{fSrc}\0{cacheIdentity}";
-        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(payload)));
+        var payload = new StringBuilder(cacheIdentity);
+        foreach (var (file, type) in stages)
+        {
+            payload.Append('\0').Append(type).Append(':').Append(file).Append('\0');
+            payload.Append(GetOrPrepare(file, type, useOpenGlEs));
+        }
+
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(payload.ToString())));
     }
 
     private static string LoadShaderSource(string fileName)

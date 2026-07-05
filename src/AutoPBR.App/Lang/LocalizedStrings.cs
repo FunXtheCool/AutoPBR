@@ -447,6 +447,12 @@ public sealed class LocalizedStrings
     public static string Preview3DParallaxRefineStepsTooltip => Resources.Preview3DParallaxRefineStepsTooltip;
     public static string Preview3DParallaxMaxUvShift => Resources.Preview3DParallaxMaxUvShift;
     public static string Preview3DParallaxMaxUvShiftTooltip => Resources.Preview3DParallaxMaxUvShiftTooltip;
+    public static string Preview3DEnableTessellationDisplacement => Resources.Preview3DEnableTessellationDisplacement;
+    public static string Preview3DEnableTessellationDisplacementTooltip => Resources.Preview3DEnableTessellationDisplacementTooltip;
+    public static string Preview3DTessellationLevel => Resources.Preview3DTessellationLevel;
+    public static string Preview3DTessellationLevelTooltip => Resources.Preview3DTessellationLevelTooltip;
+    public static string Preview3DTessellationDisplacementStrength => Resources.Preview3DTessellationDisplacementStrength;
+    public static string Preview3DTessellationDisplacementStrengthTooltip => Resources.Preview3DTessellationDisplacementStrengthTooltip;
     public static string Preview3DParallaxShadowSamples => Resources.Preview3DParallaxShadowSamples;
     public static string Preview3DParallaxShadowSamplesTooltip => Resources.Preview3DParallaxShadowSamplesTooltip;
     public static string Preview3DParallaxShadowSoftness => Resources.Preview3DParallaxShadowSoftness;

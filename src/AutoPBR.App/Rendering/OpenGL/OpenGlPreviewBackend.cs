@@ -18,6 +18,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private GL? _gl;
     private bool _useOpenGlEs;
     private GlShaderProgram? _program;
+    private bool _mainProgramUsesTessellation;
     private GlShaderProgram? _shadowProgram;
     private GlShadowMapTarget? _shadowTarget;
     private GlShadowMapTarget? _shadowTargetCascadeNear;
@@ -91,22 +92,29 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private ulong _lastParityCatalogIncomingPackFingerprint;
 
     private readonly Matrix4x4[] _entityBoneScratch = new Matrix4x4[EntityGpuSkinningLimits.MaxBones];
+    private readonly Matrix4x4[] _entityPrevBoneScratch = new Matrix4x4[EntityGpuSkinningLimits.MaxBones];
     /// <summary>std140: 64 mat4 (row-major source floats interpreted as column-major in GLSL) + 16 B tail scalars.</summary>
     private const int EntitySkinningUboMatrixBytes = EntityGpuSkinningLimits.MaxBones * 64;
 
     private const int EntitySkinningUboTotalBytes = EntitySkinningUboMatrixBytes;
 
     private readonly byte[] _entitySkinningUboScratch = new byte[EntitySkinningUboTotalBytes];
+    private readonly byte[] _entityPrevSkinningUboScratch = new byte[EntitySkinningUboTotalBytes];
     private uint _entityBoneUbo;
+    private uint _entityPrevBoneUbo;
+    private int _entityPrevBoneSnapshotCount;
+    private bool _entityPrevBoneSnapshotValid;
 
     private const uint EntitySkinningUboBindingPoint = 2;
+    private const uint EntityPrevSkinningUboBindingPoint = 3;
 
     private readonly record struct EntitySkinningUniformLocs(
         int PreviewSpaceVerts,
         int BindMesh,
         int GpuSkinning,
         int BoneCount,
-        int MeshLiftY)
+        int MeshLiftY,
+        int PrevBonePaletteValid)
     {
         public bool IsComplete =>
             PreviewSpaceVerts >= 0 && BindMesh >= 0 && GpuSkinning >= 0 && BoneCount >= 0 && MeshLiftY >= 0;
@@ -265,6 +273,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
 
             _scene = scene;
             _meshDirty = true;
+            InvalidatePreviewTaaHistory();
         }
     }
 
@@ -289,6 +298,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         {
             _material = material;
             _materialDirty = true;
+            InvalidatePreviewTaaHistory();
         }
     }
 
@@ -298,6 +308,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         {
             _grassGroundMaterial = material;
             _grassGroundMaterialDirty = true;
+            InvalidatePreviewTaaHistory();
         }
     }
 
@@ -568,6 +579,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
             _blockModelSubject = subject;
             _blockModelSlots = slotMaterials;
             _prevPauseEntityIdleAnimation = false;
+            InvalidatePreviewTaaHistory();
             if (subject is not null && slotMaterials is { Length: > 0 })
             {
                 var pi = Math.Clamp(subject.PrimaryMaterialIndex, 0, slotMaterials.Length - 1);

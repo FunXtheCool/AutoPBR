@@ -48,6 +48,7 @@ public static class SlimeFamilyPreviewScale
                 LayerOrdinal = e.LayerOrdinal,
                 CastsShadow = e.CastsShadow,
                 ShellInflateTexels = e.ShellInflateTexels,
+                EnableParallax = e.EnableParallax,
                 MirrorCuboidUv = e.MirrorCuboidUv,
             });
         }

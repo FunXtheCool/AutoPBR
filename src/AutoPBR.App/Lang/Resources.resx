@@ -1540,6 +1540,24 @@
   <data name="Preview3DParallaxMaxUvShiftTooltip" xml:space="preserve">
     <value>Caps how far one parallax trace may travel in UV space. Raise for deeper relief; lower to reduce grazing-angle stretching.</value>
   </data>
+  <data name="Preview3DEnableTessellationDisplacement" xml:space="preserve">
+    <value>Tessellated protrusion</value>
+  </data>
+  <data name="Preview3DEnableTessellationDisplacementTooltip" xml:space="preserve">
+    <value>Use desktop OpenGL tessellation to add real outward geometry from high height-map regions. POM still handles recessed detail.</value>
+  </data>
+  <data name="Preview3DTessellationLevel" xml:space="preserve">
+    <value>Tessellation level</value>
+  </data>
+  <data name="Preview3DTessellationLevelTooltip" xml:space="preserve">
+    <value>Triangle subdivision level for high-end displacement preview. Higher values improve silhouettes and edge relief at higher GPU cost.</value>
+  </data>
+  <data name="Preview3DTessellationDisplacementStrength" xml:space="preserve">
+    <value>Protrusion strength</value>
+  </data>
+  <data name="Preview3DTessellationDisplacementStrengthTooltip" xml:space="preserve">
+    <value>Maximum world-space outward displacement from bright height-map values.</value>
+  </data>
   <data name="Preview3DParallaxShadowSamples" xml:space="preserve">
     <value>Self-shadow samples</value>
   </data>

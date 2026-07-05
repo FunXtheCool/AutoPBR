@@ -473,6 +473,12 @@ public static class Resources
     public static string Preview3DParallaxRefineStepsTooltip => GetString("Preview3DParallaxRefineStepsTooltip");
     public static string Preview3DParallaxMaxUvShift => GetString("Preview3DParallaxMaxUvShift");
     public static string Preview3DParallaxMaxUvShiftTooltip => GetString("Preview3DParallaxMaxUvShiftTooltip");
+    public static string Preview3DEnableTessellationDisplacement => GetString("Preview3DEnableTessellationDisplacement");
+    public static string Preview3DEnableTessellationDisplacementTooltip => GetString("Preview3DEnableTessellationDisplacementTooltip");
+    public static string Preview3DTessellationLevel => GetString("Preview3DTessellationLevel");
+    public static string Preview3DTessellationLevelTooltip => GetString("Preview3DTessellationLevelTooltip");
+    public static string Preview3DTessellationDisplacementStrength => GetString("Preview3DTessellationDisplacementStrength");
+    public static string Preview3DTessellationDisplacementStrengthTooltip => GetString("Preview3DTessellationDisplacementStrengthTooltip");
     public static string Preview3DParallaxShadowSamples => GetString("Preview3DParallaxShadowSamples");
     public static string Preview3DParallaxShadowSamplesTooltip => GetString("Preview3DParallaxShadowSamplesTooltip");
     public static string Preview3DParallaxShadowSoftness => GetString("Preview3DParallaxShadowSoftness");

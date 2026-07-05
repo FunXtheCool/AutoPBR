@@ -63,6 +63,9 @@ public partial class MainWindowViewModel
     [ObservableProperty] private double _preview3DParallaxShadowSamples = 24;
     [ObservableProperty] private double _preview3DParallaxShadowSoftness = 1.25;
     [ObservableProperty] private double _preview3DParallaxMaxUvShift = 0.45;
+    [ObservableProperty] private bool _preview3DEnableTessellationDisplacement = true;
+    [ObservableProperty] private double _preview3DTessellationLevel = 8.0;
+    [ObservableProperty] private double _preview3DTessellationDisplacementStrength = 0.06;
     [ObservableProperty] private bool _preview3DEnableSss = true;
     [ObservableProperty] private bool _preview3DEnableParallaxShadow = true;
     [ObservableProperty] private bool _preview3DEnableParallaxAo = true;
@@ -278,6 +281,9 @@ public partial class MainWindowViewModel
     partial void OnPreview3DParallaxShadowSamplesChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DParallaxShadowSoftnessChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DParallaxMaxUvShiftChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DEnableTessellationDisplacementChanged(bool value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DTessellationLevelChanged(double value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DTessellationDisplacementStrengthChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEnableSssChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEnableParallaxShadowChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEnableParallaxAoChanged(bool value) => OnPreview3DGpuSettingChanged(value);
@@ -510,6 +516,9 @@ public partial class MainWindowViewModel
             ParallaxShadowSamples = (int)Math.Round(Math.Clamp(Preview3DParallaxShadowSamples, 4.0, 64.0)),
             ParallaxShadowSoftness = (float)Math.Clamp(Preview3DParallaxShadowSoftness, 0.0, 4.0),
             ParallaxMaxUvShift = (float)Math.Clamp(Preview3DParallaxMaxUvShift, 0.05, 0.75),
+            EnableTessellationDisplacement = Preview3DEnableTessellationDisplacement,
+            TessellationLevel = (float)Math.Clamp(Preview3DTessellationLevel, 1.0, 16.0),
+            TessellationDisplacementStrength = (float)Math.Clamp(Preview3DTessellationDisplacementStrength, 0.0, 0.20),
             EnableParallaxAo = Preview3DEnableParallaxAo,
             ParallaxAoStrength = (float)Preview3DParallaxAoStrength,
             EnableIbl = Preview3DEnableIbl,

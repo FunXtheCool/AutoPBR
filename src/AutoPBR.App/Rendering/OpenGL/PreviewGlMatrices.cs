@@ -33,6 +33,13 @@ internal static class PreviewGlMatrices
             0, 0, -1, 0);
     }
 
+    public static Matrix4x4 ApplyProjectionJitter(Matrix4x4 projection, Vector2 ndcJitter)
+    {
+        projection.M13 += ndcJitter.X * projection.M43;
+        projection.M23 += ndcJitter.Y * projection.M43;
+        return projection;
+    }
+
     /// <summary>
     /// Right-handed world→view matrix (glm <c>lookAt</c> RH equivalent). Stored in row-major
     /// <see cref="Matrix4x4"/> layout matching <see cref="CreatePerspectiveFieldOfViewOpenGl"/>:

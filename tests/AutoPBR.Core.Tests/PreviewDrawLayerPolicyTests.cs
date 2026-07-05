@@ -15,6 +15,7 @@ public sealed class PreviewDrawLayerPolicyTests
         Assert.True(batch.LayerPolicy.DepthWrite);
         Assert.Equal(PreviewDrawLayerShadowMode.Draw, batch.LayerPolicy.ShadowMode);
         Assert.Equal(0, batch.LayerPolicy.DepthBiasStep);
+        Assert.True(batch.EnableParallax);
     }
 
     [Fact]
@@ -157,6 +158,47 @@ public sealed class MinecraftModelBakerLayerPolicyTests
         Assert.True(MinecraftModelBaker.TryBake(model, "minecraft", pathToIdx, texSizes, out _, out _, out var batches));
         Assert.Single(batches);
         Assert.Equal(PreviewDepthLayerKind.EmissiveOverlay, batches[0].LayerPolicy.Kind);
+    }
+
+    [Fact]
+    public void TryBake_splits_batches_when_parallax_eligibility_changes_with_same_material()
+    {
+        var tex = "entity/test/base";
+        var texZip = "assets/minecraft/textures/entity/test/base.png";
+        var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase) { [texZip] = 0 };
+        var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase) { [texZip] = (64, 64) };
+        var model = new MergedJavaBlockModel
+        {
+            Textures = new Dictionary<string, string> { ["#skin"] = tex },
+            Elements = [
+                new ModelElement
+                {
+                    From = [0, 0, 0],
+                    To = [16, 16, 16],
+                    Faces = new Dictionary<string, ModelFace>
+                    {
+                        ["north"] = new ModelFace { TextureKey = "#skin" },
+                    },
+                },
+                new ModelElement
+                {
+                    From = [0, 0, 0],
+                    To = [16, 16, 16],
+                    EnableParallax = false,
+                    Faces = new Dictionary<string, ModelFace>
+                    {
+                        ["north"] = new ModelFace { TextureKey = "#skin" },
+                    },
+                },
+            ],
+        };
+
+        Assert.True(MinecraftModelBaker.TryBake(model, "minecraft", pathToIdx, texSizes, out _, out _, out var batches));
+        Assert.Equal(2, batches.Count);
+        Assert.True(batches[0].EnableParallax);
+        Assert.False(batches[1].EnableParallax);
+        Assert.All(batches, b => Assert.Equal(0, b.MaterialIndex));
+        Assert.All(batches, b => Assert.Equal(PreviewDepthLayerKind.Base, b.LayerPolicy.Kind));
     }
 }
 

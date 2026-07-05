@@ -84,6 +84,15 @@ public sealed class PreviewRenderSettings
     /// <summary>Genesis POM: maximum UV travel allowed for one parallax trace.</summary>
     public float ParallaxMaxUvShift { get; init; } = 0.45f;
 
+    /// <summary>Genesis high-end preview: tessellate triangles and displace high height-map regions outward.</summary>
+    public bool EnableTessellationDisplacement { get; init; } = true;
+
+    /// <summary>Genesis tessellation: fixed triangle tessellation level for the preview path.</summary>
+    public float TessellationLevel { get; init; } = 8f;
+
+    /// <summary>Genesis tessellation: maximum world-space outward protrusion at full height.</summary>
+    public float TessellationDisplacementStrength { get; init; } = 0.06f;
+
     /// <summary>Genesis: toggle for POM-derived contact ambient occlusion.</summary>
     public bool EnableParallaxAo { get; init; } = true;
 

@@ -9,13 +9,15 @@ internal sealed class GlSceneCaptureTarget(GL gl, bool useOpenGlEs) : IDisposabl
 {
     private uint _fbo;
     private uint _colorTexture;
+    private uint _taaSignalTexture;
     private uint _depthTexture;
     private int _width;
     private int _height;
     private bool _disposed;
 
     public uint DepthTextureHandle => _depthTexture;
-    public bool IsValid => _fbo != 0 && _colorTexture != 0 && _depthTexture != 0;
+    public uint TaaSignalTextureHandle => _taaSignalTexture;
+    public bool IsValid => _fbo != 0 && _colorTexture != 0 && _taaSignalTexture != 0 && _depthTexture != 0;
 
     public bool EnsureSize(int width, int height)
     {
@@ -40,6 +42,19 @@ internal sealed class GlSceneCaptureTarget(GL gl, bool useOpenGlEs) : IDisposabl
 
         gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
         gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
+
+        _taaSignalTexture = gl.GenTexture();
+        gl.BindTexture(TextureTarget.Texture2D, _taaSignalTexture);
+        unsafe
+        {
+            gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgba8, (uint)width, (uint)height, 0,
+                PixelFormat.Rgba, PixelType.UnsignedByte, (void*)0);
+        }
+
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Nearest);
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Nearest);
         gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
         gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
 
@@ -69,9 +84,11 @@ internal sealed class GlSceneCaptureTarget(GL gl, bool useOpenGlEs) : IDisposabl
         gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);
         gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0,
             TextureTarget.Texture2D, _colorTexture, 0);
+        gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment1,
+            TextureTarget.Texture2D, _taaSignalTexture, 0);
         gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment,
             TextureTarget.Texture2D, _depthTexture, 0);
-        ConfigureColorAttachment();
+        ConfigureSceneAttachments();
         var status = gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
         gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         gl.BindTexture(TextureTarget.Texture2D, 0);
@@ -92,7 +109,7 @@ internal sealed class GlSceneCaptureTarget(GL gl, bool useOpenGlEs) : IDisposabl
         }
 
         gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);
-        ConfigureColorAttachment();
+        ConfigureSceneAttachments();
         gl.Viewport(0, 0, (uint)Math.Max(1, width), (uint)Math.Max(1, height));
         gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
     }
@@ -106,7 +123,7 @@ internal sealed class GlSceneCaptureTarget(GL gl, bool useOpenGlEs) : IDisposabl
         }
 
         gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);
-        ConfigureColorAttachment();
+        ConfigureColorAttachment0();
         gl.Viewport(0, 0, (uint)Math.Max(1, width), (uint)Math.Max(1, height));
     }
 
@@ -140,7 +157,23 @@ internal sealed class GlSceneCaptureTarget(GL gl, bool useOpenGlEs) : IDisposabl
         return err == GLEnum.NoError;
     }
 
-    private void ConfigureColorAttachment()
+    private void ConfigureSceneAttachments()
+    {
+        unsafe
+        {
+            Span<DrawBufferMode> bufs =
+            [
+                DrawBufferMode.ColorAttachment0,
+                DrawBufferMode.ColorAttachment1
+            ];
+            fixed (DrawBufferMode* ptr = bufs)
+            {
+                gl.DrawBuffers((uint)bufs.Length, ptr);
+            }
+        }
+    }
+
+    private void ConfigureColorAttachment0()
     {
         if (useOpenGlEs)
         {
@@ -168,6 +201,12 @@ internal sealed class GlSceneCaptureTarget(GL gl, bool useOpenGlEs) : IDisposabl
         {
             gl.DeleteTexture(_colorTexture);
             _colorTexture = 0;
+        }
+
+        if (_taaSignalTexture != 0)
+        {
+            gl.DeleteTexture(_taaSignalTexture);
+            _taaSignalTexture = 0;
         }
 
         if (_depthTexture != 0)

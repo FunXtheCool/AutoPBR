@@ -37,22 +37,19 @@ public sealed partial class OpenGlPreviewBackend
 
     private void TryInitGodRaysCore(GL gl, bool useOpenGlEs)
     {
-        _ = useOpenGlEs;
         DestroyGodRayResources();
         _godRayInitFailureDetail = null;
-        _sceneCapture = new GlSceneCaptureTarget(gl, useOpenGlEs);
-        _godRayHalfResTarget = new GlColorRenderTarget(gl, useOpenGlEs);
-        _godRayResolveTarget = new GlColorRenderTarget(gl, useOpenGlEs);
-        _godRayHistoryTarget = new GlColorRenderTarget(gl, useOpenGlEs);
-
-        _scenePresentProgram = CreatePreviewProgram("genesis_godrays.vert", "genesis_scene_present.frag", out var presentErr);
-        if (_scenePresentProgram is not { IsValid: true })
+        if (!TryInitSceneCaptureCore(gl, useOpenGlEs, out var sceneErr))
         {
-            _godRayInitFailureDetail = "present: " + TrimShaderDiagnostic(presentErr);
-            EmitDiagnostic("[3D preview] Scene-present shader: " + TrimShaderDiagnostic(presentErr));
+            _godRayInitFailureDetail = "scene-capture: " + TrimShaderDiagnostic(sceneErr);
+            EmitDiagnostic("[3D preview] Scene capture shader: " + TrimShaderDiagnostic(sceneErr));
             DestroyGodRayResources();
             return;
         }
+
+        _godRayHalfResTarget = new GlColorRenderTarget(gl, useOpenGlEs);
+        _godRayResolveTarget = new GlColorRenderTarget(gl, useOpenGlEs);
+        _godRayHistoryTarget = new GlColorRenderTarget(gl, useOpenGlEs);
 
         _screenSpaceGodRayProgram = CreatePreviewProgram("genesis_godrays.vert", "genesis_godrays.frag", out var ssErr);
         if (_screenSpaceGodRayProgram is not { IsValid: true })
@@ -79,6 +76,48 @@ public sealed partial class OpenGlPreviewBackend
             EmitDiagnostic("[3D preview] God-ray composite shader: " + TrimShaderDiagnostic(compErr));
             DestroyGodRayResources();
             return;
+        }
+
+    }
+
+    private bool TryInitSceneCaptureCore(GL gl, bool useOpenGlEs, out string? error)
+    {
+        error = null;
+        _sceneCapture ??= new GlSceneCaptureTarget(gl, useOpenGlEs);
+        if (_scenePresentProgram is not { IsValid: true })
+        {
+            _scenePresentProgram?.Dispose();
+            _scenePresentProgram = CreatePreviewProgram("genesis_godrays.vert", "genesis_scene_present.frag", out error);
+            if (_scenePresentProgram is not { IsValid: true })
+            {
+                _scenePresentProgram?.Dispose();
+                _scenePresentProgram = null;
+                return false;
+            }
+        }
+
+        if (_godRayQuadVao == 0 || _godRayQuadVbo == 0)
+        {
+            CreateSceneFullscreenQuad(gl);
+        }
+
+        return _sceneCapture is not null &&
+               _scenePresentProgram is { IsValid: true } &&
+               _godRayQuadVao != 0;
+    }
+
+    private void CreateSceneFullscreenQuad(GL gl)
+    {
+        if (_godRayQuadVbo != 0)
+        {
+            gl.DeleteBuffer(_godRayQuadVbo);
+            _godRayQuadVbo = 0;
+        }
+
+        if (_godRayQuadVao != 0)
+        {
+            gl.DeleteVertexArray(_godRayQuadVao);
+            _godRayQuadVao = 0;
         }
 
         Span<float> quad =
@@ -153,6 +192,12 @@ public sealed partial class OpenGlPreviewBackend
         _godRayHistoryTarget is not null &&
         _godRayQuadVao != 0;
 
+    private bool CanUseTaaSceneCapture(in PreviewRenderSettings settings) =>
+        IsPreviewTaaActive(settings) &&
+        _sceneCapture is not null &&
+        _scenePresentProgram is { IsValid: true } &&
+        _godRayQuadVao != 0;
+
     private void SyncGodRayToggleState(in PreviewRenderSettings settings)
     {
         var godRaysChanged = _prevEnableGodRays != settings.EnableGodRays;
@@ -196,7 +241,7 @@ public sealed partial class OpenGlPreviewBackend
 
     private bool TryBeginGodRaySceneRender(ref GlRenderFrame frame)
     {
-        if (!CanUseGodRayCapture(frame.Settings) || _sceneCapture is null)
+        if ((!CanUseGodRayCapture(frame.Settings) && !CanUseTaaSceneCapture(frame.Settings)) || _sceneCapture is null)
         {
             return false;
         }

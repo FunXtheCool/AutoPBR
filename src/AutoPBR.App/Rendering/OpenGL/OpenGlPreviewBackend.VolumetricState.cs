@@ -42,6 +42,10 @@ public sealed partial class OpenGlPreviewBackend
         _godRayPrevViewProj = Matrix4x4.Identity;
         _cloudPrevViewProj = Matrix4x4.Identity;
         _taaPrevViewProj = Matrix4x4.Identity;
+        _prevPreviewTaaActive = false;
+        _taaPrevSubjectModel = Matrix4x4.Identity;
+        _taaPrevSubjectModelValid = false;
+        InvalidatePreviousEntitySkinningBones();
         _cloudFramePhase = 0f;
         _volumePathFailLogged = 0;
         _screenSpaceGodRayLogged = 0;

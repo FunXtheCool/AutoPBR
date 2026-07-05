@@ -71,6 +71,81 @@ vec3 trClampHistoryToNeighborhood(vec3 history, vec3 nMin, vec3 nMax)
     return clamp(history, nMin, nMax);
 }
 
+vec3 trRgbToYCoCg(vec3 c)
+{
+    return vec3(
+        dot(c, vec3(0.25, 0.5, 0.25)),
+        c.r - c.b,
+        c.g - 0.5 * (c.r + c.b));
+}
+
+vec3 trYCoCgToRgb(vec3 c)
+{
+    float t = c.x - 0.5 * c.z;
+    return vec3(t + 0.5 * c.y, c.x + 0.5 * c.z, t - 0.5 * c.y);
+}
+
+void trNeighborhoodMinMax3YCoCg(sampler2D currentTex, vec2 uv, vec2 texelSize, out vec3 nMin, out vec3 nMax)
+{
+    nMin = vec3(1e6);
+    nMax = vec3(-1e6);
+    for (int oy = -1; oy <= 1; ++oy)
+    {
+        for (int ox = -1; ox <= 1; ++ox)
+        {
+            vec2 tapUv = clamp(uv + vec2(float(ox), float(oy)) * texelSize, vec2(0.001), vec2(0.999));
+            vec3 tap = trRgbToYCoCg(texture(currentTex, tapUv).rgb);
+            nMin = min(nMin, tap);
+            nMax = max(nMax, tap);
+        }
+    }
+}
+
+vec3 trClipHistoryToNeighborhoodYCoCg(vec3 historyRgb, vec3 currentRgb, vec3 nMin, vec3 nMax)
+{
+    vec3 history = trRgbToYCoCg(historyRgb);
+    vec3 current = trRgbToYCoCg(currentRgb);
+    vec3 center = (nMin + nMax) * 0.5;
+    vec3 extent = max((nMax - nMin) * 0.5, vec3(1e-5));
+    vec3 offset = history - center;
+    vec3 unit = abs(offset) / extent;
+    float maxUnit = max(max(unit.x, unit.y), unit.z);
+    vec3 clipped = maxUnit > 1.0 ? center + offset / maxUnit : history;
+    clipped = mix(clipped, clamp(history, nMin, nMax), 0.25);
+    return maxUnit > 3.0 ? currentRgb : clamp(trYCoCgToRgb(clipped), vec3(0.0), vec3(64.0));
+}
+
+float trLuminance(vec3 c)
+{
+    return dot(c, vec3(0.2126, 0.7152, 0.0722));
+}
+
+float trLuminanceReactiveWeight(vec3 current, vec3 history)
+{
+    float lc = trLuminance(current);
+    float lh = trLuminance(history);
+    float diff = abs(lc - lh) / max(max(lc, lh), 0.04);
+    return 1.0 - smoothstep(0.08, 0.35, diff);
+}
+
+float trDepthEdgeWeight(sampler2D depthTex, vec2 uv, vec2 texelSize)
+{
+    float dMin = 1.0;
+    float dMax = 0.0;
+    for (int oy = -1; oy <= 1; ++oy)
+    {
+        for (int ox = -1; ox <= 1; ++ox)
+        {
+            vec2 tapUv = clamp(uv + vec2(float(ox), float(oy)) * texelSize, vec2(0.001), vec2(0.999));
+            float d = texture(depthTex, tapUv).r;
+            dMin = min(dMin, d);
+            dMax = max(dMax, d);
+        }
+    }
+
+    return 1.0 - smoothstep(0.0025, 0.018, dMax - dMin);
+}
+
 // Screen-space velocity from depth reprojection (current UV minus previous UV).
 vec2 trScreenVelocityFromDepth(vec2 uv, float depth, mat4 invViewProj, mat4 prevViewProj)
 {

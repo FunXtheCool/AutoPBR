@@ -24,6 +24,7 @@ uniform int   uParallaxRefineSteps;
 uniform int   uParallaxShadowSamples;
 uniform float uParallaxShadowSoftness;
 uniform float uParallaxMaxUvShift;
+uniform float uParallaxUvScale;
 
 vec2 pomTileLocal(vec2 uv)
 {
@@ -76,7 +77,7 @@ vec2 traceParallaxPom(sampler2D heightTex, vec2 uv0, vec3 Vtan, float strength, 
         steer *= GEN_POM_STEER_TAN_CAP / max(tanMag, GEN_EPS);
     }
 
-    float parallaxScale = pomUvDisplacementScale(strength);
+    float parallaxScale = pomUvDisplacementScale(strength) * clamp(uParallaxUvScale, 0.02, 1.0);
     vec2 totalOffset = steer * parallaxScale;
     float maxUvShift = clamp(uParallaxMaxUvShift, 0.05, 0.75);
     float totalLen = length(totalOffset);
@@ -192,7 +193,7 @@ float traceParallaxShadow(sampler2D heightTex, vec2 uvHit, vec3 Ltan, float refD
         return 1.0;
     }
 
-    float uvScale = pomUvDisplacementScale(strength);
+    float uvScale = pomUvDisplacementScale(strength) * clamp(uParallaxUvScale, 0.02, 1.0);
     vec2 tileBase = floor(uvHit);
     vec2 localUv = pomTileLocal(uvHit);
     vec2 uvStep = (Ltan.xy / lz) * uvScale * stepLen;

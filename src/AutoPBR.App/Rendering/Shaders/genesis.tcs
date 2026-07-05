@@ -1,0 +1,49 @@
+#version 400 core
+// Genesis high-end preview tessellation control stage.
+// Mirrors Iris shaderpack constraints: triangle patches for geometry-style rendering.
+
+layout(vertices = 3) out;
+
+in vec3 vWorldPos[];
+in vec3 vWorldNormal[];
+in vec2 vUv[];
+in vec4 vWorldTangent[];
+in vec4 vLightClip[];
+in vec4 vCurrClip[];
+in vec4 vPrevClip[];
+
+out vec3 tcWorldPos[];
+out vec3 tcWorldNormal[];
+out vec2 tcUv[];
+out vec4 tcWorldTangent[];
+out vec4 tcLightClip[];
+out vec4 tcCurrClip[];
+out vec4 tcPrevClip[];
+
+uniform int   uEnableTessellationDisplacement;
+uniform int   uHasHeight;
+uniform float uTessellationLevel;
+
+void main()
+{
+    int id = gl_InvocationID;
+    tcWorldPos[id] = vWorldPos[id];
+    tcWorldNormal[id] = vWorldNormal[id];
+    tcUv[id] = vUv[id];
+    tcWorldTangent[id] = vWorldTangent[id];
+    tcLightClip[id] = vLightClip[id];
+    tcCurrClip[id] = vCurrClip[id];
+    tcPrevClip[id] = vPrevClip[id];
+    gl_out[id].gl_Position = gl_in[id].gl_Position;
+
+    if (id == 0)
+    {
+        float level = (uEnableTessellationDisplacement > 0 && uHasHeight > 0)
+            ? clamp(uTessellationLevel, 1.0, 16.0)
+            : 1.0;
+        gl_TessLevelOuter[0] = level;
+        gl_TessLevelOuter[1] = level;
+        gl_TessLevelOuter[2] = level;
+        gl_TessLevelInner[0] = level;
+    }
+}
