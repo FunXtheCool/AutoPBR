@@ -1557,6 +1557,141 @@
   <data name="Preview3DCameraExpanderSection" xml:space="preserve">
     <value>相机</value>
   </data>
+  <data name="Preview3DTaaSection" xml:space="preserve">
+    <value>TXAA</value>
+  </data>
+  <data name="Preview3DTaaMode" xml:space="preserve">
+    <value>TAA模式</value>
+  </data>
+  <data name="Preview3DTaaModeTooltip" xml:space="preserve">
+    <value>调整最终预览 TAA。稳定、抖动少，减少视口抖动；边缘 AA 允许控制轮廓累积；锐利保持更多边缘对比度；无抖动会禁用投影抖动，同时保留解析历史记录。</value>
+  </data>
+  <data name="Preview3DTaaModeBalanced" xml:space="preserve">
+    <value>稳定的</value>
+  </data>
+  <data name="Preview3DTaaModeLessJitter" xml:space="preserve">
+    <value>抖动更少</value>
+  </data>
+  <data name="Preview3DTaaModeStableSoft" xml:space="preserve">
+    <value>边缘AA</value>
+  </data>
+  <data name="Preview3DTaaModeSharper" xml:space="preserve">
+    <value>锋利的</value>
+  </data>
+  <data name="Preview3DTaaModeNoJitter" xml:space="preserve">
+    <value>无抖动</value>
+  </data>
+  <data name="Preview3DTaaTemporalScale" xml:space="preserve">
+    <value>颞</value>
+  </data>
+  <data name="Preview3DTaaTemporalScaleTooltip" xml:space="preserve">
+    <value>缩放所选 TAA 模式的历史混合。较低的值可减少重影；值越高，累积的边缘覆盖范围就越大。</value>
+  </data>
+  <data name="Preview3DTaaJitterScale" xml:space="preserve">
+    <value>抖动</value>
+  </data>
+  <data name="Preview3DTaaJitterScaleTooltip" xml:space="preserve">
+    <value>缩放子像素投影抖动。设置为 0 以隔离解析/FXAA 路径而不移动场景。</value>
+  </data>
+  <data name="Preview3DTaaSourceFilterScale" xml:space="preserve">
+    <value>源过滤器</value>
+  </data>
+  <data name="Preview3DTaaSourceFilterScaleTooltip" xml:space="preserve">
+    <value>缩放在被拒绝的 TAA 边缘附近使用的小当前帧滤波器。</value>
+  </data>
+  <data name="Preview3DTaaEdgeBlendScale" xml:space="preserve">
+    <value>边缘融合</value>
+  </data>
+  <data name="Preview3DTaaEdgeBlendScaleTooltip" xml:space="preserve">
+    <value>缩放深度/轮廓过渡周围使用的边缘覆盖模糊。</value>
+  </data>
+  <data name="Preview3DTaaFxaaStrengthScale" xml:space="preserve">
+    <value>FXAA实力</value>
+  </data>
+  <data name="Preview3DTaaFxaaStrengthScaleTooltip" xml:space="preserve">
+    <value>在 TAA 解析后缩放最终 FXAA-lite 混合。</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaEdgeScale" xml:space="preserve">
+    <value>FXAA 亮度</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaEdgeScaleTooltip" xml:space="preserve">
+    <value>缩放亮度边缘进入 FXAA 蒙版的强度，与深度边缘检测无关。</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaThreshold" xml:space="preserve">
+    <value>FXAA 阈值</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaThresholdTooltip" xml:space="preserve">
+    <value>FXAA 边缘检测的亮度对比度阈值。较低的值会捕获更微妙的边缘，并可能模糊像素艺术纹理细节。</value>
+  </data>
+  <data name="Preview3DTaaForceFxaa" xml:space="preserve">
+    <value>强制全画幅 FXAA</value>
+  </data>
+  <data name="Preview3DTaaForceFxaaTooltip" xml:space="preserve">
+    <value>诊断模式：绕过深度/几何掩模并在各处应用最终的 FXAA-lite 通道。使用它来验证 AA 后解析是否明显写入预览。</value>
+  </data>
+  <data name="Preview3DParallaxSection" xml:space="preserve">
+    <value>视差</value>
+  </data>
+  <data name="Preview3DParallaxTraceLayers" xml:space="preserve">
+    <value>POM 迹线层</value>
+  </data>
+  <data name="Preview3DParallaxTraceLayersTooltip" xml:space="preserve">
+    <value>主要高度场射线行进层。较高的值可提高陡角精度，但 GPU 成本较高。</value>
+  </data>
+  <data name="Preview3DParallaxRefineSteps" xml:space="preserve">
+    <value>POM精炼步骤</value>
+  </data>
+  <data name="Preview3DParallaxRefineStepsTooltip" xml:space="preserve">
+    <value>第一次高度场命中后进行二进制细化步骤。较高的值会减少位移 UV 中的阶梯。</value>
+  </data>
+  <data name="Preview3DParallaxMaxUvShift" xml:space="preserve">
+    <value>POM 最大 UV 偏移</value>
+  </data>
+  <data name="Preview3DParallaxMaxUvShiftTooltip" xml:space="preserve">
+    <value>限制一条视差轨迹在 UV 空间中可以传播的距离。抬起以获得更深的缓解；降低以减少掠角拉伸。</value>
+  </data>
+  <data name="Preview3DEnableTessellationDisplacement" xml:space="preserve">
+    <value>棋盘状突起</value>
+  </data>
+  <data name="Preview3DEnableTessellationDisplacementTooltip" xml:space="preserve">
+    <value>使用桌面 OpenGL 曲面细分从高高度图区域添加真实的外部几何图形。 POM 仍然可以处理凹陷的细节。</value>
+  </data>
+  <data name="Preview3DTessellationLevel" xml:space="preserve">
+    <value>细分级别</value>
+  </data>
+  <data name="Preview3DTessellationLevelTooltip" xml:space="preserve">
+    <value>用于高端位移预览的三角形细分级别。较高的值可改善轮廓和边缘浮雕，但 GPU 成本较高。</value>
+  </data>
+  <data name="Preview3DTessellationDisplacementStrength" xml:space="preserve">
+    <value>突出强度</value>
+  </data>
+  <data name="Preview3DTessellationDisplacementStrengthTooltip" xml:space="preserve">
+    <value>明亮高度图值的最大世界空间向外位移。</value>
+  </data>
+  <data name="Preview3DParallaxShadowSamples" xml:space="preserve">
+    <value>自阴影样本</value>
+  </data>
+  <data name="Preview3DParallaxShadowSamplesTooltip" xml:space="preserve">
+    <value>视差自阴影光线所使用的样本射向太阳或月光。较高的值可减少锯齿。</value>
+  </data>
+  <data name="Preview3DParallaxShadowSoftness" xml:space="preserve">
+    <value>自阴影柔和度</value>
+  </data>
+  <data name="Preview3DParallaxShadowSoftnessTooltip" xml:space="preserve">
+    <value>柔化接收器侧视差自阴影，使高度场阴影混合得更像主阴影滤镜。</value>
+  </data>
+  <data name="Preview3DShowFpsCounter" xml:space="preserve">
+    <value>FPS 计数器</value>
+  </data>
+  <data name="Preview3DShowFpsCounterTooltip" xml:space="preserve">
+    <value>在 3D 预览的右上角显示每秒帧数读数。</value>
+  </data>
+  <data name="Preview3DCapFpsAt60" xml:space="preserve">
+    <value>限制为 60 FPS</value>
+  </data>
+  <data name="Preview3DCapFpsAt60Tooltip" xml:space="preserve">
+    <value>将连续 3D 预览渲染速度限制为每秒 60 帧，以减少 GPU 使用。默认关闭（无上限）。</value>
+  </data>
 </root>
 
 

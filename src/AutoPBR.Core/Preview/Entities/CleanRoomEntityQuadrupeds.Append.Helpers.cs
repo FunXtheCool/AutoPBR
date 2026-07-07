@@ -22,6 +22,7 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var legScale = p.LegScale;
 
         // Body: texOffs(28,8), (-5,-10,-7)+ (10,16,8), PartPose.offsetAndRotation(0,11,2, pi/2,0,0).
+        // Bind uses ModelPart.translateAndRotate (T then R block), not PartPose Er×T storage.
         var bodyPose = EntityParityTemplate.Mul(EntityParityTemplate.T(0f, 11f, 2f), EntityParityTemplate.Rx(MathF.PI / 2f));
         new EntityCuboid(-5f, -10f, -7f, 5f, 6f, 1f, 28, 8).Emit(b, bodyPose, bodyScale);
 

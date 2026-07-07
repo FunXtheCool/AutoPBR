@@ -38,7 +38,11 @@ public sealed partial class OpenGlPreviewBackend
             }
         }
 
-        frame.Gl.Viewport(frame.VpX, frame.VpY, (uint)frame.Vw, (uint)frame.Vh);
+        var sceneVpX = frame.GodRayCaptureActive ? 0 : frame.VpX;
+        var sceneVpY = frame.GodRayCaptureActive ? 0 : frame.VpY;
+        var sceneVpW = frame.GodRayCaptureActive && frame.SceneCaptureW > 0 ? frame.SceneCaptureW : frame.Vw;
+        var sceneVpH = frame.GodRayCaptureActive && frame.SceneCaptureH > 0 ? frame.SceneCaptureH : frame.Vh;
+        frame.Gl.Viewport(sceneVpX, sceneVpY, (uint)sceneVpW, (uint)sceneVpH);
         frame.Gl.Disable(EnableCap.ScissorTest);
         frame.Gl.Enable(EnableCap.DepthTest);
         frame.Gl.DepthFunc(GLEnum.Lequal);
@@ -89,12 +93,15 @@ public sealed partial class OpenGlPreviewBackend
             aspect,
             nearPlane,
             farPlane);
+        frame.UnjitteredProj = frame.Proj;
+        frame.PreviewTaaJitterNdc = Vector2.Zero;
         SyncPreviewTaaToggleState(frame.Settings);
         if (IsPreviewTaaActive(frame.Settings))
         {
+            frame.PreviewTaaJitterNdc = CurrentPreviewTaaJitter(frame.Vw, frame.Vh, frame.Settings);
             frame.Proj = PreviewGlMatrices.ApplyProjectionJitter(
                 frame.Proj,
-                CurrentPreviewTaaJitter(frame.Vw, frame.Vh));
+                frame.PreviewTaaJitterNdc);
         }
 
         frame.View = PreviewGlMatrices.CreateLookAtRhOpenGlRowStorage(frame.Eye, frame.LookTarget, Vector3.UnitY);
@@ -146,8 +153,9 @@ public sealed partial class OpenGlPreviewBackend
             ShouldCullSolidBackFaces(frame.Scene.SceneKind, frame.BlockModel));
 
         _program.Use();
-        var currentViewProj = frame.Proj * frame.View;
-        SetMatrix("uPrevViewProj", ResolvePreviewTaaPrevViewProj(currentViewProj));
+        var taaCurrentViewProj = frame.UnjitteredProj * frame.View;
+        SetMatrix("uTaaCurrViewProj", taaCurrentViewProj);
+        SetMatrix("uPrevViewProj", ResolvePreviewTaaPrevViewProj(taaCurrentViewProj));
         SetMatrix("uView", frame.View);
         SetMatrix("uProj", frame.Proj);
         SetMatrix("uLightViewProj", frame.ShadowVp);
@@ -306,6 +314,7 @@ public sealed partial class OpenGlPreviewBackend
                 EmitDepthLayerDiagnostic(frame.BlockModel, nearPlane, farPlane, frame.Gl);
             }
             var blendWasEnabled = frame.Gl.IsEnabled(EnableCap.Blend);
+            var uploadedMaterialIndex = -1;
 
             foreach (var batch in frame.BlockModel.DrawBatches)
             {
@@ -333,7 +342,11 @@ public sealed partial class OpenGlPreviewBackend
                 SetInt("uEntityAlphaMode", batchAlphaMode);
 
                 var slot = frame.BlockSlots[batch.MaterialIndex];
-                UploadMaterial(frame.Gl, slot, frame.Settings.NearestTextureFilter);
+                if (batch.MaterialIndex != uploadedMaterialIndex)
+                {
+                    UploadMaterial(frame.Gl, slot, frame.Settings.NearestTextureFilter);
+                    uploadedMaterialIndex = batch.MaterialIndex;
+                }
                 var bHasN = slot.NormalRgba is { Length: > 0 };
                 var bHasS = slot.SpecularRgba is { Length: > 0 };
                 var bHasH = slot.HeightRgba is { Length: > 0 };

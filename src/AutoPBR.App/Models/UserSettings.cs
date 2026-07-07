@@ -214,6 +214,12 @@ public sealed class UserSettings
     /// <summary>Draw X/Y/Z axis reference in the corner of the 3D preview.</summary>
     public bool Preview3DShowAxes { get; set; } = true;
 
+    /// <summary>Show a frames-per-second readout in the top-right corner of the 3D preview.</summary>
+    public bool Preview3DShowFpsCounter { get; set; }
+
+    /// <summary>Cap continuous 3D preview rendering to 60 FPS (off = uncapped).</summary>
+    public bool Preview3DCapFpsAt60 { get; set; }
+
     /// <summary>When true, 3D preview uses parallax occlusion mapping (POM) from the height map.</summary>
     public bool Preview3DEnableParallax { get; set; } = true;
 
@@ -372,6 +378,28 @@ public sealed class UserSettings
 
     /// <summary>Final preview TAA on the composited RGB frame.</summary>
     public bool Preview3DEnablePreviewTaa { get; set; } = true;
+
+    /// <summary>Final preview TAA tuning preset: 0 = less jitter, 1 = stable, 2 = edge AA, 3 = sharp, 4 = no projection jitter.</summary>
+    public int? Preview3DTaaMode { get; set; }
+
+    /// <summary>Bumped when persisted preview settings change encoding; used for one-time migrations on load.</summary>
+    public int PersistedSettingsGeneration { get; set; }
+
+    public double Preview3DTaaTemporalScale { get; set; } = 1.0;
+
+    public double Preview3DTaaJitterScale { get; set; } = 1.0;
+
+    public double Preview3DTaaSourceFilterScale { get; set; } = 1.0;
+
+    public double Preview3DTaaEdgeBlendScale { get; set; } = 1.0;
+
+    public double Preview3DTaaFxaaStrengthScale { get; set; } = 1.0;
+
+    public double Preview3DTaaFxaaLumaEdgeScale { get; set; } = 1.0;
+
+    public double Preview3DTaaFxaaLumaThreshold { get; set; } = 0.018;
+
+    public bool Preview3DTaaForceFxaa { get; set; }
 
     /// <summary>Genesis Shadows Phase 2: master toggle for the directional shadow map pass.</summary>
     public bool Preview3DEnableShadows { get; set; } = true;

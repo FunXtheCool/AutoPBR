@@ -93,8 +93,8 @@ internal sealed partial class CleanRoomEntityModelRuntime
         var b = new RigBuilder(64, 64);
         AppendPigQuadrupedMesh(b, p, snoutBob, rightHindLegPitchRad, leftHindLegPitchRad, rightFrontLegPitchRad, leftFrontLegPitchRad);
 
-        var bodyPose = EntityParityTemplate.Mul(EntityParityTemplate.T(0f, 11f, 2f), EntityParityTemplate.Rx(MathF.PI / 2f));
-        new EntityCuboid(-10f, -7f, 10f, 6f, 1f, 10.5f, 28, 32, UvSizeW: 16, UvSizeH: 8, UvSizeD: 1).Emit(b, bodyPose, p.BodyScale);
+        var mantlePose = EntityParityTemplate.Mul(EntityParityTemplate.T(0f, 11f, 2f), EntityParityTemplate.Rx(MathF.PI / 2f));
+        new EntityCuboid(-10f, -7f, 10f, 6f, 1f, 10.5f, 28, 32, UvSizeW: 16, UvSizeH: 8, UvSizeD: 1).Emit(b, mantlePose, p.BodyScale);
 
         return ApplyLivingEntityRendererPreviewBasis(b.Build(texRef), GeometryIrLerBasisKind.StandardWorldRoot);
     }

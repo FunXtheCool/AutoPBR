@@ -154,6 +154,7 @@
                 16
               ],
               "textureKey": "#skin",
+              "mirrorU": true,
               "liftKind": "exact",
               "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
             }
@@ -230,6 +231,7 @@
                 16
               ],
               "textureKey": "#skin",
+              "mirrorU": true,
               "liftKind": "exact",
               "provenance": "javap lift CubeListBuilder.addBox profile_named_26_1_2_float"
             }

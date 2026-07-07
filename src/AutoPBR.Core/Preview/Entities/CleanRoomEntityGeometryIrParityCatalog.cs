@@ -354,6 +354,51 @@ internal sealed partial class CleanRoomEntityModelRuntime
             out _);
     }
 
+    /// <summary>
+    /// Test-only entry matching production <see cref="TryBuildParityCatalogMeshFromGeometryIr"/> bind-pose settings.
+    /// </summary>
+    internal static bool TryBuildParityCatalogGeometryIrMeshForTests(
+        string normalizedAssetPath,
+        MinecraftNativeProfile profile,
+        float idlePhase01,
+        float animationTimeSeconds,
+        bool applyGeometryIrSetupAnimMotion,
+        out MergedJavaBlockModel mesh,
+        out string? officialJvm)
+    {
+        mesh = null!;
+        officialJvm = null;
+        var norm = normalizedAssetPath.Replace('\\', '/').TrimStart('/');
+        var stem = Path.GetFileNameWithoutExtension(norm).ToLowerInvariant();
+        if (EntityTextureParityCatalog.ResolveRule(norm, stem) is not { } rule)
+        {
+            return false;
+        }
+
+        var isBaby = LooksLikeBabyTexture(stem, norm);
+        if (!TryBuildParityCatalogMeshFromGeometryIr(
+            norm,
+            stem,
+            ToTextureRef(norm),
+            profile,
+            isBaby,
+            idlePhase01,
+            animationTimeSeconds,
+            rule,
+            applyGeometryIrSetupAnimMotion,
+            out mesh,
+            out officialJvm))
+        {
+            return false;
+        }
+
+        mesh = CleanRoomEntityModelRuntime.ApplyParityCatalogPreviewPostProcess(
+            mesh,
+            rule,
+            animationTimeSeconds);
+        return true;
+    }
+
     internal static bool ShouldSuppressHandBuiltParityFallback(
         MinecraftNativeProfile profile,
         EntityTextureParityRule rule,

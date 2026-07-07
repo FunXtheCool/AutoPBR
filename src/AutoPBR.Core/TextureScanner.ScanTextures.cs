@@ -14,6 +14,7 @@ internal static partial class TextureScanner
         AutoPbrOptions options,
         IProgress<ConversionProgress>? progress = null,
         string? cachePackPath = null,
+        bool applyFoliageIgnoreFilter = true,
         CancellationToken cancellationToken = default)
     {
         var results = new List<TextureWorkItem>();
@@ -155,7 +156,9 @@ internal static partial class TextureScanner
                 continue;
             }
 
-            if (FoliageModeResolver.IsIgnoreAll(options.FoliageMode) && tags.Sprite2DFoliageTarget)
+            if (applyFoliageIgnoreFilter &&
+                FoliageModeResolver.IsIgnoreAll(options.FoliageMode) &&
+                tags.Sprite2DFoliageTarget)
             {
                 continue;
             }

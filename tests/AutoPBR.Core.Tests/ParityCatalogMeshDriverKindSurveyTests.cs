@@ -4,11 +4,6 @@ namespace AutoPBR.Core.Tests;
 
 public sealed class ParityCatalogMeshDriverKindSurveyTests(ITestOutputHelper? output)
 {
-    private static readonly HashSet<string> KnownCleanRoomCatalogPaths =
-    [
-        "assets/minecraft/textures/entity/chicken/chicken_warm.png",
-    ];
-
     private static readonly MinecraftNativeProfile Profile26 =
         new("26.1.2", Path.Combine(AppContext.BaseDirectory, "Data", "minecraft-native", "26.1.2"), new Version(26, 1, 2));
 
@@ -110,12 +105,9 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests(ITestOutputHelper? ou
         }
 
         Assert.Empty(failed);
-        var unexpectedCleanRoom = cleanRoomPaths
-            .Where(p => !KnownCleanRoomCatalogPaths.Contains(p))
-            .ToList();
-        Assert.Empty(unexpectedCleanRoom);
-        Assert.Equal(paths.Count - KnownCleanRoomCatalogPaths.Count, ir);
-        Assert.Equal(KnownCleanRoomCatalogPaths.Count, cleanRoom);
+        Assert.Empty(cleanRoomPaths);
+        Assert.Equal(paths.Count, ir);
+        Assert.Equal(0, cleanRoom);
     }
 
     [Fact]
@@ -163,6 +155,7 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests(ITestOutputHelper? ou
     [InlineData("assets/minecraft/textures/entity/cow/cow_temperate.png", false, "CowModel")]
     [InlineData("assets/minecraft/textures/entity/cow/cow_temperate_baby.png", true, "BabyCowModel")]
     [InlineData("assets/minecraft/textures/entity/cow/cow_cold.png", false, "ColdCowModel")]
+    [InlineData("assets/minecraft/textures/entity/chicken/chicken_warm.png", false, "WarmChickenModel")]
     [InlineData("assets/minecraft/textures/entity/panda/panda.png", false, "PandaModel")]
     [InlineData("assets/minecraft/textures/entity/bear/polarbear.png", false, "PolarBearModel")]
     [InlineData("assets/minecraft/textures/entity/bear/polarbear_baby.png", true, "BabyPolarBearModel")]

@@ -179,6 +179,7 @@ public static class ResourcePackConverter
                 extracted,
                 options,
                 cachePackPath: inputZipPath,
+                applyFoliageIgnoreFilter: false,
                 cancellationToken: cancellationToken);
             if (textures.Count == 0)
             {
@@ -503,6 +504,7 @@ public static class ResourcePackConverter
         textures = TextureScanner.ScanTextures(
             extracted,
             options,
+            applyFoliageIgnoreFilter: false,
             cancellationToken: cancellationToken);
         mergedModel = parityModel;
         orderedModelTextures = parityOrdered;

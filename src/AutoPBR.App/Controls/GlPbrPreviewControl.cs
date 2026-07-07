@@ -1,6 +1,6 @@
 using System.Diagnostics;
-
 using System.Numerics;
+using System.Threading;
 
 using AutoPBR.App.Rendering.Abstractions;
 using AutoPBR.App.Rendering.OpenGL;
@@ -26,7 +26,14 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
 {
     private readonly OpenGlPreviewBackend _backend = new();
     private long _lastTicks = Stopwatch.GetTimestamp();
+    private double _fpsAccumSeconds;
+    private int _fpsFrameCount;
+    private double _smoothedFps;
+    private bool _capFpsAt60;
+    private long _lastCapFrameTicks;
+    private int _capScheduleGeneration;
     private bool _disposed;
+    private const double CapFrameIntervalSeconds = 1.0 / 60.0;
     private Key _cameraResetKey = Key.R;
     private bool _cameraDrag;
     private bool _cameraDragIsOrbit;
@@ -64,10 +71,37 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
 
     public IRenderPreviewBackend Backend => _backend;
 
+    /// <summary>Frames per second averaged over the last ~0.5s of rendered preview frames.</summary>
+    public double SmoothedPreviewFps => Volatile.Read(ref _smoothedFps);
+
+    public bool TryGetPreviewViewportInfo(out int pixelWidth, out int pixelHeight,
+        out double logicalWidth, out double logicalHeight, out double renderScale)
+    {
+        renderScale = TopLevel.GetTopLevel(this)?.RenderScaling ?? 1.0;
+        logicalWidth = Bounds.Width;
+        logicalHeight = Bounds.Height;
+        pixelWidth = Math.Max(1, (int)Math.Ceiling(logicalWidth * renderScale));
+        pixelHeight = Math.Max(1, (int)Math.Ceiling(logicalHeight * renderScale));
+        return logicalWidth > 0.0 && logicalHeight > 0.0;
+    }
+
     /// <summary>Routes shader and GL init messages into the main app log (invoked from the GL thread).</summary>
     public void SetRendererLog(Action<string>? log) => _backend.SetDiagnosticLog(log);
 
     public void InvalidateShaderCaches() => _backend.InvalidateShaderCachesAndReload();
+
+    /// <summary>When true, continuous preview rendering is limited to 60 FPS. Off by default (uncapped).</summary>
+    public void SetPreviewFrameRateCap(bool capAt60)
+    {
+        if (_capFpsAt60 == capAt60)
+        {
+            return;
+        }
+
+        _capFpsAt60 = capAt60;
+        Interlocked.Increment(ref _capScheduleGeneration);
+        RequestNextFrameRendering();
+    }
 
     /// <summary>Updates orbit boom arm length, orbit/pan/zoom sensitivities, and the reset-camera key.</summary>
     public void SetCameraInteractionFromSettings(float orbitRadPerPx, float panPerPixel, float zoomPerWheelStep,
@@ -194,14 +228,53 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         _lastTicks = now;
         PushDebugFlyInput();
         _backend.RenderFrame(dt);
-        var scale = TopLevel.GetTopLevel(this)?.RenderScaling ?? 1.0;
-        var w = Math.Max(1, (int)Math.Ceiling(Bounds.Width * scale));
-        var h = Math.Max(1, (int)Math.Ceiling(Bounds.Height * scale));
+        RecordRenderFrame(dt);
+        TryGetPreviewViewportInfo(out var w, out var h, out _, out _, out _);
         _backend.GlRender(gl, fb, w, h);
-        if (_backend.NeedsContinuousRendering)
+        _lastCapFrameTicks = now;
+        RequestContinuousFrameIfNeeded();
+    }
+
+    private void RequestContinuousFrameIfNeeded()
+    {
+        if (!_backend.NeedsContinuousRendering)
+        {
+            return;
+        }
+
+        if (!_capFpsAt60)
         {
             RequestNextFrameRendering();
+            return;
         }
+
+        var now = Stopwatch.GetTimestamp();
+        var elapsed = (now - _lastCapFrameTicks) / (double)Stopwatch.Frequency;
+        if (elapsed >= CapFrameIntervalSeconds)
+        {
+            RequestNextFrameRendering();
+            return;
+        }
+
+        var delayMs = Math.Max(1, (int)Math.Ceiling((CapFrameIntervalSeconds - elapsed) * 1000.0));
+        var generation = Volatile.Read(ref _capScheduleGeneration);
+        _ = ScheduleCappedFrameAsync(generation, delayMs);
+    }
+
+    private async Task ScheduleCappedFrameAsync(int generation, int delayMs)
+    {
+        await Task.Delay(delayMs).ConfigureAwait(false);
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            if (generation != Volatile.Read(ref _capScheduleGeneration) ||
+                !_capFpsAt60 ||
+                !_backend.NeedsContinuousRendering)
+            {
+                return;
+            }
+
+            RequestNextFrameRendering();
+        });
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -212,9 +285,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
             return;
         }
 
-        var scale = TopLevel.GetTopLevel(this)?.RenderScaling ?? 1.0;
-        var w = Math.Max(1, (int)Math.Ceiling(Bounds.Width * scale));
-        var h = Math.Max(1, (int)Math.Ceiling(Bounds.Height * scale));
+        TryGetPreviewViewportInfo(out var w, out var h, out _, out _, out _);
         _backend.Resize(w, h);
         RequestNextFrameRendering();
     }
@@ -484,6 +555,20 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         _backend.ApplyCameraZoom(notches);
         e.Handled = true;
         RequestNextFrameRendering();
+    }
+
+    private void RecordRenderFrame(TimeSpan dt)
+    {
+        _fpsAccumSeconds += dt.TotalSeconds;
+        _fpsFrameCount++;
+        if (_fpsAccumSeconds < 0.5)
+        {
+            return;
+        }
+
+        Volatile.Write(ref _smoothedFps, _fpsFrameCount / _fpsAccumSeconds);
+        _fpsAccumSeconds = 0;
+        _fpsFrameCount = 0;
     }
 
     public void Dispose()

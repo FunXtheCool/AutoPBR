@@ -119,7 +119,8 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         if (settings.EnablePreviewTaa &&
-            PreviewVolumetricQuality.Resolve(settings.VolumetricQuality).PreviewTaaWeight > 0f)
+            (PreviewVolumetricQuality.ResolvePreviewTaa(settings.VolumetricQuality, settings.PreviewTaaMode).TemporalWeight > 0f ||
+             settings.PreviewTaaForceFxaa))
         {
             tier |= PreviewGpuInitTier.PreviewTaa;
         }

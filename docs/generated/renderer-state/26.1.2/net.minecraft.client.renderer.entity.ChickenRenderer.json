@@ -13,7 +13,8 @@
   "extractionStatus": "partial hand-pilot",
   "extractionNotes": [
     "P6 hand shard: idle preview supplies flap/flapSpeed scalar fields used by chicken setupAnim.",
-    "RendererStateLift compiler remains deferred; this shard supplies preview scalar timing only."
+    "RendererStateLift compiler remains deferred; this shard supplies preview scalar timing only.",
+    "WarmChickenModel is a parity-catalog climate alias (26.1.2 warm variant uses ChickenVariant.ModelType.NORMAL); no WarmChickenModel.class in client.jar."
   ],
   "scalarRenderStateFields": [
     { "renderStateField": "flap", "setupAnimStateField": "flap" },

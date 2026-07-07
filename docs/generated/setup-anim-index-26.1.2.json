@@ -248,6 +248,14 @@
       "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.chicken.AdultChickenModel"
     },
     {
+      "officialJvmName": "net.minecraft.client.model.animal.chicken.WarmChickenModel",
+      "shardRelPath": "setup-anim/26.1.2/net.minecraft.client.model.animal.chicken.WarmChickenModel.json",
+      "profile": "named_jar_26.1.2",
+      "extractionStatus": "ok",
+      "jarPath": "",
+      "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.chicken.AdultChickenModel"
+    },
+    {
       "officialJvmName": "net.minecraft.client.model.animal.cow.BabyCowModel",
       "shardRelPath": "setup-anim/26.1.2/net.minecraft.client.model.animal.cow.BabyCowModel.json",
       "profile": "named_jar_26.1.2",

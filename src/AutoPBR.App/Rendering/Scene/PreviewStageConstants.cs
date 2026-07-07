@@ -33,6 +33,9 @@ public static class PreviewStageConstants
     /// <summary>Debounce before re-tinting grass colormap preview materials after slider drags.</summary>
     public const int GrassColormapTintDebounceMs = 200;
 
+    /// <summary>Debounce before pushing TXAA slider/mode changes to the GPU preview.</summary>
+    public const int PreviewTaaGpuDebounceMs = 200;
+
     public const double DefaultGrassColormapTemperature = 0.72;
     public const double DefaultGrassColormapDownfall = 0.45;
 

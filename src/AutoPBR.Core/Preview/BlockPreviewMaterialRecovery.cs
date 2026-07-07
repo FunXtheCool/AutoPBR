@@ -45,6 +45,7 @@ internal static class BlockPreviewMaterialRecovery
         textures = TextureScanner.ScanTextures(
             extracted,
             options,
+            applyFoliageIgnoreFilter: false,
             cancellationToken: cancellationToken);
 
         var workOrdered = new List<TextureWorkItem>(orderedModelTextures.Count);

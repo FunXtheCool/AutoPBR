@@ -1557,6 +1557,141 @@
   <data name="Preview3DCameraExpanderSection" xml:space="preserve">
     <value>Камера</value>
   </data>
+  <data name="Preview3DTaaSection" xml:space="preserve">
+    <value>ТХАА</value>
+  </data>
+  <data name="Preview3DTaaMode" xml:space="preserve">
+    <value>режим ТАА</value>
+  </data>
+  <data name="Preview3DTaaModeTooltip" xml:space="preserve">
+    <value>Отрегулируйте окончательный предварительный просмотр TAA. Стабильное и меньшее дрожание уменьшает дрожание окна просмотра; Edge AA позволяет контролировать накопление силуэтов; Sharp сохраняет больший контраст по краям; «Без дрожания» отключает дрожание проекции, сохраняя при этом историю разрешения.</value>
+  </data>
+  <data name="Preview3DTaaModeBalanced" xml:space="preserve">
+    <value>Стабильный</value>
+  </data>
+  <data name="Preview3DTaaModeLessJitter" xml:space="preserve">
+    <value>Меньше джиттера</value>
+  </data>
+  <data name="Preview3DTaaModeStableSoft" xml:space="preserve">
+    <value>Край АА</value>
+  </data>
+  <data name="Preview3DTaaModeSharper" xml:space="preserve">
+    <value>Острый</value>
+  </data>
+  <data name="Preview3DTaaModeNoJitter" xml:space="preserve">
+    <value>Нет дрожания</value>
+  </data>
+  <data name="Preview3DTaaTemporalScale" xml:space="preserve">
+    <value>Временной</value>
+  </data>
+  <data name="Preview3DTaaTemporalScaleTooltip" xml:space="preserve">
+    <value>Масштабирует смесь истории из выбранного режима TAA. Более низкие значения уменьшают двоение изображения; более высокие значения накапливают большее покрытие краев.</value>
+  </data>
+  <data name="Preview3DTaaJitterScale" xml:space="preserve">
+    <value>Джиттер</value>
+  </data>
+  <data name="Preview3DTaaJitterScaleTooltip" xml:space="preserve">
+    <value>Масштабирует дрожание субпиксельной проекции. Установите значение 0, чтобы изолировать путь разрешения/FXAA без перемещения сцены.</value>
+  </data>
+  <data name="Preview3DTaaSourceFilterScale" xml:space="preserve">
+    <value>Исходный фильтр</value>
+  </data>
+  <data name="Preview3DTaaSourceFilterScaleTooltip" xml:space="preserve">
+    <value>Масштабирует небольшой фильтр текущего кадра, используемый вблизи отклоненных краев TAA.</value>
+  </data>
+  <data name="Preview3DTaaEdgeBlendScale" xml:space="preserve">
+    <value>Краевая смесь</value>
+  </data>
+  <data name="Preview3DTaaEdgeBlendScaleTooltip" xml:space="preserve">
+    <value>Масштабирует размытие покрытия краев, используемое вокруг переходов глубины/силуэта.</value>
+  </data>
+  <data name="Preview3DTaaFxaaStrengthScale" xml:space="preserve">
+    <value>Сила FXAA</value>
+  </data>
+  <data name="Preview3DTaaFxaaStrengthScaleTooltip" xml:space="preserve">
+    <value>Масштабирует окончательную смесь FXAA-lite после разрешения TAA.</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaEdgeScale" xml:space="preserve">
+    <value>Яркость FXAA</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaEdgeScaleTooltip" xml:space="preserve">
+    <value>Масштабирует, насколько сильно края яркости входят в маску FXAA, независимо от обнаружения границ глубины.</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaThreshold" xml:space="preserve">
+    <value>Порог FXAA</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaThresholdTooltip" xml:space="preserve">
+    <value>Порог контрастности яркости для обнаружения границ FXAA. Более низкие значения улавливают более тонкие края и могут размыть детали пиксельной текстуры.</value>
+  </data>
+  <data name="Preview3DTaaForceFxaa" xml:space="preserve">
+    <value>Принудительное полнокадровое FXAA</value>
+  </data>
+  <data name="Preview3DTaaForceFxaaTooltip" xml:space="preserve">
+    <value>Режим диагностики: обходите маски глубины/геометрии и везде применяйте окончательный проход FXAA-lite. Используйте это, чтобы убедиться, что разрешение после AA заметно записывается в предварительный просмотр.</value>
+  </data>
+  <data name="Preview3DParallaxSection" xml:space="preserve">
+    <value>Параллакс</value>
+  </data>
+  <data name="Preview3DParallaxTraceLayers" xml:space="preserve">
+    <value>Слои трассировки POM</value>
+  </data>
+  <data name="Preview3DParallaxTraceLayersTooltip" xml:space="preserve">
+    <value>Первичные лучевые слои поля высот. Более высокие значения улучшают точность крутых углов при более высоких затратах на графический процессор.</value>
+  </data>
+  <data name="Preview3DParallaxRefineSteps" xml:space="preserve">
+    <value>POM уточняет шаги</value>
+  </data>
+  <data name="Preview3DParallaxRefineStepsTooltip" xml:space="preserve">
+    <value>Двоичные этапы уточнения после первого попадания в поле высот. Более высокие значения уменьшают ступенчатость смещенного UV.</value>
+  </data>
+  <data name="Preview3DParallaxMaxUvShift" xml:space="preserve">
+    <value>POM макс. УФ-смещение</value>
+  </data>
+  <data name="Preview3DParallaxMaxUvShiftTooltip" xml:space="preserve">
+    <value>Ограничивает расстояние, которое может пройти одна трасса параллакса в УФ-пространстве. Поднимите для более глубокого облегчения; опустите, чтобы уменьшить растяжение угла скольжения.</value>
+  </data>
+  <data name="Preview3DEnableTessellationDisplacement" xml:space="preserve">
+    <value>Мозаичный выступ</value>
+  </data>
+  <data name="Preview3DEnableTessellationDisplacementTooltip" xml:space="preserve">
+    <value>Используйте тесселяцию OpenGL для настольных компьютеров, чтобы добавить реальную внешнюю геометрию из областей карты с большой высотой. POM по-прежнему обрабатывает утопленные детали.</value>
+  </data>
+  <data name="Preview3DTessellationLevel" xml:space="preserve">
+    <value>Уровень тесселяции</value>
+  </data>
+  <data name="Preview3DTessellationLevelTooltip" xml:space="preserve">
+    <value>Уровень разделения треугольников для высококачественного предварительного просмотра смещения. Более высокие значения улучшают силуэты и рельеф краев при более высоких затратах на графический процессор.</value>
+  </data>
+  <data name="Preview3DTessellationDisplacementStrength" xml:space="preserve">
+    <value>Сила выступа</value>
+  </data>
+  <data name="Preview3DTessellationDisplacementStrengthTooltip" xml:space="preserve">
+    <value>Максимальное смещение мирового пространства наружу от ярких значений карты высот.</value>
+  </data>
+  <data name="Preview3DParallaxShadowSamples" xml:space="preserve">
+    <value>Образцы собственной тени</value>
+  </data>
+  <data name="Preview3DParallaxShadowSamplesTooltip" xml:space="preserve">
+    <value>Образцы, используемые параллаксом для луча собственной тени в направлении солнечного или лунного света. Более высокие значения уменьшают сглаживание.</value>
+  </data>
+  <data name="Preview3DParallaxShadowSoftness" xml:space="preserve">
+    <value>Мягкость собственной тени</value>
+  </data>
+  <data name="Preview3DParallaxShadowSoftnessTooltip" xml:space="preserve">
+    <value>Смягчает собственные тени параллакса на стороне приемника, поэтому тени поля высот больше смешиваются, как основной фильтр теней.</value>
+  </data>
+  <data name="Preview3DShowFpsCounter" xml:space="preserve">
+    <value>Счетчик ФПС</value>
+  </data>
+  <data name="Preview3DShowFpsCounterTooltip" xml:space="preserve">
+    <value>Отображение количества кадров в секунду в правом верхнем углу предварительного просмотра в 3D.</value>
+  </data>
+  <data name="Preview3DCapFpsAt60" xml:space="preserve">
+    <value>Ограничьте до 60 кадров в секунду.</value>
+  </data>
+  <data name="Preview3DCapFpsAt60Tooltip" xml:space="preserve">
+    <value>Ограничьте непрерывный предварительный 3D-рендеринг до 60 кадров в секунду, чтобы сократить использование графического процессора. По умолчанию выключено (без ограничений).</value>
+  </data>
 </root>
 
 

@@ -188,6 +188,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
                        _gpuBootstrap is not null ||
                        _settings.AutoRotate ||
                        _settings.AnimateTimeOfDay ||
+                       ShouldContinuouslyAccumulatePreviewTaa(_settings) ||
                        (_settings.EnableEntityAnimation && _blockModelSubject?.EnableRenderTimeAnimation == true) ||
                        (_settings.EnableVolumetricClouds && !_settings.CloudFreezeWind) ||
                        (_debugFlyRmbHeld && _flyEngaged) ||
@@ -514,18 +515,9 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
                 SameEntityPreviewAsset(prev, subject))
             {
                 var incomingFp = subject.EmulatedRebake?.PackConverterCpuMeshFingerprint ?? 0;
-                var committedMeshFp = prev.InterleavedVertices.Length > 0 &&
-                    prev.InterleavedVertices.Length % PreviewMesh.FloatsPerVertex == 0
-                    ? PreviewMeshGeometryFingerprint.ComputeCpuPreviewMesh(
-                        prev.InterleavedVertices,
-                        PreviewMesh.FloatsPerVertex)
-                    : 0UL;
                 if (previewPoseChanged ||
                     (_entityBindPoseCommittedKey is not null &&
                      !ParityCatalogCpuBindCommitKeyMatchesCurrentRevision(_entityBindPoseCommittedKey)) ||
-                    (incomingFp != 0 &&
-                     committedMeshFp != 0 &&
-                     incomingFp != committedMeshFp) ||
                     (_lastParityCatalogIncomingPackFingerprint != 0 &&
                      incomingFp != 0 &&
                      incomingFp != _lastParityCatalogIncomingPackFingerprint))
@@ -1196,7 +1188,17 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         CloudMarchStepOverride = s.CloudMarchStepOverride,
         CloudFreezeWind = s.CloudFreezeWind,
         EnablePreviewTaa = s.EnablePreviewTaa,
+        PreviewTaaMode = s.PreviewTaaMode,
+        PreviewTaaTemporalScale = s.PreviewTaaTemporalScale,
+        PreviewTaaJitterScale = s.PreviewTaaJitterScale,
+        PreviewTaaSourceFilterScale = s.PreviewTaaSourceFilterScale,
+        PreviewTaaEdgeBlendScale = s.PreviewTaaEdgeBlendScale,
+        PreviewTaaFxaaStrengthScale = s.PreviewTaaFxaaStrengthScale,
+        PreviewTaaFxaaLumaEdgeScale = s.PreviewTaaFxaaLumaEdgeScale,
+        PreviewTaaFxaaLumaThreshold = s.PreviewTaaFxaaLumaThreshold,
+        PreviewTaaForceFxaa = s.PreviewTaaForceFxaa,
         LogVolumetricTiming = s.LogVolumetricTiming,
+        LogPreviewTaaDiagnostics = s.LogPreviewTaaDiagnostics,
         ShowSunProjectionDebug = s.ShowSunProjectionDebug
     };
 }

@@ -1557,6 +1557,141 @@
   <data name="Preview3DCameraExpanderSection" xml:space="preserve">
     <value>Câmera</value>
   </data>
+  <data name="Preview3DTaaSection" xml:space="preserve">
+    <value>TXAA</value>
+  </data>
+  <data name="Preview3DTaaMode" xml:space="preserve">
+    <value>Modo TAA</value>
+  </data>
+  <data name="Preview3DTaaModeTooltip" xml:space="preserve">
+    <value>Ajuste a visualização final TAA. Estável e com menos jitter reduz o tremor da janela de visualização; Edge AA permite acumulação controlada de silhueta; Sharp mantém mais contraste nas bordas; Nenhum jitter desativa o jitter de projeção enquanto mantém o histórico de resolução.</value>
+  </data>
+  <data name="Preview3DTaaModeBalanced" xml:space="preserve">
+    <value>Estável</value>
+  </data>
+  <data name="Preview3DTaaModeLessJitter" xml:space="preserve">
+    <value>Menos nervosismo</value>
+  </data>
+  <data name="Preview3DTaaModeStableSoft" xml:space="preserve">
+    <value>Borda AA</value>
+  </data>
+  <data name="Preview3DTaaModeSharper" xml:space="preserve">
+    <value>Afiado</value>
+  </data>
+  <data name="Preview3DTaaModeNoJitter" xml:space="preserve">
+    <value>Sem nervosismo</value>
+  </data>
+  <data name="Preview3DTaaTemporalScale" xml:space="preserve">
+    <value>Temporal</value>
+  </data>
+  <data name="Preview3DTaaTemporalScaleTooltip" xml:space="preserve">
+    <value>Dimensiona a mistura do histórico do modo TAA selecionado. Valores mais baixos reduzem fantasmas; valores mais altos acumulam mais cobertura de borda.</value>
+  </data>
+  <data name="Preview3DTaaJitterScale" xml:space="preserve">
+    <value>Tremor</value>
+  </data>
+  <data name="Preview3DTaaJitterScaleTooltip" xml:space="preserve">
+    <value>Dimensiona o jitter de projeção subpixel. Defina como 0 para isolar o caminho de resolução/FXAA sem mover a cena.</value>
+  </data>
+  <data name="Preview3DTaaSourceFilterScale" xml:space="preserve">
+    <value>Filtro de origem</value>
+  </data>
+  <data name="Preview3DTaaSourceFilterScaleTooltip" xml:space="preserve">
+    <value>Dimensiona o pequeno filtro de quadro atual usado próximo às bordas TAA rejeitadas.</value>
+  </data>
+  <data name="Preview3DTaaEdgeBlendScale" xml:space="preserve">
+    <value>Mistura de borda</value>
+  </data>
+  <data name="Preview3DTaaEdgeBlendScaleTooltip" xml:space="preserve">
+    <value>Dimensiona o desfoque de cobertura de borda usado em transições de profundidade/silhueta.</value>
+  </data>
+  <data name="Preview3DTaaFxaaStrengthScale" xml:space="preserve">
+    <value>Força FXAA</value>
+  </data>
+  <data name="Preview3DTaaFxaaStrengthScaleTooltip" xml:space="preserve">
+    <value>Dimensiona a mistura FXAA-lite final após a resolução do TAA.</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaEdgeScale" xml:space="preserve">
+    <value>Luz FXAA</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaEdgeScaleTooltip" xml:space="preserve">
+    <value>Dimensiona a intensidade com que as bordas de luminância entram na máscara FXAA, independentemente da detecção de borda de profundidade.</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaThreshold" xml:space="preserve">
+    <value>Limite FXAA</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaThresholdTooltip" xml:space="preserve">
+    <value>Limite de contraste Luma para detecção de borda FXAA. Valores mais baixos capturam bordas mais sutis e podem desfocar detalhes de textura de pixel art.</value>
+  </data>
+  <data name="Preview3DTaaForceFxaa" xml:space="preserve">
+    <value>Forçar FXAA full-frame</value>
+  </data>
+  <data name="Preview3DTaaForceFxaaTooltip" xml:space="preserve">
+    <value>Modo de diagnóstico: ignore as máscaras de profundidade/geometria e aplique a passagem final FXAA-lite em todos os lugares. Use isso para verificar se a resolução pós-AA está visivelmente gravando na visualização.</value>
+  </data>
+  <data name="Preview3DParallaxSection" xml:space="preserve">
+    <value>Paralaxe</value>
+  </data>
+  <data name="Preview3DParallaxTraceLayers" xml:space="preserve">
+    <value>Camadas de rastreamento POM</value>
+  </data>
+  <data name="Preview3DParallaxTraceLayersTooltip" xml:space="preserve">
+    <value>Camadas primárias de marcha de raio de campo de altura. Valores mais altos melhoram a precisão de ângulos acentuados com maior custo de GPU.</value>
+  </data>
+  <data name="Preview3DParallaxRefineSteps" xml:space="preserve">
+    <value>Etapas de refinamento do POM</value>
+  </data>
+  <data name="Preview3DParallaxRefineStepsTooltip" xml:space="preserve">
+    <value>Etapas de refinamento binário após o primeiro acerto no campo de altura. Valores mais altos reduzem a subida de escadas no UV deslocado.</value>
+  </data>
+  <data name="Preview3DParallaxMaxUvShift" xml:space="preserve">
+    <value>Mudança máxima de UV POM</value>
+  </data>
+  <data name="Preview3DParallaxMaxUvShiftTooltip" xml:space="preserve">
+    <value>Limita a distância que um traço de paralaxe pode percorrer no espaço UV. Aumente para um alívio mais profundo; abaixe para reduzir o alongamento do ângulo rasante.</value>
+  </data>
+  <data name="Preview3DEnableTessellationDisplacement" xml:space="preserve">
+    <value>Protuberância tesselada</value>
+  </data>
+  <data name="Preview3DEnableTessellationDisplacementTooltip" xml:space="preserve">
+    <value>Use o mosaico OpenGL de desktop para adicionar geometria externa real de regiões de mapas de alta altura. POM ainda lida com detalhes embutidos.</value>
+  </data>
+  <data name="Preview3DTessellationLevel" xml:space="preserve">
+    <value>Nível de mosaico</value>
+  </data>
+  <data name="Preview3DTessellationLevelTooltip" xml:space="preserve">
+    <value>Nível de subdivisão triangular para visualização de deslocamento de alta qualidade. Valores mais altos melhoram as silhuetas e o relevo das bordas com um custo de GPU mais alto.</value>
+  </data>
+  <data name="Preview3DTessellationDisplacementStrength" xml:space="preserve">
+    <value>Força de protrusão</value>
+  </data>
+  <data name="Preview3DTessellationDisplacementStrengthTooltip" xml:space="preserve">
+    <value>Deslocamento máximo para fora do espaço mundial a partir de valores brilhantes do mapa de altura.</value>
+  </data>
+  <data name="Preview3DParallaxShadowSamples" xml:space="preserve">
+    <value>Amostras de auto-sombra</value>
+  </data>
+  <data name="Preview3DParallaxShadowSamplesTooltip" xml:space="preserve">
+    <value>Amostras usadas pelo raio de auto-sombra de paralaxe em direção à luz do sol ou da lua. Valores mais altos reduzem o alias.</value>
+  </data>
+  <data name="Preview3DParallaxShadowSoftness" xml:space="preserve">
+    <value>Suavidade de auto-sombra</value>
+  </data>
+  <data name="Preview3DParallaxShadowSoftnessTooltip" xml:space="preserve">
+    <value>Suaviza as auto-sombras de paralaxe do lado do receptor para que as sombras do campo de altura se misturem mais como o filtro de sombra principal.</value>
+  </data>
+  <data name="Preview3DShowFpsCounter" xml:space="preserve">
+    <value>Contador FPS</value>
+  </data>
+  <data name="Preview3DShowFpsCounterTooltip" xml:space="preserve">
+    <value>Mostre uma leitura de quadros por segundo no canto superior direito da visualização 3D.</value>
+  </data>
+  <data name="Preview3DCapFpsAt60" xml:space="preserve">
+    <value>Limite a 60 FPS</value>
+  </data>
+  <data name="Preview3DCapFpsAt60Tooltip" xml:space="preserve">
+    <value>Limite a renderização contínua de visualização 3D a 60 quadros por segundo para reduzir o uso da GPU. Desativado por padrão (sem limite).</value>
+  </data>
 </root>
 
 

@@ -54,7 +54,7 @@ internal static class SpriteVoxelMeshBuilder
                 var y1 = originY + (height - py) * voxelSize;
                 var y0 = y1 - voxelSize;
                 var u = (px + 0.5f) / width;
-                var v = (py + 0.5f) / height;
+                var v = 1f - (py + 0.5f) / height;
                 var uv = new Vector2(u, v);
 
                 AddCuboid(x0, y0, z0, x1, y1, z1, uv, verts, indices);

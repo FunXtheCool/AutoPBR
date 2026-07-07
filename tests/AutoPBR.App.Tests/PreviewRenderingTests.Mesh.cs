@@ -118,7 +118,7 @@ public sealed partial class PreviewRenderingTests
     {
         var mesh = PreviewMeshFactory.CreateItemPlane();
         var bitangent = ReadBitangent(mesh.InterleavedVertices, 0);
-        AssertVectorNear(-Vector3.UnitY, bitangent);
+        AssertVectorNear(Vector3.UnitY, bitangent);
     }
 
     [Fact]

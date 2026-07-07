@@ -179,7 +179,43 @@ public class PreviewGlslEsAdaptTests
         Assert.Contains("trClipHistoryToNeighborhoodYCoCg", adapted, StringComparison.Ordinal);
         Assert.Contains("trLuminanceReactiveWeight", adapted, StringComparison.Ordinal);
         Assert.Contains("trDepthEdgeWeight", adapted, StringComparison.Ordinal);
-        Assert.Contains("0.08 * stableW", adapted, StringComparison.Ordinal);
+        Assert.Contains("stableTemporal", adapted, StringComparison.Ordinal);
+        Assert.Contains("uStableTemporalBoost", adapted, StringComparison.Ordinal);
+        Assert.Contains("uMaxStableTemporal", adapted, StringComparison.Ordinal);
+        Assert.Contains("uTaaSharpenStrength", adapted, StringComparison.Ordinal);
+        Assert.Contains("uDepthEdgeHistoryFloor", adapted, StringComparison.Ordinal);
+        Assert.Contains("uEdgeAaBlend", adapted, StringComparison.Ordinal);
+        Assert.Contains("uCurrentJitterPixels", adapted, StringComparison.Ordinal);
+        Assert.Contains("uSourceFilterStrength", adapted, StringComparison.Ordinal);
+        Assert.Contains("uSilhouetteHistoryWeight", adapted, StringComparison.Ordinal);
+        Assert.Contains("uFxaaEdgeStrength", adapted, StringComparison.Ordinal);
+        Assert.Contains("uFxaaLumaEdgeStrength", adapted, StringComparison.Ordinal);
+        Assert.Contains("uFxaaLumaThreshold", adapted, StringComparison.Ordinal);
+        Assert.Contains("uForceFxaa", adapted, StringComparison.Ordinal);
+        Assert.Contains("taaCurrentResolveFilter", adapted, StringComparison.Ordinal);
+        Assert.Contains("taaFxaaLite", adapted, StringComparison.Ordinal);
+        Assert.Contains("taaTentBlur3x3", adapted, StringComparison.Ordinal);
+        Assert.Contains("taaMorphologicalEdgeBlend", adapted, StringComparison.Ordinal);
+        Assert.Contains("taaClosestGeometryDepth3", adapted, StringComparison.Ordinal);
+        Assert.Contains("taaLumaEdgeMask", adapted, StringComparison.Ordinal);
+        Assert.Contains("depthGeometryW", adapted, StringComparison.Ordinal);
+        Assert.Contains("signalGeometryW", adapted, StringComparison.Ordinal);
+        Assert.Contains("silhouetteW", adapted, StringComparison.Ordinal);
+        Assert.Contains("depthFxaaMask", adapted, StringComparison.Ordinal);
+        Assert.Contains("lumaFxaaMask", adapted, StringComparison.Ordinal);
+        Assert.Contains("geometryFxaaW", adapted, StringComparison.Ordinal);
+        Assert.Contains("fxaaEdgeMask", adapted, StringComparison.Ordinal);
+        Assert.Contains("edgeHistoryW", adapted, StringComparison.Ordinal);
+        Assert.Contains("postFxaaW", adapted, StringComparison.Ordinal);
+        Assert.Contains("acrossNormal", adapted, StringComparison.Ordinal);
+        Assert.Contains("depthGrad", adapted, StringComparison.Ordinal);
+        Assert.Contains("forceFullFrame", adapted, StringComparison.Ordinal);
+        Assert.Contains("uForceFxaa > 0", adapted, StringComparison.Ordinal);
+        Assert.Contains("thresholdLow", adapted, StringComparison.Ordinal);
+        Assert.Contains("edgeMask * strength", adapted, StringComparison.Ordinal);
+        Assert.Contains("coverageW", adapted, StringComparison.Ordinal);
+        Assert.Contains("reprojectionDepth", adapted, StringComparison.Ordinal);
+        Assert.Contains("rawDepthEdgeW", adapted, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -215,11 +251,14 @@ public class PreviewGlslEsAdaptTests
 
         Assert.Contains("uniform mat4 uPrevModel", src, StringComparison.Ordinal);
         Assert.Contains("uniform mat4 uPrevViewProj", src, StringComparison.Ordinal);
+        Assert.Contains("uniform mat4 uTaaCurrViewProj", src, StringComparison.Ordinal);
         Assert.Contains("EntityPrevSkinningBones", src, StringComparison.Ordinal);
         Assert.Contains("uEntityPrevBonePaletteValid", src, StringComparison.Ordinal);
         Assert.Contains("prevEntityPos = prevBone * vec4(aPos, 1.0)", src, StringComparison.Ordinal);
         Assert.Contains("out vec4 vPrevClip", src, StringComparison.Ordinal);
+        Assert.Contains("vCurrClip = uTaaCurrViewProj * wp", src, StringComparison.Ordinal);
         Assert.Contains("vPrevClip = uPrevViewProj * uPrevModel * prevEntityPos", src, StringComparison.Ordinal);
+        Assert.Contains("gl_Position = clip", src, StringComparison.Ordinal);
     }
 
     [Fact]

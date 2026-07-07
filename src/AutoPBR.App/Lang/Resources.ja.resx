@@ -1557,6 +1557,141 @@
   <data name="Preview3DCameraExpanderSection" xml:space="preserve">
     <value>カメラ</value>
   </data>
+  <data name="Preview3DTaaSection" xml:space="preserve">
+    <value>TXAA</value>
+  </data>
+  <data name="Preview3DTaaMode" xml:space="preserve">
+    <value>TAAモード</value>
+  </data>
+  <data name="Preview3DTaaModeTooltip" xml:space="preserve">
+    <value>最終プレビュー TAA を調整します。安定してジッターが少ないため、ビューポートの揺れが軽減されます。エッジ AA により、制御されたシルエットの蓄積が可能になります。シャープはより多くのエッジコントラストを維持します。 [ジッターなし] は、解決履歴を保持しながら投影ジッターを無効にします。</value>
+  </data>
+  <data name="Preview3DTaaModeBalanced" xml:space="preserve">
+    <value>安定した</value>
+  </data>
+  <data name="Preview3DTaaModeLessJitter" xml:space="preserve">
+    <value>ジッターが少ない</value>
+  </data>
+  <data name="Preview3DTaaModeStableSoft" xml:space="preserve">
+    <value>エッジAA</value>
+  </data>
+  <data name="Preview3DTaaModeSharper" xml:space="preserve">
+    <value>シャープ</value>
+  </data>
+  <data name="Preview3DTaaModeNoJitter" xml:space="preserve">
+    <value>ジッターなし</value>
+  </data>
+  <data name="Preview3DTaaTemporalScale" xml:space="preserve">
+    <value>時間的</value>
+  </data>
+  <data name="Preview3DTaaTemporalScaleTooltip" xml:space="preserve">
+    <value>選択した TAA モードからヒストリ ブレンドをスケールします。値を低くするとゴーストが軽減されます。値が大きいほど、より多くのエッジ カバレッジが蓄積されます。</value>
+  </data>
+  <data name="Preview3DTaaJitterScale" xml:space="preserve">
+    <value>ジッター</value>
+  </data>
+  <data name="Preview3DTaaJitterScaleTooltip" xml:space="preserve">
+    <value>サブピクセル投影ジッターをスケールします。シーンを移動せずに解決/FXAA パスを分離するには、0 に設定します。</value>
+  </data>
+  <data name="Preview3DTaaSourceFilterScale" xml:space="preserve">
+    <value>ソースフィルター</value>
+  </data>
+  <data name="Preview3DTaaSourceFilterScaleTooltip" xml:space="preserve">
+    <value>拒否された TAA エッジ付近で使用される小さな現在のフレーム フィルターをスケーリングします。</value>
+  </data>
+  <data name="Preview3DTaaEdgeBlendScale" xml:space="preserve">
+    <value>エッジブレンド</value>
+  </data>
+  <data name="Preview3DTaaEdgeBlendScaleTooltip" xml:space="preserve">
+    <value>深度/シルエットの遷移の周囲で使用されるエッジ カバレッジ ブラーをスケールします。</value>
+  </data>
+  <data name="Preview3DTaaFxaaStrengthScale" xml:space="preserve">
+    <value>FXAAの強さ</value>
+  </data>
+  <data name="Preview3DTaaFxaaStrengthScaleTooltip" xml:space="preserve">
+    <value>TAA 解決後に最終的な FXAA-lite ブレンドをスケーリングします。</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaEdgeScale" xml:space="preserve">
+    <value>FXAA ルマ</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaEdgeScaleTooltip" xml:space="preserve">
+    <value>深度エッジの検出とは無関係に、輝度エッジが FXAA マスクにどの程度強く入るかをスケーリングします。</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaThreshold" xml:space="preserve">
+    <value>FXAA しきい値</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaThresholdTooltip" xml:space="preserve">
+    <value>FXAA エッジ検出の輝度コントラストしきい値。値を低くすると、より微妙なエッジが捉えられ、ピクセルアートのテクスチャの詳細がぼやける可能性があります。</value>
+  </data>
+  <data name="Preview3DTaaForceFxaa" xml:space="preserve">
+    <value>フルフレーム FXAA を強制する</value>
+  </data>
+  <data name="Preview3DTaaForceFxaaTooltip" xml:space="preserve">
+    <value>診断モード: 深度/ジオメトリ マスクをバイパスし、最終的な FXAA-lite パスをあらゆる場所に適用します。これを使用して、AA 後の解決がプレビューに視覚的に書き込まれていることを確認します。</value>
+  </data>
+  <data name="Preview3DParallaxSection" xml:space="preserve">
+    <value>視差</value>
+  </data>
+  <data name="Preview3DParallaxTraceLayers" xml:space="preserve">
+    <value>POM トレース層</value>
+  </data>
+  <data name="Preview3DParallaxTraceLayersTooltip" xml:space="preserve">
+    <value>プライマリ ハイト フィールド レイ マーチ レイヤー。値を大きくすると、GPU コストが高くなりますが、急角度の精度が向上します。</value>
+  </data>
+  <data name="Preview3DParallaxRefineSteps" xml:space="preserve">
+    <value>POM のリファイン手順</value>
+  </data>
+  <data name="Preview3DParallaxRefineStepsTooltip" xml:space="preserve">
+    <value>最初のハイトフィールドヒット後のバイナリリファインメントステップ。値を高くすると、ディスプレイスメントされた UV の階段状のステップが減少します。</value>
+  </data>
+  <data name="Preview3DParallaxMaxUvShift" xml:space="preserve">
+    <value>POM 最大 UV シフト</value>
+  </data>
+  <data name="Preview3DParallaxMaxUvShiftTooltip" xml:space="preserve">
+    <value>1 つの視差トレースが UV 空間内で移動できる距離を制限します。上げるとより深い緩和が得られます。かすめ角の伸びを減らすには、低くします。</value>
+  </data>
+  <data name="Preview3DEnableTessellationDisplacement" xml:space="preserve">
+    <value>モザイク状の突起</value>
+  </data>
+  <data name="Preview3DEnableTessellationDisplacementTooltip" xml:space="preserve">
+    <value>デスクトップ OpenGL テッセレーションを使用して、高さマップ領域から実際の外側のジオメトリを追加します。 POM は引き続き凹部のディテールを処理します。</value>
+  </data>
+  <data name="Preview3DTessellationLevel" xml:space="preserve">
+    <value>テッセレーションレベル</value>
+  </data>
+  <data name="Preview3DTessellationLevelTooltip" xml:space="preserve">
+    <value>ハイエンドのディスプレイスメント プレビュー用の三角形のサブディビジョン レベル。値を大きくすると、GPU コストが高くなりますが、シルエットとエッジ レリーフが向上します。</value>
+  </data>
+  <data name="Preview3DTessellationDisplacementStrength" xml:space="preserve">
+    <value>突出強度</value>
+  </data>
+  <data name="Preview3DTessellationDisplacementStrengthTooltip" xml:space="preserve">
+    <value>明るい高さマップ値からのワールド空間の外側への最大変位。</value>
+  </data>
+  <data name="Preview3DParallaxShadowSamples" xml:space="preserve">
+    <value>セルフシャドウのサンプル</value>
+  </data>
+  <data name="Preview3DParallaxShadowSamplesTooltip" xml:space="preserve">
+    <value>太陽や月の光に向けた視差セルフシャドウ光線で使用したサンプル。値を大きくすると、エイリアシングが減少します。</value>
+  </data>
+  <data name="Preview3DParallaxShadowSoftness" xml:space="preserve">
+    <value>セルフシャドウの柔らかさ</value>
+  </data>
+  <data name="Preview3DParallaxShadowSoftnessTooltip" xml:space="preserve">
+    <value>受信機側の視差セルフシャドウを和らげ、ハイトフィールドシャドウがメインシャドウフィルターのようにブレンドされるようにします。</value>
+  </data>
+  <data name="Preview3DShowFpsCounter" xml:space="preserve">
+    <value>FPSカウンター</value>
+  </data>
+  <data name="Preview3DShowFpsCounterTooltip" xml:space="preserve">
+    <value>3D プレビューの右上隅に 1 秒あたりのフレーム数の読み出しを表示します。</value>
+  </data>
+  <data name="Preview3DCapFpsAt60" xml:space="preserve">
+    <value>60 FPS に制限する</value>
+  </data>
+  <data name="Preview3DCapFpsAt60Tooltip" xml:space="preserve">
+    <value>GPU の使用量を減らすために、連続 3D プレビュー レンダリングを 1 秒あたり 60 フレームに制限します。デフォルトではオフ (上限なし)。</value>
+  </data>
 </root>
 
 

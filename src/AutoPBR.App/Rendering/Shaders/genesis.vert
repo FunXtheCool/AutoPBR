@@ -12,6 +12,7 @@ uniform mat4 uModel;
 uniform mat4 uPrevModel;
 uniform mat4 uView;
 uniform mat4 uProj;
+uniform mat4 uTaaCurrViewProj;
 uniform mat4 uPrevViewProj;
 uniform mat4 uLightViewProj;
 
@@ -95,7 +96,8 @@ void main()
     vWorldTangent = vec4(normalize(t), aTangent.w);
     vUv = aUv;
     vLightClip = uLightViewProj * wp;
-    vCurrClip = uProj * uView * wp;
+    vec4 clip = uProj * uView * wp;
+    vCurrClip = uTaaCurrViewProj * wp;
     vPrevClip = uPrevViewProj * uPrevModel * prevEntityPos;
-    gl_Position = vCurrClip;
+    gl_Position = clip;
 }

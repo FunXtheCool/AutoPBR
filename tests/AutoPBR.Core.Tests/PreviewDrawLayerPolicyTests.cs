@@ -19,31 +19,31 @@ public sealed class PreviewDrawLayerPolicyTests
     }
 
     [Fact]
-    public void ForKind_cutout_overlay_writes_depth_for_post_occlusion()
+    public void ForKind_cutout_overlay_writes_depth_and_casts_shadow()
     {
         var policy = PreviewDrawLayerPolicy.ForKind(PreviewDepthLayerKind.CutoutOverlay, layerOrdinal: 1);
         Assert.True(policy.DepthWrite);
-        Assert.Equal(PreviewDrawLayerShadowMode.Skip, policy.ShadowMode);
+        Assert.Equal(PreviewDrawLayerShadowMode.Draw, policy.ShadowMode);
         Assert.Equal(2, policy.DepthBiasStep);
     }
 
     [Fact]
-    public void ForKind_cosmetic_overlay_writes_depth_and_skips_shadow()
+    public void ForKind_cosmetic_overlay_writes_depth_and_casts_shadow()
     {
         var policy = PreviewDrawLayerPolicy.ForKind(PreviewDepthLayerKind.CosmeticOverlay, layerOrdinal: 1);
         Assert.Equal(PreviewDepthLayerKind.CosmeticOverlay, policy.Kind);
         Assert.True(policy.DepthWrite);
-        Assert.Equal(PreviewDrawLayerShadowMode.Skip, policy.ShadowMode);
+        Assert.Equal(PreviewDrawLayerShadowMode.Draw, policy.ShadowMode);
         Assert.Equal(201, policy.DrawOrder);
         Assert.Equal(2, policy.DepthBiasStep);
     }
 
     [Fact]
-    public void ForKind_emissive_overlay_writes_depth_and_skips_shadow()
+    public void ForKind_emissive_overlay_writes_depth_and_casts_shadow()
     {
         var policy = PreviewDrawLayerPolicy.ForKind(PreviewDepthLayerKind.EmissiveOverlay);
         Assert.True(policy.DepthWrite);
-        Assert.Equal(PreviewDrawLayerShadowMode.Skip, policy.ShadowMode);
+        Assert.Equal(PreviewDrawLayerShadowMode.Draw, policy.ShadowMode);
         Assert.Equal(2, policy.DepthBiasStep);
     }
 
@@ -260,7 +260,7 @@ public sealed class PreviewDepthLayerClassifierTests
             cuboidIndexOnPart: 0,
             cuboidCountOnPart: 1);
         Assert.Equal(PreviewDepthLayerKind.TranslucentOverlay, kind);
-        Assert.False(castsShadow);
+        Assert.True(castsShadow);
     }
 
     [Fact]
@@ -369,6 +369,7 @@ public sealed class PreviewDepthLayerResolverTests
 
         PreviewDepthLayerResolver.EnrichMergedModel(merged);
         Assert.Equal(PreviewDepthLayerKind.CutoutOverlay, merged.Elements[0].DepthLayerKind);
+        Assert.False(merged.Elements[0].CastsShadow);
     }
 
     [Fact]
@@ -406,12 +407,68 @@ public sealed class PreviewDepthLayerResolverTests
     public void ClassifyIrCuboid_honors_explicit_previewDepthLayer_on_ir()
     {
         using var cuboid = JsonDocument.Parse("{\"previewDepthLayer\":\"cosmeticOverlay\"}");
-        var (kind, _, _) = PreviewDepthLayerClassifier.ClassifyIrCuboid(
+        var (kind, _, castsShadow) = PreviewDepthLayerClassifier.ClassifyIrCuboid(
             "body",
             "net.minecraft.client.model.npc.VillagerModel",
             cuboid.RootElement,
             0,
             1);
         Assert.Equal(PreviewDepthLayerKind.CosmeticOverlay, kind);
+        Assert.True(castsShadow);
+    }
+
+    [Theory]
+    [InlineData(PreviewDepthLayerKind.CutoutOverlay, true)]
+    [InlineData(PreviewDepthLayerKind.CosmeticOverlay, true)]
+    [InlineData(PreviewDepthLayerKind.EmissiveOverlay, false)]
+    [InlineData(PreviewDepthLayerKind.TranslucentOverlay, false)]
+    [InlineData(PreviewDepthLayerKind.DebugOnly, false)]
+    public void CastsShadowForKind_skips_translucent_debug_and_emissive_fx(PreviewDepthLayerKind kind, bool expected)
+    {
+        Assert.Equal(expected, PreviewDepthLayerResolver.CastsShadowForKind(kind));
+    }
+
+    [Fact]
+    public void CastsShadowFor_slime_outer_cube_overrides_translucent_skip()
+    {
+        using var cuboid = JsonDocument.Parse("{\"textureKey\":\"#skin\"}");
+        var castsShadow = PreviewDepthLayerClassifier.ClassifyIrCuboid(
+            "outer_cube",
+            "net.minecraft.client.model.monster.slime.SlimeModel",
+            cuboid.RootElement,
+            0,
+            1).CastsShadow;
+        Assert.True(castsShadow);
+        Assert.True(PreviewDepthLayerResolver.IsSlimeOuterBodyShadowCaster(
+            "outer_cube",
+            "net.minecraft.client.model.monster.slime.SlimeModel"));
+    }
+
+    [Theory]
+    [InlineData("wind_mid", "#wind", PreviewDepthLayerKind.CutoutOverlay, true)]
+    [InlineData("body", "#wind", PreviewDepthLayerKind.CutoutOverlay, true)]
+    [InlineData("body", "#skin", PreviewDepthLayerKind.CutoutOverlay, false)]
+    [InlineData("body", "#emissive", PreviewDepthLayerKind.EmissiveOverlay, true)]
+    public void IsWindOrSpecialFxShadowExempt_matches_wind_and_glow_tokens(
+        string partId,
+        string textureKey,
+        PreviewDepthLayerKind kind,
+        bool exempt)
+    {
+        Assert.Equal(exempt, PreviewDepthLayerResolver.IsWindOrSpecialFxShadowExempt(partId, textureKey, kind));
+    }
+
+    [Fact]
+    public void ClassifyIrCuboid_wind_part_is_shadow_exempt()
+    {
+        using var cuboid = JsonDocument.Parse("{\"textureKey\":\"#wind\"}");
+        var (kind, _, castsShadow) = PreviewDepthLayerClassifier.ClassifyIrCuboid(
+            "wind_mid",
+            "net.minecraft.client.model.monster.breeze.BreezeModel",
+            cuboid.RootElement,
+            1,
+            3);
+        Assert.Equal(PreviewDepthLayerKind.CutoutOverlay, kind);
+        Assert.False(castsShadow);
     }
 }

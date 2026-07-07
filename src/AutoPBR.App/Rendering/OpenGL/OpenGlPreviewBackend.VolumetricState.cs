@@ -22,6 +22,7 @@ public sealed partial class OpenGlPreviewBackend
         _prevEnableVolumetricClouds = settings.EnableVolumetricClouds;
         _prevCloudDisableTemporal = settings.CloudDisableTemporal;
         _prevEnablePreviewTaa = settings.EnablePreviewTaa;
+        _prevPreviewTaaMode = settings.PreviewTaaMode;
         _cloudTierReadyWarmupDraws = CloudTierReadyWarmupDraws;
         _cloudDeferredCompositeRetries = 4;
         _loggedCloudDraw = false;

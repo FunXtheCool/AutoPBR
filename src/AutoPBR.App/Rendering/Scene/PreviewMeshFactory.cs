@@ -90,6 +90,10 @@ public static class PreviewMeshFactory
     }
 
     /// <summary>XY quad centered at origin, facing +Z (viewer from +Z sees front).</summary>
+    /// <remarks>
+    /// UVs match <see cref="AutoPBR.Core.Preview.PreviewUvBakePolicy.BlockOrItemBaseline"/> with <c>FlipV</c>
+    /// plus <see cref="Abstractions.PreviewMaterial.GlUploadFlipRows"/> on upload (same convention as baked block/item faces).
+    /// </remarks>
     public static PreviewMesh CreateItemPlane(string name = "item_plane", float halfSize = 0.5f)
     {
         var h = halfSize;
@@ -101,7 +105,7 @@ public static class PreviewMeshFactory
             new(h, h, 0),
             new(-h, h, 0)
         ];
-        Vector2[] uvs = [new(0, 1), new(1, 1), new(1, 0), new(0, 0)];
+        Vector2[] uvs = [new(0, 0), new(1, 0), new(1, 1), new(0, 1)];
         PreviewTangentBasis.Derive(corners, uvs, n, Vector3.UnitX, 1f, out var t, out var wSign);
         var verts = new List<float>(4 * PreviewMesh.FloatsPerVertex);
         for (var i = 0; i < 4; i++)
@@ -143,7 +147,7 @@ public static class PreviewMeshFactory
             var c3 = Vector3.Transform(new Vector3(-h, h, 0), rot);
 
             Vector3[] corners = [c0, c1, c2, c3];
-            Vector2[] uvs = [new(0, 1), new(1, 1), new(1, 0), new(0, 0)];
+            Vector2[] uvs = [new(0, 0), new(1, 0), new(1, 1), new(0, 1)];
             PreviewTangentBasis.Derive(corners, uvs, n, t, 1f, out var tangent, out var wSign);
 
             var baseIndex = (uint)(v.Count / PreviewMesh.FloatsPerVertex);

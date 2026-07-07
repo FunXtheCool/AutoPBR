@@ -1,0 +1,124 @@
+using System.Numerics;
+
+using AutoPBR.App.Rendering.OpenGL;
+
+namespace AutoPBR.App.Rendering;
+
+/// <summary>Fits directional shadow ortho extents to preview subject bounds (large entities such as Ender Dragon).</summary>
+internal static class PreviewShadowFrustum
+{
+    private const float MinHalfExtent = 0.75f;
+    private const float MaxHalfExtent = 36f;
+    private const float DepthPadding = 2.5f;
+    private const float ExtentPaddingFraction = 0.12f;
+
+    public static Matrix4x4 BuildDirectionalViewProj(
+        Vector3 worldLightDir,
+        Vector3 boundsMin,
+        Vector3 boundsMax,
+        Matrix4x4 worldFromModel,
+        float minHalfExtent = MinHalfExtent,
+        float maxHalfExtent = MaxHalfExtent)
+    {
+        Span<Vector3> corners = stackalloc Vector3[8];
+        WriteAabbCorners(boundsMin, boundsMax, corners);
+        for (var i = 0; i < corners.Length; i++)
+        {
+            corners[i] = Vector3.Transform(corners[i], worldFromModel);
+        }
+
+        var center = Vector3.Zero;
+        foreach (var corner in corners)
+        {
+            center += corner;
+        }
+
+        center /= corners.Length;
+
+        var up = PreviewLightMath.PickShadowViewUp(worldLightDir);
+        var radius = 0f;
+        foreach (var corner in corners)
+        {
+            radius = MathF.Max(radius, Vector3.Distance(corner, center));
+        }
+
+        var eyeDistance = Math.Clamp(radius + 6f, 8f, maxHalfExtent * 2f);
+        var eye = center - worldLightDir * eyeDistance;
+        var view = PreviewGlMatrices.CreateLookAtRhOpenGlRowStorage(eye, center, up);
+
+        var minX = float.PositiveInfinity;
+        var maxX = float.NegativeInfinity;
+        var minY = float.PositiveInfinity;
+        var maxY = float.NegativeInfinity;
+        var minZ = float.PositiveInfinity;
+        var maxZ = float.NegativeInfinity;
+        foreach (var corner in corners)
+        {
+            var lightSpace = TransformPointColumn(view, corner);
+            minX = MathF.Min(minX, lightSpace.X);
+            maxX = MathF.Max(maxX, lightSpace.X);
+            minY = MathF.Min(minY, lightSpace.Y);
+            maxY = MathF.Max(maxY, lightSpace.Y);
+            minZ = MathF.Min(minZ, lightSpace.Z);
+            maxZ = MathF.Max(maxZ, lightSpace.Z);
+        }
+
+        var halfX = (maxX - minX) * 0.5f;
+        var halfY = (maxY - minY) * 0.5f;
+        var half = MathF.Max(halfX, halfY);
+        half *= 1f + ExtentPaddingFraction;
+        half = Math.Clamp(MathF.Max(half, minHalfExtent), minHalfExtent, maxHalfExtent);
+
+        var centerX = (minX + maxX) * 0.5f;
+        var centerY = (minY + maxY) * 0.5f;
+        var zNear = -maxZ - DepthPadding;
+        var zFar = -minZ + DepthPadding;
+        if (zFar - zNear < 1f)
+        {
+            var mid = (zNear + zFar) * 0.5f;
+            zNear = mid - 0.5f;
+            zFar = mid + 0.5f;
+        }
+
+        var proj = PreviewGlMatrices.CreateOrthographicOpenGlRowStorage(
+            centerX - half,
+            centerX + half,
+            centerY - half,
+            centerY + half,
+            zNear,
+            zFar);
+        return proj * view;
+    }
+
+    internal static void ExpandBoundsForGroundReceiver(ref Vector3 min, ref Vector3 max, float groundY)
+    {
+        min.Y = MathF.Min(min.Y, groundY);
+        var spanX = max.X - min.X;
+        var spanZ = max.Z - min.Z;
+        var pad = MathF.Max(spanX, spanZ) * 0.35f + 1.5f;
+        var cx = (min.X + max.X) * 0.5f;
+        var cz = (min.Z + max.Z) * 0.5f;
+        min.X = MathF.Min(min.X, cx - pad);
+        max.X = MathF.Max(max.X, cx + pad);
+        min.Z = MathF.Min(min.Z, cz - pad);
+        max.Z = MathF.Max(max.Z, cz + pad);
+    }
+
+    private static void WriteAabbCorners(Vector3 min, Vector3 max, Span<Vector3> corners)
+    {
+        corners[0] = new Vector3(min.X, min.Y, min.Z);
+        corners[1] = new Vector3(max.X, min.Y, min.Z);
+        corners[2] = new Vector3(min.X, max.Y, min.Z);
+        corners[3] = new Vector3(max.X, max.Y, min.Z);
+        corners[4] = new Vector3(min.X, min.Y, max.Z);
+        corners[5] = new Vector3(max.X, min.Y, max.Z);
+        corners[6] = new Vector3(min.X, max.Y, max.Z);
+        corners[7] = new Vector3(max.X, max.Y, max.Z);
+    }
+
+    private static Vector3 TransformPointColumn(Matrix4x4 rowStorageMatrix, Vector3 point)
+    {
+        var column = Matrix4x4.Transpose(rowStorageMatrix);
+        return Vector3.Transform(point, column);
+    }
+}

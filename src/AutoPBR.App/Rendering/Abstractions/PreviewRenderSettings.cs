@@ -270,8 +270,38 @@ public sealed class PreviewRenderSettings
     /// <summary>When true, log froxel inject/integrate timings that exceed the documented budget.</summary>
     public bool LogVolumetricTiming { get; init; }
 
+    /// <summary>When true, emit periodic TXAA resolve/readback diagnostics (Debug tab only; expensive on the render thread).</summary>
+    public bool LogPreviewTaaDiagnostics { get; init; }
+
     /// <summary>Final full-res TAA on the composited preview frame (uses shared temporal reprojection).</summary>
     public bool EnablePreviewTaa { get; init; } = true;
+
+    /// <summary>Final preview TAA tuning preset: 0 = less jitter, 1 = stable, 2 = edge AA, 3 = sharp, 4 = no projection jitter.</summary>
+    public int PreviewTaaMode { get; init; }
+
+    /// <summary>Multiplier for the TAA history blend from the selected preset.</summary>
+    public float PreviewTaaTemporalScale { get; init; } = 1f;
+
+    /// <summary>Multiplier for the projection jitter amplitude from the selected preset.</summary>
+    public float PreviewTaaJitterScale { get; init; } = 1f;
+
+    /// <summary>Multiplier for the current-frame source filter near TAA edges.</summary>
+    public float PreviewTaaSourceFilterScale { get; init; } = 1f;
+
+    /// <summary>Multiplier for the edge blur/coverage blend from the selected preset.</summary>
+    public float PreviewTaaEdgeBlendScale { get; init; } = 1f;
+
+    /// <summary>Multiplier for the final FXAA-lite pass strength.</summary>
+    public float PreviewTaaFxaaStrengthScale { get; init; } = 1f;
+
+    /// <summary>Multiplier for how strongly luma edges participate in the final FXAA-lite mask.</summary>
+    public float PreviewTaaFxaaLumaEdgeScale { get; init; } = 1f;
+
+    /// <summary>Luma contrast threshold for the final FXAA-lite pass.</summary>
+    public float PreviewTaaFxaaLumaThreshold { get; init; } = 0.018f;
+
+    /// <summary>Debug: bypass geometry/depth masks and apply FXAA-lite to all luma edges.</summary>
+    public bool PreviewTaaForceFxaa { get; init; }
 
     /// <summary>Debug overlay: sun projection frustum lines in the preview viewport.</summary>
     public bool ShowSunProjectionDebug { get; init; }

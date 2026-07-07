@@ -91,6 +91,7 @@ public static class PreviewGroundMapsResolver
             IReadOnlyList<TextureWorkItem> textures = TextureScanner.ScanTextures(
                 extracted,
                 options,
+                applyFoliageIgnoreFilter: false,
                 cancellationToken: cancellationToken);
             if (textures.Count == 0)
             {

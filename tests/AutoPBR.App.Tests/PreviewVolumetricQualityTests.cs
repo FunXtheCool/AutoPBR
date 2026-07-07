@@ -5,9 +5,9 @@ namespace AutoPBR.App.Tests;
 public sealed class PreviewVolumetricQualityTests
 {
     [Theory]
-    [InlineData(0, 8, 24, 12, 0f, 0f, 0f, 0f, 0f, 0f, 0f)]
-    [InlineData(1, 4, 32, 20, 2.8f, 0.28f, 0.42f, 1, 0.35f, 0.45f, 0.55f)]
-    [InlineData(2, 3, 48, 24, 4.2f, 0.38f, 0.55f, 2, 0.42f, 0.55f, 0.72f)]
+    [InlineData(0, 8, 24, 12, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)]
+    [InlineData(1, 4, 32, 20, 2.8f, 0.28f, 0.42f, 1, 0.35f, 0.45f, 0.78f, 1.0f)]
+    [InlineData(2, 3, 48, 24, 4.2f, 0.38f, 0.55f, 2, 0.42f, 0.55f, 0.84f, 1.0f)]
     public void Resolve_ReturnsExpectedProfile(
         int quality,
         int divisor,
@@ -19,7 +19,8 @@ public sealed class PreviewVolumetricQualityTests
         int cloudQuality,
         float volumeTemporal,
         float upsampleTemporal,
-        float previewTaa)
+        float previewTaa,
+        float previewTaaJitterScale)
     {
         var profile = PreviewVolumetricQuality.Resolve(quality);
 
@@ -33,6 +34,7 @@ public sealed class PreviewVolumetricQualityTests
         Assert.Equal(volumeTemporal, profile.VolumeIntegrateTemporalWeight);
         Assert.Equal(upsampleTemporal, profile.UpsampleTemporalWeight);
         Assert.Equal(previewTaa, profile.PreviewTaaWeight);
+        Assert.Equal(previewTaaJitterScale, profile.PreviewTaaJitterScale);
     }
 
     [Theory]
@@ -54,6 +56,40 @@ public sealed class PreviewVolumetricQualityTests
     }
 
     [Theory]
+    [InlineData(1, 0, 0.82f, 0.52f, 0.08f, 0.93f, 0.035f, 0.08f, 0.08f, 0.22f, 0.35f, 0.30f)]
+    [InlineData(1, 1, 0.88f, 0.35f, 0.05f, 0.95f, 0.020f, 0.10f, 0.07f, 0.16f, 0.24f, 0.22f)]
+    [InlineData(1, 2, 0.80f, 0.70f, 0.10f, 0.90f, 0.035f, 0.60f, 0.55f, 0.80f, 0.95f, 0.72f)]
+    [InlineData(1, 3, 0.68f, 0.65f, 0.05f, 0.86f, 0.070f, 0.04f, 0.05f, 0.12f, 0.24f, 0.20f)]
+    [InlineData(1, 4, 0.72f, 0f, 0.03f, 0.84f, 0.035f, 0.18f, 0.28f, 0.45f, 0.30f, 0.55f)]
+    public void ResolvePreviewTaa_ReturnsModeProfile(
+        int quality,
+        int mode,
+        float temporal,
+        float jitter,
+        float stableBoost,
+        float maxStable,
+        float sharpen,
+        float edgeFloor,
+        float edgeBlend,
+        float sourceFilter,
+        float silhouetteHistory,
+        float fxaaStrength)
+    {
+        var profile = PreviewVolumetricQuality.ResolvePreviewTaa(quality, mode);
+
+        Assert.Equal(temporal, profile.TemporalWeight, 0.0001f);
+        Assert.Equal(jitter, profile.JitterScale, 0.0001f);
+        Assert.Equal(stableBoost, profile.StableTemporalBoost, 0.0001f);
+        Assert.Equal(maxStable, profile.MaxStableTemporal, 0.0001f);
+        Assert.Equal(sharpen, profile.SharpenStrength, 0.0001f);
+        Assert.Equal(edgeFloor, profile.DepthEdgeHistoryFloor, 0.0001f);
+        Assert.Equal(edgeBlend, profile.EdgeAaBlend, 0.0001f);
+        Assert.Equal(sourceFilter, profile.SourceFilterStrength, 0.0001f);
+        Assert.Equal(silhouetteHistory, profile.SilhouetteHistoryWeight, 0.0001f);
+        Assert.Equal(fxaaStrength, profile.FxaaEdgeStrength, 0.0001f);
+    }
+
+    [Theory]
     [InlineData(0.55f, true, 1, 0.275f)]
     [InlineData(0.55f, true, 0, 0.55f)]
     [InlineData(0.55f, false, 1, 0.55f)]
@@ -71,5 +107,18 @@ public sealed class PreviewVolumetricQualityTests
         };
 
         Assert.Equal(expected, PreviewVolumetricQuality.EffectivePassTemporalWeight(passWeight, settings));
+    }
+
+    [Fact]
+    public void EffectivePassTemporalWeight_DoesNotHalveWhenPreviewTaaTemporalScaleIsZero()
+    {
+        var settings = new PreviewRenderSettings
+        {
+            EnablePreviewTaa = true,
+            VolumetricQuality = 1,
+            PreviewTaaTemporalScale = 0f,
+        };
+
+        Assert.Equal(0.55f, PreviewVolumetricQuality.EffectivePassTemporalWeight(0.55f, settings));
     }
 }

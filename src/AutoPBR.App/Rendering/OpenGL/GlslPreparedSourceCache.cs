@@ -49,6 +49,20 @@ internal static class GlslPreparedSourceCache
         return Cache.GetOrAdd(key, _ => GlslSourceAdapter.Adapt(raw, shaderType, useOpenGlEs));
     }
 
+    public static string ComputePreparedSourceFingerprint(string entryFile, ShaderType shaderType, bool useOpenGlEs)
+    {
+        var prepared = GetOrPrepare(entryFile, shaderType, useOpenGlEs);
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(prepared)))[..12];
+    }
+
+    public static string GetShaderSourceOrigin(string entryFile)
+    {
+        var sourcePath = TryFindSourceShaderPath(entryFile);
+        return sourcePath is null
+            ? $"avares://AutoPBR.App/Rendering/Shaders/{entryFile}"
+            : sourcePath;
+    }
+
     public static int PrewarmWorkItemCount => PreviewShaderEntries.Length * 2;
 
     public static void Clear() => Cache.Clear();
@@ -96,9 +110,43 @@ internal static class GlslPreparedSourceCache
 
     private static string LoadShaderSource(string fileName)
     {
+        var sourcePath = TryFindSourceShaderPath(fileName);
+        if (sourcePath is not null)
+        {
+            return File.ReadAllText(sourcePath);
+        }
+
         var uri = new Uri($"avares://AutoPBR.App/Rendering/Shaders/{fileName}");
         using var stream = AssetLoader.Open(uri);
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();
+    }
+
+    private static string? TryFindSourceShaderPath(string fileName)
+    {
+        var relative = fileName
+            .Replace('/', Path.DirectorySeparatorChar)
+            .Replace('\\', Path.DirectorySeparatorChar);
+        foreach (var start in new[] { AppContext.BaseDirectory, Directory.GetCurrentDirectory() })
+        {
+            if (string.IsNullOrWhiteSpace(start))
+            {
+                continue;
+            }
+
+            var dir = new DirectoryInfo(start);
+            while (dir is not null)
+            {
+                var path = Path.Combine(dir.FullName, "src", "AutoPBR.App", "Rendering", "Shaders", relative);
+                if (File.Exists(path))
+                {
+                    return path;
+                }
+
+                dir = dir.Parent;
+            }
+        }
+
+        return null;
     }
 }

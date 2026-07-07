@@ -17,6 +17,8 @@ internal sealed class GlSceneCaptureTarget(GL gl, bool useOpenGlEs) : IDisposabl
 
     public uint DepthTextureHandle => _depthTexture;
     public uint TaaSignalTextureHandle => _taaSignalTexture;
+    public int Width => _width;
+    public int Height => _height;
     public bool IsValid => _fbo != 0 && _colorTexture != 0 && _taaSignalTexture != 0 && _depthTexture != 0;
 
     public bool EnsureSize(int width, int height)

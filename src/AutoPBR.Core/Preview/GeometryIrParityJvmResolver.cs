@@ -161,6 +161,7 @@ internal static class GeometryIrParityJvmResolver
                 else if (PathImpliesClimate(normalizedAssetPath, stem, "warm"))
                 {
                     yield return $"{pkg}.Warm{normalizedStem}Model";
+                    yield return $"{pkg}.Adult{normalizedStem}Model";
                     yield return $"{pkg}.{normalizedStem}Model";
                 }
                 else

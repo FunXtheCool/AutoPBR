@@ -1557,6 +1557,141 @@
   <data name="Preview3DCameraExpanderSection" xml:space="preserve">
     <value>कैमरा</value>
   </data>
+  <data name="Preview3DTaaSection" xml:space="preserve">
+    <value>टीएक्सएए</value>
+  </data>
+  <data name="Preview3DTaaMode" xml:space="preserve">
+    <value>टीएए मोड</value>
+  </data>
+  <data name="Preview3DTaaModeTooltip" xml:space="preserve">
+    <value>अंतिम पूर्वावलोकन TAA समायोजित करें. स्थिर और कम घबराहट व्यूपोर्ट शेक को कम करती है; एज एए नियंत्रित सिल्हूट संचय की अनुमति देता है; शार्प अधिक किनारे वाला कंट्रास्ट रखता है; संकल्प इतिहास को बनाए रखते हुए कोई भी जिटर प्रक्षेपण जिटर को अक्षम नहीं करता है।</value>
+  </data>
+  <data name="Preview3DTaaModeBalanced" xml:space="preserve">
+    <value>स्थिर</value>
+  </data>
+  <data name="Preview3DTaaModeLessJitter" xml:space="preserve">
+    <value>कम घबराहट</value>
+  </data>
+  <data name="Preview3DTaaModeStableSoft" xml:space="preserve">
+    <value>एज ए.ए</value>
+  </data>
+  <data name="Preview3DTaaModeSharper" xml:space="preserve">
+    <value>तीखा</value>
+  </data>
+  <data name="Preview3DTaaModeNoJitter" xml:space="preserve">
+    <value>कोई घबराहट नहीं</value>
+  </data>
+  <data name="Preview3DTaaTemporalScale" xml:space="preserve">
+    <value>लौकिक</value>
+  </data>
+  <data name="Preview3DTaaTemporalScaleTooltip" xml:space="preserve">
+    <value>चयनित TAA मोड से इतिहास मिश्रण को मापता है। निम्न मान भूत-प्रेत को कम करते हैं; उच्च मान अधिक एज कवरेज जमा करते हैं।</value>
+  </data>
+  <data name="Preview3DTaaJitterScale" xml:space="preserve">
+    <value>घबराना</value>
+  </data>
+  <data name="Preview3DTaaJitterScaleTooltip" xml:space="preserve">
+    <value>स्केल उप-पिक्सेल प्रक्षेपण घबराना। दृश्य को हिलाए बिना रिज़ॉल्यूशन/एफएक्सएए पथ को अलग करने के लिए 0 पर सेट करें।</value>
+  </data>
+  <data name="Preview3DTaaSourceFilterScale" xml:space="preserve">
+    <value>स्रोत फ़िल्टर</value>
+  </data>
+  <data name="Preview3DTaaSourceFilterScaleTooltip" xml:space="preserve">
+    <value>अस्वीकृत TAA किनारों के पास उपयोग किए जाने वाले छोटे वर्तमान-फ़्रेम फ़िल्टर को स्केल करता है।</value>
+  </data>
+  <data name="Preview3DTaaEdgeBlendScale" xml:space="preserve">
+    <value>किनारे का मिश्रण</value>
+  </data>
+  <data name="Preview3DTaaEdgeBlendScaleTooltip" xml:space="preserve">
+    <value>गहराई/सिल्हूट ट्रांज़िशन के आसपास उपयोग किए जाने वाले किनारे कवरेज ब्लर को स्केल करता है।</value>
+  </data>
+  <data name="Preview3DTaaFxaaStrengthScale" xml:space="preserve">
+    <value>एफएक्सएए ताकत</value>
+  </data>
+  <data name="Preview3DTaaFxaaStrengthScaleTooltip" xml:space="preserve">
+    <value>TAA समाधान के बाद अंतिम FXAA-लाइट मिश्रण को स्केल करता है।</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaEdgeScale" xml:space="preserve">
+    <value>एफएक्सएए लूमा</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaEdgeScaleTooltip" xml:space="preserve">
+    <value>गहराई के किनारे का पता लगाने से स्वतंत्र, यह मापता है कि चमकदार किनारे एफएक्सएए मास्क में कितनी मजबूती से प्रवेश करते हैं।</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaThreshold" xml:space="preserve">
+    <value>एफएक्सएए सीमा</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaThresholdTooltip" xml:space="preserve">
+    <value>Luma contrast threshold for FXAA edge detection. कम मान अधिक सूक्ष्म किनारों को पकड़ते हैं और पिक्सेल-कला बनावट विवरण को धुंधला कर सकते हैं।</value>
+  </data>
+  <data name="Preview3DTaaForceFxaa" xml:space="preserve">
+    <value>पूर्ण-फ़्रेम FXAA को बाध्य करें</value>
+  </data>
+  <data name="Preview3DTaaForceFxaaTooltip" xml:space="preserve">
+    <value>डायग्नोस्टिक मोड: गहराई/ज्यामिति मास्क को बायपास करें और अंतिम एफएक्सएए-लाइट पास को हर जगह लागू करें। यह सत्यापित करने के लिए इसका उपयोग करें कि पोस्ट-एए रिज़ॉल्यूशन पूर्वावलोकन में स्पष्ट रूप से लिख रहा है।</value>
+  </data>
+  <data name="Preview3DParallaxSection" xml:space="preserve">
+    <value>लंबन</value>
+  </data>
+  <data name="Preview3DParallaxTraceLayers" xml:space="preserve">
+    <value>पोम ट्रेस परतें</value>
+  </data>
+  <data name="Preview3DParallaxTraceLayersTooltip" xml:space="preserve">
+    <value>प्राथमिक ऊंचाई-क्षेत्र किरण-मार्च परतें। उच्च मान उच्च GPU लागत पर खड़ी-कोण सटीकता में सुधार करते हैं।</value>
+  </data>
+  <data name="Preview3DParallaxRefineSteps" xml:space="preserve">
+    <value>पोम परिशोधित चरण</value>
+  </data>
+  <data name="Preview3DParallaxRefineStepsTooltip" xml:space="preserve">
+    <value>पहली ऊंचाई-क्षेत्र हिट के बाद बाइनरी शोधन चरण। उच्च मान विस्थापित यूवी में सीढ़ी चढ़ना कम कर देते हैं।</value>
+  </data>
+  <data name="Preview3DParallaxMaxUvShift" xml:space="preserve">
+    <value>पोम अधिकतम यूवी शिफ्ट</value>
+  </data>
+  <data name="Preview3DParallaxMaxUvShiftTooltip" xml:space="preserve">
+    <value>कैप्स कि एक लंबन निशान यूवी अंतरिक्ष में कितनी दूर तक यात्रा कर सकता है। गहरी राहत के लिए उठाएँ; चराई-कोण के खिंचाव को कम करने के लिए नीचे।</value>
+  </data>
+  <data name="Preview3DEnableTessellationDisplacement" xml:space="preserve">
+    <value>टेस्सेलेटेड फलाव</value>
+  </data>
+  <data name="Preview3DEnableTessellationDisplacementTooltip" xml:space="preserve">
+    <value>उच्च ऊंचाई-मानचित्र क्षेत्रों से वास्तविक बाहरी ज्यामिति जोड़ने के लिए डेस्कटॉप ओपनजीएल टेस्सेलेशन का उपयोग करें। POM अभी भी छुपे हुए विवरण को संभालता है।</value>
+  </data>
+  <data name="Preview3DTessellationLevel" xml:space="preserve">
+    <value>टेस्सेलेशन स्तर</value>
+  </data>
+  <data name="Preview3DTessellationLevelTooltip" xml:space="preserve">
+    <value>उच्च-स्तरीय विस्थापन पूर्वावलोकन के लिए त्रिभुज उपखंड स्तर। उच्च मान उच्च GPU लागत पर सिल्हूट और किनारे की राहत में सुधार करते हैं।</value>
+  </data>
+  <data name="Preview3DTessellationDisplacementStrength" xml:space="preserve">
+    <value>उभार शक्ति</value>
+  </data>
+  <data name="Preview3DTessellationDisplacementStrengthTooltip" xml:space="preserve">
+    <value>उज्ज्वल ऊंचाई-मानचित्र मानों से अधिकतम विश्व-अंतरिक्ष बाहरी विस्थापन।</value>
+  </data>
+  <data name="Preview3DParallaxShadowSamples" xml:space="preserve">
+    <value>स्व-छाया नमूने</value>
+  </data>
+  <data name="Preview3DParallaxShadowSamplesTooltip" xml:space="preserve">
+    <value>सूर्य या चंद्रमा की रोशनी की ओर लंबन स्व-छाया किरण द्वारा उपयोग किए गए नमूने। उच्च मान अलियासिंग को कम करते हैं।</value>
+  </data>
+  <data name="Preview3DParallaxShadowSoftness" xml:space="preserve">
+    <value>स्व-छाया कोमलता</value>
+  </data>
+  <data name="Preview3DParallaxShadowSoftnessTooltip" xml:space="preserve">
+    <value>रिसीवर-साइड लंबन स्व-छाया को नरम करता है ताकि ऊंचाई-क्षेत्र की छाया मुख्य छाया फ़िल्टर की तरह मिश्रित हो।</value>
+  </data>
+  <data name="Preview3DShowFpsCounter" xml:space="preserve">
+    <value>एफपीएस काउंटर</value>
+  </data>
+  <data name="Preview3DShowFpsCounterTooltip" xml:space="preserve">
+    <value>3डी पूर्वावलोकन के शीर्ष-दाएं कोने में फ़्रेम-प्रति-सेकंड रीडआउट दिखाएं।</value>
+  </data>
+  <data name="Preview3DCapFpsAt60" xml:space="preserve">
+    <value>60 एफपीएस तक सीमित करें</value>
+  </data>
+  <data name="Preview3DCapFpsAt60Tooltip" xml:space="preserve">
+    <value>GPU के उपयोग को कम करने के लिए निरंतर 3D पूर्वावलोकन रेंडरिंग को 60 फ़्रेम प्रति सेकंड तक सीमित करें। डिफ़ॉल्ट रूप से बंद (अनकैप्ड)।</value>
+  </data>
 </root>
 
 

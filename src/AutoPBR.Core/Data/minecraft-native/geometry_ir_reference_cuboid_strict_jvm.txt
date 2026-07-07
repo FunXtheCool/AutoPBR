@@ -157,6 +157,8 @@ net.minecraft.client.model.animal.chicken.BabyChickenModel
 
 net.minecraft.client.model.animal.chicken.ColdChickenModel
 
+net.minecraft.client.model.animal.chicken.WarmChickenModel
+
 net.minecraft.client.model.animal.cow.BabyCowModel
 
 net.minecraft.client.model.animal.cow.ColdCowModel

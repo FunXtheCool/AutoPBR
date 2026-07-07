@@ -24,7 +24,21 @@ internal static partial class MinecraftModelBaker
         }
 
         var policy = PreviewDrawLayerPolicy.ForKind(kind, layerOrdinal);
-        if (element.CastsShadow && policy.ShadowMode == PreviewDrawLayerShadowMode.Skip)
+        if (element.CastsShadow)
+        {
+            if (policy.ShadowMode == PreviewDrawLayerShadowMode.Skip)
+            {
+                policy = new PreviewDrawLayerPolicy
+                {
+                    Kind = policy.Kind,
+                    DrawOrder = policy.DrawOrder,
+                    DepthBiasStep = policy.DepthBiasStep,
+                    DepthWrite = policy.DepthWrite,
+                    ShadowMode = PreviewDrawLayerShadowMode.Draw,
+                };
+            }
+        }
+        else if (policy.ShadowMode == PreviewDrawLayerShadowMode.Draw)
         {
             policy = new PreviewDrawLayerPolicy
             {
@@ -32,7 +46,7 @@ internal static partial class MinecraftModelBaker
                 DrawOrder = policy.DrawOrder,
                 DepthBiasStep = policy.DepthBiasStep,
                 DepthWrite = policy.DepthWrite,
-                ShadowMode = PreviewDrawLayerShadowMode.Draw,
+                ShadowMode = PreviewDrawLayerShadowMode.Skip,
             };
         }
 

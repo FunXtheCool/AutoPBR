@@ -12,6 +12,9 @@ namespace AutoPBR.App.Services;
 /// <summary>Two-way sync between MainWindowViewModel and UserSettings persistence.</summary>
 internal static class UserSettingsSynchronizer
 {
+    private const int CurrentPersistedSettingsGeneration = 2;
+    private const int DefaultPreview3DTaaMode = 0;
+
     public static void LoadInto(MainWindowViewModel vm, UserSettings settings)
     {
         if (!string.IsNullOrWhiteSpace(settings.OutputDirectory))
@@ -55,6 +58,8 @@ internal static class UserSettingsSynchronizer
             0.0,
             1.0);
         vm.Preview3DShowAxes = settings.Preview3DShowAxes;
+        vm.Preview3DShowFpsCounter = settings.Preview3DShowFpsCounter;
+        vm.Preview3DCapFpsAt60 = settings.Preview3DCapFpsAt60;
         vm.Preview3DEnableParallax = settings.Preview3DEnableParallax;
         vm.Preview3DEnableNormalMap = settings.Preview3DEnableNormalMap;
         vm.Preview3DEnableSpecularMap = settings.Preview3DEnableSpecularMap;
@@ -177,6 +182,15 @@ internal static class UserSettingsSynchronizer
         vm.Preview3DCloudMarchStepOverride = Math.Clamp(settings.Preview3DCloudMarchStepOverride, 0.0, 64.0);
         vm.Preview3DCloudFreezeWind = settings.Preview3DCloudFreezeWind;
         vm.Preview3DEnablePreviewTaa = settings.Preview3DEnablePreviewTaa;
+        vm.Preview3DTaaMode = ResolvePreview3DTaaMode(settings);
+        vm.Preview3DTaaTemporalScale = Math.Clamp(settings.Preview3DTaaTemporalScale, 0.0, 1.25);
+        vm.Preview3DTaaJitterScale = Math.Clamp(settings.Preview3DTaaJitterScale, 0.0, 2.0);
+        vm.Preview3DTaaSourceFilterScale = Math.Clamp(settings.Preview3DTaaSourceFilterScale, 0.0, 2.0);
+        vm.Preview3DTaaEdgeBlendScale = Math.Clamp(settings.Preview3DTaaEdgeBlendScale, 0.0, 2.0);
+        vm.Preview3DTaaFxaaStrengthScale = Math.Clamp(settings.Preview3DTaaFxaaStrengthScale, 0.0, 5.0);
+        vm.Preview3DTaaFxaaLumaEdgeScale = Math.Clamp(settings.Preview3DTaaFxaaLumaEdgeScale, 0.0, 2.0);
+        vm.Preview3DTaaFxaaLumaThreshold = Math.Clamp(settings.Preview3DTaaFxaaLumaThreshold, 0.001, 0.12);
+        vm.Preview3DTaaForceFxaa = settings.Preview3DTaaForceFxaa;
         vm.Preview3DEnableShadowCascades = settings.Preview3DEnableShadowCascades;
         vm.Preview3DSpritePlaneCount = settings.Preview3DSpritePlaneCount <= 0
             ? 2
@@ -365,6 +379,8 @@ internal static class UserSettingsSynchronizer
         settings.Preview3DGrassColormapTemperature = Math.Clamp(vm.Preview3DGrassColormapTemperature, 0.0, 1.0);
         settings.Preview3DGrassColormapDownfall = Math.Clamp(vm.Preview3DGrassColormapDownfall, 0.0, 1.0);
         settings.Preview3DShowAxes = vm.Preview3DShowAxes;
+        settings.Preview3DShowFpsCounter = vm.Preview3DShowFpsCounter;
+        settings.Preview3DCapFpsAt60 = vm.Preview3DCapFpsAt60;
         settings.Preview3DEnableParallax = vm.Preview3DEnableParallax;
         settings.Preview3DEnableNormalMap = vm.Preview3DEnableNormalMap;
         settings.Preview3DEnableSpecularMap = vm.Preview3DEnableSpecularMap;
@@ -422,6 +438,16 @@ internal static class UserSettingsSynchronizer
         settings.Preview3DCloudMarchStepOverride = Math.Clamp(vm.Preview3DCloudMarchStepOverride, 0.0, 64.0);
         settings.Preview3DCloudFreezeWind = vm.Preview3DCloudFreezeWind;
         settings.Preview3DEnablePreviewTaa = vm.Preview3DEnablePreviewTaa;
+        settings.Preview3DTaaMode = Math.Clamp(vm.Preview3DTaaMode, 0, 4);
+        settings.PersistedSettingsGeneration = CurrentPersistedSettingsGeneration;
+        settings.Preview3DTaaTemporalScale = Math.Clamp(vm.Preview3DTaaTemporalScale, 0.0, 1.25);
+        settings.Preview3DTaaJitterScale = Math.Clamp(vm.Preview3DTaaJitterScale, 0.0, 2.0);
+        settings.Preview3DTaaSourceFilterScale = Math.Clamp(vm.Preview3DTaaSourceFilterScale, 0.0, 2.0);
+        settings.Preview3DTaaEdgeBlendScale = Math.Clamp(vm.Preview3DTaaEdgeBlendScale, 0.0, 2.0);
+        settings.Preview3DTaaFxaaStrengthScale = Math.Clamp(vm.Preview3DTaaFxaaStrengthScale, 0.0, 5.0);
+        settings.Preview3DTaaFxaaLumaEdgeScale = Math.Clamp(vm.Preview3DTaaFxaaLumaEdgeScale, 0.0, 2.0);
+        settings.Preview3DTaaFxaaLumaThreshold = Math.Clamp(vm.Preview3DTaaFxaaLumaThreshold, 0.001, 0.12);
+        settings.Preview3DTaaForceFxaa = vm.Preview3DTaaForceFxaa;
         settings.Preview3DEnableShadows = vm.Preview3DEnableShadows;
         settings.Preview3DLightYawDegrees = Math.Clamp(vm.Preview3DLightYawDegrees, -180.0, 180.0);
         settings.Preview3DLightPitchDegrees = Math.Clamp(vm.Preview3DLightPitchDegrees, -89.0, 89.0);
@@ -521,5 +547,25 @@ internal static class UserSettingsSynchronizer
         settings.DictionaryRequestTimeoutMs = Math.Clamp(vm.DictionaryRequestTimeoutMs, 100, 5000);
         settings.CustomTagRules = vm.CustomTagRules.ToList();
         settings.Save();
+    }
+
+    private static int ResolvePreview3DTaaMode(UserSettings settings)
+    {
+        if (settings.PersistedSettingsGeneration >= CurrentPersistedSettingsGeneration)
+        {
+            return Math.Clamp(settings.Preview3DTaaMode ?? DefaultPreview3DTaaMode, 0, 4);
+        }
+
+        if (settings.Preview3DTaaMode is null)
+        {
+            return DefaultPreview3DTaaMode;
+        }
+
+        return Math.Clamp(settings.Preview3DTaaMode.Value, 0, 4) switch
+        {
+            0 => 1,
+            1 => 0,
+            var mode => mode,
+        };
     }
 }

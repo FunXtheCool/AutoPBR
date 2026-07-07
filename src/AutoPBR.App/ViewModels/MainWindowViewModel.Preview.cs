@@ -28,6 +28,7 @@ public partial class MainWindowViewModel
     private string? _lastPreview3DLoggedError;
     private DispatcherTimer? _preview3DCameraPoseTimer;
     private CancellationTokenSource? _preview3DSpriteThicknessDebounceCts;
+    private CancellationTokenSource? _preview3DTaaGpuDebounceCts;
 
     public static string[] Preview3DEntityAlphaModeOptions { get; } =
     [
@@ -54,6 +55,9 @@ public partial class MainWindowViewModel
     [ObservableProperty] private bool _preview3DShowGrid = true;
     [ObservableProperty] private bool _preview3DShowGroundMesh = true;
     [ObservableProperty] private bool _preview3DShowAxes = true;
+    [ObservableProperty] private bool _preview3DShowFpsCounter;
+    [ObservableProperty] private bool _preview3DCapFpsAt60;
+    [ObservableProperty] private string? _preview3DFpsCounterText;
     [ObservableProperty] private bool _preview3DEnableParallax = true;
     [ObservableProperty] private bool _preview3DEnableNormalMap = true;
     [ObservableProperty] private bool _preview3DEnableSpecularMap = true;
@@ -128,6 +132,15 @@ public partial class MainWindowViewModel
     [ObservableProperty] private double _preview3DCloudMarchStepOverride;
     [ObservableProperty] private bool _preview3DCloudFreezeWind;
     [ObservableProperty] private bool _preview3DEnablePreviewTaa = true;
+    [ObservableProperty] private int _preview3DTaaMode;
+    [ObservableProperty] private double _preview3DTaaTemporalScale = 1.0;
+    [ObservableProperty] private double _preview3DTaaJitterScale = 1.0;
+    [ObservableProperty] private double _preview3DTaaSourceFilterScale = 1.0;
+    [ObservableProperty] private double _preview3DTaaEdgeBlendScale = 1.0;
+    [ObservableProperty] private double _preview3DTaaFxaaStrengthScale = 1.0;
+    [ObservableProperty] private double _preview3DTaaFxaaLumaEdgeScale = 1.0;
+    [ObservableProperty] private double _preview3DTaaFxaaLumaThreshold = 0.018;
+    [ObservableProperty] private bool _preview3DTaaForceFxaa;
     [ObservableProperty] private bool _preview3DGpuInitOverlayVisible;
     [ObservableProperty] private string _preview3DGpuInitOverlayText = PreviewGpuInitProgress.Starting.Phase;
     [ObservableProperty] private double _preview3DGpuInitProgressFraction;
@@ -138,6 +151,15 @@ public partial class MainWindowViewModel
         LocalizedStrings.Preview3DVolumetricQualityLow,
         LocalizedStrings.Preview3DVolumetricQualityMedium,
         LocalizedStrings.Preview3DVolumetricQualityHigh
+    ];
+
+    public string[] Preview3DTaaModeOptions { get; } =
+    [
+        LocalizedStrings.Preview3DTaaModeLessJitter,
+        LocalizedStrings.Preview3DTaaModeBalanced,
+        LocalizedStrings.Preview3DTaaModeStableSoft,
+        LocalizedStrings.Preview3DTaaModeSharper,
+        LocalizedStrings.Preview3DTaaModeNoJitter
     ];
 
     internal void InitPreviewShaderPrewarm()
@@ -185,6 +207,7 @@ public partial class MainWindowViewModel
         !(_lastPreviewTextureMaps?.IsItemTexturePath ?? false);
     public bool IsPreview3DSpriteMode => IsPreview3DItemMode || IsPreview3DFoliageSpriteMode;
     public bool IsPreviewSpriteTarget => _lastPreviewTextureMaps?.Sprite2DFoliageTarget ?? false;
+    public bool IsPreview3DFpsCounterVisible => Preview3DShowFpsCounter && IsPreview3D;
 
     internal void RegisterGlPreview(GlPbrPreviewControl glPreview)
     {
@@ -226,6 +249,7 @@ public partial class MainWindowViewModel
         OnPropertyChanged(nameof(IsPreview3DSpriteMode));
         OnPropertyChanged(nameof(IsPreview3DGrassColormapVisible));
         OnPropertyChanged(nameof(IsPreviewSpriteTarget));
+        OnPropertyChanged(nameof(IsPreview3DFpsCounterVisible));
         if (!_loadingSettings)
         {
             SaveSettings();
@@ -272,6 +296,34 @@ public partial class MainWindowViewModel
     partial void OnPreview3DShowGridChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DShowGroundMeshChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DShowAxesChanged(bool value) => OnPreview3DGpuSettingChanged(value);
+
+    partial void OnPreview3DShowFpsCounterChanged(bool value)
+    {
+        OnPropertyChanged(nameof(IsPreview3DFpsCounterVisible));
+        if (_loadingSettings)
+        {
+            return;
+        }
+
+        SaveSettings();
+        if (!value)
+        {
+            Preview3DFpsCounterText = null;
+        }
+    }
+
+    partial void OnPreview3DCapFpsAt60Changed(bool value) => OnPreview3DFrameRateCapSettingChanged(value);
+
+    private void OnPreview3DFrameRateCapSettingChanged(bool _)
+    {
+        if (_loadingSettings)
+        {
+            return;
+        }
+
+        SaveSettings();
+        PushPreview3DFrameRateCap();
+    }
     partial void OnPreview3DEnableParallaxChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEnableNormalMapChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEnableSpecularMapChanged(bool value) => OnPreview3DGpuSettingChanged(value);
@@ -328,7 +380,16 @@ public partial class MainWindowViewModel
     partial void OnPreview3DCloudDisableTemporalChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DCloudMarchStepOverrideChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DCloudFreezeWindChanged(bool value) => OnPreview3DGpuSettingChanged(value);
-    partial void OnPreview3DEnablePreviewTaaChanged(bool value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DEnablePreviewTaaChanged(bool value) => OnDebouncedPreviewTaaGpuSettingChanged(value);
+    partial void OnPreview3DTaaModeChanged(int value) => OnDebouncedPreviewTaaGpuSettingChanged(value);
+    partial void OnPreview3DTaaTemporalScaleChanged(double value) => OnDebouncedPreviewTaaGpuSettingChanged(value);
+    partial void OnPreview3DTaaJitterScaleChanged(double value) => OnDebouncedPreviewTaaGpuSettingChanged(value);
+    partial void OnPreview3DTaaSourceFilterScaleChanged(double value) => OnDebouncedPreviewTaaGpuSettingChanged(value);
+    partial void OnPreview3DTaaEdgeBlendScaleChanged(double value) => OnDebouncedPreviewTaaGpuSettingChanged(value);
+    partial void OnPreview3DTaaFxaaStrengthScaleChanged(double value) => OnDebouncedPreviewTaaGpuSettingChanged(value);
+    partial void OnPreview3DTaaFxaaLumaEdgeScaleChanged(double value) => OnDebouncedPreviewTaaGpuSettingChanged(value);
+    partial void OnPreview3DTaaFxaaLumaThresholdChanged(double value) => OnDebouncedPreviewTaaGpuSettingChanged(value);
+    partial void OnPreview3DTaaForceFxaaChanged(bool value) => OnDebouncedPreviewTaaGpuSettingChanged(value);
     partial void OnPreview3DEnableShadowsChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DLightYawDegreesChanged(double value) => OnPreview3DLightDirectionChanged(value);
     partial void OnPreview3DLightPitchDegreesChanged(double value) => OnPreview3DLightDirectionChanged(value);
@@ -424,6 +485,60 @@ public partial class MainWindowViewModel
             Preview3DTimeOfDayHours);
         _syncingPreviewLightFromTimeOfDay = false;
         OnPreview3DGpuSettingChanged(_);
+    }
+
+    private void OnDebouncedPreviewTaaGpuSettingChanged<T>(T value)
+    {
+        _ = value;
+        if (_loadingSettings)
+        {
+            return;
+        }
+
+        SaveSettings();
+        ScheduleDebouncedPreviewTaaGpuRefresh();
+    }
+
+    private void ScheduleDebouncedPreviewTaaGpuRefresh()
+    {
+        if (!IsPreview3D)
+        {
+            return;
+        }
+
+        _preview3DTaaGpuDebounceCts?.Cancel();
+        _preview3DTaaGpuDebounceCts?.Dispose();
+        var cts = new CancellationTokenSource();
+        _preview3DTaaGpuDebounceCts = cts;
+        _ = RunDebouncedPreviewTaaGpuRefreshAsync(cts);
+    }
+
+    private async Task RunDebouncedPreviewTaaGpuRefreshAsync(CancellationTokenSource debounceCts)
+    {
+        try
+        {
+            await Task.Delay(PreviewStageConstants.PreviewTaaGpuDebounceMs, debounceCts.Token)
+                .ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        if (!ReferenceEquals(_preview3DTaaGpuDebounceCts, debounceCts))
+        {
+            return;
+        }
+
+        RunOnUiThread(() =>
+        {
+            if (!ReferenceEquals(_preview3DTaaGpuDebounceCts, debounceCts))
+            {
+                return;
+            }
+
+            Push3DRenderSettingsOnly();
+        });
     }
 
     private void OnPreview3DGpuSettingChanged<T>(T _)
@@ -571,11 +686,23 @@ public partial class MainWindowViewModel
             CloudMarchStepOverride = (int)Math.Clamp(Math.Round(Preview3DCloudMarchStepOverride), 0, 64),
             CloudFreezeWind = Preview3DCloudFreezeWind,
             EnablePreviewTaa = Preview3DEnablePreviewTaa,
+            PreviewTaaMode = Math.Clamp(Preview3DTaaMode, 0, 4),
+            PreviewTaaTemporalScale = (float)Math.Clamp(Preview3DTaaTemporalScale, 0.0, 1.25),
+            PreviewTaaJitterScale = (float)Math.Clamp(Preview3DTaaJitterScale, 0.0, 2.0),
+            PreviewTaaSourceFilterScale = (float)Math.Clamp(Preview3DTaaSourceFilterScale, 0.0, 2.0),
+            PreviewTaaEdgeBlendScale = (float)Math.Clamp(Preview3DTaaEdgeBlendScale, 0.0, 2.0),
+            PreviewTaaFxaaStrengthScale = (float)Math.Clamp(Preview3DTaaFxaaStrengthScale, 0.0, 5.0),
+            PreviewTaaFxaaLumaEdgeScale = (float)Math.Clamp(Preview3DTaaFxaaLumaEdgeScale, 0.0, 2.0),
+            PreviewTaaFxaaLumaThreshold = (float)Math.Clamp(Preview3DTaaFxaaLumaThreshold, 0.001, 0.12),
+            PreviewTaaForceFxaa = Preview3DTaaForceFxaa,
             CloudQuality = PreviewVolumetricQuality.Resolve(Math.Clamp(Preview3DVolumetricQuality, 0, 2)).CloudQuality,
             LogVolumetricTiming = DebugMode,
+            LogPreviewTaaDiagnostics = DebugMode,
             ShowSunProjectionDebug = Preview3DShowCelestialDebug
         };
     }
+
+    private void PushPreview3DFrameRateCap() => _glPreview?.SetPreviewFrameRateCap(Preview3DCapFpsAt60);
 
     private void PushPreview3DCamera()
     {
@@ -584,6 +711,7 @@ public partial class MainWindowViewModel
             return;
         }
 
+        PushPreview3DFrameRateCap();
         var resetKey = Enum.TryParse<Key>(Preview3DCameraResetKey, ignoreCase: true, out var parsedKey)
             ? parsedKey
             : Key.R;
@@ -741,6 +869,12 @@ public partial class MainWindowViewModel
             lines.Add(provenance.ToOverlayLine());
         }
 
+        if (_glPreview.TryGetPreviewViewportInfo(out var pixelWidth, out var pixelHeight,
+            out var logicalWidth, out var logicalHeight, out var renderScale))
+        {
+            lines.Add($"Viewport: {pixelWidth}x{pixelHeight}px ({logicalWidth:0}x{logicalHeight:0} @ {renderScale:0.##}x)");
+        }
+
         if (_glPreview.Backend.TryGetCameraDebugPose(out Vector3 eye, out Vector3 target))
         {
             lines.Add($"Eye: {eye.X:0.00}, {eye.Y:0.00}, {eye.Z:0.00}");
@@ -748,6 +882,27 @@ public partial class MainWindowViewModel
         }
 
         Preview3DCameraDebugText = lines.Count > 0 ? string.Join('\n', lines) : null;
+        UpdatePreview3DFpsCounterText();
+    }
+
+    private void UpdatePreview3DFpsCounterText()
+    {
+        if (!Preview3DShowFpsCounter || !IsPreview3D || _glPreview is null)
+        {
+            if (Preview3DFpsCounterText is not null)
+            {
+                Preview3DFpsCounterText = null;
+            }
+
+            return;
+        }
+
+        var fps = _glPreview.SmoothedPreviewFps;
+        var text = fps > 0.5 ? $"{fps:0} FPS" : "— FPS";
+        if (text != Preview3DFpsCounterText)
+        {
+            Preview3DFpsCounterText = text;
+        }
     }
 
     private void DisposePreviewResources()
@@ -758,6 +913,9 @@ public partial class MainWindowViewModel
         _previewGrassColormapDebounceCts?.Cancel();
         _previewGrassColormapDebounceCts?.Dispose();
         _previewGrassColormapDebounceCts = null;
+        _preview3DTaaGpuDebounceCts?.Cancel();
+        _preview3DTaaGpuDebounceCts?.Dispose();
+        _preview3DTaaGpuDebounceCts = null;
 
         if (_preview3DCameraPoseTimer is { } timer)
         {

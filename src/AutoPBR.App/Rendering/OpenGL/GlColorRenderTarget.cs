@@ -81,7 +81,9 @@ internal sealed class GlColorRenderTarget(GL gl, bool useOpenGlEs) : IDisposable
         var priorRead = gl.GetInteger(GetPName.ReadFramebufferBinding);
         var priorDraw = gl.GetInteger(GetPName.DrawFramebufferBinding);
         gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, source._fbo);
+        gl.ReadBuffer(ReadBufferMode.ColorAttachment0);
         gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, _fbo);
+        ConfigureDrawFramebufferColorAttachment(_fbo);
         gl.BlitFramebuffer(0, 0, _width, _height, 0, 0, _width, _height,
             ClearBufferMask.ColorBufferBit, GLEnum.Nearest);
         var err = gl.GetError();
@@ -102,6 +104,7 @@ internal sealed class GlColorRenderTarget(GL gl, bool useOpenGlEs) : IDisposable
         gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, readFramebuffer);
         gl.ReadBuffer(readFramebuffer == 0 ? ReadBufferMode.Back : ReadBufferMode.ColorAttachment0);
         gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, _fbo);
+        ConfigureDrawFramebufferColorAttachment(_fbo);
         gl.BlitFramebuffer(0, 0, width, height, 0, 0, width, height,
             ClearBufferMask.ColorBufferBit, GLEnum.Nearest);
         var err = gl.GetError();
@@ -110,19 +113,74 @@ internal sealed class GlColorRenderTarget(GL gl, bool useOpenGlEs) : IDisposable
         return err == GLEnum.NoError;
     }
 
+    public bool BlitColorToFramebuffer(uint drawFramebuffer, int x, int y, int width, int height)
+    {
+        if (!IsValid || width != _width || height != _height)
+        {
+            return false;
+        }
+
+        var priorRead = gl.GetInteger(GetPName.ReadFramebufferBinding);
+        var priorDraw = gl.GetInteger(GetPName.DrawFramebufferBinding);
+        gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, _fbo);
+        gl.ReadBuffer(ReadBufferMode.ColorAttachment0);
+        gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, drawFramebuffer);
+        ConfigureDrawFramebufferColorAttachment(drawFramebuffer);
+        gl.BlitFramebuffer(0, 0, width, height, x, y, x + width, y + height,
+            ClearBufferMask.ColorBufferBit, GLEnum.Nearest);
+        var err = gl.GetError();
+        gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, (uint)Math.Max(0, priorRead));
+        gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, (uint)Math.Max(0, priorDraw));
+        return err == GLEnum.NoError;
+    }
+
+    public byte[]? TryReadRgb8(int x, int y, int width, int height)
+    {
+        return TryReadRgb8(x, y, width, height, out _);
+    }
+
+    public byte[]? TryReadRgb8(int x, int y, int width, int height, out GLEnum error)
+    {
+        if (!IsValid ||
+            x < 0 || y < 0 ||
+            width <= 0 || height <= 0 ||
+            x + width > _width || y + height > _height)
+        {
+            error = GLEnum.InvalidValue;
+            return null;
+        }
+
+        var priorRead = gl.GetInteger(GetPName.ReadFramebufferBinding);
+        try
+        {
+            gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, _fbo);
+            gl.ReadBuffer(ReadBufferMode.ColorAttachment0);
+            return GlFramebufferReadback.TryReadRgb8(gl, x, y, width, height, out error);
+        }
+        finally
+        {
+            gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, (uint)Math.Max(0, priorRead));
+        }
+    }
+
     private void ConfigureColorAttachment()
+    {
+        ConfigureDrawFramebufferColorAttachment(_fbo);
+    }
+
+    private void ConfigureDrawFramebufferColorAttachment(uint framebuffer)
     {
         if (useOpenGlEs)
         {
             unsafe
             {
-                var buf = DrawBufferMode.ColorAttachment0;
+                var buf = framebuffer == 0 ? DrawBufferMode.Back : DrawBufferMode.ColorAttachment0;
                 gl.DrawBuffers(1, &buf);
             }
         }
         else
         {
-            gl.DrawBuffer(DrawBufferMode.ColorAttachment0);
+            gl.DrawBuffer(framebuffer == 0 ? DrawBufferMode.Back : DrawBufferMode.ColorAttachment0);
         }
     }
 

@@ -43,11 +43,16 @@ sealed class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            // Avoid intermittent WinUI compositor commit timeouts on some Windows setups.
-            // RedirectionSurface takes a more stable composition path than direct WinUI composition.
+            // WinUI/DirectComposition sync to the display refresh rate (uncapped on high-Hz monitors).
+            // RedirectionSurface is legacy and hard-capped at 60 FPS — keep it last as a fallback only.
             .With(new Win32PlatformOptions
             {
-                CompositionMode = new[] { Win32CompositionMode.RedirectionSurface },
+                CompositionMode =
+                [
+                    Win32CompositionMode.WinUIComposition,
+                    Win32CompositionMode.DirectComposition,
+                    Win32CompositionMode.RedirectionSurface,
+                ],
             })
             .WithInterFont()
             .LogToTrace();

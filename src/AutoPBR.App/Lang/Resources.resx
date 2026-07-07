@@ -1454,10 +1454,82 @@
     <value>Hold cloud advection at time zero so shapes stay fixed while tuning lighting.</value>
   </data>
   <data name="Preview3DEnablePreviewTaa" xml:space="preserve">
-    <value>Preview TAA</value>
+    <value>TAA</value>
   </data>
   <data name="Preview3DEnablePreviewTaaTooltip" xml:space="preserve">
     <value>Final temporal anti-aliasing on the composited frame. Uses shared reprojection helpers; motion-aware when god rays provide scene depth. Per-pass temporal is halved while this is on.</value>
+  </data>
+  <data name="Preview3DTaaSection" xml:space="preserve">
+    <value>TXAA</value>
+  </data>
+  <data name="Preview3DTaaMode" xml:space="preserve">
+    <value>TAA mode</value>
+  </data>
+  <data name="Preview3DTaaModeTooltip" xml:space="preserve">
+    <value>Adjust final preview TAA. Stable and Less jitter reduce viewport shake; Edge AA allows controlled silhouette accumulation; Sharp keeps more edge contrast; No jitter disables projection jitter while keeping resolve history.</value>
+  </data>
+  <data name="Preview3DTaaModeBalanced" xml:space="preserve">
+    <value>Stable</value>
+  </data>
+  <data name="Preview3DTaaModeLessJitter" xml:space="preserve">
+    <value>Less jitter</value>
+  </data>
+  <data name="Preview3DTaaModeStableSoft" xml:space="preserve">
+    <value>Edge AA</value>
+  </data>
+  <data name="Preview3DTaaModeSharper" xml:space="preserve">
+    <value>Sharp</value>
+  </data>
+  <data name="Preview3DTaaModeNoJitter" xml:space="preserve">
+    <value>No jitter</value>
+  </data>
+  <data name="Preview3DTaaTemporalScale" xml:space="preserve">
+    <value>Temporal</value>
+  </data>
+  <data name="Preview3DTaaTemporalScaleTooltip" xml:space="preserve">
+    <value>Scales the history blend from the selected TAA mode. Lower values reduce ghosting; higher values accumulate more edge coverage.</value>
+  </data>
+  <data name="Preview3DTaaJitterScale" xml:space="preserve">
+    <value>Jitter</value>
+  </data>
+  <data name="Preview3DTaaJitterScaleTooltip" xml:space="preserve">
+    <value>Scales sub-pixel projection jitter. Set to 0 to isolate the resolve/FXAA path without moving the scene.</value>
+  </data>
+  <data name="Preview3DTaaSourceFilterScale" xml:space="preserve">
+    <value>Source filter</value>
+  </data>
+  <data name="Preview3DTaaSourceFilterScaleTooltip" xml:space="preserve">
+    <value>Scales the small current-frame filter used near rejected TAA edges.</value>
+  </data>
+  <data name="Preview3DTaaEdgeBlendScale" xml:space="preserve">
+    <value>Edge blend</value>
+  </data>
+  <data name="Preview3DTaaEdgeBlendScaleTooltip" xml:space="preserve">
+    <value>Scales the edge coverage blur used around depth/silhouette transitions.</value>
+  </data>
+  <data name="Preview3DTaaFxaaStrengthScale" xml:space="preserve">
+    <value>FXAA strength</value>
+  </data>
+  <data name="Preview3DTaaFxaaStrengthScaleTooltip" xml:space="preserve">
+    <value>Scales the final FXAA-lite blend after TAA resolve.</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaEdgeScale" xml:space="preserve">
+    <value>FXAA luma</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaEdgeScaleTooltip" xml:space="preserve">
+    <value>Scales how strongly luminance edges enter the FXAA mask, independent of depth edge detection.</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaThreshold" xml:space="preserve">
+    <value>FXAA threshold</value>
+  </data>
+  <data name="Preview3DTaaFxaaLumaThresholdTooltip" xml:space="preserve">
+    <value>Luma contrast threshold for FXAA edge detection. Lower values catch more subtle edges and can blur pixel-art texture detail.</value>
+  </data>
+  <data name="Preview3DTaaForceFxaa" xml:space="preserve">
+    <value>Force full-frame FXAA</value>
+  </data>
+  <data name="Preview3DTaaForceFxaaTooltip" xml:space="preserve">
+    <value>Diagnostic mode: bypass depth/geometry masks and apply the final FXAA-lite pass everywhere. Use this to verify the post-AA resolve is visibly writing to the preview.</value>
   </data>
   <data name="Preview3DLightingSection" xml:space="preserve">
     <value>Lighting</value>
@@ -1662,6 +1734,18 @@
   </data>
   <data name="Preview3DShowAxes" xml:space="preserve">
     <value>3D XYZ axes</value>
+  </data>
+  <data name="Preview3DShowFpsCounter" xml:space="preserve">
+    <value>FPS Counter</value>
+  </data>
+  <data name="Preview3DShowFpsCounterTooltip" xml:space="preserve">
+    <value>Show a frames-per-second readout in the top-right corner of the 3D preview.</value>
+  </data>
+  <data name="Preview3DCapFpsAt60" xml:space="preserve">
+    <value>Limit to 60 FPS</value>
+  </data>
+  <data name="Preview3DCapFpsAt60Tooltip" xml:space="preserve">
+    <value>Cap continuous 3D preview rendering to 60 frames per second to reduce GPU use. Off by default (follows display refresh rate).</value>
   </data>
   <data name="Preview3DItemUseAlphaBlend" xml:space="preserve">
     <value>Item alpha blend</value>

@@ -133,6 +133,7 @@ public sealed partial class OpenGlPreviewBackend
             gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
 
+        ConfigureDefaultFramebufferColorOutput(gl, defaultFbo);
         gl.Viewport(vpX, vpY, (uint)vw, (uint)vh);
         gl.Disable(EnableCap.ScissorTest);
 

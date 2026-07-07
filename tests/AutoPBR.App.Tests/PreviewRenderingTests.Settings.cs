@@ -1,3 +1,4 @@
+using AutoPBR.App.Lang;
 using AutoPBR.App.Rendering.Abstractions;
 using AutoPBR.App.Rendering.OpenGL;
 
@@ -74,6 +75,7 @@ public sealed partial class PreviewRenderingTests
         Assert.Equal(1, s.VolumetricQuality);
         Assert.Equal(0.45f, s.GodRayStrength);
         Assert.False(s.LogVolumetricTiming);
+        Assert.False(s.LogPreviewTaaDiagnostics);
     }
 
     [Fact]
@@ -143,7 +145,32 @@ public sealed partial class PreviewRenderingTests
         Assert.Contains("SyncPreviewTaaToggleState(frame.Settings);", source, StringComparison.Ordinal);
         Assert.Contains("if (IsPreviewTaaActive(frame.Settings))", source, StringComparison.Ordinal);
         Assert.Contains("PreviewGlMatrices.ApplyProjectionJitter", source, StringComparison.Ordinal);
-        Assert.Contains("CurrentPreviewTaaJitter(frame.Vw, frame.Vh)", source, StringComparison.Ordinal);
+        Assert.Contains("CurrentPreviewTaaJitter(frame.Vw, frame.Vh, frame.Settings)", source, StringComparison.Ordinal);
+        Assert.Contains("frame.UnjitteredProj = frame.Proj;", source, StringComparison.Ordinal);
+        Assert.Contains("frame.PreviewTaaJitterNdc", source, StringComparison.Ordinal);
+        Assert.Contains("SetMatrix(\"uTaaCurrViewProj\", taaCurrentViewProj);", source, StringComparison.Ordinal);
+        Assert.Contains("ResolvePreviewTaaPrevViewProj(taaCurrentViewProj)", source, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void PreviewTaa_JitteredModesKeepRenderingToAccumulateSamples()
+    {
+        var backend = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "OpenGlPreviewBackend.cs");
+        var taa = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "OpenGlPreviewBackend.Taa.cs");
+        Assert.Contains("ShouldContinuouslyAccumulatePreviewTaa(_settings)", backend, StringComparison.Ordinal);
+        Assert.Contains("private bool ShouldContinuouslyAccumulatePreviewTaa", taa, StringComparison.Ordinal);
+        Assert.Contains("if (!IsPreviewTaaActive(settings))", taa, StringComparison.Ordinal);
+        Assert.Contains("taa.TemporalWeight > 0f && taa.JitterScale > 0f", taa, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -180,11 +207,23 @@ public sealed partial class PreviewRenderingTests
             "Rendering",
             "OpenGL",
             "GlColorRenderTarget.cs");
+        var readback = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "GlFramebufferReadback.cs");
 
         Assert.Contains(
             "gl.ReadBuffer(readFramebuffer == 0 ? ReadBufferMode.Back : ReadBufferMode.ColorAttachment0);",
             source,
             StringComparison.Ordinal);
+        Assert.Contains("public byte[]? TryReadRgb8", source, StringComparison.Ordinal);
+        Assert.Contains("out GLEnum error", source, StringComparison.Ordinal);
+        Assert.Contains("GlFramebufferReadback.TryReadRgb8", source, StringComparison.Ordinal);
+        Assert.Contains("DrainErrors(gl);", readback, StringComparison.Ordinal);
+        Assert.Contains("GLEnum.Rgba", readback, StringComparison.Ordinal);
+        Assert.Contains("var rgb = new byte[width * height * 3];", readback, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -217,6 +256,247 @@ public sealed partial class PreviewRenderingTests
         Assert.Contains("TextureUnit.Texture3", source, StringComparison.Ordinal);
         Assert.Contains("TaaSignalTextureHandle", source, StringComparison.Ordinal);
         Assert.Contains("\"uHasTaaSignal\"", source, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void PreviewTaa_ModeDropdownIsWiredToSettingsAndResolveUniforms()
+    {
+        var view = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Views",
+            "MainWindow.axaml");
+        var viewModel = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "ViewModels",
+            "MainWindowViewModel.Preview.cs");
+        var settings = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "Abstractions",
+            "PreviewRenderSettings.cs");
+        var userSettings = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Models",
+            "UserSettings.cs");
+        var synchronizer = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Services",
+            "UserSettingsSynchronizer.cs");
+        var backend = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "OpenGlPreviewBackend.cs");
+        var render = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "OpenGlPreviewBackend.Render.cs");
+        var godRays = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "OpenGlPreviewBackend.GodRays.cs");
+        var taa = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "OpenGlPreviewBackend.Taa.cs");
+        var colorTarget = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "GlColorRenderTarget.cs");
+        var previewControl = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Controls",
+            "GlPbrPreviewControl.cs");
+        var sceneCapture = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "GlSceneCaptureTarget.cs");
+        var shaderCache = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "GlslPreparedSourceCache.cs");
+
+        Assert.Contains("Preview3DTaaModeOptions", view, StringComparison.Ordinal);
+        Assert.Contains("FlyoutSection Header=\"{Binding Strings.Preview3DTaaSection}\"", view, StringComparison.Ordinal);
+        Assert.Contains("SelectedIndex=\"{Binding Preview3DTaaMode, Mode=TwoWay}\"", view, StringComparison.Ordinal);
+        var shaders = view.IndexOf("Preview3DShadersSection", StringComparison.Ordinal);
+        var taaSection = view.IndexOf("Preview3DTaaSection", StringComparison.Ordinal);
+        var taaToggle = view.IndexOf("IsChecked=\"{Binding Preview3DEnablePreviewTaa, Mode=TwoWay}\"", StringComparison.Ordinal);
+        var pomToggle = view.IndexOf("IsChecked=\"{Binding Preview3DEnableParallax, Mode=TwoWay}\"", StringComparison.Ordinal);
+        Assert.True(shaders >= 0);
+        Assert.True(taaSection > shaders);
+        Assert.True(taaToggle > shaders && taaToggle < taaSection);
+        Assert.True(pomToggle > shaders && pomToggle < taaSection);
+        Assert.True(
+            taaSection <
+            view.IndexOf("SelectedIndex=\"{Binding Preview3DTaaMode, Mode=TwoWay}\"", StringComparison.Ordinal));
+        Assert.Contains("[ObservableProperty] private int _preview3DTaaMode;", viewModel, StringComparison.Ordinal);
+        Assert.Contains("[ObservableProperty] private bool _preview3DTaaForceFxaa;", viewModel, StringComparison.Ordinal);
+        Assert.True(
+            viewModel.IndexOf("Preview3DTaaModeLessJitter", StringComparison.Ordinal) <
+            viewModel.IndexOf("Preview3DTaaModeBalanced", StringComparison.Ordinal));
+        Assert.Contains("OnDebouncedPreviewTaaGpuSettingChanged", viewModel, StringComparison.Ordinal);
+        Assert.Contains("ScheduleDebouncedPreviewTaaGpuRefresh", viewModel, StringComparison.Ordinal);
+        Assert.Contains("PreviewTaaGpuDebounceMs", viewModel, StringComparison.Ordinal);
+        Assert.DoesNotContain("OnPreview3DTaaFxaaStrengthScaleChanged(double value) => OnPreview3DGpuSettingChanged", viewModel, StringComparison.Ordinal);
+        Assert.Contains("PreviewTaaMode = Math.Clamp(Preview3DTaaMode, 0, 4)", viewModel, StringComparison.Ordinal);
+        Assert.Contains("PreviewTaaFxaaStrengthScale = (float)Math.Clamp(Preview3DTaaFxaaStrengthScale, 0.0, 5.0)", viewModel, StringComparison.Ordinal);
+        Assert.Contains("PreviewTaaForceFxaa = Preview3DTaaForceFxaa", viewModel, StringComparison.Ordinal);
+        Assert.Contains("public int PreviewTaaMode { get; init; }", settings, StringComparison.Ordinal);
+        Assert.Contains("0 = less jitter", settings, StringComparison.Ordinal);
+        Assert.Contains("public float PreviewTaaFxaaStrengthScale { get; init; } = 1f;", settings, StringComparison.Ordinal);
+        Assert.Contains("public bool PreviewTaaForceFxaa { get; init; }", settings, StringComparison.Ordinal);
+        Assert.Contains("public double Preview3DTaaFxaaStrengthScale { get; set; } = 1.0;", userSettings, StringComparison.Ordinal);
+        Assert.Contains("public bool Preview3DTaaForceFxaa { get; set; }", userSettings, StringComparison.Ordinal);
+        Assert.Contains("public int? Preview3DTaaMode { get; set; }", userSettings, StringComparison.Ordinal);
+        Assert.Contains("ResolvePreview3DTaaMode(settings)", synchronizer, StringComparison.Ordinal);
+        Assert.Contains("DefaultPreview3DTaaMode = 0", synchronizer, StringComparison.Ordinal);
+        Assert.Contains("settings.Preview3DTaaFxaaStrengthScale = Math.Clamp(vm.Preview3DTaaFxaaStrengthScale, 0.0, 5.0);", synchronizer, StringComparison.Ordinal);
+        Assert.Contains("PreviewTaaFxaaStrengthScale = s.PreviewTaaFxaaStrengthScale", backend, StringComparison.Ordinal);
+        Assert.Contains("Math.Clamp(settings.PreviewTaaFxaaStrengthScale, 0f, 5f)", taa, StringComparison.Ordinal);
+        Assert.Contains("ConfigureDefaultFramebufferColorOutput(gl, defaultFbo);", render, StringComparison.Ordinal);
+        Assert.Contains("private void ConfigureDefaultFramebufferColorOutput", godRays, StringComparison.Ordinal);
+        Assert.Contains("DrawBufferMode.Back", godRays, StringComparison.Ordinal);
+        Assert.Contains("DrawBufferMode.ColorAttachment0", godRays, StringComparison.Ordinal);
+        Assert.Contains("ResolveEffectivePreviewTaa", taa, StringComparison.Ordinal);
+        Assert.Contains("ResolvePreviewTaa(settings.VolumetricQuality, settings.PreviewTaaMode)", taa, StringComparison.Ordinal);
+        Assert.Contains("\"uStableTemporalBoost\"", taa, StringComparison.Ordinal);
+        Assert.Contains("\"uTaaSharpenStrength\"", taa, StringComparison.Ordinal);
+        Assert.Contains("\"uDepthEdgeHistoryFloor\"", taa, StringComparison.Ordinal);
+        Assert.Contains("\"uEdgeAaBlend\"", taa, StringComparison.Ordinal);
+        Assert.Contains("\"uCurrentJitterPixels\"", taa, StringComparison.Ordinal);
+        Assert.Contains("\"uSourceFilterStrength\"", taa, StringComparison.Ordinal);
+        Assert.Contains("\"uSilhouetteHistoryWeight\"", taa, StringComparison.Ordinal);
+        Assert.Contains("\"uFxaaEdgeStrength\"", taa, StringComparison.Ordinal);
+        Assert.Contains("\"uFxaaLumaEdgeStrength\"", taa, StringComparison.Ordinal);
+        Assert.Contains("\"uFxaaLumaThreshold\"", taa, StringComparison.Ordinal);
+        Assert.Contains("\"uForceFxaa\"", taa, StringComparison.Ordinal);
+        Assert.Contains("ComputePreviewTaaSettingsKey", taa, StringComparison.Ordinal);
+        Assert.Contains("gl.Disable(EnableCap.CullFace);", taa, StringComparison.Ordinal);
+        Assert.Contains("gl.Disable(EnableCap.ScissorTest);", taa, StringComparison.Ordinal);
+        Assert.Contains("gl.ColorMask(true, true, true, true);", taa, StringComparison.Ordinal);
+        Assert.Contains("TAA resolve draw GL error", taa, StringComparison.Ordinal);
+        Assert.Contains("_taaResolveTarget", taa, StringComparison.Ordinal);
+        Assert.Contains("var resolveTarget = _taaResolveTarget!;", taa, StringComparison.Ordinal);
+        Assert.Contains("resolveTarget.EnsureSize(w, h)", taa, StringComparison.Ordinal);
+        Assert.Contains("resolveTarget.BindDraw();", taa, StringComparison.Ordinal);
+        Assert.Contains("TryPresentPreviewTaaResolveToDefault", taa, StringComparison.Ordinal);
+        Assert.Contains("SetIntOnProgram(_scenePresentProgram, \"uSceneColor\", 0);", taa, StringComparison.Ordinal);
+        Assert.Contains("resolveTarget.BlitColorToFramebuffer(readFbo, frame.VpX, frame.VpY, w, h)", taa, StringComparison.Ordinal);
+        Assert.Contains("historyTarget.CopyColorFrom(resolveTarget)", taa, StringComparison.Ordinal);
+        Assert.Contains("MaybeLogPreviewTaaDiagnostics", taa, StringComparison.Ordinal);
+        Assert.Contains("if (!frame.Settings.LogPreviewTaaDiagnostics)", taa, StringComparison.Ordinal);
+        Assert.Contains("[3D preview] TAA resolve: view=", taa, StringComparison.Ordinal);
+        Assert.Contains("sceneCapture={sceneCaptureSize}", taa, StringComparison.Ordinal);
+        Assert.Contains("resolveSize={resolveSize}", taa, StringComparison.Ordinal);
+        Assert.Contains("jitterPx=", taa, StringComparison.Ordinal);
+        Assert.Contains("fxaaLuma=", taa, StringComparison.Ordinal);
+        Assert.Contains("fxaaThreshold=", taa, StringComparison.Ordinal);
+        Assert.Contains("forceFxaa=", taa, StringComparison.Ordinal);
+        Assert.Contains("EmitPreviewTaaShaderDiagnostic", taa, StringComparison.Ordinal);
+        Assert.Contains("Preview TAA shader ready: resolveSource=", taa, StringComparison.Ordinal);
+        Assert.Contains("MaybeLogPreviewTaaReadbackDiagnostics", taa, StringComparison.Ordinal);
+        Assert.Contains("LogPreviewTaaDiagnostics = DebugMode", viewModel, StringComparison.Ordinal);
+        Assert.Contains("[3D preview] TAA readback:", taa, StringComparison.Ordinal);
+        Assert.Contains("scratch={PixelHashText", taa, StringComparison.Ordinal);
+        Assert.Contains("read-failed({ReadbackErrorText(error)})", taa, StringComparison.Ordinal);
+        Assert.Contains("resolveDelta={DeltaText(resolveDelta)}", taa, StringComparison.Ordinal);
+        Assert.Contains("presentDelta={DeltaText(presentDelta)}", taa, StringComparison.Ordinal);
+        Assert.Contains("rawPresentedDelta={DeltaText(rawPresentedDelta)}", taa, StringComparison.Ordinal);
+        Assert.Contains("resolveMax={DeltaText(resolveMaxDelta)}", taa, StringComparison.Ordinal);
+        Assert.Contains("resolveChanged={PercentText(resolveChangedPct)}", taa, StringComparison.Ordinal);
+        Assert.Contains("presentMax={DeltaText(presentMaxDelta)}", taa, StringComparison.Ordinal);
+        Assert.Contains("MaxAbsRgbDelta", taa, StringComparison.Ordinal);
+        Assert.Contains("ChangedPixelPercent", taa, StringComparison.Ordinal);
+        Assert.Contains("BlitColorToFramebuffer", colorTarget, StringComparison.Ordinal);
+        Assert.Contains("TryReadRgb8", colorTarget, StringComparison.Ordinal);
+        Assert.Contains("ConfigureDrawFramebufferColorAttachment(drawFramebuffer)", colorTarget, StringComparison.Ordinal);
+        Assert.Contains("public int Width => _width;", sceneCapture, StringComparison.Ordinal);
+        Assert.Contains("public int Height => _height;", sceneCapture, StringComparison.Ordinal);
+        Assert.Contains("ComputePreparedSourceFingerprint", shaderCache, StringComparison.Ordinal);
+        Assert.Contains("GetShaderSourceOrigin", shaderCache, StringComparison.Ordinal);
+        Assert.Contains("TryFindSourceShaderPath", shaderCache, StringComparison.Ordinal);
+        Assert.Contains("File.ReadAllText(sourcePath)", shaderCache, StringComparison.Ordinal);
+        Assert.Contains("TryGetPreviewViewportInfo", previewControl, StringComparison.Ordinal);
+        Assert.Contains("Viewport: {pixelWidth}x{pixelHeight}px", viewModel, StringComparison.Ordinal);
+        Assert.Contains("Value=\"{Binding Preview3DTaaFxaaStrengthScale, Mode=TwoWay}\"", view, StringComparison.Ordinal);
+        Assert.Contains("Maximum=\"5.00\"", view, StringComparison.Ordinal);
+        Assert.DoesNotContain("IsChecked=\"{Binding Preview3DTaaForceFxaa, Mode=TwoWay}\"", view, StringComparison.Ordinal);
+        Assert.Equal("TXAA", LocalizedStrings.Preview3DTaaSection);
+    }
+
+    [Fact]
+    public void RenderSettingsPreviewTaaDefaultsToLessJitter()
+    {
+        var settings = new PreviewRenderSettings();
+        Assert.Equal(0, settings.PreviewTaaMode);
+
+        var profile = PreviewVolumetricQuality.ResolvePreviewTaa(1, settings.PreviewTaaMode);
+        Assert.Equal(0.82f, profile.TemporalWeight, 0.0001f);
+        Assert.Equal(0.52f, profile.JitterScale, 0.0001f);
+    }
+
+    [Fact]
+    public void PreviewTaa_EdgeModesSupersampleSceneCaptureBeforeResolve()
+    {
+        var frame = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "OpenGlPreviewBackend.Render.Frame.cs");
+        var godRays = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "OpenGlPreviewBackend.GodRays.cs");
+        var scenePass = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "OpenGlPreviewBackend.Render.PassScene.cs");
+        var taa = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "OpenGlPreviewBackend.Taa.cs");
+
+        Assert.Contains("public int SceneCaptureW;", frame, StringComparison.Ordinal);
+        Assert.Contains("public int SceneCaptureH;", frame, StringComparison.Ordinal);
+        Assert.Contains("public float SceneCaptureScale;", frame, StringComparison.Ordinal);
+        Assert.Contains("PreviewTaaSsaaMaxDimension", godRays, StringComparison.Ordinal);
+        Assert.Contains("ResolvePreviewSceneCaptureScale", godRays, StringComparison.Ordinal);
+        Assert.Contains("ResolveSceneCaptureSize(ref frame, out var captureW, out var captureH, out var captureScale)", godRays, StringComparison.Ordinal);
+        Assert.Contains("_sceneCapture.EnsureSize(captureW, captureH)", godRays, StringComparison.Ordinal);
+        Assert.Contains("_sceneCapture.BindDraw(captureW, captureH)", godRays, StringComparison.Ordinal);
+        Assert.Contains("Scene capture AA scale:", godRays, StringComparison.Ordinal);
+        Assert.Contains("if (!frame.Settings.LogPreviewTaaDiagnostics)", godRays, StringComparison.Ordinal);
+        Assert.Contains("var sceneVpW = frame.GodRayCaptureActive && frame.SceneCaptureW > 0 ? frame.SceneCaptureW : frame.Vw;", scenePass, StringComparison.Ordinal);
+        Assert.Contains("var sceneVpH = frame.GodRayCaptureActive && frame.SceneCaptureH > 0 ? frame.SceneCaptureH : frame.Vh;", scenePass, StringComparison.Ordinal);
+        Assert.Contains("frame.Gl.Viewport(sceneVpX, sceneVpY, (uint)sceneVpW, (uint)sceneVpH);", scenePass, StringComparison.Ordinal);
+        Assert.Contains("captureScale={frame.SceneCaptureScale:0.##}", taa, StringComparison.Ordinal);
     }
 
     [Fact]

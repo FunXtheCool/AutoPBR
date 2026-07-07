@@ -10,6 +10,8 @@ namespace AutoPBR.App.Rendering.OpenGL;
 
 public sealed partial class OpenGlPreviewBackend
 {
+    private const int PreviewTaaSsaaMaxDimension = 3072;
+
     private GlShaderProgram? _scenePresentProgram;
     private GlShaderProgram? _screenSpaceGodRayProgram;
     private GlShaderProgram? _shadowAwareGodRayProgram;
@@ -34,6 +36,7 @@ public sealed partial class OpenGlPreviewBackend
     private bool _prevEnableVolumetricClouds;
     private bool _prevGodRayStabilizeDebug = true;
     private bool _prevCloudDisableTemporal;
+    private int _lastSceneCaptureAaLogKey;
 
     private void TryInitGodRaysCore(GL gl, bool useOpenGlEs)
     {
@@ -198,6 +201,76 @@ public sealed partial class OpenGlPreviewBackend
         _scenePresentProgram is { IsValid: true } &&
         _godRayQuadVao != 0;
 
+    private float ResolvePreviewSceneCaptureScale(in PreviewRenderSettings settings)
+    {
+        if (!IsPreviewTaaActive(settings))
+        {
+            return 1f;
+        }
+
+        var taa = ResolveEffectivePreviewTaa(settings);
+        if (settings.PreviewTaaForceFxaa ||
+            Math.Clamp(settings.PreviewTaaMode, 0, 4) == 2 ||
+            taa.EdgeAaBlend >= 0.45f ||
+            taa.FxaaEdgeStrength >= 0.70f)
+        {
+            return 2f;
+        }
+
+        if (taa.EdgeAaBlend > 0.05f || taa.FxaaEdgeStrength > 0.20f)
+        {
+            return 1.5f;
+        }
+
+        return 1f;
+    }
+
+    private void ResolveSceneCaptureSize(ref GlRenderFrame frame, out int captureW, out int captureH, out float captureScale)
+    {
+        captureScale = ResolvePreviewSceneCaptureScale(frame.Settings);
+        if (captureScale > 1f)
+        {
+            var maxOutputDimension = Math.Max(frame.Vw, frame.Vh);
+            var maxAllowedScale = PreviewTaaSsaaMaxDimension / (float)Math.Max(1, maxOutputDimension);
+            captureScale = Math.Clamp(captureScale, 1f, Math.Max(1f, maxAllowedScale));
+        }
+
+        captureW = Math.Max(1, (int)MathF.Ceiling(frame.Vw * captureScale));
+        captureH = Math.Max(1, (int)MathF.Ceiling(frame.Vh * captureScale));
+    }
+
+    private void MaybeLogSceneCaptureAaScale(ref GlRenderFrame frame)
+    {
+        if (!frame.Settings.LogPreviewTaaDiagnostics)
+        {
+            return;
+        }
+
+        if (frame.SceneCaptureScale <= 1f)
+        {
+            return;
+        }
+
+        var key = HashCode.Combine(
+            frame.Vw,
+            frame.Vh,
+            frame.SceneCaptureW,
+            frame.SceneCaptureH,
+            MathF.Round(frame.SceneCaptureScale * 100f),
+            Math.Clamp(frame.Settings.PreviewTaaMode, 0, 4),
+            frame.Settings.PreviewTaaForceFxaa);
+        if (_lastSceneCaptureAaLogKey == key)
+        {
+            return;
+        }
+
+        _lastSceneCaptureAaLogKey = key;
+        EmitDiagnostic(
+            $"[3D preview] Scene capture AA scale: {frame.SceneCaptureScale:0.##}x " +
+            $"({frame.Vw}x{frame.Vh} -> {frame.SceneCaptureW}x{frame.SceneCaptureH}, " +
+            $"taaMode={Math.Clamp(frame.Settings.PreviewTaaMode, 0, 4)} forceFxaa={frame.Settings.PreviewTaaForceFxaa}).");
+    }
+
     private void SyncGodRayToggleState(in PreviewRenderSettings settings)
     {
         var godRaysChanged = _prevEnableGodRays != settings.EnableGodRays;
@@ -246,13 +319,18 @@ public sealed partial class OpenGlPreviewBackend
             return false;
         }
 
-        if (!_sceneCapture.EnsureSize(frame.Vw, frame.Vh))
+        ResolveSceneCaptureSize(ref frame, out var captureW, out var captureH, out var captureScale);
+        if (!_sceneCapture.EnsureSize(captureW, captureH))
         {
             EmitDiagnostic("[3D preview] God-ray scene target incomplete; rendering directly to the default FBO.");
             return false;
         }
 
-        _sceneCapture.BindDraw(frame.Vw, frame.Vh);
+        frame.SceneCaptureW = captureW;
+        frame.SceneCaptureH = captureH;
+        frame.SceneCaptureScale = captureScale;
+        _sceneCapture.BindDraw(captureW, captureH);
+        MaybeLogSceneCaptureAaScale(ref frame);
         return true;
     }
 
@@ -277,7 +355,7 @@ public sealed partial class OpenGlPreviewBackend
         BindDefaultFramebuffer(ref frame);
     }
 
-    private static void BindDefaultFramebuffer(ref GlRenderFrame frame)
+    private void BindDefaultFramebuffer(ref GlRenderFrame frame)
     {
         if (frame.DefaultFbo != 0)
         {
@@ -289,6 +367,23 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         frame.Gl.Viewport(frame.VpX, frame.VpY, (uint)frame.Vw, (uint)frame.Vh);
+        ConfigureDefaultFramebufferColorOutput(frame.Gl, frame.DefaultFbo);
+    }
+
+    private void ConfigureDefaultFramebufferColorOutput(GL gl, int defaultFbo)
+    {
+        var colorTarget = defaultFbo == 0 ? DrawBufferMode.Back : DrawBufferMode.ColorAttachment0;
+        if (_useOpenGlEs)
+        {
+            unsafe
+            {
+                gl.DrawBuffers(1, &colorTarget);
+            }
+        }
+        else
+        {
+            gl.DrawBuffer(colorTarget);
+        }
     }
 
     private bool TryPresentSceneCaptureToDefault(ref GlRenderFrame frame)

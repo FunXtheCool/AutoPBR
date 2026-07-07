@@ -17,6 +17,9 @@ public sealed partial class OpenGlPreviewBackend
         public int VpY;
         public int Vw;
         public int Vh;
+        public int SceneCaptureW;
+        public int SceneCaptureH;
+        public float SceneCaptureScale;
         public PreviewRenderSettings Settings;
         public IRenderPreviewScene Scene;
         public PreviewMaterial? Material;
@@ -61,7 +64,9 @@ public sealed partial class OpenGlPreviewBackend
         public Vector3 Eye;
         public Vector3 LookTarget;
         public Matrix4x4 Proj;
+        public Matrix4x4 UnjitteredProj;
         public Matrix4x4 View;
+        public Vector2 PreviewTaaJitterNdc;
         public float NearPlane;
         public float FarPlane;
         public Vector3 LightDir;

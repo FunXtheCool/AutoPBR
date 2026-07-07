@@ -320,6 +320,14 @@
       "jarPath": "net/minecraft/client/model/animal/chicken/ColdChickenModel.class"
     },
     {
+      "officialJvmName": "net.minecraft.client.model.animal.chicken.WarmChickenModel",
+      "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.animal.chicken.WarmChickenModel.json",
+      "profile": "named_jar_26.1.2",
+      "modelIndexJvmName": "net.minecraft.client.model.animal.chicken.WarmChickenModel",
+      "extractionStatus": "ok",
+      "jarPath": ""
+    },
+    {
       "officialJvmName": "net.minecraft.client.model.animal.cow.BabyCowModel",
       "shardRelPath": "geometry/26.1.2/net.minecraft.client.model.animal.cow.BabyCowModel.json",
       "profile": "named_jar_26.1.2",

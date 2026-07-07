@@ -23,18 +23,18 @@ internal static class PreviewDepthLayerResolver
     {
         if (GeometryIrCuboidMetadata.TryGetPreviewDepthLayer(cuboid, out var explicitKind))
         {
-            return (explicitKind, cuboidIndexOnPart, CastsShadowFor(explicitKind, cuboid));
+            return (explicitKind, cuboidIndexOnPart, CastsShadowFor(explicitKind, partId, cuboid, officialJvmName));
         }
 
         if (TryClassifyByPartId(partId, officialJvmName, out var partKind, out var partOrdinal))
         {
-            return (partKind, partOrdinal, CastsShadowFor(partKind, cuboid));
+            return (partKind, partOrdinal, CastsShadowFor(partKind, partId, cuboid, officialJvmName));
         }
 
         if (GeometryIrCuboidMetadata.TryGetTextureKey(cuboid, out var textureKey) &&
             TryInferFromTextureKey(textureKey, partId, out var keyKind, out var keyOrdinal))
         {
-            return (keyKind, keyOrdinal, CastsShadowFor(keyKind, cuboid));
+            return (keyKind, keyOrdinal, CastsShadowFor(keyKind, partId, cuboid, officialJvmName));
         }
 
         // Horizontal wing/gill sheets stay Base: javap emits bone cuboids before skin on the same
@@ -44,7 +44,85 @@ internal static class PreviewDepthLayerResolver
             return (PreviewDepthLayerKind.Base, cuboidIndexOnPart, true);
         }
 
-        return (PreviewDepthLayerKind.Base, 0, false);
+        return (PreviewDepthLayerKind.Base, 0, true);
+    }
+
+    internal static bool CastsShadowForKind(PreviewDepthLayerKind kind) =>
+        kind is not (PreviewDepthLayerKind.TranslucentOverlay
+                      or PreviewDepthLayerKind.DebugOnly
+                      or PreviewDepthLayerKind.EmissiveOverlay);
+
+    internal static bool IsWindOrSpecialFxShadowExempt(
+        string? partId,
+        string? textureKeyOrPath,
+        PreviewDepthLayerKind kind)
+    {
+        if (kind == PreviewDepthLayerKind.EmissiveOverlay)
+        {
+            return true;
+        }
+
+        if (!string.IsNullOrEmpty(partId) && partId.StartsWith("wind", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (string.IsNullOrWhiteSpace(textureKeyOrPath))
+        {
+            return false;
+        }
+
+        var token = textureKeyOrPath.Replace('\\', '/');
+        return token.Contains("wind", StringComparison.OrdinalIgnoreCase) ||
+               token.Contains("emissive", StringComparison.OrdinalIgnoreCase) ||
+               token.Contains("glow", StringComparison.OrdinalIgnoreCase);
+    }
+
+    internal static bool IsSlimeOuterBodyShadowCaster(string? partId, string? officialJvmName) =>
+        string.Equals(partId, "outer_cube", StringComparison.OrdinalIgnoreCase) &&
+        IsSlimeModelJvm(officialJvmName);
+
+    private static bool CastsShadowFor(PreviewDepthLayerKind kind, string partId, JsonElement cuboid, string? officialJvmName)
+    {
+        if (IsSlimeOuterBodyShadowCaster(partId, officialJvmName))
+        {
+            return true;
+        }
+
+        if (!CastsShadowForKind(kind))
+        {
+            return false;
+        }
+
+        GeometryIrCuboidMetadata.TryGetTextureKey(cuboid, out var textureKey);
+        return !IsWindOrSpecialFxShadowExempt(partId, textureKey, kind);
+    }
+
+    private static bool CastsShadowForElement(
+        PreviewDepthLayerKind kind,
+        ModelElement element,
+        IReadOnlyDictionary<string, string> textures)
+    {
+        if (!CastsShadowForKind(kind))
+        {
+            return false;
+        }
+
+        foreach (var face in element.Faces.Values)
+        {
+            if (IsWindOrSpecialFxShadowExempt(null, face.TextureKey, kind))
+            {
+                return false;
+            }
+
+            if (textures.TryGetValue(face.TextureKey, out var zipPath) &&
+                IsWindOrSpecialFxShadowExempt(null, zipPath, kind))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public static bool TryResolveElement(
@@ -65,7 +143,7 @@ internal static class PreviewDepthLayerResolver
 
         if (TryInferFromFaceTextureKeys(element.Faces, out kind, out layerOrdinal))
         {
-            castsShadow = kind == PreviewDepthLayerKind.Base && element.CastsShadow;
+            castsShadow = CastsShadowForElement(kind, element, textures);
             return true;
         }
 
@@ -79,7 +157,7 @@ internal static class PreviewDepthLayerResolver
             if (PreviewDepthLayerHeuristics.TryInferKind(zipPath.Replace('\\', '/'), out kind))
             {
                 layerOrdinal = 0;
-                castsShadow = kind == PreviewDepthLayerKind.Base && element.CastsShadow;
+                castsShadow = CastsShadowForElement(kind, element, textures);
                 return true;
             }
         }
@@ -182,7 +260,12 @@ internal static class PreviewDepthLayerResolver
                     continue;
                 }
 
-                merged.Elements[i] = CopyElement(element, kind, element.LayerOrdinal, castsShadow: false);
+                merged.Elements[i] = CopyElement(
+                    element,
+                    kind,
+                    element.LayerOrdinal,
+                    castsShadow: CastsShadowForKind(kind) &&
+                                 !IsWindOrSpecialFxShadowExempt(null, face.TextureKey, kind));
                 break;
             }
         }
@@ -250,11 +333,13 @@ internal static class PreviewDepthLayerResolver
                     continue;
                 }
 
+                // Coplanar outer shells keep CutoutOverlay draw order but still cast directional shadows
+                // (e.g. cow torso cuboid promoted over udder sibling; dragon body segments).
                 merged.Elements[idx] = CopyElement(
                     element,
                     PreviewDepthLayerKind.CutoutOverlay,
                     overlayOrdinal,
-                    castsShadow: false);
+                    castsShadow: true);
             }
         }
     }
@@ -536,18 +621,6 @@ internal static class PreviewDepthLayerResolver
         }
 
         return false;
-    }
-
-    private static bool CastsShadowFor(PreviewDepthLayerKind kind, JsonElement cuboid)
-    {
-        if (kind == PreviewDepthLayerKind.Base &&
-            GeometryIrCuboidMetadata.TryGetInflate(cuboid, out var inflate) &&
-            inflate > 0f)
-        {
-            return true;
-        }
-
-        return kind == PreviewDepthLayerKind.Base;
     }
 
     private static int WindPartOrdinal(string partId)

@@ -21,7 +21,7 @@ public enum PreviewDrawLayerShadowMode
     /// <summary>Draw into shadow maps (base and physical shells).</summary>
     Draw = 0,
 
-    /// <summary>Skip shadow pass (cosmetic overlays, eyes, profession paint).</summary>
+    /// <summary>Skip shadow pass (alpha-blended / translucent shells only).</summary>
     Skip = 1,
 }
 
@@ -66,7 +66,7 @@ public readonly struct PreviewDrawLayerPolicy() : IEquatable<PreviewDrawLayerPol
                     // Write biased depth so post volumetrics (cloud composite depth gate) and later
                     // passes occlude the outer shell; depth-write-off left far-plane depth on overlays.
                     DepthWrite = true,
-                    ShadowMode = PreviewDrawLayerShadowMode.Skip,
+                    ShadowMode = PreviewDrawLayerShadowMode.Draw,
                 };
             case PreviewDepthLayerKind.CosmeticOverlay:
                 return new PreviewDrawLayerPolicy
@@ -75,7 +75,7 @@ public readonly struct PreviewDrawLayerPolicy() : IEquatable<PreviewDrawLayerPol
                     DrawOrder = 200 + Math.Min(layerOrdinal, MaxDepthBiasStep),
                     DepthBiasStep = biasStep,
                     DepthWrite = true,
-                    ShadowMode = PreviewDrawLayerShadowMode.Skip,
+                    ShadowMode = PreviewDrawLayerShadowMode.Draw,
                 };
             case PreviewDepthLayerKind.EmissiveOverlay:
                 return new PreviewDrawLayerPolicy
@@ -84,7 +84,7 @@ public readonly struct PreviewDrawLayerPolicy() : IEquatable<PreviewDrawLayerPol
                     DrawOrder = 300 + layerOrdinal,
                     DepthBiasStep = 2,
                     DepthWrite = true,
-                    ShadowMode = PreviewDrawLayerShadowMode.Skip,
+                    ShadowMode = PreviewDrawLayerShadowMode.Draw,
                 };
             case PreviewDepthLayerKind.TranslucentOverlay:
                 return new PreviewDrawLayerPolicy

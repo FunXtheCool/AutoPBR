@@ -1,6 +1,8 @@
 using System.Numerics;
 
+using AutoPBR.App.Rendering;
 using AutoPBR.App.Rendering.Abstractions;
+using AutoPBR.App.Rendering.Scene;
 using AutoPBR.Core.Models;
 
 using Silk.NET.OpenGL;
@@ -9,8 +11,8 @@ namespace AutoPBR.App.Rendering.OpenGL;
 
 public sealed partial class OpenGlPreviewBackend
 {
-    private const float ShadowCascadeNearHalfExtent = 0.75f;
-    private const float ShadowCascadeFarHalfExtent = 1.5f;
+    private const float ShadowCascadeNearMaxHalfExtent = 8f;
+    private const float ShadowCascadeFarMaxHalfExtent = 36f;
     private const float ShadowCascadeSplitDistance = 6f;
 
     private void GlRenderPassShadow(ref GlRenderFrame frame)
@@ -24,13 +26,46 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         frame.CascadeSplitWorldDistance = ShadowCascadeSplitDistance;
-        frame.ShadowVp = BuildShadowViewProj(frame.LightDir, ShadowCascadeFarHalfExtent);
+
+        frame.ModelMatrix = Matrix4x4.CreateRotationY((float)frame.Rotation);
+        if (frame.Scene.SceneKind == PreviewSceneKind.ItemPlane)
+        {
+            frame.ModelMatrix = Matrix4x4.Identity;
+        }
+        else if (frame.BlockModel is { EnableRenderTimeAnimation: true, AnimationPreset: "entity_emulated", } &&
+                 frame.Settings is { EnableEntityAnimation: true, EnableLegacyEntityWobble: true })
+        {
+            var animT = frame.EntityEmulatedAnimClock;
+            var amp = Math.Clamp(frame.Settings.EntityAnimationAmplitude, 0f, 2f);
+            var bob = Matrix4x4.CreateTranslation(0f, MathF.Sin(animT * 2.2f) * (0.035f * amp), 0f);
+            var yawWobble = Matrix4x4.CreateRotationY(MathF.Sin(animT * 0.9f) * (0.22f * amp));
+            var roll = Matrix4x4.CreateRotationZ(MathF.Sin(animT * 1.6f) * (0.03f * amp));
+            frame.ModelMatrix = roll * yawWobble * bob * frame.ModelMatrix;
+        }
+
+        if (TryGetShadowCasterBoundsForFrame(ref frame, out var boundsMin, out var boundsMax))
+        {
+            frame.ShadowVp = PreviewShadowFrustum.BuildDirectionalViewProj(
+                frame.LightDir,
+                boundsMin,
+                boundsMax,
+                frame.ModelMatrix,
+                maxHalfExtent: ShadowCascadeFarMaxHalfExtent);
+            frame.ShadowVpNear = PreviewShadowFrustum.BuildDirectionalViewProj(
+                frame.LightDir,
+                boundsMin,
+                boundsMax,
+                frame.ModelMatrix,
+                maxHalfExtent: ShadowCascadeNearMaxHalfExtent);
+        }
+        else
+        {
+            frame.ShadowVp = BuildShadowViewProjFallback(frame.LightDir, ShadowCascadeFarMaxHalfExtent * 0.5f);
+            frame.ShadowVpNear = BuildShadowViewProjFallback(frame.LightDir, ShadowCascadeNearMaxHalfExtent * 0.5f);
+        }
+
         frame.ShadowCascadesActive = frame.Settings is { EnableShadowCascades: true, EnableShadows: true } &&
                                      _shadowTargetCascadeNear is not null;
-        if (frame.ShadowCascadesActive)
-        {
-            frame.ShadowVpNear = BuildShadowViewProj(frame.LightDir, ShadowCascadeNearHalfExtent);
-        }
 
         frame.EntityAlphaModeUniform = PreviewSubjectAlphaPolicy.ResolveAlphaModeUniform(
             frame.Scene.SceneKind,
@@ -51,22 +86,6 @@ public sealed partial class OpenGlPreviewBackend
         frame.EnableParallaxShadowEff = PreviewEntityEmulatedShaderGating.EffectiveParallaxShadow(
             frame.Settings.EnableParallaxShadow, frame.EntityEmulatedPreview, frame.Settings.EnableEntityParallax);
 
-        frame.ModelMatrix = Matrix4x4.CreateRotationY((float)frame.Rotation);
-        if (frame.Scene.SceneKind == PreviewSceneKind.ItemPlane)
-        {
-            frame.ModelMatrix = Matrix4x4.Identity;
-        }
-        else if (frame.BlockModel is { EnableRenderTimeAnimation: true, AnimationPreset: "entity_emulated", } &&
-                 frame.Settings is { EnableEntityAnimation: true, EnableLegacyEntityWobble: true })
-        {
-            var animT = frame.EntityEmulatedAnimClock;
-            var amp = Math.Clamp(frame.Settings.EntityAnimationAmplitude, 0f, 2f);
-            var bob = Matrix4x4.CreateTranslation(0f, MathF.Sin(animT * 2.2f) * (0.035f * amp), 0f);
-            var yawWobble = Matrix4x4.CreateRotationY(MathF.Sin(animT * 0.9f) * (0.22f * amp));
-            var roll = Matrix4x4.CreateRotationZ(MathF.Sin(animT * 1.6f) * (0.03f * amp));
-            frame.ModelMatrix = roll * yawWobble * bob * frame.ModelMatrix;
-        }
-
         frame.ShadowAvailable = frame.Settings.EnableShadows && _shadowProgram?.IsValid == true && _shadowTarget is not null;
         if (!frame.ShadowAvailable)
         {
@@ -81,7 +100,44 @@ public sealed partial class OpenGlPreviewBackend
         RenderShadowDepthPass(ref frame, frame.ShadowVp, _shadowTarget!);
     }
 
-    private static Matrix4x4 BuildShadowViewProj(Vector3 worldLightDir, float orthoHalfExtent)
+    private bool TryGetShadowCasterBoundsForFrame(ref GlRenderFrame frame, out Vector3 min, out Vector3 max)
+    {
+        ReadOnlySpan<float> verts;
+        int stride;
+        if (frame.BlockModel?.InterleavedVertices is { Length: > 0 } subjectVerts)
+        {
+            verts = subjectVerts;
+            stride = frame.BlockModel.VertexStrideFloats > 0
+                ? frame.BlockModel.VertexStrideFloats
+                : PreviewMesh.FloatsPerVertex;
+        }
+        else if (frame.Scene.Meshes is { Count: > 0 } meshes &&
+                 meshes[0].InterleavedVertices is { Length: > 0 } sceneVerts)
+        {
+            verts = sceneVerts;
+            stride = PreviewMesh.FloatsPerVertex;
+        }
+        else
+        {
+            min = default;
+            max = default;
+            return false;
+        }
+
+        if (!TryComputeVertexBounds(verts, stride, out min, out max))
+        {
+            return false;
+        }
+
+        if (frame.Settings.ShowGroundMesh)
+        {
+            PreviewShadowFrustum.ExpandBoundsForGroundReceiver(ref min, ref max, PreviewStageConstants.GridWorldY);
+        }
+
+        return true;
+    }
+
+    private static Matrix4x4 BuildShadowViewProjFallback(Vector3 worldLightDir, float orthoHalfExtent)
     {
         const float shadowBoom = 4.0f;
         const float shadowNear = shadowBoom - 2.5f;
@@ -152,6 +208,7 @@ public sealed partial class OpenGlPreviewBackend
                 }
 
                 SetIntOnProgram(_shadowProgram, "uEntityAlphaMode", frame.EntityAlphaModeUniform);
+                var uploadedMaterialIndex = -1;
                 foreach (var batch in frame.BlockModel.DrawBatches)
                 {
                     if ((uint)batch.MaterialIndex >= (uint)frame.BlockSlots.Length)
@@ -164,7 +221,11 @@ public sealed partial class OpenGlPreviewBackend
                         continue;
                     }
 
-                    UploadMaterial(frame.Gl, frame.BlockSlots[batch.MaterialIndex], frame.Settings.NearestTextureFilter);
+                    if (batch.MaterialIndex != uploadedMaterialIndex)
+                    {
+                        UploadMaterial(frame.Gl, frame.BlockSlots[batch.MaterialIndex], frame.Settings.NearestTextureFilter);
+                        uploadedMaterialIndex = batch.MaterialIndex;
+                    }
                     frame.Gl.ActiveTexture(TextureUnit.Texture0);
                     _albedo!.Bind(0);
                     SetIntOnProgram(_shadowProgram, "uAlbedo", 0);

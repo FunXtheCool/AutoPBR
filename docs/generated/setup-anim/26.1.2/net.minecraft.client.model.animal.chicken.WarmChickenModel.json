@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "versionLabel": "26.1.2",
+  "officialJvmName": "net.minecraft.client.model.animal.chicken.WarmChickenModel",
+  "profile": "named_jar_26.1.2",
+  "inheritsSetupAnimFrom": "net.minecraft.client.model.animal.chicken.AdultChickenModel",
+  "assignments": [],
+  "setupAnimMethod": "setupAnim",
+  "extractionStatus": "ok",
+  "extractionNotes": [
+    "Climate parity alias: warm chicken uses ChickenVariant.ModelType.NORMAL; setupAnim matches AdultChickenModel.",
+    "No WarmChickenModel.class in client.jar."
+  ]
+}
