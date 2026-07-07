@@ -95,7 +95,7 @@ public sealed class BeeLegMeshDiagnosticTests
         using var wingPose = JsonDocument.Parse("""
             {"translation":[0,0,0],"rotationEulerRad":[0,-0.2618,0],"eulerOrder":"XYZ"}
             """);
-        Assert.False(CleanRoomEntityModelRuntime.ShouldUseColumnPartPoseCompose(
+        Assert.False(EntityModelRuntime.ShouldUseColumnPartPoseCompose(
             wingPose.RootElement, opts with { OfficialJvmName = beeJvm }));
     }
 
@@ -219,7 +219,7 @@ public sealed class BeeLegMeshDiagnosticTests
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var mesh, out _), path);
 
-        var emitOptions = CleanRoomEntityModelRuntime.CreateParityCatalogPartIdResolveEmitOptions(
+        var emitOptions = EntityModelRuntime.CreateParityCatalogPartIdResolveEmitOptions(
             "Bee", Profile26, isBaby: false, beeJvm, 64, 64, path, previewPoseId: null);
         var cmp = GeometryIrReferenceComparer.CompareReferenceJavaPreviewWorldToParityMesh(
             reference.RootElement,

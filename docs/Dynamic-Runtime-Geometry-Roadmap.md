@@ -60,7 +60,7 @@ selected texture
       -> declarative model importers
       -> static bytecode lift importer for .jar only
       -> bundled/local vanilla IR fallback
-      -> CleanRoom fallback
+      -> error placeholder mesh (uncatalogued / IR miss)
   -> canonical geometry IR
   -> existing mesh emitter/baker
   -> preview renderer
@@ -81,7 +81,7 @@ The renderer already has several useful boundaries:
 - `MinecraftModelBaker` bakes `MergedJavaBlockModel` into preview vertices, indices, and draw batches.
 - `PreviewMeshProvenance` already reports which mesh pipeline produced the preview.
 
-The main missing piece is a runtime model resolver that can discover and import modded model formats before the current CleanRoom fallback path.
+The main missing piece is a runtime model resolver that can discover and import modded model formats before the error-placeholder path.
 
 ## Archive Classification
 
@@ -142,10 +142,10 @@ For a selected texture, resolve model data in this order:
 4. GeckoLib/Blockbench `.geo.json` assets.
 5. Vanilla/local/bundled geometry IR provider.
 6. `.jar` static bytecode lift, only when a plausible class can be mapped.
-7. CleanRoom fallback.
-8. 2D-only preview.
+7. Error placeholder mesh (`PreviewMeshDriverKind.ErrorPlaceholder`).
+8. 2D-only preview (non-entity paths only).
 
-This keeps runtime model support additive and allows CleanRoom to phase out naturally.
+Hand-built CleanRoom entity meshes were removed in 2026-07; catalogued vanilla entities use bundled geometry IR exclusively.
 
 ## Canonical Import Contract
 
@@ -217,7 +217,7 @@ Runtime behavior:
 3. Prefer explicit OptiFine/GeckoLib/AutoPBR IR sidecars.
 4. Fall back to existing Java model JSON resolver.
 5. Fall back to vanilla/local IR if the texture is vanilla-like.
-6. Fall back to CleanRoom only when no runtime model data exists.
+6. Fall back to error placeholder mesh when no runtime model data exists (entity textures).
 
 ## `.jar` Mod Lane
 
@@ -314,9 +314,9 @@ Extend `PreviewMeshProvenance` so logs and overlays can identify runtime sources
 - `Mesh: GeckoLib geo.json`
 - `Mesh: jar bytecode lift`
 - `Mesh: bundled vanilla geometry IR`
-- `Mesh: CleanRoom fallback`
+- `Mesh: error placeholder`
 
-This is important for bug reports and for validating that CleanRoom is actually being phased out.
+This is important for bug reports and for validating runtime resolver coverage.
 
 ## Test Matrix
 
@@ -331,7 +331,7 @@ Add fixture archives for:
 - multiple namespaces.
 - selected texture used by multiple possible models.
 - vanilla texture resolved through runtime/local IR provider.
-- vanilla texture falling back to CleanRoom only when runtime IR is unavailable.
+- uncatalogued entity texture showing error placeholder when runtime IR is unavailable.
 
 ## Milestones
 
@@ -377,11 +377,10 @@ Add fixture archives for:
 - Add cache and cancellation.
 - Keep bytecode lift behind strict fallback/provenance.
 
-### Milestone 7: CleanRoom Phase-Out
+### Milestone 7: Runtime resolver (replaces former CleanRoom phase-out)
 
-- Track which preview routes still use CleanRoom.
-- Replace remaining routes with runtime IR/importers.
-- Keep CleanRoom only as a debug/emergency fallback until no longer needed.
+- **Done:** parity-catalog entity preview is geometry IR only; hand `Build*` removed; IR miss → error placeholder.
+- **Next:** plug runtime importers into the same `TryBuildStaticMesh` hook for modded/uncatalogued textures.
 
 ## Recommended First Build Target
 

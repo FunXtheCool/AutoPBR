@@ -14,7 +14,7 @@ public sealed class ColdCowHornMeshDiagnosticTests
         const string jvm = "net.minecraft.client.model.animal.cow.ColdCowModel";
         const string texture = "assets/minecraft/textures/entity/cow/cow_cold.png";
 
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         Assert.True(runtime.TryBuildStaticMesh(texture, Profile26, 0f, 0f, out var mesh, out var prov, applyGeometryIrSetupAnimMotion: false));
 
         var repo = GeometryIrTestTierSupport.FindRepoRoot();

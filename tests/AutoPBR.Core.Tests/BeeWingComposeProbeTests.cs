@@ -32,8 +32,8 @@ public sealed class BeeWingComposeProbeTests
 
         var rightCenter = MeasureElementCuboidCenter(mesh, partIds, "right_wing");
         var leftCenter = MeasureElementCuboidCenter(mesh, partIds, "left_wing");
-        var expectedRight = Vector3.Transform(RightWingJvmCenter, CleanRoomEntityModelRuntime.LivingEntityRendererPreviewRootScale);
-        var expectedLeft = Vector3.Transform(LeftWingJvmCenter, CleanRoomEntityModelRuntime.LivingEntityRendererPreviewRootScale);
+        var expectedRight = Vector3.Transform(RightWingJvmCenter, EntityModelRuntime.LivingEntityRendererPreviewRootScale);
+        var expectedLeft = Vector3.Transform(LeftWingJvmCenter, EntityModelRuntime.LivingEntityRendererPreviewRootScale);
 
         Assert.True(Vector3.Distance(rightCenter, expectedRight) <= 0.12f,
             $"right_wing center mesh={rightCenter} ler(jvm)={expectedRight} dist={Vector3.Distance(rightCenter, expectedRight):F4}");
@@ -111,7 +111,7 @@ public sealed class BeeWingComposeProbeTests
         using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(BeeJvm, shard.RootElement);
 
-        var blockMesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var blockMesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             TexturePath,
             Profile26,
             BeeJvm,
@@ -126,7 +126,7 @@ public sealed class BeeWingComposeProbeTests
             repaired,
             GeometryIrMeshEmitOptions.ForParity(64, 64) with { OfficialJvmName = BeeJvm });
         var blockCenter = MeasureElementCuboidCenter(blockMesh, partIds, "right_wing");
-        var expectedRight = Vector3.Transform(RightWingJvmCenter, CleanRoomEntityModelRuntime.LivingEntityRendererPreviewRootScale);
+        var expectedRight = Vector3.Transform(RightWingJvmCenter, EntityModelRuntime.LivingEntityRendererPreviewRootScale);
 
         Assert.True(Vector3.Distance(blockCenter, expectedRight) <= 0.12f,
             $"block-stack right_wing center={blockCenter} ler(jvm)={expectedRight} dist={Vector3.Distance(blockCenter, expectedRight):F4}");

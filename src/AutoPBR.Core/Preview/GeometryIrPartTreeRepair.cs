@@ -567,7 +567,7 @@ internal static partial class GeometryIrPartTreeRepair
 
     /// <summary>
     /// Baby wolf bind tail xRot (-π/6) is overwritten every frame by <c>WolfModel.setupAnim</c> with
-    /// <see cref="CleanRoomEntityModelRuntime.WolfDefaultTailAngleRad"/>; Explore bind preview must match that idle pose.
+    /// <see cref="EntityModelRuntime.WolfDefaultTailAngleRad"/>; Explore bind preview must match that idle pose.
     /// </summary>
     public static JsonElement ApplyWolfIdleTailPreviewPose(string? officialJvmName, JsonElement geometryRoot)
     {
@@ -580,7 +580,7 @@ internal static partial class GeometryIrPartTreeRepair
         }
 
         var node = JsonNode.Parse(geometryRoot.GetRawText());
-        if (node is not JsonObject doc || !TrySetPartRotationEulerX(doc, "tail", CleanRoomEntityModelRuntime.WolfDefaultTailAngleRad))
+        if (node is not JsonObject doc || !TrySetPartRotationEulerX(doc, "tail", EntityModelRuntime.WolfDefaultTailAngleRad))
         {
             return geometryRoot;
         }

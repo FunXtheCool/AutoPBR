@@ -36,7 +36,7 @@ public sealed class AttachedPartWorldMatrixParityTests
         var shardPath = Path.Combine(root, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
         using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrModelSpaceParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrModelSpaceParityMeshForTests(
             "entity/test",
             jvm,
             atlasW,
@@ -94,7 +94,7 @@ public sealed class AttachedPartWorldMatrixParityTests
 
         using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrModelSpaceParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrModelSpaceParityMeshForTests(
             "assets/minecraft/textures/entity/dolphin/dolphin.png",
             jvm,
             atlasW,
@@ -126,66 +126,6 @@ public sealed class AttachedPartWorldMatrixParityTests
         }
     }
 
-    [Theory]
-    [InlineData("net.minecraft.client.model.animal.dolphin.DolphinModel", 64, 64, "left_fin", "right_fin", "back_fin")]
-    public void Dolphin_catalog_mesh_part_affine_matches_hand_builder_model_space(
-        string jvm,
-        int atlasW,
-        int atlasH,
-        params string[] partIds)
-    {
-        var root = GeometryIrTestTierSupport.FindRepoRoot();
-        var shardPath = Path.Combine(root, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
-        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
-            !string.Equals(status, "ok", StringComparison.Ordinal))
-        {
-            return;
-        }
-
-        var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(
-            "assets/minecraft/textures/entity/dolphin/dolphin.png",
-            Profile26,
-            0f,
-            0f,
-            out var mesh,
-            out _,
-            applyGeometryIrSetupAnimMotion: false));
-
-        var hand = CleanRoomEntityModelRuntime.BuildDolphinHandMeshForTests(
-            "assets/minecraft/textures/entity/dolphin/dolphin.png",
-            Profile26);
-        var handPartOrder = new[] { "body", "back_fin", "left_fin", "right_fin", "tail", "tail_fin", "head", "nose" };
-        var handIdxByPart = new Dictionary<string, int>(StringComparer.Ordinal);
-        for (var i = 0; i < handPartOrder.Length && i < hand.Elements.Count; i++)
-        {
-            handIdxByPart[handPartOrder[i]] = i;
-        }
-
-        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
-        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
-        var elementPartIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
-            repaired,
-            GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH) with { OfficialJvmName = jvm });
-
-        foreach (var partId in partIds)
-        {
-            Assert.True(handIdxByPart.TryGetValue(partId, out var handIdx), partId);
-            var handWorld = hand.Elements[handIdx].LocalToParent;
-            Matrix4x4? meshWorld = null;
-            for (var i = 0; i < mesh!.Elements.Count; i++)
-            {
-                if (string.Equals(elementPartIds[i], partId, StringComparison.Ordinal))
-                {
-                    meshWorld = mesh.Elements[i].LocalToParent;
-                    break;
-                }
-            }
-
-            Assert.NotNull(meshWorld);
-            AssertProbePointsNear(handWorld, meshWorld.Value, 0.05f, partId);
-        }
-    }
 
     [Theory]
     [InlineData("assets/minecraft/textures/entity/cow/cow_cold.png", "net.minecraft.client.model.animal.cow.ColdCowModel", 64, 64, "right_horn")]
@@ -208,7 +148,7 @@ public sealed class AttachedPartWorldMatrixParityTests
         var refMatrices = ReferencePartWorldMatrixIndex.Build(reference.RootElement, jvm);
         Assert.True(refMatrices.TryGetValue(partId, out var refModelWorld));
 
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         Assert.True(runtime.TryBuildStaticMesh(texturePath, Profile26, 0f, 0f, out var mesh, out _, applyGeometryIrSetupAnimMotion: false));
 
         using var shard = JsonDocument.Parse(File.ReadAllText(Path.Combine(root, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json")));
@@ -216,7 +156,7 @@ public sealed class AttachedPartWorldMatrixParityTests
         var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
             repaired,
             GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH) with { OfficialJvmName = jvm });
-        var ler = CleanRoomEntityModelRuntime.LivingEntityRendererPreviewRootScale;
+        var ler = EntityModelRuntime.LivingEntityRendererPreviewRootScale;
 
         Matrix4x4? meshWorld = null;
         for (var i = 0; i < mesh!.Elements.Count; i++)
@@ -267,7 +207,7 @@ public sealed class AttachedPartWorldMatrixParityTests
         }
     }
 
-    /// <summary>Reference tree walk using production <see cref="CleanRoomEntityModelRuntime.TryComposePartPosePublic"/>.</summary>
+    /// <summary>Reference tree walk using production <see cref="EntityModelRuntime.TryComposePartPosePublic"/>.</summary>
     private static class ReferencePartWorldMatrixIndex
     {
         public static Dictionary<string, Matrix4x4> Build(JsonElement referenceRoot, string? officialJvmName = null)
@@ -296,7 +236,7 @@ public sealed class AttachedPartWorldMatrixParityTests
             var world = parentWorld;
             if (part.TryGetProperty("pose", out var poseEl))
             {
-                if (!CleanRoomEntityModelRuntime.TryComposePartPosePublic(poseEl, parentWorld, out var worldTexel, partId))
+                if (!EntityModelRuntime.TryComposePartPosePublic(poseEl, parentWorld, out var worldTexel, partId))
                 {
                     world = parentWorld;
                 }

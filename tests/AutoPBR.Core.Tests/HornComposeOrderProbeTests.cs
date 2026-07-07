@@ -23,13 +23,13 @@ public sealed class HornComposeOrderProbeTests
         var cuboidCenter = new Vector3(-0.5f, -1.5f, 0.5f);
 
         EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose = false;
-        Assert.True(CleanRoomEntityModelRuntime.TryComposePartPosePublic(doc.RootElement, out var erTLocal));
+        Assert.True(EntityModelRuntime.TryComposePartPosePublic(doc.RootElement, out var erTLocal));
         var erTHornWorld = Matrix4x4.Multiply(head, erTLocal);
         var erTCenter = Vector3.Transform(cuboidCenter, erTHornWorld);
         var headPivot = Vector3.Transform(Vector3.Zero, head);
 
         EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose = true;
-        Assert.True(CleanRoomEntityModelRuntime.TryComposePartPosePublic(doc.RootElement, out var txErLocal));
+        Assert.True(EntityModelRuntime.TryComposePartPosePublic(doc.RootElement, out var txErLocal));
         var txErHornWorld = Matrix4x4.Multiply(head, txErLocal);
         var txErCenter = Vector3.Transform(cuboidCenter, txErHornWorld);
 

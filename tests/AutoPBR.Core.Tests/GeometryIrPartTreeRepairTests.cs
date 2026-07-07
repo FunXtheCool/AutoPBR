@@ -71,7 +71,7 @@ public sealed class GeometryIrPartTreeRepairTests
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
         Assert.False(PartNestedUnder(repaired, "tail2", "tail1"));
 
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/cat/cat_calico",
             new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2)),
             jvm,
@@ -173,7 +173,7 @@ public sealed class GeometryIrPartTreeRepairTests
         }
 
         using var reference = JsonDocument.Parse(File.ReadAllText(refPath));
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/axolotl/axolotl_blue",
             profile,
             jvm,
@@ -219,7 +219,7 @@ public sealed class GeometryIrPartTreeRepairTests
         }
 
         using var reference = JsonDocument.Parse(File.ReadAllText(refPath));
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/axolotl/axolotl_blue",
             profile,
             jvm,

@@ -110,7 +110,7 @@ public static partial class GeometryIrLiftQualityReport
 
         var (atlasW, atlasH) = ResolveParityAtlasForQualityReport(officialJvmName);
         var profile = new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2));
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/test", profile, officialJvmName, atlasW, atlasH, out _, shardRoot);
         if (mesh is null)
         {

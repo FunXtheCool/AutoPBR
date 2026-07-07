@@ -19,7 +19,7 @@ public sealed class GeometryIrParityEmitTests
             """;
 
         using var doc = JsonDocument.Parse(cuboid);
-        var ok = CleanRoomEntityModelRuntime.TryToEntityCuboidForTests(
+        var ok = EntityModelRuntime.TryToEntityCuboidForTests(
             doc.RootElement,
             new GeometryIrMeshEmitOptions
             {
@@ -53,7 +53,7 @@ public sealed class GeometryIrParityEmitTests
             """;
 
         using var doc = JsonDocument.Parse(cuboid);
-        var ok = CleanRoomEntityModelRuntime.TryToEntityCuboidForTests(
+        var ok = EntityModelRuntime.TryToEntityCuboidForTests(
             doc.RootElement,
             new GeometryIrMeshEmitOptions
             {
@@ -89,7 +89,7 @@ public sealed class GeometryIrParityEmitTests
             """;
 
         using var doc = JsonDocument.Parse(cap);
-        var ok = CleanRoomEntityModelRuntime.TryToEntityCuboidForTests(
+        var ok = EntityModelRuntime.TryToEntityCuboidForTests(
             doc.RootElement,
             new GeometryIrMeshEmitOptions
             {
@@ -108,7 +108,7 @@ public sealed class GeometryIrParityEmitTests
         Assert.NotNull(cuboidOut.FaceMask);
         Assert.Equal(["down"], cuboidOut.FaceMask);
 
-        var b = new CleanRoomEntityModelRuntime.RigBuilder(32, 32);
+        var b = new EntityModelRuntime.RigBuilder(32, 32);
         cuboidOut.Emit(b, Matrix4x4.Identity, 1f, "#base");
         var built = b.Build("entity/decorated_pot/decorated_pot_base");
         var capEl = Assert.Single(built.Elements);
@@ -135,7 +135,7 @@ public sealed class GeometryIrParityEmitTests
             """;
 
         using var doc = JsonDocument.Parse(cap);
-        var ok = CleanRoomEntityModelRuntime.TryToEntityCuboidForTests(
+        var ok = EntityModelRuntime.TryToEntityCuboidForTests(
             doc.RootElement,
             new GeometryIrMeshEmitOptions
             {
@@ -149,7 +149,7 @@ public sealed class GeometryIrParityEmitTests
 
         Assert.True(ok, failure);
 
-        var b = new CleanRoomEntityModelRuntime.RigBuilder(32, 32);
+        var b = new EntityModelRuntime.RigBuilder(32, 32);
         cuboidOut.Emit(b, Matrix4x4.Identity, 1f, "#base");
         var built = b.Build("entity/decorated_pot/decorated_pot_base");
         var capEl = Assert.Single(built.Elements);
@@ -164,12 +164,12 @@ public sealed class GeometryIrParityEmitTests
     public void DecoratedPot_side_thicken_keeps_north_on_exterior_plane()
     {
         float x0 = 0f, y0 = 0f, z0 = 0f, x1 = 14f, y1 = 16f, z1 = 0f;
-        CleanRoomEntityModelRuntime.ApplyDecoratedPotPreviewSheetThickness(
+        EntityModelRuntime.ApplyDecoratedPotPreviewSheetThickness(
             ref x0, ref y0, ref z0, ref x1, ref y1, ref z1,
-            CleanRoomEntityModelRuntime.DecoratedPotPreviewDegenerateAxisThickness,
+            EntityModelRuntime.DecoratedPotPreviewDegenerateAxisThickness,
             ["north"]);
         Assert.Equal(0f, z0, 3);
-        Assert.Equal(CleanRoomEntityModelRuntime.DecoratedPotPreviewDegenerateAxisThickness, z1, 3);
+        Assert.Equal(EntityModelRuntime.DecoratedPotPreviewDegenerateAxisThickness, z1, 3);
         Assert.True(x1 - x0 >= 14f - 0.01f);
         Assert.True(x1 - x0 <= 14f + 0.01f);
     }
@@ -190,7 +190,7 @@ public sealed class GeometryIrParityEmitTests
             """;
 
         using var doc = JsonDocument.Parse(wing);
-        var ok = CleanRoomEntityModelRuntime.TryToEntityCuboidForTests(
+        var ok = EntityModelRuntime.TryToEntityCuboidForTests(
             doc.RootElement,
             new GeometryIrMeshEmitOptions
             {
@@ -203,7 +203,7 @@ public sealed class GeometryIrParityEmitTests
             out var failure);
 
         Assert.True(ok, failure);
-        var b = new CleanRoomEntityModelRuntime.RigBuilder(64, 64);
+        var b = new EntityModelRuntime.RigBuilder(64, 64);
         cuboidOut.Emit(b, Matrix4x4.Identity, 1f);
         var built = b.Build("entity/bee/bee");
         var el = Assert.Single(built.Elements);

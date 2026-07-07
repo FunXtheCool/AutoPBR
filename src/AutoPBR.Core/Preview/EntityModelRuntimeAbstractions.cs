@@ -36,7 +36,7 @@ internal interface IEntityModelRuntime
 
 internal static class EntityModelRuntimeFactory
 {
-    public static IEntityModelRuntime Create() => new CleanRoomEntityModelRuntime();
+    public static IEntityModelRuntime Create() => new EntityModelRuntime();
 }
 
 internal static class EntityModelRuntimeExtensions

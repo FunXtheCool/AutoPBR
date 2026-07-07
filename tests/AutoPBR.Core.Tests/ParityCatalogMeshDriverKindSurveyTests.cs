@@ -33,9 +33,9 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests(ITestOutputHelper? ou
         var runtime = EntityModelRuntimeFactory.Create();
         var paths = EntityTextureParityCatalog.GetCataloguedDiffusePathsWithManifestRules();
         var ir = 0;
-        var cleanRoom = 0;
+        var errorPlaceholder = 0;
         var failed = new List<string>();
-        var cleanRoomPaths = new List<string>();
+        var errorPlaceholderPaths = new List<string>();
         foreach (var path in paths)
         {
             if (!runtime.TryBuildStaticMesh(path, profile, 0f, 0f, out _, out var provenance))
@@ -48,20 +48,20 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests(ITestOutputHelper? ou
             {
                 ir++;
             }
-            else if (provenance.Kind == PreviewMeshDriverKind.CleanRoom)
+            else if (provenance.Kind == PreviewMeshDriverKind.ErrorPlaceholder)
             {
-                cleanRoom++;
-                cleanRoomPaths.Add(path);
+                errorPlaceholder++;
+                errorPlaceholderPaths.Add(path);
             }
         }
 
         output?.WriteLine($"Total catalogued: {paths.Count}");
         output?.WriteLine($"RuntimeGeometryIrJson: {ir}");
-        output?.WriteLine($"CleanRoom: {cleanRoom}");
+        output?.WriteLine($"ErrorPlaceholder: {errorPlaceholder}");
         output?.WriteLine($"Build failed: {failed.Count}");
-        foreach (var p in cleanRoomPaths)
+        foreach (var p in errorPlaceholderPaths)
         {
-            output?.WriteLine($"  CleanRoom: {p}");
+            output?.WriteLine($"  ErrorPlaceholder: {p}");
         }
 
         foreach (var p in failed)
@@ -82,9 +82,9 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests(ITestOutputHelper? ou
         var runtime = EntityModelRuntimeFactory.Create();
         var paths = EntityTextureParityCatalog.GetCataloguedDiffusePathsWithManifestRules();
         var ir = 0;
-        var cleanRoom = 0;
+        var errorPlaceholder = 0;
         var failed = new List<string>();
-        var cleanRoomPaths = new List<string>();
+        var errorPlaceholderPaths = new List<string>();
         foreach (var path in paths)
         {
             if (!runtime.TryBuildStaticMesh(path, profile, 0f, 0f, out _, out var provenance))
@@ -97,34 +97,24 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests(ITestOutputHelper? ou
             {
                 ir++;
             }
-            else if (provenance.Kind == PreviewMeshDriverKind.CleanRoom)
+            else if (provenance.Kind == PreviewMeshDriverKind.ErrorPlaceholder)
             {
-                cleanRoom++;
-                cleanRoomPaths.Add(path);
+                errorPlaceholder++;
+                errorPlaceholderPaths.Add(path);
             }
         }
 
         Assert.Empty(failed);
-        Assert.Empty(cleanRoomPaths);
+        Assert.Empty(errorPlaceholderPaths);
         Assert.Equal(paths.Count, ir);
-        Assert.Equal(0, cleanRoom);
+        Assert.Equal(0, errorPlaceholder);
     }
 
     [Fact]
     public void Catalogued_manifest_paths_milestone_builders_use_runtime_geometry_ir()
     {
         var survey = ParityCatalogIrSurveyHelper.Run();
-        Assert.All(survey.CleanRoomPaths, path =>
-            Assert.True(
-                path.Contains("/horse/", StringComparison.OrdinalIgnoreCase) ||
-                path.Contains("/cat/", StringComparison.OrdinalIgnoreCase) ||
-                path.Contains("/wolf/", StringComparison.OrdinalIgnoreCase) ||
-                path.Contains("/villager/", StringComparison.OrdinalIgnoreCase) ||
-                path.Contains("/player/", StringComparison.OrdinalIgnoreCase) ||
-                path.Contains("/chicken/", StringComparison.OrdinalIgnoreCase) ||
-                path.Contains("/equipment/", StringComparison.OrdinalIgnoreCase) ||
-                path.Contains("/strider/", StringComparison.OrdinalIgnoreCase),
-                path));
+        Assert.Empty(survey.ErrorPlaceholderPaths);
     }
 
     [Fact]
@@ -176,7 +166,7 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests(ITestOutputHelper? ou
             $"{row.TexturePath}: driver={row.DriverKind} suppress={row.SuppressesHandFallback} ir={row.IrFailureReason} jvm={row.ResolvedGeometryJvm} detail={row.ProvenanceDetail}");
         Assert.Contains(expectedJvmSuffix, row.ResolvedGeometryJvm ?? row.ProvenanceDetail ?? "", StringComparison.Ordinal);
         Assert.True(row.SuppressesHandFallback);
-        Assert.NotEqual(CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.Skip, row.LerBasis);
+        Assert.NotEqual(EntityModelRuntime.GeometryIrLerBasisKind.Skip, row.LerBasis);
         output?.WriteLine(
             $"{row.TexturePath}\t{row.DriverKind}\t{row.ResolvedGeometryJvm}\tsuppress={row.SuppressesHandFallback}\tsetup={row.SetupAnimWouldEvaluate}\tstate={row.SetupAnimStateSource}\tler={row.LerBasis}\tdefAnim={row.DefinitionAnimationJvm}");
     }
@@ -187,7 +177,7 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests(ITestOutputHelper? ou
         var cow = ParityCatalogEntityPreviewDiagnostics.SurveyPath(
             "assets/minecraft/textures/entity/cow/cow_temperate.png",
             Profile26);
-        Assert.Equal(CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot, cow.LerBasis);
+        Assert.Equal(EntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot, cow.LerBasis);
         Assert.True(cow.HasSetupAnimDocument);
         Assert.Equal("living-walk", cow.SetupAnimStateSource);
 
@@ -196,7 +186,7 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests(ITestOutputHelper? ou
             Profile26,
             animationTimeSeconds: 2.5f,
             applyGeometryIrSetupAnimMotion: true);
-        Assert.Equal(CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot, breeze.LerBasis);
+        Assert.Equal(EntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot, breeze.LerBasis);
         Assert.True(breeze.HasSetupAnimDocument);
         Assert.Equal("renderer-state", breeze.SetupAnimStateSource);
     }
@@ -219,7 +209,7 @@ public sealed class ParityCatalogMeshDriverKindSurveyTests(ITestOutputHelper? ou
             {
                 SuppressesHandFallback: true,
                 BuildSucceeded: true,
-                DriverKind: PreviewMeshDriverKind.CleanRoom
+                DriverKind: PreviewMeshDriverKind.ErrorPlaceholder
             })
             .Select(r => $"{r.TexturePath} ({r.IrFailureReason})")
             .ToList();

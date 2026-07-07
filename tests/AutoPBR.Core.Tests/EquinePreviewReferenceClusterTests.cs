@@ -39,7 +39,7 @@ public sealed class EquinePreviewReferenceClusterTests
         int minElements)
     {
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         var profile = new MinecraftNativeProfile("26.1.2", TestEnvironmentPaths.AbsentNativeRoot, new Version(26, 1, 2));
         Assert.True(runtime.TryBuildStaticMesh(texturePath, profile, idlePhase01: 0.2f, animationTimeSeconds: 0f, out var mesh));
         Assert.True(mesh.Elements.Count >= minElements, $"elements={mesh.Elements.Count}");
@@ -133,7 +133,7 @@ public sealed class EquinePreviewReferenceClusterTests
     public void Baby_donkey_catalog_mesh_legs_cluster_with_body(string texturePath)
     {
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         var profile = new MinecraftNativeProfile("26.1.2", TestEnvironmentPaths.AbsentNativeRoot, new Version(26, 1, 2));
         Assert.True(runtime.TryBuildStaticMesh(texturePath, profile, idlePhase01: 0.2f, animationTimeSeconds: 0f, out var mesh));
 
@@ -179,7 +179,7 @@ public sealed class EquinePreviewReferenceClusterTests
     public void Baby_equine_catalog_mesh_tail_clusters_with_body(string texturePath)
     {
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         var profile = new MinecraftNativeProfile("26.1.2", TestEnvironmentPaths.AbsentNativeRoot, new Version(26, 1, 2));
         Assert.True(runtime.TryBuildStaticMesh(texturePath, profile, idlePhase01: 0.2f, animationTimeSeconds: 0f, out var mesh));
 

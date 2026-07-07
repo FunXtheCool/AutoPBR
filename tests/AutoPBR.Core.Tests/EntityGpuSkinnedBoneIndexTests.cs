@@ -21,7 +21,7 @@ public sealed class EntityGpuSkinnedBoneIndexTests
         out float[] verts,
         out int elementCount)
     {
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         var profile = new MinecraftNativeProfile("26.1.2", TestEnvironmentPaths.AbsentNativeRoot, new Version(26, 1, 2));
         Assert.True(runtime.TryBuildStaticMesh(assetPath, profile, idlePhase01: 0f, animationTimeSeconds: 0f, out var merged));
         elementCount = merged.Elements.Count;

@@ -5,7 +5,7 @@ namespace AutoPBR.Core.Preview;
 
 /// <summary>
 /// Loads <c>minecraft_26.1.2_entity_textures.json</c> plus the companion model manifest under <c>Data/minecraft-native/</c>.
-/// Catalogued vanilla diffuse paths must never take family fallbacks (see <see cref="CleanRoomEntityModelRuntime"/>).
+/// Catalogued vanilla diffuse paths must never take family fallbacks (see <see cref="EntityModelRuntime"/>).
 /// </summary>
 public static class EntityTextureParityCatalog
 {

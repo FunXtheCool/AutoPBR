@@ -35,7 +35,7 @@ public sealed class BabyFamilyAttachmentClusterTests
     {
         const string texturePath = "assets/minecraft/textures/entity/zombie_villager/baby/desert.png";
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         MergedJavaBlockModel merged;
         using (EntityPreviewBuildContext.UsePose(EntityPreviewPoseCatalog.HumanoidZombieArms))
         {
@@ -92,7 +92,7 @@ public sealed class BabyFamilyAttachmentClusterTests
     {
         const string texturePath = "assets/minecraft/textures/entity/zombie_villager/baby/desert.png";
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         MergedJavaBlockModel merged;
         using (EntityPreviewBuildContext.UsePose(EntityPreviewPoseCatalog.HumanoidZombieArms))
         {
@@ -148,7 +148,7 @@ public sealed class BabyFamilyAttachmentClusterTests
     public void Baby_zombie_villager_zombie_arms_pose_keeps_arms_laterally_attached(string texturePath)
     {
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         MergedJavaBlockModel mesh;
         using (EntityPreviewBuildContext.UsePose(EntityPreviewPoseCatalog.HumanoidZombieArms))
         {
@@ -192,7 +192,7 @@ public sealed class BabyFamilyAttachmentClusterTests
     public void Catalog_baby_limb_and_tail_centroids_stay_near_body(string texturePath, float maxGapPreviewUnits)
     {
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         Assert.True(runtime.TryBuildStaticMesh(texturePath, Profile26, 0f, 0f, out var mesh));
 
         var stem = Path.GetFileNameWithoutExtension(texturePath).ToLowerInvariant();
@@ -235,7 +235,7 @@ public sealed class BabyFamilyAttachmentClusterTests
     public void Baked_cpu_vertices_cluster_like_local_to_parent(string texturePath, float maxGapPreviewUnits)
     {
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         Assert.True(runtime.TryBuildStaticMesh(texturePath, Profile26, 0f, 0f, out var merged));
 
         var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(merged, "minecraft");
@@ -289,7 +289,7 @@ public sealed class BabyFamilyAttachmentClusterTests
     public void Gpu_bind_pose_shader_path_keeps_baby_parts_clustered(string texturePath, float maxGapPreviewUnits)
     {
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         Assert.True(runtime.TryBuildStaticMesh(texturePath, Profile26, 0f, 0f, out var mergedBind));
 
         var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(mergedBind, "minecraft");
@@ -375,7 +375,7 @@ public sealed class BabyFamilyAttachmentClusterTests
     public void Explore_placement_pipeline_keeps_baby_parts_clustered(string texturePath, float maxGapPreviewUnits)
     {
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         Assert.True(runtime.TryBuildStaticMesh(texturePath, Profile26, 0f, 0f, out var merged));
 
         var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(merged, "minecraft");
@@ -436,7 +436,7 @@ public sealed class BabyFamilyAttachmentClusterTests
     public void Setup_anim_keeps_baby_family_parts_clustered(string texturePath)
     {
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         Assert.True(runtime.TryBuildStaticMesh(
             texturePath, Profile26, 0.2f, animationTimeSeconds: 1.25f, out var animated,
             applyGeometryIrSetupAnimMotion: true));

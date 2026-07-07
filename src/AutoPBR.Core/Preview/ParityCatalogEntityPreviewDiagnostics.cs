@@ -22,7 +22,7 @@ internal static class ParityCatalogEntityPreviewDiagnostics
         bool HasSetupAnimDocument,
         bool SetupAnimWouldEvaluate,
         string SetupAnimStateSource,
-        CleanRoomEntityModelRuntime.GeometryIrLerBasisKind LerBasis,
+        EntityModelRuntime.GeometryIrLerBasisKind LerBasis,
         bool LerComposeProbeAvailable,
         float LerDefaultLegMinusHeadY,
         float LerRightComposeLegMinusHeadY,
@@ -52,7 +52,7 @@ internal static class ParityCatalogEntityPreviewDiagnostics
     {
         var norm = entityTextureAssetPath.Replace('\\', '/').TrimStart('/');
         var stem = Path.GetFileNameWithoutExtension(norm).ToLowerInvariant();
-        var isBaby = CleanRoomEntityModelRuntime.LooksLikeBabyTexture(stem, norm);
+        var isBaby = EntityModelRuntime.LooksLikeBabyTexture(stem, norm);
         var rule = EntityTextureParityCatalog.ResolveRule(norm, stem);
         var builder = rule?.BuilderMethod ?? "(no rule)";
         var tier = rule is not null ? GeometryIrParityPolicy.GetTier(rule.BuilderMethod) : GeometryIrParityTier.PreferIr;
@@ -68,7 +68,7 @@ internal static class ParityCatalogEntityPreviewDiagnostics
                 resolvedJvm = jvm;
             }
 
-            suppresses = CleanRoomEntityModelRuntime.ShouldSuppressHandBuiltParityFallback(
+            suppresses = EntityModelRuntime.ShouldSuppressHandBuiltParityFallback(
                 profile, rule, norm, stem, isBaby, out irFailure);
         }
 
@@ -81,7 +81,7 @@ internal static class ParityCatalogEntityPreviewDiagnostics
         var setupStateSource = "";
         if (rule is not null)
         {
-            CleanRoomEntityModelRuntime.ProbeParityCatalogSetupAnimCapability(
+            EntityModelRuntime.ProbeParityCatalogSetupAnimCapability(
                 rule,
                 resolvedJvm,
                 isBaby,
@@ -96,7 +96,7 @@ internal static class ParityCatalogEntityPreviewDiagnostics
                     rule.DeobfuscatedModelClass,
                     isBaby,
                     resolvedJvm ?? "");
-                _ = CleanRoomEntityModelRuntime.ResolveSetupAnimPreviewStateForTests(
+                _ = EntityModelRuntime.ResolveSetupAnimPreviewStateForTests(
                     modelJvm,
                     animationTimeSeconds,
                     idlePhase01,
@@ -126,12 +126,6 @@ internal static class ParityCatalogEntityPreviewDiagnostics
             resolvedJvm ??= provenance.Detail;
         }
 
-        if (buildOk && provenance.Kind == PreviewMeshDriverKind.CleanRoom && rule is not null)
-        {
-            irFailure = CleanRoomEntityModelRuntime.ClassifyParityCatalogGeometryIrFailure(
-                profile, rule, norm, stem, isBaby);
-        }
-
         var lerProbeAvailable = false;
         var lerDefaultLegMinusHeadY = 0f;
         var lerRightLegMinusHeadY = 0f;
@@ -155,8 +149,8 @@ internal static class ParityCatalogEntityPreviewDiagnostics
                 lerRecommended = MathF.Abs(lerDefaultLegMinusHeadY - lerRightLegMinusHeadY) < 1e-4f
                     ? ""
                     : lerRightLegMinusHeadY < lerDefaultLegMinusHeadY
-                        ? CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.RightComposeLocalChain.ToString()
-                        : CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot.ToString();
+                        ? EntityModelRuntime.GeometryIrLerBasisKind.RightComposeLocalChain.ToString()
+                        : EntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot.ToString();
             }
         }
 
@@ -173,7 +167,7 @@ internal static class ParityCatalogEntityPreviewDiagnostics
             hasSetupAnim,
             setupAnimEval,
             setupStateSource,
-            CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(resolvedJvm, stem, norm),
+            EntityModelRuntime.ResolveGeometryIrLerBasis(resolvedJvm, stem, norm),
             lerProbeAvailable,
             lerDefaultLegMinusHeadY,
             lerRightLegMinusHeadY,
@@ -237,7 +231,7 @@ internal static class ParityCatalogEntityPreviewDiagnostics
     private static string? ResolveDefinitionAnimationJvm(string builderMethod, bool isBaby)
     {
         string? match = null;
-        foreach (var binding in EntityCleanRoomAnimationMap.GetBindingsForParityBuilder(builderMethod))
+        foreach (var binding in EntityParityAnimationMap.GetBindingsForParityBuilder(builderMethod))
         {
             if (binding.RestrictToBabyTextures is true && !isBaby)
             {
@@ -295,7 +289,7 @@ internal static class ParityCatalogEntityPreviewDiagnostics
     {
         defaultLegMinusHeadY = 0f;
         rightComposeLegMinusHeadY = 0f;
-        var defaultMesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTestsWithLerCompose(
+        var defaultMesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTestsWithLerCompose(
             "entity/test",
             officialJvmName,
             atlasWidth,
@@ -303,7 +297,7 @@ internal static class ParityCatalogEntityPreviewDiagnostics
             geometryRoot,
             lerMirrorRightComposeLocalChain: false,
             out _);
-        var rightMesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTestsWithLerCompose(
+        var rightMesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTestsWithLerCompose(
             "entity/test",
             officialJvmName,
             atlasWidth,

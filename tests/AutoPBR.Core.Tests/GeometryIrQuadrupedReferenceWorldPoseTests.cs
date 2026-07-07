@@ -17,7 +17,7 @@ public sealed class GeometryIrQuadrupedReferenceWorldPoseTests
     [Fact]
     public void Living_entity_renderer_root_scale_negates_part_origin_y()
     {
-        var s = CleanRoomEntityModelRuntime.LivingEntityRendererPreviewRootScale;
+        var s = EntityModelRuntime.LivingEntityRendererPreviewRootScale;
         var t = Matrix4x4.CreateTranslation(0f, 4f, -8f);
         var modelOrigin = Vector3.Transform(Vector3.Zero, t);
         Assert.Equal(4f, modelOrigin.Y, precision: 3);
@@ -52,7 +52,7 @@ public sealed class GeometryIrQuadrupedReferenceWorldPoseTests
         }
 
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, ir.RootElement);
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/test",
             Profile26,
             jvm,
@@ -88,7 +88,7 @@ public sealed class GeometryIrQuadrupedReferenceWorldPoseTests
 
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, ir.RootElement);
         var emitOptions = GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH).WithOfficialJvmPoseComposeDefaults(jvm);
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrModelSpaceParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrModelSpaceParityMeshForTests(
             "entity/test",
             jvm,
             atlasW,
@@ -208,13 +208,13 @@ public sealed class GeometryIrQuadrupedReferenceWorldPoseTests
     [Fact]
     public void Cow_geometry_ir_uses_column_pose_stack_root_ler_for_baked_mesh_transform_semantics()
     {
-        Assert.False(CleanRoomEntityModelRuntime.ResolveGeometryIrLerMirrorRightComposeLocalChain(
+        Assert.False(EntityModelRuntime.ResolveGeometryIrLerMirrorRightComposeLocalChain(
             "net.minecraft.client.model.animal.cow.CowModel",
             "cow",
             "assets/minecraft/textures/entity/cow/cow_temperate.png"));
         Assert.Equal(
-            CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot,
-            CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(
+            EntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot,
+            EntityModelRuntime.ResolveGeometryIrLerBasis(
                 "net.minecraft.client.model.animal.cow.CowModel",
                 "cow",
                 "assets/minecraft/textures/entity/cow/cow_temperate.png"));

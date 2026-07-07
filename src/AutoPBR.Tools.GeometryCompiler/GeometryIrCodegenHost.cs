@@ -55,13 +55,13 @@ internal static class GeometryIrCodegenHost
 
             var typeName = jvm.Split('.')[^1];
             sb.AppendLine(CultureInfo.InvariantCulture,
-                $"    private static readonly CleanRoomEntityModelRuntime.EntityCuboid[] {typeName}BodyLayerData =");
+                $"    private static readonly EntityModelRuntime.EntityCuboid[] {typeName}BodyLayerData =");
             sb.AppendLine("    [");
             EmitCuboidsFromParts(roots, sb, "        ");
             sb.AppendLine("    ];");
             sb.AppendLine();
             sb.AppendLine(CultureInfo.InvariantCulture,
-                $"    internal static ReadOnlySpan<CleanRoomEntityModelRuntime.EntityCuboid> {typeName}BodyLayer => {typeName}BodyLayerData;");
+                $"    internal static ReadOnlySpan<EntityModelRuntime.EntityCuboid> {typeName}BodyLayer => {typeName}BodyLayerData;");
             sb.AppendLine();
             wrote++;
         }
@@ -96,7 +96,7 @@ internal static class GeometryIrCodegenHost
                     }
 
                     sb.AppendLine(CultureInfo.InvariantCulture,
-                        $"{indent}new CleanRoomEntityModelRuntime.EntityCuboid({Fmt(from[0])}f, {Fmt(from[1])}f, {Fmt(from[2])}f, {Fmt(to[0])}f, {Fmt(to[1])}f, {Fmt(to[2])}f, {uv[0]}, {uv[1]}),");
+                        $"{indent}new EntityModelRuntime.EntityCuboid({Fmt(from[0])}f, {Fmt(from[1])}f, {Fmt(from[2])}f, {Fmt(to[0])}f, {Fmt(to[1])}f, {Fmt(to[2])}f, {uv[0]}, {uv[1]}),");
                 }
             }
 

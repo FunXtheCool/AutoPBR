@@ -4,7 +4,7 @@
 **Pinned version:** 26.1.2 (`tools/minecraft-parity/26.1.2/client.jar`)  
 **Assembly pilots:** 56 JVMs ([`geometry-assembly-parity-pilots-26.1.2.txt`](generated/geometry-assembly-parity-pilots-26.1.2.txt))  
 **Quality snapshot:** [`geometry-lift-quality-26.1.2.json`](generated/geometry-lift-quality-26.1.2.json) — `generatedUtc` 2026-05-26T02:32:22Z · **Completion audit:** [`plan-completion-audit.md`](generated/plan-completion-audit.md) · **Automated tracks:** [`automated-tracks-complete.md`](generated/automated-tracks-complete.md)  
-**Related:** [`test-guidance-geometry-animation-ir.md`](test-guidance-geometry-animation-ir.md) (tiers), [`generated/geometry-ir-conventions.md`](generated/geometry-ir-conventions.md), [`vanilla-preview-parity.md`](vanilla-preview-parity.md), [`cleanroom-entity-cuboid.md`](cleanroom-entity-cuboid.md), [`ghast-family-parity.md`](ghast-family-parity.md)
+**Related:** [`test-guidance-geometry-animation-ir.md`](test-guidance-geometry-animation-ir.md) (tiers), [`generated/geometry-ir-conventions.md`](generated/geometry-ir-conventions.md), [`vanilla-preview-parity.md`](vanilla-preview-parity.md), [`entity-cuboid-layer.md`](entity-cuboid-layer.md), [`ghast-family-parity.md`](ghast-family-parity.md)
 **Superseded plans:** [`archive/README.md`](archive/README.md) (historical roadmaps only — do not edit for new work)
 
 ---
@@ -19,7 +19,7 @@ Preview-only layers are **temporary guardrails**, not substitutes for lifter fix
 |-----------|------------------|
 | LER / living-entity renderer preview basis | Wrong `PartPose` kind or flat part tree in geometry IR |
 | `GeometryIrPartTreeRepair` / reference pose sync | `addOrReplaceChild` recovery in mesh lift |
-| Clean-room `Build*` templates | Factory bytecode poses (`offset` vs `offsetAndRotation`) |
+| Clean-room `Build*` templates | **Removed** — catalog uses geometry IR only; failures → error placeholder mesh |
 | `preview-deltas/*.json` | Lifted cuboids, hierarchy, extraction notes |
 | `PreviewRenderStateSynthesis` | Renderer-state lift (P6 — future) |
 | Hand-tuned `Compute*` / `*VanillaKeyframes` | `VanillaSetupAnimRuntime` + lifted setupAnim IR |
@@ -32,7 +32,7 @@ Preview-only layers are **temporary guardrails**, not substitutes for lifter fix
 
 ## North star
 
-Explore 3D and CleanRoom parity preview match **vanilla-as-lifted**: correct part hierarchy, factory-accurate rest poses, sampled definition clips where IR is complete, and setupAnim evaluation against a honest render-state bag. Promotion uses **allowlists + quality gates**, not preview hacks.
+Explore 3D and entity preview match **vanilla-as-lifted**: correct part hierarchy, factory-accurate rest poses, sampled definition clips where IR is complete, and setupAnim evaluation against a honest render-state bag. Promotion uses **allowlists + quality gates**, not preview hacks.
 
 ## Current status (2026-05-26 audit)
 
@@ -43,7 +43,7 @@ Explore 3D and CleanRoom parity preview match **vanilla-as-lifted**: correct par
 - **P6 renderer-state compiler:** hand renderer-state pilot shards + resolver are landed; bytecode `RendererStateLift` stays deferred behind [`archive/p6-renderer-state-lift-blockers.md`](archive/p6-renderer-state-lift-blockers.md).
 - **Phase 1C cube deformation:** `inflate` is lifted but parity emit intentionally skips corner expansion until reference bake / viewport policy changes.
 - **Reference-output freshness:** JDK 25 reference batches may be stale; re-bake only when validating reference artifacts.
-- **Catalog/CleanRoom hygiene:** catalog manifest paths are strict IR; remaining hand `Build*` work is optional CleanRoom cleanup (`BuildQuadruped` legacy path).
+- **Catalog hygiene (done 2026-07):** parity-catalog preview is **geometry IR only**; hand `Build*` dispatch removed. Unresolved entity textures show a **3D error placeholder** (`PreviewMeshDriverKind.ErrorPlaceholder`) via `EntityModelRuntime` / `EntityPreviewErrorMesh`.
 - **Regeneration hygiene:** re-run full geometry/setup/animation indexes when new lifts land; current committed geometry index has no `partial` rows.
 
 ---
@@ -127,7 +127,7 @@ Legacy `referenceCuboidsMatch` / `referencePosesMatch` / `referenceMeshMatch` va
 
 8. **Preview-deltas backlog** — pilot-wide overlays where interpretation still diverges
 
-9. **Entity cuboid codegen** — `EntityCuboid` + `GeometryIrEntityCuboidTables.g.cs`; IR-first `Build*` paths per [`cleanroom-entity-cuboid.md`](cleanroom-entity-cuboid.md); mob mesh wiring in [`generated/mob-ir-parity-backlog.txt`](generated/mob-ir-parity-backlog.txt) (BuildBaby* / geometry IR only)
+9. **Entity cuboid codegen** — `EntityCuboid` + `GeometryIrEntityCuboidTables.g.cs`; IR-first `Build*` paths per [`entity-cuboid-layer.md`](entity-cuboid-layer.md); mob mesh wiring in [`generated/mob-ir-parity-backlog.txt`](generated/mob-ir-parity-backlog.txt) (BuildBaby* / geometry IR only)
 
 ## A.3 Pilot gate tables (short names)
 
@@ -436,7 +436,7 @@ Details and allowlist table: [`test-guidance-geometry-animation-ir.md`](test-gui
 - **Reference batch freshness:** JDK 25 required for class file 69; pilot `reference-output` may be stale.
 - **P6 renderer lift:** Breeze/Sniffer/Allay/Camel/Warden/Frog/Creaking/**Nautilus**/**CopperGolem** pilot shards + preview resolver landed; synthesis fallback for other mobs; bytecode compiler remains deferred.
 - **Phase 1C cube deformation:** `BabyZombieModel` `inflate: 0.25` is recorded in IR; parity emit skips inflate until reference/viewport policy changes.
-- **Optional CleanRoom cleanup:** catalog paths are strict IR; remaining hand adult `BuildQuadruped` cleanup is not a plan blocker.
+- **CleanRoom mesh cleanup (2026-07):** Hand-built entity meshes removed; catalog paths are strict IR with error-placeholder fallback for failures.
 
 ## Optional hygiene
 

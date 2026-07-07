@@ -55,7 +55,7 @@ public sealed class RendererStateWardenPreviewTests
             "26.1.2",
             Path.Combine(AppContext.BaseDirectory, "Data", "minecraft-native", "26.1.2"),
             new Version(26, 1, 2));
-        var state = CleanRoomEntityModelRuntime.ResolveSetupAnimPreviewStateForTests(
+        var state = EntityModelRuntime.ResolveSetupAnimPreviewStateForTests(
             WardenModel,
             animationTimeSeconds: 8f,
             idlePhase01: 0.3f,

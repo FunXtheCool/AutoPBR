@@ -5,7 +5,7 @@ namespace AutoPBR.Core.Tests;
 
 /// <summary>
 /// Catalog-wide preview pipeline invariants: production geometry IR emit is deterministic and CPU/GPU bind bakes agree.
-/// Hand-built CleanRoom vs IR bind alignment for object entities and promoted pilots lives in
+/// Object-entity preview orientation and promoted pilot bind alignment lives in
 /// <see cref="ObjectEntityBlockStateParityTests"/> and <see cref="GeometryIrReferenceRigTests"/>.
 /// </summary>
 public sealed class ParityCatalogMeshPipelineInvariantTests(ITestOutputHelper output)
@@ -93,7 +93,7 @@ public sealed class ParityCatalogMeshPipelineInvariantTests(ITestOutputHelper ou
                 continue;
             }
 
-            if (!CleanRoomEntityModelRuntime.TryBuildParityCatalogGeometryIrMeshForTests(
+            if (!EntityModelRuntime.TryBuildParityCatalogGeometryIrMeshForTests(
                     path,
                     Profile26,
                     idlePhase01: 0f,

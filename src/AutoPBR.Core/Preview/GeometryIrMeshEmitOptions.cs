@@ -4,7 +4,7 @@ using System.Text.Json;
 namespace AutoPBR.Core.Preview;
 
 /// <summary>
-/// Options for geometry IR body-layer emission on <see cref="CleanRoomEntityModelRuntime"/>.
+/// Options for geometry IR body-layer emission on <see cref="EntityModelRuntime"/>.
 /// </summary>
 internal readonly struct GeometryIrMeshEmitOptions
 {

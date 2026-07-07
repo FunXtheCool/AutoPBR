@@ -15,7 +15,7 @@ public sealed class EntityGpuShaderBindPosePathTests
     public void Gpu_bind_pose_shader_path_matches_cpu_rebake_for_cow()
     {
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         const string path = "assets/minecraft/textures/entity/cow/cow_temperate.png";
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var mergedBind));
 

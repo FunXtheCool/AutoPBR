@@ -97,7 +97,7 @@ internal static class GhastPreviewTestLandmarks
                 expected = Matrix4x4.Multiply(Matrix4x4.CreateRotationX(pitch), expected);
             }
 
-            expected = CleanRoomEntityModelRuntime.ApplyLivingEntityRendererColumnRootScale(expected);
+            expected = EntityModelRuntime.ApplyLivingEntityRendererColumnRootScale(expected);
             AssertMatrixClose(expected, mesh.Elements[i].LocalToParent, partId, tolerance);
         }
     }

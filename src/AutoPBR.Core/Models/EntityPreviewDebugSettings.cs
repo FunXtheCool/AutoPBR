@@ -42,7 +42,7 @@ public static class EntityPreviewDebugSettings
 
 
 
-    /// <summary>Replace <see cref="Preview.CleanRoomEntityModelRuntime"/> LER policy with a fixed basis.</summary>
+    /// <summary>Replace <see cref="Preview.EntityModelRuntime"/> LER policy with a fixed basis.</summary>
 
     public static EntityPreviewLerBasisOverride LerBasisOverride { get; set; } = EntityPreviewLerBasisOverride.PolicyDefault;
 

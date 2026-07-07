@@ -29,7 +29,7 @@ public sealed class BabyCatalogGeometryIrPreviewTests
     {
         var norm = texturePath.Replace('\\', '/').TrimStart('/');
         var stem = Path.GetFileNameWithoutExtension(norm).ToLowerInvariant();
-        var isBaby = CleanRoomEntityModelRuntime.LooksLikeBabyTexture(stem, norm);
+        var isBaby = EntityModelRuntime.LooksLikeBabyTexture(stem, norm);
         Assert.True(isBaby);
 
         var rule = EntityTextureParityCatalog.ResolveRule(norm, stem);

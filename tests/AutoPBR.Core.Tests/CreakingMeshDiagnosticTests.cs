@@ -22,7 +22,7 @@ public sealed class CreakingMeshDiagnosticTests
             $"{CreakingJvm}.json");
         using var reference = JsonDocument.Parse(File.ReadAllText(referencePath));
 
-        var parity = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var parity = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/creaking/creaking", Profile26, CreakingJvm, 64, 64, out var err);
         Assert.Null(err);
         Assert.NotNull(parity);

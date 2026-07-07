@@ -18,13 +18,13 @@ public sealed class GeometryIrCodegenEmitTests
     public void Cod_codegen_emit_matches_ir_parity_mesh()
     {
         var profile = new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2));
-        var p = CleanRoomEntityModelRuntime.BabyProfile.Adult;
+        var p = EntityModelRuntime.BabyProfile.Adult;
         const string texRef = "entity/fish/cod";
 
-        var ir = CleanRoomEntityModelRuntime.TryBuildCodGeometryIrMeshForTests(texRef, profile, p, tailSway: 0f, out _);
+        var ir = EntityModelRuntime.TryBuildCodGeometryIrMeshForTests(texRef, profile, p, tailSway: 0f, out _);
         Assert.NotNull(ir);
 
-        var codegen = CleanRoomEntityModelRuntime.TryBuildCodGeometryIrMeshForTests(
+        var codegen = EntityModelRuntime.TryBuildCodGeometryIrMeshForTests(
             texRef, profile, p, tailSway: 0f, preferCodegen: true, out _);
         Assert.NotNull(codegen);
 

@@ -5,7 +5,7 @@
   "profile": "named_jar_26_1_2",
   "extractionStatus": "ok",
   "extractionNotes": [
-    "Synced from CleanRoomEntityModelRuntime for Model-ID.txt batch (tools/sync_model_id_geometry_cleanroom.py).",
+    "Synced from EntityModelRuntime for Model-ID.txt batch (tools/sync_model_id_geometry_ir.py).",
     "Mirrors CleanRoomEntityModelRuntime.BuildBlaze (rodSpin=0); legacy flat FQN shard aligned to packaged blaze mesh."
   ],
   "factoryMethod": "createBodyLayer",

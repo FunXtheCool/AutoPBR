@@ -18,7 +18,7 @@ public sealed class EntityGpuBindMeshPreviewSpaceTests
     public void Preview_space_bake_matches_cpu_placement_clusters(string texturePath, int atlasW, int atlasH)
     {
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         Assert.True(runtime.TryBuildStaticMesh(texturePath, Profile26, 0f, 0f, out var mergedBind));
 
         var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(mergedBind, "minecraft");
@@ -71,7 +71,7 @@ public sealed class EntityGpuBindMeshPreviewSpaceTests
     public void Animated_skin_bake_matches_cpu_rebake(string texturePath, float idle, float anim)
     {
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         Assert.True(runtime.TryBuildStaticMesh(texturePath, Profile26, idle, 0f, out var mergedBind));
         Assert.True(runtime.TryBuildStaticMesh(
             texturePath,

@@ -22,7 +22,7 @@ public sealed class ColdCowHornReferencePoseTests
         }
 
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, ir.RootElement);
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/test",
             Profile26,
             jvm,

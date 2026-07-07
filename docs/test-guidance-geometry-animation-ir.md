@@ -13,7 +13,7 @@ Committed IR (`docs/generated/geometry/`, `docs/generated/animation/`, indexes) 
 | Tier | Purpose | Default CI (`dotnet test`) | Examples |
 |------|---------|----------------------------|----------|
 | **T0 — Invariant** | Lifter, parser, schema shape, runtime math | **Always on** | `DualLiftRegressionTests`, `GeometryIrStructuralValidatorTests`, `GeometryIrLiftTreeValidatorTests`, `GeometryIrLiftPolicyTests`, formula/setup asserts (parity G3–G4) |
-| **T1 — Pilot contract** | Committed shard + emit/reference for **promoted** models only | **Always on** (allowlist) | `Phase8GeometryIrStrictTests`, `MobFamilyGeometryIrGoldenTests`, `ChickenGeometryShardCleanRoomParityTests` |
+| **T1 — Pilot contract** | Committed shard + emit/reference for **promoted** models only | **Always on** (allowlist) | `Phase8GeometryIrStrictTests`, `MobFamilyGeometryIrGoldenTests`, `ParityCatalogMeshPipelineInvariantTests` |
 | **T2 — Probe** | Load/compare when assets exist; **no assert** if missing or not promoted | **Always on** (must not fail on `partial`) | `GeometryIrReferenceBakeTests` (non-strict pilots), jar reconciliation when `client.jar` absent |
 | **T3 — Diagnostic** | Index-wide stats, lift-quality reports, perf | **Opt-in** | `GeometryIrLiftQualityReportTests` index sweep — set `AUTOPBR_RUN_LIFT_QUALITY_INDEX=1` |
 | **T2 — UV atlas probe** | Multi-layer atlas false-green (e.g. Breeze wind) | **Always on** (skip if shard not `ok`) | `GeometryIrLiftQualityReportTests.Breeze_ok_shard_fails_uv_within_atlas_and_assembly_gate`, `GeometryIrUvAtlasQualityTests` |

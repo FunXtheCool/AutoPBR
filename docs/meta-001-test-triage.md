@@ -1,9 +1,23 @@
 # META-001 test triage (post batch 3)
 
-**Updated:** 2026-05-25 (Wave C remaining failures cleared)  
-**Baseline:** compile-blocked files **0**; full suite **1853 pass / 0 fail / 1853 total**
+**Updated:** 2026-07-07 (CleanRoom mesh path removed; docs refreshed)  
+**Baseline:** compile-blocked files **0**; parity survey **761/761** `RuntimeGeometryIrJson`, **0** `ErrorPlaceholder`
 
 Related: [`large-class-split-agent-plan.md`](large-class-split-agent-plan.md)
+
+---
+
+## 2026-07 CleanRoom mesh path removal ✅
+
+| Change | Notes |
+|--------|-------|
+| Deleted `CleanRoomEntity*` hand mesh tree (~85 files) | Production uses `EntityModelRuntime` + `EntityGeometryIr*` partials only |
+| Stripped hand `Build*` from `EntityBlockEntities.cs` | Kept IR preview orientation helpers (bed, boat, sign, pot) |
+| Removed CleanRoom comparison tests | `ChickenGeometryShardCleanRoomParityTests`, `ParityCatalogMeshDriverSurveyDiagnostics` |
+| Survey gate | `ParityCatalogMeshDriverKindSurveyTests`: **761/761 IR**, **0 ErrorPlaceholder** |
+| Docs | [`entity-cuboid-layer.md`](entity-cuboid-layer.md), [`vanilla-preview-parity.md`](vanilla-preview-parity.md), [`runtime-ir-preview-plan.md`](runtime-ir-preview-plan.md) |
+
+Historical tables below reference **`CleanRoomEntity*`** file names from pre-removal commits.
 
 ---
 
@@ -35,7 +49,7 @@ Related: [`large-class-split-agent-plan.md`](large-class-split-agent-plan.md)
 | Leg builder patterns: `aload 5`, mirror `aload_2`/`aload_3`, parametric `iload_N` age | `GeometryJavapPoseOracle.cs` |
 | Boat/chest/chest-boat hand-lift IR (hull-only `BoatModel`, synthetic `ChestBoatModel`, `ChestModel`) | `ParityCatalogHandLiftGeometryIrCatalog.cs`, `GeometryIrParityHandLiftJvmMap.cs` |
 
-**Parity survey:** **761/761** `RuntimeGeometryIrJson`, **0** `CleanRoom` (`ParityCatalogMeshDriverKindSurveyTests` **20/20**).
+**Parity survey:** **761/761** `RuntimeGeometryIrJson`, **0** `ErrorPlaceholder` (`ParityCatalogMeshDriverKindSurveyTests`).
 
 **Javap oracle:** **21/21 pass** (was **2/21**); the `BabyAxolotlModel` aggregate mismatch was a synthetic `root` pose in the oracle.
 

@@ -82,7 +82,7 @@ public sealed class GeometryIrAssemblyViewportSanityTests
 
         var (atlasW, atlasH) = GeometryIrTestTierSupport.ResolveParityAtlasSize(officialJvmName, shardRoot);
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(officialJvmName, shardRoot);
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/test",
             Profile26,
             officialJvmName,
@@ -109,7 +109,7 @@ public sealed class GeometryIrAssemblyViewportSanityTests
 
         var (atlasW, atlasH) = GeometryIrTestTierSupport.ResolveParityAtlasSize(officialJvmName, shardRoot);
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(officialJvmName, shardRoot);
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/test",
             Profile26,
             officialJvmName,

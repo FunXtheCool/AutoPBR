@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace AutoPBR.Core.Preview;
 
-internal sealed partial class CleanRoomEntityModelRuntime
+internal sealed partial class EntityModelRuntime
 {
     /// <summary>
     /// Emits body-layer meshes by walking IR part poses and consuming codegen cuboids in the same DFS order

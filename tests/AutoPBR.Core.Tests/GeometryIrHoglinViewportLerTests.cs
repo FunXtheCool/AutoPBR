@@ -20,9 +20,9 @@ public sealed class GeometryIrHoglinViewportLerTests
     [InlineData(BabyHoglinJvm)]
     public void Hoglin_family_does_not_use_flat_offset_quadruped_ler_right_compose(string officialJvm)
     {
-        Assert.False(CleanRoomEntityModelRuntime.UsesFlatPartPoseOffsetQuadrupedJvm(officialJvm));
+        Assert.False(EntityModelRuntime.UsesFlatPartPoseOffsetQuadrupedJvm(officialJvm));
         Assert.False(
-            CleanRoomEntityModelRuntime.ResolveGeometryIrLerMirrorRightComposeLocalChain(
+            EntityModelRuntime.ResolveGeometryIrLerMirrorRightComposeLocalChain(
                 officialJvm,
                 "hoglinmodel",
                 "assets/minecraft/textures/entity/hoglin/hoglin.png"));
@@ -36,7 +36,7 @@ public sealed class GeometryIrHoglinViewportLerTests
         using var doc = JsonDocument.Parse(File.ReadAllText(shardPath));
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(HoglinJvm, doc.RootElement.Clone());
 
-        var columnMesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var columnMesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/test",
             new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2)),
             HoglinJvm,
@@ -59,7 +59,7 @@ public sealed class GeometryIrHoglinViewportLerTests
     public void Panda_polar_bear_family_column_pose_stack_root_orders_legs_below_head(string officialJvm)
     {
         Assert.False(
-            CleanRoomEntityModelRuntime.ResolveGeometryIrLerMirrorRightComposeLocalChain(
+            EntityModelRuntime.ResolveGeometryIrLerMirrorRightComposeLocalChain(
                 officialJvm,
                 stemLower: null,
                 normalizedAssetPath: null));
@@ -69,7 +69,7 @@ public sealed class GeometryIrHoglinViewportLerTests
         using var doc = JsonDocument.Parse(File.ReadAllText(shardPath));
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(officialJvm, doc.RootElement.Clone());
 
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/test",
             new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2)),
             officialJvm,
@@ -106,7 +106,7 @@ public sealed class GeometryIrHoglinViewportLerTests
         var shardRoot = doc.RootElement.Clone();
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(officialJvm, shardRoot);
 
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/test",
             new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2)),
             officialJvm,

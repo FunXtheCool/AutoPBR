@@ -1,6 +1,6 @@
 # Entity preview: GPU vs CPU parity policy
 
-Explore 3D preview uses two tessellation paths for emulated entities (parity-catalog geometry IR and clean-room fallbacks). **Both must produce the same preview-world silhouette** after the 2026-05-28 LER / walk-order / **ModelPart block-stack compose** fixes landed on CPU. GPU skinning is the default draw path; this document is the contract for keeping it aligned.
+Explore 3D preview uses two tessellation paths for emulated entities (parity-catalog geometry IR and error-placeholder fallback). **Both must produce the same preview-world silhouette** after the 2026-05-28 LER / walk-order / **ModelPart block-stack compose** fixes landed on CPU. GPU skinning is the default draw path; this document is the contract for keeping it aligned.
 
 **Explore sign-off (2026-05-28):** Adult parity-catalog mobs (cow, pig, chicken, climate cows, etc.) no longer show texel-scale part separation once production compose follows the **ModelPart PoseStack policy** (block space, bind offset in row 4 + `Er` upper 3×3, **`local × parent`**). Confirmed via Entity Debug live A/B (anti-**`T × Er`**) and JVM horn placement (`ColdCowModel`). **Baby** attachment edge cases may still diverge on **`worldPose`-only** tests — use cluster / JVM render probes where attached parts rotate under parents.
 
@@ -22,7 +22,7 @@ Ghast-family direct-lift and padded-atlas contract: [ghast-family-parity.md](gha
 | Part-tree repair | Ears, head stacks, baby donkey legs — see `GeometryIrPartTreeRepair` | No flat-quadruped leg reparent except documented exceptions |
 | setupAnim off | Bind pose only; no emit-time pose overrides | `applyGeometryIrSetupAnimMotion: false`, `wave=0` on emit |
 
-CPU and GPU both call `CleanRoomEntityModelRuntime.TryBuildStaticMesh` with the same flags for a given Explore frame (`EnableEntityAnimation` → `applyGeometryIrSetupAnimMotion`).
+CPU and GPU both call `EntityModelRuntime.TryBuildStaticMesh` with the same flags for a given Explore frame (`EnableEntityAnimation` → `applyGeometryIrSetupAnimMotion`).
 
 ### Baby scale contract
 

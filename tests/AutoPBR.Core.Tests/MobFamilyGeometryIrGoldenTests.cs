@@ -31,7 +31,7 @@ public sealed class MobFamilyGeometryIrGoldenTests
         Assert.True(GeometryIrDocumentLoader.TryLoadLiftedOkForParity(profile, officialJvmName, out var root));
         Assert.True(CountCuboidsInPartTree(root) >= minCuboids);
 
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/test",
             profile,
             officialJvmName,
@@ -61,9 +61,9 @@ public sealed class MobFamilyGeometryIrGoldenTests
             return;
         }
 
-        var a = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var a = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/test", profile, officialJvmName, atlasWidth, atlasHeight, out var errA);
-        var b = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var b = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/test", profile, officialJvmName, atlasWidth, atlasHeight, out var errB);
         Assert.Null(errA);
         Assert.Null(errB);

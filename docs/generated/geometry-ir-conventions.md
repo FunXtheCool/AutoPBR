@@ -100,6 +100,6 @@ Vanilla `LivingEntityRenderer` applies `scale(-1,-1,1)` **once before** the mode
 
 **Tests:** `PigLerEmitSanityTests`, `GeometryIrLerMirrorComposeClassificationTests`, `ChickenPreviewZClusterTests`, `ColdCowHornPreviewPlacementTests`, `ModelPartTranslateAndRotateProbeTests`, `EntityGpuSkinnedMatrixCpuParityTests`. Full write-up: [`runtime-ir-preview-plan.md` § PartPose vs ModelPart render](../runtime-ir-preview-plan.md#partpose-vs-modelpart-render--do-not-conflate-2026-05-28).
 
-## CleanRoom preview consumption
+## Entity preview consumption
 
-Static body-layer geometry uses the **`EntityCuboid`** record plus optional **`GeometryIrMeshEmitter`** ([`GeometryIrMeshEmitter.cs`](../../src/AutoPBR.Core/Preview/GeometryIrMeshEmitter.cs)) — see [`cleanroom-entity-cuboid.md`](../cleanroom-entity-cuboid.md). Parity catalog calls **`GeometryIrLiftPolicy`** and rejects shards whose cuboids are not `exact` (except allowlisted `tex_crop_static`). **Cod** / **Salmon** are IR-only builders; parity catalog tries generic IR emit before legacy code-built `Build*` fallbacks.
+Static body-layer geometry uses the **`EntityCuboid`** record plus **`GeometryIrMeshEmitter`** ([`GeometryIrMeshEmitter.cs`](../../src/AutoPBR.Core/Preview/GeometryIrMeshEmitter.cs)) — see [`entity-cuboid-layer.md`](../entity-cuboid-layer.md). Parity catalog calls **`GeometryIrLiftPolicy`** and rejects shards whose cuboids are not `exact` (except allowlisted `tex_crop_static`). Catalogued manifest paths emit geometry IR exclusively; IR failure surfaces as **`PreviewMeshDriverKind.ErrorPlaceholder`** (hand-built mesh fallbacks removed 2026-07).

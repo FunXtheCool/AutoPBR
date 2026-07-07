@@ -77,7 +77,7 @@ public sealed class BabyVsAdultReferenceOriginDumpTests
         var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
             repaired,
             GeometryIrMeshEmitOptions.ForParity(atlasW, atlasH) with { OfficialJvmName = jvm });
-        var ler = CleanRoomEntityModelRuntime.LivingEntityRendererPreviewRootScale;
+        var ler = EntityModelRuntime.LivingEntityRendererPreviewRootScale;
 
         foreach (var (partId, refOrigin) in refWorld.OrderBy(kv => kv.Key, StringComparer.Ordinal))
         {

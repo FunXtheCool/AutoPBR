@@ -64,12 +64,12 @@ public sealed class EntityTextureParityJsonCatalogTests
         var rule = EntityTextureParityCatalog.ResolveRule(norm, stem);
         Assert.NotNull(rule);
 
-        var route = CleanRoomEntityModelRuntime.ClassifyEntityTextureRoute(
+        var route = EntityModelRuntime.ClassifyEntityTextureRoute(
             norm,
             Profile2612,
             idlePhase01: 0.33f,
             animationTimeSeconds: 0.41f);
-        Assert.Equal(EntityPreviewRouteKind.SpecificMesh, route);
+        Assert.Equal(EntityPreviewRouteKind.ParityCatalogGeometryIr, route);
 
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(norm, Profile2612, idlePhase01: 0.33f, animationTimeSeconds: 0.41f, out var merged));

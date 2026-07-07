@@ -41,7 +41,7 @@ public sealed class RendererStateBreezePreviewTests
     [Fact]
     public void Geometry_ir_setup_anim_state_uses_renderer_state_when_model_has_p6_shard()
     {
-        var state = CleanRoomEntityModelRuntime.ResolveSetupAnimPreviewStateForTests(
+        var state = EntityModelRuntime.ResolveSetupAnimPreviewStateForTests(
             BreezeModel,
             animationTimeSeconds: 2.5f,
             idlePhase01: 0.3f,

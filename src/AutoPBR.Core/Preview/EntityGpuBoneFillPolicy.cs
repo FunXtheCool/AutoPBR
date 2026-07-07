@@ -7,9 +7,9 @@ namespace AutoPBR.Core.Preview;
 internal static class EntityGpuBoneFillPolicy
 {
     /// <summary>
-    /// Use a full <see cref="CleanRoomEntityModelRuntime.TryBuildStaticMesh"/> pass and copy
+    /// Use a full <see cref="EntityModelRuntime.TryBuildStaticMesh"/> pass and copy
     /// <see cref="ModelElement.LocalToParent"/> into the GPU bone buffer (same source as bind-pose lift sampling),
-    /// instead of <see cref="CleanRoomEntityModelRuntime.TryFillBoneMatricesFast"/> pose capture.
+    /// instead of <see cref="EntityModelRuntime.TryFillBoneMatricesFast"/> pose capture.
     /// </summary>
     /// <remarks>
     /// Equine rigs apply LER mirror as <c>LocalToParent * S</c> via a dedicated path. Chicken forces full mesh extract as an A/B path.
@@ -31,7 +31,7 @@ internal static class EntityGpuBoneFillPolicy
     }
 
     /// <summary>
-    /// Stems whose rigs return <c>b.Build</c> without folding <see cref="CleanRoomEntityModelRuntime.ApplyLivingEntityRendererPreviewBasis"/>:
+    /// Stems whose rigs return <c>b.Build</c> without folding <see cref="EntityModelRuntime.ApplyLivingEntityRendererPreviewBasis"/>:
     /// captured bone matrices are already in the same space as merged <see cref="ModelElement.LocalToParent"/>.
     /// </summary>
     internal static readonly HashSet<string> StemsSkippingLivingPreviewBasis = new(StringComparer.OrdinalIgnoreCase)
@@ -57,7 +57,7 @@ internal static class EntityGpuBoneFillPolicy
 
     /// <summary>
     /// When true, fast pose-captured bones still need the vanilla LER <c>scale(-1,-1,1)</c> folded per
-    /// <see cref="CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis"/> (same policy as catalog emit).
+    /// <see cref="EntityModelRuntime.ResolveGeometryIrLerBasis"/> (same policy as catalog emit).
     /// Parity-catalog geometry IR meshes already include LER — see <see cref="EntityGpuBoneDispatchKind.ParityCatalog"/>.
     /// </summary>
     public static bool ShouldApplyStandardLivingPreviewBasis(string normalizedAssetPath, string stemLower)
@@ -67,10 +67,10 @@ internal static class EntityGpuBoneFillPolicy
             return false;
         }
 
-        return CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(
+        return EntityModelRuntime.ResolveGeometryIrLerBasis(
             officialJvmName: null,
             stemLower,
-            normalizedAssetPath) is CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot
-            or CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.RightComposeLocalChain;
+            normalizedAssetPath) is EntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot
+            or EntityModelRuntime.GeometryIrLerBasisKind.RightComposeLocalChain;
     }
 }

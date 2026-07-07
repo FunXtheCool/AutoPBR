@@ -21,7 +21,7 @@ public sealed class EntityGpuExplorePolarBearDiagnosticsTests
         float maxBodyPartGap)
     {
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         Assert.True(runtime.TryBuildStaticMesh(texturePath, Profile26, 0f, 0f, out var mergedBind));
 
         var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(mergedBind, "minecraft");

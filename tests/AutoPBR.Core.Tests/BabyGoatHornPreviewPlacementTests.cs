@@ -27,9 +27,9 @@ public sealed class BabyGoatHornPreviewPlacementTests
         Assert.True(TryFindPart(geometryRoot, "head", out var head));
         Assert.True(TryFindPart(geometryRoot, "right_horn", out var horn));
 
-        Assert.True(CleanRoomEntityModelRuntime.TryComposePartPosePublic(
+        Assert.True(EntityModelRuntime.TryComposePartPosePublic(
             head.GetProperty("pose"), Matrix4x4.Identity, out var headWorld, "head"));
-        Assert.True(CleanRoomEntityModelRuntime.TryComposePartPosePublic(
+        Assert.True(EntityModelRuntime.TryComposePartPosePublic(
             horn.GetProperty("pose"), headWorld, out var hornWorld, "right_horn"));
 
         Matrix4x4? jvmHorn = null;
@@ -44,7 +44,7 @@ public sealed class BabyGoatHornPreviewPlacementTests
         }
 
         Assert.NotNull(jvmHorn);
-        var jvmTexel = CleanRoomEntityModelRuntime.BlockRowAffineToTexel(jvmHorn.Value);
+        var jvmTexel = EntityModelRuntime.BlockRowAffineToTexel(jvmHorn.Value);
         Assert.True(MatrixDistance(hornWorld, jvmTexel) <= 0.05f,
             $"horn={Format(hornWorld)} jvm={Format(jvmTexel)}");
     }
@@ -53,7 +53,7 @@ public sealed class BabyGoatHornPreviewPlacementTests
     public void Catalog_horn_cuboid_centroids_cluster_with_head_not_body_in_preview_space()
     {
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         Assert.True(runtime.TryBuildStaticMesh(TexturePath, Profile26, 0f, 0f, out var merged));
 
         var repo = GeometryIrTestTierSupport.FindRepoRoot();

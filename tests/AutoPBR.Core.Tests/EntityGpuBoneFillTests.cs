@@ -28,7 +28,7 @@ public sealed class EntityGpuBoneFillTests
     [Fact]
     public void TryFillBoneMatricesFast_matches_TryBuildStaticMesh_for_catalogued_cow()
     {
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         const string path = "assets/minecraft/textures/entity/cow/cow.png";
         var absent = TestEnvironmentPaths.AbsentNativeRoot;
         var profile = new MinecraftNativeProfile("26.1.2", absent, new Version(26, 1, 2));
@@ -49,7 +49,7 @@ public sealed class EntityGpuBoneFillTests
     [Fact]
     public void TryFillBoneMatricesFast_sets_parity_route_cache_on_rebake_context()
     {
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         const string path = "assets/minecraft/textures/entity/cow/cow_temperate.png";
         var absent = TestEnvironmentPaths.AbsentNativeRoot;
         var profile = new MinecraftNativeProfile("26.1.2", absent, new Version(26, 1, 2));
@@ -77,48 +77,20 @@ public sealed class EntityGpuBoneFillTests
     }
 
     [Fact]
-    public void TryFillBoneMatricesFast_family_fallback_route_cache_matches_full_dispatch()
+    public void TryFillBoneMatricesFast_returns_false_for_uncatalogued_entity_texture()
     {
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         const string path = "assets/minecraft/textures/entity/custom/zzzevokerfang.png";
         var absent = TestEnvironmentPaths.AbsentNativeRoot;
         var profile = new MinecraftNativeProfile("26.1.2", absent, new Version(26, 1, 2));
-        const float idle = 0.21f;
-        const float anim = 0.88f;
-
-        var rebake = new EntityEmulatedPreviewRebakeContext
-        {
-            PackZipPath = "test.zip",
-            AssetArchivePath = path,
-            NativeRootDirectory = absent,
-            NativeProfileName = profile.Name,
-            NativeParsedVersion = profile.ParsedVersion?.ToString(),
-            ModelDefaultNamespace = "minecraft",
-            IdlePhase01 = idle,
-            OrderedTextureZipPaths = [path]
-        };
-
         var scratch = new List<Matrix4x4>(128);
-        Assert.True(runtime.TryFillBoneMatricesFast(path, profile, idle, anim, scratch, out var boneCount1, rebake));
-        Assert.Equal(EntityGpuBoneDispatchKind.FamilyFallback, rebake.GpuBoneDispatchRoute!.Value.Kind);
-        Assert.Equal(EntityGpuBoneFamily.Humanoid, rebake.GpuBoneDispatchRoute.Value.Family);
-
-        Assert.True(runtime.TryBuildStaticMesh(path, profile, idle, anim, out var full));
-        Assert.Equal(full.Elements.Count, boneCount1);
-
-        scratch.Clear();
-        Assert.True(runtime.TryFillBoneMatricesFast(path, profile, idle, anim, scratch, out var boneCount2, rebake));
-        Assert.Equal(boneCount1, boneCount2);
-        for (var i = 0; i < boneCount2; i++)
-        {
-            Assert.True(MatricesClose(full.Elements[i].LocalToParent, scratch[i], 1e-4f), $"bone index {i}");
-        }
+        Assert.False(runtime.TryFillBoneMatricesFast(path, profile, 0.21f, 0.88f, scratch, out _));
     }
 
     [Fact]
-    public void TryFillBoneMatricesFast_specific_model_slot_route_cache_matches_full_dispatch_for_pig()
+    public void TryFillBoneMatricesFast_parity_catalog_route_cache_matches_full_dispatch_for_pig()
     {
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         const string path = "assets/minecraft/textures/entity/pig/pig.png";
         var absent = TestEnvironmentPaths.AbsentNativeRoot;
         var profile = new MinecraftNativeProfile("26.1.2", absent, new Version(26, 1, 2));
@@ -139,8 +111,8 @@ public sealed class EntityGpuBoneFillTests
 
         var scratch = new List<Matrix4x4>(128);
         Assert.True(runtime.TryFillBoneMatricesFast(path, profile, idle, anim, scratch, out var boneCount1, rebake));
-        Assert.Equal(EntityGpuBoneDispatchKind.SpecificModelSlot, rebake.GpuBoneDispatchRoute!.Value.Kind);
-        Assert.True(rebake.GpuBoneDispatchRoute.Value.SpecificSlot > 0);
+        Assert.Equal(EntityGpuBoneDispatchKind.ParityCatalog, rebake.GpuBoneDispatchRoute!.Value.Kind);
+        Assert.True(rebake.GpuBoneDispatchRoute.Value.ParityBuilderMethod?.Contains("Pig", StringComparison.OrdinalIgnoreCase) == true);
 
         Assert.True(runtime.TryBuildStaticMesh(path, profile, idle, anim, out var full));
         Assert.Equal(full.Elements.Count, boneCount1);

@@ -17,7 +17,7 @@ internal static class SetupAnimPlaybackDefinitionResolver
 
         JsonObject? best = null;
         var bestScore = -1;
-        foreach (var binding in EntityCleanRoomAnimationMap.GetBindingsForParityBuilder(parityBuilderMethod))
+        foreach (var binding in EntityParityAnimationMap.GetBindingsForParityBuilder(parityBuilderMethod))
         {
             if (binding.RestrictToBabyTextures is { } restrict && restrict != isBaby)
             {

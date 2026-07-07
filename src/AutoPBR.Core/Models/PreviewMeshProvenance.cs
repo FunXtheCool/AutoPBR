@@ -11,11 +11,14 @@ public enum PreviewMeshDriverKind
     /// <summary>Bytecode-lifted geometry IR JSON under bundled native data.</summary>
     RuntimeGeometryIrJson,
 
-    /// <summary>Hand-written clean-room entity rig code (catalog, family, or specific routes).</summary>
+    [Obsolete("Hand-built CleanRoom meshes removed; retained for saved debug state only.")]
     CleanRoom,
 
     /// <summary>Synthetic vanilla block cube from block texture parity catalog (multi-face slots).</summary>
     VanillaBlockParity,
+
+    /// <summary>Visible placeholder mesh when entity geometry cannot be resolved (Source-style "!").</summary>
+    ErrorPlaceholder,
 }
 
 /// <summary>Human-readable mesh source for preview log / 3D debug overlay.</summary>
@@ -39,6 +42,10 @@ public readonly record struct PreviewMeshProvenance(PreviewMeshDriverKind Kind, 
             string.IsNullOrWhiteSpace(Detail)
                 ? "[Preview] Mesh: vanilla block parity"
                 : $"[Preview] Mesh: vanilla block parity ({Detail})",
+        PreviewMeshDriverKind.ErrorPlaceholder =>
+            string.IsNullOrWhiteSpace(Detail)
+                ? "[Preview] Mesh: error placeholder"
+                : $"[Preview] Mesh: error placeholder ({Detail})",
         _ => "[Preview] Mesh: (none — 2D maps only)"
     };
 
@@ -61,6 +68,10 @@ public readonly record struct PreviewMeshProvenance(PreviewMeshDriverKind Kind, 
             string.IsNullOrWhiteSpace(Detail)
                 ? "Mesh: vanilla block parity"
                 : $"Mesh: vanilla block parity ({Detail})",
+        PreviewMeshDriverKind.ErrorPlaceholder =>
+            string.IsNullOrWhiteSpace(Detail)
+                ? "Mesh: error placeholder"
+                : $"Mesh: error placeholder ({Detail})",
         _ => "Mesh: (none)"
     };
 }

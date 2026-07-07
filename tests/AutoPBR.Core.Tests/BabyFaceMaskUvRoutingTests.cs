@@ -297,14 +297,14 @@ public sealed class BabyFaceMaskUvRoutingTests
     {
         using var doc = JsonDocument.Parse(cuboidJson);
         Assert.True(
-            CleanRoomEntityModelRuntime.TryToEntityCuboidForTests(
+            EntityModelRuntime.TryToEntityCuboidForTests(
                 doc.RootElement,
                 options,
                 out var entityCuboid,
                 out var failure),
             failure);
 
-        var b = new CleanRoomEntityModelRuntime.RigBuilder(options.AtlasWidth, options.AtlasHeight);
+        var b = new EntityModelRuntime.RigBuilder(options.AtlasWidth, options.AtlasHeight);
         entityCuboid.Emit(b, Matrix4x4.Identity, 1f);
         var el = Assert.Single(b.Build("entity/test").Elements);
         var span = axis switch
@@ -400,20 +400,20 @@ public sealed class BabyFaceMaskUvRoutingTests
             """;
 
         using var doc = JsonDocument.Parse(cuboid);
-        var tableCuboid = new CleanRoomEntityModelRuntime.EntityCuboid(
+        var tableCuboid = new EntityModelRuntime.EntityCuboid(
             -0.5f, 0f, 0f, 0.5f, 2f, 0f, 2, 2, -1, -1, -1, false);
         var options = ChickenWingOptions() with
         {
             OfficialJvmName = "net.minecraft.client.model.animal.chicken.ChickenModel",
             PreferCodegenCuboids = true,
         };
-        var entityCuboid = CleanRoomEntityModelRuntime.ApplyCodegenEmitOptionsForTests(
+        var entityCuboid = EntityModelRuntime.ApplyCodegenEmitOptionsForTests(
             tableCuboid,
             doc.RootElement,
             "left_wing",
             options);
 
-        var b = new CleanRoomEntityModelRuntime.RigBuilder(options.AtlasWidth, options.AtlasHeight);
+        var b = new EntityModelRuntime.RigBuilder(options.AtlasWidth, options.AtlasHeight);
         entityCuboid.Emit(b, Matrix4x4.Identity, 1f);
         var built = b.Build("entity/test");
         var el = Assert.Single(built.Elements);
@@ -451,14 +451,14 @@ public sealed class BabyFaceMaskUvRoutingTests
     {
         using var doc = JsonDocument.Parse(cuboidJson);
         Assert.True(
-            CleanRoomEntityModelRuntime.TryToEntityCuboidForTests(
+            EntityModelRuntime.TryToEntityCuboidForTests(
                 doc.RootElement,
                 options with { OfficialJvmName = options.OfficialJvmName },
                 out var entityCuboid,
                 out var failure),
             failure);
 
-        var b = new CleanRoomEntityModelRuntime.RigBuilder(options.AtlasWidth, options.AtlasHeight);
+        var b = new EntityModelRuntime.RigBuilder(options.AtlasWidth, options.AtlasHeight);
         entityCuboid.Emit(b, Matrix4x4.Identity, 1f);
         var built = b.Build("entity/test");
         var el = Assert.Single(built.Elements);

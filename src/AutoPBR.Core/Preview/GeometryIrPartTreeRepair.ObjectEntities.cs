@@ -101,8 +101,8 @@ internal static partial class GeometryIrPartTreeRepair
 
                 var texU = uv[0]?.GetValue<int>() ?? 0;
                 var texV = uv[1]?.GetValue<int>() ?? 0;
-                if (texU == CleanRoomEntityModelRuntime.DecoratedPotCapTexCropRawU &&
-                    texV == CleanRoomEntityModelRuntime.DecoratedPotCapTexCropV)
+                if (texU == EntityModelRuntime.DecoratedPotCapTexCropRawU &&
+                    texV == EntityModelRuntime.DecoratedPotCapTexCropV)
                 {
                     continue;
                 }
@@ -113,8 +113,8 @@ internal static partial class GeometryIrPartTreeRepair
                     continue;
                 }
 
-                uv[0] = CleanRoomEntityModelRuntime.DecoratedPotCapTexCropRawU;
-                uv[1] = CleanRoomEntityModelRuntime.DecoratedPotCapTexCropV;
+                uv[0] = EntityModelRuntime.DecoratedPotCapTexCropRawU;
+                uv[1] = EntityModelRuntime.DecoratedPotCapTexCropV;
             }
         }
 

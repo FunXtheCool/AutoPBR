@@ -72,10 +72,10 @@ public sealed class SetupAnimGeometryIrPreviewTests
     public void Flat_quadruped_peer_position_strip_applies_to_feline_not_cow()
     {
         Assert.True(
-            CleanRoomEntityModelRuntime.TryHasFlatQuadrupedPeerPositionAssignmentsForTests(
+            EntityModelRuntime.TryHasFlatQuadrupedPeerPositionAssignmentsForTests(
                 "net.minecraft.client.model.animal.feline.AdultCatModel"));
         Assert.False(
-            CleanRoomEntityModelRuntime.TryHasFlatQuadrupedPeerPositionAssignmentsForTests(
+            EntityModelRuntime.TryHasFlatQuadrupedPeerPositionAssignmentsForTests(
                 "net.minecraft.client.model.animal.cow.CowModel"));
     }
 

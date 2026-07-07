@@ -6,7 +6,7 @@ namespace AutoPBR.Core.Preview;
 /// <summary>
 /// Optional fields on geometry IR <c>cuboid</c> objects (see <c>docs/generated/schema/geometry-ir.schema.json</c>) produced by
 /// the javap mesh lifter. Map <see cref="GetMirrorCuboidUv"/> to the <c>mirrorCuboidUv</c> argument on
-/// <see cref="CleanRoomEntityModelRuntime"/>'s internal rig builder when emitting parity cuboids from IR.
+/// <see cref="EntityModelRuntime"/>'s internal rig builder when emitting parity cuboids from IR.
 /// </summary>
 public static class GeometryIrCuboidMetadata
 {

@@ -23,7 +23,7 @@ public sealed class PolarBearPreviewZClusterTests
         int atlasH)
     {
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         Assert.True(runtime.TryBuildStaticMesh(texturePath, Profile26, 0f, 0f, out var mesh));
 
         var repo = GeometryIrTestTierSupport.FindRepoRoot();

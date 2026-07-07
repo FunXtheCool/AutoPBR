@@ -36,7 +36,7 @@ public static class EntityPreviewGrounding
             return false;
         }
 
-        var isBaby = CleanRoomEntityModelRuntime.LooksLikeBabyTexture(stem, norm);
+        var isBaby = EntityModelRuntime.LooksLikeBabyTexture(stem, norm);
         if (!GeometryIrParityJvmResolver.TryResolveLiftedRoot(
                 profile,
                 rule,
@@ -59,7 +59,7 @@ public static class EntityPreviewGrounding
             atlasH = thi;
         }
 
-        var options = CleanRoomEntityModelRuntime.CreateParityCatalogPartIdResolveEmitOptions(
+        var options = EntityModelRuntime.CreateParityCatalogPartIdResolveEmitOptions(
             rule.BuilderMethod,
             profile,
             isBaby,

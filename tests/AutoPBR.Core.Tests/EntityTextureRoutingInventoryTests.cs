@@ -57,122 +57,92 @@ public sealed class EntityTextureRoutingInventoryTests
     }
 
     [Fact]
-    public void VanillaJar_EntityTexturesHaveNoFamilyFallbacks()
+    public void VanillaJar_EntityTexturesDoNotUseRemovedFamilyFallbackRoutes()
     {
         WhenClientJarPresent("1.21.11", jar =>
         {
             var profile = new MinecraftNativeProfile("1.21.11", "unused", new Version(1, 21, 11));
-            var quad = new List<string>();
-            var fly = new List<string>();
-            var aqua = new List<string>();
             foreach (var path in EnumerateVanillaEntityPngPaths(jar))
             {
-                var route = CleanRoomEntityModelRuntime.ClassifyEntityTextureRoute(
+                var route = EntityModelRuntime.ClassifyEntityTextureRoute(
                     path,
                     profile,
                     idlePhase01: 0.33f,
                     animationTimeSeconds: 0.41f);
-                switch (route)
-                {
-                    case EntityPreviewRouteKind.QuadrupedFamilyFallback:
-                        quad.Add(path);
-                        break;
-                    case EntityPreviewRouteKind.FlyingFamilyFallback:
-                        fly.Add(path);
-                        break;
-                    case EntityPreviewRouteKind.AquaticFamilyFallback:
-                        aqua.Add(path);
-                        break;
-                }
+                Assert.True(
+                    route is EntityPreviewRouteKind.ParityCatalogGeometryIr
+                        or EntityPreviewRouteKind.ErrorPlaceholder
+                        or EntityPreviewRouteKind.InvalidPath,
+                    $"{path}: {route}");
             }
-
-            Assert.True(quad.Count == 0, string.Join('\n', quad));
-            Assert.True(fly.Count == 0, string.Join('\n', fly));
-            Assert.True(aqua.Count == 0, string.Join('\n', aqua));
         });
     }
 
     [Fact]
-    public void VanillaJar_EntityTexturesHaveNoUnknownMisses()
+    public void VanillaJar_EntityTexturesClassifyToMeshOrErrorPlaceholder()
     {
         WhenClientJarPresent("1.21.11", jar =>
         {
             var profile = new MinecraftNativeProfile("1.21.11", "unused", new Version(1, 21, 11));
-            var unknown = new List<string>();
             foreach (var path in EnumerateVanillaEntityPngPaths(jar))
             {
-                var route = CleanRoomEntityModelRuntime.ClassifyEntityTextureRoute(
+                var route = EntityModelRuntime.ClassifyEntityTextureRoute(
                     path,
                     profile,
                     idlePhase01: 0.33f,
                     animationTimeSeconds: 0.41f);
-                if (route == EntityPreviewRouteKind.UnknownNoMesh)
-                {
-                    unknown.Add(path);
-                }
+                Assert.NotEqual(EntityPreviewRouteKind.InvalidPath, route);
             }
-
-            Assert.True(unknown.Count == 0, string.Join('\n', unknown));
         });
     }
 
     [Fact]
-    public void VanillaJar_26_1_2_EntityTexturesHaveNoFamilyFallbacks_WhenJarPresent()
+    public void VanillaJar_26_1_2_EntityTexturesDoNotUseRemovedFamilyFallbackRoutes_WhenJarPresent()
     {
         WhenClientJarPresent("26.1.2", jar =>
         {
             var profile = new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2));
-            var quad = new List<string>();
-            var fly = new List<string>();
-            var aqua = new List<string>();
             foreach (var path in EnumerateVanillaEntityPngPaths(jar))
             {
-                var route = CleanRoomEntityModelRuntime.ClassifyEntityTextureRoute(
+                var route = EntityModelRuntime.ClassifyEntityTextureRoute(
                     path,
                     profile,
                     idlePhase01: 0.33f,
                     animationTimeSeconds: 0.41f);
-                switch (route)
-                {
-                    case EntityPreviewRouteKind.QuadrupedFamilyFallback:
-                        quad.Add(path);
-                        break;
-                    case EntityPreviewRouteKind.FlyingFamilyFallback:
-                        fly.Add(path);
-                        break;
-                    case EntityPreviewRouteKind.AquaticFamilyFallback:
-                        aqua.Add(path);
-                        break;
-                }
+                Assert.True(
+                    route is EntityPreviewRouteKind.ParityCatalogGeometryIr
+                        or EntityPreviewRouteKind.ErrorPlaceholder,
+                    $"{path}: {route}");
             }
-
-            Assert.True(quad.Count == 0, string.Join('\n', quad));
-            Assert.True(fly.Count == 0, string.Join('\n', fly));
-            Assert.True(aqua.Count == 0, string.Join('\n', aqua));
         });
     }
 
     [Fact]
-    public void VanillaJar_26_1_2_EntityTexturesHaveNoUnknownMisses_WhenJarPresent()
+    public void VanillaJar_26_1_2_CataloguedEntityTexturesUseGeometryIr_WhenJarPresent()
     {
         WhenClientJarPresent("26.1.2", jar =>
         {
             var profile = new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2));
-            var unknown = new List<string>();
+            var irMiss = new List<string>();
             foreach (var path in EnumerateVanillaEntityPngPaths(jar))
             {
-                var route = CleanRoomEntityModelRuntime.ClassifyEntityTextureRoute(
+                if (!EntityTextureParityCatalog.IsCatalogued(path))
+                {
+                    continue;
+                }
+
+                var route = EntityModelRuntime.ClassifyEntityTextureRoute(
                     path,
                     profile,
                     idlePhase01: 0.33f,
                     animationTimeSeconds: 0.41f);
-                if (route == EntityPreviewRouteKind.UnknownNoMesh)
+                if (route != EntityPreviewRouteKind.ParityCatalogGeometryIr)
                 {
-                    unknown.Add(path);
+                    irMiss.Add($"{path}: {route}");
                 }
             }
 
-            Assert.True(unknown.Count == 0, string.Join('\n', unknown));
+            Assert.True(irMiss.Count == 0, string.Join('\n', irMiss));
         });
     }
 }

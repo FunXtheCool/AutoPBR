@@ -6,7 +6,7 @@ namespace AutoPBR.Core.Preview;
 
 /// <summary>
 /// In-memory geometry IR for block-entity / renderer-only parity builders (no vanilla <c>*Model</c> in client index).
-/// Cuboids match <see cref="CleanRoomEntityModelRuntime"/> hand builders at rest pose.
+/// Cuboids match <see cref="EntityModelRuntime"/> hand builders at rest pose.
 /// </summary>
 internal static class ParityCatalogHandLiftGeometryIrCatalog
 {
@@ -312,11 +312,11 @@ internal static class ParityCatalogHandLiftGeometryIrCatalog
                 0, 37, 16, pi, 0, 0),
             PartWithCuboidPose(
                 "top",
-                PotCapCuboid(CleanRoomEntityModelRuntime.DecoratedPotCapTexCropRawU, CleanRoomEntityModelRuntime.DecoratedPotCapTexCropV),
+                PotCapCuboid(EntityModelRuntime.DecoratedPotCapTexCropRawU, EntityModelRuntime.DecoratedPotCapTexCropV),
                 1, 16, 1),
             PartWithCuboidPose(
                 "bottom",
-                PotCapCuboid(CleanRoomEntityModelRuntime.DecoratedPotCapTexCropRawU, CleanRoomEntityModelRuntime.DecoratedPotCapTexCropV),
+                PotCapCuboid(EntityModelRuntime.DecoratedPotCapTexCropRawU, EntityModelRuntime.DecoratedPotCapTexCropV),
                 1, 0, 1),
             PartWithCuboidPose(
                 "back",

@@ -1,6 +1,7 @@
 # Geometry lift assembly parity — multi-phase roadmap
 
 **Status:** Planning (multitask-ready)  
+**Updated:** 2026-07-07 — hand-built CleanRoom meshes removed; parity catalog emit is `EntityGeometryIrParityCatalog.cs` only.  
 **Pinned version:** 26.1.2 (`minecraft-26.1.2-client.jar`)  
 **Trigger:** Models in the [pilot JVM set](generated/geometry-assembly-parity-pilots-26.1.2.txt) (e.g. `CreeperModel` as canary) report `ok` with all three `reference*Match: true` in [`geometry-lift-quality-26.1.2.json`](generated/geometry-lift-quality-26.1.2.json), yet Explore 3D preview shows wrong assembly (e.g. legs above head).
 
@@ -57,7 +58,7 @@ Quality mesh path applies `GeometryIrPartTreeRepair` + `GeometryIrReferencePoseS
 - **Host:** `net.minecraft.client.model.monster.creeper.CreeperModel`
 - **Extraction note:** `No PartDefinition / PartDefinition-equivalent addChild binding lines found in mesh factory javap`
 - **Structure:** Six parts as flat siblings under `root` (head, body, four legs)
-- **IR vs hand parity** (`CleanRoomEntityMonsters.BuildCreeper`):
+- **IR parity reference** (historical hand path removed 2026-07): compare lifted `CreeperModel.json` emit against JVM reference bakes and assembly cohesion tests.
 
 | Part | Lifted IR / `reference_java` | `javap`-verified clean-room |
 |------|------------------------------|-----------------------------|
@@ -450,7 +451,7 @@ subagent_type: generalPurpose
 
 **Objective:** Safe preview path until IR is fixed; prevent repair from making layout worse.
 
-**Primary code:** `GeometryIrPartTreeRepair.cs`, `CleanRoomEntityGeometryIrParityCatalog.cs`
+**Primary code:** `GeometryIrPartTreeRepair.cs`, `EntityGeometryIrParityCatalog.cs`
 
 ### Agent 5A — Reparent with pose rebase
 
@@ -535,8 +536,8 @@ CreeperModel is regression canary only. Report blockers before Phase 4.
 | Reference comparer | `src/AutoPBR.Core/Preview/GeometryIrReferenceComparer.cs` |
 | Preview mesh walk | `src/AutoPBR.Core/Preview/GeometryIrMeshWalk.cs` |
 | Part tree repair | `src/AutoPBR.Core/Preview/GeometryIrPartTreeRepair.cs` |
-| Parity catalog emit | `src/AutoPBR.Core/Preview/Entities/CleanRoomEntityGeometryIrParityCatalog.cs` |
-| Creeper hand parity | `src/AutoPBR.Core/Preview/Entities/CleanRoomEntityMonsters.cs` (`BuildCreeper`) |
+| Parity catalog emit | `src/AutoPBR.Core/Preview/Entities/EntityGeometryIrParityCatalog.cs` |
+| Creeper IR parity | `docs/generated/geometry/26.1.2/net.minecraft.client.model.monster.creeper.CreeperModel.json` + assembly cohesion tests |
 | Bytecode lifter | `src/AutoPBR.Tools.GeometryCompiler/JavapFloatGeometryMeshLift.cs` |
 | Creeper IR shard | `docs/generated/geometry/26.1.2/net.minecraft.client.model.monster.creeper.CreeperModel.json` |
 | Reference bake | `tools/MinecraftGeometryReference/reference-output/...CreeperModel.json` |

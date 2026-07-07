@@ -34,7 +34,7 @@ public sealed class GeometryIrParityPolicyTests
     public void Chicken_ir_preview_anim_mesh_depends_on_animation_clock()
     {
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         var profile = new MinecraftNativeProfile("26.1.2", TestEnvironmentPaths.AbsentNativeRoot, new Version(26, 1, 2));
         const string path = "assets/minecraft/textures/entity/chicken/chicken_temperate.png";
         Assert.True(runtime.TryBuildStaticMesh(

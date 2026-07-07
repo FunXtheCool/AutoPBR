@@ -50,7 +50,7 @@ public sealed class MobFamilyGeometryIrFidelityTests
             return;
         }
 
-        var parity = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var parity = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/test", profile, officialJvmName, atlasW, atlasH, out var parityErr);
         Assert.Null(parityErr);
         Assert.NotNull(parity);
@@ -67,12 +67,13 @@ public sealed class MobFamilyGeometryIrFidelityTests
             GeometryIrTestTierSupport.MobFamilyPilotVersionLabel,
             "unused",
             new Version(26, 1, 2));
-        var p = CleanRoomEntityModelRuntime.BabyProfile.Adult;
-        var parity = CleanRoomEntityModelRuntime.TryBuildCodGeometryIrMeshForTests(
+        var p = EntityModelRuntime.BabyProfile.Adult;
+        var parity = EntityModelRuntime.TryBuildCodGeometryIrMeshForTests(
             "entity/fish/cod", profile, p, tailSway: 0f, out _);
-        var viewport = CleanRoomEntityModelRuntime.BuildAquatic(
-            "entity/fish/cod", profile, isBaby: false, tailSway: 0f);
+        var viewport = EntityModelRuntime.TryBuildGeometryIrViewportMeshForTests(
+            "entity/fish/cod", profile, "net.minecraft.client.model.animal.fish.CodModel", 32, 32, out _);
         Assert.NotNull(parity);
+        Assert.NotNull(viewport);
         Assert.True(HasElementWithLocalExtents(
             viewport, x0: -2f, y0: -0.08f, z0: -1f, x1: 0f, y1: 0.08f, z1: 1f, tol: 1e-3f));
         Assert.False(HasElementWithLocalExtents(
@@ -87,10 +88,10 @@ public sealed class MobFamilyGeometryIrFidelityTests
             GeometryIrTestTierSupport.MobFamilyPilotVersionLabel,
             "unused",
             new Version(26, 1, 2));
-        var p = CleanRoomEntityModelRuntime.BabyProfile.Adult;
-        var parity = CleanRoomEntityModelRuntime.TryBuildSalmonGeometryIrMeshForTests(
+        var p = EntityModelRuntime.BabyProfile.Adult;
+        var parity = EntityModelRuntime.TryBuildSalmonGeometryIrMeshForTests(
             "entity/fish/salmon", profile, p, tailSway: 0f, out var parityFailure);
-        var viewport = CleanRoomEntityModelRuntime.TryBuildGeometryIrViewportMeshForTests(
+        var viewport = EntityModelRuntime.TryBuildGeometryIrViewportMeshForTests(
             "entity/fish/salmon",
             profile,
             salmonJvm,

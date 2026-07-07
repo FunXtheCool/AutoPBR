@@ -14,14 +14,14 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
         string officialJvmName,
         string stem)
     {
-        Assert.True(CleanRoomEntityModelRuntime.UsesComposedOffsetAndRotationBodyDefaultLerJvm(officialJvmName));
-        Assert.False(CleanRoomEntityModelRuntime.UsesFlatPartPoseOffsetQuadrupedJvm(officialJvmName));
+        Assert.True(EntityModelRuntime.UsesComposedOffsetAndRotationBodyDefaultLerJvm(officialJvmName));
+        Assert.False(EntityModelRuntime.UsesFlatPartPoseOffsetQuadrupedJvm(officialJvmName));
         Assert.False(
-            CleanRoomEntityModelRuntime.UsesQuadrupedLerMirrorRightComposeLocalChain(
+            EntityModelRuntime.UsesQuadrupedLerMirrorRightComposeLocalChain(
                 stem,
                 normalizedAssetPath: ""));
         Assert.False(
-            CleanRoomEntityModelRuntime.ResolveGeometryIrLerMirrorRightComposeLocalChain(
+            EntityModelRuntime.ResolveGeometryIrLerMirrorRightComposeLocalChain(
                 officialJvmName,
                 stem,
                 normalizedAssetPath: null));
@@ -34,16 +34,16 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
         string officialJvmName,
         string stem)
     {
-        Assert.False(CleanRoomEntityModelRuntime.UsesComposedOffsetAndRotationBodyDefaultLerJvm(officialJvmName));
-        Assert.True(CleanRoomEntityModelRuntime.UsesFlatPartPoseOffsetQuadrupedJvm(officialJvmName));
+        Assert.False(EntityModelRuntime.UsesComposedOffsetAndRotationBodyDefaultLerJvm(officialJvmName));
+        Assert.True(EntityModelRuntime.UsesFlatPartPoseOffsetQuadrupedJvm(officialJvmName));
         Assert.False(
-            CleanRoomEntityModelRuntime.ResolveGeometryIrLerMirrorRightComposeLocalChain(
+            EntityModelRuntime.ResolveGeometryIrLerMirrorRightComposeLocalChain(
                 officialJvmName,
                 stem,
                 normalizedAssetPath: null));
         Assert.Equal(
-            CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot,
-            CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(officialJvmName, stem, normalizedAssetPath: null));
+            EntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot,
+            EntityModelRuntime.ResolveGeometryIrLerBasis(officialJvmName, stem, normalizedAssetPath: null));
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
         using var doc = JsonDocument.Parse(File.ReadAllText(shardPath));
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(AdultFelineJvm, doc.RootElement.Clone());
 
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/test",
             new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2)),
             AdultFelineJvm,
@@ -88,7 +88,7 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
         using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
         var geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(officialJvm, shard.RootElement);
         var profile = new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2));
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/test",
             profile,
             officialJvm,
@@ -113,13 +113,13 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
     public void Flat_offset_quadrupeds_resolve_column_pose_stack_root_ler(string officialJvmName, string stem)
     {
         Assert.False(
-            CleanRoomEntityModelRuntime.ResolveGeometryIrLerMirrorRightComposeLocalChain(
+            EntityModelRuntime.ResolveGeometryIrLerMirrorRightComposeLocalChain(
                 officialJvmName,
                 stem,
                 normalizedAssetPath: null));
         Assert.Equal(
-            CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot,
-            CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(officialJvmName, stem, normalizedAssetPath: null));
+            EntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot,
+            EntityModelRuntime.ResolveGeometryIrLerBasis(officialJvmName, stem, normalizedAssetPath: null));
     }
 
     [Theory]
@@ -131,15 +131,15 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
         string normalizedAssetPath)
     {
         Assert.False(
-            CleanRoomEntityModelRuntime.ResolveGeometryIrLerMirrorRightComposeLocalChain(
+            EntityModelRuntime.ResolveGeometryIrLerMirrorRightComposeLocalChain(
                 officialJvmName,
                 stem,
                 normalizedAssetPath));
         Assert.Equal(
-            CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot,
-            CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(officialJvmName, stem, normalizedAssetPath));
+            EntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot,
+            EntityModelRuntime.ResolveGeometryIrLerBasis(officialJvmName, stem, normalizedAssetPath));
         Assert.False(
-            CleanRoomEntityModelRuntime.UsesComposedOffsetAndRotationBodyDefaultLerJvm(officialJvmName));
+            EntityModelRuntime.UsesComposedOffsetAndRotationBodyDefaultLerJvm(officialJvmName));
     }
 
     [Fact]
@@ -147,17 +147,17 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
     {
         const string path = "assets/minecraft/textures/entity/horse/horse_white.png";
         Assert.True(
-            CleanRoomEntityModelRuntime.UsesEquineGeometryIrPreviewBasis(
+            EntityModelRuntime.UsesEquineGeometryIrPreviewBasis(
                 HorseJvm,
                 "horsemodel",
                 path));
         Assert.False(
-            CleanRoomEntityModelRuntime.UsesQuadrupedLerMirrorRightComposeLocalChain(
+            EntityModelRuntime.UsesQuadrupedLerMirrorRightComposeLocalChain(
                 "horsemodel",
                 path));
         Assert.Equal(
-            CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.EquineDedicated,
-            CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(HorseJvm, "horsemodel", path));
+            EntityModelRuntime.GeometryIrLerBasisKind.EquineDedicated,
+            EntityModelRuntime.ResolveGeometryIrLerBasis(HorseJvm, "horsemodel", path));
     }
 
     [Theory]
@@ -183,6 +183,6 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
     {
         Assert.Equal(
             expected,
-            CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(officialJvm, stem, normalizedAssetPath).ToString());
+            EntityModelRuntime.ResolveGeometryIrLerBasis(officialJvm, stem, normalizedAssetPath).ToString());
     }
 }

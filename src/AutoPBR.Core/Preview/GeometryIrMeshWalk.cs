@@ -37,7 +37,7 @@ internal static class GeometryIrMeshWalk
         var useLegacyPartPose = ShouldUseLegacyPartPose(options);
         var parentWorldBlock = useLegacyPartPose
             ? rootTransform
-            : CleanRoomEntityModelRuntime.TexelRowAffineToBlock(rootTransform);
+            : EntityModelRuntime.TexelRowAffineToBlock(rootTransform);
 
         foreach (var rootPart in roots.EnumerateArray())
         {
@@ -216,14 +216,14 @@ internal static class GeometryIrMeshWalk
     {
         failureReason = null;
         worldBlock = parentWorldBlock;
-        var useColumnPartPose = CleanRoomEntityModelRuntime.ShouldUseColumnPartPoseCompose(poseEl, options);
+        var useColumnPartPose = EntityModelRuntime.ShouldUseColumnPartPoseCompose(poseEl, options);
         var useLegacyPartPose = (EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose ||
                                  GeometryIrEmitPolicy.UsesTranslationTimesRotationPartPose(options.OfficialJvmName, partId)) &&
             !useColumnPartPose &&
             !GeometryIrEmitPolicy.IgnoresLegacyPartPoseDebugSwitch(options.OfficialJvmName);
         worldTexel = useLegacyPartPose
             ? parentWorldBlock
-            : CleanRoomEntityModelRuntime.BlockRowAffineToTexel(parentWorldBlock);
+            : EntityModelRuntime.BlockRowAffineToTexel(parentWorldBlock);
 
         if (!poseEl.ValueKind.Equals(JsonValueKind.Object))
         {
@@ -232,18 +232,18 @@ internal static class GeometryIrMeshWalk
 
         if (useColumnPartPose)
         {
-            if (!CleanRoomEntityModelRuntime.TryComposeColumnPartPose(poseEl, worldTexel, out worldTexel, out failureReason))
+            if (!EntityModelRuntime.TryComposeColumnPartPose(poseEl, worldTexel, out worldTexel, out failureReason))
             {
                 return false;
             }
 
-            worldBlock = CleanRoomEntityModelRuntime.TexelRowAffineToBlock(worldTexel);
+            worldBlock = EntityModelRuntime.TexelRowAffineToBlock(worldTexel);
             return true;
         }
 
         if (useLegacyPartPose)
         {
-            if (!CleanRoomEntityModelRuntime.TryComposeLegacyPartPoseTexelPublic(
+            if (!EntityModelRuntime.TryComposeLegacyPartPoseTexelPublic(
                     poseEl, out var localPartPose, out failureReason))
             {
                 return false;
@@ -256,13 +256,13 @@ internal static class GeometryIrMeshWalk
             return true;
         }
 
-        if (!CleanRoomEntityModelRuntime.TryComposePartRenderLocalBlock(poseEl, out var localBlock, out failureReason))
+        if (!EntityModelRuntime.TryComposePartRenderLocalBlock(poseEl, out var localBlock, out failureReason))
         {
             return false;
         }
 
         worldBlock = Matrix4x4.Multiply(localBlock, parentWorldBlock);
-        worldTexel = CleanRoomEntityModelRuntime.BlockRowAffineToTexel(worldBlock);
+        worldTexel = EntityModelRuntime.BlockRowAffineToTexel(worldBlock);
         return true;
     }
 
@@ -302,7 +302,7 @@ internal static class GeometryIrMeshWalk
             worldTexel = poseOverride(partId, worldTexel);
             worldBlock = ShouldUseLegacyPartPose(options, partId)
                 ? worldTexel
-                : CleanRoomEntityModelRuntime.TexelRowAffineToBlock(worldTexel);
+                : EntityModelRuntime.TexelRowAffineToBlock(worldTexel);
         }
 
         if (partId.Length > 0)

@@ -1,5 +1,7 @@
 # Animation IR → CleanRoom live preview
 
+> **Archive (2026-07):** Hand-built CleanRoom entity meshes were removed. Setup-anim / definition-animation IR and `EntityParityAnimationMap` remain active; mesh emit is geometry IR only via `EntityModelRuntime`.
+
 ## SetupAnim IR (procedural + playback)
 
 Bytecode-lifted `*Model.setupAnim` shards live under `docs/generated/setup-anim/<ver>/` and copy to `Data/minecraft-native/setup-anim/<ver>/`. Index: `setup-anim-index-26.1.2.json`.
@@ -86,7 +88,7 @@ Work below still needs **sampler interpolation upgrades** (Catmull-Rom / MIXED),
 
 ## Related code
 
-- [`cleanroom-entity-cuboid.md`](cleanroom-entity-cuboid.md) — static mesh `EntityCuboid` layer, planned geometry IR emitter, and codegen (orthogonal to animation IR sampling).
-- `CleanRoomEntityModelRuntime.cs` / `Entities/CleanRoomEntityModelRuntime.ParityCatalogDispatch.cs` — GPU stem routes and catalog cases calling samplers.
-- `EntityCleanRoomAnimationMap` — version label fallback when `MinecraftNativeProfile` is null or `"root"`.
+- [`entity-cuboid-layer.md`](../entity-cuboid-layer.md) — static mesh `EntityCuboid` layer, geometry IR emitter, and codegen (orthogonal to animation IR sampling).
+- `EntityModelRuntime.cs` / `Entities/EntityGeometryIrParityCatalog.cs` — GPU stem routes and catalog geometry IR emit.
+- `EntityParityAnimationMap` — version label fallback when `MinecraftNativeProfile` is null or `"root"`.
 - `docs/generated/schema/animation-ir.schema.json` — IR shape reference.

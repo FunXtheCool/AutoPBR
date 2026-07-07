@@ -11,7 +11,7 @@ internal static class RendererStateDocumentLoader
     private static readonly ConcurrentDictionary<string, JsonObject?> ModelCache = new(StringComparer.OrdinalIgnoreCase);
     private static volatile bool _modelIndexBuilt;
 
-    public static string VersionLabel => EntityCleanRoomAnimationMap.VersionLabel;
+    public static string VersionLabel => EntityParityAnimationMap.VersionLabel;
 
     public static bool TryLoadByRenderer(string officialRendererJvmName, out JsonObject root)
     {

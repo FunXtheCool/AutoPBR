@@ -73,18 +73,18 @@ public sealed class QuadrupedReferenceWorldPoseAnalysisTests
         var syncedVsRef = GeometryIrReferenceComparer.CompareReferenceWorldPartOrigins(
             reference.RootElement, synced, tolerance: 0.05);
 
-        var meshDefault = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTestsWithLerCompose(
+        var meshDefault = EntityModelRuntime.TryBuildGeometryIrParityMeshForTestsWithLerCompose(
             "entity/test", jvm, atlasW, atlasH, repaired, lerMirrorRightComposeLocalChain: false, out _);
-        var meshRight = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTestsWithLerCompose(
+        var meshRight = EntityModelRuntime.TryBuildGeometryIrParityMeshForTestsWithLerCompose(
             "entity/test", jvm, atlasW, atlasH, repaired, lerMirrorRightComposeLocalChain: true, out _);
-        var meshPolicy = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var meshPolicy = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/test", Profile26, jvm, atlasW, atlasH, out _, geometryRootOverride: repaired);
 
         Assert.NotNull(meshDefault);
         Assert.NotNull(meshRight);
         Assert.NotNull(meshPolicy);
 
-        var policyBasis = CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(jvm, "", null);
+        var policyBasis = EntityModelRuntime.ResolveGeometryIrLerBasis(jvm, "", null);
 
         _output.WriteLine($"=== {jvm} ===");
         _output.WriteLine($"IR walk vs reference baked worldPose: match={repairedVsRef.IsMatch} msg={repairedVsRef.Message}");

@@ -18,7 +18,7 @@ public sealed class ColdCowHornPreviewPlacementTests
     public void Catalog_horn_cuboid_centroids_cluster_with_head_not_body_in_cpu_and_gpu_preview_space()
     {
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         Assert.True(runtime.TryBuildStaticMesh(TexturePath, Profile26, 0f, 0f, out var merged));
 
         var repo = GeometryIrTestTierSupport.FindRepoRoot();
@@ -82,7 +82,7 @@ public sealed class ColdCowHornPreviewPlacementTests
                 (float)t[0].GetDouble(),
                 (float)t[1].GetDouble(),
                 (float)t[2].GetDouble());
-            var preview = Vector3.Transform(model, CleanRoomEntityModelRuntime.LivingEntityRendererPreviewRootScale);
+            var preview = Vector3.Transform(model, EntityModelRuntime.LivingEntityRendererPreviewRootScale);
             preview = EntityEmulatedGpuSkinningMath.PreviewCuboidNormalizeTexelPosition(preview);
             preview.Y += liftY;
             return preview;

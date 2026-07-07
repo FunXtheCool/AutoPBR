@@ -12,8 +12,8 @@ public sealed class EntityParityTemplateEulerTests
         const float x = 0.1f;
         const float y = 0.2f;
         const float z = 0.3f;
-        var a = CleanRoomEntityModelRuntime.ErForTests(x, y, z);
-        var b = CleanRoomEntityModelRuntime.ComposeEulerForTests("XYZ", x, y, z);
+        var a = EntityModelRuntime.ErForTests(x, y, z);
+        var b = EntityModelRuntime.ComposeEulerForTests("XYZ", x, y, z);
         AssertMatricesClose(a, b);
     }
 
@@ -23,8 +23,8 @@ public sealed class EntityParityTemplateEulerTests
         const float x = 0.4f;
         const float y = 0.2f;
         const float z = 0.1f;
-        var xyz = CleanRoomEntityModelRuntime.ComposeEulerForTests("XYZ", x, y, z);
-        var zyx = CleanRoomEntityModelRuntime.ComposeEulerForTests("ZYX", x, y, z);
+        var xyz = EntityModelRuntime.ComposeEulerForTests("XYZ", x, y, z);
+        var zyx = EntityModelRuntime.ComposeEulerForTests("ZYX", x, y, z);
         Assert.False(MatricesClose(xyz, zyx));
     }
 

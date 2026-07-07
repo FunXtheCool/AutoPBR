@@ -17,8 +17,8 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
         Assert.True(runtime.TryBuildStaticMesh(texturePath, profile, 0f, 0f, out var mesh, out var provenance));
         Assert.Contains(expectedJvm, provenance.Detail ?? "", StringComparison.Ordinal);
         Assert.Equal(
-            CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot,
-            CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(
+            EntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot,
+            EntityModelRuntime.ResolveGeometryIrLerBasis(
                 expectedJvm,
                 Path.GetFileNameWithoutExtension(texturePath).ToLowerInvariant(),
                 texturePath));
@@ -49,7 +49,7 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
         using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
         var geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(officialJvm, shard.RootElement);
         var profile = new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2));
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/test",
             profile,
             officialJvm,
@@ -112,7 +112,7 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
         using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
         var geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(CowJvm, shard.RootElement);
         var profile = new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2));
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/cow/cow_temperate",
             profile,
             CowJvm,
@@ -144,7 +144,7 @@ public sealed partial class GeometryIrLerMirrorComposeClassificationTests
         using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
         var geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(PigJvm, shard.RootElement);
         var profile = new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2));
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/pig/pig",
             profile,
             PigJvm,

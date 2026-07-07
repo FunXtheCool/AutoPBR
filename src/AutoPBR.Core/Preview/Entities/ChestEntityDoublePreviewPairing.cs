@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace AutoPBR.Core.Preview;
 
-internal sealed partial class CleanRoomEntityModelRuntime
+internal sealed partial class EntityModelRuntime
 {
     /// <summary>
     /// Preview camera faces the chest front (+Z); place the east/right block at origin and offset the west/left block +X

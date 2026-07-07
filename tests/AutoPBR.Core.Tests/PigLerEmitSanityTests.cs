@@ -17,16 +17,16 @@ public sealed class PigLerEmitSanityTests
         var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{PigJvm}.json");
         using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
         var geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(PigJvm, shard.RootElement);
-        var plan = CleanRoomEntityModelRuntime.ResolveGeometryIrParityEmitPlan(
+        var plan = EntityModelRuntime.ResolveGeometryIrParityEmitPlan(
             PigJvm,
             "pig",
             "assets/minecraft/textures/entity/pig/pig.png",
             deferLivingEntityRendererUntilAfterMotionPasses: false);
-        Assert.Equal(CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot, plan.Basis);
+        Assert.Equal(EntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot, plan.Basis);
         Assert.True(plan.ApplyPostLivingEntityRendererBasis);
         Assert.Equal(Matrix4x4.Identity, plan.EmitRootTransform);
 
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/pig/pig",
             new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2)),
             PigJvm,

@@ -3,45 +3,45 @@ namespace AutoPBR.Core.Preview.Generated;
 
 internal static partial class GeometryIrEntityCuboidTables
 {
-    private static readonly CleanRoomEntityModelRuntime.EntityCuboid[] CodModelBodyLayerData =
+    private static readonly EntityModelRuntime.EntityCuboid[] CodModelBodyLayerData =
     [
-        new CleanRoomEntityModelRuntime.EntityCuboid(-1f, -2f, 0f, 1f, 2f, 7f, 0, 0),
-        new CleanRoomEntityModelRuntime.EntityCuboid(-1f, -2f, -3f, 1f, 2f, 0f, 11, 0),
-        new CleanRoomEntityModelRuntime.EntityCuboid(-1f, -2f, -1f, 1f, 1f, 0f, 0, 0),
-        new CleanRoomEntityModelRuntime.EntityCuboid(-2f, 0f, -1f, 0f, 0f, 1f, 22, 1),
-        new CleanRoomEntityModelRuntime.EntityCuboid(0f, 0f, -1f, 2f, 0f, 1f, 22, 4),
-        new CleanRoomEntityModelRuntime.EntityCuboid(0f, -2f, 0f, 0f, 2f, 4f, 22, 3),
-        new CleanRoomEntityModelRuntime.EntityCuboid(0f, -1f, -1f, 0f, 0f, 5f, 20, -6),
+        new EntityModelRuntime.EntityCuboid(-1f, -2f, 0f, 1f, 2f, 7f, 0, 0),
+        new EntityModelRuntime.EntityCuboid(-1f, -2f, -3f, 1f, 2f, 0f, 11, 0),
+        new EntityModelRuntime.EntityCuboid(-1f, -2f, -1f, 1f, 1f, 0f, 0, 0),
+        new EntityModelRuntime.EntityCuboid(-2f, 0f, -1f, 0f, 0f, 1f, 22, 1),
+        new EntityModelRuntime.EntityCuboid(0f, 0f, -1f, 2f, 0f, 1f, 22, 4),
+        new EntityModelRuntime.EntityCuboid(0f, -2f, 0f, 0f, 2f, 4f, 22, 3),
+        new EntityModelRuntime.EntityCuboid(0f, -1f, -1f, 0f, 0f, 5f, 20, -6),
     ];
 
-    internal static ReadOnlySpan<CleanRoomEntityModelRuntime.EntityCuboid> CodModelBodyLayer => CodModelBodyLayerData;
+    internal static ReadOnlySpan<EntityModelRuntime.EntityCuboid> CodModelBodyLayer => CodModelBodyLayerData;
 
-    private static readonly CleanRoomEntityModelRuntime.EntityCuboid[] SalmonModelBodyLayerData =
+    private static readonly EntityModelRuntime.EntityCuboid[] SalmonModelBodyLayerData =
     [
-        new CleanRoomEntityModelRuntime.EntityCuboid(-1.5f, -2.5f, 0f, 1.5f, 2.5f, 8f, 0, 0),
-        new CleanRoomEntityModelRuntime.EntityCuboid(0f, 0f, 0f, 0f, 2f, 3f, 2, 1),
-        new CleanRoomEntityModelRuntime.EntityCuboid(-1.5f, -2.5f, 0f, 1.5f, 2.5f, 8f, 0, 13),
-        new CleanRoomEntityModelRuntime.EntityCuboid(0f, -2.5f, 0f, 0f, 2.5f, 6f, 20, 10),
-        new CleanRoomEntityModelRuntime.EntityCuboid(0f, 0f, 0f, 0f, 2f, 4f, 0, 2),
-        new CleanRoomEntityModelRuntime.EntityCuboid(-1f, -2f, -3f, 1f, 2f, 0f, 22, 0),
-        new CleanRoomEntityModelRuntime.EntityCuboid(-2f, 0f, 0f, 0f, 0f, 2f, -4, 0),
-        new CleanRoomEntityModelRuntime.EntityCuboid(0f, 0f, 0f, 2f, 0f, 2f, 0, 0),
+        new EntityModelRuntime.EntityCuboid(-1.5f, -2.5f, 0f, 1.5f, 2.5f, 8f, 0, 0),
+        new EntityModelRuntime.EntityCuboid(0f, 0f, 0f, 0f, 2f, 3f, 2, 1),
+        new EntityModelRuntime.EntityCuboid(-1.5f, -2.5f, 0f, 1.5f, 2.5f, 8f, 0, 13),
+        new EntityModelRuntime.EntityCuboid(0f, -2.5f, 0f, 0f, 2.5f, 6f, 20, 10),
+        new EntityModelRuntime.EntityCuboid(0f, 0f, 0f, 0f, 2f, 4f, 0, 2),
+        new EntityModelRuntime.EntityCuboid(-1f, -2f, -3f, 1f, 2f, 0f, 22, 0),
+        new EntityModelRuntime.EntityCuboid(-2f, 0f, 0f, 0f, 0f, 2f, -4, 0),
+        new EntityModelRuntime.EntityCuboid(0f, 0f, 0f, 2f, 0f, 2f, 0, 0),
     ];
 
-    internal static ReadOnlySpan<CleanRoomEntityModelRuntime.EntityCuboid> SalmonModelBodyLayer => SalmonModelBodyLayerData;
+    internal static ReadOnlySpan<EntityModelRuntime.EntityCuboid> SalmonModelBodyLayer => SalmonModelBodyLayerData;
 
-    private static readonly CleanRoomEntityModelRuntime.EntityCuboid[] ChickenModelBodyLayerData =
+    private static readonly EntityModelRuntime.EntityCuboid[] ChickenModelBodyLayerData =
     [
-        new CleanRoomEntityModelRuntime.EntityCuboid(-2f, -6f, -2f, 2f, 0f, 1f, 0, 0),
-        new CleanRoomEntityModelRuntime.EntityCuboid(-2f, -4f, -4f, 2f, -2f, -2f, 14, 0),
-        new CleanRoomEntityModelRuntime.EntityCuboid(-1f, -2f, -3f, 1f, 0f, -1f, 14, 4),
-        new CleanRoomEntityModelRuntime.EntityCuboid(-3f, -4f, -3f, 3f, 4f, 3f, 0, 9),
-        new CleanRoomEntityModelRuntime.EntityCuboid(-1f, 0f, -3f, 2f, 5f, 0f, 26, 0),
-        new CleanRoomEntityModelRuntime.EntityCuboid(-1f, 0f, -3f, 2f, 5f, 0f, 26, 0),
-        new CleanRoomEntityModelRuntime.EntityCuboid(0f, 0f, -3f, 1f, 4f, 3f, 24, 13),
-        new CleanRoomEntityModelRuntime.EntityCuboid(-1f, 0f, -3f, 0f, 4f, 3f, 24, 13),
+        new EntityModelRuntime.EntityCuboid(-2f, -6f, -2f, 2f, 0f, 1f, 0, 0),
+        new EntityModelRuntime.EntityCuboid(-2f, -4f, -4f, 2f, -2f, -2f, 14, 0),
+        new EntityModelRuntime.EntityCuboid(-1f, -2f, -3f, 1f, 0f, -1f, 14, 4),
+        new EntityModelRuntime.EntityCuboid(-3f, -4f, -3f, 3f, 4f, 3f, 0, 9),
+        new EntityModelRuntime.EntityCuboid(-1f, 0f, -3f, 2f, 5f, 0f, 26, 0),
+        new EntityModelRuntime.EntityCuboid(-1f, 0f, -3f, 2f, 5f, 0f, 26, 0),
+        new EntityModelRuntime.EntityCuboid(0f, 0f, -3f, 1f, 4f, 3f, 24, 13),
+        new EntityModelRuntime.EntityCuboid(-1f, 0f, -3f, 0f, 4f, 3f, 24, 13),
     ];
 
-    internal static ReadOnlySpan<CleanRoomEntityModelRuntime.EntityCuboid> ChickenModelBodyLayer => ChickenModelBodyLayerData;
+    internal static ReadOnlySpan<EntityModelRuntime.EntityCuboid> ChickenModelBodyLayer => ChickenModelBodyLayerData;
 
 }

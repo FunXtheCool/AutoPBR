@@ -26,7 +26,7 @@ public sealed class ObjectEntityBlockStateParityTests
     [InlineData("ChestEntity", "assets/minecraft/textures/entity/chest/normal_right.png", "net.minecraft.client.model.object.chest.ChestModel.createDoubleBodyRightLayer")]
     [InlineData("Minecart", "assets/minecraft/textures/entity/minecart/minecart.png", "net.minecraft.client.model.object.cart.MinecartModel")]
     [InlineData("Bell", "assets/minecraft/textures/entity/bell/bell_body.png", "net.minecraft.client.model.object.bell.BellModel")]
-    [InlineData("BannerFlagStanding", "assets/minecraft/textures/entity/banner/white.png", "net.minecraft.client.model.object.banner.BannerFlagModel.standingPreviewComposite")]
+    [InlineData("BannerFlagStanding", "assets/minecraft/textures/entity/banner/stripe_top.png", "net.minecraft.client.model.object.banner.BannerFlagModel.standingPreviewComposite")]
     [InlineData("BannerFlagWall", "assets/minecraft/textures/entity/banner/banner_base.png", "net.minecraft.client.model.object.banner.BannerFlagModel.wallPreviewComposite")]
     [InlineData("Skull", "assets/minecraft/textures/entity/decorated_pot/skull_pottery_pattern.png", "net.minecraft.client.model.object.skull.SkullModel.previewComposite")]
     [InlineData("DecoratedPotEntity", "assets/minecraft/textures/entity/decorated_pot/heartbreak_pottery_pattern.png", "net.minecraft.client.model.DecoratedPotModel.previewComposite")]
@@ -45,49 +45,6 @@ public sealed class ObjectEntityBlockStateParityTests
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
         Assert.Equal(3, model.Elements.Count);
-    }
-
-    [Fact]
-    public void ChestEntity_ir_mesh_matches_cleanroom_bind_pose()
-    {
-        const string path = "assets/minecraft/textures/entity/chest/normal.png";
-        var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var irMesh), path);
-        Assert.True(
-            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
-                "ChestEntity",
-                path,
-                Profile26,
-                out var cleanMesh),
-            path);
-        var cmp = GeometryIrMeshParityComparer.Compare(irMesh, cleanMesh, tolerance: 0.05f);
-        Assert.True(cmp.IsMatch, cmp.Message);
-    }
-
-    [Theory]
-    [InlineData("assets/minecraft/textures/entity/chest/normal_left.png")]
-    [InlineData("assets/minecraft/textures/entity/chest/normal_right.png")]
-    public void ChestEntity_double_half_ir_mesh_matches_cleanroom_bind_pose(string path)
-    {
-        var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(
-            runtime.TryBuildStaticMesh(
-                path,
-                Profile26,
-                0f,
-                0f,
-                out var irMesh,
-                pairDoubleChestPreviewHalves: false),
-            path);
-        Assert.True(
-            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
-                "ChestEntity",
-                path,
-                Profile26,
-                out var cleanMesh),
-            path);
-        var cmp = GeometryIrMeshParityComparer.Compare(irMesh, cleanMesh, tolerance: 0.05f);
-        Assert.True(cmp.IsMatch, cmp.Message);
     }
 
     [Theory]
@@ -144,13 +101,13 @@ public sealed class ObjectEntityBlockStateParityTests
     public void ChestEntity_partner_path_swaps_left_and_right_suffix()
     {
         Assert.True(
-            CleanRoomEntityModelRuntime.TryGetDoubleChestPartnerAssetPath(
+            EntityModelRuntime.TryGetDoubleChestPartnerAssetPath(
                 "assets/minecraft/textures/entity/chest/normal_left.png",
                 out var right));
         Assert.Equal("assets/minecraft/textures/entity/chest/normal_right.png", right);
 
         Assert.True(
-            CleanRoomEntityModelRuntime.TryGetDoubleChestPartnerAssetPath(
+            EntityModelRuntime.TryGetDoubleChestPartnerAssetPath(
                 "assets/minecraft/textures/entity/chest/copper_exposed_right.png",
                 out var left));
         Assert.Equal("assets/minecraft/textures/entity/chest/copper_exposed_left.png", left);
@@ -199,23 +156,6 @@ public sealed class ObjectEntityBlockStateParityTests
     }
 
     [Fact]
-    public void Bell_ir_mesh_matches_cleanroom_bind_pose()
-    {
-        const string path = "assets/minecraft/textures/entity/bell/bell_body.png";
-        var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var irMesh), path);
-        Assert.True(
-            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
-                "Bell",
-                path,
-                Profile26,
-                out var cleanMesh),
-            path);
-        var cmp = GeometryIrMeshParityComparer.Compare(irMesh, cleanMesh, tolerance: 0.05f);
-        Assert.True(cmp.IsMatch, cmp.Message);
-    }
-
-    [Fact]
     public void Bell_preview_dome_extends_below_mounting_flange()
     {
         const string path = "assets/minecraft/textures/entity/bell/bell_body.png";
@@ -234,33 +174,16 @@ public sealed class ObjectEntityBlockStateParityTests
     [Fact]
     public void BannerStanding_resolves_flag_bar_and_pole_from_composite_shard()
     {
-        const string path = "assets/minecraft/textures/entity/banner/white.png";
+        const string path = "assets/minecraft/textures/entity/banner/stripe_top.png";
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
         Assert.Equal(3, model.Elements.Count);
     }
 
     [Fact]
-    public void BannerStanding_ir_mesh_matches_cleanroom_bind_pose()
-    {
-        const string path = "assets/minecraft/textures/entity/banner/white.png";
-        var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var irMesh), path);
-        Assert.True(
-            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
-                "BannerFlagStanding",
-                path,
-                Profile26,
-                out var cleanMesh),
-            path);
-        var cmp = GeometryIrMeshParityComparer.Compare(irMesh, cleanMesh, tolerance: 0.05f);
-        Assert.True(cmp.IsMatch, cmp.Message);
-    }
-
-    [Fact]
     public void BannerStanding_flag_hangs_below_bar_in_preview_space()
     {
-        const string path = "assets/minecraft/textures/entity/banner/white.png";
+        const string path = "assets/minecraft/textures/entity/banner/stripe_top.png";
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
         ModelElement? flag = null;
@@ -458,30 +381,6 @@ public sealed class ObjectEntityBlockStateParityTests
     }
 
     [Fact]
-    public void StandingSign_geometry_ir_matches_cleanroom_after_vertical_flip()
-    {
-        const string path = "assets/minecraft/textures/entity/signs/acacia.png";
-        var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var ir, out var prov));
-        Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, prov.Kind);
-        Assert.True(
-            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
-                "StandingSignEntity", path, Profile26, out var hand));
-        Assert.Equal(hand.Elements.Count, ir.Elements.Count);
-        for (var i = 0; i < hand.Elements.Count; i++)
-        {
-            Assert.True(
-                MatricesClose(hand.Elements[i].LocalToParent, ir.Elements[i].LocalToParent, 1e-3f),
-                $"element {i} LTP mismatch");
-            for (var c = 0; c < 3; c++)
-            {
-                Assert.Equal(hand.Elements[i].From[c], ir.Elements[i].From[c]);
-                Assert.Equal(hand.Elements[i].To[c], ir.Elements[i].To[c]);
-            }
-        }
-    }
-
-    [Fact]
     public void StandingSign_rebaked_mesh_post_bottom_cap_stays_attached()
     {
         const string path = "assets/minecraft/textures/entity/signs/acacia.png";
@@ -572,30 +471,6 @@ public sealed class ObjectEntityBlockStateParityTests
     }
 
     [Fact]
-    public void HangingSign_geometry_ir_matches_cleanroom_after_vertical_flip()
-    {
-        const string path = "assets/minecraft/textures/entity/signs/hanging/acacia.png";
-        var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var ir, out var prov));
-        Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, prov.Kind);
-        Assert.True(
-            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
-                "HangingSignEntity", path, Profile26, out var hand));
-        Assert.Equal(hand.Elements.Count, ir.Elements.Count);
-        for (var i = 0; i < hand.Elements.Count; i++)
-        {
-            Assert.True(
-                MatricesClose(hand.Elements[i].LocalToParent, ir.Elements[i].LocalToParent, 1e-3f),
-                $"element {i} LTP mismatch");
-            for (var c = 0; c < 3; c++)
-            {
-                Assert.Equal(hand.Elements[i].From[c], ir.Elements[i].From[c]);
-                Assert.Equal(hand.Elements[i].To[c], ir.Elements[i].To[c]);
-            }
-        }
-    }
-
-    [Fact]
     public void HangingSign_wall_resolves_board_and_plank()
     {
         const string path = "assets/minecraft/textures/entity/signs/hanging/acacia.png";
@@ -618,56 +493,6 @@ public sealed class ObjectEntityBlockStateParityTests
         Assert.Equal(2, model.Elements.Count);
         Assert.Single(model.Elements, IsHangingSignBoardElement);
         Assert.Single(model.Elements, IsHangingSignVerticalChainElement);
-    }
-
-    [Fact]
-    public void HangingSign_wall_geometry_ir_matches_cleanroom_after_vertical_flip()
-    {
-        const string path = "assets/minecraft/textures/entity/signs/hanging/acacia.png";
-        var runtime = EntityModelRuntimeFactory.Create();
-        using var scope = EntityPreviewBuildContext.UseContextType(EntityPreviewContextTypeCatalog.Wall);
-        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var ir, out var prov));
-        Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, prov.Kind);
-        Assert.True(
-            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
-                "HangingSignEntity", path, Profile26, out var hand));
-        Assert.Equal(hand.Elements.Count, ir.Elements.Count);
-        for (var i = 0; i < hand.Elements.Count; i++)
-        {
-            Assert.True(
-                MatricesClose(hand.Elements[i].LocalToParent, ir.Elements[i].LocalToParent, 1e-3f),
-                $"element {i} LTP mismatch");
-            for (var c = 0; c < 3; c++)
-            {
-                Assert.Equal(hand.Elements[i].From[c], ir.Elements[i].From[c]);
-                Assert.Equal(hand.Elements[i].To[c], ir.Elements[i].To[c]);
-            }
-        }
-    }
-
-    [Fact]
-    public void HangingSign_ceiling_middle_geometry_ir_matches_cleanroom_after_vertical_flip()
-    {
-        const string path = "assets/minecraft/textures/entity/signs/hanging/acacia.png";
-        var runtime = EntityModelRuntimeFactory.Create();
-        using var scope = EntityPreviewBuildContext.UseContextType(EntityPreviewContextTypeCatalog.CeilingMiddle);
-        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var ir, out var prov));
-        Assert.Equal(PreviewMeshDriverKind.RuntimeGeometryIrJson, prov.Kind);
-        Assert.True(
-            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
-                "HangingSignEntity", path, Profile26, out var hand));
-        Assert.Equal(hand.Elements.Count, ir.Elements.Count);
-        for (var i = 0; i < hand.Elements.Count; i++)
-        {
-            Assert.True(
-                MatricesClose(hand.Elements[i].LocalToParent, ir.Elements[i].LocalToParent, 1e-3f),
-                $"element {i} LTP mismatch");
-            for (var c = 0; c < 3; c++)
-            {
-                Assert.Equal(hand.Elements[i].From[c], ir.Elements[i].From[c]);
-                Assert.Equal(hand.Elements[i].To[c], ir.Elements[i].To[c]);
-            }
-        }
     }
 
     [Fact]
@@ -762,22 +587,6 @@ public sealed class ObjectEntityBlockStateParityTests
         Assert.InRange(maxZ - minZ, 0f, 17f);
         Assert.True(maxY - minY < 42f, $"height span {maxY - minY:G3} exceeds javap pot envelope");
         Assert.True(minY < 4f, $"expected neck Rx(PI) to pull geometry down; minY={minY:G3}");
-    }
-
-    [Fact]
-    public void DecoratedPot_ir_mesh_matches_cleanroom_bind_pose()
-    {
-        const string path = "assets/minecraft/textures/entity/decorated_pot/heartbreak_pottery_pattern.png";
-        var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var irMesh), path);
-        Assert.True(
-            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
-                "DecoratedPotEntity",
-                path,
-                Profile26,
-                out var cleanMesh),
-            path);
-        AssertWorldCornerSetsMatch(cleanMesh, irMesh, tolerance: 0.08f);
     }
 
     [Fact]
@@ -1074,7 +883,7 @@ public sealed class ObjectEntityBlockStateParityTests
         var runtime = EntityModelRuntimeFactory.Create();
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
 
-        const float minSideHeight = 16f + CleanRoomEntityModelRuntime.DecoratedPotPreviewVerticalSealOverlap - 0.01f;
+        const float minSideHeight = 16f + EntityModelRuntime.DecoratedPotPreviewVerticalSealOverlap - 0.01f;
         const float maxHorizontalSpan = 14f + 0.02f;
         const float maxSideDepth = 0.52f;
         var sideCount = 0;
@@ -1506,23 +1315,6 @@ public sealed class ObjectEntityBlockStateParityTests
     }
 
     [Fact]
-    public void Bed_ir_mesh_matches_cleanroom_bind_pose()
-    {
-        const string path = "assets/minecraft/textures/entity/bed/red.png";
-        var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var irMesh), path);
-        Assert.True(
-            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
-                "Bed",
-                path,
-                Profile26,
-                out var cleanMesh),
-            path);
-        var cmp = GeometryIrMeshParityComparer.Compare(irMesh, cleanMesh, tolerance: 0.05f);
-        Assert.True(cmp.IsMatch, cmp.Message);
-    }
-
-    [Fact]
     public void Bed_preview_mattress_sits_above_legs_in_world_space()
     {
         const string path = "assets/minecraft/textures/entity/bed/black.png";
@@ -1602,23 +1394,6 @@ public sealed class ObjectEntityBlockStateParityTests
         Assert.Equal(8f, (min.Z + max.Z) * 0.5f, 0.08f);
     }
 
-    [Theory]
-    [InlineData("assets/minecraft/textures/entity/conduit/base.png")]
-    [InlineData("assets/minecraft/textures/entity/conduit/cage.png")]
-    public void Conduit_ir_mesh_matches_cleanroom_bind_pose(string path)
-    {
-        var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var irMesh), path);
-        Assert.True(
-            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
-                "ConduitEntity",
-                path,
-                Profile26,
-                out var cleanMesh),
-            path);
-        AssertWorldCornerSetsMatch(cleanMesh, irMesh, tolerance: 0.05f);
-    }
-
     [Fact]
     public void ExperienceOrb_resolves_single_cuboid_from_hand_lift_shard()
     {
@@ -1680,17 +1455,17 @@ public sealed class ObjectEntityBlockStateParityTests
     [InlineData("assets/minecraft/textures/entity/enderdragon/dragon_fireball.png")]
     public void HandLift_object_entity_paths_skip_living_entity_renderer_basis(string path)
     {
-        var basis = CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(
+        var basis = EntityModelRuntime.ResolveGeometryIrLerBasis(
             officialJvmName: "net.minecraft.client.model.ConduitRenderer.createShellLayer",
             stemLower: "break_particle",
             normalizedAssetPath: path);
-        Assert.Equal(CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.Skip, basis);
+        Assert.Equal(EntityModelRuntime.GeometryIrLerBasisKind.Skip, basis);
     }
 
     [Theory]
     [InlineData("assets/minecraft/textures/entity/bed/red.png", "red")]
     [InlineData("assets/minecraft/textures/entity/signs/oak.png", "oak")]
-    [InlineData("assets/minecraft/textures/entity/banner/white.png", "white")]
+    [InlineData("assets/minecraft/textures/entity/banner/stripe_top.png", "stripe_top")]
     [InlineData("assets/minecraft/textures/entity/boat/oak.png", "oak")]
     [InlineData("assets/minecraft/textures/entity/boat/bamboo.png", "bamboo")]
     [InlineData("assets/minecraft/textures/entity/chest_boat/oak.png", "oak")]
@@ -1698,11 +1473,11 @@ public sealed class ObjectEntityBlockStateParityTests
     [InlineData("assets/minecraft/textures/entity/minecart/minecart.png", "minecart")]
     public void ObjectEntity_paths_skip_living_entity_renderer_basis(string path, string stem)
     {
-        var basis = CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(
+        var basis = EntityModelRuntime.ResolveGeometryIrLerBasis(
             officialJvmName: "net.minecraft.client.model.BedModel",
             stemLower: stem,
             normalizedAssetPath: path);
-        Assert.Equal(CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.Skip, basis);
+        Assert.Equal(EntityModelRuntime.GeometryIrLerBasisKind.Skip, basis);
         Assert.False(EntityGpuBoneFillPolicy.ShouldApplyStandardLivingPreviewBasis(path, stem), path);
     }
 
@@ -1711,10 +1486,10 @@ public sealed class ObjectEntityBlockStateParityTests
     {
         const string path = "assets/minecraft/textures/entity/armorstand/armorstand.png";
         const string jvm = "net.minecraft.client.model.object.armorstand.ArmorStandModel";
-        var basis = CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(jvm, "armorstand", path);
-        Assert.Equal(CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot, basis);
+        var basis = EntityModelRuntime.ResolveGeometryIrLerBasis(jvm, "armorstand", path);
+        Assert.Equal(EntityModelRuntime.GeometryIrLerBasisKind.StandardWorldRoot, basis);
         Assert.True(EntityGpuBoneFillPolicy.ShouldApplyStandardLivingPreviewBasis(path, "armorstand"));
-        Assert.True(CleanRoomEntityModelRuntime.UsesLivingEntityRendererDespiteObjectPackage(jvm, path));
+        Assert.True(EntityModelRuntime.UsesLivingEntityRendererDespiteObjectPackage(jvm, path));
     }
 
     [Fact]
@@ -1838,26 +1613,6 @@ public sealed class ObjectEntityBlockStateParityTests
         MathF.Abs(a.M44 - b.M44) <= eps && MathF.Abs(a.M41 - b.M41) <= eps && MathF.Abs(a.M42 - b.M42) <= eps &&
         MathF.Abs(a.M43 - b.M43) <= eps;
 
-    [Fact]
-    public void BoatOak_emit_from_lifted_resolver_root_matches_cleanroom_landmark()
-    {
-        const string path = "assets/minecraft/textures/entity/boat/oak.png";
-        var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var mesh), path);
-        var bottom = FindBoatHullBottomSlab(mesh);
-        TransformWorldCorners(bottom, out var min, out _);
-        Assert.True(
-            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
-                "Boat",
-                path,
-                Profile26,
-                out var clean),
-            path);
-        TransformWorldCorners(FindBoatHullBottomSlab(clean), out var cleanMin, out _);
-        Assert.True(Vector3.Distance(min, cleanMin) <= 0.05f,
-            $"bottom min corner delta {Vector3.Distance(min, cleanMin):G6}");
-    }
-
     private static ModelElement FindBoatHullBottomSlab(MergedJavaBlockModel model)
     {
         foreach (var el in model.Elements)
@@ -1897,66 +1652,10 @@ public sealed class ObjectEntityBlockStateParityTests
         Assert.Equal(JsonValueKind.Array, roots.ValueKind);
     }
 
-    [Fact]
-    public void BoatOak_bottom_slab_matches_cleanroom_landmark()
-    {
-        const string path = "assets/minecraft/textures/entity/boat/oak.png";
-        var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
-        Assert.True(
-            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
-                "Boat",
-                path,
-                Profile26,
-                out var clean),
-            path);
-        TransformWorldCorners(FindBoatHullBottomSlab(model), out var irMin, out var irMax);
-        TransformWorldCorners(FindBoatHullBottomSlab(clean), out var cleanMin, out var cleanMax);
-        AssertWorldCornerSetsMatchSingleCorner(irMin, cleanMin, 0.05f);
-        AssertWorldCornerSetsMatchSingleCorner(irMax, cleanMax, 0.05f);
-    }
-
     private static void AssertWorldCornerSetsMatchSingleCorner(Vector3 actual, Vector3 expected, float tolerance)
     {
         Assert.True(Vector3.Distance(actual, expected) <= tolerance,
             $"corner delta {Vector3.Distance(actual, expected):G6} exceeds {tolerance:G6}");
-    }
-
-    [Theory]
-    [InlineData("Boat", "assets/minecraft/textures/entity/boat/oak.png")]
-    [InlineData("Boat", "assets/minecraft/textures/entity/boat/bamboo.png")]
-    [InlineData("ChestBoat", "assets/minecraft/textures/entity/chest_boat/oak.png")]
-    [InlineData("ChestBoat", "assets/minecraft/textures/entity/chest_boat/bamboo.png")]
-    public void Boat_family_ir_mesh_matches_cleanroom_bind_pose(string builderMethod, string path)
-    {
-        var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var irMesh), path);
-        Assert.True(
-            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
-                builderMethod,
-                path,
-                Profile26,
-                out var cleanMesh),
-            path);
-        var cmp = GeometryIrMeshParityComparer.Compare(irMesh, cleanMesh, tolerance: 0.05f);
-        Assert.True(cmp.IsMatch, cmp.Message);
-    }
-
-    [Fact]
-    public void Minecart_ir_mesh_matches_cleanroom_bind_pose()
-    {
-        const string path = "assets/minecraft/textures/entity/minecart/minecart.png";
-        var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var irMesh), path);
-        Assert.True(
-            CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
-                "Minecart",
-                path,
-                Profile26,
-                out var cleanMesh),
-            path);
-        var cmp = GeometryIrMeshParityComparer.Compare(irMesh, cleanMesh, tolerance: 0.05f);
-        Assert.True(cmp.IsMatch, cmp.Message);
     }
 
     private static void AssertWorldCornerSetsMatch(MergedJavaBlockModel expected, MergedJavaBlockModel actual, float tolerance)

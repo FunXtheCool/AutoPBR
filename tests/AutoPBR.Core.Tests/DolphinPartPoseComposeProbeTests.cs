@@ -92,9 +92,9 @@ public sealed class DolphinPartPoseComposeProbeTests
 
     private static Matrix4x4 ComposeBodyAttachedFinBlockStack(JsonElement body, JsonElement fin)
     {
-        Assert.True(CleanRoomEntityModelRuntime.TryComposePartRenderLocalBlock(
+        Assert.True(EntityModelRuntime.TryComposePartRenderLocalBlock(
             body.GetProperty("pose"), out var bodyLocal, out _));
-        Assert.True(CleanRoomEntityModelRuntime.TryComposePartRenderLocalBlock(
+        Assert.True(EntityModelRuntime.TryComposePartRenderLocalBlock(
             fin.GetProperty("pose"), out var finLocal, out _));
         return Matrix4x4.Multiply(finLocal, bodyLocal);
     }
@@ -103,11 +103,11 @@ public sealed class DolphinPartPoseComposeProbeTests
     {
         if (useColumn)
         {
-            Assert.True(CleanRoomEntityModelRuntime.TryComposePartPosePublic(
+            Assert.True(EntityModelRuntime.TryComposePartPosePublic(
                 body.GetProperty("pose"), Matrix4x4.Identity, out var bodyWorld));
-            Assert.True(CleanRoomEntityModelRuntime.TryComposeColumnPartPose(
+            Assert.True(EntityModelRuntime.TryComposeColumnPartPose(
                 fin.GetProperty("pose"), bodyWorld, out var columnWorld, out _));
-            return TransformCuboidCenter(fin, CleanRoomEntityModelRuntime.TexelRowAffineToBlock(columnWorld));
+            return TransformCuboidCenter(fin, EntityModelRuntime.TexelRowAffineToBlock(columnWorld));
         }
 
         return TransformCuboidCenter(fin, ComposeBodyAttachedFinBlockStack(body, fin));

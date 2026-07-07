@@ -89,9 +89,9 @@ public sealed class ModelPartTranslateAndRotateProbeTests
         Assert.True(TryFindPart(geometryRoot, "head", out var head));
         Assert.True(TryFindPart(geometryRoot, "right_horn", out var horn));
 
-        Assert.True(CleanRoomEntityModelRuntime.TryComposePartPosePublic(
+        Assert.True(EntityModelRuntime.TryComposePartPosePublic(
             head.GetProperty("pose"), Matrix4x4.Identity, out var headWorld));
-        Assert.True(CleanRoomEntityModelRuntime.TryComposePartPosePublic(
+        Assert.True(EntityModelRuntime.TryComposePartPosePublic(
             horn.GetProperty("pose"), headWorld, out var hornWorld));
 
         var jvmHornBlock = MatrixFromRowMajor(
@@ -99,7 +99,7 @@ public sealed class ModelPartTranslateAndRotateProbeTests
             0, 0, 1, 0,
             0, -1, 0, 0,
             -0.28125f, 0.09375f, -0.71875f, 1);
-        var jvmHornTexel = CleanRoomEntityModelRuntime.BlockRowAffineToTexel(jvmHornBlock);
+        var jvmHornTexel = EntityModelRuntime.BlockRowAffineToTexel(jvmHornBlock);
 
         var headBlock = SeparatedTranslateRotateBlock(T(0f, 4f / 16f, -8f / 16f), Matrix4x4.Identity);
         var probeHead = MatrixFromRowMajor(
@@ -113,7 +113,7 @@ public sealed class ModelPartTranslateAndRotateProbeTests
         var chain = Mul(hornLocal, probeHead);
         Assert.True(MatrixDistance(chain, jvmHornBlock) <= 0.001f,
             $"probe chain row4={Format(chain)} jvm={Format(jvmHornBlock)}");
-        var manual = CleanRoomEntityModelRuntime.BlockRowAffineToTexel(chain);
+        var manual = EntityModelRuntime.BlockRowAffineToTexel(chain);
         Assert.True(MatrixDistance(manual, jvmHornTexel) <= 0.05f,
             $"manual={Format(manual)} jvm={Format(jvmHornTexel)} production={Format(hornWorld)}");
         Assert.True(MatrixDistance(hornWorld, jvmHornTexel) <= 0.05f,

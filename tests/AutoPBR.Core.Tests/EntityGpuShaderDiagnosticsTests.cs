@@ -9,7 +9,7 @@ public sealed class EntityGpuShaderDiagnosticsTests
     public void Bind_pose_palette_is_identity_on_bind_vertices()
     {
         GeometryIrParityPolicy.ResetForTests();
-        var runtime = new CleanRoomEntityModelRuntime();
+        var runtime = new EntityModelRuntime();
         const string path = "assets/minecraft/textures/entity/cow/cow_temperate.png";
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var merged));
 
@@ -97,12 +97,12 @@ public sealed class EntityGpuShaderDiagnosticsTests
         try
         {
             EntityPreviewDebugSettings.LerBasisOverride = EntityPreviewLerBasisOverride.RightComposeLocalChain;
-            var basis = CleanRoomEntityModelRuntime.ResolveGeometryIrLerBasis(
+            var basis = EntityModelRuntime.ResolveGeometryIrLerBasis(
                 "net.minecraft.client.model.animal.cow.CowModel",
                 "cow",
                 normalizedAssetPath: null);
             Assert.Equal(
-                CleanRoomEntityModelRuntime.GeometryIrLerBasisKind.RightComposeLocalChain,
+                EntityModelRuntime.GeometryIrLerBasisKind.RightComposeLocalChain,
                 basis);
         }
         finally

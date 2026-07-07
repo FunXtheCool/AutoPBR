@@ -2,7 +2,7 @@
 
 **Status:** Phase 1–2 complete — optional P3 trims done (DeepBump tiling, quadruped adults farm shard, JVM disassembler helpers)  
 **Created:** 2026-05-22 (line-count audit of `src/` + `tests/`)  
-**Updated:** 2026-05-27 (Phase 2 merged to `main`; doc rebaseline + REF-021 P3 splits)  
+**Updated:** 2026-07-07 (CleanRoom hand mesh tree removed — `EntityModelRuntime` / `EntityDispatch` replace `CleanRoomEntity*`; historical REF IDs below describe pre-removal layout)  
 **Goal:** Improve AI context readability, IDE navigation, and compile-time locality **without** behavior changes.  
 **Related:** [`runtime-ir-preview-plan.md`](runtime-ir-preview-plan.md) (§ Quadruped body placement regression, § Baby JVM family), [`manual-explore-playbook.md`](manual-explore-playbook.md), [`test-guidance-geometry-animation-ir.md`](test-guidance-geometry-animation-ir.md), [`vanilla-preview-parity.md`](vanilla-preview-parity.md), [`meta-001-test-triage.md`](meta-001-test-triage.md)
 

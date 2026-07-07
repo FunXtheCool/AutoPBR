@@ -3,7 +3,7 @@ using System.Numerics;
 namespace AutoPBR.Core.Preview;
 
 /// <summary>
-/// When active, <see cref="CleanRoomEntityModelRuntime.RigBuilder"/> records per-<c>AddBox</c> bone matrices only
+/// When active, <see cref="EntityModelRuntime.RigBuilder"/> records per-<c>AddBox</c> bone matrices only
 /// (same order as full mesh elements) for GPU skinning without allocating cuboid faces.
 /// </summary>
 internal static class EntityRigPoseCapture

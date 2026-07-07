@@ -3,11 +3,11 @@ using AutoPBR.Core.Preview.Generated;
 namespace AutoPBR.Core.Preview;
 
 /// <summary>
-/// Maps official JVM names to compile-time <see cref="CleanRoomEntityModelRuntime.EntityCuboid"/> body-layer tables.
+/// Maps official JVM names to compile-time <see cref="EntityModelRuntime.EntityCuboid"/> body-layer tables.
 /// </summary>
 internal static class GeometryIrCodegenTables
 {
-    public static bool TryGetBodyLayerSpan(string officialJvmName, out ReadOnlySpan<CleanRoomEntityModelRuntime.EntityCuboid> cuboids)
+    public static bool TryGetBodyLayerSpan(string officialJvmName, out ReadOnlySpan<EntityModelRuntime.EntityCuboid> cuboids)
     {
         cuboids = default;
         if (string.Equals(officialJvmName, "net.minecraft.client.model.animal.fish.CodModel", StringComparison.Ordinal))

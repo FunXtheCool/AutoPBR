@@ -68,10 +68,10 @@ public sealed class GeometryIrMeshEmitterTests
     public void Cod_ir_fidelity_emit_matches_shard_cuboid_count_and_fin_extents()
     {
         var profile = new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2));
-        var p = CleanRoomEntityModelRuntime.BabyProfile.Adult;
+        var p = EntityModelRuntime.BabyProfile.Adult;
         const string texRef = "entity/fish/cod";
 
-        var mesh = CleanRoomEntityModelRuntime.TryBuildCodGeometryIrMeshForTests(texRef, profile, p, tailSway: 0f, out var failure);
+        var mesh = EntityModelRuntime.TryBuildCodGeometryIrMeshForTests(texRef, profile, p, tailSway: 0f, out var failure);
         Assert.Null(failure);
         Assert.NotNull(mesh);
         Assert.Equal(7, mesh.Elements.Count);
@@ -84,12 +84,15 @@ public sealed class GeometryIrMeshEmitterTests
     public void Cod_viewport_emit_thickens_zero_extent_axes_from_ir()
     {
         var profile = new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2));
-        var p = CleanRoomEntityModelRuntime.BabyProfile.Adult;
+        var p = EntityModelRuntime.BabyProfile.Adult;
         const string texRef = "entity/fish/cod";
 
-        var parity = CleanRoomEntityModelRuntime.TryBuildCodGeometryIrMeshForTests(texRef, profile, p, tailSway: 0f, out _);
-        var viewport = CleanRoomEntityModelRuntime.BuildAquatic(texRef, profile, isBaby: false, tailSway: 0f);
+        var parity = EntityModelRuntime.TryBuildCodGeometryIrMeshForTests(texRef, profile, p, tailSway: 0f, out _);
+        var viewport = EntityModelRuntime.TryBuildGeometryIrViewportMeshForTests(
+            texRef, profile, CodJvmName, atlasWidth: 32, atlasHeight: 32, out var viewportFailure);
+        Assert.Null(viewportFailure);
         Assert.NotNull(parity);
+        Assert.NotNull(viewport);
         Assert.Equal(parity.Elements.Count, viewport.Elements.Count);
         Assert.True(HasElementWithLocalExtents(viewport, x0: -2f, y0: -0.08f, z0: -1f, x1: 0f, y1: 0.08f, z1: 1f, tol: 1e-3f));
     }
@@ -98,27 +101,31 @@ public sealed class GeometryIrMeshEmitterTests
     public void Salmon_ir_fidelity_emit_matches_shard_cuboid_count()
     {
         var profile = new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2));
-        var p = CleanRoomEntityModelRuntime.BabyProfile.Adult;
+        var p = EntityModelRuntime.BabyProfile.Adult;
         const string texRef = "entity/fish/salmon";
 
-        var mesh = CleanRoomEntityModelRuntime.TryBuildSalmonGeometryIrMeshForTests(texRef, profile, p, tailSway: 0f, out var failure);
+        var mesh = EntityModelRuntime.TryBuildSalmonGeometryIrMeshForTests(texRef, profile, p, tailSway: 0f, out var failure);
         Assert.Null(failure);
         Assert.NotNull(mesh);
         Assert.Equal(8, mesh.Elements.Count);
     }
 
     [Fact]
-    public void BuildAquatic_emits_geometry_ir_cod_viewport_mesh()
+    public void Cod_geometry_ir_viewport_emit_matches_cod_shard_layout()
     {
         var profile = new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2));
-        var aquatic = CleanRoomEntityModelRuntime.BuildAquatic(
-            "entity/_preview/aquatic_fallback",
+        var viewport = EntityModelRuntime.TryBuildGeometryIrViewportMeshForTests(
+            "entity/fish/cod",
             profile,
-            isBaby: false,
-            tailSway: 0f);
-        Assert.Equal(7, aquatic.Elements.Count);
+            CodJvmName,
+            atlasWidth: 32,
+            atlasHeight: 32,
+            out var failure);
+        Assert.Null(failure);
+        Assert.NotNull(viewport);
+        Assert.Equal(7, viewport.Elements.Count);
         Assert.True(HasElementWithLocalExtents(
-            aquatic, x0: -2f, y0: -0.08f, z0: -1f, x1: 0f, y1: 0.08f, z1: 1f, tol: 1e-3f));
+            viewport, x0: -2f, y0: -0.08f, z0: -1f, x1: 0f, y1: 0.08f, z1: 1f, tol: 1e-3f));
     }
 
     private static void CollectPartTree(JsonElement part, Dictionary<string, JsonElement> parts)

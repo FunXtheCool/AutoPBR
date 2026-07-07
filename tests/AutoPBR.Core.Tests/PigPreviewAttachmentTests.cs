@@ -376,7 +376,7 @@ public sealed class PigPreviewAttachmentTests
             GeometryIrPartTreeRepair.ApplyForParityCatalog(PigJvm, shard.RootElement),
             "body",
             out var bodyPose));
-        Assert.True(CleanRoomEntityModelRuntime.TryComposePartPosePublic(bodyPose, Matrix4x4.Identity, out var irBind));
+        Assert.True(EntityModelRuntime.TryComposePartPosePublic(bodyPose, Matrix4x4.Identity, out var irBind));
 
         var separated = SeparatedTranslateRotateBlock(
             Matrix4x4.CreateTranslation(0f, 11f, 2f),
@@ -480,7 +480,7 @@ public sealed class PigPreviewAttachmentTests
             GeometryIrTestTierSupport.FindRepoRoot(),
             "docs", "generated", "geometry", "26.1.2", $"{PigJvm}.json")));
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(PigJvm, shard.RootElement);
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrModelSpaceParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrModelSpaceParityMeshForTests(
             "entity/pig/pig", PigJvm, 64, 64, repaired, out var err);
         Assert.NotNull(mesh);
         Assert.Null(err);
@@ -517,13 +517,13 @@ public sealed class PigPreviewAttachmentTests
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(PigJvm, shard.RootElement);
         Assert.True(TryFindPartPose(repaired, "body", out var bodyPose));
         Assert.True(TryFindPartPose(repaired, "right_front_leg", out var legPose));
-        Assert.True(CleanRoomEntityModelRuntime.TryComposePartPosePublic(bodyPose, Matrix4x4.Identity, out var bodyBind));
-        Assert.True(CleanRoomEntityModelRuntime.TryComposePartPosePublic(legPose, Matrix4x4.Identity, out var legBind));
+        Assert.True(EntityModelRuntime.TryComposePartPosePublic(bodyPose, Matrix4x4.Identity, out var bodyBind));
+        Assert.True(EntityModelRuntime.TryComposePartPosePublic(legPose, Matrix4x4.Identity, out var legBind));
 
         var bodyCorner = new Vector3(-5f, -10f, -7f);
         var legCorner = new Vector3(-2f, 0f, -2f);
-        var bodyLer = CleanRoomEntityModelRuntime.ApplyLivingEntityRendererColumnRootScale(bodyBind);
-        var legLer = CleanRoomEntityModelRuntime.ApplyLivingEntityRendererColumnRootScale(legBind);
+        var bodyLer = EntityModelRuntime.ApplyLivingEntityRendererColumnRootScale(bodyBind);
+        var legLer = EntityModelRuntime.ApplyLivingEntityRendererColumnRootScale(legBind);
         var outerGap = Vector3.Transform(legCorner, legLer).X - Vector3.Transform(bodyCorner, bodyLer).X;
         _output.WriteLine($"ler outerGap={outerGap:F3}");
         Assert.InRange(outerGap, -0.05f, 0.05f);
@@ -632,7 +632,7 @@ public sealed class PigPreviewAttachmentTests
 
             var rows = entry.GetProperty("matrixRowMajor");
             matrix = MatrixFromReferenceRows(rows);
-            matrix = CleanRoomEntityModelRuntime.BlockRowAffineToTexel(matrix);
+            matrix = EntityModelRuntime.BlockRowAffineToTexel(matrix);
             return true;
         }
 

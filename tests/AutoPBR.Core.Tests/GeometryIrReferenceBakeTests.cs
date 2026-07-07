@@ -94,8 +94,8 @@ public sealed class GeometryIrReferenceBakeTests
         }
 
         var profile = new MinecraftNativeProfile("26.1.2", "unused", new Version(26, 1, 2));
-        var mesh = CleanRoomEntityModelRuntime.TryBuildCodGeometryIrMeshForTests(
-            "entity/fish/cod", profile, CleanRoomEntityModelRuntime.BabyProfile.Adult, tailSway: 0f, out _);
+        var mesh = EntityModelRuntime.TryBuildCodGeometryIrMeshForTests(
+            "entity/fish/cod", profile, EntityModelRuntime.BabyProfile.Adult, tailSway: 0f, out _);
         Assert.NotNull(mesh);
 
         var cmp = GeometryIrReferenceComparer.CompareReferenceToParityMesh(reference.RootElement, mesh, tolerance: 0.08);

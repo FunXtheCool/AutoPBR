@@ -7,7 +7,7 @@ internal static class SetupAnimDocumentLoader
 {
     private static readonly ConcurrentDictionary<string, JsonObject?> Cache = new(StringComparer.OrdinalIgnoreCase);
 
-    public static string VersionLabel => EntityCleanRoomAnimationMap.VersionLabel;
+    public static string VersionLabel => EntityParityAnimationMap.VersionLabel;
 
     public static bool TryLoadOk(string officialJvmName, out JsonObject root)
     {

@@ -5,7 +5,7 @@ using AutoPBR.Core.Models;
 
 namespace AutoPBR.Core.Preview;
 
-internal sealed partial class CleanRoomEntityModelRuntime
+internal sealed partial class EntityModelRuntime
 {
     private const float PoseEpsilon = 1e-5f;
 

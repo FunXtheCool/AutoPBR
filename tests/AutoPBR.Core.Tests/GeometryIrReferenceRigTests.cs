@@ -115,7 +115,7 @@ public sealed class GeometryIrReferenceRigTests
             return;
         }
 
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "entity/test", Profile26, jvm, atlasW, atlasH, out var err);
         Assert.Null(err);
         Assert.NotNull(mesh);
@@ -141,7 +141,7 @@ public sealed class GeometryIrReferenceRigTests
             return;
         }
 
-        ReadOnlySpan<CleanRoomEntityModelRuntime.EntityCuboid> table = jvm switch
+        ReadOnlySpan<EntityModelRuntime.EntityCuboid> table = jvm switch
         {
             "net.minecraft.client.model.animal.fish.CodModel" =>
                 GeometryIrEntityCuboidTables.CodModelBodyLayer,
@@ -149,7 +149,7 @@ public sealed class GeometryIrReferenceRigTests
                 GeometryIrEntityCuboidTables.SalmonModelBodyLayer,
             "net.minecraft.client.model.animal.chicken.ChickenModel" =>
                 GeometryIrEntityCuboidTables.ChickenModelBodyLayer,
-            _ => ReadOnlySpan<CleanRoomEntityModelRuntime.EntityCuboid>.Empty
+            _ => ReadOnlySpan<EntityModelRuntime.EntityCuboid>.Empty
         };
 
         Assert.False(table.IsEmpty);
@@ -398,53 +398,6 @@ public sealed class GeometryIrReferenceRigTests
         Assert.True(maxErr > 0.05f, $"expected zombie arms pose delta, got {maxErr:F4}");
     }
 
-    [Fact]
-    public void Baby_zombie_villager_zombie_arms_geometry_ir_matches_hand_built_javap_pose()
-    {
-        const string path = "assets/minecraft/textures/entity/zombie_villager/zombie_villager_baby.png";
-        const string builder = "HumanoidZombieVillager";
-        using (EntityPreviewBuildContext.UsePose(EntityPreviewPoseCatalog.HumanoidZombieArms))
-        {
-            Assert.True(
-                CleanRoomEntityModelRuntime.TryBuildCleanRoomParityCatalogMeshForTests(
-                    builder, path, Profile26, out var hand));
-            var runtime = EntityModelRuntimeFactory.Create();
-            Assert.True(
-                runtime.TryBuildStaticMesh(
-                    path,
-                    Profile26,
-                    idlePhase01: 0f,
-                    animationTimeSeconds: 0f,
-                    out var ir,
-                    out _,
-                    applyGeometryIrSetupAnimMotion: false));
-            Assert.Equal(hand.Elements.Count, ir.Elements.Count);
-            var stem = Path.GetFileNameWithoutExtension(path).ToLowerInvariant();
-            var rule = EntityTextureParityCatalog.ResolveRule(path, stem);
-            Assert.NotNull(rule);
-            Assert.True(GeometryIrParityJvmResolver.TryResolveLiftedRoot(
-                Profile26, rule, path, stem, isBaby: true, out var jvm, out var geometryRoot));
-            geometryRoot = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, geometryRoot);
-            var partIds = GeometryIrMeshWalk.CollectCuboidOwnerPartIds(
-                geometryRoot,
-                GeometryIrMeshEmitOptions.ForParity() with { OfficialJvmName = jvm });
-            var maxArmErr = 0f;
-            for (var i = 0; i < hand.Elements.Count; i++)
-            {
-                if (!partIds[i].Contains("arm", StringComparison.Ordinal))
-                {
-                    continue;
-                }
-
-                maxArmErr = MathF.Max(
-                    maxArmErr,
-                    MaxMatrixDelta(hand.Elements[i].LocalToParent, ir.Elements[i].LocalToParent));
-            }
-
-            Assert.True(maxArmErr <= 0.12f, $"hand vs IR arm matrix delta {maxArmErr:F4}");
-        }
-    }
-
     private static float MaxMatrixDelta(Matrix4x4 a, Matrix4x4 b)
     {
         var max = 0f;
@@ -476,7 +429,7 @@ public sealed class GeometryIrReferenceRigTests
         }
 
         using var reference = JsonDocument.Parse(File.ReadAllText(referencePath));
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "#skin",
             Profile26,
             jvm,
@@ -502,7 +455,7 @@ public sealed class GeometryIrReferenceRigTests
         }
 
         using var reference = JsonDocument.Parse(File.ReadAllText(referencePath));
-        var mesh = CleanRoomEntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
+        var mesh = EntityModelRuntime.TryBuildGeometryIrParityMeshForTests(
             "#skin",
             Profile26,
             jvm,
@@ -548,7 +501,7 @@ public sealed class GeometryIrReferenceRigTests
 
         var tail = FindBabyWolfTailCuboid(mesh);
         var previewCenter = CuboidCenterTexel(tail);
-        var ler = CleanRoomEntityModelRuntime.LivingEntityRendererPreviewRootScale;
+        var ler = EntityModelRuntime.LivingEntityRendererPreviewRootScale;
         var expectedPreview = Vector3.Transform(javaCenter.Value, ler);
 
         Assert.True(

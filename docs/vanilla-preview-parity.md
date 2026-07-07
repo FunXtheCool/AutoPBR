@@ -9,7 +9,7 @@ Parity checks and `javap` extractions should be pinned to the same versions the 
 | Role | Version | Notes |
 |------|---------|--------|
 | Pre–26.1 baby / model baseline | **1.21.11** (`MinecraftNativeProfile` name + `Version(1,21,11)`) | Used widely in [`MinecraftJavaModelPreviewTests`](../tests/AutoPBR.Core.Tests/MinecraftJavaModelPreviewTests.cs). |
-| Post–26.1 baby split | **26.1.2** (`Version(26,1,2)`) | [`UsesPostBabyModelUpdate`](../src/AutoPBR.Core/Preview/CleanRoomEntityModelRuntime.cs) and baby dimension tests. |
+| Post–26.1 baby split | **26.1.2** (`Version(26,1,2)`) | [`UsesPostBabyModelUpdate`](../src/AutoPBR.Core/Preview/EntityModelRuntime.cs) and baby dimension tests. |
 | Bytecode / mapping spot-checks | **1.21.4** client JAR + `client.txt` | Stable LTS-ish reference for `javap -c` when a class matches 1.21.x layout; re-verify if Mojang refactors `*Model` between minors. |
 
 **Artifacts (per pinned version)**
@@ -49,19 +49,21 @@ Rebake reference after compose changes: `pwsh -File tools/Export-GeometryReferen
 
 ## Parity-catalog geometry IR (26.1.2)
 
-All **761** rows in `minecraft_26.1.2_entity_texture_model_manifest.json` resolve to **`RuntimeGeometryIrJson`** in preview (`ParityCatalogMeshDriverKindSurveyTests`). Resolution order: bytecode-lifted shards under `Data/minecraft-native/geometry/26.1.2/`, equipment JVM overrides (`GeometryIrParityEquipmentJvmMap`), and hand-lift catalogs for renderer-only hosts. See [`cleanroom-entity-cuboid.md`](cleanroom-entity-cuboid.md) §3.
+All **761** rows in `minecraft_26.1.2_entity_texture_model_manifest.json` resolve to **`RuntimeGeometryIrJson`** in preview (`ParityCatalogMeshDriverKindSurveyTests`). Resolution order: bytecode-lifted shards under `Data/minecraft-native/geometry/26.1.2/`, equipment JVM overrides (`GeometryIrParityEquipmentJvmMap`), and hand-lift catalogs for renderer-only hosts. See [`entity-cuboid-layer.md`](entity-cuboid-layer.md) §3.
 
 ## Pipeline overview
 
 | Track | Vanilla source | Core code |
 |-------|------------------|-----------|
 | **Blocks / items** | `assets/<ns>/models/**.json` — elements `from` / `to` / `faces`, optional **`rotation`** object (`origin`, `axis`, `angle`, optional `rescale`) | [`MinecraftModelMerger`](../src/AutoPBR.Core/Preview/MinecraftModelMerger.cs) → `ModelElement.LocalToParent` |
-| **Entities** | `net.minecraft.client.model.*Model` (`createBodyLayer`, cuboids + poses) | [`CleanRoomEntityModelRuntime`](../src/AutoPBR.Core/Preview/CleanRoomEntityModelRuntime.cs) → `RigBuilder.AddBox(..., localToParent)` |
+| **Entities** | `net.minecraft.client.model.*Model` (`createBodyLayer`, cuboids + poses) | [`EntityModelRuntime`](../src/AutoPBR.Core/Preview/EntityModelRuntime.cs) → geometry IR emit + `RigBuilder` (error placeholder only for IR miss) |
 | **Bake** | — | [`MinecraftModelBaker`](../src/AutoPBR.Core/Preview/MinecraftModelBaker.cs): apply `LocalToParent` in **model texel space**, then `W()` preview scaling; normals/tangents transformed with the same matrix. |
 
 ## Track A — Entity checklist (rolling)
 
-Use one row per model class; mark **done** when `javap` notes exist, `CleanRoomEntityModelRuntime` matches, and tests/visual pass.
+Use one row per model class; mark **done** when `javap` notes exist, geometry IR shard is `ok`, and tests/visual pass.
+
+**Catalog policy (2026-07):** all 761 parity-catalog entity diffuse paths emit `RuntimeGeometryIrJson` only. Hand `Build*` templates are removed; uncatalogued textures show `ErrorPlaceholder`.
 
 ### Structured geometry / preview deltas (pilot)
 
@@ -137,11 +139,11 @@ Machine-readable parity lives under [`docs/generated/`](../docs/generated/README
 | ExperienceOrb (renderer) | 1.21.11 (`hwu`) | done | No `ModelPart`; `16×16` tile UV + `1×1` XY quad, `scale(0.3³)` + billboard. Preview: **one thin north/south slab** sized `≈4.8×4.8×0.08` in entity texel space, same tile UV; `spritePick01` maps pseudo `value` `0..10`. |
 | DragonFireball (renderer) | 1.21.11 (`hwh`) | done | No `ModelPart`; `1×1` quad × `scale(2,2,2)` + billboard. Preview: **one thin north/south slab** with full `64×32` UV, extents `≈32×32×0.08` in entity texel space (not a solid cube). |
 | MooshroomModel | — | inherits cow | Same rig as cow texture family. |
-| **Family / proxy rigs** | | | *(catalogued paths use manifest builders; fallbacks apply only when parity catalog + `TryBuildSpecific` both miss.)* |
+| **Family / proxy rigs** | | | *(Removed 2026-07: catalogued paths use manifest geometry IR only; uncatalogued paths emit error placeholder.)* |
 | HumanoidModel proxy (`BuildHumanoid`, `HumanoidGeneric` dispatch, equipment `humanoid` / `humanoid_leggings`) | 1.21.4 | done | Wide sheet: body `texOffs(16,16)` `8×12×4`, head `(0,0)` `8×8×8`, arms `(40,16)` `4×12×4`, legs `(0,16)` `4×12×4` — aligned with player outer-layer topology for preview. |
 | `PlayerSlim` / `BuildPlayerSlim` | 1.21.4 | done | Alex arms `(32,48)` / `(40,16)` `3×12×4`; legs `(16,48)` left / `(0,16)` right. |
 | Quadruped fallback (`BuildQuadruped`) | 1.21.4 (`CowModel` subset) | done | Body `(18,4)` + pose `T(0,5,2)·Rx(π/2)`, head `(0,0)`, legs `(0,16)` — **no** horns/udder vs full cow. |
-| Flying fallback (`BuildFlying`) | 1.21.4 / 26.1.2 Phantom (`het`) | done | Delegates to `BuildPhantom` cuboids/poses; eyes texture key reuses caller `texRef` when no `phantom_eyes` sibling (`CleanRoomEntityRuntime_BuildFlyingFallbackUsesPhantomClassSilhouette`). |
+| Flying fallback (`BuildFlying`) | 1.21.4 / 26.1.2 Phantom (`het`) | removed | Hand-built family fallbacks removed 2026-07; catalog paths use `PhantomModel` geometry IR. |
 | Aquatic fallback (`BuildAquatic`) | 1.21.4 (`CodModel`) | done | Delegates to `BuildCod` — real fish UV/layout (`32×32`). |
 | Equipment overlay fallback (`BuildEquipmentBodyOverlay`) | 1.21.4 (`AbstractEquineModel` body) | done | `texOffs(0,32)` equine torso shell for unmatched equipment diffuse paths. |
 | TurtleModel | 1.21.11 (`hcu`) | done | `hcu.a`: head `6×5×6` @ `(3,0)` `T(0,19,-10)`; shell `19×20×6` + belly `11×18×3` + egg_belly `9×18×1` under shared `T(0,11,-10)·Rx(π/2)`; hind flippers `4×1×10` @ `(±3.5,22,11)`; front `13×1×5` @ `(±5,21,-4)`. |
@@ -248,12 +250,12 @@ This section is **locked process policy** for every entity parity rollout. The h
 | **G6 — Route integrity** | Representative texture path resolves to `SpecificMesh` (not fallback/unknown). | `ClassifyEntityTextureRoute` assertions per entity/model route. |
 | **G7 — Test execution** | Targeted entity tests and filtered parity suite both pass locally. | Commands + pass results recorded in session/PR notes. |
 
-### Runtime implementation template (copy into new `Build*` methods)
+### Runtime implementation template (geometry IR parity)
 
-1. **Geometry block** — vanilla cuboids + UVs in local part space.
-2. **Rig/setup block** — explicit `PartPose` chain via `CleanRoomEntityModelRuntime.EntityParityTemplate` (`T`, `Er`, `Mul`, axis rotations) and child attachment order matching javap.
-3. **Setup math block** — baseline `setupAnim` writes captured as pure helper formulas.
-4. **Global transform audit block** — verify renderer-space orientation/scale does not silently conjugate child rotations.
+1. **Geometry block** — lifted IR cuboids + UVs in local part space (`GeometryIrMeshEmitter`).
+2. **Rig/setup block** — explicit `PartPose` chain via `EntityModelRuntime` / `EntityParityTemplate` (`T`, `Er`, `Mul`, axis rotations) and child attachment order matching javap.
+3. **Setup math block** — baseline `setupAnim` writes captured as pure helper formulas (definition-animation IR crosswalk via `EntityParityAnimationMap`).
+4. **Global transform audit block** — verify renderer-space orientation/scale does not silently conjugate child rotations; object entities use `EntityBlockEntities` finish passes.
 
 ### Baby equine (HorseModel / DonkeyModel splits — 26.1.2)
 

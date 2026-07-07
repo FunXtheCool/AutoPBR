@@ -325,7 +325,7 @@ internal static class GeometryIrReferenceComparer
                 parityMesh.Elements.Count);
         }
 
-        var ler = CleanRoomEntityModelRuntime.LivingEntityRendererPreviewRootScale;
+        var ler = EntityModelRuntime.LivingEntityRendererPreviewRootScale;
         var compared = 0;
         var skipped = 0;
         foreach (var (partId, refOrigin) in refWorld)
@@ -394,7 +394,7 @@ internal static class GeometryIrReferenceComparer
             translationsByPartId["body"] = bodyOrigin;
         }
 
-        if (CleanRoomEntityModelRuntime.UsesFlatPartPoseOffsetQuadrupedJvm(emitOptions.OfficialJvmName) &&
+        if (EntityModelRuntime.UsesFlatPartPoseOffsetQuadrupedJvm(emitOptions.OfficialJvmName) &&
             !string.Equals(
                 emitOptions.OfficialJvmName,
                 "net.minecraft.client.model.animal.polarbear.PolarBearModel",
@@ -448,7 +448,7 @@ internal static class GeometryIrReferenceComparer
         var partId = part.TryGetProperty("id", out var idEl) ? idEl.GetString() : null;
         var world = parentWorld;
         if (part.TryGetProperty("pose", out var poseEl) &&
-            CleanRoomEntityModelRuntime.TryComposePartPosePublic(poseEl, parentWorld, out var worldTexel, partId))
+            EntityModelRuntime.TryComposePartPosePublic(poseEl, parentWorld, out var worldTexel, partId))
         {
             world = worldTexel;
         }
@@ -502,7 +502,7 @@ internal static class GeometryIrReferenceComparer
                 continue;
             }
 
-            var texel = CleanRoomEntityModelRuntime.BlockRowAffineToTexel(blockRow);
+            var texel = EntityModelRuntime.BlockRowAffineToTexel(blockRow);
             translationsByPartId[id] = Vector3.Transform(Vector3.Zero, texel);
         }
 

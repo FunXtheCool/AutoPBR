@@ -210,7 +210,7 @@ public sealed class EntityCuboidUvRoutingAuditTests
                 From = e.From,
                 To = e.To,
                 Faces = e.Faces,
-                LocalToParent = CleanRoomEntityModelRuntime.ApplyLivingEntityRendererColumnRootScale(e.LocalToParent),
+                LocalToParent = EntityModelRuntime.ApplyLivingEntityRendererColumnRootScale(e.LocalToParent),
             });
         }
 
