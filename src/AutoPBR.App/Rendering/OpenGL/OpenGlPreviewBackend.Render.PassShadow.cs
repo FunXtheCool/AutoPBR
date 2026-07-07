@@ -100,7 +100,7 @@ public sealed partial class OpenGlPreviewBackend
         RenderShadowDepthPass(ref frame, frame.ShadowVp, _shadowTarget!);
     }
 
-    private bool TryGetShadowCasterBoundsForFrame(ref GlRenderFrame frame, out Vector3 min, out Vector3 max)
+    private static bool TryGetShadowCasterBoundsForFrame(ref GlRenderFrame frame, out Vector3 min, out Vector3 max)
     {
         ReadOnlySpan<float> verts;
         int stride;

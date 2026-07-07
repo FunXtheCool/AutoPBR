@@ -122,7 +122,7 @@ internal static class VanillaBlockPreviewRuntime
 
     private static MergedJavaBlockModel BuildThinPlate(
         string selectedPath,
-        IReadOnlyDictionary<string, string> slotToZipPath,
+        Dictionary<string, string> slotToZipPath,
         string defaultNamespace)
     {
         var textures = new Dictionary<string, string>(StringComparer.Ordinal)
@@ -230,7 +230,7 @@ internal static class VanillaBlockPreviewRuntime
 
     private static MergedJavaBlockModel BuildTextureShape(
         string selectedPath,
-        IReadOnlyDictionary<string, string> slotToZipPath,
+        Dictionary<string, string> slotToZipPath,
         string defaultNamespace,
         Func<string, IReadOnlyDictionary<string, string>, MergedJavaBlockModel> build)
     {

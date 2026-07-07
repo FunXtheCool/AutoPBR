@@ -119,7 +119,7 @@ public sealed class PigPreviewAttachmentTests
         float[] verts,
         int stride,
         MergedJavaBlockModel mesh,
-        IReadOnlyList<string> partIds,
+        string[] partIds,
         float y,
         float zMin,
         float zMax,
@@ -156,7 +156,7 @@ public sealed class PigPreviewAttachmentTests
         float[] verts,
         int stride,
         MergedJavaBlockModel mesh,
-        IReadOnlyList<string> partIds,
+        string[] partIds,
         string partId,
         float y,
         float yTol,
@@ -192,7 +192,7 @@ public sealed class PigPreviewAttachmentTests
     }
 
     private static float MeasurePartMaxY(
-        float[] verts, int stride, MergedJavaBlockModel mesh, IReadOnlyList<string> partIds, string partId)
+        float[] verts, int stride, MergedJavaBlockModel mesh, string[] partIds, string partId)
     {
         var maxY = float.NegativeInfinity;
         var vi = 0;
@@ -217,7 +217,7 @@ public sealed class PigPreviewAttachmentTests
         float[] verts,
         int stride,
         MergedJavaBlockModel mesh,
-        IReadOnlyList<string> partIds,
+        string[] partIds,
         string partId,
         float y,
         float yTol)
@@ -426,7 +426,7 @@ public sealed class PigPreviewAttachmentTests
     private static (float MinX, float MaxX, float MinY, float MaxY) MeasurePartAxisRangeByBoneIndex(
         float[] verts,
         int stride,
-        IReadOnlyList<string> partIds,
+        List<string> partIds,
         string partId)
     {
         var minX = float.PositiveInfinity;
@@ -827,7 +827,7 @@ public sealed class PigPreviewAttachmentTests
         float[] verts,
         int stride,
         MergedJavaBlockModel mesh,
-        IReadOnlyList<string> partIds,
+        string[] partIds,
         PartPreviewBounds legBounds) =>
         MeasureLocalizedLegTopBodyUndersideGapAt(verts, stride, mesh, partIds, legBounds, radius: 1.25f);
 
@@ -835,7 +835,7 @@ public sealed class PigPreviewAttachmentTests
         float[] verts,
         int stride,
         MergedJavaBlockModel mesh,
-        IReadOnlyList<string> partIds,
+        string[] partIds,
         PartPreviewBounds legBounds,
         float radius)
     {
@@ -905,7 +905,7 @@ public sealed class PigPreviewAttachmentTests
         float[] verts,
         int stride,
         MergedJavaBlockModel mesh,
-        IReadOnlyList<string> partIds)
+        string[] partIds)
     {
         var result = new Dictionary<string, PartPreviewBounds>(StringComparer.Ordinal);
         var vi = 0;

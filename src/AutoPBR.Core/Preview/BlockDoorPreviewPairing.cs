@@ -94,7 +94,7 @@ internal static class BlockDoorPreviewPairing
     }
 
     private static bool TryResolveDoorTextureRef(
-        IReadOnlyDictionary<string, string> textures,
+        Dictionary<string, string> textures,
         string halfKey,
         string doorStem,
         string textureNamespace,
@@ -133,6 +133,6 @@ internal static class BlockDoorPreviewPairing
         return false;
     }
 
-    private static IEnumerable<string> mergedFaceTextureKeys(IReadOnlyDictionary<string, string> textures) =>
+    private static IEnumerable<string> mergedFaceTextureKeys(Dictionary<string, string> textures) =>
         textures.Values.Where(v => !string.IsNullOrWhiteSpace(v) && !v.StartsWith('#'));
 }

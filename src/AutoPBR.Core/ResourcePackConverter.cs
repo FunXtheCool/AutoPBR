@@ -250,7 +250,10 @@ public static class ResourcePackConverter
                     // Recovered via block texture parity catalog after pack JSON material gaps.
                 }
 
-                if (workOrdered is not null)
+                if (workOrdered is not null
+                    && mergedModel is not null
+                    && orderedModelTextures is not null
+                    && modelDefaultNs is not null)
                 {
                     await NormalHeightGenerator.GenerateAsync(workOrdered, options, null, cancellationToken)
                         .ConfigureAwait(false);
@@ -464,9 +467,9 @@ public static class ResourcePackConverter
         MinecraftNativeProfile? previewNativeProfile,
         AutoPbrOptions options,
         CancellationToken cancellationToken,
-        ref MergedJavaBlockModel mergedModel,
-        ref List<string> orderedModelTextures,
-        ref string modelDefaultNs,
+        ref MergedJavaBlockModel? mergedModel,
+        ref List<string>? orderedModelTextures,
+        ref string? modelDefaultNs,
         ref PreviewMeshProvenance meshProvenance,
         ref bool isEmulatedEntityModel,
         ref IReadOnlyList<TextureWorkItem> textures,

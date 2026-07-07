@@ -137,7 +137,7 @@ internal static class MinecraftModelMerger
         return accumulated;
     }
 
-    private static void ReindexByName(IReadOnlyList<ModelElement> elements, Dictionary<string, int> byName)
+    private static void ReindexByName(List<ModelElement> elements, Dictionary<string, int> byName)
     {
         byName.Clear();
         for (var i = 0; i < elements.Count; i++)

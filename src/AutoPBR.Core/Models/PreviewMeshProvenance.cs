@@ -34,10 +34,12 @@ public readonly record struct PreviewMeshProvenance(PreviewMeshDriverKind Kind, 
             string.IsNullOrWhiteSpace(Detail)
                 ? "[Preview] Mesh: runtime JSON (geometry IR)"
                 : $"[Preview] Mesh: runtime JSON (geometry IR · {Detail})",
+#pragma warning disable CS0618 // CleanRoom retained for saved debug state only.
         PreviewMeshDriverKind.CleanRoom =>
             string.IsNullOrWhiteSpace(Detail)
                 ? "[Preview] Mesh: CleanRoom"
                 : $"[Preview] Mesh: CleanRoom ({Detail})",
+#pragma warning restore CS0618
         PreviewMeshDriverKind.VanillaBlockParity =>
             string.IsNullOrWhiteSpace(Detail)
                 ? "[Preview] Mesh: vanilla block parity"
@@ -60,10 +62,12 @@ public readonly record struct PreviewMeshProvenance(PreviewMeshDriverKind Kind, 
             string.IsNullOrWhiteSpace(Detail)
                 ? "Mesh: runtime JSON (geometry IR)"
                 : $"Mesh: runtime JSON (geometry IR · {Detail})",
+#pragma warning disable CS0618 // CleanRoom retained for saved debug state only.
         PreviewMeshDriverKind.CleanRoom =>
             string.IsNullOrWhiteSpace(Detail)
                 ? "Mesh: CleanRoom"
                 : $"Mesh: CleanRoom ({Detail})",
+#pragma warning restore CS0618
         PreviewMeshDriverKind.VanillaBlockParity =>
             string.IsNullOrWhiteSpace(Detail)
                 ? "Mesh: vanilla block parity"

@@ -4,6 +4,10 @@ namespace AutoPBR.App.Lang;
 
 /// <summary>Exposes resource strings as bindable properties. Replace the instance when culture changes so UI updates.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+[System.Diagnostics.CodeAnalysis.SuppressMessage(
+    "Naming",
+    "CA1707:Identifiers should not contain underscores",
+    Justification = "Property names mirror Resources.resx keys for GPU preview status strings.")]
 public sealed class LocalizedStrings
 {
     public static string Appearance => Resources.Appearance;

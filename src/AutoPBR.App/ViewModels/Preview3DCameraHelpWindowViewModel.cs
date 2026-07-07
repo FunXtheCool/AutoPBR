@@ -53,8 +53,12 @@ public sealed partial class Preview3DCameraHelpWindowViewModel : ViewModelBase
         new(LocalizedStrings.Preview3DCameraHelpItemFlyWheelInput, LocalizedStrings.Preview3DCameraHelpItemFlyWheelDesc),
     ];
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Performance",
+        "CA1863:Cache a 'CompositeFormat' for repeated use in this formatting operation",
+        Justification = "Format string is localized and may change when culture changes.")]
     public string ResetKeyInput => string.Format(
-        System.Globalization.CultureInfo.CurrentUICulture,
+        System.Globalization.CultureInfo.CurrentCulture,
         LocalizedStrings.Preview3DCameraResetKeyFormat,
         _main.Preview3DCameraResetKey);
 
