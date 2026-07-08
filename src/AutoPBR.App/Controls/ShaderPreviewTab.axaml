@@ -1,0 +1,445 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AutoPBR.App.ViewModels"
+             xmlns:ctrls="using:AutoPBR.App.Controls"
+             xmlns:stage="using:AutoPBR.App.Rendering.Scene"
+             x:Class="AutoPBR.App.Controls.ShaderPreviewTab"
+             x:DataType="vm:MainWindowViewModel"
+             MinWidth="0">
+        <ScrollViewer x:Name="ShaderTabScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                        <Grid MinWidth="0" HorizontalAlignment="Stretch"
+                              MaxWidth="{Binding #ShaderTabScrollViewer.Viewport.Width}">
+                            <StackPanel Margin="0,12,0,0" Spacing="12" MinWidth="0" HorizontalAlignment="Stretch">
+                                <Border CornerRadius="8" Background="{Binding CardBackground}" BorderBrush="{Binding CardBorderBrush}" BorderThickness="1" Padding="12" MinWidth="0">
+                                    <StackPanel Spacing="10" MinWidth="0">
+                                        <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding Strings.ShaderPreviewLabPbrSection}" TextWrapping="Wrap" />
+                                        <ctrls:ReflowColumnsPanel MaxColumns="3" MinColumnWidth="240" ColumnSpacing="16" MinWidth="0">
+                                            <StackPanel Spacing="8" MinWidth="0">
+                                                <ctrls:FlyoutSection Header="{Binding Strings.Preview3DShadersSection}" FlyoutMaxWidth="720">
+                                                    <StackPanel Spacing="8">
+                                                        <CheckBox IsChecked="{Binding Preview3DEnableNormalMap, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DEnableNormalMapTooltip}">
+                                                            <TextBlock Text="{Binding Strings.Preview3DEnableNormalMap}" TextWrapping="Wrap" />
+                                                        </CheckBox>
+                                                        <CheckBox IsChecked="{Binding Preview3DEnableSpecularMap, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DEnableSpecularMapTooltip}">
+                                                            <TextBlock Text="{Binding Strings.Preview3DEnableSpecularMap}" TextWrapping="Wrap" />
+                                                        </CheckBox>
+                                                        <CheckBox IsChecked="{Binding Preview3DEnableSss, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DEnableSssTooltip}">
+                                                            <TextBlock Text="{Binding Strings.Preview3DEnableSss}" TextWrapping="Wrap" />
+                                                        </CheckBox>
+                                                        <CheckBox IsChecked="{Binding Preview3DEnableIbl, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DEnableIblTooltip}">
+                                                            <TextBlock Text="{Binding Strings.Preview3DEnableIbl}" TextWrapping="Wrap" />
+                                                        </CheckBox>
+                                                        <CheckBox IsChecked="{Binding Preview3DEnableGodRays, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DEnableGodRaysTooltip}">
+                                                            <TextBlock Text="{Binding Strings.Preview3DEnableGodRays}" TextWrapping="Wrap" />
+                                                        </CheckBox>
+                                                        <CheckBox IsChecked="{Binding Preview3DEnableVolumetricClouds, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DEnableVolumetricCloudsTooltip}">
+                                                            <TextBlock Text="{Binding Strings.Preview3DEnableVolumetricClouds}" TextWrapping="Wrap" />
+                                                        </CheckBox>
+                                                        <CheckBox IsChecked="{Binding Preview3DEnablePreviewTaa, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DEnablePreviewTaaTooltip}">
+                                                            <TextBlock Text="{Binding Strings.Preview3DEnablePreviewTaa}" TextWrapping="Wrap" />
+                                                        </CheckBox>
+                                                        <CheckBox IsChecked="{Binding Preview3DEnableParallax, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DEnableParallaxTooltip}">
+                                                            <TextBlock Text="{Binding Strings.Preview3DEnableParallax}" TextWrapping="Wrap" />
+                                                        </CheckBox>
+                                                    </StackPanel>
+                                                </ctrls:FlyoutSection>
+                                                <ctrls:FlyoutSection Header="{Binding Strings.Preview3DTaaSection}" FlyoutMaxWidth="720">
+                                                    <StackPanel Spacing="8">
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DTaaMode}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DTaaModeTooltip}" />
+                                                            <ComboBox Grid.Column="1" MinWidth="180" HorizontalAlignment="Left" ItemsSource="{Binding Preview3DTaaModeOptions}" SelectedIndex="{Binding Preview3DTaaMode, Mode=TwoWay}" IsEnabled="{Binding Preview3DEnablePreviewTaa}" ToolTip.Tip="{Binding Strings.Preview3DTaaModeTooltip}" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DTaaTemporalScale}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DTaaTemporalScaleTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.00" Maximum="1.25" SmallChange="0.02" LargeChange="0.10" TickFrequency="0.25" Value="{Binding Preview3DTaaTemporalScale, Mode=TwoWay}" Increment="0.02" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DTaaTemporalScaleTooltip}" IsEnabled="{Binding Preview3DEnablePreviewTaa}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DTaaJitterScale}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DTaaJitterScaleTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.00" Maximum="2.00" SmallChange="0.02" LargeChange="0.10" TickFrequency="0.25" Value="{Binding Preview3DTaaJitterScale, Mode=TwoWay}" Increment="0.02" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DTaaJitterScaleTooltip}" IsEnabled="{Binding Preview3DEnablePreviewTaa}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DTaaSourceFilterScale}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DTaaSourceFilterScaleTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.00" Maximum="2.00" SmallChange="0.02" LargeChange="0.10" TickFrequency="0.25" Value="{Binding Preview3DTaaSourceFilterScale, Mode=TwoWay}" Increment="0.02" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DTaaSourceFilterScaleTooltip}" IsEnabled="{Binding Preview3DEnablePreviewTaa}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DTaaEdgeBlendScale}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DTaaEdgeBlendScaleTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.00" Maximum="2.00" SmallChange="0.02" LargeChange="0.10" TickFrequency="0.25" Value="{Binding Preview3DTaaEdgeBlendScale, Mode=TwoWay}" Increment="0.02" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DTaaEdgeBlendScaleTooltip}" IsEnabled="{Binding Preview3DEnablePreviewTaa}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DTaaFxaaStrengthScale}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DTaaFxaaStrengthScaleTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.00" Maximum="5.00" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.50" Value="{Binding Preview3DTaaFxaaStrengthScale, Mode=TwoWay}" Increment="0.05" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DTaaFxaaStrengthScaleTooltip}" IsEnabled="{Binding Preview3DEnablePreviewTaa}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DTaaFxaaLumaEdgeScale}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DTaaFxaaLumaEdgeScaleTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.00" Maximum="2.00" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.50" Value="{Binding Preview3DTaaFxaaLumaEdgeScale, Mode=TwoWay}" Increment="0.05" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DTaaFxaaLumaEdgeScaleTooltip}" IsEnabled="{Binding Preview3DEnablePreviewTaa}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DTaaFxaaLumaThreshold}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DTaaFxaaLumaThresholdTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.001" Maximum="0.120" SmallChange="0.001" LargeChange="0.010" TickFrequency="0.02" Value="{Binding Preview3DTaaFxaaLumaThreshold, Mode=TwoWay}" Increment="0.001" FormatString="F3" ToolTip.Tip="{Binding Strings.Preview3DTaaFxaaLumaThresholdTooltip}" IsEnabled="{Binding Preview3DEnablePreviewTaa}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                    </StackPanel>
+                                                </ctrls:FlyoutSection>
+                                                <ctrls:FlyoutSection Header="{Binding Strings.Preview3DLightingSection}" FlyoutMaxWidth="720">
+                                                    <StackPanel Spacing="8">
+                                                        <CheckBox IsChecked="{Binding Preview3DEnableShadows, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DEnableShadowsTooltip}">
+                                                            <TextBlock Text="{Binding Strings.Preview3DEnableShadows}" TextWrapping="Wrap" />
+                                                        </CheckBox>
+                                                        <CheckBox IsChecked="{Binding Preview3DEnableShadowCascades, Mode=TwoWay}"
+                                                                  IsEnabled="{Binding Preview3DEnableShadows}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DEnableShadowCascadesTooltip}">
+                                                            <TextBlock Text="{Binding Strings.Preview3DEnableShadowCascades}" TextWrapping="Wrap" />
+                                                        </CheckBox>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DTimeOfDayHours}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DTimeOfDayHoursTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0" Maximum="24" SmallChange="0.25" LargeChange="1" TickFrequency="3" Value="{Binding Preview3DTimeOfDayHours, Mode=TwoWay}" Increment="0.25" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DTimeOfDayHoursTooltip}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <CheckBox IsChecked="{Binding Preview3DAnimateTimeOfDay, Mode=TwoWay}"
+                                                                  IsVisible="{Binding IsPreview3D}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DAnimateTimeOfDayTooltip}">
+                                                            <TextBlock Text="{Binding Strings.Preview3DAnimateTimeOfDay}" TextWrapping="Wrap" />
+                                                        </CheckBox>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DTimeOfDaySpeed}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DTimeOfDaySpeedTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.1" Maximum="4.0" SmallChange="0.1" LargeChange="0.5" TickFrequency="1.0" Value="{Binding Preview3DTimeOfDaySpeed, Mode=TwoWay}" Increment="0.1" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DTimeOfDaySpeedTooltip}" IsEnabled="{Binding Preview3DAnimateTimeOfDay}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DIblStrength}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DIblStrengthTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.0" Maximum="2.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.5" Value="{Binding Preview3DIblStrength, Mode=TwoWay}" Increment="0.05" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DIblStrengthTooltip}" IsEnabled="{Binding Preview3DEnableIbl}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                    </StackPanel>
+                                                </ctrls:FlyoutSection>
+                                                <ctrls:FlyoutSection Header="{Binding Strings.Preview3DSpritesSection}" FlyoutMaxWidth="720">
+                                                    <StackPanel Spacing="8">
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DSpriteThickness}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DSpriteThicknessTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="{x:Static stage:PreviewStageConstants.SpriteThicknessMin}" Maximum="{x:Static stage:PreviewStageConstants.SpriteThicknessMax}" SmallChange="{x:Static stage:PreviewStageConstants.SpriteThicknessStep}" LargeChange="0.01" TickFrequency="0.02" Value="{Binding Preview3DSpriteThickness, Mode=TwoWay}" Increment="0.002" FormatString="F3" ToolTip.Tip="{Binding Strings.Preview3DSpriteThicknessTooltip}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DSpritePlaneCount}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DSpritePlaneCountTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="1" Maximum="8" SmallChange="1" LargeChange="1" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding Preview3DSpritePlaneCount, Mode=TwoWay}" Increment="1" FormatString="0.##" ToolTip.Tip="{Binding Strings.Preview3DSpritePlaneCountTooltip}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                    </StackPanel>
+                                                </ctrls:FlyoutSection>
+                                            </StackPanel>
+                                            <StackPanel Spacing="8" MinWidth="0">
+                                                <ctrls:FlyoutSection Header="{Binding Strings.Preview3DAnimationSection}" FlyoutMaxWidth="720">
+                                                    <StackPanel Spacing="8">
+                                                        <CheckBox Content="{Binding Strings.Preview3DAutoRotate}"
+                                                                  IsChecked="{Binding Preview3DAutoRotate, Mode=TwoWay}"
+                                                                  IsEnabled="{Binding IsPreview3D}" />
+                                                        <CheckBox Content="{Binding Strings.Preview3DEnableEntityAnimation}"
+                                                                  IsChecked="{Binding Preview3DEnableEntityAnimation, Mode=TwoWay}"
+                                                                  IsEnabled="{Binding IsPreview3D}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DEnableEntityAnimationTooltip}" />
+                                                        <CheckBox Content="{Binding Strings.Preview3DPauseEntityIdleAnimation}"
+                                                                  IsChecked="{Binding Preview3DPauseEntityIdleAnimation, Mode=TwoWay}"
+                                                                  IsEnabled="{Binding Preview3DEnableEntityAnimation}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DPauseEntityIdleAnimationTooltip}" />
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DEntityAnimationSpeed}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DEntityAnimationSpeedTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.00" Maximum="4.00" SmallChange="0.05" LargeChange="0.20" TickFrequency="0.5" Value="{Binding Preview3DEntityAnimationSpeed, Mode=TwoWay}" Increment="0.05" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DEntityAnimationSpeedTooltip}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DEntityAnimationAmplitude}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DEntityAnimationAmplitudeTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.00" Maximum="2.00" SmallChange="0.05" LargeChange="0.10" TickFrequency="0.25" Value="{Binding Preview3DEntityAnimationAmplitude, Mode=TwoWay}" Increment="0.05" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DEntityAnimationAmplitudeTooltip}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                    </StackPanel>
+                                                </ctrls:FlyoutSection>
+                                                <ctrls:FlyoutSection Header="{Binding Strings.Preview3DEntitiesSection}" FlyoutMaxWidth="720">
+                                                    <StackPanel Spacing="8">
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DEntityAlphaMode}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DEntityAlphaModeTooltip}" />
+                                                            <ComboBox Grid.Column="1" MinWidth="160" HorizontalAlignment="Left" ItemsSource="{x:Static vm:MainWindowViewModel.Preview3DEntityAlphaModeOptions}" SelectedIndex="{Binding Preview3DEntityAlphaMode, Mode=TwoWay}" ToolTip.Tip="{Binding Strings.Preview3DEntityAlphaModeTooltip}" />
+                                                        </Grid>
+                                                        <CheckBox Content="{Binding Strings.Preview3DEnableEntityLabPbrShading}"
+                                                                  IsChecked="{Binding Preview3DEnableEntityLabPbrShading, Mode=TwoWay}"
+                                                                  IsEnabled="{Binding IsPreview3D}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DEnableEntityLabPbrShadingTooltip}" />
+                                                        <CheckBox Content="{Binding Strings.Preview3DEnableEntityParallax}"
+                                                                  IsChecked="{Binding Preview3DEnableEntityParallax, Mode=TwoWay}"
+                                                                  IsEnabled="{Binding IsPreview3D}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DEnableEntityParallaxTooltip}" />
+                                                    </StackPanel>
+                                                </ctrls:FlyoutSection>
+                                                <ctrls:FlyoutSection Header="{Binding Strings.Preview3DGrassSection}" FlyoutMaxWidth="720">
+                                                    <StackPanel Spacing="8">
+                                                        <TextBlock Text="{Binding Strings.Preview3DGrassColormap}" TextWrapping="Wrap" />
+                                                        <Image Source="{Binding Preview3DGrassColormapImage}"
+                                                               Stretch="Uniform"
+                                                               MaxHeight="72"
+                                                               HorizontalAlignment="Stretch" />
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DGrassColormapTemperature}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DGrassColormapTemperatureTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0" Maximum="1" SmallChange="0.01" LargeChange="0.1" TickFrequency="0.1" Value="{Binding Preview3DGrassColormapTemperature, Mode=TwoWay}" Increment="0.01" FormatString="0.##" ToolTip.Tip="{Binding Strings.Preview3DGrassColormapTemperatureTooltip}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DGrassColormapDownfall}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DGrassColormapDownfallTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0" Maximum="1" SmallChange="0.01" LargeChange="0.1" TickFrequency="0.1" Value="{Binding Preview3DGrassColormapDownfall, Mode=TwoWay}" Increment="0.01" FormatString="0.##" ToolTip.Tip="{Binding Strings.Preview3DGrassColormapDownfallTooltip}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <TextBlock Text="{Binding Preview3DGrassColormapSampleText}"
+                                                                   FontFamily="Consolas"
+                                                                   FontSize="11"
+                                                                   Opacity="0.85"
+                                                                   TextWrapping="Wrap" />
+                                                    </StackPanel>
+                                                </ctrls:FlyoutSection>
+                                            </StackPanel>
+                                            <StackPanel Spacing="8" MinWidth="0">
+                                                <ctrls:FlyoutSection Header="{Binding Strings.Preview3DParallaxSection}" FlyoutMaxWidth="720">
+                                                    <StackPanel Spacing="8">
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DParallaxHeightStrength}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DParallaxHeightStrengthTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.00" Maximum="1.00" SmallChange="0.005" LargeChange="0.05" TickFrequency="0.10" Value="{Binding Preview3DParallaxHeightStrength, Mode=TwoWay}" Increment="0.005" FormatString="F3" ToolTip.Tip="{Binding Strings.Preview3DParallaxHeightStrengthTooltip}" IsEnabled="{Binding Preview3DEnableParallax}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DParallaxTraceLayers}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DParallaxTraceLayersTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="8" Maximum="128" SmallChange="4" LargeChange="16" TickFrequency="8" IsSnapToTickEnabled="True" Value="{Binding Preview3DParallaxTraceLayers, Mode=TwoWay}" Increment="4" FormatString="0" ToolTip.Tip="{Binding Strings.Preview3DParallaxTraceLayersTooltip}" IsEnabled="{Binding Preview3DEnableParallax}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DParallaxRefineSteps}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DParallaxRefineStepsTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0" Maximum="8" SmallChange="1" LargeChange="1" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding Preview3DParallaxRefineSteps, Mode=TwoWay}" Increment="1" FormatString="0" ToolTip.Tip="{Binding Strings.Preview3DParallaxRefineStepsTooltip}" IsEnabled="{Binding Preview3DEnableParallax}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DParallaxMaxUvShift}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DParallaxMaxUvShiftTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.05" Maximum="0.75" SmallChange="0.01" LargeChange="0.05" TickFrequency="0.10" Value="{Binding Preview3DParallaxMaxUvShift, Mode=TwoWay}" Increment="0.01" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DParallaxMaxUvShiftTooltip}" IsEnabled="{Binding Preview3DEnableParallax}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <CheckBox IsChecked="{Binding Preview3DEnableTessellationDisplacement, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DEnableTessellationDisplacementTooltip}">
+                                                            <TextBlock Text="{Binding Strings.Preview3DEnableTessellationDisplacement}" TextWrapping="Wrap" />
+                                                        </CheckBox>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DTessellationLevel}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DTessellationLevelTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="1" Maximum="16" SmallChange="1" LargeChange="2" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding Preview3DTessellationLevel, Mode=TwoWay}" Increment="1" FormatString="0" ToolTip.Tip="{Binding Strings.Preview3DTessellationLevelTooltip}" IsEnabled="{Binding Preview3DEnableTessellationDisplacement}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DTessellationDisplacementStrength}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DTessellationDisplacementStrengthTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.00" Maximum="0.20" SmallChange="0.002" LargeChange="0.01" TickFrequency="0.02" Value="{Binding Preview3DTessellationDisplacementStrength, Mode=TwoWay}" Increment="0.002" FormatString="F3" ToolTip.Tip="{Binding Strings.Preview3DTessellationDisplacementStrengthTooltip}" IsEnabled="{Binding Preview3DEnableTessellationDisplacement}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <CheckBox IsChecked="{Binding Preview3DEnableParallaxShadow, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DEnableParallaxShadowTooltip}">
+                                                            <TextBlock Text="{Binding Strings.Preview3DEnableParallaxShadow}" TextWrapping="Wrap" />
+                                                        </CheckBox>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DParallaxShadowSamples}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DParallaxShadowSamplesTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="4" Maximum="64" SmallChange="2" LargeChange="8" TickFrequency="4" IsSnapToTickEnabled="True" Value="{Binding Preview3DParallaxShadowSamples, Mode=TwoWay}" Increment="2" FormatString="0" ToolTip.Tip="{Binding Strings.Preview3DParallaxShadowSamplesTooltip}" IsEnabled="{Binding Preview3DEnableParallaxShadow}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DParallaxShadowSoftness}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DParallaxShadowSoftnessTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.00" Maximum="4.00" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.50" Value="{Binding Preview3DParallaxShadowSoftness, Mode=TwoWay}" Increment="0.05" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DParallaxShadowSoftnessTooltip}" IsEnabled="{Binding Preview3DEnableParallaxShadow}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <CheckBox IsChecked="{Binding Preview3DEnableParallaxAo, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DEnableParallaxAoTooltip}">
+                                                            <TextBlock Text="{Binding Strings.Preview3DEnableParallaxAo}" TextWrapping="Wrap" />
+                                                        </CheckBox>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DParallaxAoStrength}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DParallaxAoStrengthTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.00" Maximum="2.00" SmallChange="0.02" LargeChange="0.10" TickFrequency="0.20" Value="{Binding Preview3DParallaxAoStrength, Mode=TwoWay}" Increment="0.02" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DParallaxAoStrengthTooltip}" IsEnabled="{Binding Preview3DEnableParallaxAo}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                    </StackPanel>
+                                                </ctrls:FlyoutSection>
+                                                <ctrls:FlyoutSection Header="{Binding Strings.Preview3DWorldSection}" FlyoutMaxWidth="720">
+                                                    <StackPanel Spacing="8">
+                                                        <CheckBox IsChecked="{Binding Preview3DShowGrid, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DShowGridTooltip}">
+                                                            <TextBlock Text="{Binding Strings.Preview3DShowGrid}" TextWrapping="Wrap" />
+                                                        </CheckBox>
+                                                        <CheckBox IsChecked="{Binding Preview3DShowGroundMesh, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DShowGroundMeshTooltip}">
+                                                            <TextBlock Text="{Binding Strings.Preview3DShowGroundMesh}" TextWrapping="Wrap" />
+                                                        </CheckBox>
+                                                    </StackPanel>
+                                                </ctrls:FlyoutSection>
+                                                <ctrls:FlyoutSection Header="{Binding Strings.Preview3DCameraExpanderSection}" FlyoutMaxWidth="720">
+                                                    <StackPanel Spacing="8">
+                                                        <CheckBox Content="{Binding Strings.Preview3DShowAxes}"
+                                                                  IsChecked="{Binding Preview3DShowAxes, Mode=TwoWay}"
+                                                                  IsEnabled="{Binding IsPreview3D}" />
+                                                        <CheckBox Content="{Binding Strings.Preview3DShowFpsCounter}"
+                                                                  IsChecked="{Binding Preview3DShowFpsCounter, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DShowFpsCounterTooltip}"
+                                                                  IsEnabled="{Binding IsPreview3D}" />
+                                                        <CheckBox Content="{Binding Strings.Preview3DCapFpsAt60}"
+                                                                  IsChecked="{Binding Preview3DCapFpsAt60, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DCapFpsAt60Tooltip}"
+                                                                  IsEnabled="{Binding IsPreview3D}" />
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DCameraOrbitSensitivity}" TextWrapping="Wrap" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.001" Maximum="0.04" SmallChange="0.0005" LargeChange="0.002" Value="{Binding Preview3DCameraOrbitSensitivity, Mode=TwoWay}" Increment="0.0005" FormatString="0.##" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DCameraPanSensitivity}" TextWrapping="Wrap" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.0005" Maximum="0.02" SmallChange="0.0002" LargeChange="0.001" Value="{Binding Preview3DCameraPanSensitivity, Mode=TwoWay}" Increment="0.0002" FormatString="0.##" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DCameraZoomSensitivity}" TextWrapping="Wrap" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.04" Maximum="0.35" SmallChange="0.01" LargeChange="0.03" Value="{Binding Preview3DCameraZoomSensitivity, Mode=TwoWay}" Increment="0.01" FormatString="0.##" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DCameraOrbitBoomDistance}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DCameraOrbitBoomDistanceTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="1.05" Maximum="120" SmallChange="0.25" LargeChange="2" Value="{Binding Preview3DCameraOrbitBoomDistance, Mode=TwoWay}" Increment="0.25" FormatString="0.##" ToolTip.Tip="{Binding Strings.Preview3DCameraOrbitBoomDistanceTooltip}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DCameraFlyLookSensitivity}" TextWrapping="Wrap" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.001" Maximum="0.04" SmallChange="0.0005" LargeChange="0.002" Value="{Binding Preview3DCameraFlyLookSensitivity, Mode=TwoWay}" Increment="0.0005" FormatString="0.##" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DCameraFlyMoveSpeed}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DCameraFlyMoveSpeedTooltip}" />
+                                                            <ctrls:OverlaySlider Grid.Column="1" Minimum="0.25" Maximum="4" SmallChange="0.05" LargeChange="0.25" Value="{Binding Preview3DCameraFlyMoveSpeed, Mode=TwoWay}" Increment="0.05" FormatString="0.##" ToolTip.Tip="{Binding Strings.Preview3DCameraFlyMoveSpeedTooltip}" HorizontalAlignment="Left" />
+                                                        </Grid>
+                                                        <CheckBox Content="{Binding Strings.Preview3DCameraInvertLookY}"
+                                                                  IsChecked="{Binding Preview3DCameraInvertLookY, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DCameraInvertLookYTooltip}" />
+                                                        <CheckBox Content="{Binding Strings.Preview3DCameraFlySmoothAcceleration}"
+                                                                  IsChecked="{Binding Preview3DCameraFlySmoothAcceleration, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{Binding Strings.Preview3DCameraFlySmoothAccelerationTooltip}" />
+                                                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DCameraResetKey}" TextWrapping="Wrap" />
+                                                            <ComboBox Grid.Column="1" MinWidth="140" HorizontalAlignment="Left"
+                                                                      ItemsSource="{Binding Preview3DCameraResetKeyChoices}"
+                                                                      SelectedItem="{Binding Preview3DCameraResetKey, Mode=TwoWay}" />
+                                                        </Grid>
+                                                    </StackPanel>
+                                                </ctrls:FlyoutSection>
+                                            </StackPanel>
+                                        </ctrls:ReflowColumnsPanel>
+
+                                        <Border Margin="0,8,0,0" Padding="0,8,0,0"
+                                                BorderThickness="0,1,0,0"
+                                                BorderBrush="{Binding CardBorderBrush}">
+                                            <StackPanel Spacing="10" MinWidth="0">
+                                                <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding Strings.Preview3DSkyDomeSection}" TextWrapping="Wrap" />
+                                                <ctrls:ReflowColumnsPanel MaxColumns="3" MinColumnWidth="240" ColumnSpacing="16" MinWidth="0">
+                                                    <StackPanel Spacing="8" MinWidth="0">
+                                                        <ctrls:FlyoutSection Header="{Binding Strings.Preview3DAtmosphereSection}" FlyoutMaxWidth="720">
+                                                            <StackPanel Spacing="8">
+                                                                <CheckBox IsChecked="{Binding Preview3DEnableAtmosphericSky, Mode=TwoWay}"
+                                                                          ToolTip.Tip="{Binding Strings.Preview3DEnableAtmosphericSkyTooltip}">
+                                                                    <TextBlock Text="{Binding Strings.Preview3DEnableAtmosphericSky}" TextWrapping="Wrap" />
+                                                                </CheckBox>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DAtmosphereTurbidity}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereTurbidityTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="1.2" Maximum="10.0" SmallChange="0.1" LargeChange="0.5" TickFrequency="1.0" Value="{Binding Preview3DAtmosphereTurbidity, Mode=TwoWay}" Increment="0.1" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereTurbidityTooltip}" IsEnabled="{Binding Preview3DEnableAtmosphericSky}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DAtmosphereHorizonFalloff}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereHorizonFalloffTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="0.25" Maximum="4.0" SmallChange="0.05" LargeChange="0.2" TickFrequency="0.5" Value="{Binding Preview3DAtmosphereHorizonFalloff, Mode=TwoWay}" Increment="0.05" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereHorizonFalloffTooltip}" IsEnabled="{Binding Preview3DEnableAtmosphericSky}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DAtmosphereSkyExposure}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSkyExposureTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="0.1" Maximum="3.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.5" Value="{Binding Preview3DAtmosphereSkyExposure, Mode=TwoWay}" Increment="0.05" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSkyExposureTooltip}" IsEnabled="{Binding Preview3DEnableAtmosphericSky}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DHorizonFogStrength}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DHorizonFogStrengthTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="0.0" Maximum="2.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.5" Value="{Binding Preview3DHorizonFogStrength, Mode=TwoWay}" Increment="0.05" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DHorizonFogStrengthTooltip}" IsEnabled="{Binding Preview3DEnableAtmosphericSky}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DGodRayStrength}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DGodRayStrengthTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="0.0" Maximum="2.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.5" Value="{Binding Preview3DGodRayStrength, Mode=TwoWay}" Increment="0.05" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DGodRayStrengthTooltip}" IsEnabled="{Binding Preview3DEnableGodRays}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                            </StackPanel>
+                                                        </ctrls:FlyoutSection>
+                                                        <ctrls:FlyoutSection Header="{Binding Strings.Preview3DCloudSection}" IsEnabled="{Binding Preview3DEnableVolumetricClouds}" FlyoutMaxWidth="720">
+                                                            <StackPanel Spacing="8">
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DVolumetricQuality}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DVolumetricQualityTooltip}" />
+                                                                    <ComboBox Grid.Column="1" MinWidth="160" HorizontalAlignment="Left" ItemsSource="{Binding Preview3DVolumetricQualityOptions}" SelectedIndex="{Binding Preview3DVolumetricQuality, Mode=TwoWay}" ToolTip.Tip="{Binding Strings.Preview3DVolumetricQualityTooltip}" />
+                                                                </Grid>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DCloudDensity}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DCloudDensityTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="0" Maximum="2" SmallChange="0.02" LargeChange="0.1" Value="{Binding Preview3DCloudDensity, Mode=TwoWay}" Increment="0.02" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DCloudDensityTooltip}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DCloudCoverageScale}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DCloudCoverageScaleTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="0" Maximum="2" SmallChange="0.02" LargeChange="0.1" Value="{Binding Preview3DCloudCoverageScale, Mode=TwoWay}" Increment="0.02" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DCloudCoverageScaleTooltip}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DCloudLayerHeight}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DCloudLayerHeightTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="-12" Maximum="48" SmallChange="0.5" LargeChange="4" Value="{Binding Preview3DCloudLayerHeight, Mode=TwoWay}" Increment="0.5" FormatString="F1" ToolTip.Tip="{Binding Strings.Preview3DCloudLayerHeightTooltip}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DCloudVolumeHeight}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DCloudVolumeHeightTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="4" Maximum="96" SmallChange="1" LargeChange="8" Value="{Binding Preview3DCloudVolumeHeight, Mode=TwoWay}" Increment="1" FormatString="F0" ToolTip.Tip="{Binding Strings.Preview3DCloudVolumeHeightTooltip}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DCloudVolumeSize}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DCloudVolumeSizeTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="8" Maximum="256" SmallChange="4" LargeChange="32" Value="{Binding Preview3DCloudVolumeSize, Mode=TwoWay}" Increment="4" FormatString="F0" ToolTip.Tip="{Binding Strings.Preview3DCloudVolumeSizeTooltip}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DCloudWindSpeed}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DCloudWindSpeedTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="0" Maximum="12" SmallChange="0.1" LargeChange="1" Value="{Binding Preview3DCloudWindSpeed, Mode=TwoWay}" Increment="0.1" FormatString="F1" ToolTip.Tip="{Binding Strings.Preview3DCloudWindSpeedTooltip}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DCloudWindHeading}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DCloudWindHeadingTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="-180" Maximum="180" SmallChange="1" LargeChange="15" Value="{Binding Preview3DCloudWindHeadingDegrees, Mode=TwoWay}" Increment="1" FormatString="F0" ToolTip.Tip="{Binding Strings.Preview3DCloudWindHeadingTooltip}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DCloudCirrusStrength}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DCloudCirrusStrengthTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="0" Maximum="2" SmallChange="0.02" LargeChange="0.1" Value="{Binding Preview3DCloudCirrusStrength, Mode=TwoWay}" Increment="0.02" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DCloudCirrusStrengthTooltip}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                            </StackPanel>
+                                                        </ctrls:FlyoutSection>
+                                                    </StackPanel>
+                                                    <StackPanel Spacing="8" MinWidth="0">
+                                                        <ctrls:FlyoutSection Header="{Binding Strings.Preview3DSunSection}" FlyoutMaxWidth="720">
+                                                            <StackPanel Spacing="8">
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DAtmosphereSunIntensity}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSunIntensityTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="0.2" Maximum="64.0" SmallChange="0.2" LargeChange="1.0" TickFrequency="4.0" Value="{Binding Preview3DAtmosphereSunIntensity, Mode=TwoWay}" Increment="0.2" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSunIntensityTooltip}" IsEnabled="{Binding Preview3DEnableAtmosphericSky}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DAtmosphereSunDiscBrightness}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSunDiscBrightnessTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="0.0" Maximum="4.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.5" Value="{Binding Preview3DAtmosphereSunDiscBrightness, Mode=TwoWay}" Increment="0.05" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSunDiscBrightnessTooltip}" IsEnabled="{Binding Preview3DEnableAtmosphericSky}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DAtmosphereSunDiscStrength}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSunDiscStrengthTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="0.0" Maximum="2.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.5" Value="{Binding Preview3DAtmosphereSunDiscStrength, Mode=TwoWay}" Increment="0.05" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSunDiscStrengthTooltip}" IsEnabled="{Binding Preview3DEnableAtmosphericSky}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DAtmosphereSunDiscSize}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSunDiscSizeTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="0.05" Maximum="2.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.5" Value="{Binding Preview3DAtmosphereSunDiscSize, Mode=TwoWay}" Increment="0.05" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereSunDiscSizeTooltip}" IsEnabled="{Binding Preview3DEnableAtmosphericSky}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                            </StackPanel>
+                                                        </ctrls:FlyoutSection>
+                                                        <ctrls:FlyoutSection Header="{Binding Strings.Preview3DMoonSection}" FlyoutMaxWidth="720">
+                                                            <StackPanel Spacing="8">
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DAtmosphereMoonDiscStrength}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonDiscStrengthTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="0.0" Maximum="4.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.5" Value="{Binding Preview3DAtmosphereMoonDiscStrength, Mode=TwoWay}" Increment="0.05" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonDiscStrengthTooltip}" IsEnabled="{Binding Preview3DEnableAtmosphericSky}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DAtmosphereMoonDiscSize}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonDiscSizeTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="0.05" Maximum="3.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.5" Value="{Binding Preview3DAtmosphereMoonDiscSize, Mode=TwoWay}" Increment="0.05" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonDiscSizeTooltip}" IsEnabled="{Binding Preview3DEnableAtmosphericSky}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DAtmosphereMoonGlowStrength}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonGlowStrengthTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="0.0" Maximum="4.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.5" Value="{Binding Preview3DAtmosphereMoonGlowStrength, Mode=TwoWay}" Increment="0.05" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonGlowStrengthTooltip}" IsEnabled="{Binding Preview3DEnableAtmosphericSky}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DAtmosphereMoonTextureSharpness}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonTextureSharpnessTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="0.0" Maximum="4.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.5" Value="{Binding Preview3DAtmosphereMoonTextureSharpness, Mode=TwoWay}" Increment="0.05" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DAtmosphereMoonTextureSharpnessTooltip}" IsEnabled="{Binding Preview3DEnableAtmosphericSky}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0" IsVisible="{Binding IsPreview3D}">
+                                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Preview3DMoonWorldLightIntensity}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.Preview3DMoonWorldLightIntensityTooltip}" />
+                                                                    <ctrls:OverlaySlider Grid.Column="1" Minimum="0.0" Maximum="8.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="1.0" Value="{Binding Preview3DMoonWorldLightIntensity, Mode=TwoWay}" Increment="0.05" FormatString="F2" ToolTip.Tip="{Binding Strings.Preview3DMoonWorldLightIntensityTooltip}" HorizontalAlignment="Left" />
+                                                                </Grid>
+                                                            </StackPanel>
+                                                        </ctrls:FlyoutSection>
+                                                    </StackPanel>
+                                                </ctrls:ReflowColumnsPanel>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </ScrollViewer>
+</UserControl>

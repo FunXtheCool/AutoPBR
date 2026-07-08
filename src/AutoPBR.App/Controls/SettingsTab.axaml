@@ -1,0 +1,140 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AutoPBR.App.ViewModels"
+             xmlns:ctrls="using:AutoPBR.App.Controls"
+             x:Class="AutoPBR.App.Controls.SettingsTab"
+             x:DataType="vm:MainWindowViewModel"
+             MinWidth="0">
+        <ScrollViewer x:Name="SettingsTabScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                    <Grid MinWidth="0" HorizontalAlignment="Stretch"
+                          MaxWidth="{Binding #SettingsTabScrollViewer.Viewport.Width}">
+                    <StackPanel Margin="0,12,0,0" Spacing="12" MinWidth="0" HorizontalAlignment="Stretch">
+                        <Border CornerRadius="8" Background="{Binding CardBackground}" BorderBrush="{Binding CardBorderBrush}" BorderThickness="1" Padding="12" MinWidth="0">
+                            <StackPanel Spacing="10" MinWidth="0">
+                                <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding Strings.Output}" TextWrapping="Wrap" />
+                                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8" MinWidth="0">
+                                    <Button Grid.Row="0" Grid.Column="0"
+                                            VerticalAlignment="Center"
+                                            Content="{Binding Strings.Browse}"
+                                            Click="BrowseOutput_Click" />
+                                    <TextBox Grid.Row="0" Grid.Column="1" Classes="path-entry" MinWidth="0"
+                                             Watermark="{Binding Strings.OutputFolderWatermark}"
+                                             Text="{Binding OutputDirectory, Mode=TwoWay}" />
+
+                                    <TextBox Grid.Row="1" Grid.Column="1" Classes="path-entry" MinWidth="0"
+                                             IsReadOnly="True" Watermark="{Binding Strings.OutputPathWatermark}"
+                                             Text="{Binding OutputZipPath}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border CornerRadius="8" Background="{Binding CardBackground}" BorderBrush="{Binding CardBorderBrush}" BorderThickness="1" Padding="12" MinWidth="0">
+                            <StackPanel Spacing="10" MinWidth="0">
+                                <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding Strings.Engine}" TextWrapping="Wrap" />
+
+                                <Grid RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="10" MinWidth="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" MinWidth="0" MaxWidth="720" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.MaxThreads}"
+                                               ToolTip.Tip="{Binding Strings.MaxThreadsTooltip}" />
+                                    <ctrls:OverlaySlider Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="{Binding MaxThreadsMax}" SmallChange="1" LargeChange="1" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding MaxThreads, Mode=TwoWay}" Increment="1" FormatString="0.##" ToolTip.Tip="{Binding Strings.MaxThreadsTooltip}" HorizontalAlignment="Left" />
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.TempFolder}"
+                                               ToolTip.Tip="{Binding Strings.TempFolderTooltip}" />
+                                    <TextBox Grid.Row="1" Grid.Column="1" Classes="path-entry" MinWidth="0" Margin="0,2,0,0"
+                                             Watermark="{Binding Strings.TempFolderWatermark}"
+                                             Text="{Binding TempDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip.Tip="{Binding Strings.TempFolderTooltip}" />
+                                    <TextBlock Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Text=" " />
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.MinecraftAssetsFolder}"
+                                               ToolTip.Tip="{Binding Strings.MinecraftAssetsFolderTooltip}" />
+                                    <TextBox Grid.Row="2" Grid.Column="1" Classes="path-entry" MinWidth="0" Margin="0,2,0,0"
+                                             Watermark="{Binding Strings.MinecraftAssetsFolderWatermark}"
+                                             Text="{Binding MinecraftAssetsDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip.Tip="{Binding Strings.MinecraftAssetsFolderTooltip}" />
+                                    <Button Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" Margin="8,2,0,0"
+                                            Content="{Binding Strings.Browse}"
+                                            Click="BrowseMinecraftAssets_Click"
+                                            ToolTip.Tip="{Binding Strings.MinecraftAssetsFolderTooltip}" />
+                                </Grid>
+
+                                <CheckBox IsChecked="{Binding UseLegacyExtractor, Mode=TwoWay}"
+                                    ToolTip.Tip="{Binding Strings.UseLegacyExtractorTooltip}">
+                                    <TextBlock Text="{Binding Strings.UseLegacyExtractor}" TextWrapping="Wrap" />
+                                </CheckBox>
+
+                                <CheckBox IsChecked="{Binding PreferOnnxTensorRtExecutionProvider, Mode=TwoWay}"
+                                    ToolTip.Tip="{Binding Strings.OnnxPreferTensorRtTooltip}">
+                                    <TextBlock Text="{Binding Strings.OnnxPreferTensorRt}" TextWrapping="Wrap" />
+                                </CheckBox>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock VerticalAlignment="Center" Text="{Binding Strings.DebugMode}" TextWrapping="Wrap" />
+                                    <ToggleSwitch VerticalAlignment="Center"
+                                                  OnContent=""
+                                                  OffContent=""
+                                                  IsChecked="{Binding DebugMode, Mode=TwoWay}" />
+                                </StackPanel>
+
+                                <Button HorizontalAlignment="Left"
+                                        Command="{Binding ForceInvalidateShaderCacheCommand}"
+                                        ToolTip.Tip="{Binding Strings.ForceShaderCacheInvalidationTooltip}">
+                                    <TextBlock Text="{Binding Strings.ForceShaderCacheInvalidation}" TextWrapping="Wrap" />
+                                </Button>
+                            </StackPanel>
+                        </Border>
+
+                        <Border CornerRadius="8" Background="{Binding CardBackground}" BorderBrush="{Binding CardBorderBrush}" BorderThickness="1" Padding="12" MinWidth="0">
+                            <StackPanel Spacing="10" MinWidth="0">
+                                <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding Strings.Appearance}" TextWrapping="Wrap" />
+                                <WrapPanel Orientation="Horizontal" ItemSpacing="16" LineSpacing="8">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock VerticalAlignment="Center" Text="{Binding Strings.ColorScheme}"
+                                                   ToolTip.Tip="{Binding Strings.UiThemeTooltip}" />
+                                        <ComboBox Width="220" ItemsSource="{Binding ColorSchemeOptions}"
+                                            SelectedItem="{Binding SelectedColorSchemeOption, Mode=TwoWay}"
+                                            ToolTip.Tip="{Binding Strings.UiThemeTooltip}">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate x:DataType="vm:FoliageModeOption">
+                                                    <TextBlock Text="{Binding DisplayName}" />
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock VerticalAlignment="Center" Text="{Binding Strings.Language}"
+                                                   ToolTip.Tip="{Binding Strings.UiLanguageTooltip}" />
+                                        <ComboBox Width="160" ItemsSource="{Binding SupportedLanguages}"
+                                            SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
+                                            ToolTip.Tip="{Binding Strings.UiLanguageTooltip}">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate x:DataType="vm:LanguageOption">
+                                                    <TextBlock Text="{Binding DisplayName}" />
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock VerticalAlignment="Center" Text="{Binding Strings.UiScaling}"
+                                                   ToolTip.Tip="{Binding Strings.UiScalingTooltip}" />
+                                        <ComboBox Width="120" MinWidth="100" MaxWidth="160" VerticalAlignment="Center"
+                                                  ItemsSource="{Binding UiScaleOptions}"
+                                                  SelectedItem="{Binding SelectedUiScaleOption, Mode=TwoWay}"
+                                                  ToolTip.Tip="{Binding Strings.UiScalingTooltip}">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate x:DataType="vm:FoliageModeOption">
+                                                    <TextBlock Text="{Binding DisplayName}" />
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </StackPanel>
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                    </Grid>
+                    </ScrollViewer>
+</UserControl>

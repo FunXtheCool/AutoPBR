@@ -1,0 +1,229 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AutoPBR.App.ViewModels"
+             xmlns:ctrls="using:AutoPBR.App.Controls"
+             x:Class="AutoPBR.App.Controls.PreviewSidebarPanel"
+             x:DataType="vm:MainWindowViewModel"
+             MinWidth="0"
+             MinHeight="0"
+             VerticalAlignment="Stretch"
+             ClipToBounds="True"
+             Background="{Binding CardBackground}"
+             BorderBrush="{Binding CardBorderBrush}"
+             BorderThickness="1,0,0,0"
+             Padding="12">
+    <UserControl.Resources>
+        <StreamGeometry x:Key="PreviewCameraHelpIcon">M8,1.33333333 C4.318,1.33333333 1.33333333,4.318 1.33333333,8 C1.33333333,11.682 4.318,14.6666667 8,14.6666667 C11.682,14.6666667 14.6666667,11.682 14.6666667,8 C14.6666667,4.318 11.682,1.33333333 8,1.33333333 Z M8.33333333,11.6666667 C8.33333333,12.2186667 7.88533333,12.6666667 7.33333333,12.6666667 C6.78133333,12.6666667 6.33333333,12.2186667 6.33333333,11.6666667 C6.33333333,11.1146667 6.78133333,10.6666667 7.33333333,10.6666667 C7.88533333,10.6666667 8.33333333,11.1146667 8.33333333,11.6666667 Z M9.16666667,6.11333333 C8.94761117,5.44971417 8.3582405,4.9664335 7.66666667,4.96666667 C6.74619083,4.96666667 6,5.7128575 6,6.63333333 L6.96666667,6.63333333 C6.96666667,6.24652333 7.27985683,5.93333333 7.66666667,5.93333333 C8.0534765,5.93333333 8.36666667,6.24652333 8.36666667,6.63333333 C8.36666667,6.930215 8.18204833,7.19117167 7.91122667,7.30318 C7.538535,7.45799833 7.26666667,7.83007 7.26666667,8.25466667 L7.26666667,8.63333333 L8.23333333,8.63333333 L8.23333333,8.25466667 C8.23333333,7.99381 8.37773833,7.75453 8.60958,7.63518 C9.090465,7.385425 9.4,6.87922833 9.4,6.32333333 C9.4,6.24548 9.39189667,6.16988833 9.37664667,6.09711 L9.16666667,6.11333333 Z</StreamGeometry>
+    </UserControl.Resources>
+        <Grid RowDefinitions="Auto,2*,Auto,1*" RowSpacing="8" MinWidth="0" MinHeight="0" ClipToBounds="True">
+                    <StackPanel Orientation="Vertical" Spacing="4" MinWidth="0">
+                        <TextBlock Text="{Binding Strings.PreviewPanelTitle}" FontWeight="SemiBold" Foreground="{Binding ForegroundBrush}" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding PreviewTextureName}"
+                                   Foreground="{Binding ForegroundBrush}"
+                                   TextTrimming="CharacterEllipsis"
+                                   TextWrapping="NoWrap"
+                                   Opacity="0.9" />
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" VerticalAlignment="Center" MinWidth="0">
+                            <WrapPanel Grid.Column="0"
+                                       Orientation="Horizontal"
+                                       ItemSpacing="8"
+                                       LineSpacing="6"
+                                       VerticalAlignment="Center"
+                                       MinWidth="0">
+                                <TextBlock Text="{Binding Strings.PreviewModeLabel}"
+                                           VerticalAlignment="Center"
+                                           Foreground="{Binding ForegroundBrush}"
+                                           Opacity="0.85"
+                                           TextWrapping="Wrap" />
+                                <ComboBox MinWidth="100"
+                                          MaxWidth="200"
+                                          SelectedIndex="{Binding PreviewDisplayMode}"
+                                          VerticalAlignment="Center">
+                                    <ComboBoxItem Content="{Binding Strings.PreviewMode2D}" />
+                                    <ComboBoxItem Content="{Binding Strings.PreviewMode3D}" />
+                                </ComboBox>
+                                <Button Content="{Binding Strings.UvDebugButton}"
+                                        VerticalAlignment="Center"
+                                        Padding="10,2"
+                                        IsVisible="{Binding DebugMode}"
+                                        Click="OpenUvDebugWindow_Click" />
+                                <Button Content="{Binding Strings.EntityDebugButton}"
+                                        VerticalAlignment="Center"
+                                        Padding="10,2"
+                                        IsVisible="{Binding DebugMode}"
+                                        Click="OpenEntityPreviewDebugWindow_Click" />
+                            </WrapPanel>
+                            <Button Grid.Column="1"
+                                    Classes="preview-help-btn"
+                                    VerticalAlignment="Center"
+                                    IsVisible="{Binding IsPreview3D}"
+                                    Background="{Binding CardBackground}"
+                                    BorderBrush="{Binding CardBorderBrush}"
+                                    BorderThickness="1"
+                                    ToolTip.Tip="{Binding Strings.Preview3DCameraSection}"
+                                    Click="OpenPreview3DCameraHelpWindow_Click">
+                                <PathIcon Width="15"
+                                          Height="15"
+                                          Foreground="{Binding ForegroundBrush}"
+                                          Data="{StaticResource PreviewCameraHelpIcon}" />
+                            </Button>
+                        </Grid>
+                        <Border IsVisible="{Binding PreviewBrickProbeDebug}"
+                                CornerRadius="4"
+                                BorderBrush="{Binding CardBorderBrush}"
+                                BorderThickness="1"
+                                Padding="6"
+                                MaxHeight="140">
+                            <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                                          VerticalScrollBarVisibility="Auto">
+                                <TextBlock Text="{Binding PreviewBrickProbeDebugText}"
+                                           FontFamily="Consolas"
+                                           FontSize="11"
+                                           Foreground="{Binding ForegroundBrush}"
+                                           TextWrapping="Wrap" />
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+                    <Grid Grid.Row="1" ClipToBounds="True" MinHeight="80">
+                        <Image IsVisible="{Binding IsPreview2D}"
+                               Source="{Binding PreviewImage}"
+                               Stretch="Uniform" />
+                        <ctrls:GlPbrPreviewControl x:Name="GlPbrPreview"
+                                                   IsVisible="{Binding IsPreview3D}"
+                                                   HorizontalAlignment="Stretch"
+                                                   VerticalAlignment="Stretch"
+                                                   MinHeight="120" />
+                        <Border IsVisible="{Binding Preview3DGpuInitOverlayVisible}"
+                                Background="#AA101018"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                ZIndex="3">
+                            <StackPanel VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        Spacing="8">
+                                <TextBlock FontSize="13"
+                                           Foreground="#F0FFFFFF"
+                                           HorizontalAlignment="Center"
+                                           Text="{Binding Preview3DGpuInitOverlayText}" />
+                                <ProgressBar Width="220"
+                                             Height="6"
+                                             Minimum="0"
+                                             Maximum="1"
+                                             Value="{Binding Preview3DGpuInitProgressFraction}"
+                                             IsIndeterminate="{Binding Preview3DGpuInitProgressIndeterminate}"
+                                             Foreground="#88FFFFFF"
+                                             Background="#33FFFFFF" />
+                            </StackPanel>
+                        </Border>
+                        <TextBlock IsVisible="{Binding IsPreview3D}"
+                                   HorizontalAlignment="Left"
+                                   VerticalAlignment="Top"
+                                   Margin="8"
+                                   ZIndex="2"
+                                   FontFamily="Consolas"
+                                   FontSize="11"
+                                   Foreground="#E8FFFFFF"
+                                   Text="{Binding Preview3DCameraDebugText}"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="520" />
+                        <Border IsVisible="{Binding IsPreview3DFpsCounterVisible}"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
+                                Margin="8"
+                                ZIndex="2"
+                                Background="#66000000"
+                                CornerRadius="4"
+                                Padding="6,3">
+                            <TextBlock FontFamily="Consolas"
+                                       FontSize="12"
+                                       Foreground="#F0FFFFFF"
+                                       Text="{Binding Preview3DFpsCounterText}" />
+                        </Border>
+                    </Grid>
+                    <StackPanel Grid.Row="2"
+                                Orientation="Vertical"
+                                Spacing="6"
+                                VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="8"
+                                    VerticalAlignment="Center"
+                                    IsVisible="{Binding IsPreviewPoseSelectorVisible}">
+                            <TextBlock Text="{Binding Strings.PreviewPoseLabel}"
+                                       VerticalAlignment="Center"
+                                       Foreground="{Binding ForegroundBrush}"
+                                       Opacity="0.85" />
+                            <ComboBox MinWidth="220"
+                                      ItemsSource="{Binding PreviewPoseOptions}"
+                                      SelectedValue="{Binding SelectedPreviewPoseId, Mode=TwoWay}"
+                                      SelectedValueBinding="{Binding Id}"
+                                      DisplayMemberBinding="{Binding DisplayName}"
+                                      VerticalAlignment="Center" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="8"
+                                    VerticalAlignment="Center"
+                                    IsVisible="{Binding IsPreviewSizeSelectorVisible}">
+                            <TextBlock Text="{Binding Strings.PreviewSizeLabel}"
+                                       VerticalAlignment="Center"
+                                       Foreground="{Binding ForegroundBrush}"
+                                       Opacity="0.85" />
+                            <ComboBox MinWidth="160"
+                                      ItemsSource="{Binding PreviewSizeOptions}"
+                                      SelectedValue="{Binding SelectedPreviewSizeId, Mode=TwoWay}"
+                                      SelectedValueBinding="{Binding Id}"
+                                      DisplayMemberBinding="{Binding DisplayName}"
+                                      VerticalAlignment="Center" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="8"
+                                    VerticalAlignment="Center"
+                                    IsVisible="{Binding IsPreviewContextTypeSelectorVisible}">
+                            <TextBlock Text="{Binding Strings.PreviewContextTypeLabel}"
+                                       VerticalAlignment="Center"
+                                       Foreground="{Binding ForegroundBrush}"
+                                       Opacity="0.85" />
+                            <ComboBox MinWidth="180"
+                                      ItemsSource="{Binding PreviewContextTypeOptions}"
+                                      SelectedValue="{Binding SelectedPreviewContextTypeId, Mode=TwoWay}"
+                                      SelectedValueBinding="{Binding Id}"
+                                      DisplayMemberBinding="{Binding DisplayName}"
+                                      VerticalAlignment="Center" />
+                        </StackPanel>
+                    </StackPanel>
+                    <Grid Grid.Row="3" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="6" MinWidth="0" MinHeight="0">
+                        <TextBlock Text="{Binding ConversionScanDebugText}"
+                                   Foreground="{Binding ForegroundBrush}"
+                                   Opacity="0.78"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"
+                                   IsVisible="{Binding IsConverting}" />
+                        <TextBlock Grid.Row="1" Text="{Binding ExploreMlDebugText}"
+                                   Foreground="{Binding ForegroundBrush}"
+                                   Opacity="0.78"
+                                   FontSize="11"
+                                   TextWrapping="Wrap" />
+                        <WrapPanel Grid.Row="2" Orientation="Horizontal" ItemSpacing="8" LineSpacing="6" VerticalAlignment="Center">
+                            <TextBlock VerticalAlignment="Center"
+                                       FontWeight="SemiBold"
+                                       Foreground="{Binding ForegroundBrush}"
+                                       Text="{Binding Strings.Log}"
+                                       TextWrapping="Wrap" />
+                            <Button Content="{Binding Strings.OpenLogFolder}"
+                                    Padding="8,2"
+                                    VerticalAlignment="Center"
+                                    Click="OpenLogFolder_Click" />
+                        </WrapPanel>
+                        <Border Grid.Row="3" CornerRadius="6" BorderBrush="{Binding CardBorderBrush}" BorderThickness="1" Padding="6" MinHeight="0">
+                            <ScrollViewer x:Name="LogScrollViewer"
+                                          HorizontalScrollBarVisibility="Disabled"
+                                          VerticalScrollBarVisibility="Auto"
+                                          MinHeight="72">
+                                <SelectableTextBlock Text="{Binding LogText}"
+                                                     FontFamily="Consolas"
+                                                     FontSize="11"
+                                                     TextWrapping="Wrap" />
+                            </ScrollViewer>
+                        </Border>
+                    </Grid>
+                </Grid>
+</UserControl>
