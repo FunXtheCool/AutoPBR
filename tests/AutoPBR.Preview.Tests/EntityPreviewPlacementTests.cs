@@ -1,8 +1,7 @@
 using AutoPBR.Core.Models;
 using AutoPBR.Preview;
-using AutoPBR.Tests.TestSupport;
 
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 public sealed class EntityPreviewPlacementTests
 {

@@ -1,7 +1,7 @@
 using System.Numerics;
 using AutoPBR.Preview;
 
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 public sealed class PreviewMeshGeometryFingerprintTests
 {

@@ -2,7 +2,7 @@ using AutoPBR.Core.Models;
 using AutoPBR.Preview;
 using Xunit;
 
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 public sealed class EntityPreviewErrorMeshTests
 {

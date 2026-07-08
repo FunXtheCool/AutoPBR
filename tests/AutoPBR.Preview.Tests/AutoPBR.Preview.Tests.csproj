@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="SixLabors.ImageSharp" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -19,7 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\AutoPBR.Core\AutoPBR.Core.csproj" />
+    <Compile Include="..\AutoPBR.Core.Tests\TestEnvironmentPaths.cs" Link="Shared\TestEnvironmentPaths.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\AutoPBR.Preview\AutoPBR.Preview.csproj" />
     <ProjectReference Include="..\..\src\AutoPBR.Contracts\AutoPBR.Contracts.csproj" />
   </ItemGroup>
@@ -29,6 +33,7 @@
     <Using Include="AutoPBR.Core.Models" />
     <Using Include="AutoPBR.Contracts.GeometryIr" />
     <Using Include="AutoPBR.Preview" />
+    <Using Include="AutoPBR.Core.Tests" />
     <Using Include="AutoPBR.Preview.Blocks" />
     <Using Include="AutoPBR.Preview.Entities" />
     <Using Include="AutoPBR.Preview.GeometryIr" />

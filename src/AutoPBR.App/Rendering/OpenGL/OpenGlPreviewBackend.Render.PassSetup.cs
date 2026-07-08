@@ -79,16 +79,11 @@ public sealed partial class OpenGlPreviewBackend
                 }
             }
         }
-        // Animation-off: 13-float GPU bind VBO + entity shader W()+lift (see entity-preview-gpu-cpu-parity.md).
-        // Parity-catalog Explore uses 12-float CPU preview meshes once committed (no per-frame rebake).
-        var needsBindPoseMesh = !parityCatalogCpuBindReady &&
-            (frame.MeshDirty ||
-             !bindPoseCommitted ||
-             frame.BlockModel is not
-             {
-                 GpuEntityBoneSkinning: true,
-                 VertexStrideFloats: EntityEmulatedPreviewMeshLayout.SkinnedFloatsPerVertex
-             });
+        var needsBindPoseMesh = PreviewRenderPassSetup.NeedsBindPoseMesh(
+            parityCatalogCpuBindReady,
+            frame.MeshDirty,
+            bindPoseCommitted,
+            frame.BlockModel);
         if (frame.EntityEmulatedMaterialsOk &&
             frame.BlockModel is not null &&
             frame.EntityRebakeCtx is not null &&

@@ -3,7 +3,7 @@ using AutoPBR.Preview;
 
 using SixLabors.ImageSharp.PixelFormats;
 
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 public sealed class PreviewGrassColormapTintTests
 {

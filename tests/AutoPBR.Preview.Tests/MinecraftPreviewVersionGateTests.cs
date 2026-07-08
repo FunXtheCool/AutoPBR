@@ -1,7 +1,7 @@
 using System.Text.Json;
 
 
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 public sealed class MinecraftPreviewVersionGateTests
 {
