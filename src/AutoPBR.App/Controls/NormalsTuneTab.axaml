@@ -1,0 +1,311 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AutoPBR.App.ViewModels"
+             xmlns:ctrls="using:AutoPBR.App.Controls"
+             x:Class="AutoPBR.App.Controls.NormalsTuneTab"
+             x:DataType="vm:MainWindowViewModel"
+             MinWidth="0">
+        <ScrollViewer x:Name="TuneTabScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                    <Grid MinWidth="0" HorizontalAlignment="Stretch"
+                          MaxWidth="{Binding #TuneTabScrollViewer.Viewport.Width}">
+                    <StackPanel Margin="0,12,0,0" Spacing="12" MinWidth="0">
+                        <!-- Normals + height: tuning | AI -->
+                        <Border CornerRadius="8" Background="{Binding CardBackground}" BorderBrush="{Binding CardBorderBrush}" BorderThickness="1" Padding="12" MinWidth="0">
+                            <ctrls:ReflowColumnsPanel MaxColumns="2" MinColumnWidth="360" ColumnSpacing="20" MinWidth="0">
+                                <StackPanel Spacing="10" MinWidth="0">
+                                    <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding Strings.NormalsAndHeightSection}" TextWrapping="Wrap" />
+                                    <ctrls:ReflowColumnsPanel MaxColumns="2" MinColumnWidth="220" ColumnSpacing="16" MinWidth="0">
+                                        <StackPanel Spacing="8" MinWidth="0">
+                                            <ctrls:FlyoutSection Header="{Binding Strings.NormalsSection}">
+                                                <StackPanel Spacing="8">
+                                                    <Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="6">
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.NormalStrength}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.NormalStrengthTooltip}" />
+                                                        <ctrls:OverlaySlider Grid.Row="0" Grid.Column="1" Minimum="0.1" Maximum="8" SmallChange="0.01" LargeChange="0.1" Value="{Binding NormalIntensity, Mode=TwoWay}" Increment="0.01" FormatString="0.##" ToolTip.Tip="{Binding Strings.NormalStrengthTooltip}" HorizontalAlignment="Left" />
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.NormalOperatorLabel}" TextWrapping="Wrap" />
+                                                        <ComboBox Grid.Row="1" Grid.Column="1" MinWidth="140" MaxWidth="220" HorizontalAlignment="Left" ItemsSource="{Binding NormalOperatorOptions}" SelectedItem="{Binding SelectedNormalOperator, Mode=TwoWay}">
+                                                            <ComboBox.ItemTemplate>
+                                                                <DataTemplate x:DataType="vm:FoliageModeOption">
+                                                                    <TextBlock Text="{Binding DisplayName}" />
+                                                                </DataTemplate>
+                                                            </ComboBox.ItemTemplate>
+                                                        </ComboBox>
+                                                        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.NormalKernelSizeLabel}" TextWrapping="Wrap" />
+                                                        <ComboBox Grid.Row="2" Grid.Column="1" MinWidth="140" MaxWidth="220" HorizontalAlignment="Left" ItemsSource="{Binding NormalKernelSizeOptions}" SelectedItem="{Binding SelectedNormalKernelSize, Mode=TwoWay}">
+                                                            <ComboBox.ItemTemplate>
+                                                                <DataTemplate x:DataType="vm:FoliageModeOption">
+                                                                    <TextBlock Text="{Binding DisplayName}" />
+                                                                </DataTemplate>
+                                                            </ComboBox.ItemTemplate>
+                                                        </ComboBox>
+                                                        <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.Derivative}" TextWrapping="Wrap" />
+                                                        <ComboBox Grid.Row="3" Grid.Column="1" MinWidth="140" MaxWidth="220" HorizontalAlignment="Left" ItemsSource="{Binding NormalDerivativeOptions}" SelectedItem="{Binding SelectedNormalDerivative, Mode=TwoWay}">
+                                                            <ComboBox.ItemTemplate>
+                                                                <DataTemplate x:DataType="vm:FoliageModeOption">
+                                                                    <TextBlock Text="{Binding DisplayName}" />
+                                                                </DataTemplate>
+                                                            </ComboBox.ItemTemplate>
+                                                        </ComboBox>
+                                                    </Grid>
+                                                </StackPanel>
+                                            </ctrls:FlyoutSection>
+                                            <ctrls:FlyoutSection Header="{Binding Strings.TuneHeight}">
+                                                <StackPanel Spacing="8">
+                                                    <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                        <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.HeightStrength}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.HeightStrengthTooltip}" />
+                                                        <ctrls:OverlaySlider Grid.Column="1" Minimum="0.001" Maximum="2" SmallChange="0.001" LargeChange="0.01" Value="{Binding HeightIntensity, Mode=TwoWay}" Increment="0.001" FormatString="0.##" ToolTip.Tip="{Binding Strings.HeightStrengthTooltip}" HorizontalAlignment="Left" />
+                                                    </Grid>
+                                                    <CheckBox IsChecked="{Binding BrickHeightMapPostProcessEnabled, Mode=TwoWay}" ToolTip.Tip="{Binding Strings.BrickProbeEnableTooltip}">
+                                                        <TextBlock Text="{Binding Strings.BrickProbeEnable}" TextWrapping="Wrap" />
+                                                    </CheckBox>
+                                                    <Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="6" IsVisible="{Binding BrickHeightMapPostProcessEnabled}">
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.BrickProbeMinStructure}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.BrickProbeMinStructureTooltip}" />
+                                                        <ctrls:OverlaySlider Grid.Row="0" Grid.Column="1" Minimum="0.001" Maximum="0.08" SmallChange="0.001" LargeChange="0.005" Value="{Binding BrickHeightMinStructuralConfidence, Mode=TwoWay}" Increment="0.001" FormatString="0.##" ToolTip.Tip="{Binding Strings.BrickProbeMinStructureTooltip}" HorizontalAlignment="Left" />
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.BrickProbeInvertDelta}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.BrickProbeInvertDeltaTooltip}" />
+                                                        <ctrls:OverlaySlider Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="12" SmallChange="0.1" LargeChange="0.5" Value="{Binding BrickHeightInvertDeltaThreshold, Mode=TwoWay}" Increment="0.1" FormatString="0.##" ToolTip.Tip="{Binding Strings.BrickProbeInvertDeltaTooltip}" HorizontalAlignment="Left" />
+                                                        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.BrickProbeLightGroutDelta}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.BrickProbeLightGroutDeltaTooltip}" />
+                                                        <ctrls:OverlaySlider Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="0.08" SmallChange="0.001" LargeChange="0.005" Value="{Binding BrickLightGroutDiffuseDeltaMin, Mode=TwoWay}" Increment="0.001" FormatString="0.##" ToolTip.Tip="{Binding Strings.BrickProbeLightGroutDeltaTooltip}" HorizontalAlignment="Left" />
+                                                    </Grid>
+                                                </StackPanel>
+                                            </ctrls:FlyoutSection>
+                                        </StackPanel>
+                                        <StackPanel Spacing="8" MinWidth="0">
+                                            <ctrls:FlyoutSection Header="{Binding Strings.Preprocessing}">
+                                                <StackPanel Spacing="8">
+                                                    <CheckBox IsChecked="{Binding PreprocessLinearize, Mode=TwoWay}">
+                                                        <TextBlock Text="{Binding Strings.PreprocessLinearize}" TextWrapping="Wrap" />
+                                                    </CheckBox>
+                                                    <Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="6">
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.PreprocessDenoiseRadius}" TextWrapping="Wrap" />
+                                                        <ctrls:OverlaySlider Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="6" SmallChange="1" LargeChange="1" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding PreprocessDenoiseRadius, Mode=TwoWay}" Increment="1" FormatString="0.##" HorizontalAlignment="Left" />
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.PreprocessDenoiseBlend}" TextWrapping="Wrap" />
+                                                        <ctrls:OverlaySlider Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="1" SmallChange="0.05" LargeChange="0.1" Value="{Binding PreprocessDenoiseBlend, Mode=TwoWay}" Increment="0.05" FormatString="0.##" HorizontalAlignment="Left" />
+                                                    </Grid>
+                                                    <CheckBox IsChecked="{Binding PreprocessFrequencySplit, Mode=TwoWay}">
+                                                        <TextBlock Text="{Binding Strings.PreprocessFrequencySplit}" TextWrapping="Wrap" />
+                                                    </CheckBox>
+                                                    <Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="6" IsVisible="{Binding PreprocessFrequencySplit}">
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.PreprocessFrequencyRadius}" TextWrapping="Wrap" />
+                                                        <ctrls:OverlaySlider Grid.Row="0" Grid.Column="1" Minimum="1" Maximum="12" SmallChange="1" LargeChange="1" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding PreprocessFrequencyRadius, Mode=TwoWay}" Increment="1" FormatString="0.##" HorizontalAlignment="Left" />
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.PreprocessFrequencyDetailStrength}" TextWrapping="Wrap" />
+                                                        <ctrls:OverlaySlider Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="2" SmallChange="0.05" LargeChange="0.1" Value="{Binding PreprocessFrequencyDetailStrength, Mode=TwoWay}" Increment="0.05" FormatString="0.##" HorizontalAlignment="Left" />
+                                                    </Grid>
+                                                    <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                        <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.NormalHeightTransparentAlphaClampMax}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.NormalHeightTransparentAlphaClampMaxTooltip}" />
+                                                        <ctrls:OverlaySlider Grid.Column="1" Minimum="0" Maximum="255" SmallChange="1" LargeChange="8" TickFrequency="16" IsSnapToTickEnabled="True" Value="{Binding NormalHeightTransparentAlphaClampMax, Mode=TwoWay}" Increment="1" FormatString="0" ToolTip.Tip="{Binding Strings.NormalHeightTransparentAlphaClampMaxTooltip}" HorizontalAlignment="Left" />
+                                                    </Grid>
+                                                </StackPanel>
+                                            </ctrls:FlyoutSection>
+                                            <ctrls:FlyoutSection Header="{Binding Strings.AoAdvanced}">
+                                                <StackPanel Spacing="8">
+                                                    <CheckBox IsChecked="{Binding GenerateAo, Mode=TwoWay}">
+                                                        <TextBlock Text="{Binding Strings.GenerateAo}" TextWrapping="Wrap" />
+                                                    </CheckBox>
+                                                    <Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="6" IsVisible="{Binding GenerateAo}">
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.AoRadius}" TextWrapping="Wrap" />
+                                                        <ctrls:OverlaySlider Grid.Row="0" Grid.Column="1" Minimum="1" Maximum="24" SmallChange="1" LargeChange="1" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding AoRadius, Mode=TwoWay}" Increment="1" FormatString="0.##" HorizontalAlignment="Left" />
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.AoStrength}" TextWrapping="Wrap" />
+                                                        <ctrls:OverlaySlider Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="3" SmallChange="0.05" LargeChange="0.1" Value="{Binding AoStrength, Mode=TwoWay}" Increment="0.05" FormatString="0.##" HorizontalAlignment="Left" />
+                                                    </Grid>
+                                                </StackPanel>
+                                            </ctrls:FlyoutSection>
+                                        </StackPanel>
+                                    </ctrls:ReflowColumnsPanel>
+                                </StackPanel>
+                                <StackPanel Spacing="10" MinWidth="0">
+                                    <Border Classes="tune-specular-divider" BorderBrush="{Binding CardBorderBrush}">
+                                        <StackPanel Spacing="10" MinWidth="0">
+                                            <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding Strings.TuneSpecular}" TextWrapping="Wrap" />
+                                            <ctrls:ReflowColumnsPanel MaxColumns="2" MinColumnWidth="220" ColumnSpacing="16" MinWidth="0">
+                                                <StackPanel Spacing="8" MinWidth="0">
+                                                    <ctrls:FlyoutSection Header="{Binding Strings.SpecularSection}">
+                                                        <StackPanel Spacing="8">
+                                                            <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                                <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.SmoothnessScale}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.SmoothnessScaleTooltip}" />
+                                                                <ctrls:OverlaySlider Grid.Column="1" Minimum="0.2" Maximum="3" SmallChange="0.05" LargeChange="0.1" Value="{Binding SmoothnessScale, Mode=TwoWay}" Increment="0.05" FormatString="0.##" ToolTip.Tip="{Binding Strings.SmoothnessScaleTooltip}" HorizontalAlignment="Left" />
+                                                            </Grid>
+                                                            <CheckBox IsChecked="{Binding SpecularUsePercentileRemap, Mode=TwoWay}">
+                                                                <TextBlock Text="{Binding Strings.SpecularPercentileRemap}" TextWrapping="Wrap" />
+                                                            </CheckBox>
+                                                            <Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="6" IsVisible="{Binding SpecularUsePercentileRemap}">
+                                                                <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.SpecularRemapLowPercentile}" TextWrapping="Wrap" />
+                                                                <ctrls:OverlaySlider Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="0.5" SmallChange="0.01" LargeChange="0.05" Value="{Binding SpecularRemapLowPercentile, Mode=TwoWay}" Increment="0.01" FormatString="0.##" HorizontalAlignment="Left" />
+                                                                <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.SpecularRemapHighPercentile}" TextWrapping="Wrap" />
+                                                                <ctrls:OverlaySlider Grid.Row="1" Grid.Column="1" Minimum="0.5" Maximum="1" SmallChange="0.01" LargeChange="0.05" Value="{Binding SpecularRemapHighPercentile, Mode=TwoWay}" Increment="0.01" FormatString="0.##" HorizontalAlignment="Left" />
+                                                            </Grid>
+                                                        </StackPanel>
+                                                    </ctrls:FlyoutSection>
+                                                    <ctrls:FlyoutSection Header="{Binding Strings.MetalnessSection}">
+                                                        <StackPanel Spacing="8">
+                                                            <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" MinWidth="0">
+                                                                <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.MetallicBoost}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.MetallicBoostTooltip}" />
+                                                                <ctrls:OverlaySlider Grid.Column="1" Minimum="0" Maximum="3" SmallChange="0.05" LargeChange="0.1" Value="{Binding MetallicBoost, Mode=TwoWay}" Increment="0.05" FormatString="0.##" ToolTip.Tip="{Binding Strings.MetallicBoostTooltip}" HorizontalAlignment="Left" />
+                                                            </Grid>
+                                                        </StackPanel>
+                                                    </ctrls:FlyoutSection>
+                                                </StackPanel>
+                                                <StackPanel Spacing="8" MinWidth="0">
+                                                    <ctrls:FlyoutSection Header="{Binding Strings.SpecularPorositySection}">
+                                                        <StackPanel Spacing="8">
+                                                            <Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="6">
+                                                                <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.PorosityBias}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.PorosityBiasTooltip}" />
+                                                                <ctrls:OverlaySlider Grid.Row="0" Grid.Column="1" Minimum="-128" Maximum="128" SmallChange="1" LargeChange="8" Value="{Binding PorosityBias, Mode=TwoWay}" Increment="1" FormatString="0.##" ToolTip.Tip="{Binding Strings.PorosityBiasTooltip}" HorizontalAlignment="Left" />
+                                                                <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.PlantMaterialPorosityExtra}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.PlantMaterialPorosityExtraTooltip}" />
+                                                                <ctrls:OverlaySlider Grid.Row="1" Grid.Column="1" Minimum="-128" Maximum="128" SmallChange="1" LargeChange="8" Value="{Binding PlantMaterialPorosityExtra, Mode=TwoWay}" Increment="1" FormatString="0.##" ToolTip.Tip="{Binding Strings.PlantMaterialPorosityExtraTooltip}" HorizontalAlignment="Left" />
+                                                            </Grid>
+                                                        </StackPanel>
+                                                    </ctrls:FlyoutSection>
+                                                    <ctrls:FlyoutSection Header="{Binding Strings.SpecularAdvanced}">
+                                                        <StackPanel Spacing="8">
+                                                            <CheckBox IsChecked="{Binding FastSpecular, Mode=TwoWay}" ToolTip.Tip="{Binding Strings.FastSpecularTooltip}">
+                                                                <TextBlock Text="{Binding Strings.FastSpecular}" TextWrapping="Wrap" />
+                                                            </CheckBox>
+                                                            <CheckBox IsChecked="{Binding SpecularForceNoEmissive, Mode=TwoWay}" ToolTip.Tip="{Binding Strings.SpecularForceNoEmissiveTooltip}">
+                                                                <TextBlock Text="{Binding Strings.SpecularForceNoEmissive}" TextWrapping="Wrap" />
+                                                            </CheckBox>
+                                                        </StackPanel>
+                                                    </ctrls:FlyoutSection>
+                                                </StackPanel>
+                                            </ctrls:ReflowColumnsPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </ctrls:ReflowColumnsPanel>
+                        </Border>
+
+                        <Border CornerRadius="8" Background="{Binding CardBackground}" BorderBrush="{Binding CardBorderBrush}" BorderThickness="1" Padding="12" MinWidth="0">
+                            <StackPanel Spacing="10" MinWidth="0">
+                                <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding Strings.AiDrivenPbrSection}" TextWrapping="Wrap" />
+                                <ctrls:ReflowColumnsPanel MaxColumns="2" MinColumnWidth="320" ColumnSpacing="20" MinWidth="0">
+                                    <StackPanel Spacing="8" MinWidth="0">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" MinWidth="0">
+                                            <ctrls:FlyoutSection Header="{Binding Strings.AiNormalsSection}" Grid.Column="0" HeaderToolTip="{Binding Strings.NormalsFromDeepBumpTooltip}" FlyoutMaxWidth="400">
+                                                <StackPanel Spacing="8">
+                                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="8" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.DeepBumpOverlap}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.DeepBumpOverlapTooltip}" />
+                                                    <ComboBox Grid.Row="0" Grid.Column="1" Width="120" MinWidth="120" MaxWidth="220" HorizontalAlignment="Left"
+                                                              ItemsSource="{Binding DeepBumpOverlapOptions}"
+                                                              SelectedItem="{Binding SelectedDeepBumpOverlap, Mode=TwoWay}"
+                                                              ToolTip.Tip="{Binding Strings.DeepBumpOverlapTooltip}">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <TextBlock Text="{Binding DisplayName}" />
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>
+                                                    </ComboBox>
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.DeepBumpInputMode}" TextWrapping="Wrap" />
+                                                    <ComboBox Grid.Row="1" Grid.Column="1" MinWidth="140" MaxWidth="220" HorizontalAlignment="Left"
+                                                              ItemsSource="{Binding DeepBumpInputModeOptions}"
+                                                              SelectedItem="{Binding SelectedDeepBumpInputMode, Mode=TwoWay}">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate x:DataType="vm:FoliageModeOption">
+                                                                <TextBlock Text="{Binding DisplayName}" />
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>
+                                                    </ComboBox>
+                                                    <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                                              IsChecked="{Binding DeepBumpForceBlue255, Mode=TwoWay}">
+                                                        <TextBlock Text="{Binding Strings.DeepBumpForceBlue255}" TextWrapping="Wrap" />
+                                                    </CheckBox>
+                                                    <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center"
+                                                               Text="{Binding Strings.DeepBumpNormalIntensity}"
+                                                               TextWrapping="Wrap"
+                                                               ToolTip.Tip="{Binding Strings.DeepBumpNormalIntensityTooltip}" />
+                                                    <ctrls:OverlaySlider Grid.Row="3" Grid.Column="1" Minimum="0.05" Maximum="8" SmallChange="0.05" LargeChange="0.1" Value="{Binding DeepBumpNormalIntensity, Mode=TwoWay}" Increment="0.05" FormatString="0.##" ToolTip.Tip="{Binding Strings.DeepBumpNormalIntensityTooltip}" HorizontalAlignment="Left" />
+                                                    <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center"
+                                                               Text="{Binding Strings.DeepBumpNormalSoftClamp}"
+                                                               TextWrapping="Wrap"
+                                                               ToolTip.Tip="{Binding Strings.DeepBumpNormalSoftClampTooltip}" />
+                                                    <ctrls:OverlaySlider Grid.Row="4" Grid.Column="1" Minimum="0" Maximum="2" SmallChange="0.05" LargeChange="0.1" Value="{Binding DeepBumpNormalSoftClamp, Mode=TwoWay}" Increment="0.05" FormatString="0.##" ToolTip.Tip="{Binding Strings.DeepBumpNormalSoftClampTooltip}" HorizontalAlignment="Left" />
+                                                </Grid>
+                                                <CheckBox IsChecked="{Binding DeepBumpEdgeGuidedEnhance, Mode=TwoWay}">
+                                                    <TextBlock Text="{Binding Strings.DeepBumpEdgeGuidedEnhance}" TextWrapping="Wrap" />
+                                                </CheckBox>
+                                                <Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="8" RowSpacing="6"
+                                                      IsVisible="{Binding DeepBumpEdgeGuidedEnhance}">
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
+                                                               Text="{Binding Strings.DeepBumpEdgeGuidedStrength}"
+                                                               TextWrapping="Wrap"
+                                                               ToolTip.Tip="{Binding Strings.DeepBumpEdgeGuidedStrengthTooltip}" />
+                                                    <ctrls:OverlaySlider Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="6" SmallChange="0.05" LargeChange="0.1" Value="{Binding DeepBumpEdgeGuidedStrength, Mode=TwoWay}" Increment="0.05" FormatString="0.##" ToolTip.Tip="{Binding Strings.DeepBumpEdgeGuidedStrengthTooltip}" HorizontalAlignment="Left" />
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"
+                                                               Text="{Binding Strings.DeepBumpEdgeGuidedGamma}"
+                                                               TextWrapping="Wrap"
+                                                               ToolTip.Tip="{Binding Strings.DeepBumpEdgeGuidedGammaTooltip}" />
+                                                    <ctrls:OverlaySlider Grid.Row="1" Grid.Column="1" Minimum="0.1" Maximum="8" SmallChange="0.05" LargeChange="0.1" Value="{Binding DeepBumpEdgeGuidedGamma, Mode=TwoWay}" Increment="0.05" FormatString="0.##" ToolTip.Tip="{Binding Strings.DeepBumpEdgeGuidedGammaTooltip}" HorizontalAlignment="Left" />
+                                                    <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"
+                                                               Text="{Binding Strings.DeepBumpEdgeGuidedDirectionMix}"
+                                                               TextWrapping="Wrap"
+                                                               ToolTip.Tip="{Binding Strings.DeepBumpEdgeGuidedDirectionMixTooltip}" />
+                                                    <ctrls:OverlaySlider Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="1" SmallChange="0.05" LargeChange="0.1" Value="{Binding DeepBumpEdgeGuidedDirectionMix, Mode=TwoWay}" Increment="0.05" FormatString="0.##" ToolTip.Tip="{Binding Strings.DeepBumpEdgeGuidedDirectionMixTooltip}" HorizontalAlignment="Left" />
+                                                </Grid>
+                                            </StackPanel>
+                                            </ctrls:FlyoutSection>
+                                            <ToggleSwitch Grid.Column="1"
+                                                          VerticalAlignment="Center"
+                                                          OnContent=""
+                                                          OffContent=""
+                                                          IsChecked="{Binding UseDeepBumpNormals, Mode=TwoWay}"
+                                                          ToolTip.Tip="{Binding Strings.NormalsFromDeepBumpTooltip}" />
+                                        </Grid>
+                                    </StackPanel>
+                                    <Border Classes="tune-specular-divider" MinWidth="0" BorderBrush="{Binding CardBorderBrush}">
+                                        <StackPanel Spacing="8" MinWidth="0">
+                                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" MinWidth="0">
+                                                <ctrls:FlyoutSection Header="{Binding Strings.AiSpecularSection}" Grid.Column="0" HeaderToolTip="{Binding Strings.UseMlSpecularPredictorTooltip}" FlyoutMaxWidth="520">
+                                                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="6" MinWidth="0">
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.MlSpecularBlendMode}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.MlSpecularBlendModeTooltip}" />
+                                                    <ComboBox Grid.Row="0" Grid.Column="1"
+                                                              MinWidth="0"
+                                                              HorizontalAlignment="Stretch"
+                                                              ItemsSource="{Binding MlSpecularBlendModeOptions}"
+                                                              SelectedItem="{Binding SelectedMlSpecularBlendModeOption, Mode=TwoWay}"
+                                                              ToolTip.Tip="{Binding Strings.MlSpecularBlendModeTooltip}">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate DataType="vm:FoliageModeOption">
+                                                                <TextBlock Text="{Binding DisplayName}" TextWrapping="Wrap" />
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>
+                                                    </ComboBox>
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.MlSpecularBlendMath}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.MlSpecularBlendMathTooltip}" />
+                                                    <ComboBox Grid.Row="1" Grid.Column="1"
+                                                              MinWidth="0"
+                                                              HorizontalAlignment="Stretch"
+                                                              ItemsSource="{Binding MlSpecularBlendMathOptions}"
+                                                              SelectedItem="{Binding SelectedMlSpecularBlendMathOption, Mode=TwoWay}"
+                                                              ToolTip.Tip="{Binding Strings.MlSpecularBlendMathTooltip}">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate DataType="vm:FoliageModeOption">
+                                                                <TextBlock Text="{Binding DisplayName}" TextWrapping="Wrap" />
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>
+                                                    </ComboBox>
+                                                    <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Strings.MlSpecularHeuristicBlend}" TextWrapping="Wrap" ToolTip.Tip="{Binding Strings.MlSpecularHeuristicBlendTooltip}" />
+                                                    <ctrls:OverlaySlider Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="1" SmallChange="0.01" LargeChange="0.05" Value="{Binding MlSpecularHeuristicBlend, Mode=TwoWay}" Increment="0.01" FormatString="0.##" ToolTip.Tip="{Binding Strings.MlSpecularHeuristicBlendTooltip}" HorizontalAlignment="Left" />
+                                                    <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                                                              HorizontalAlignment="Stretch"
+                                                              IsChecked="{Binding MlSpecularUseEdgeChannel, Mode=TwoWay}">
+                                                        <TextBlock Text="{Binding Strings.MlSpecularUseEdgeChannel}" TextWrapping="Wrap" />
+                                                    </CheckBox>
+                                                    <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center"
+                                                               Text="{Binding Strings.MlSpecularTransparentAlphaClampMax}"
+                                                               TextWrapping="Wrap"
+                                                               ToolTip.Tip="{Binding Strings.MlSpecularTransparentAlphaClampMaxTooltip}" />
+                                                    <ctrls:OverlaySlider Grid.Row="4" Grid.Column="1" Minimum="0" Maximum="255" SmallChange="1" LargeChange="16" TickFrequency="16" IsSnapToTickEnabled="True" Value="{Binding MlSpecularTransparentAlphaClampMax, Mode=TwoWay}" Increment="1" FormatString="0" ToolTip.Tip="{Binding Strings.MlSpecularTransparentAlphaClampMaxTooltip}" HorizontalAlignment="Left" />
+                                                </Grid>
+                                                </ctrls:FlyoutSection>
+                                                <ToggleSwitch Grid.Column="1"
+                                                              VerticalAlignment="Center"
+                                                              OnContent=""
+                                                              OffContent=""
+                                                              IsChecked="{Binding UseMlSpecularPredictor, Mode=TwoWay}"
+                                                              ToolTip.Tip="{Binding Strings.UseMlSpecularPredictorTooltip}" />
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+                                </ctrls:ReflowColumnsPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                    </Grid>
+                    </ScrollViewer>
+</UserControl>

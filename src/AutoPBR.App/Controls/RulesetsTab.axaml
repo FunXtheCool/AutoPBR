@@ -1,0 +1,334 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AutoPBR.App.ViewModels"
+             xmlns:rvm="using:AutoPBR.App.ViewModels.Rulesets"
+             xmlns:core="using:AutoPBR.Core.Models"
+             xmlns:expr="using:AutoPBR.Core.Models.RuleExpressions"
+             xmlns:ctrls="using:AutoPBR.App.Controls"
+             xmlns:appConv="using:AutoPBR.App.Converters"
+             x:Class="AutoPBR.App.Controls.RulesetsTab"
+             x:DataType="vm:MainWindowViewModel"
+             MinWidth="0">
+    <UserControl.Resources>
+        <appConv:ConditionValueOptionsConverter x:Key="ConditionValueOptionsConverter" />
+        <appConv:ActionValueOptionsConverter x:Key="ActionValueOptionsConverter" />
+    </UserControl.Resources>                    <ScrollViewer x:Name="RulesetsTabScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                    <Grid MinWidth="0" HorizontalAlignment="Stretch"
+                          MaxWidth="{Binding #RulesetsTabScrollViewer.Viewport.Width}">
+                    <StackPanel Margin="0,12,0,0" Spacing="12" MinWidth="0" HorizontalAlignment="Stretch">
+                        <Border x:Name="TagRulesCard" CornerRadius="8" Background="{Binding CardBackground}" BorderBrush="{Binding CardBorderBrush}" BorderThickness="1" Padding="12" MinWidth="0">
+                            <StackPanel Spacing="8" MinWidth="0">
+                                <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding Strings.RulesetsCustomExpressions}" TextWrapping="Wrap" />
+                                <TextBlock Text="{Binding Strings.TagRulesCustomDescription}" TextWrapping="Wrap" Opacity="0.9" />
+                                <ItemsControl x:Name="CustomTagRulesList" ItemsSource="{Binding Rulesets.CustomTagRules}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="core:CustomTagRuleEntry">
+                                            <Border Margin="0,0,0,6" Padding="8" BorderBrush="#40FFFFFF" BorderThickness="1" CornerRadius="4">
+                                                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,Auto" RowSpacing="6" ColumnSpacing="8" MinWidth="0">
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleId, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" VerticalAlignment="Center" />
+                                                    <TextBox Grid.Row="0" Grid.Column="1" Watermark="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleIdWatermark, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}"
+                                                             Text="{Binding Id, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleDisplayName, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" VerticalAlignment="Center" />
+                                                    <TextBox Grid.Row="1" Grid.Column="1" Watermark="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleDisplayNameWatermark, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}"
+                                                             Text="{Binding DisplayName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleKindLabel, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" VerticalAlignment="Center"
+                                                               IsVisible="{Binding IsTagDefinition}" />
+                                                    <ComboBox Grid.Row="2" Grid.Column="1"
+                                                              IsVisible="{Binding IsTagDefinition}"
+                                                              ItemsSource="{Binding ((vm:MainWindowViewModel)DataContext).Rulesets.TagRuleKindOptions, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                              SelectedItem="{Binding Kind, Mode=TwoWay}" />
+                                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.RulesetsKeywords, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" VerticalAlignment="Center"
+                                                               IsVisible="{Binding IsTagDefinition}" />
+                                                    <StackPanel Grid.Row="3" Grid.Column="1" Spacing="4" IsVisible="{Binding IsTagDefinition}">
+                                                        <ItemsControl ItemsSource="{Binding KeywordTokens}">
+                                                            <ItemsControl.ItemsPanel>
+                                                                <ItemsPanelTemplate>
+                                                                    <WrapPanel Orientation="Horizontal" ItemSpacing="6" LineSpacing="6" />
+                                                                </ItemsPanelTemplate>
+                                                            </ItemsControl.ItemsPanel>
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate>
+                                                                    <Border Padding="6,2" CornerRadius="10" BorderBrush="#40FFFFFF" BorderThickness="1">
+                                                                        <TextBlock Text="{Binding .}" TextWrapping="Wrap" MaxWidth="280" />
+                                                                    </Border>
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                        <WrapPanel Orientation="Horizontal" ItemSpacing="6">
+                                                            <Button Content="{Binding ((vm:MainWindowViewModel)DataContext).Strings.RulesetsManageTokens, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}"
+                                                                    Command="{Binding ((vm:MainWindowViewModel)DataContext).Rulesets.AddKeywordTokenCommand, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                                    CommandParameter="{Binding}" />
+                                                            <Button Content="{Binding ((vm:MainWindowViewModel)DataContext).Strings.RulesetsRemoveLast, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}"
+                                                                    Command="{Binding ((vm:MainWindowViewModel)DataContext).Rulesets.RemoveKeywordTokenCommand, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                                    CommandParameter="{Binding}" />
+                                                        </WrapPanel>
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.RulesetsSemanticHints, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" VerticalAlignment="Center"
+                                                               IsVisible="{Binding IsTagDefinition}" />
+                                                    <StackPanel Grid.Row="4" Grid.Column="1" Spacing="4" IsVisible="{Binding IsTagDefinition}">
+                                                        <ItemsControl ItemsSource="{Binding SemanticHintTokens}">
+                                                            <ItemsControl.ItemsPanel>
+                                                                <ItemsPanelTemplate>
+                                                                    <WrapPanel Orientation="Horizontal" ItemSpacing="6" LineSpacing="6" />
+                                                                </ItemsPanelTemplate>
+                                                            </ItemsControl.ItemsPanel>
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate>
+                                                                    <Border Padding="6,2" CornerRadius="10" BorderBrush="#40FFFFFF" BorderThickness="1">
+                                                                        <TextBlock Text="{Binding .}" TextWrapping="Wrap" MaxWidth="280" />
+                                                                    </Border>
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                        <WrapPanel Orientation="Horizontal" ItemSpacing="6">
+                                                            <Button Content="{Binding ((vm:MainWindowViewModel)DataContext).Strings.RulesetsManageTokens, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}"
+                                                                    Command="{Binding ((vm:MainWindowViewModel)DataContext).Rulesets.AddSemanticHintTokenCommand, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                                    CommandParameter="{Binding}" />
+                                                            <Button Content="{Binding ((vm:MainWindowViewModel)DataContext).Strings.RulesetsRemoveLast, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}"
+                                                                    Command="{Binding ((vm:MainWindowViewModel)DataContext).Rulesets.RemoveSemanticHintTokenCommand, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                                    CommandParameter="{Binding}" />
+                                                        </WrapPanel>
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.RulesetsExpression, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" VerticalAlignment="Center" IsVisible="{Binding HasExpression}" />
+                                                    <StackPanel Grid.Row="5" Grid.Column="1" Spacing="6" IsVisible="{Binding HasExpression}">
+                                                    <StackPanel Spacing="6"
+                                                                DataContext="{Binding Expression}">
+                                                        <CheckBox Content="{Binding ((vm:MainWindowViewModel)DataContext).Strings.RulesetsEnableExpression, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}"
+                                                                  IsChecked="{Binding Enabled, Mode=TwoWay}" />
+                                                        <Button Content="{Binding ((vm:MainWindowViewModel)DataContext).Strings.RulesetsAddCondition, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}"
+                                                                Command="{Binding ((vm:MainWindowViewModel)DataContext).Rulesets.AddExpressionConditionCommand, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                                CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Border}}" />
+                                                        <Button Content="{Binding ((vm:MainWindowViewModel)DataContext).Strings.RulesetsAddAction, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}"
+                                                                Command="{Binding ((vm:MainWindowViewModel)DataContext).Rulesets.AddExpressionActionCommand, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                                CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Border}}" />
+                                                        <TextBlock Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.RulesetsConditions, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" FontWeight="SemiBold" />
+                                                        <ItemsControl ItemsSource="{Binding Condition.Children, FallbackValue={x:Null}, TargetNullValue={x:Null}}">
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate x:DataType="expr:RuleConditionNode">
+                                                                    <WrapPanel Orientation="Horizontal" ItemSpacing="6" LineSpacing="6">
+                                                                        <ComboBox MinWidth="150"
+                                                                                  ItemsSource="{Binding ((vm:MainWindowViewModel)DataContext).Rulesets.ConditionTypeOptions, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                                                  SelectedItem="{Binding Type, Mode=TwoWay}" />
+                                                                        <ComboBox MinWidth="180"
+                                                                                  SelectedItem="{Binding Value, Mode=TwoWay}">
+                                                                            <ComboBox.ItemsSource>
+                                                                                <MultiBinding Converter="{StaticResource ConditionValueOptionsConverter}">
+                                                                                    <Binding Path="Type" />
+                                                                                    <Binding Path="((vm:MainWindowViewModel)DataContext).Rulesets.AvailableTagIds" RelativeSource="{RelativeSource AncestorType=UserControl}" FallbackValue="{x:Null}" TargetNullValue="{x:Null}" />
+                                                                                    <Binding Path="((vm:MainWindowViewModel)DataContext).Rulesets.AvailableFlagIds" RelativeSource="{RelativeSource AncestorType=UserControl}" FallbackValue="{x:Null}" TargetNullValue="{x:Null}" />
+                                                                                </MultiBinding>
+                                                                            </ComboBox.ItemsSource>
+                                                                        </ComboBox>
+                                                                        <TextBox MinWidth="140"
+                                                                                 Watermark="{Binding ((vm:MainWindowViewModel)DataContext).Strings.RulesetsValueWatermark, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}"
+                                                                                 Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                                        <Button Content="{Binding ((vm:MainWindowViewModel)DataContext).Strings.RulesetsRemove, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}"
+                                                                                Command="{Binding ((vm:MainWindowViewModel)DataContext).Rulesets.RemoveExpressionConditionCommand, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                                                CommandParameter="{Binding}" />
+                                                                    </WrapPanel>
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                        <TextBlock Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.RulesetsActions, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" FontWeight="SemiBold" />
+                                                        <ItemsControl ItemsSource="{Binding Actions}">
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate x:DataType="expr:RuleActionDefinition">
+                                                                    <WrapPanel Orientation="Horizontal" ItemSpacing="6" LineSpacing="6">
+                                                                        <ComboBox MinWidth="150"
+                                                                                  ItemsSource="{Binding ((vm:MainWindowViewModel)DataContext).Rulesets.ActionTypeOptions, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                                                  SelectedItem="{Binding Type, Mode=TwoWay}" />
+                                                                        <ComboBox MinWidth="180"
+                                                                                  SelectedItem="{Binding Value, Mode=TwoWay}">
+                                                                            <ComboBox.ItemsSource>
+                                                                                <MultiBinding Converter="{StaticResource ActionValueOptionsConverter}">
+                                                                                    <Binding Path="Type" />
+                                                                                    <Binding Path="((vm:MainWindowViewModel)DataContext).Rulesets.AvailableTagIds" RelativeSource="{RelativeSource AncestorType=UserControl}" FallbackValue="{x:Null}" TargetNullValue="{x:Null}" />
+                                                                                    <Binding Path="((vm:MainWindowViewModel)DataContext).Rulesets.AvailableFlagIds" RelativeSource="{RelativeSource AncestorType=UserControl}" FallbackValue="{x:Null}" TargetNullValue="{x:Null}" />
+                                                                                </MultiBinding>
+                                                                            </ComboBox.ItemsSource>
+                                                                        </ComboBox>
+                                                                        <Button Content="{Binding ((vm:MainWindowViewModel)DataContext).Strings.RulesetsRemove, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}"
+                                                                                Command="{Binding ((vm:MainWindowViewModel)DataContext).Rulesets.RemoveExpressionActionCommand, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                                                CommandParameter="{Binding}" />
+                                                                    </WrapPanel>
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                        <TextBlock Text="{Binding DisplayName}" Opacity="0.8" TextWrapping="Wrap" />
+                                                    </StackPanel>
+                                                    </StackPanel>
+                                                    <WrapPanel Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" ItemSpacing="8" LineSpacing="6" Margin="0,2,0,0">
+                                                        <CheckBox Margin="0,0,12,6" Content="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleEnabled, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" IsChecked="{Binding Enabled, Mode=TwoWay}" ToolTip.Tip="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleEnabledTooltip, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" />
+                                                        <Button Margin="0,0,4,6" Content="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleMoveUp, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}"
+                                                                Command="{Binding ((vm:MainWindowViewModel)DataContext).Rulesets.MoveCustomTagRuleUpCommand, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                                CommandParameter="{Binding}" Padding="6,4" ToolTip.Tip="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleMoveUpTooltip, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" />
+                                                        <Button Margin="0,0,4,6" Content="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleMoveDown, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}"
+                                                                Command="{Binding ((vm:MainWindowViewModel)DataContext).Rulesets.MoveCustomTagRuleDownCommand, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                                CommandParameter="{Binding}" Padding="6,4" ToolTip.Tip="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleMoveDownTooltip, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" />
+                                                        <Button Margin="0,0,0,6" Content="{Binding ((vm:MainWindowViewModel)DataContext).Strings.RemoveTagRule, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}"
+                                                                Command="{Binding ((vm:MainWindowViewModel)DataContext).Rulesets.RemoveCustomTagRuleCommand, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                                CommandParameter="{Binding}" Padding="8,4" />
+                                                    </WrapPanel>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
+                                    <Button Content="{Binding Strings.AddCustomTag}" Command="{Binding Rulesets.AddCustomTagCommand}" Padding="8,4" />
+                                    <Button Content="{Binding Strings.AddCustomRule}" Command="{Binding Rulesets.AddCustomRuleCommand}" Padding="8,4" />
+                                    <Button Content="{Binding Strings.RefreshTagRules}" Command="{Binding Rulesets.RefreshTagRulesCommand}" Padding="8,4"
+                                            ToolTip.Tip="{Binding Strings.RefreshTagRulesTooltip}" />
+                                    <Button Content="{Binding Strings.ExportTagRules}" Click="ExportTagRules_Click" Padding="8,4"
+                                            ToolTip.Tip="{Binding Strings.ExportTagRulesTooltip}" />
+                                    <Button Content="{Binding Strings.ImportTagRules}" Click="ImportTagRules_Click" Padding="8,4"
+                                            ToolTip.Tip="{Binding Strings.ImportTagRulesTooltip}" />
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border CornerRadius="8" Background="{Binding CardBackground}" BorderBrush="{Binding CardBorderBrush}" BorderThickness="1" Padding="12" MinWidth="0">
+                            <StackPanel Spacing="8" MinWidth="0">
+                                <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding Strings.RulesetsBuiltInExpressions}" TextWrapping="Wrap" />
+                                <ItemsControl ItemsSource="{Binding Rulesets.BuiltInRules}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="rvm:RuleDisplayItemViewModel">
+                                            <Border Margin="0,0,0,6" Padding="8" BorderBrush="#30FFFFFF" BorderThickness="1" CornerRadius="4" Opacity="0.65">
+                                                <Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="8" RowSpacing="4">
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleId, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" />
+                                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Id}" />
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleDisplayName, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" />
+                                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DisplayName}" />
+                                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.RulesetsExpression, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" />
+                                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ExpressionText}" TextWrapping="Wrap" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12" MinWidth="0">
+                            <Border Grid.Column="0" CornerRadius="8" Background="{Binding CardBackground}" BorderBrush="{Binding CardBorderBrush}" BorderThickness="1" Padding="12" MinWidth="0">
+                                <StackPanel Spacing="8" MinWidth="0">
+                                    <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding Strings.RulesetsBuiltInTags}" TextWrapping="Wrap" />
+                                    <ItemsControl ItemsSource="{Binding Rulesets.BuiltInTags}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="rvm:RuleDisplayItemViewModel">
+                                                <Border Margin="0,0,0,6" Padding="8" BorderBrush="#30FFFFFF" BorderThickness="1" CornerRadius="4" Opacity="0.65">
+                                                    <Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="8" RowSpacing="4">
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleId, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" />
+                                                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Id}" />
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleDisplayName, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" />
+                                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DisplayName}" />
+                                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleKindLabel, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" />
+                                                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Kind}" />
+                                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleKeywords, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" />
+                                                        <StackPanel Grid.Row="3" Grid.Column="1" Spacing="4">
+                                                        <ItemsControl ItemsSource="{Binding VisibleKeywordTokens}">
+                                                            <ItemsControl.ItemsPanel>
+                                                                <ItemsPanelTemplate>
+                                                                    <WrapPanel Orientation="Horizontal" ItemSpacing="6" LineSpacing="6" />
+                                                                </ItemsPanelTemplate>
+                                                            </ItemsControl.ItemsPanel>
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate>
+                                                                    <Border Padding="6,2" CornerRadius="10" BorderBrush="#30FFFFFF" BorderThickness="1">
+                                                                        <TextBlock Text="{Binding .}" TextWrapping="Wrap" MaxWidth="280" />
+                                                                    </Border>
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                        <Button Content="{Binding MoreKeywordsLabel}"
+                                                                IsVisible="{Binding HasHiddenKeywords}"
+                                                                Command="{Binding ((vm:MainWindowViewModel)DataContext).Rulesets.ToggleKeywordExpansionCommand, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                                CommandParameter="{Binding}" />
+                                                        <Button Content="{Binding ((vm:MainWindowViewModel)DataContext).Strings.RulesetsShowLess, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}"
+                                                                IsVisible="{Binding KeywordsExpanded}"
+                                                                Command="{Binding ((vm:MainWindowViewModel)DataContext).Rulesets.ToggleKeywordExpansionCommand, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                                CommandParameter="{Binding}" />
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="1" CornerRadius="8" Background="{Binding CardBackground}" BorderBrush="{Binding CardBorderBrush}" BorderThickness="1" Padding="12" MinWidth="0">
+                                <StackPanel Spacing="8" MinWidth="0">
+                                    <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding Strings.RulesetsBuiltInFlags}" TextWrapping="Wrap" />
+                                    <ItemsControl ItemsSource="{Binding Rulesets.BuiltInFlags}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="rvm:RuleDisplayItemViewModel">
+                                                <Border Margin="0,0,0,6" Padding="8" BorderBrush="#30FFFFFF" BorderThickness="1" CornerRadius="4" Opacity="0.65">
+                                                    <Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="8" RowSpacing="4">
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleId, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" />
+                                                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Id}" />
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleDisplayName, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" />
+                                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DisplayName}" />
+                                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleKindLabel, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" />
+                                                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Kind}" />
+                                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleKeywords, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" />
+                                                        <StackPanel Grid.Row="3" Grid.Column="1" Spacing="4">
+                                                        <ItemsControl ItemsSource="{Binding VisibleKeywordTokens}">
+                                                            <ItemsControl.ItemsPanel>
+                                                                <ItemsPanelTemplate>
+                                                                    <WrapPanel Orientation="Horizontal" ItemSpacing="6" LineSpacing="6" />
+                                                                </ItemsPanelTemplate>
+                                                            </ItemsControl.ItemsPanel>
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate>
+                                                                    <Border Padding="6,2" CornerRadius="10" BorderBrush="#30FFFFFF" BorderThickness="1">
+                                                                        <TextBlock Text="{Binding .}" TextWrapping="Wrap" MaxWidth="280" />
+                                                                    </Border>
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                        <Button Content="{Binding MoreKeywordsLabel}"
+                                                                IsVisible="{Binding HasHiddenKeywords}"
+                                                                Command="{Binding ((vm:MainWindowViewModel)DataContext).Rulesets.ToggleKeywordExpansionCommand, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                                CommandParameter="{Binding}" />
+                                                        <Button Content="{Binding ((vm:MainWindowViewModel)DataContext).Strings.RulesetsShowLess, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}"
+                                                                IsVisible="{Binding KeywordsExpanded}"
+                                                                Command="{Binding ((vm:MainWindowViewModel)DataContext).Rulesets.ToggleKeywordExpansionCommand, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                                                                CommandParameter="{Binding}" />
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <Border CornerRadius="8" Background="{Binding CardBackground}" BorderBrush="{Binding CardBorderBrush}" BorderThickness="1" Padding="12" MinWidth="0">
+                            <StackPanel Spacing="8" MinWidth="0">
+                                <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding Strings.RulesetsSystemRules}" TextWrapping="Wrap" />
+                                <TextBlock Text="{Binding Strings.RulesetsSystemRulesDescription}" TextWrapping="Wrap" Opacity="0.85" />
+                                <ItemsControl ItemsSource="{Binding Rulesets.SystemComputedRules}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="rvm:RuleDisplayItemViewModel">
+                                            <Border Margin="0,0,0,6" Padding="8" BorderBrush="#30FFFFFF" BorderThickness="1" CornerRadius="4" Opacity="0.65">
+                                                <Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="8" RowSpacing="4">
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleId, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" />
+                                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Id}" />
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleDisplayName, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" />
+                                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DisplayName}" />
+                                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding ((vm:MainWindowViewModel)DataContext).Strings.TagRuleSemanticHints, RelativeSource={RelativeSource AncestorType=UserControl}, FallbackValue='', TargetNullValue=''}" />
+                                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SemanticHints}" TextWrapping="Wrap" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                    </Grid>
+                    </ScrollViewer>
+</UserControl>
