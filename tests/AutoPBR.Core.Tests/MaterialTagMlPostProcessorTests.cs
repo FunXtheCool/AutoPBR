@@ -1,3 +1,4 @@
+using AutoPBR.Core;
 using AutoPBR.Core.Embeddings;
 using AutoPBR.Core.Models;
 using Xunit;
@@ -6,17 +7,17 @@ namespace AutoPBR.Core.Tests;
 
 public sealed class MaterialTagMlPostProcessorTests
 {
-    private static readonly IReadOnlyList<TagRule> MaterialRules = TagRulePresets.DefaultMaterials;
+    private static readonly IReadOnlyList<MaterialTagRuleDescriptor> MaterialRules =
+        TagRulePresets.DefaultMaterials.ToDescriptors();
 
     [Fact]
     public void ApplyOrePathKeepsMetalAndAddsStone()
     {
-        var rules = MaterialRules;
         var result = MaterialTagMlPostProcessor.Apply(
             "iron_ore",
             @"\minecraft\textures\block\iron_ore",
             ["metal", "unknown"],
-            rules,
+            MaterialRules,
             maxMaterialTags: null);
 
         Assert.Contains("stone", result, StringComparer.OrdinalIgnoreCase);
@@ -26,12 +27,11 @@ public sealed class MaterialTagMlPostProcessorTests
     [Fact]
     public void ApplyNonOrePathKeepsMetal()
     {
-        var rules = MaterialRules;
         var result = MaterialTagMlPostProcessor.Apply(
             "iron_ingot",
             @"\minecraft\textures\item\iron_ingot",
             ["metal"],
-            rules,
+            MaterialRules,
             maxMaterialTags: null);
 
         Assert.Contains("metal", result, StringComparer.OrdinalIgnoreCase);

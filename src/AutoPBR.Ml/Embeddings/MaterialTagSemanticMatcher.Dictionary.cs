@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 using AutoPBR.Contracts.Ml;
-using AutoPBR.Core.Models;
+using AutoPBR.Contracts;
 
 namespace AutoPBR.Core.Embeddings;
 
@@ -11,7 +11,7 @@ public sealed partial class MaterialTagSemanticMatcher
 {
     private DictionaryEvidence BuildDictionaryEvidence(
         string queryText,
-        List<TagRule> materialRules,
+        List<MaterialTagRuleDescriptor> materialRules,
         Dictionary<string, List<string>> prototypesByRuleId,
         bool dictionaryEvidenceEnabled,
         IDictionaryDefinitionProvider? dictionaryProvider,

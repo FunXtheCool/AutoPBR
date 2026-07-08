@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Using Include="AutoPBR.Contracts" />
+    <Using Include="AutoPBR.Contracts.Ml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="MathNet.Numerics" />
     <PackageReference Include="Microsoft.ML.OnnxRuntime.Managed" />

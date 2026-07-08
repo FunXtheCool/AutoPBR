@@ -32,6 +32,7 @@ Namespaces mirror the folder path after the project root:
 | `src/AutoPBR.Contracts/GeometryIr/` | `AutoPBR.Contracts.GeometryIr` |
 | `src/AutoPBR.Contracts/Ml/` | `AutoPBR.Contracts.Ml` |
 | `src/AutoPBR.Ml/` | `AutoPBR.Core` (+ `Embeddings`, `HeightFromNormals` sub-namespaces; assembly split only) |
+| `src/AutoPBR.Ml/Embeddings/` | `AutoPBR.Core.Embeddings` (tag matching, MiniLM, dictionary provider) |
 | `src/AutoPBR.App/Rendering/OpenGL/` | `AutoPBR.App.Rendering.OpenGL` |
 
 Do not use a flat namespace when subfolders exist.

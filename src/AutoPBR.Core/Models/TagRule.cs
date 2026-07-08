@@ -1,5 +1,6 @@
 namespace AutoPBR.Core.Models;
 
+using AutoPBR.Contracts;
 using AutoPBR.Core.Models.RuleExpressions;
 
 /// <summary>

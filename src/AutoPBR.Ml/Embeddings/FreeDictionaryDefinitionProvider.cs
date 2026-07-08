@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
 using AutoPBR.Contracts.Ml;
+using AutoPBR.Contracts;
 
 namespace AutoPBR.Core.Embeddings;
 
@@ -72,7 +73,7 @@ public sealed class FreeDictionaryDefinitionProvider : IDictionaryDefinitionProv
         }
     }
 
-    internal static IReadOnlyList<string> ParseDefinitions(string json)
+    public static IReadOnlyList<string> ParseDefinitions(string json)
     {
         if (string.IsNullOrWhiteSpace(json))
         {

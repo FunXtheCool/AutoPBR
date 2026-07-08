@@ -1,4 +1,3 @@
-using AutoPBR.Core.Models;
 
 namespace AutoPBR.Core.Embeddings;
 
@@ -71,7 +70,7 @@ public static class MaterialTagMlPostProcessor
         string textureName,
         string ruleRelativeKey,
         IReadOnlyList<string> materialTagIds,
-        IReadOnlyList<TagRule> materialRules,
+        IReadOnlyList<MaterialTagRuleDescriptor> materialRules,
         int? maxMaterialTags = null)
     {
         if (materialTagIds.Count == 0)
@@ -79,7 +78,7 @@ public static class MaterialTagMlPostProcessor
             return [];
         }
 
-        var pathBelow = TagRuleApplicator.PathBelowNamespace(ruleRelativeKey);
+        var pathBelow = TagPathMatching.PathBelowNamespace(ruleRelativeKey);
         var combined = textureName + "\0" + pathBelow;
 
         var result = materialTagIds.ToList();
@@ -103,8 +102,8 @@ public static class MaterialTagMlPostProcessor
         string combined,
         int cap)
     {
-        var orePath = TagRuleApplicator.KeywordMatches(combined, "ore", wholeWord: true);
-        var coalContext = TagRuleApplicator.KeywordMatches(combined, "coal", wholeWord: true);
+        var orePath = TagPathMatching.KeywordMatches(combined, "ore", wholeWord: true);
+        var coalContext = TagPathMatching.KeywordMatches(combined, "coal", wholeWord: true);
         var hasStone = Contains(result, "stone");
         var hasGem = Contains(result, "gem");
         var hasMetal = Contains(result, "metal");
@@ -173,7 +172,7 @@ public static class MaterialTagMlPostProcessor
     /// </summary>
     private static List<string> EnsureStoneForOrePaths(List<string> ids, string combined)
     {
-        if (!TagRuleApplicator.KeywordMatches(combined, "ore", wholeWord: true))
+        if (!TagPathMatching.KeywordMatches(combined, "ore", wholeWord: true))
         {
             return ids;
         }
@@ -210,7 +209,7 @@ public static class MaterialTagMlPostProcessor
         string tagIdToDrop,
         string combined,
         string[] pathHints,
-        IReadOnlyList<TagRule> materialRules)
+        IReadOnlyList<MaterialTagRuleDescriptor> materialRules)
     {
         if (!Contains(ids, tagIdToDrop))
         {
@@ -283,7 +282,7 @@ public static class MaterialTagMlPostProcessor
         return result;
     }
 
-    private static TagRule? FindRule(IReadOnlyList<TagRule> materialRules, string ruleId)
+    private static MaterialTagRuleDescriptor? FindRule(IReadOnlyList<MaterialTagRuleDescriptor> materialRules, string ruleId)
     {
         foreach (var r in materialRules)
         {

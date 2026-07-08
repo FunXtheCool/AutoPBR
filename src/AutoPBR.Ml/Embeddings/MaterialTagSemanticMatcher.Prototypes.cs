@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 using AutoPBR.Contracts.Ml;
-using AutoPBR.Core.Models;
+using AutoPBR.Contracts;
 
 namespace AutoPBR.Core.Embeddings;
 
@@ -29,7 +29,7 @@ public sealed partial class MaterialTagSemanticMatcher
     /// Prototype phrases for embedding: display name and semantic hints, excluding any phrase that uses
     /// another material rule's id, display-name word, or keyword (avoids cross-tag contamination, e.g. "stone bricks" on stone vs brick).
     /// </summary>
-    private static List<string> BuildPrototypePhrases(TagRule rule, IReadOnlyList<TagRule> allRules)
+    private static List<string> BuildPrototypePhrases(MaterialTagRuleDescriptor rule, IReadOnlyList<MaterialTagRuleDescriptor> allRules)
     {
         var foreignTokens = CollectForeignMaterialTokens(rule, allRules);
         var list = new List<string>();
@@ -65,7 +65,7 @@ public sealed partial class MaterialTagSemanticMatcher
     }
 
     /// <summary>Tokens from other material rules (id, keywords, display-name words) used to reject overlapping prototype phrases.</summary>
-    private static HashSet<string> CollectForeignMaterialTokens(TagRule current, IReadOnlyList<TagRule> allRules)
+    private static HashSet<string> CollectForeignMaterialTokens(MaterialTagRuleDescriptor current, IReadOnlyList<MaterialTagRuleDescriptor> allRules)
     {
         var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var r in allRules)

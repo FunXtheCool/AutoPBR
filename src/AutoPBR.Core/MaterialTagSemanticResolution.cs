@@ -69,6 +69,7 @@ public static class MaterialTagSemanticResolution
     {
         usedSemanticMl = false;
         var materialRules = allRules.Where(r => r.Kind == TagRuleKind.Material).ToList();
+        var materialDescriptors = materialRules.ToDescriptors();
 
         if (IsVanillaEntityBedColorTexture(textureName, ruleRelativeKey))
         {
@@ -77,7 +78,7 @@ public static class MaterialTagSemanticResolution
                 textureName,
                 ruleRelativeKey,
                 ["organic"],
-                materialRules,
+                materialDescriptors,
                 sem is { Enabled: true, Matcher: not null } ? sem.MaxTags : null);
         }
 
@@ -88,7 +89,7 @@ public static class MaterialTagSemanticResolution
                 textureName,
                 ruleRelativeKey,
                 ["organic"],
-                materialRules,
+                materialDescriptors,
                 sem is { Enabled: true, Matcher: not null } ? sem.MaxTags : null);
         }
 
@@ -99,7 +100,7 @@ public static class MaterialTagSemanticResolution
                 textureName,
                 ruleRelativeKey,
                 ids,
-                materialRules,
+                materialDescriptors,
                 sem is { Enabled: true, Matcher: not null } ? sem.MaxTags : null);
         }
 
@@ -110,7 +111,7 @@ public static class MaterialTagSemanticResolution
                 textureName,
                 ruleRelativeKey,
                 heuristicIds,
-                materialRules,
+                materialDescriptors,
                 sem.MaxTags);
         }
 
@@ -118,7 +119,7 @@ public static class MaterialTagSemanticResolution
         var mlIds = matcher.Match(
                 textureName,
                 ruleRelativeKey,
-                materialRules,
+                materialDescriptors,
                 sem.MinSimilarity,
                 sem.MaxTags,
                 sem.CertaintyThreshold,
@@ -134,7 +135,7 @@ public static class MaterialTagSemanticResolution
             textureName,
             ruleRelativeKey,
             mlIds,
-            materialRules,
+            materialDescriptors,
             sem.MaxTags);
     }
 

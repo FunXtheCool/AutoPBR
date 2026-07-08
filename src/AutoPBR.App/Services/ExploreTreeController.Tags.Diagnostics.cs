@@ -29,10 +29,11 @@ internal sealed partial class ExploreTreeController
         var name = Path.GetFileNameWithoutExtension(archivePath);
         var rules = _tagRulesProvider?.Invoke() ?? TagRulePresets.Default;
         var materialRules = rules.Where(r => r.Kind == TagRuleKind.Material).ToList();
+        var materialDescriptors = materialRules.ToDescriptors();
         return matcher.MatchDebug(
             name,
             ruleKey,
-            materialRules,
+            materialDescriptors,
             sem.DictionaryEvidenceEnabled,
             sem.DictionaryProvider,
             sem.DictionaryEvidenceWeight,
@@ -59,6 +60,7 @@ internal sealed partial class ExploreTreeController
         var name = Path.GetFileNameWithoutExtension(archivePath);
         var rules = _tagRulesProvider?.Invoke() ?? TagRulePresets.Default;
         var materialRules = rules.Where(r => r.Kind == TagRuleKind.Material).ToList();
+        var materialDescriptors = materialRules.ToDescriptors();
         var flagRules = rules.Where(r => r.Kind == TagRuleKind.Flag).ToList();
         var rulesById = rules
             .GroupBy(static r => r.Id, StringComparer.OrdinalIgnoreCase)
@@ -89,7 +91,7 @@ internal sealed partial class ExploreTreeController
             semanticRawIds = matcher.Match(
                 name,
                 ruleKey,
-                materialRules,
+                materialDescriptors,
                 sem.MinSimilarity,
                 sem.MaxTags,
                 sem.CertaintyThreshold,
@@ -109,7 +111,7 @@ internal sealed partial class ExploreTreeController
             name,
             ruleKey,
             semanticRawIds,
-            materialRules,
+            materialDescriptors,
             sem.MaxTags);
         var postAdded = postProcessedMaterialIds.Except(semanticRawIds, StringComparer.OrdinalIgnoreCase).ToList();
         var postRemoved = semanticRawIds.Except(postProcessedMaterialIds, StringComparer.OrdinalIgnoreCase).ToList();

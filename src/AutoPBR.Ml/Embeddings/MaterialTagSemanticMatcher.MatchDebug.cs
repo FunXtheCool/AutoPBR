@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 using AutoPBR.Contracts.Ml;
-using AutoPBR.Core.Models;
+using AutoPBR.Contracts;
 
 namespace AutoPBR.Core.Embeddings;
 
@@ -16,7 +16,7 @@ public sealed partial class MaterialTagSemanticMatcher
     public SemanticMatchDebugReport MatchDebug(
         string textureName,
         string ruleRelativeKey,
-        IReadOnlyList<TagRule> rules,
+        IReadOnlyList<MaterialTagRuleDescriptor> rules,
         bool dictionaryEvidenceEnabled = false,
         IDictionaryDefinitionProvider? dictionaryProvider = null,
         double dictionaryEvidenceWeight = 0.35,

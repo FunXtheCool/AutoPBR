@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using AutoPBR.Contracts;
 using AutoPBR.Core.Models;
 
 namespace AutoPBR.Core;
@@ -8,28 +9,8 @@ namespace AutoPBR.Core;
 /// </summary>
 internal static class TagRuleApplicator
 {
-    /// <summary>
-    /// Unicode letter/number runs count as one token; other characters (including <c>_</c>, <c>/</c>, <c>\</c>) are boundaries.
-    /// </summary>
-    internal static bool KeywordMatches(string haystack, string keyword, bool wholeWord)
-    {
-        if (string.IsNullOrEmpty(keyword))
-        {
-            return false;
-        }
-
-        if (!wholeWord)
-        {
-            return haystack.Contains(keyword, StringComparison.OrdinalIgnoreCase);
-        }
-
-        var escaped = Regex.Escape(keyword);
-        // Avoid $@"..." — '{' in \p{L} would start string interpolation.
-        return Regex.IsMatch(
-            haystack,
-            "(?<![\\p{L}\\p{N}])" + escaped + "(?![\\p{L}\\p{N}])",
-            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-    }
+    internal static bool KeywordMatches(string haystack, string keyword, bool wholeWord) =>
+        TagPathMatching.KeywordMatches(haystack, keyword, wholeWord);
 
     /// <summary>
     /// Returns tag ids whose keywords match the texture file name or the relative path <strong>excluding</strong>
@@ -76,20 +57,6 @@ internal static class TagRuleApplicator
         return list;
     }
 
-    /// <summary>Everything after the first path segment of <paramref name="relativeKey"/> (the namespace / mod root).</summary>
-    internal static string PathBelowNamespace(string relativeKey)
-    {
-        if (string.IsNullOrEmpty(relativeKey))
-        {
-            return string.Empty;
-        }
-
-        var parts = relativeKey.Replace('/', '\\').Split('\\', StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length <= 1)
-        {
-            return string.Empty;
-        }
-
-        return string.Join("\\", parts.Skip(1));
-    }
+    internal static string PathBelowNamespace(string relativeKey) =>
+        TagPathMatching.PathBelowNamespace(relativeKey);
 }
