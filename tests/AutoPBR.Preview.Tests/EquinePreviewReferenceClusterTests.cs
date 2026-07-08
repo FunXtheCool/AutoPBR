@@ -3,7 +3,7 @@ using System.Text.Json;
 using AutoPBR.Core.Models;
 using AutoPBR.Preview;
 
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 /// <summary>
 /// Adult equines use <see cref="AbstractEquineModel"/> IR (not the mis-lifted <c>HorseModel</c> baby shard)

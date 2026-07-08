@@ -3,7 +3,7 @@ using System.Text.Json;
 using AutoPBR.Core.Models;
 using AutoPBR.Preview;
 
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 /// <summary>
 /// Chicken torso is pitched via <c>body</c> <c>Rx(π/2)</c>; LER column-root scale must keep body Z

@@ -3,7 +3,7 @@ using System.Text.Json;
 using AutoPBR.Core.Models;
 using AutoPBR.Preview;
 
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 /// <summary>
 /// Polar bear body uses <c>Rx(π/2)</c> like cow/chicken; preview Z/X must cluster with head/legs (not float along an axis).

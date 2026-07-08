@@ -4,7 +4,7 @@ using System.Text.Json.Nodes;
 using AutoPBR.Core.Models;
 using AutoPBR.Preview;
 
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 public sealed class PlayerPreviewAttachmentTests
 {

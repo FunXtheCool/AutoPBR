@@ -1,7 +1,7 @@
 using System.Numerics;
 using AutoPBR.Preview;
 
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 /// <summary>
 /// Animation-off Explore path bakes preview-space positions into the GPU bind VBO (same as CPU rebake).

@@ -20,6 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\Shared\GeometryIrTestTierSupport.cs" Link="Shared\GeometryIrTestTierSupport.cs" />
+    <Compile Include="..\Shared\GhastPreviewTestLandmarks.cs" Link="Shared\GhastPreviewTestLandmarks.cs" />
     <Compile Include="..\AutoPBR.Core.Tests\TestEnvironmentPaths.cs" Link="Shared\TestEnvironmentPaths.cs" />
   </ItemGroup>
 
@@ -39,6 +41,7 @@
     <Using Include="AutoPBR.Preview.Entities" />
     <Using Include="AutoPBR.Preview.GeometryIr" />
     <Using Include="AutoPBR.Preview.Parity" />
+    <Using Include="AutoPBR.Tests.TestSupport" />
     <Using Include="Xunit" />
   </ItemGroup>
 

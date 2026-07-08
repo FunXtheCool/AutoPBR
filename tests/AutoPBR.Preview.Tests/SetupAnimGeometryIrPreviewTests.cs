@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 public sealed class SetupAnimGeometryIrPreviewTests
 {

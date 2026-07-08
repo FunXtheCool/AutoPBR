@@ -5,7 +5,7 @@ using AutoPBR.Preview;
 using AutoPBR.Tests.TestSupport;
 using Xunit.Abstractions;
 
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 public sealed class RabbitPreviewAttachmentTests
 {

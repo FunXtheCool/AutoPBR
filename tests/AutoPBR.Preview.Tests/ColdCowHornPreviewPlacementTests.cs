@@ -1,7 +1,7 @@
 using System.Numerics;
 using System.Text.Json;
 
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 /// <summary>
 /// Cold cow horns must render on the head cluster in preview space (GPU bind + CPU), not inside the rotated body.

@@ -1,6 +1,6 @@
 using AutoPBR.Core.Models;
 
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 public sealed class PreviewScanReproTests
 {

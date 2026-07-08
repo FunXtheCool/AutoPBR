@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 /// <summary>
 /// Baby parity-catalog previews must resolve dedicated Baby* geometry IR hosts and emit a compact rig

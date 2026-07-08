@@ -1,7 +1,7 @@
 using System.Numerics;
 using System.Text.Json;
 
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 /// <summary>
 /// Baby goat horns use <c>PartPose.offsetAndRotation</c> under a pitched head; column <c>Er×T</c> compose must match JVM render affines.
