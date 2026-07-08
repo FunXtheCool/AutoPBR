@@ -1,4 +1,4 @@
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 /// <summary>T0/T2: P6 CopperGolem renderer-state shard + honest setupAnim walk/idle timing (no hand pose math).</summary>
 public sealed class RendererStateCopperGolemPreviewTests

@@ -82,4 +82,41 @@ public sealed partial class ObjectEntityBlockStateParityTests
             max = Vector3.Max(max, w);
         }
     }
+
+    private static float MeasureElementPreviewCentroidY(ModelElement el)
+    {
+        ReadOnlySpan<(float x, float y, float z)> corners =
+        [
+            (el.From[0], el.From[1], el.From[2]),
+            (el.To[0], el.From[1], el.From[2]),
+            (el.From[0], el.To[1], el.From[2]),
+            (el.To[0], el.To[1], el.From[2]),
+            (el.From[0], el.From[1], el.To[2]),
+            (el.To[0], el.From[1], el.To[2]),
+            (el.From[0], el.To[1], el.To[2]),
+            (el.To[0], el.To[1], el.To[2]),
+        ];
+        var sumY = 0f;
+        foreach (var (x, y, z) in corners)
+        {
+            var world = Vector3.Transform(new Vector3(x, y, z), el.LocalToParent);
+            sumY += world.Y / 16f - 0.5f;
+        }
+
+        return sumY / corners.Length;
+    }
+
+    private static bool IsStandingSignBoardElement(ModelElement el)
+    {
+        var width = el.To[0] - el.From[0];
+        var height = el.To[1] - el.From[1];
+        return width > 20f && MathF.Abs(height - 12f) < 0.01f;
+    }
+
+    private static bool IsStandingSignPostElement(ModelElement el)
+    {
+        var width = el.To[0] - el.From[0];
+        var height = el.To[1] - el.From[1];
+        return width < 5f && MathF.Abs(height - 14f) < 0.01f;
+    }
 }

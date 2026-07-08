@@ -1,4 +1,4 @@
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 /// <summary>T0/T2: P6 Nautilus renderer-state shard + honest setupAnim swim walk timing (no hand pose math).</summary>
 public sealed class RendererStateNautilusPreviewTests

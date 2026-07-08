@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\AutoPBR.Core\AutoPBR.Core.csproj" />
     <ProjectReference Include="..\..\src\AutoPBR.Preview\AutoPBR.Preview.csproj" />
     <ProjectReference Include="..\..\src\AutoPBR.Contracts\AutoPBR.Contracts.csproj" />
   </ItemGroup>

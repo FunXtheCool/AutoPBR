@@ -45,16 +45,14 @@ public sealed partial class OpenGlPreviewBackend
             frame.EntityEmulatedAnimClock = 0f;
         }
 
-        var bindPoseRebakeKey = frame.EntityRebakeCtx is not null
-            ? !setupAnimMotion && IsParityCatalogEmulatedAsset(frame.EntityRebakeCtx.AssetArchivePath)
-                ? BuildParityCatalogCpuBindCommitKey(frame.EntityRebakeCtx)
-                : BuildEntityGpuBindRebakeKey(frame.EntityRebakeCtx)
-            : null;
+        var bindPoseRebakeKey = PreviewRenderPassSetup.ResolveEntityBindRebakeKey(
+            setupAnimMotion,
+            frame.EntityRebakeCtx);
         var bindPoseCommitted = bindPoseRebakeKey is not null &&
             string.Equals(bindPoseRebakeKey, _entityBindPoseCommittedKey, StringComparison.Ordinal);
         var parityCatalogCpuBindReady = frame.EntityRebakeCtx is not null &&
             frame.BlockModel is not null &&
-            IsParityCatalogEmulatedAsset(frame.EntityRebakeCtx.AssetArchivePath) &&
+            PreviewRenderPassSetup.IsParityCatalogEmulatedAsset(frame.EntityRebakeCtx.AssetArchivePath) &&
             PreviewRenderPassSetup.IsParityCatalogCpuBindReady(
                 setupAnimMotion,
                 frame.BlockModel,
@@ -89,7 +87,7 @@ public sealed partial class OpenGlPreviewBackend
             frame.EntityRebakeCtx is not null &&
             !frame.Settings.EnableEntityAnimation &&
             needsBindPoseMesh &&
-            IsParityCatalogEmulatedAsset(frame.EntityRebakeCtx.AssetArchivePath) &&
+            PreviewRenderPassSetup.IsParityCatalogEmulatedAsset(frame.EntityRebakeCtx.AssetArchivePath) &&
             TryCommitParityCatalogCpuBindPoseMesh(
                 ref frame,
                 bindPoseRebakeKey,
@@ -101,7 +99,7 @@ public sealed partial class OpenGlPreviewBackend
             frame.EntityRebakeCtx is not null &&
             !frame.Settings.EnableEntityAnimation &&
             needsBindPoseMesh &&
-            !IsParityCatalogEmulatedAsset(frame.EntityRebakeCtx.AssetArchivePath) &&
+            !PreviewRenderPassSetup.IsParityCatalogEmulatedAsset(frame.EntityRebakeCtx.AssetArchivePath) &&
             EntityEmulatedPreviewRebaker.TryPrepareGpuSkinnedEmulatedMesh(
                 frame.EntityRebakeCtx,
                 frame.BlockModel.Materials,
@@ -179,7 +177,7 @@ public sealed partial class OpenGlPreviewBackend
             frame.EntityRebakeCtx is not null &&
             !frame.Settings.EnableEntityAnimation &&
             needsBindPoseMesh &&
-            !IsParityCatalogEmulatedAsset(frame.EntityRebakeCtx.AssetArchivePath) &&
+            !PreviewRenderPassSetup.IsParityCatalogEmulatedAsset(frame.EntityRebakeCtx.AssetArchivePath) &&
             EntityEmulatedPreviewRebaker.TryRebakeMesh(
                 frame.EntityRebakeCtx,
                 frame.BlockModel.Materials,
@@ -246,7 +244,7 @@ public sealed partial class OpenGlPreviewBackend
                  frame.BlockModel is not null &&
                  frame.EntityRebakeCtx is not null)
         {
-            var rebakeKey = BuildEntityGpuBindRebakeKey(frame.EntityRebakeCtx);
+            var rebakeKey = PreviewRenderPassSetup.BuildEntityGpuBindRebakeKey(frame.EntityRebakeCtx);
             if (!string.Equals(rebakeKey, _emulatedRebakeSubjectKey, StringComparison.Ordinal))
             {
                 _emulatedRebakeSubjectKey = rebakeKey;
@@ -747,7 +745,7 @@ public sealed partial class OpenGlPreviewBackend
         frame.BlockModel = cpuSubject;
         UploadPreviewMesh(cpuVerts, cpuIdx);
         frame.UploadedLiveEntityAnim = true;
-        _entityBindPoseCommittedKey = BuildParityCatalogCpuBindCommitKey(frame.EntityRebakeCtx);
+        _entityBindPoseCommittedKey = PreviewRenderPassSetup.BuildParityCatalogCpuBindCommitKey(frame.EntityRebakeCtx);
 
         lock (_sync)
         {

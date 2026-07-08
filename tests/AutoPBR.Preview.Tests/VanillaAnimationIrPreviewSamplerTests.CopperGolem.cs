@@ -1,4 +1,4 @@
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 public sealed partial class VanillaAnimationIrPreviewSamplerTests
 {

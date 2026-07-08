@@ -66,4 +66,41 @@ internal static class PreviewRenderPassSetup
         prevPauseEntityIdleAnimation = paused;
         return clock;
     }
+
+    internal static string BuildEntityGpuBindRebakeKey(EntityEmulatedPreviewRebakeContext ctx) =>
+        $"{ctx.PackZipPath}\u001f{ctx.AssetArchivePath}\u001f{ctx.PackConverterCpuMeshFingerprint}\u001f{ctx.PreviewPoseId ?? ""}\u001f{ctx.PreviewSizeId ?? ""}\u001f{ctx.PreviewContextTypeId ?? ""}";
+
+    /// <summary>
+    /// Stable parity-catalog animation-off CPU bind key. Do not include mesh fingerprint — TryRebakeMesh updates
+    /// <see cref="EntityEmulatedPreviewRebakeContext.PackConverterCpuMeshFingerprint"/> after commit, which must not
+    /// invalidate the GL-committed subject on every UI re-push.
+    /// </summary>
+    internal static string BuildParityCatalogCpuBindCommitKey(EntityEmulatedPreviewRebakeContext ctx) =>
+        $"{ctx.PackZipPath}\u001f{ctx.AssetArchivePath}\u001fparity-cpu-v{PreviewMeshGeometryFingerprint.PipelineRevision}\u001f{ctx.PreviewPoseId ?? ""}\u001f{ctx.PreviewSizeId ?? ""}\u001f{ctx.PreviewContextTypeId ?? ""}";
+
+    internal static bool ParityCatalogCpuBindCommitKeyMatchesCurrentRevision(string? committedKey) =>
+        committedKey is not null &&
+        committedKey.Contains(
+            $"parity-cpu-v{PreviewMeshGeometryFingerprint.PipelineRevision}",
+            StringComparison.Ordinal);
+
+    internal static bool IsParityCatalogEmulatedAsset(string? assetArchivePath)
+    {
+        if (string.IsNullOrWhiteSpace(assetArchivePath))
+        {
+            return false;
+        }
+
+        var norm = assetArchivePath.Replace('\\', '/').TrimStart('/');
+        return EntityTextureParityCatalog.IsCatalogued(norm);
+    }
+
+    internal static string? ResolveEntityBindRebakeKey(
+        bool setupAnimMotion,
+        EntityEmulatedPreviewRebakeContext? rebakeCtx) =>
+        rebakeCtx is null
+            ? null
+            : !setupAnimMotion && IsParityCatalogEmulatedAsset(rebakeCtx.AssetArchivePath)
+                ? BuildParityCatalogCpuBindCommitKey(rebakeCtx)
+                : BuildEntityGpuBindRebakeKey(rebakeCtx);
 }

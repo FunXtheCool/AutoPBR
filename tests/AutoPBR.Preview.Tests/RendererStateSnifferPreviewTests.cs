@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 /// <summary>T0/T2: P6 Sniffer renderer-state shard + honest setupAnim clip timing (no hand pose math).</summary>
 public sealed class RendererStateSnifferPreviewTests

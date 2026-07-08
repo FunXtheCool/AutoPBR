@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 /// <summary>T0/T2: P6 Allay renderer-state shard + honest setupAnim hold/dance flags (no hand pose math).</summary>
 public sealed class RendererStateAllayPreviewTests

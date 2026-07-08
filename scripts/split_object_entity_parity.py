@@ -8,9 +8,10 @@ MAIN = ROOT / "tests/AutoPBR.Core.Tests/ObjectEntityBlockStateParityTests.cs"
 def find_test_start(lines: list[str], method_marker: str) -> int:
     for i, line in enumerate(lines):
         if method_marker in line:
-            if i > 0 and lines[i - 1].strip().startswith("["):
-                return i - 1
-            return i
+            j = i
+            while j > 0 and lines[j - 1].strip().startswith("["):
+                j -= 1
+            return j
     raise SystemExit(f"marker not found: {method_marker}")
 
 

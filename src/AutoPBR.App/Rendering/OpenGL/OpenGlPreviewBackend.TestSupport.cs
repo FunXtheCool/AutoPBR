@@ -12,7 +12,7 @@ public sealed partial class OpenGlPreviewBackend
             _blockModelSubject = committedSubject;
             if (committedSubject.EmulatedRebake is { } ctx)
             {
-                _entityBindPoseCommittedKey = BuildParityCatalogCpuBindCommitKey(ctx);
+                _entityBindPoseCommittedKey = PreviewRenderPassSetup.BuildParityCatalogCpuBindCommitKey(ctx);
             }
 
             _meshDirty = false;
@@ -53,7 +53,7 @@ public sealed partial class OpenGlPreviewBackend
     }
 
     internal static string TestBuildParityCatalogCpuBindCommitKey(EntityEmulatedPreviewRebakeContext ctx) =>
-        BuildParityCatalogCpuBindCommitKey(ctx);
+        PreviewRenderPassSetup.BuildParityCatalogCpuBindCommitKey(ctx);
 
     internal static bool TestTryResolveEntitySkinningDrawState(
         PreviewModelSubject? model,
