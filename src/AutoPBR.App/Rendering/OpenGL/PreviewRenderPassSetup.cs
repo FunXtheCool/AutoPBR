@@ -1,10 +1,22 @@
 using AutoPBR.App.Rendering.Scene;
+using AutoPBR.Preview;
 
 namespace AutoPBR.App.Rendering.OpenGL;
 
 /// <summary>Entity emulated idle animation clock for OpenGL pass setup (extracted from pass setup partial).</summary>
 internal static class PreviewRenderPassSetup
 {
+    internal static bool IsParityCatalogCpuBindReady(
+        bool setupAnimMotion,
+        PreviewModelSubject blockModel,
+        bool bindPoseCommitted) =>
+        !setupAnimMotion &&
+        bindPoseCommitted &&
+        !blockModel.GpuEntityBoneSkinning &&
+        blockModel.EntityPreviewPlacementApplied &&
+        blockModel.InterleavedVertices.Length > 0 &&
+        blockModel.Indices.Length > 0;
+
     internal static float ResolveEntityEmulatedAnimClock(
         in GlRenderFrame frame,
         ref bool prevPauseEntityIdleAnimation,

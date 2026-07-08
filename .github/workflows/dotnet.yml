@@ -27,7 +27,27 @@ on:
       - ".github/workflows/**"
 
 jobs:
-  build:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      app: ${{ steps.filter.outputs.app }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            app:
+              - 'src/AutoPBR.App/**'
+              - 'tests/AutoPBR.App.Tests/**'
+              - 'src/AutoPBR.PreviewGpuAssets/**'
+              - 'src/AutoPBR.Tools.GeneratePreviewCloudAssets/**'
+              - 'src/AutoPBR.Tools.GeneratePreviewGroundAssets/**'
+              - 'src/AutoPBR.Tools.GenerateIcon/**'
+
+  build-core:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -48,14 +68,57 @@ jobs:
       - name: Restore
         run: dotnet restore "AutoPBR.sln"
 
-      - name: Build
-        run: dotnet build "AutoPBR.sln" -c Release --no-restore -v minimal
+      - name: Build core stack (no Avalonia App)
+        run: |
+          dotnet build "src/AutoPBR.Contracts/AutoPBR.Contracts.csproj" -c Release --no-restore -v minimal
+          dotnet build "src/AutoPBR.Core/AutoPBR.Core.csproj" -c Release --no-restore -v minimal
+          dotnet build "src/AutoPBR.Preview/AutoPBR.Preview.csproj" -c Release --no-restore -v minimal
+          dotnet build "src/AutoPBR.Cli/AutoPBR.Cli.csproj" -c Release --no-restore -v minimal
+          dotnet build "src/AutoPBR.Tools.GeometryCompiler/AutoPBR.Tools.GeometryCompiler.csproj" -c Release --no-restore -v minimal
+          dotnet build "src/AutoPBR.Tools.AnimationCompiler/AutoPBR.Tools.AnimationCompiler.csproj" -c Release --no-restore -v minimal
+          dotnet build "tests/AutoPBR.Core.Tests/AutoPBR.Core.Tests.csproj" -c Release --no-restore -v minimal
+          dotnet build "tests/AutoPBR.GeometryCompiler.Tests/AutoPBR.GeometryCompiler.Tests.csproj" -c Release --no-restore -v minimal
+          dotnet build "tests/AutoPBR.Preview.Tests/AutoPBR.Preview.Tests.csproj" -c Release --no-restore -v minimal
+          dotnet build "tests/AutoPBR.AnimationCompiler.Tests/AutoPBR.AnimationCompiler.Tests.csproj" -c Release --no-restore -v minimal
 
-      - name: Test
-        run: dotnet test "AutoPBR.sln" -c Release --no-build --settings tests/ci.runsettings -v minimal
+      - name: Test core stack
+        run: |
+          dotnet test "tests/AutoPBR.Preview.Tests/AutoPBR.Preview.Tests.csproj" -c Release --no-build --settings tests/ci.runsettings -v minimal
+          dotnet test "tests/AutoPBR.Core.Tests/AutoPBR.Core.Tests.csproj" -c Release --no-build --settings tests/ci.runsettings -v minimal
+          dotnet test "tests/AutoPBR.GeometryCompiler.Tests/AutoPBR.GeometryCompiler.Tests.csproj" -c Release --no-build --settings tests/ci.runsettings -v minimal
+          dotnet test "tests/AutoPBR.AnimationCompiler.Tests/AutoPBR.AnimationCompiler.Tests.csproj" -c Release --no-build --settings tests/ci.runsettings -v minimal
 
       - name: Validate geometry IR (26.1.2 strict)
         run: dotnet run --project src/AutoPBR.Tools.GeometryCompiler --no-build -c Release -- validate-geometry --strict 26.1.2
 
       - name: Geometry IR reference alignment (strict pilots, when reference JSON committed)
         run: dotnet test tests/AutoPBR.Core.Tests/AutoPBR.Core.Tests.csproj -c Release --no-build --filter "FullyQualifiedName~GeometryIrReferenceBakeTests" -v minimal
+
+  build-app:
+    needs: changes
+    if: github.event_name == 'push' || needs.changes.outputs.app == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', 'Directory.Packages.props', 'global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore
+        run: dotnet restore "AutoPBR.sln"
+
+      - name: Build solution
+        run: dotnet build "AutoPBR.sln" -c Release --no-restore -v minimal
+
+      - name: Test App
+        run: dotnet test "tests/AutoPBR.App.Tests/AutoPBR.App.Tests.csproj" -c Release --no-build --settings tests/ci.runsettings -v minimal

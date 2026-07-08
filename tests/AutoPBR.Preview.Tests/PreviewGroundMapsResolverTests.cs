@@ -4,7 +4,7 @@ using AutoPBR.Preview;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
-namespace AutoPBR.Core.Tests;
+namespace AutoPBR.Preview.Tests;
 
 public sealed class PreviewGroundMapsResolverTests
 {

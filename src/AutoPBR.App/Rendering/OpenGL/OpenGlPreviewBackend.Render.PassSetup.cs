@@ -52,17 +52,13 @@ public sealed partial class OpenGlPreviewBackend
             : null;
         var bindPoseCommitted = bindPoseRebakeKey is not null &&
             string.Equals(bindPoseRebakeKey, _entityBindPoseCommittedKey, StringComparison.Ordinal);
-        var parityCatalogCpuBindReady = !setupAnimMotion &&
-            frame.EntityRebakeCtx is not null &&
+        var parityCatalogCpuBindReady = frame.EntityRebakeCtx is not null &&
+            frame.BlockModel is not null &&
             IsParityCatalogEmulatedAsset(frame.EntityRebakeCtx.AssetArchivePath) &&
-            bindPoseCommitted &&
-            frame.BlockModel is
-            {
-                GpuEntityBoneSkinning: false,
-                EntityPreviewPlacementApplied: true,
-                InterleavedVertices.Length: > 0,
-                Indices.Length: > 0
-            };
+            PreviewRenderPassSetup.IsParityCatalogCpuBindReady(
+                setupAnimMotion,
+                frame.BlockModel,
+                bindPoseCommitted);
         if (parityCatalogCpuBindReady)
         {
             // Committed parity-catalog CPU mesh: do not let the generic fallback path clobber the VBO

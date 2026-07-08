@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);CA1707</NoWarn>
+    <RootNamespace>AutoPBR.Preview.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\AutoPBR.Core\AutoPBR.Core.csproj" />
+    <ProjectReference Include="..\..\src\AutoPBR.Preview\AutoPBR.Preview.csproj" />
+    <ProjectReference Include="..\..\src\AutoPBR.Contracts\AutoPBR.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="AutoPBR.Core" />
+    <Using Include="AutoPBR.Core.Models" />
+    <Using Include="AutoPBR.Contracts.GeometryIr" />
+    <Using Include="AutoPBR.Preview" />
+    <Using Include="AutoPBR.Preview.Blocks" />
+    <Using Include="AutoPBR.Preview.Entities" />
+    <Using Include="AutoPBR.Preview.GeometryIr" />
+    <Using Include="AutoPBR.Preview.Parity" />
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>
