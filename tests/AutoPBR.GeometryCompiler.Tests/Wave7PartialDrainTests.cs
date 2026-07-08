@@ -22,7 +22,7 @@ public sealed class Wave7PartialDrainTests
         }
 
         Assert.True(
-            GeometryLiftPipeline.TryLiftWithJavapFallback(JavapLocator.FindJavap(), jar, null,
+            GeometryLiftPipeline.TryLiftWithJavapFallback(GeometryJavapLocator.FindJavap(), jar, null,
                 "net.minecraft.client.model.animal.chicken.ColdChickenModel", "createBodyLayer",
                 preferAsm: true, out var attempt),
             string.Join("; ", attempt.Notes));
@@ -42,7 +42,7 @@ public sealed class Wave7PartialDrainTests
         }
 
         Assert.True(
-            GeometryLiftPipeline.TryLiftWithJavapFallback(JavapLocator.FindJavap(), jar, null,
+            GeometryLiftPipeline.TryLiftWithJavapFallback(GeometryJavapLocator.FindJavap(), jar, null,
                 "net.minecraft.client.model.animal.cow.ColdCowModel", "createBodyLayer", preferAsm: true,
                 out var attempt),
             string.Join("; ", attempt.Notes));

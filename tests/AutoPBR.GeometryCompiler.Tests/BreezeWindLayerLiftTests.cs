@@ -15,7 +15,7 @@ public sealed class BreezeWindLayerLiftTests
         }
 
         Assert.True(
-            GeometryLiftPipeline.TryLiftWithJavapFallback(JavapLocator.FindJavap(), jar, null,
+            GeometryLiftPipeline.TryLiftWithJavapFallback(GeometryJavapLocator.FindJavap(), jar, null,
                 "net.minecraft.client.model.monster.breeze.BreezeModel", "createBodyLayer", preferAsm: true,
                 out var attempt),
             string.Join("; ", attempt.Notes));
@@ -33,7 +33,7 @@ public sealed class BreezeWindLayerLiftTests
         }
 
         Assert.True(
-            GeometryLiftPipeline.TryLiftWithJavapFallback(JavapLocator.FindJavap(), jar, null,
+            GeometryLiftPipeline.TryLiftWithJavapFallback(GeometryJavapLocator.FindJavap(), jar, null,
                 "net.minecraft.client.model.monster.breeze.BreezeModel", "createBodyLayer", preferAsm: true,
                 out var attempt),
             string.Join("; ", attempt.Notes));
@@ -55,7 +55,7 @@ public sealed class BreezeWindLayerLiftTests
         }
 
         Assert.True(
-            GeometryLiftPipeline.TryLiftWithJavapFallback(JavapLocator.FindJavap(), jar, null,
+            GeometryLiftPipeline.TryLiftWithJavapFallback(GeometryJavapLocator.FindJavap(), jar, null,
                 "net.minecraft.client.model.monster.breeze.BreezeModel", "createBodyLayer", preferAsm: true,
                 out var attempt),
             string.Join("; ", attempt.Notes));

@@ -1,6 +1,6 @@
 using AutoPBR.Core;
 using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -29,7 +29,7 @@ if (!File.Exists(dataPath))
 }
 
 var specularData = SpecularData.LoadFromFile(dataPath);
-var options = new AutoPbrOptions
+var options = new AutoPBROptions
 {
     SpecularData = specularData,
     FastSpecular = true,

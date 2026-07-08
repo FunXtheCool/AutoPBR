@@ -11,7 +11,7 @@ internal static partial class TextureScanner
 {
     public static IReadOnlyList<TextureWorkItem> ScanTextures(
         string extractedPackRoot,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         IProgress<ConversionProgress>? progress = null,
         string? cachePackPath = null,
         bool applyFoliageIgnoreFilter = true,

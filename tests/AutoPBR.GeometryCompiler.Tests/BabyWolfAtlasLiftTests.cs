@@ -19,7 +19,7 @@ public sealed class BabyWolfAtlasLiftTests
 
         Assert.True(
             GeometryLiftPipeline.TryLiftWithJavapFallback(
-                JavapLocator.FindJavap(),
+                GeometryJavapLocator.FindJavap(),
                 jar,
                 null,
                 Jvm,

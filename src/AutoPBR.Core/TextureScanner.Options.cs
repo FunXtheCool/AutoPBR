@@ -9,7 +9,7 @@ namespace AutoPBR.Core;
 /// </summary>
 internal static partial class TextureScanner
 {
-    private static IEnumerable<(string folder, bool specularOnly)> GetEnabledFolders(AutoPbrOptions options)
+    private static IEnumerable<(string folder, bool specularOnly)> GetEnabledFolders(AutoPBROptions options)
     {
         if (options.ProcessBlocks)
         {
@@ -48,7 +48,7 @@ internal static partial class TextureScanner
         }
     }
 
-    private static int ResolveMaxParallelism(AutoPbrOptions options)
+    private static int ResolveMaxParallelism(AutoPBROptions options)
     {
         if (options.MaxThreads > 0)
         {
@@ -58,6 +58,6 @@ internal static partial class TextureScanner
         return Math.Max(1, Environment.ProcessorCount - 2);
     }
 
-    private static IReadOnlyList<TagRule> ResolveTagRules(AutoPbrOptions options) =>
+    private static IReadOnlyList<TagRule> ResolveTagRules(AutoPBROptions options) =>
         options.TagRules is { Count: > 0 } rules ? rules : TagRulePresets.Default;
 }

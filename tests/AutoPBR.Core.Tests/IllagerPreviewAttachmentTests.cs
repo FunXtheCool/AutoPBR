@@ -1,7 +1,7 @@
 using System.Numerics;
 
 using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 
 namespace AutoPBR.Core.Tests;
 

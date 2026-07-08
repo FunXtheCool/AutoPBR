@@ -3,7 +3,7 @@ using AutoPBR.Core.Models;
 namespace AutoPBR.Core;
 
 /// <summary>
-/// Shared helpers for thread naming and computing reasonable parallelism based on AutoPbrOptions.
+/// Shared helpers for thread naming and computing reasonable parallelism based on AutoPBROptions.
 /// </summary>
 internal static class ThreadingUtil
 {
@@ -18,9 +18,9 @@ internal static class ThreadingUtil
         return Math.Clamp(requested, 1, logical);
     }
 
-    public static int GetZipParallelism(AutoPbrOptions options) => GetEffectiveThreads(options.MaxThreads);
+    public static int GetZipParallelism(AutoPBROptions options) => GetEffectiveThreads(options.MaxThreads);
 
-    public static int GetConversionParallelism(AutoPbrOptions options) => GetEffectiveThreads(options.MaxThreads);
+    public static int GetConversionParallelism(AutoPBROptions options) => GetEffectiveThreads(options.MaxThreads);
 
     /// <summary>Set thread name for debugging (e.g. in Visual Studio Threads window). Name can only be set once per thread.</summary>
     public static void SetThreadName(string name)

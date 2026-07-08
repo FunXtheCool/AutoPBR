@@ -32,7 +32,7 @@ internal static class BrickProbeResolution
     /// <summary>
     /// Structuring-element radii for multi-scale white/black top-hat (same r for opening and closing).
     /// <paramref name="userMaxRadius"/> is combined with a resolution floor so HD packs still try coarse scales
-    /// when the user leaves defaults (see <see cref="AutoPbrDefaults.DefaultBrickMortarTopHatMaxRadius"/>).
+    /// when the user leaves defaults (see <see cref="AutoPBRDefaults.DefaultBrickMortarTopHatMaxRadius"/>).
     /// </summary>
     public static int[] GetTopHatRadii(int minDim, int userMaxRadius)
     {

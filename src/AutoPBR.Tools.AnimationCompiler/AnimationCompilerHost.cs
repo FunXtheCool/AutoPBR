@@ -31,7 +31,7 @@ internal sealed class AnimationCompilerHost
         _maps = string.IsNullOrWhiteSpace(mappingsPath) ? null : MojangMappingsParser.Load(mappingsPath);
         _versionLabel = versionLabel;
         _outDir = outDir;
-        _javap = string.IsNullOrWhiteSpace(javapOverride) ? JavapLocator.FindJavap() : javapOverride;
+        _javap = string.IsNullOrWhiteSpace(javapOverride) ? AnimationJavapLocator.FindJavap() : javapOverride;
         _maxBatchParallelism = Math.Max(1, maxBatchParallelism);
         _quiet = quiet;
         _emitStats = emitStats;

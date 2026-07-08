@@ -37,7 +37,7 @@ public class ParallelZipWriterTests
                 outZip,
                 [filePath],
                 temp,
-                new AutoPbrOptions(),
+                new AutoPBROptions(),
                 progress: null,
                 ConversionStage.Packing,
                 CancellationToken.None);
@@ -95,7 +95,7 @@ public class ParallelZipWriterTests
                 outZip,
                 [filePath],
                 temp,
-                new AutoPbrOptions(),
+                new AutoPBROptions(),
                 progress: null,
                 ConversionStage.Packing,
                 CancellationToken.None);

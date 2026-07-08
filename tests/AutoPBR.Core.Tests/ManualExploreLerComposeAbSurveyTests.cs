@@ -1,4 +1,4 @@
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 using Xunit.Abstractions;
 
 namespace AutoPBR.Core.Tests;

@@ -91,7 +91,7 @@ public static class PreviewMeshFactory
 
     /// <summary>XY quad centered at origin, facing +Z (viewer from +Z sees front).</summary>
     /// <remarks>
-    /// UVs match <see cref="AutoPBR.Core.Preview.PreviewUvBakePolicy.BlockOrItemBaseline"/> with <c>FlipV</c>
+    /// UVs match <see cref="AutoPBR.Preview.PreviewUvBakePolicy.BlockOrItemBaseline"/> with <c>FlipV</c>
     /// plus <see cref="Abstractions.PreviewMaterial.GlUploadFlipRows"/> on upload (same convention as baked block/item faces).
     /// </remarks>
     public static PreviewMesh CreateItemPlane(string name = "item_plane", float halfSize = 0.5f)

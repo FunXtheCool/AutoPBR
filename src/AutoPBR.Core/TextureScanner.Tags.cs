@@ -34,7 +34,7 @@ internal static partial class TextureScanner
             effective.Contains(FlagTagResolver.Sprite2DId),
             effective.Contains("organic") ||
             effective.Contains("plant") ||
-            AutoPbrDefaults.PlantTextureKeys.Contains(candidate.RelativePathNoExt),
+            AutoPBRDefaults.PlantTextureKeys.Contains(candidate.RelativePathNoExt),
             effective.Contains("brick"),
             effective.Contains(FlagTagResolver.UvWrapId),
             invertSpecular,
@@ -44,7 +44,7 @@ internal static partial class TextureScanner
 
     private static TagComputationResult ComputeTagsForCandidate(
         ScanCandidate candidate,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         IReadOnlyList<TagRule> rules,
         bool deferSemanticMl,
         IReadOnlyCollection<string>? inheritedMaterialTagIds = null)
@@ -94,7 +94,7 @@ internal static partial class TextureScanner
 
     private static Dictionary<string, IReadOnlyCollection<string>> BuildNumericOptifineFolderMaterialHints(
         IReadOnlyList<ScanCandidate> candidates,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         IReadOnlyList<TagRule> rules,
         CancellationToken cancellationToken)
     {

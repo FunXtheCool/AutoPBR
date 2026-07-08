@@ -11,7 +11,7 @@ internal static partial class TextureScanner
 {
     private static bool ShouldRunSemanticMlForCandidate(
         ScanCandidate candidate,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         IReadOnlyList<TagRule> rules)
     {
         if (IsNumericOnlyOptifineTile(candidate.Name, candidate.RelativePathNoExt))

@@ -33,7 +33,7 @@ internal sealed partial class GeometryCompilerHost
         _clientJar = clientJar;
         _versionLabel = versionLabel;
         _outDir = outDir;
-        _javap = string.IsNullOrWhiteSpace(javapOverride) ? JavapLocator.FindJavap() : javapOverride;
+        _javap = string.IsNullOrWhiteSpace(javapOverride) ? GeometryJavapLocator.FindJavap() : javapOverride;
         _maps = string.IsNullOrWhiteSpace(mappingsPath) || !File.Exists(mappingsPath)
             ? null
             : MojangMappingsParser.Load(mappingsPath);

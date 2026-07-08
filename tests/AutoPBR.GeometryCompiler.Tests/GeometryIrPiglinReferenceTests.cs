@@ -1,4 +1,4 @@
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 using AutoPBR.Tests.TestSupport;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -38,7 +38,7 @@ public sealed class GeometryIrPiglinReferenceTests
             $"{jvm}.json");
         Assert.True(File.Exists(refPath), $"missing reference bake: {jvm}");
 
-        Assert.True(GeometryLiftPipeline.TryLiftRoots(JavapLocator.FindJavap(), jar, null, jvm, "createBodyLayer",
+        Assert.True(GeometryLiftPipeline.TryLiftRoots(GeometryJavapLocator.FindJavap(), jar, null, jvm, "createBodyLayer",
                 out var roots, out var notes),
             string.Join("; ", notes));
 
@@ -174,7 +174,7 @@ public sealed class GeometryIrPiglinReferenceTests
         Assert.True(BytecodeMeshResolution.TryResolve(jar, null,
             "net.minecraft.client.model.monster.piglin.AdultPiglinModel", "createBodyLayer", out var adultResolved));
         Assert.Contains(adultResolved.MeshConcat, resolved.MeshConcat, StringComparison.Ordinal);
-        Assert.True(GeometryLiftPipeline.TryLiftRoots(JavapLocator.FindJavap(), jar, null, jvm, "createBodyLayer",
+        Assert.True(GeometryLiftPipeline.TryLiftRoots(GeometryJavapLocator.FindJavap(), jar, null, jvm, "createBodyLayer",
                 out var roots, out var notes),
             string.Join("; ", notes));
         var head = FindPartById(roots, "head");

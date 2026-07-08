@@ -2,7 +2,7 @@ using System.Numerics;
 
 using AutoPBR.App.Rendering.Abstractions;
 using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 
 namespace AutoPBR.App.Rendering.OpenGL;
 

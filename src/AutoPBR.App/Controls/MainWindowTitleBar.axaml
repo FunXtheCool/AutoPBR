@@ -1,0 +1,70 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AutoPBR.App.ViewModels"
+             x:Class="AutoPBR.App.Controls.MainWindowTitleBar"
+             x:DataType="vm:MainWindowViewModel"
+             Height="40">
+    <Border Background="{Binding WindowBackground}">
+        <Grid ColumnDefinitions="Auto,*,Auto">
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center"
+                        Spacing="8"
+                        Margin="12,0,8,0">
+                <Border Background="Transparent"
+                        VerticalAlignment="Center"
+                        PointerPressed="TitleBarDragRegion_PointerPressed">
+                    <Image Source="/Assets/AutoPBR-logo.png"
+                           Width="24"
+                           Height="24"
+                           VerticalAlignment="Center"
+                           IsHitTestVisible="False" />
+                </Border>
+                <ToggleSwitch VerticalAlignment="Center"
+                              OnContent=""
+                              OffContent=""
+                              IsChecked="{Binding UseBatchFolderInput, Mode=TwoWay}"
+                              ToolTip.Tip="{Binding Strings.InputSourceModeTooltip}" />
+            </StackPanel>
+            <Border Grid.Column="1"
+                    Background="Transparent"
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Stretch"
+                    ClipToBounds="True"
+                    PointerPressed="TitleBarDragRegion_PointerPressed">
+                <TextBlock VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           Text="{Binding Strings.AppTitle}"
+                           Foreground="{Binding ForegroundBrush}"
+                           TextTrimming="CharacterEllipsis"
+                           TextWrapping="NoWrap"
+                           IsHitTestVisible="False" />
+            </Border>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="0">
+                <Button Width="46" Height="40"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        ToolTip.Tip="{Binding Strings.WindowMinimize}"
+                        Click="WindowMinimize_Click">
+                    <TextBlock Text="&#x2014;" FontSize="14" Foreground="{Binding ForegroundBrush}" />
+                </Button>
+                <Button Width="46" Height="40"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        ToolTip.Tip="{Binding Strings.WindowMaximize}"
+                        Click="WindowMaximize_Click">
+                    <TextBlock Text="&#x25A1;" FontSize="12" Foreground="{Binding ForegroundBrush}" />
+                </Button>
+                <Button Width="46" Height="40"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        ToolTip.Tip="{Binding Strings.WindowClose}"
+                        Click="WindowClose_Click">
+                    <TextBlock Text="&#x2715;" FontSize="12" Foreground="{Binding ForegroundBrush}" />
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

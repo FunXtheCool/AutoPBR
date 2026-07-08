@@ -17,7 +17,7 @@ internal static partial class NormalHeightGenerator
         float normalIntensity,
         bool invertR,
         bool invertG,
-        AutoPbrOptions options)
+        AutoPBROptions options)
     {
         normalIntensity = MathF.Max(normalIntensity, 1e-3f);
 

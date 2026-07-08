@@ -218,6 +218,18 @@ public partial class MainWindow : Window
     [DllImport("user32.dll", SetLastError = true)]
     private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
+    internal void HandleTitleBarDragRegionPointerPressed(object? sender, PointerPressedEventArgs e) =>
+        TitleBarDragRegion_PointerPressed(sender, e);
+
+    internal void HandleWindowMinimizeClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e) =>
+        WindowMinimize_Click(sender, e);
+
+    internal void HandleWindowMaximizeClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e) =>
+        WindowMaximize_Click(sender, e);
+
+    internal void HandleWindowCloseClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e) =>
+        WindowClose_Click(sender, e);
+
     private void TitleBarDragRegion_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)

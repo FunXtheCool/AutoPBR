@@ -10,7 +10,7 @@ namespace AutoPBR.App.Rendering.OpenGL;
 
 public sealed partial class OpenGlPreviewBackend
 {
-    private const int PreviewTaaSsaaMaxDimension = 3072;
+    private readonly GodRaysPassCoordinator _godRaysPassCoordinator = new();
 
     private GlShaderProgram? _scenePresentProgram;
     private GlShaderProgram? _screenSpaceGodRayProgram;
@@ -31,12 +31,47 @@ public sealed partial class OpenGlPreviewBackend
     private int _godRayHistoryVw;
     private int _godRayHistoryVh;
     private int _volumePathFailLogged;
-    private double _lastVolumetricTimingLogMs;
-    private bool _prevEnableGodRays;
-    private bool _prevEnableVolumetricClouds;
-    private bool _prevGodRayStabilizeDebug = true;
-    private bool _prevCloudDisableTemporal;
-    private int _lastSceneCaptureAaLogKey;
+
+    private void ApplyGodRaysPassInvalidation(in GodRaysPassInvalidation invalidation)
+    {
+        if (invalidation.GodRayHistory)
+        {
+            _godRayHistoryValid = false;
+        }
+
+        if (invalidation.VolumeFroxelHistory)
+        {
+            _volumeFroxelHistoryValid = false;
+        }
+
+        if (invalidation.VolumeIntegrateHistory)
+        {
+            _volumeIntegrateHistoryValid = false;
+        }
+
+        if (invalidation.CloudHistory)
+        {
+            _cloudHistoryValid = false;
+        }
+
+        if (invalidation.TaaHistory)
+        {
+            _taaHistoryValid = false;
+        }
+
+        if (invalidation.ResetGodRayLogs)
+        {
+            _volumePathFailLogged = 0;
+            _screenSpaceGodRayLogged = 0;
+            _shadowAwareGodRayLogged = 0;
+            _godRayBlitFailLogged = 0;
+        }
+
+        if (invalidation.ResetCloudDrawLog)
+        {
+            _loggedCloudDraw = false;
+        }
+    }
 
     private void TryInitGodRaysCore(GL gl, bool useOpenGlEs)
     {
@@ -201,116 +236,29 @@ public sealed partial class OpenGlPreviewBackend
         _scenePresentProgram is { IsValid: true } &&
         _godRayQuadVao != 0;
 
-    private float ResolvePreviewSceneCaptureScale(in PreviewRenderSettings settings)
-    {
-        if (!IsPreviewTaaActive(settings))
-        {
-            return 1f;
-        }
+    private float ResolvePreviewSceneCaptureScale(in PreviewRenderSettings settings) =>
+        GodRaysPassCoordinator.ResolveSceneCaptureScale(
+            settings,
+            s => IsPreviewTaaActive(s),
+            s => ResolveEffectivePreviewTaa(s));
 
-        var taa = ResolveEffectivePreviewTaa(settings);
-        if (settings.PreviewTaaForceFxaa ||
-            Math.Clamp(settings.PreviewTaaMode, 0, 4) == 2 ||
-            taa.EdgeAaBlend >= 0.45f ||
-            taa.FxaaEdgeStrength >= 0.70f)
-        {
-            return 2f;
-        }
+    private void ResolveSceneCaptureSize(ref GlRenderFrame frame, out int captureW, out int captureH, out float captureScale) =>
+        GodRaysPassCoordinator.ResolveSceneCaptureSize(
+            in frame,
+            s => IsPreviewTaaActive(s),
+            s => ResolveEffectivePreviewTaa(s),
+            out captureW,
+            out captureH,
+            out captureScale);
 
-        if (taa.EdgeAaBlend > 0.05f || taa.FxaaEdgeStrength > 0.20f)
-        {
-            return 1.5f;
-        }
+    private void MaybeLogSceneCaptureAaScale(ref GlRenderFrame frame) =>
+        _godRaysPassCoordinator.TryLogSceneCaptureAaScale(in frame, EmitDiagnostic);
 
-        return 1f;
-    }
+    private void SyncGodRayToggleState(in PreviewRenderSettings settings) =>
+        ApplyGodRaysPassInvalidation(_godRaysPassCoordinator.SyncGodRayToggleState(settings));
 
-    private void ResolveSceneCaptureSize(ref GlRenderFrame frame, out int captureW, out int captureH, out float captureScale)
-    {
-        captureScale = ResolvePreviewSceneCaptureScale(frame.Settings);
-        if (captureScale > 1f)
-        {
-            var maxOutputDimension = Math.Max(frame.Vw, frame.Vh);
-            var maxAllowedScale = PreviewTaaSsaaMaxDimension / (float)Math.Max(1, maxOutputDimension);
-            captureScale = Math.Clamp(captureScale, 1f, Math.Max(1f, maxAllowedScale));
-        }
-
-        captureW = Math.Max(1, (int)MathF.Ceiling(frame.Vw * captureScale));
-        captureH = Math.Max(1, (int)MathF.Ceiling(frame.Vh * captureScale));
-    }
-
-    private void MaybeLogSceneCaptureAaScale(ref GlRenderFrame frame)
-    {
-        if (!frame.Settings.LogPreviewTaaDiagnostics)
-        {
-            return;
-        }
-
-        if (frame.SceneCaptureScale <= 1f)
-        {
-            return;
-        }
-
-        var key = HashCode.Combine(
-            frame.Vw,
-            frame.Vh,
-            frame.SceneCaptureW,
-            frame.SceneCaptureH,
-            MathF.Round(frame.SceneCaptureScale * 100f),
-            Math.Clamp(frame.Settings.PreviewTaaMode, 0, 4),
-            frame.Settings.PreviewTaaForceFxaa);
-        if (_lastSceneCaptureAaLogKey == key)
-        {
-            return;
-        }
-
-        _lastSceneCaptureAaLogKey = key;
-        EmitDiagnostic(
-            $"[3D preview] Scene capture AA scale: {frame.SceneCaptureScale:0.##}x " +
-            $"({frame.Vw}x{frame.Vh} -> {frame.SceneCaptureW}x{frame.SceneCaptureH}, " +
-            $"taaMode={Math.Clamp(frame.Settings.PreviewTaaMode, 0, 4)} forceFxaa={frame.Settings.PreviewTaaForceFxaa}).");
-    }
-
-    private void SyncGodRayToggleState(in PreviewRenderSettings settings)
-    {
-        var godRaysChanged = _prevEnableGodRays != settings.EnableGodRays;
-        var stabilizeChanged = _prevGodRayStabilizeDebug != settings.GodRayStabilizeDebug;
-        if (!godRaysChanged && !stabilizeChanged)
-        {
-            return;
-        }
-
-        _prevEnableGodRays = settings.EnableGodRays;
-        _prevGodRayStabilizeDebug = settings.GodRayStabilizeDebug;
-        _godRayHistoryValid = false;
-        _volumeFroxelHistoryValid = false;
-        _volumeIntegrateHistoryValid = false;
-        _volumePathFailLogged = 0;
-        _screenSpaceGodRayLogged = 0;
-        _shadowAwareGodRayLogged = 0;
-        _godRayBlitFailLogged = 0;
-        _loggedCloudDraw = false;
-        _cloudHistoryValid = false;
-        _taaHistoryValid = false;
-    }
-
-    private void SyncVolumetricToggleState(in PreviewRenderSettings settings)
-    {
-        var cloudsChanged = _prevEnableVolumetricClouds != settings.EnableVolumetricClouds;
-        var temporalChanged = _prevCloudDisableTemporal != settings.CloudDisableTemporal;
-        if (!cloudsChanged && !temporalChanged)
-        {
-            return;
-        }
-
-        _prevEnableVolumetricClouds = settings.EnableVolumetricClouds;
-        _prevCloudDisableTemporal = settings.CloudDisableTemporal;
-        _loggedCloudDraw = false;
-        _godRayHistoryValid = false;
-        _volumeFroxelHistoryValid = false;
-        _cloudHistoryValid = false;
-        _taaHistoryValid = false;
-    }
+    private void SyncVolumetricToggleState(in PreviewRenderSettings settings) =>
+        ApplyGodRaysPassInvalidation(_godRaysPassCoordinator.SyncVolumetricToggleState(settings));
 
     private bool TryBeginGodRaySceneRender(ref GlRenderFrame frame)
     {
@@ -659,30 +607,8 @@ public sealed partial class OpenGlPreviewBackend
         return true;
     }
 
-    private void MaybeLogVolumetricTiming(in PreviewRenderSettings settings, double injectMs, double integrateMs)
-    {
-        if (!settings.LogVolumetricTiming)
-        {
-            return;
-        }
-
-        var totalMs = injectMs + integrateMs;
-        if (totalMs < 2.5)
-        {
-            return;
-        }
-
-        var now = Environment.TickCount64;
-        if (now - _lastVolumetricTimingLogMs < 8000)
-        {
-            return;
-        }
-
-        _lastVolumetricTimingLogMs = now;
-        EmitDiagnostic(
-            $"[3D preview] Volumetric pass timing: inject {injectMs:F2} ms, integrate {integrateMs:F2} ms " +
-            $"(budget ~2.5 ms @1080p; quality={settings.VolumetricQuality}).");
-    }
+    private void MaybeLogVolumetricTiming(in PreviewRenderSettings settings, double injectMs, double integrateMs) =>
+        _godRaysPassCoordinator.TryLogVolumetricTiming(settings, injectMs, integrateMs, EmitDiagnostic);
 
     private void DrawGodRayComposite(ref GlRenderFrame frame)
     {

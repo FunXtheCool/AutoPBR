@@ -1,6 +1,6 @@
 using AutoPBR.App.Lang;
 using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 
 using Avalonia.Media;
 

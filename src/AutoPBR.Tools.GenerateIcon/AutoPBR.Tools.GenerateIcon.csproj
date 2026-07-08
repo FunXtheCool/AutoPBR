@@ -7,6 +7,6 @@
     <RootNamespace>AutoPBR.Tools.GenerateIcon</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="System.Drawing.Common" Version="8.0.10" />
+    <PackageReference Include="System.Drawing.Common" />
   </ItemGroup>
 </Project>

@@ -1,5 +1,7 @@
 # Generated Minecraft client reference
 
+**Generated reference corpus — do not hand-edit.** Regenerate artifacts via `tools/` scripts (see sections below). Hand-written docs live under `docs/` (not this folder).
+
 Indexes are **per game version** (`minecraft-client-model-index-<version>.md` / `.json`). Class lists, JAR paths, and `javapPublic` signatures **differ by release** (obfuscation vs named bytecode, class count, and bytecode). Do not assume one version’s JSON applies to another.
 
 | Game version | Mapping source | Index files |

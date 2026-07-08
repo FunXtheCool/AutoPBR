@@ -143,7 +143,7 @@ public sealed class GeometryIr12111PartialClusterTests
 
         var mapsPath = Path.Combine(root, "tools", "minecraft-parity", "1.21.11", "client_mappings.txt");
         MojangMappingsParser? maps = File.Exists(mapsPath) ? MojangMappingsParser.Load(mapsPath) : null;
-        var javap = JavapLocator.FindJavap();
+        var javap = GeometryJavapLocator.FindJavap();
         Assert.True(
             GeometryLiftPipeline.TryLiftWithJavapFallback(javap, jar, maps, jvm, "createBodyLayer", preferAsm: true,
                 out var attempt),
@@ -174,7 +174,7 @@ public sealed class GeometryIr12111PartialClusterTests
         }
 
         var maps = MojangMappingsParser.Load(mapsPath);
-        var javap = JavapLocator.FindJavap();
+        var javap = GeometryJavapLocator.FindJavap();
         Assert.True(
             GeometryLiftPipeline.TryLiftWithJavapFallback(javap, jar, maps, jvm, "createBodyLayer", preferAsm: true,
                 out var attempt),
@@ -202,7 +202,7 @@ public sealed class GeometryIr12111PartialClusterTests
         }
 
         var maps = MojangMappingsParser.Load(mapsPath);
-        var javap = JavapLocator.FindJavap();
+        var javap = GeometryJavapLocator.FindJavap();
         Assert.True(
             GeometryLiftPipeline.TryLiftWithJavapFallback(javap, jar, maps, jvm, "createBodyLayer", preferAsm: true,
                 out var attempt),

@@ -21,7 +21,7 @@ public sealed class PreviewScanReproTests
             const string archivePath = "assets/minecraft/textures/item/acacia_boat.png";
             PackExtractionService.ExtractEntry(jar, archivePath, extracted);
 
-            var options = new AutoPbrOptions
+            var options = new AutoPBROptions
             {
                 ProcessItems = true,
                 FoliageMode = "Ignore All"

@@ -18,7 +18,7 @@ internal static partial class SpecularGenerator
 
     private static string? BuildSpecularModelLogLine(
         string textureName,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         bool useMlSpecular,
         string? mlDiagnostic)
     {

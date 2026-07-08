@@ -106,7 +106,7 @@ internal static partial class JavapClassDisassembly
     }
 
     private static string ResolveJavapExecutable(string? javapExe) =>
-        string.IsNullOrWhiteSpace(javapExe) ? JavapLocator.FindJavap() ?? "javap" : javapExe;
+        string.IsNullOrWhiteSpace(javapExe) ? GeometryJavapLocator.FindJavap() ?? "javap" : javapExe;
 
     private static CachedDisasm RunDisassembleUncached(string? javapExe, string clientJar, string javapClassArg)
     {

@@ -34,12 +34,12 @@ var input = args[0];
 var output = args[1];
 
 var fast = args.Any(a => a.Equals("--fast", StringComparison.OrdinalIgnoreCase));
-float normal = AutoPbrDefaults.DefaultNormalIntensity;
-float height = AutoPbrDefaults.DefaultHeightIntensity;
+float normal = AutoPBRDefaults.DefaultNormalIntensity;
+float height = AutoPBRDefaults.DefaultHeightIntensity;
 var normalOperator = NormalOperator.SobelVc;
 var normalKernelSize = NormalKernelSize.K3;
 var normalDerivative = NormalDerivative.Luminance;
-float deepBumpNormalStrength = AutoPbrDefaults.DefaultNormalIntensity;
+float deepBumpNormalStrength = AutoPBRDefaults.DefaultNormalIntensity;
 float deepBumpNormalSoftClamp = 0f;
 var deepBumpEdgeGuided = args.Any(a => a.Equals("--deepbump-edge-guided", StringComparison.OrdinalIgnoreCase));
 float deepBumpEdgeStrength = 1f;
@@ -346,7 +346,7 @@ if (!string.IsNullOrWhiteSpace(tagRulesJsonPath))
     }
 }
 
-var options = new AutoPbrOptions
+var options = new AutoPBROptions
 {
     FastSpecular = fast,
     NormalIntensity = normal,

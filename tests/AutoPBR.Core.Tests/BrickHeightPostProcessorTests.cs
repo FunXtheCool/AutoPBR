@@ -30,7 +30,7 @@ public sealed class BrickHeightPostProcessorTests
         using var img = new Image<Rgba32>(n, n, new Rgba32(128, 128, 128));
         var height = new byte[n * n];
         Array.Fill(height, (byte)200);
-        var opts = new AutoPbrOptions { BrickHeightMapPostProcessEnabled = true };
+        var opts = new AutoPBROptions { BrickHeightMapPostProcessEnabled = true };
 
         var outBytes = BrickHeightPostProcessor.Apply(height, n, n, img, opts, out var res);
 
@@ -46,7 +46,7 @@ public sealed class BrickHeightPostProcessorTests
 
         var height = new byte[n * n];
         Array.Fill(height, (byte)220);
-        var opts = new AutoPbrOptions
+        var opts = new AutoPBROptions
         {
             BrickHeightMapPostProcessEnabled = true,
             BrickHeightMinStructuralConfidence = 0.008f,
@@ -85,7 +85,7 @@ public sealed class BrickHeightPostProcessorTests
             }
         }
 
-        var opts = new AutoPbrOptions
+        var opts = new AutoPBROptions
         {
             BrickHeightMapPostProcessEnabled = true,
             BrickHeightMinStructuralConfidence = 0.008f,
@@ -119,7 +119,7 @@ public sealed class BrickHeightPostProcessorTests
             }
         }
 
-        var opts = new AutoPbrOptions
+        var opts = new AutoPBROptions
         {
             BrickHeightMapPostProcessEnabled = true,
             BrickHeightMinStructuralConfidence = 0.008f,
@@ -152,7 +152,7 @@ public sealed class BrickHeightPostProcessorTests
             }
         }
 
-        var opts = new AutoPbrOptions
+        var opts = new AutoPBROptions
         {
             BrickHeightMapPostProcessEnabled = true,
             BrickHeightMinStructuralConfidence = 0.006f,
@@ -184,7 +184,7 @@ public sealed class BrickHeightPostProcessorTests
             }
         }
 
-        var opts = new AutoPbrOptions
+        var opts = new AutoPBROptions
         {
             BrickHeightMapPostProcessEnabled = true,
             BrickHeightMinStructuralConfidence = 0.006f,

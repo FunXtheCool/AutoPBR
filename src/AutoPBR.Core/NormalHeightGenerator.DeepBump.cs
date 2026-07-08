@@ -8,7 +8,7 @@ namespace AutoPBR.Core;
 
 internal static partial class NormalHeightGenerator
 {
-    internal static DeepBumpNormalsGenerator? CreateDeepBumpGenerator(AutoPbrOptions options)
+    internal static DeepBumpNormalsGenerator? CreateDeepBumpGenerator(AutoPBROptions options)
     {
         return options.UseDeepBumpNormals && !string.IsNullOrWhiteSpace(options.DeepBumpModelPath)
             ? DeepBumpNormalsGenerator.TryCreate(
@@ -81,7 +81,7 @@ internal static partial class NormalHeightGenerator
     private static bool TryGenerateDeepBumpNormal(
         Image<Rgba32> diffuse,
         TextureWorkItem t,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         DeepBumpNormalsGenerator generatorForLoop,
         out Image<Rgba32> normal,
         out string failureReason)
@@ -139,7 +139,7 @@ internal static partial class NormalHeightGenerator
         Image<Rgba32> diffuse,
         int width,
         int height,
-        AutoPbrOptions options)
+        AutoPBROptions options)
     {
         var n = width * height;
         var grey = new float[n];

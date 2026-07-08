@@ -1,5 +1,5 @@
 using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -24,7 +24,7 @@ public sealed class PreviewGroundMapsResolverTests
             await File.WriteAllBytesAsync(diffuse, CreateSolidPng(16, 16, 90, 140, 55, 255));
 
             var dataPath = Path.Combine(AppContext.BaseDirectory, "Data", "textures_data.json");
-            var options = new AutoPbrOptions
+            var options = new AutoPBROptions
             {
                 SpecularData = SpecularData.LoadFromFile(dataPath),
                 FastSpecular = true,

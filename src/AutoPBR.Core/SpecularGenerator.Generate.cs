@@ -14,7 +14,7 @@ internal static partial class SpecularGenerator
 {
     public static Task GenerateAsync(
         IReadOnlyList<TextureWorkItem> textures,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         IProgress<ConversionProgress>? progress,
         CancellationToken ct)
     {
@@ -60,7 +60,7 @@ internal static partial class SpecularGenerator
     internal static string? GenerateLoaded(
         TextureWorkItem t,
         Image<Rgba32> img,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         IColorConverter<RGBColor, LabColor> rgbToLab,
         CIEDE2000ColorDifference de2000,
         int totalForTileParallelism,

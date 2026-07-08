@@ -29,7 +29,7 @@ public sealed class HumanoidPlayerMeshLiftTests
         Assert.True(BytecodeMeshResolution.TryResolve(jar, null, jvm, factoryMethod, out var resolved));
         Assert.True(
             GeometryLiftPipeline.TryLiftWithJavapFallback(
-                JavapLocator.FindJavap(),
+                GeometryJavapLocator.FindJavap(),
                 jar,
                 null,
                 jvm,

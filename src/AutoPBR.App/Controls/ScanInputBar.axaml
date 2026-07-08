@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AutoPBR.App.ViewModels"
+             xmlns:converters="using:Avalonia.Data.Converters"
+             x:Class="AutoPBR.App.Controls.ScanInputBar"
+             x:DataType="vm:MainWindowViewModel">
+    <Border Background="{Binding WindowBackground}"
+            BorderBrush="{Binding CardBorderBrush}"
+            BorderThickness="0,0,0,1">
+        <StackPanel Margin="16,8,16,10" Spacing="8" MinWidth="0">
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" MinWidth="0"
+                  IsVisible="{Binding UseBatchFolderInput, Converter={x:Static converters:BoolConverters.Not}}">
+                <TextBox Grid.Column="0" MinWidth="0" Watermark="{Binding Strings.ResourcePackWatermark}" Text="{Binding PackPath, Mode=TwoWay}" />
+                <Button Grid.Column="1" Content="{Binding Strings.ScanButton}" Command="{Binding ScanCurrentInputCommand}" />
+                <Button Grid.Column="2" Content="{Binding Strings.Browse}" Click="BrowseInput_Click" />
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" MinWidth="0"
+                  IsVisible="{Binding UseBatchFolderInput}">
+                <TextBox Grid.Column="0" MinWidth="0" Watermark="{Binding Strings.BatchFolderWatermark}" Text="{Binding BatchFolderPath, Mode=TwoWay}" />
+                <Button Grid.Column="1" Content="{Binding Strings.ScanButton}" Command="{Binding ScanCurrentInputCommand}" />
+                <Button Grid.Column="2" Content="{Binding Strings.Browse}" Click="BrowseInput_Click" />
+            </Grid>
+        </StackPanel>
+    </Border>
+</UserControl>

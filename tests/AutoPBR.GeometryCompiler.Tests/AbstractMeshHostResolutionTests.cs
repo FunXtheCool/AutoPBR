@@ -50,7 +50,7 @@ public sealed class AbstractMeshHostResolutionTests
             JavapMeshBytecodeProfiles.ContainsMeshSignals(bytecode.MeshConcat),
             $"no mesh signals in bytecode concat for {jvm}");
 
-        var javap = JavapLocator.FindJavap();
+        var javap = GeometryJavapLocator.FindJavap();
         if (!string.IsNullOrEmpty(javap))
         {
             var disasm = GeometryLiftPipeline.TryResolveMeshDisassembly(javap, jar, maps, jvm);

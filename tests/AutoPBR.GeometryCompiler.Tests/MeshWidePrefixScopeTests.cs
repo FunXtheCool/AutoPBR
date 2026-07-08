@@ -54,7 +54,7 @@ public sealed class MeshWidePrefixScopeTests
         }
 
         const string jvm = "net.minecraft.client.model.monster.piglin.AdultPiglinModel";
-        Assert.True(GeometryLiftPipeline.TryLiftRoots(JavapLocator.FindJavap(), jar, null, jvm, "createBodyLayer",
+        Assert.True(GeometryLiftPipeline.TryLiftRoots(GeometryJavapLocator.FindJavap(), jar, null, jvm, "createBodyLayer",
                 out var roots, out var notes),
             string.Join("; ", notes));
 

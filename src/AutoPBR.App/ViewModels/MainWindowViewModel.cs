@@ -19,7 +19,7 @@ using AutoPBR.App.ViewModels.Rulesets;
 using AutoPBR.Core;
 using AutoPBR.Core.Embeddings;
 using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 
 namespace AutoPBR.App.ViewModels;
 
@@ -89,27 +89,27 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [ObservableProperty] private string? _packPath;
     [ObservableProperty] private string? _outputDirectory;
 
-    [ObservableProperty] private double _normalIntensity = AutoPbrDefaults.DefaultNormalIntensity;
-    [ObservableProperty] private double _heightIntensity = AutoPbrDefaults.DefaultHeightIntensity;
-    [ObservableProperty] private bool _brickHeightMapPostProcessEnabled = AutoPbrDefaults.DefaultBrickHeightMapPostProcessEnabled;
-    [ObservableProperty] private double _brickHeightMinStructuralConfidence = AutoPbrDefaults.DefaultBrickHeightMinStructuralConfidence;
-    [ObservableProperty] private double _brickHeightInvertDeltaThreshold = AutoPbrDefaults.DefaultBrickHeightInvertDeltaThreshold;
-    [ObservableProperty] private double _brickLightGroutDiffuseDeltaMin = AutoPbrDefaults.DefaultBrickLightGroutDiffuseDeltaMin;
+    [ObservableProperty] private double _normalIntensity = AutoPBRDefaults.DefaultNormalIntensity;
+    [ObservableProperty] private double _heightIntensity = AutoPBRDefaults.DefaultHeightIntensity;
+    [ObservableProperty] private bool _brickHeightMapPostProcessEnabled = AutoPBRDefaults.DefaultBrickHeightMapPostProcessEnabled;
+    [ObservableProperty] private double _brickHeightMinStructuralConfidence = AutoPBRDefaults.DefaultBrickHeightMinStructuralConfidence;
+    [ObservableProperty] private double _brickHeightInvertDeltaThreshold = AutoPBRDefaults.DefaultBrickHeightInvertDeltaThreshold;
+    [ObservableProperty] private double _brickLightGroutDiffuseDeltaMin = AutoPBRDefaults.DefaultBrickLightGroutDiffuseDeltaMin;
     /// <summary>When true, preview refresh captures brick probe metrics into <see cref="PreviewBrickProbeDebugText"/>.</summary>
-    [ObservableProperty] private bool _previewBrickProbeDebug = AutoPbrDefaults.DefaultBrickProbePreviewDebug;
+    [ObservableProperty] private bool _previewBrickProbeDebug = AutoPBRDefaults.DefaultBrickProbePreviewDebug;
     [ObservableProperty] private string? _previewBrickProbeDebugText;
     [ObservableProperty] private bool _fastSpecular;
     [ObservableProperty] private string _foliageMode = "No Height";
     [ObservableProperty] private bool _useLegacyExtractor;
-    [ObservableProperty] private double _smoothnessScale = AutoPbrDefaults.DefaultSmoothnessScale;
-    [ObservableProperty] private double _metallicBoost = AutoPbrDefaults.DefaultMetallicBoost;
-    [ObservableProperty] private double _porosityBias = AutoPbrDefaults.DefaultPorosityBias;
+    [ObservableProperty] private double _smoothnessScale = AutoPBRDefaults.DefaultSmoothnessScale;
+    [ObservableProperty] private double _metallicBoost = AutoPBRDefaults.DefaultMetallicBoost;
+    [ObservableProperty] private double _porosityBias = AutoPBRDefaults.DefaultPorosityBias;
 
     /// <summary>Extra B-channel bias for plant-tagged textures (added to <see cref="PorosityBias"/>).</summary>
-    [ObservableProperty] private double _plantMaterialPorosityExtra = AutoPbrDefaults.DefaultPlantMaterialPorosityExtra;
+    [ObservableProperty] private double _plantMaterialPorosityExtra = AutoPBRDefaults.DefaultPlantMaterialPorosityExtra;
 
     /// <summary>0 = heuristic specular when ML ran; 1 = full ML contribution from the heuristic/AI blend slider.</summary>
-    [ObservableProperty] private double _mlSpecularHeuristicBlend = AutoPbrDefaults.DefaultMlSpecularHeuristicBlend;
+    [ObservableProperty] private double _mlSpecularHeuristicBlend = AutoPBRDefaults.DefaultMlSpecularHeuristicBlend;
 
     /// <summary>Enum name (SmoothnessOnly, AiMetalAndEmissive, or Full); kept in sync with <see cref="SelectedMlSpecularBlendModeOption"/>.</summary>
     [ObservableProperty] private string _mlSpecularHeuristicBlendMode =
@@ -139,7 +139,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [ObservableProperty] private string _deepBumpOverlap = "Large";
     [ObservableProperty] private string _deepBumpInputMode = nameof(AutoPBR.Core.Models.DeepBumpInputMode.Auto);
     [ObservableProperty] private bool _deepBumpForceBlue255;
-    [ObservableProperty] private double _deepBumpNormalIntensity = AutoPbrDefaults.DefaultNormalIntensity;
+    [ObservableProperty] private double _deepBumpNormalIntensity = AutoPBRDefaults.DefaultNormalIntensity;
     [ObservableProperty] private double _deepBumpNormalSoftClamp;
     [ObservableProperty] private bool _deepBumpEdgeGuidedEnhance;
     [ObservableProperty] private double _deepBumpEdgeGuidedStrength = 1.0;

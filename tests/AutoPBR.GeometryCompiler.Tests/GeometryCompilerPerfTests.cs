@@ -50,7 +50,7 @@ public sealed class GeometryCompilerPerfTests
     {
         JavapClassDisassembly.ClearDisassemblyCacheForTests();
         GeometryCompilerStats.Reset();
-        var javap = JavapLocator.FindJavap();
+        var javap = GeometryJavapLocator.FindJavap();
         if (string.IsNullOrWhiteSpace(javap))
         {
             return;

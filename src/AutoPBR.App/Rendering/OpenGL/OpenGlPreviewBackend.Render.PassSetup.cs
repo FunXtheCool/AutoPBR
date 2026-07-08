@@ -1,7 +1,7 @@
 using AutoPBR.App.Rendering.Abstractions;
 using AutoPBR.App.Rendering.Scene;
 using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 
 namespace AutoPBR.App.Rendering.OpenGL;
 
@@ -31,25 +31,11 @@ public sealed partial class OpenGlPreviewBackend
         // Must not depend on materials being ready; otherwise frame.ModelMatrix wobble uses a different phase than bones when amp != 1.
         if (frame.EntityEmulatedPreview && frame.BlockModel is not null && frame.EntityRebakeCtx is not null)
         {
-            var speed = Math.Clamp(frame.Settings.EntityAnimationSpeed, 0f, 4f);
-            var amp = Math.Clamp(frame.Settings.EntityAnimationAmplitude, 0f, 2f);
-            var paused = frame.Settings.PauseEntityIdleAnimation;
-            if (paused)
-            {
-                if (!_prevPauseEntityIdleAnimation)
-                {
-                    _frozenEntityIdleAnimClock = (float)(frame.RenderTime * speed * amp);
-                }
-
-                frame.EntityEmulatedAnimClock = _frozenEntityIdleAnimClock;
-            }
-            else
-            {
-                frame.EntityEmulatedAnimClock = (float)(frame.RenderTime * speed * amp);
-            }
-
-            frame.EntityEmulatedPauseEdge = paused != _prevPauseEntityIdleAnimation;
-            _prevPauseEntityIdleAnimation = paused;
+            frame.EntityEmulatedAnimClock = PreviewRenderPassSetup.ResolveEntityEmulatedAnimClock(
+                frame,
+                ref _prevPauseEntityIdleAnimation,
+                ref _frozenEntityIdleAnimClock,
+                out frame.EntityEmulatedPauseEdge);
         }
 
         frame.UploadedLiveEntityAnim = false;

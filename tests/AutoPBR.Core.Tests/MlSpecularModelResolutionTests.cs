@@ -5,7 +5,7 @@ namespace AutoPBR.Core.Tests;
 
 public sealed class MlSpecularModelResolutionTests
 {
-    private static AutoPbrOptions Options(
+    private static AutoPBROptions Options(
         bool useMl,
         string? fallback,
         IReadOnlyDictionary<int, string>? map) =>

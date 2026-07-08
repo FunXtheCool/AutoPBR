@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 

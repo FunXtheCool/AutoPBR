@@ -12,27 +12,27 @@ using NormalOperatorEnum = AutoPBR.Core.Models.NormalOperator;
 namespace AutoPBR.App.Models;
 
 /// <summary>
-/// Snapshot of conversion-related settings used to build <see cref="AutoPbrOptions"/>.
+/// Snapshot of conversion-related settings used to build <see cref="AutoPBROptions"/>.
 /// Populated from the VM before conversion or preview.
 /// </summary>
 internal sealed class ConversionSettingsModel
 {
-    public double NormalIntensity { get; set; } = AutoPbrDefaults.DefaultNormalIntensity;
-    public double HeightIntensity { get; set; } = AutoPbrDefaults.DefaultHeightIntensity;
-    public bool BrickHeightMapPostProcessEnabled { get; set; } = AutoPbrDefaults.DefaultBrickHeightMapPostProcessEnabled;
-    public double BrickHeightMinStructuralConfidence { get; set; } = AutoPbrDefaults.DefaultBrickHeightMinStructuralConfidence;
-    public double BrickHeightInvertDeltaThreshold { get; set; } = AutoPbrDefaults.DefaultBrickHeightInvertDeltaThreshold;
-    public double BrickLightGroutDiffuseDeltaMin { get; set; } = AutoPbrDefaults.DefaultBrickLightGroutDiffuseDeltaMin;
+    public double NormalIntensity { get; set; } = AutoPBRDefaults.DefaultNormalIntensity;
+    public double HeightIntensity { get; set; } = AutoPBRDefaults.DefaultHeightIntensity;
+    public bool BrickHeightMapPostProcessEnabled { get; set; } = AutoPBRDefaults.DefaultBrickHeightMapPostProcessEnabled;
+    public double BrickHeightMinStructuralConfidence { get; set; } = AutoPBRDefaults.DefaultBrickHeightMinStructuralConfidence;
+    public double BrickHeightInvertDeltaThreshold { get; set; } = AutoPBRDefaults.DefaultBrickHeightInvertDeltaThreshold;
+    public double BrickLightGroutDiffuseDeltaMin { get; set; } = AutoPBRDefaults.DefaultBrickLightGroutDiffuseDeltaMin;
     /// <summary>Single-texture preview only: populate brick probe diagnostics on the work item.</summary>
     public bool BrickProbePreviewDebug { get; set; }
     public bool FastSpecular { get; set; }
     public bool UseLegacyExtractor { get; set; }
-    public double SmoothnessScale { get; set; } = AutoPbrDefaults.DefaultSmoothnessScale;
-    public double MetallicBoost { get; set; } = AutoPbrDefaults.DefaultMetallicBoost;
-    public double PorosityBias { get; set; } = AutoPbrDefaults.DefaultPorosityBias;
+    public double SmoothnessScale { get; set; } = AutoPBRDefaults.DefaultSmoothnessScale;
+    public double MetallicBoost { get; set; } = AutoPBRDefaults.DefaultMetallicBoost;
+    public double PorosityBias { get; set; } = AutoPBRDefaults.DefaultPorosityBias;
 
     /// <summary>Extra B offset for plant-tagged textures (added to <see cref="PorosityBias"/>).</summary>
-    public double PlantMaterialPorosityExtra { get; set; } = AutoPbrDefaults.DefaultPlantMaterialPorosityExtra;
+    public double PlantMaterialPorosityExtra { get; set; } = AutoPBRDefaults.DefaultPlantMaterialPorosityExtra;
     public int MaxThreads { get; set; }
     public string? TempDirectory { get; set; }
 
@@ -49,13 +49,13 @@ internal sealed class ConversionSettingsModel
     public string DeepBumpOverlap { get; set; } = "Large";
     public string DeepBumpInputMode { get; set; } = nameof(DeepBumpInputModeEnum.Auto);
     public bool DeepBumpForceBlue255 { get; set; }
-    public double DeepBumpNormalIntensity { get; set; } = AutoPbrDefaults.DefaultNormalIntensity;
+    public double DeepBumpNormalIntensity { get; set; } = AutoPBRDefaults.DefaultNormalIntensity;
     public double DeepBumpNormalSoftClamp { get; set; }
     public bool DeepBumpEdgeGuidedEnhance { get; set; }
     public double DeepBumpEdgeGuidedStrength { get; set; } = 1.0;
     public double DeepBumpEdgeGuidedGamma { get; set; } = 1.0;
     public double DeepBumpEdgeGuidedDirectionMix { get; set; } = 0.35;
-    /// <summary>0 = only fully transparent pixels (aligned with <see cref="AutoPbrOptions.NormalHeightTransparentAlphaClampMax"/> default).</summary>
+    /// <summary>0 = only fully transparent pixels (aligned with <see cref="AutoPBROptions.NormalHeightTransparentAlphaClampMax"/> default).</summary>
     public int NormalHeightTransparentAlphaClampMax { get; set; }
     public string NormalOperator { get; set; } = nameof(NormalOperatorEnum.SobelVc);
     public string NormalKernelSize { get; set; } = "3";
@@ -82,7 +82,7 @@ internal sealed class ConversionSettingsModel
     public IReadOnlyDictionary<int, string>? MlSpecularModelPathsByResolution { get; set; }
 
     /// <summary>0 = heuristic specular when ML ran; 1 = full ML weight from the blend toward model output.</summary>
-    public double MlSpecularHeuristicBlend { get; set; } = AutoPbrDefaults.DefaultMlSpecularHeuristicBlend;
+    public double MlSpecularHeuristicBlend { get; set; } = AutoPBRDefaults.DefaultMlSpecularHeuristicBlend;
 
     /// <summary><see cref="MlSpecularBlendModeEnum"/> as enum name string (e.g. SmoothnessOnly, AiMetalAndEmissive, Full).</summary>
     public string MlSpecularHeuristicBlendMode { get; set; } = nameof(MlSpecularBlendModeEnum.SmoothnessOnly);
@@ -90,7 +90,7 @@ internal sealed class ConversionSettingsModel
     public string MlSpecularBlendMath { get; set; } = nameof(MlSpecularBlendMathEnum.Linear);
 
     public bool MlSpecularUseEdgeChannel { get; set; } = true;
-    /// <summary>0 = only fully transparent pixels (aligned with <see cref="AutoPbrOptions.MlSpecularTransparentAlphaClampMax"/> default).</summary>
+    /// <summary>0 = only fully transparent pixels (aligned with <see cref="AutoPBROptions.MlSpecularTransparentAlphaClampMax"/> default).</summary>
     public int MlSpecularTransparentAlphaClampMax { get; set; }
     public bool SpecularDebugDisableHeuristicSpecular { get; set; }
     public bool SpecularDebugSkipSpecularRemap { get; set; }
@@ -104,7 +104,7 @@ internal sealed class ConversionSettingsModel
     public bool PreferOnnxTensorRtExecutionProvider { get; set; }
 
     /// <summary>Builds Core options from this snapshot plus runtime data (specular, ignore set, entries filter, tag overrides, tag rules, semantic options).</summary>
-    public AutoPbrOptions ToAutoPbrOptions(
+    public AutoPBROptions ToAutoPBROptions(
         SpecularData? specularData,
         HashSet<string> ignore,
         IReadOnlyList<string>? entriesToExtractOnly,
@@ -136,7 +136,7 @@ internal sealed class ConversionSettingsModel
             out var parsedMlBlendMath)
             ? parsedMlBlendMath
             : MlSpecularBlendMathEnum.Linear;
-        return new AutoPbrOptions
+        return new AutoPBROptions
         {
             NormalIntensity = (float)NormalIntensity,
             HeightIntensity = (float)HeightIntensity,

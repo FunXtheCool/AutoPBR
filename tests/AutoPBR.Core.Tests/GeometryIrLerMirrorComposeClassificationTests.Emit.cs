@@ -1,6 +1,6 @@
 using System.Text.Json;
 using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 using AutoPBR.Tests.TestSupport;
 
 namespace AutoPBR.Core.Tests;

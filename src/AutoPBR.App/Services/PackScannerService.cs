@@ -1,5 +1,5 @@
 using AutoPBR.App.Models;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 
 namespace AutoPBR.App.Services;
 

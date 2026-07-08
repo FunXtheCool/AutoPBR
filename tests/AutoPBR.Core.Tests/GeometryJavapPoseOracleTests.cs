@@ -1,4 +1,4 @@
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 using AutoPBR.Tests.TestSupport;
 
 namespace AutoPBR.Core.Tests;

@@ -1,5 +1,5 @@
 using AutoPBR.Core;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 using Xunit;
 
 namespace AutoPBR.Core.Tests;

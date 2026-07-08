@@ -1,6 +1,6 @@
 using System.Globalization;
 using System.Text.Json;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 
 namespace AutoPBR.Tools.GeometryCompiler;
 

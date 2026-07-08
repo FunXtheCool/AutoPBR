@@ -25,7 +25,7 @@ public sealed class PartialToOkLiftTests(ITestOutputHelper output)
     public void Former_partial_models_pass_strict_shard_validation(string officialJvmName)
     {
         var jar = ResolveClientJar();
-        var javap = JavapLocator.FindJavap();
+        var javap = GeometryJavapLocator.FindJavap();
         var factoryMethod = ResolveFactoryMethod(jar, officialJvmName);
         Assert.True(GeometryLiftPipeline.TryLiftRoots(javap, jar, null, officialJvmName, factoryMethod,
                 out var roots, out var notes),
@@ -144,7 +144,7 @@ public sealed class PartialToOkLiftTests(ITestOutputHelper output)
     {
         var jar = ResolveClientJar();
         Assert.True(
-            GeometryLiftPipeline.TryLiftWithJavapFallback(JavapLocator.FindJavap(), jar, null,
+            GeometryLiftPipeline.TryLiftWithJavapFallback(GeometryJavapLocator.FindJavap(), jar, null,
                 "net.minecraft.client.model.animal.feline.AdultCatModel", "createBodyLayer", preferAsm: true,
                 out var attempt),
             string.Join("; ", attempt.Notes));
@@ -165,7 +165,7 @@ public sealed class PartialToOkLiftTests(ITestOutputHelper output)
     public void AdultCatModel_pipeline_lift_with_tree_repair()
     {
         var jar = ResolveClientJar();
-        var javap = JavapLocator.FindJavap();
+        var javap = GeometryJavapLocator.FindJavap();
         Assert.True(
             GeometryLiftPipeline.TryLiftWithJavapFallback(javap, jar, null,
                 "net.minecraft.client.model.animal.feline.AdultCatModel", "createBodyLayer", preferAsm: true,

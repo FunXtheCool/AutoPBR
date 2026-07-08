@@ -38,7 +38,7 @@ internal static class MlSpecularInference
     public static bool TryPredictSpecular(
         Image<Rgba32> image,
         float[] edgeMagnitude,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         out byte[] r,
         out byte[] g,
         out byte[] b,
@@ -157,7 +157,7 @@ internal static class MlSpecularInference
         return runners.ToArray();
     }
 
-    private static int ResolveCpuRunnerPoolSize(AutoPbrOptions options)
+    private static int ResolveCpuRunnerPoolSize(AutoPBROptions options)
     {
         // Multiple CPU sessions remove the single-runner lock bottleneck.
         // Cap pool size to avoid excessive model memory duplication.
@@ -283,7 +283,7 @@ internal static class MlSpecularInference
         public bool Predict(
             Image<Rgba32> image,
             float[] edgeMagnitude,
-            AutoPbrOptions options,
+            AutoPBROptions options,
             byte[] r,
             byte[] g,
             byte[] b,

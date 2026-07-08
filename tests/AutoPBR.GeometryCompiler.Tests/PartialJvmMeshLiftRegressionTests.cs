@@ -62,7 +62,7 @@ public sealed class PartialJvmMeshLiftRegressionTests
         Assert.True(BytecodeGeometryMeshLift.TryLiftConcat(capeOnly, null, out var capeOnlyRoots, out var capeOnlyNotes),
             string.Join("; ", capeOnlyNotes));
         Assert.NotNull(FindPartById(capeOnlyRoots, "cape"));
-        Assert.True(GeometryLiftPipeline.TryLiftRoots(JavapLocator.FindJavap(), jar, null, jvm, "createCapeLayer",
+        Assert.True(GeometryLiftPipeline.TryLiftRoots(GeometryJavapLocator.FindJavap(), jar, null, jvm, "createCapeLayer",
                 out var roots, out var notes),
             string.Join("; ", notes));
         var cape = FindPartById(roots, "cape");
@@ -108,7 +108,7 @@ public sealed class PartialJvmMeshLiftRegressionTests
         Assert.True(BytecodeGeometryMeshLift.TryLiftConcat(bodyMeshOnly, null, out var meshRoots, out var meshNotes),
             string.Join("; ", meshNotes));
         Assert.NotNull(FindPartById(meshRoots, "shell"));
-        Assert.True(GeometryLiftPipeline.TryLiftRoots(JavapLocator.FindJavap(), jar, null, jvm, "createBodyLayer",
+        Assert.True(GeometryLiftPipeline.TryLiftRoots(GeometryJavapLocator.FindJavap(), jar, null, jvm, "createBodyLayer",
                 out var roots, out var notes),
             string.Join("; ", notes));
         Assert.NotNull(FindPartById(roots, "shell"));
@@ -126,7 +126,7 @@ public sealed class PartialJvmMeshLiftRegressionTests
         }
 
         const string jvm = "net.minecraft.client.model.monster.piglin.BabyPiglinModel";
-        Assert.True(GeometryLiftPipeline.TryLiftRoots(JavapLocator.FindJavap(), jar, null, jvm, "createBodyLayer",
+        Assert.True(GeometryLiftPipeline.TryLiftRoots(GeometryJavapLocator.FindJavap(), jar, null, jvm, "createBodyLayer",
                 out var roots, out var notes),
             string.Join("; ", notes));
         var head = FindPartById(roots, "head");

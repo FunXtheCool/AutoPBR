@@ -17,7 +17,7 @@ public sealed class SetupAnimInheritanceLiftTests
             return;
         }
 
-        var javap = JavapLocator.FindJavap();
+        var javap = AnimationJavapLocator.FindJavap();
         Assert.False(string.IsNullOrWhiteSpace(javap));
         const string pig = "net.minecraft.client.model.animal.pig.PigModel";
         Assert.True(JavapRunner.TryDisassemble(javap, jar, pig, out var disasm, out _));
@@ -38,7 +38,7 @@ public sealed class SetupAnimInheritanceLiftTests
             return;
         }
 
-        var javap = JavapLocator.FindJavap();
+        var javap = AnimationJavapLocator.FindJavap();
         Assert.False(string.IsNullOrWhiteSpace(javap));
         const string zombie = "net.minecraft.client.model.monster.zombie.ZombieModel";
         Assert.True(JavapRunner.TryDisassemble(javap, jar, zombie, out var disasm, out _));

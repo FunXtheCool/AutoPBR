@@ -15,7 +15,7 @@ internal static partial class SpecularGenerator
     private static SpecularTileResult GenerateSpecularForDiffuseTile(
         Image<Rgba32> cropped,
         TextureWorkItem t,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         IColorConverter<RGBColor, LabColor> rgbToLab,
         CIEDE2000ColorDifference de2000)
     {

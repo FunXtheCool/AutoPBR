@@ -17,10 +17,7 @@ public sealed partial class OpenGlPreviewBackend
     private void OnLazyCloudGpuTierReady(in PreviewRenderSettings settings, int viewportWidth, int viewportHeight)
     {
         InvalidateVolumetricTemporalHistories();
-        _prevEnableGodRays = settings.EnableGodRays;
-        _prevGodRayStabilizeDebug = settings.GodRayStabilizeDebug;
-        _prevEnableVolumetricClouds = settings.EnableVolumetricClouds;
-        _prevCloudDisableTemporal = settings.CloudDisableTemporal;
+        _godRaysPassCoordinator.SeedToggleBaseline(settings);
         _prevEnablePreviewTaa = settings.EnablePreviewTaa;
         _prevPreviewTaaMode = settings.PreviewTaaMode;
         _cloudTierReadyWarmupDraws = CloudTierReadyWarmupDraws;

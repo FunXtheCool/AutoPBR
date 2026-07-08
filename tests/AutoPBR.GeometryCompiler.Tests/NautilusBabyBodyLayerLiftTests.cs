@@ -12,7 +12,7 @@ public sealed class NautilusBabyBodyLayerLiftTests
         var jar = ResolveClientJar();
         Assert.True(
             GeometryLiftPipeline.TryLiftWithJavapFallback(
-                JavapLocator.FindJavap(),
+                GeometryJavapLocator.FindJavap(),
                 jar,
                 null,
                 "net.minecraft.client.model.animal.nautilus.NautilusModel",

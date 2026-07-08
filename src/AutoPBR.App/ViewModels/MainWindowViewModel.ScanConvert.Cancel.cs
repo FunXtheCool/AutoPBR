@@ -46,7 +46,7 @@ public partial class MainWindowViewModel
     }
 
     /// <summary>Build converter options from current VM state and scan data.</summary>
-    private AutoPbrOptions BuildConversionOptions(
+    private AutoPBROptions BuildConversionOptions(
         HashSet<string> ignore,
         IReadOnlyList<string>? entriesToExtractOnly,
         IReadOnlyDictionary<string, (IReadOnlyList<string> Added, IReadOnlyList<string> Removed)>? manualTagOverrides = null,
@@ -116,7 +116,7 @@ public partial class MainWindowViewModel
             PreprocessFrequencyDetailStrength = PreprocessFrequencyDetailStrength,
             PreferOnnxTensorRtExecutionProvider = PreferOnnxTensorRtExecutionProvider
         };
-        return model.ToAutoPbrOptions(_specularData, ignore, entriesToExtractOnly,
+        return model.ToAutoPBROptions(_specularData, ignore, entriesToExtractOnly,
             manualTagOverrides ?? _exploreController.GetManualTagOverrides(), GetEffectiveTagRules(),
             BuildMaterialTagSemanticOptions());
     }

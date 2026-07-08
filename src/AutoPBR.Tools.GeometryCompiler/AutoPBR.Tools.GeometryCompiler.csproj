@@ -10,6 +10,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AutoPBR.Core\AutoPBR.Core.csproj" />
+    <ProjectReference Include="..\AutoPBR.Contracts\AutoPBR.Contracts.csproj" />
+    <ProjectReference Include="..\AutoPBR.Preview\AutoPBR.Preview.csproj" />
   </ItemGroup>
 
   <ItemGroup>

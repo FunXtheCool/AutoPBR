@@ -10,7 +10,7 @@ internal static class ConversionCoordinator
     public static Task ConvertAsync(
         string inputZipPath,
         string outputZipPath,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         IProgress<ConversionProgress>? progress,
         CancellationToken cancellationToken = default) =>
         ResourcePackConverter.ConvertAsync(inputZipPath, outputZipPath, options, progress, cancellationToken);

@@ -1,4 +1,4 @@
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 
 using System.IO.Compression;
 using System.Text;

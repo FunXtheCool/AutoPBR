@@ -9,7 +9,7 @@ internal static class TextureConversionPipeline
 {
     public static Task GenerateNormalsAndSpecularAsync(
         IReadOnlyList<TextureWorkItem> textures,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         IProgress<ConversionProgress>? progress,
         CancellationToken ct)
     {

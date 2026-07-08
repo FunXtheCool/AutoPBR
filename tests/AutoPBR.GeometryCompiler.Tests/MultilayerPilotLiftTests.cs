@@ -21,7 +21,7 @@ public sealed class MultilayerPilotLiftTests
     public void Multilayer_pilot_lifts_from_jar(string officialJvmName)
     {
         var jar = ResolveClientJar();
-        var javap = JavapLocator.FindJavap();
+        var javap = GeometryJavapLocator.FindJavap();
         var factory = officialJvmName.Contains("SpinAttack", StringComparison.Ordinal)
             ? "createLayer"
             : officialJvmName.Contains("PlayerCape", StringComparison.Ordinal)

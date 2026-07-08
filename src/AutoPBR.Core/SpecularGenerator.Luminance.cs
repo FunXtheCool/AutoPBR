@@ -13,7 +13,7 @@ namespace AutoPBR.Core;
 internal static partial class SpecularGenerator
 {
     private static (float[] luminance, float[] edgeMagnitude, float meanLuminance) BuildLuminanceAndEdge(
-        Image<Rgba32> cropped, int width, int height, AutoPbrOptions options)
+        Image<Rgba32> cropped, int width, int height, AutoPBROptions options)
     {
         var lum = new float[width * height];
         cropped.ProcessPixelRows(acc =>

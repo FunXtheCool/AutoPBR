@@ -1,5 +1,5 @@
 using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 
 namespace AutoPBR.Core.Tests;
 
@@ -61,7 +61,7 @@ public sealed class GrassBlockSnowPreviewResolveTests
                 texturePath,
                 extracted,
                 previewNativeProfile: null,
-                options: new AutoPbrOptions());
+                options: new AutoPBROptions());
 
             Assert.NotNull(resolved.MergedModel);
             Assert.Equal(PreviewMeshDriverKind.PackModelJson, resolved.MeshProvenance.Kind);

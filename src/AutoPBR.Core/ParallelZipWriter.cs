@@ -31,7 +31,7 @@ internal static class ParallelZipWriter
         string outputPath,
         IReadOnlyList<string> files,
         string basePath,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         IProgress<ConversionProgress>? progress,
         ConversionStage stage,
         CancellationToken cancellationToken)

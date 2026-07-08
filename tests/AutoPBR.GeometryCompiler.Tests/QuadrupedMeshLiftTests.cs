@@ -1,6 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 using AutoPBR.Tests.TestSupport;
 using AutoPBR.Tools.GeometryCompiler;
 

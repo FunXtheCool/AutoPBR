@@ -114,6 +114,10 @@ tools/MinecraftGeometryReference/build/
 /.tmp*
 /.scratch/
 /.diagnostics/
+/tmp.cs
+/tmp_*.csx
+tests/_*.csx
+tests/**/*.csx
 tools/chain-test.cs
 
 # Test/coverage diagnostics

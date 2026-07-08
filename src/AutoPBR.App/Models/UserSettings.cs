@@ -20,13 +20,13 @@ public sealed class UserSettings
 
     /// <summary>When true, input UI targets batch folder; main Convert runs batch for that folder.</summary>
     public bool UseBatchFolderInput { get; set; }
-    public double NormalIntensity { get; set; } = AutoPbrDefaults.DefaultNormalIntensity;
-    public double HeightIntensity { get; set; } = AutoPbrDefaults.DefaultHeightIntensity;
-    public bool BrickHeightMapPostProcessEnabled { get; set; } = AutoPbrDefaults.DefaultBrickHeightMapPostProcessEnabled;
-    public double BrickHeightMinStructuralConfidence { get; set; } = AutoPbrDefaults.DefaultBrickHeightMinStructuralConfidence;
-    public double BrickHeightInvertDeltaThreshold { get; set; } = AutoPbrDefaults.DefaultBrickHeightInvertDeltaThreshold;
-    public double BrickLightGroutDiffuseDeltaMin { get; set; } = AutoPbrDefaults.DefaultBrickLightGroutDiffuseDeltaMin;
-    public bool PreviewBrickProbeDebug { get; set; } = AutoPbrDefaults.DefaultBrickProbePreviewDebug;
+    public double NormalIntensity { get; set; } = AutoPBRDefaults.DefaultNormalIntensity;
+    public double HeightIntensity { get; set; } = AutoPBRDefaults.DefaultHeightIntensity;
+    public bool BrickHeightMapPostProcessEnabled { get; set; } = AutoPBRDefaults.DefaultBrickHeightMapPostProcessEnabled;
+    public double BrickHeightMinStructuralConfidence { get; set; } = AutoPBRDefaults.DefaultBrickHeightMinStructuralConfidence;
+    public double BrickHeightInvertDeltaThreshold { get; set; } = AutoPBRDefaults.DefaultBrickHeightInvertDeltaThreshold;
+    public double BrickLightGroutDiffuseDeltaMin { get; set; } = AutoPBRDefaults.DefaultBrickLightGroutDiffuseDeltaMin;
+    public bool PreviewBrickProbeDebug { get; set; } = AutoPBRDefaults.DefaultBrickProbePreviewDebug;
     public bool FastSpecular { get; set; }
     public string FoliageMode { get; set; } = "No Height";
 
@@ -47,9 +47,9 @@ public sealed class UserSettings
         set => UseLegacyExtractor = !value;
     }
 
-    public double SmoothnessScale { get; set; } = AutoPbrDefaults.DefaultSmoothnessScale;
-    public double MetallicBoost { get; set; } = AutoPbrDefaults.DefaultMetallicBoost;
-    public double PorosityBias { get; set; } = AutoPbrDefaults.DefaultPorosityBias;
+    public double SmoothnessScale { get; set; } = AutoPBRDefaults.DefaultSmoothnessScale;
+    public double MetallicBoost { get; set; } = AutoPBRDefaults.DefaultMetallicBoost;
+    public double PorosityBias { get; set; } = AutoPBRDefaults.DefaultPorosityBias;
 
     /// <summary>Extra porosity B for plant-tagged textures (added to <see cref="PorosityBias"/>). Null = use default on load.</summary>
     public double? PlantMaterialPorosityExtra { get; set; }
@@ -80,7 +80,7 @@ public sealed class UserSettings
 
     public string DeepBumpInputMode { get; set; } = nameof(DeepBumpInputModeEnum.Auto);
     public bool DeepBumpForceBlue255 { get; set; }
-    public double DeepBumpNormalIntensity { get; set; } = AutoPbrDefaults.DefaultNormalIntensity;
+    public double DeepBumpNormalIntensity { get; set; } = AutoPBRDefaults.DefaultNormalIntensity;
     public double DeepBumpNormalSoftClamp { get; set; }
     public bool DeepBumpEdgeGuidedEnhance { get; set; }
     public double DeepBumpEdgeGuidedStrength { get; set; } = 1.0;

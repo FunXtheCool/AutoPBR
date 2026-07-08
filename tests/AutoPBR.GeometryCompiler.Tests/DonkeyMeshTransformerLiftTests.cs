@@ -1,4 +1,4 @@
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 using AutoPBR.Tests.TestSupport;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -60,7 +60,7 @@ public sealed class DonkeyMeshTransformerLiftTests
             $"{DonkeyJvm}.json");
         Assert.True(File.Exists(refPath), $"missing reference bake: {DonkeyJvm}");
 
-        Assert.True(GeometryLiftPipeline.TryLiftRoots(JavapLocator.FindJavap(), jar, null, DonkeyJvm, "createBodyLayer",
+        Assert.True(GeometryLiftPipeline.TryLiftRoots(GeometryJavapLocator.FindJavap(), jar, null, DonkeyJvm, "createBodyLayer",
                 out var roots, out var notes),
             string.Join("; ", notes));
 

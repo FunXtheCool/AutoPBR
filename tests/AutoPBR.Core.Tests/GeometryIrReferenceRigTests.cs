@@ -1,8 +1,8 @@
 using System.Numerics;
 using System.Text.Json;
 
-using AutoPBR.Core.Preview;
-using AutoPBR.Core.Preview.Generated;
+using AutoPBR.Preview;
+using AutoPBR.Preview.Generated;
 
 namespace AutoPBR.Core.Tests;
 

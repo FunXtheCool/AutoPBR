@@ -15,7 +15,7 @@ internal static class BrickHeightPostProcessor
         int width,
         int height,
         Image<Rgba32> diffuse,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         out BrickHeightPostProcessResult result)
     {
         var n = width * height;
@@ -368,7 +368,7 @@ internal static class BrickHeightPostProcessor
         }
     }
 
-    private static float[] ExtractLuminance01(Image<Rgba32> cropped, int width, int height, AutoPbrOptions options)
+    private static float[] ExtractLuminance01(Image<Rgba32> cropped, int width, int height, AutoPBROptions options)
     {
         var lum = new float[width * height];
         cropped.ProcessPixelRows(acc =>

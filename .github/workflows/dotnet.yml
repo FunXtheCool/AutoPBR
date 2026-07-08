@@ -3,8 +3,28 @@ name: Build and test
 on:
   push:
     branches: [main, master]
+    paths:
+      - "**.cs"
+      - "**.csproj"
+      - "**.sln"
+      - "**.props"
+      - "**.json"
+      - "**.axaml"
+      - "**.glsl"
+      - "docs/generated/**"
+      - ".github/workflows/**"
   pull_request:
     branches: [main, master]
+    paths:
+      - "**.cs"
+      - "**.csproj"
+      - "**.sln"
+      - "**.props"
+      - "**.json"
+      - "**.axaml"
+      - "**.glsl"
+      - "docs/generated/**"
+      - ".github/workflows/**"
 
 jobs:
   build:
@@ -16,6 +36,14 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', 'Directory.Packages.props', 'global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
       - name: Restore
         run: dotnet restore "AutoPBR.sln"

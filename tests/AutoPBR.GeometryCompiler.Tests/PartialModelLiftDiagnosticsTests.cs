@@ -55,7 +55,7 @@ public sealed class PartialModelLiftDiagnosticsTests
     public void Mesh_definition_prologue_does_not_block_createBodyLayer_lift()
     {
         var jar = ResolveClientJar();
-        var javap = JavapLocator.FindJavap() ?? "javap";
+        var javap = GeometryJavapLocator.FindJavap() ?? "javap";
         JavapClassDisassembly.TryDisassemble(javap, jar,
             "net.minecraft.client.model.animal.frog.FrogModel", out var stdout, out _);
         var block = JavapClassDisassembly.ExtractMethodCodeBlock(stdout, "createBodyLayer");
@@ -89,7 +89,7 @@ public sealed class PartialModelLiftDiagnosticsTests
     public void Frog_full_createBodyLayer_block_lifts()
     {
         var jar = ResolveClientJar();
-        var javap = JavapLocator.FindJavap() ?? "javap";
+        var javap = GeometryJavapLocator.FindJavap() ?? "javap";
         JavapClassDisassembly.TryDisassemble(javap, jar,
             "net.minecraft.client.model.animal.frog.FrogModel", out var stdout, out var err);
         var block = JavapClassDisassembly.ExtractMethodCodeBlock(stdout, "createBodyLayer");
@@ -103,7 +103,7 @@ public sealed class PartialModelLiftDiagnosticsTests
     public void Frog_javap_named_concat_resolves_and_lifts()
     {
         var jar = ResolveClientJar();
-        var javap = JavapLocator.FindJavap() ?? "javap";
+        var javap = GeometryJavapLocator.FindJavap() ?? "javap";
         var disasm = GeometryLiftPipeline.TryResolveMeshDisassembly(javap, jar, null,
             "net.minecraft.client.model.animal.frog.FrogModel");
         Assert.NotNull(disasm);
@@ -116,7 +116,7 @@ public sealed class PartialModelLiftDiagnosticsTests
     public void BabyAxolotl_right_hind_leg_does_not_inherit_body_cuboids()
     {
         var jar = ResolveClientJar();
-        var javap = JavapLocator.FindJavap();
+        var javap = GeometryJavapLocator.FindJavap();
         Assert.True(GeometryLiftPipeline.TryLiftWithJavapFallback(javap, jar, null,
                 "net.minecraft.client.model.animal.axolotl.BabyAxolotlModel", "createBodyLayer", preferAsm: true,
                 out var attempt),
@@ -134,7 +134,7 @@ public sealed class PartialModelLiftDiagnosticsTests
     public void AdultAxolotl_lift_includes_body_with_torso_cuboids()
     {
         var jar = ResolveClientJar();
-        var javap = JavapLocator.FindJavap();
+        var javap = GeometryJavapLocator.FindJavap();
         Assert.True(GeometryLiftPipeline.TryLiftWithJavapFallback(javap, jar, null,
                 "net.minecraft.client.model.animal.axolotl.AdultAxolotlModel", "createBodyLayer", preferAsm: true,
                 out var attempt),
@@ -158,7 +158,7 @@ public sealed class PartialModelLiftDiagnosticsTests
         string parentId)
     {
         var jar = ResolveClientJar();
-        var javap = JavapLocator.FindJavap() ?? "javap";
+        var javap = GeometryJavapLocator.FindJavap() ?? "javap";
         var disasm = GeometryLiftPipeline.TryResolveMeshDisassembly(javap, jar, null, officialJvmName);
         Assert.NotNull(disasm);
         Assert.True(
@@ -174,7 +174,7 @@ public sealed class PartialModelLiftDiagnosticsTests
     public void Lifted_tree_passes_semantic_validator_for_adult_axolotl()
     {
         var jar = ResolveClientJar();
-        var javap = JavapLocator.FindJavap();
+        var javap = GeometryJavapLocator.FindJavap();
         Assert.True(GeometryLiftPipeline.TryLiftWithJavapFallback(javap, jar, null,
                 "net.minecraft.client.model.animal.axolotl.AdultAxolotlModel", "createBodyLayer", preferAsm: true,
                 out var attempt),
@@ -190,7 +190,7 @@ public sealed class PartialModelLiftDiagnosticsTests
     public void Lifted_tree_probe_reports_no_duplicate_cuboids_across_parts(string officialJvmName, string factoryMethod)
     {
         var jar = ResolveClientJar();
-        var javap = JavapLocator.FindJavap();
+        var javap = GeometryJavapLocator.FindJavap();
         Assert.True(GeometryLiftPipeline.TryLiftWithJavapFallback(javap, jar, null, officialJvmName, factoryMethod,
                 preferAsm: true, out var attempt),
             string.Join("; ", attempt.Notes));
@@ -203,7 +203,7 @@ public sealed class PartialModelLiftDiagnosticsTests
     public void Bytecode_lift_from_jar_produces_cuboids(string officialJvmName)
     {
         var jar = ResolveClientJar();
-        var javap = JavapLocator.FindJavap();
+        var javap = GeometryJavapLocator.FindJavap();
         var ok = GeometryLiftPipeline.TryLiftWithJavapFallback(javap, jar, null, officialJvmName, "createBodyLayer",
             preferAsm: true, out var attempt);
 

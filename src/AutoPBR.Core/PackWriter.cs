@@ -47,7 +47,7 @@ internal static class PackWriter
         string extracted,
         string outputZipPath,
         IReadOnlyList<TextureWorkItem> textures,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         IProgress<ConversionProgress>? progress,
         CancellationToken cancellationToken)
     {

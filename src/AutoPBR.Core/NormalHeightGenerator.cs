@@ -14,7 +14,7 @@ internal static partial class NormalHeightGenerator
 {
     public static Task GenerateAsync(
         IReadOnlyList<TextureWorkItem> textures,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         IProgress<ConversionProgress>? progress,
         CancellationToken ct)
     {
@@ -75,7 +75,7 @@ internal static partial class NormalHeightGenerator
     internal static string? GenerateLoaded(
         TextureWorkItem t,
         Image<Rgba32> diffuseImg,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         DeepBumpNormalsGenerator? generatorForLoop,
         DeepBumpFallbackTracker deepBumpFallback,
         int totalForTileParallelism,
@@ -239,7 +239,7 @@ internal static partial class NormalHeightGenerator
     private static Image<Rgba32> GenerateNormalForDiffuse(
         Image<Rgba32> diffuse,
         TextureWorkItem t,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         DeepBumpNormalsGenerator? generatorForLoop,
         out string? brickInfo,
         out bool usedClassicFallback,
@@ -292,7 +292,7 @@ internal static partial class NormalHeightGenerator
         }
 
         var heightIntensity = t.Overrides.HeightIntensity ?? options.HeightIntensity;
-        var brightness = t.Overrides.HeightBrightness ?? AutoPbrDefaults.DefaultHeightBrightness;
+        var brightness = t.Overrides.HeightBrightness ?? AutoPBRDefaults.DefaultHeightBrightness;
         var heightMap = GenerateHeightMap(diffuse, width, height, heightIntensity, brightness, t.Overrides.InvertHeight, options);
 
         BrickHeightPostProcessResult? brickProbeResult = null;
@@ -450,7 +450,7 @@ internal static partial class NormalHeightGenerator
     }
 
     private static HeightMap GenerateHeightMap(Image<Rgba32> cropped, int width, int height, float heightIntensity,
-        float brightness, bool invertHeight, AutoPbrOptions options)
+        float brightness, bool invertHeight, AutoPBROptions options)
     {
         heightIntensity = MathF.Max(heightIntensity, 1e-3f);
 

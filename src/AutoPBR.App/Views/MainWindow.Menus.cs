@@ -90,6 +90,9 @@ public partial class MainWindow : Window
         }
     }
 
+    internal void HandleBrowseInputClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e) =>
+        BrowseInput_Click(sender, e);
+
     private async void BrowseInput_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         try

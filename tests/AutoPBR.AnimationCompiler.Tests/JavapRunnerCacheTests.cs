@@ -9,7 +9,7 @@ public sealed class JavapRunnerCacheTests
     {
         JavapRunner.ClearDisassemblyCacheForTests();
         AnimationCompilerStats.Reset();
-        var javap = JavapLocator.FindJavap();
+        var javap = AnimationJavapLocator.FindJavap();
         if (string.IsNullOrWhiteSpace(javap))
         {
             return;

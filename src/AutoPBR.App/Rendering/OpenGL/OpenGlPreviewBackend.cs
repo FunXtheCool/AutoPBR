@@ -3,7 +3,7 @@ using System.Numerics;
 using AutoPBR.App.Lang;
 using AutoPBR.App.Rendering.Abstractions;
 using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 
 using Silk.NET.OpenGL;
 

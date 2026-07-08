@@ -21,7 +21,7 @@ public sealed class ClimatePartialLiftTests
         }
 
         const string jvm = "net.minecraft.client.model.animal.cow.ColdCowModel";
-        Assert.True(GeometryLiftPipeline.TryLiftRoots(JavapLocator.FindJavap(), jar, null, jvm, "createBodyLayer",
+        Assert.True(GeometryLiftPipeline.TryLiftRoots(GeometryJavapLocator.FindJavap(), jar, null, jvm, "createBodyLayer",
                 out var roots, out var notes),
             string.Join("; ", notes));
 
@@ -43,7 +43,7 @@ public sealed class ClimatePartialLiftTests
             return;
         }
 
-        Assert.True(GeometryLiftPipeline.TryLiftRoots(JavapLocator.FindJavap(), jar, null, jvm, "createBodyLayer",
+        Assert.True(GeometryLiftPipeline.TryLiftRoots(GeometryJavapLocator.FindJavap(), jar, null, jvm, "createBodyLayer",
                 out var roots, out var notes),
             string.Join("; ", notes));
 
@@ -62,7 +62,7 @@ public sealed class ClimatePartialLiftTests
             return;
         }
 
-        Assert.True(GeometryLiftPipeline.TryLiftRoots(JavapLocator.FindJavap(), jar, null, jvm, "createBodyLayer",
+        Assert.True(GeometryLiftPipeline.TryLiftRoots(GeometryJavapLocator.FindJavap(), jar, null, jvm, "createBodyLayer",
                 out var roots, out var notes),
             string.Join("; ", notes));
 

@@ -31,7 +31,7 @@ public sealed class BrickProbeResolutionTests
     [Fact]
     public void GetTopHatRadii256UsesCoarseScalesWhenUserDefault()
     {
-        var radii = BrickProbeResolution.GetTopHatRadii(256, AutoPbrDefaults.DefaultBrickMortarTopHatMaxRadius);
+        var radii = BrickProbeResolution.GetTopHatRadii(256, AutoPBRDefaults.DefaultBrickMortarTopHatMaxRadius);
         Assert.Contains(radii, r => r >= 8);
     }
 }

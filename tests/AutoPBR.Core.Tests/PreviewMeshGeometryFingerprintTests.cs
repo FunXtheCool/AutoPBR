@@ -1,5 +1,5 @@
 using System.Numerics;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 
 namespace AutoPBR.Core.Tests;
 

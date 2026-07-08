@@ -1,6 +1,5 @@
 using AutoPBR.Core.Embeddings;
 using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
 
 namespace AutoPBR.Core;
 
@@ -189,7 +188,7 @@ public static class MaterialTagSemanticResolution
         }
 
         if (effectiveTagIds.Contains(FlagTagResolver.ItemId, StringComparer.OrdinalIgnoreCase) &&
-            !PreviewPathPolicy.IsItemFlatSpriteExempt(effectiveTagIds))
+            !ItemFlatSpriteTagPolicy.IsItemFlatSpriteExempt(effectiveTagIds))
         {
             effectiveTagIds.Add(FlagTagResolver.Sprite2DId);
             return;

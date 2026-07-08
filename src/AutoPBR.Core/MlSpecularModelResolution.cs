@@ -5,7 +5,7 @@ namespace AutoPBR.Core;
 /// <summary>
 /// Selects a specular ONNX model path from per-resolution mapping using <b>ceil</b> policy:
 /// smallest configured resolution &gt;= texture size; if none, largest configured resolution.
-/// Falls back to <see cref="AutoPbrOptions.MlSpecularModelPath"/> when the map is empty or has no valid entries.
+/// Falls back to <see cref="AutoPBROptions.MlSpecularModelPath"/> when the map is empty or has no valid entries.
 /// </summary>
 public static class MlSpecularModelResolution
 {
@@ -48,7 +48,7 @@ public static class MlSpecularModelResolution
     /// <param name="selectedResolution">The resolution key chosen from the map, or null when using fallback path only.</param>
     /// <param name="diagnostic">Human-readable failure reason when the method returns false.</param>
     public static bool TryResolveModelPath(
-        AutoPbrOptions options,
+        AutoPBROptions options,
         int textureSize,
         out string? modelPath,
         out int? selectedResolution,

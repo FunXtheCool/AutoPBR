@@ -5,7 +5,7 @@ using AutoPBR.App.Rendering.OpenGL;
 using AutoPBR.App.ViewModels;
 using AutoPBR.Core;
 using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 
 namespace AutoPBR.App.Services;
 
@@ -234,7 +234,7 @@ internal static class UserSettingsSynchronizer
         vm.MetallicBoost = settings.MetallicBoost;
         vm.PorosityBias = settings.PorosityBias;
         vm.PlantMaterialPorosityExtra = Math.Clamp(
-            settings.PlantMaterialPorosityExtra ?? AutoPbrDefaults.DefaultPlantMaterialPorosityExtra,
+            settings.PlantMaterialPorosityExtra ?? AutoPBRDefaults.DefaultPlantMaterialPorosityExtra,
             -128,
             128);
         vm.MaxThreads = settings.MaxThreads;
@@ -264,7 +264,7 @@ internal static class UserSettingsSynchronizer
             : settings.DeepBumpInputMode;
         vm.DeepBumpForceBlue255 = settings.DeepBumpForceBlue255;
         vm.DeepBumpNormalIntensity = settings.DeepBumpNormalIntensity <= 0
-            ? AutoPbrDefaults.DefaultNormalIntensity
+            ? AutoPBRDefaults.DefaultNormalIntensity
             : settings.DeepBumpNormalIntensity;
         vm.DeepBumpNormalSoftClamp = Math.Clamp(settings.DeepBumpNormalSoftClamp, 0.0, 2.0);
         vm.DeepBumpEdgeGuidedEnhance = settings.DeepBumpEdgeGuidedEnhance;
@@ -299,7 +299,7 @@ internal static class UserSettingsSynchronizer
         vm.MlSpecularModelPath128 = settings.MlSpecularModelPath128;
         vm.MlSpecularModelPath256 = settings.MlSpecularModelPath256;
         vm.MlSpecularHeuristicBlend = Math.Clamp(
-            settings.MlSpecularHeuristicBlend ?? AutoPbrDefaults.DefaultMlSpecularHeuristicBlend,
+            settings.MlSpecularHeuristicBlend ?? AutoPBRDefaults.DefaultMlSpecularHeuristicBlend,
             0.0,
             1.0);
         {

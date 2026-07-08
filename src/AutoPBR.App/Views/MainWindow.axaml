@@ -71,76 +71,8 @@
                 CornerRadius="8"
                 Padding="1">
         <Grid RowDefinitions="Auto,*,Auto" Background="{Binding WindowBackground}">
-        <!-- Custom title bar: logo (left), title (center), window controls (right); flush with content -->
-        <Border Grid.Row="0"
-                Background="{Binding WindowBackground}"
-                Height="40">
-            <Grid ColumnDefinitions="Auto,*,Auto">
-                <StackPanel Grid.Column="0"
-                            Orientation="Horizontal"
-                            VerticalAlignment="Center"
-                            Spacing="8"
-                            Margin="12,0,8,0">
-                    <Border Background="Transparent"
-                            VerticalAlignment="Center"
-                            PointerPressed="TitleBarDragRegion_PointerPressed">
-                        <Image Source="/Assets/AutoPBR-logo.png"
-                               Width="24"
-                               Height="24"
-                               VerticalAlignment="Center"
-                               IsHitTestVisible="False" />
-                    </Border>
-                    <ToggleSwitch VerticalAlignment="Center"
-                                  OnContent=""
-                                  OffContent=""
-                                  IsChecked="{Binding UseBatchFolderInput, Mode=TwoWay}"
-                                  ToolTip.Tip="{Binding Strings.InputSourceModeTooltip}" />
-                </StackPanel>
-                <Border x:Name="TitleBarDragRegion"
-                        Grid.Column="1"
-                        Background="Transparent"
-                        VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch"
-                        ClipToBounds="True"
-                        PointerPressed="TitleBarDragRegion_PointerPressed">
-                    <TextBlock VerticalAlignment="Center"
-                               HorizontalAlignment="Center"
-                               FontSize="14"
-                               FontWeight="SemiBold"
-                               Text="{Binding Strings.AppTitle}"
-                               Foreground="{Binding ForegroundBrush}"
-                               TextTrimming="CharacterEllipsis"
-                               TextWrapping="NoWrap"
-                               IsHitTestVisible="False" />
-                </Border>
-                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="0">
-                    <Button x:Name="MinimizeButton"
-                            Width="46" Height="40"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            ToolTip.Tip="{Binding Strings.WindowMinimize}"
-                            Click="WindowMinimize_Click">
-                        <TextBlock Text="&#x2014;" FontSize="14" Foreground="{Binding ForegroundBrush}" />
-                    </Button>
-                    <Button x:Name="MaximizeButton"
-                            Width="46" Height="40"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            ToolTip.Tip="{Binding Strings.WindowMaximize}"
-                            Click="WindowMaximize_Click">
-                        <TextBlock Text="&#x25A1;" FontSize="12" Foreground="{Binding ForegroundBrush}" />
-                    </Button>
-                    <Button x:Name="CloseButton"
-                            Width="46" Height="40"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            ToolTip.Tip="{Binding Strings.WindowClose}"
-                            Click="WindowClose_Click">
-                        <TextBlock Text="&#x2715;" FontSize="12" Foreground="{Binding ForegroundBrush}" />
-                    </Button>
-                </StackPanel>
-            </Grid>
-        </Border>
+        <!-- Custom title bar -->
+        <ctrls:MainWindowTitleBar Grid.Row="0" DataContext="{Binding}" />
 
         <Grid x:Name="ContentGrid" Grid.Row="1" RowDefinitions="*" Background="{Binding WindowBackground}" ClipToBounds="True">
             <Grid.ColumnDefinitions>
@@ -149,25 +81,7 @@
                 <ColumnDefinition Width="280" MinWidth="260" MaxWidth="600" />
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0" RowDefinitions="Auto,*" MinWidth="0">
-                <Border Grid.Row="0"
-                        Background="{Binding WindowBackground}"
-                        BorderBrush="{Binding CardBorderBrush}"
-                        BorderThickness="0,0,0,1">
-                    <StackPanel Margin="16,8,16,10" Spacing="8" MinWidth="0">
-                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" MinWidth="0"
-                              IsVisible="{Binding UseBatchFolderInput, Converter={x:Static converters:BoolConverters.Not}}">
-                            <TextBox Grid.Column="0" MinWidth="0" Watermark="{Binding Strings.ResourcePackWatermark}" Text="{Binding PackPath, Mode=TwoWay}" />
-                            <Button Grid.Column="1" Content="{Binding Strings.ScanButton}" Command="{Binding ScanCurrentInputCommand}" />
-                            <Button Grid.Column="2" Content="{Binding Strings.Browse}" Click="BrowseInput_Click" />
-                        </Grid>
-                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" MinWidth="0"
-                              IsVisible="{Binding UseBatchFolderInput}">
-                            <TextBox Grid.Column="0" MinWidth="0" Watermark="{Binding Strings.BatchFolderWatermark}" Text="{Binding BatchFolderPath, Mode=TwoWay}" />
-                            <Button Grid.Column="1" Content="{Binding Strings.ScanButton}" Command="{Binding ScanCurrentInputCommand}" />
-                            <Button Grid.Column="2" Content="{Binding Strings.Browse}" Click="BrowseInput_Click" />
-                        </Grid>
-                    </StackPanel>
-                </Border>
+                <ctrls:ScanInputBar Grid.Row="0" DataContext="{Binding}" />
                 <Grid Grid.Row="1" MinWidth="0">
             <TabControl x:Name="MainTabControl" Margin="16,8,16,16" ZIndex="0" MinWidth="0">
                 <TabItem Header="{Binding Strings.TabExplore}">

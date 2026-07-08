@@ -1,6 +1,6 @@
 using System.Numerics;
 using System.Text.Json;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 
 namespace AutoPBR.Core.Tests;
 

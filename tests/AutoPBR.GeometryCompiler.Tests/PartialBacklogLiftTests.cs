@@ -30,7 +30,7 @@ public sealed class PartialBacklogLiftTests
     public void Partial_backlog_lifts_with_cuboids_from_jar(string officialJvmName)
     {
         var jar = ResolveClientJar();
-        var javap = JavapLocator.FindJavap();
+        var javap = GeometryJavapLocator.FindJavap();
         ClientJarIO.TryResolveJarEntry(jar, officialJvmName, null, out _, out var classBytes);
         var factoryMethod = MeshFactoryMethodResolver.Resolve(null, officialJvmName, "createBodyLayer", classBytes);
         var ok = GeometryLiftPipeline.TryLiftWithJavapFallback(javap, jar, null, officialJvmName, factoryMethod,

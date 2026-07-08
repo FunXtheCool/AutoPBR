@@ -92,7 +92,7 @@ public sealed class PigMultiAddBoxLiftTests
             BytecodeGeometryMeshLift.TryLiftConcat(resolved.MeshConcat, null, out var asmRoots, out var notes),
             string.Join("; ", notes));
 
-        var javapExe = JavapLocator.FindJavap();
+        var javapExe = GeometryJavapLocator.FindJavap();
         Assert.True(
             JavapClassDisassembly.TryDisassemble(javapExe, jar, resolved.HostJvmName, out var javapOut, out _));
         var javapConcat = JavapClassDisassembly.ConcatMeshFactoryCodeDeep(

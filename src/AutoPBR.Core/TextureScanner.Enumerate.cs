@@ -12,7 +12,7 @@ internal static partial class TextureScanner
     private static TextureWorkItem BuildWorkItem(
         ScanCandidate candidate,
         TagComputationResult tags,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         int? packBaseTileSize)
     {
         return new TextureWorkItem
@@ -40,7 +40,7 @@ internal static partial class TextureScanner
     private static bool IsSkippableByFilename(string file)
     {
         var fileName = Path.GetFileName(file);
-        if (AutoPbrDefaults.ExcludedFileNames.Contains(fileName))
+        if (AutoPBRDefaults.ExcludedFileNames.Contains(fileName))
         {
             return true;
         }
@@ -61,7 +61,7 @@ internal static partial class TextureScanner
                name.EndsWith("_e", StringComparison.OrdinalIgnoreCase);
     }
 
-    private static bool IsIgnoredByKey(ScanCandidate candidate, AutoPbrOptions options) =>
+    private static bool IsIgnoredByKey(ScanCandidate candidate, AutoPBROptions options) =>
         options.IgnoreTextureKeys.Contains(candidate.RelativePathNoExt);
 
     private static int? EstimatePackBaseTileSize(IEnumerable<ScanCandidate> candidates)
@@ -109,7 +109,7 @@ internal static partial class TextureScanner
             .Key;
     }
 
-    private static IEnumerable<ScanCandidate> EnumerateScanCandidates(string extractedPackRoot, AutoPbrOptions options)
+    private static IEnumerable<ScanCandidate> EnumerateScanCandidates(string extractedPackRoot, AutoPBROptions options)
     {
         foreach (var namespaceName in GetAssetNamespaces(extractedPackRoot))
         {

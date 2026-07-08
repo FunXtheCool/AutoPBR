@@ -1,4 +1,5 @@
 using AutoPBR.Core;
+using AutoPBR.Preview;
 using AutoPBR.Core.Models;
 
 namespace AutoPBR.App.Services;
@@ -10,15 +11,15 @@ internal static class PreviewService
     public static Task<PreviewRenderResult> RenderPreviewAsync(
         string inputZipPath,
         string archivePath,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         CancellationToken cancellationToken = default) =>
-        ResourcePackConverter.RenderPreviewAsync(inputZipPath, archivePath, options, cancellationToken);
+        ResourcePackPreviewRenderer.RenderPreviewAsync(inputZipPath, archivePath, options, cancellationToken);
 
     /// <summary>Same as <see cref="RenderPreviewAsync"/> plus raw RGBA maps for the 3D preview path.</summary>
     public static Task<PreviewDetailedResult> RenderPreviewDetailedAsync(
         string inputZipPath,
         string archivePath,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         CancellationToken cancellationToken = default) =>
-        ResourcePackConverter.RenderPreviewDetailedAsync(inputZipPath, archivePath, options, cancellationToken);
+        ResourcePackPreviewRenderer.RenderPreviewDetailedAsync(inputZipPath, archivePath, options, cancellationToken);
 }

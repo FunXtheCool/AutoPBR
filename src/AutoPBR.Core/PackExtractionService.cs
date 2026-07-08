@@ -11,7 +11,7 @@ internal static class PackExtractionService
     public static void ExtractPack(
         string inputZipPath,
         string extracted,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         IProgress<ConversionProgress>? progress,
         CancellationToken cancellationToken)
     {

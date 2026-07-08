@@ -64,7 +64,7 @@ internal static class ExportAssemblyPilotJavapSnapshotsCommand
             : Path.GetFullPath(snapshotsDir);
         Directory.CreateDirectory(snapshotsDir);
 
-        var javap = string.IsNullOrWhiteSpace(javapOverride) ? JavapLocator.FindJavap() : javapOverride;
+        var javap = string.IsNullOrWhiteSpace(javapOverride) ? GeometryJavapLocator.FindJavap() : javapOverride;
         var pilots = File.ReadAllLines(pilotList)
             .Select(l => l.Trim())
             .Where(l => l.Length > 0 && !l.StartsWith('#'))

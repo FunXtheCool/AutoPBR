@@ -1,5 +1,5 @@
 using System.Text.Json;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 using AutoPBR.Tools.GeometryCompiler;
 
 namespace AutoPBR.GeometryCompiler.Tests;
@@ -28,7 +28,7 @@ public sealed class PilotUvAtlasLiftTests
             ? "createSaddleLayer"
             : "createBodyLayer";
         Assert.True(
-            GeometryLiftPipeline.TryLiftWithJavapFallback(JavapLocator.FindJavap(), jar, null, jvmName,
+            GeometryLiftPipeline.TryLiftWithJavapFallback(GeometryJavapLocator.FindJavap(), jar, null, jvmName,
                 factoryMethod, preferAsm: true, out var attempt),
             string.Join("; ", attempt.Notes));
 

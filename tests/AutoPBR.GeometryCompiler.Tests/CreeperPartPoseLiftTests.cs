@@ -121,7 +121,7 @@ public sealed class CreeperPartPoseLiftTests
         }
 
         Assert.True(
-            GeometryLiftPipeline.TryLiftRoots(JavapLocator.FindJavap(), jar, null, CreeperJvm, "createBodyLayer",
+            GeometryLiftPipeline.TryLiftRoots(GeometryJavapLocator.FindJavap(), jar, null, CreeperJvm, "createBodyLayer",
                 out var roots, out var notes),
             string.Join("; ", notes));
 
@@ -161,7 +161,7 @@ public sealed class CreeperPartPoseLiftTests
         var hasOffsetAndRotation = resolved.MeshConcat.Contains("PartPose.offsetAndRotation", StringComparison.Ordinal);
 
         Assert.True(
-            GeometryLiftPipeline.TryLiftRoots(JavapLocator.FindJavap(), jar, null, CreeperJvm, "createBodyLayer",
+            GeometryLiftPipeline.TryLiftRoots(GeometryJavapLocator.FindJavap(), jar, null, CreeperJvm, "createBodyLayer",
                 out var roots, out var notes),
             string.Join("; ", notes));
 
@@ -193,7 +193,7 @@ public sealed class CreeperPartPoseLiftTests
         }
 
         Assert.True(
-            GeometryLiftPipeline.TryLiftRoots(JavapLocator.FindJavap(), jar, null, CreeperJvm, "createBodyLayer",
+            GeometryLiftPipeline.TryLiftRoots(GeometryJavapLocator.FindJavap(), jar, null, CreeperJvm, "createBodyLayer",
                 out var roots, out var notes),
             string.Join("; ", notes));
 
@@ -234,7 +234,7 @@ public sealed class CreeperPartPoseLiftTests
         }
 
         Assert.True(
-            GeometryLiftPipeline.TryLiftRoots(JavapLocator.FindJavap(), jar, null, CreeperJvm, "createBodyLayer",
+            GeometryLiftPipeline.TryLiftRoots(GeometryJavapLocator.FindJavap(), jar, null, CreeperJvm, "createBodyLayer",
                 out var roots, out var notes),
             string.Join("; ", notes));
 

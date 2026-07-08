@@ -148,7 +148,7 @@ public sealed class SetupAnimLiftTests
             SetupAnimLift.TryLift(disasm, "net.minecraft.client.model.animal.feline.AbstractFelineModel", out _, out _));
         Assert.True(
             SetupAnimLift.TryHoistAbstractHostSetupAnim(
-                JavapLocator.FindJavap()!,
+                AnimationJavapLocator.FindJavap()!,
                 ClientJarPath,
                 "net.minecraft.client.model.animal.feline.AbstractFelineModel",
                 out var shard,
@@ -398,7 +398,7 @@ public sealed class SetupAnimLiftTests
             return string.Empty;
         }
 
-        var javap = JavapLocator.FindJavap();
+        var javap = AnimationJavapLocator.FindJavap();
         Assert.False(string.IsNullOrWhiteSpace(javap), "javap not found on PATH");
         Assert.True(JavapRunner.TryDisassemble(javap, jar, officialJvmName, out var disasm, out var err), err ?? "javap failed");
         var cacheDir = Path.GetDirectoryName(cachePath);

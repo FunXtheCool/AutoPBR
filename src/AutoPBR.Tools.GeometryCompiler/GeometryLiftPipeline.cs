@@ -57,7 +57,7 @@ internal static class GeometryLiftPipeline
         bool preferAsm,
         out MeshLiftAttempt attempt)
     {
-        javapExe ??= JavapLocator.FindJavap();
+        javapExe ??= GeometryJavapLocator.FindJavap();
         attempt = new MeshLiftAttempt([], [], "none", officialJvmName, "", null);
         var allNotes = new List<string>();
 

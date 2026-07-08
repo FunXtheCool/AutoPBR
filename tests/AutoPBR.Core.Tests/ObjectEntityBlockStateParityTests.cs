@@ -2,7 +2,7 @@ using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 using AutoPBR.Tests.TestSupport;
 
 namespace AutoPBR.Core.Tests;
@@ -11,7 +11,7 @@ namespace AutoPBR.Core.Tests;
 /// Block-linked object entities (boat, chest boat, chest, minecart, banner, bell, bed, sign) use bytecode IR
 /// or hand-lift with object-entity JVM routing and LER skip — not mob LivingEntityRenderer basis.
 /// </summary>
-public sealed class ObjectEntityBlockStateParityTests
+public sealed partial class ObjectEntityBlockStateParityTests
 {
     private static readonly MinecraftNativeProfile Profile26 =
         new("26.1.2", "unused", new Version(26, 1, 2));
@@ -169,84 +169,6 @@ public sealed class ObjectEntityBlockStateParityTests
         Assert.True(
             bodyMax.Y <= baseMax.Y + 0.5f,
             $"mounting flange should cap the dome; bodyMaxY={bodyMax.Y:G3} baseMaxY={baseMax.Y:G3}");
-    }
-
-    [Fact]
-    public void BannerStanding_resolves_flag_bar_and_pole_from_composite_shard()
-    {
-        const string path = "assets/minecraft/textures/entity/banner/stripe_top.png";
-        var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
-        Assert.Equal(3, model.Elements.Count);
-    }
-
-    [Fact]
-    public void BannerStanding_flag_hangs_below_bar_in_preview_space()
-    {
-        const string path = "assets/minecraft/textures/entity/banner/stripe_top.png";
-        var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
-        ModelElement? flag = null;
-        ModelElement? bar = null;
-        foreach (var el in model.Elements)
-        {
-            var height = el.To[1] - el.From[1];
-            if (height > 30f)
-            {
-                flag = el;
-            }
-            else if (height is >= 1.5f and <= 3f)
-            {
-                bar = el;
-            }
-        }
-
-        Assert.NotNull(flag);
-        Assert.NotNull(bar);
-        TransformWorldCorners(flag!, out var flagMin, out _);
-        TransformWorldCorners(bar!, out _, out var barMax);
-        Assert.True(
-            flagMin.Y < barMax.Y - 4f,
-            $"banner cloth should hang below the bar; flagMinY={flagMin.Y:G3} barMaxY={barMax.Y:G3}");
-    }
-
-    [Fact]
-    public void BannerWall_resolves_flag_and_bar_without_pole()
-    {
-        const string path = "assets/minecraft/textures/entity/banner/banner_base.png";
-        var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
-        Assert.Equal(2, model.Elements.Count);
-    }
-
-    [Fact]
-    public void BannerWall_flag_hangs_below_bar_in_preview_space()
-    {
-        const string path = "assets/minecraft/textures/entity/banner/banner_base.png";
-        var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
-        ModelElement? flag = null;
-        ModelElement? bar = null;
-        foreach (var el in model.Elements)
-        {
-            var height = el.To[1] - el.From[1];
-            if (height > 30f)
-            {
-                flag = el;
-            }
-            else if (height is >= 1.5f and <= 3f)
-            {
-                bar = el;
-            }
-        }
-
-        Assert.NotNull(flag);
-        Assert.NotNull(bar);
-        TransformWorldCorners(flag!, out var flagMin, out _);
-        TransformWorldCorners(bar!, out _, out var barMax);
-        Assert.True(
-            flagMin.Y < barMax.Y - 4f,
-            $"wall banner cloth should hang below the bar; flagMinY={flagMin.Y:G3} barMaxY={barMax.Y:G3}");
     }
 
     [Fact]
@@ -1682,82 +1604,5 @@ public sealed class ObjectEntityBlockStateParityTests
         var width = el.To[0] - el.From[0];
         var height = el.To[1] - el.From[1];
         return width < 5f && MathF.Abs(height - 14f) < 0.01f;
-    }
-
-    private static bool IsHangingSignBoardElement(ModelElement el)
-    {
-        var width = el.To[0] - el.From[0];
-        var height = el.To[1] - el.From[1];
-        return width > 12f && MathF.Abs(height - 10f) < 0.01f;
-    }
-
-    private static bool IsHangingSignChainElement(ModelElement el)
-    {
-        var width = el.To[0] - el.From[0];
-        var height = el.To[1] - el.From[1];
-        return width < 5f && MathF.Abs(height - 6f) < 0.01f;
-    }
-
-    private static bool IsHangingSignWallPlankElement(ModelElement el)
-    {
-        var width = el.To[0] - el.From[0];
-        var height = el.To[1] - el.From[1];
-        return width > 14f && MathF.Abs(height - 2f) < 0.01f;
-    }
-
-    private static bool IsHangingSignVerticalChainElement(ModelElement el)
-    {
-        var width = el.To[0] - el.From[0];
-        var height = el.To[1] - el.From[1];
-        return width > 10f && MathF.Abs(height - 6f) < 0.01f;
-    }
-
-    private static IEnumerable<Vector3> CollectWorldCorners(MergedJavaBlockModel model)
-    {
-        foreach (var el in model.Elements)
-        {
-            var m = el.LocalToParent;
-            var fx = el.From[0];
-            var fy = el.From[1];
-            var fz = el.From[2];
-            var tx = el.To[0];
-            var ty = el.To[1];
-            var tz = el.To[2];
-            (float x, float y, float z)[] c =
-            [
-                (fx, fy, fz), (tx, fy, fz), (fx, ty, fz), (tx, ty, fz),
-                (fx, fy, tz), (tx, fy, tz), (fx, ty, tz), (tx, ty, tz),
-            ];
-            foreach (var p in c)
-            {
-                yield return Vector3.Transform(new Vector3(p.x, p.y, p.z), m);
-            }
-        }
-    }
-
-    private static string CornerSortKey(Vector3 v) => $"{v.X:F4},{v.Y:F4},{v.Z:F4}";
-
-    private static void TransformWorldCorners(ModelElement el, out Vector3 min, out Vector3 max)
-    {
-        var m = el.LocalToParent;
-        min = new Vector3(float.MaxValue);
-        max = new Vector3(float.MinValue);
-        var fx = el.From[0];
-        var fy = el.From[1];
-        var fz = el.From[2];
-        var tx = el.To[0];
-        var ty = el.To[1];
-        var tz = el.To[2];
-        ReadOnlySpan<(float x, float y, float z)> c =
-        [
-            (fx, fy, fz), (tx, fy, fz), (fx, ty, fz), (tx, ty, fz),
-            (fx, fy, tz), (tx, fy, tz), (fx, ty, tz), (tx, ty, tz),
-        ];
-        foreach (var p in c)
-        {
-            var w = Vector3.Transform(new Vector3(p.x, p.y, p.z), m);
-            min = Vector3.Min(min, w);
-            max = Vector3.Max(max, w);
-        }
     }
 }

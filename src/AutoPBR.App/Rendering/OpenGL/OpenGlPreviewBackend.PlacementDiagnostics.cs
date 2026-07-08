@@ -1,5 +1,5 @@
 using AutoPBR.Core.Models;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 
 using Silk.NET.OpenGL;
 

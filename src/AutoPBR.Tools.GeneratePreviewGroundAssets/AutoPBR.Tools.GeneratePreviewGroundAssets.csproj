@@ -8,5 +8,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoPBR.Core\AutoPBR.Core.csproj" />
+    <ProjectReference Include="..\AutoPBR.Preview\AutoPBR.Preview.csproj" />
   </ItemGroup>
 </Project>

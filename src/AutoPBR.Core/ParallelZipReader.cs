@@ -20,7 +20,7 @@ internal static class ParallelZipReader
     public static void ExtractZip(
         string inputZipPath,
         string extracted,
-        AutoPbrOptions options,
+        AutoPBROptions options,
         IProgress<ConversionProgress>? progress,
         ConversionStage stage,
         CancellationToken cancellationToken,

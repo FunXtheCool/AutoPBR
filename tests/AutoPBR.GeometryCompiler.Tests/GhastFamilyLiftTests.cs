@@ -1,6 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using AutoPBR.Core.Preview;
+using AutoPBR.Preview;
 using AutoPBR.Tests.TestSupport;
 
 namespace AutoPBR.GeometryCompiler.Tests;
@@ -46,7 +46,7 @@ public sealed class GhastFamilyLiftTests
         }
 
         Assert.True(
-            GeometryLiftPipeline.TryLiftWithJavapFallback(JavapLocator.FindJavap(), jar, null, jvm, "createBodyLayer",
+            GeometryLiftPipeline.TryLiftWithJavapFallback(GeometryJavapLocator.FindJavap(), jar, null, jvm, "createBodyLayer",
                 preferAsm: true, out var attempt),
             string.Join("; ", attempt.Notes));
 

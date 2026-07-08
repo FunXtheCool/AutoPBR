@@ -1,0 +1,379 @@
+using System.Numerics;
+using System.Text.Json;
+using AutoPBR.Core.Models;
+
+namespace AutoPBR.Preview.GeometryIr;
+
+/// <summary>
+/// Shared DFS over geometry IR part trees — used by mesh emit, setupAnim cuboid order, and part-world indexing.
+/// </summary>
+internal static class GeometryIrMeshWalk
+{
+    public readonly struct CuboidVisitContext
+    {
+        public required string PartId { get; init; }
+        public required Matrix4x4 PartWorld { get; init; }
+        public required float PartScale { get; init; }
+        public required JsonElement Cuboid { get; init; }
+        public int CuboidIndexOnPart { get; init; }
+        public int CuboidCountOnPart { get; init; }
+    }
+
+    public static bool WalkRoots(
+        JsonElement geometryRoot,
+        Matrix4x4 rootTransform,
+        GeometryIrMeshEmitOptions options,
+        Func<CuboidVisitContext, bool>? onCuboid,
+        Action<string, Matrix4x4>? onPartWorld,
+        out string? failureReason)
+    {
+        failureReason = null;
+        if (!geometryRoot.TryGetProperty("roots", out var roots) || roots.ValueKind != JsonValueKind.Array)
+        {
+            failureReason = "missing roots array";
+            return false;
+        }
+
+        var useLegacyPartPose = ShouldUseLegacyPartPose(options);
+        var parentWorldBlock = useLegacyPartPose
+            ? rootTransform
+            : EntityModelRuntime.TexelRowAffineToBlock(rootTransform);
+
+        foreach (var rootPart in roots.EnumerateArray())
+        {
+            if (!VisitPart(rootPart, parentWorldBlock, options, onCuboid, onPartWorld, ref failureReason))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>Composed part-origin translations (M41–M43) keyed by part <c>id</c>.</summary>
+    public static bool TryCollectPartWorldTranslations(
+        JsonElement geometryRoot,
+        Matrix4x4 rootTransform,
+        out Dictionary<string, Vector3> translationsByPartId,
+        out string? failureReason) =>
+        TryCollectBakedWorldTranslations(geometryRoot, out translationsByPartId, out failureReason) ||
+        TryCollectPartWorldTranslationsByWalk(
+            geometryRoot,
+            rootTransform,
+            GeometryIrMeshEmitOptions.ForParity() with { RootTransform = rootTransform },
+            out translationsByPartId,
+            out failureReason);
+
+    /// <summary>
+    /// Uses Java reference bake <c>worldPose.translation</c> when every visited part exposes it (Phase 3A).
+    /// </summary>
+    public static bool TryCollectBakedWorldTranslations(
+        JsonElement geometryRoot,
+        out Dictionary<string, Vector3> translationsByPartId,
+        out string? failureReason)
+    {
+        translationsByPartId = new Dictionary<string, Vector3>(StringComparer.Ordinal);
+        failureReason = null;
+        if (!geometryRoot.TryGetProperty("roots", out var roots) || roots.ValueKind != JsonValueKind.Array)
+        {
+            return false;
+        }
+
+        foreach (var root in roots.EnumerateArray())
+        {
+            if (!WalkBakedWorldTranslations(root, translationsByPartId, ref failureReason))
+            {
+                translationsByPartId = new Dictionary<string, Vector3>(StringComparer.Ordinal);
+                return false;
+            }
+        }
+
+        return translationsByPartId.Count > 0;
+    }
+
+    private static bool WalkBakedWorldTranslations(
+        JsonElement part,
+        Dictionary<string, Vector3> collected,
+        ref string? failureReason)
+    {
+        if (part.TryGetProperty("id", out var idEl))
+        {
+            var id = idEl.GetString() ?? "";
+            if (id.Length > 0)
+            {
+                if (part.TryGetProperty("worldPose", out var worldPose) &&
+                    worldPose.ValueKind == JsonValueKind.Object &&
+                    worldPose.TryGetProperty("translation", out var worldT) &&
+                    worldT.ValueKind == JsonValueKind.Array &&
+                    worldT.GetArrayLength() >= 3)
+                {
+                    collected[id] = new Vector3(
+                        (float)worldT[0].GetDouble(),
+                        (float)worldT[1].GetDouble(),
+                        (float)worldT[2].GetDouble());
+                }
+                else if (part.TryGetProperty("pose", out var pose) &&
+                         pose.TryGetProperty("translation", out var poseT) &&
+                         poseT.ValueKind == JsonValueKind.Array &&
+                         poseT.GetArrayLength() >= 3)
+                {
+                    collected[id] = new Vector3(
+                        (float)poseT[0].GetDouble(),
+                        (float)poseT[1].GetDouble(),
+                        (float)poseT[2].GetDouble());
+                }
+                else
+                {
+                    failureReason = $"part '{id}' missing worldPose.translation";
+                    return false;
+                }
+            }
+        }
+
+        if (part.TryGetProperty("children", out var children) && children.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var child in children.EnumerateArray())
+            {
+                if (!WalkBakedWorldTranslations(child, collected, ref failureReason))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Composed part-origin translations from reference pose walk (same semantics as IR mesh emit).
+    /// </summary>
+    internal static bool TryCollectReferencePartWorldTranslationsByWalk(
+        JsonElement geometryRoot,
+        GeometryIrMeshEmitOptions emitOptions,
+        out Dictionary<string, Vector3> translationsByPartId,
+        out string? failureReason) =>
+        TryCollectPartWorldTranslationsByWalk(
+            geometryRoot,
+            Matrix4x4.Identity,
+            emitOptions,
+            out translationsByPartId,
+            out failureReason);
+
+    private static bool TryCollectPartWorldTranslationsByWalk(
+        JsonElement geometryRoot,
+        Matrix4x4 rootTransform,
+        GeometryIrMeshEmitOptions emitOptions,
+        out Dictionary<string, Vector3> translationsByPartId,
+        out string? failureReason)
+    {
+        var collected = new Dictionary<string, Vector3>(StringComparer.Ordinal);
+        var options = emitOptions with { RootTransform = rootTransform };
+        var ok = WalkRoots(
+            geometryRoot,
+            rootTransform,
+            options,
+            onCuboid: null,
+            onPartWorld: (partId, world) =>
+            {
+                collected[partId] = new Vector3(world.M41, world.M42, world.M43);
+            },
+            out failureReason);
+        translationsByPartId = collected;
+        return ok;
+    }
+
+    public static List<string> CollectCuboidOwnerPartIds(
+        JsonElement geometryRoot,
+        GeometryIrMeshEmitOptions options)
+    {
+        var list = new List<string>(32);
+        WalkRoots(
+            geometryRoot,
+            options.RootTransform,
+            options,
+            ctx =>
+            {
+                list.Add(ctx.PartId);
+                return true;
+            },
+            onPartWorld: null,
+            out _);
+        return list;
+    }
+
+    /// <summary>
+    /// Composes part world from parent chain using Java reference bake semantics
+    /// (<c>PartWorldPoseMath</c>: local = Er×T, world = parentWorld × local).
+    /// </summary>
+    private static bool TryComposePartWorldFromParent(
+        JsonElement poseEl,
+        Matrix4x4 parentWorldBlock,
+        in GeometryIrMeshEmitOptions options,
+        string? partId,
+        out Matrix4x4 worldBlock,
+        out Matrix4x4 worldTexel,
+        out string? failureReason)
+    {
+        failureReason = null;
+        worldBlock = parentWorldBlock;
+        var useColumnPartPose = EntityModelRuntime.ShouldUseColumnPartPoseCompose(poseEl, options);
+        var useLegacyPartPose = (EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose ||
+                                 GeometryIrEmitPolicy.UsesTranslationTimesRotationPartPose(options.OfficialJvmName, partId)) &&
+            !useColumnPartPose &&
+            !GeometryIrEmitPolicy.IgnoresLegacyPartPoseDebugSwitch(options.OfficialJvmName);
+        worldTexel = useLegacyPartPose
+            ? parentWorldBlock
+            : EntityModelRuntime.BlockRowAffineToTexel(parentWorldBlock);
+
+        if (!poseEl.ValueKind.Equals(JsonValueKind.Object))
+        {
+            return true;
+        }
+
+        if (useColumnPartPose)
+        {
+            if (!EntityModelRuntime.TryComposeColumnPartPose(poseEl, worldTexel, out worldTexel, out failureReason))
+            {
+                return false;
+            }
+
+            worldBlock = EntityModelRuntime.TexelRowAffineToBlock(worldTexel);
+            return true;
+        }
+
+        if (useLegacyPartPose)
+        {
+            if (!EntityModelRuntime.TryComposeLegacyPartPoseTexelPublic(
+                    poseEl, out var localPartPose, out failureReason))
+            {
+                return false;
+            }
+
+            worldBlock = GeometryIrEmitPolicy.UsesTranslationTimesRotationPartPose(options.OfficialJvmName, partId)
+                ? Matrix4x4.Multiply(parentWorldBlock, localPartPose)
+                : Matrix4x4.Multiply(localPartPose, parentWorldBlock);
+            worldTexel = worldBlock;
+            return true;
+        }
+
+        if (!EntityModelRuntime.TryComposePartRenderLocalBlock(poseEl, out var localBlock, out failureReason))
+        {
+            return false;
+        }
+
+        worldBlock = Matrix4x4.Multiply(localBlock, parentWorldBlock);
+        worldTexel = EntityModelRuntime.BlockRowAffineToTexel(worldBlock);
+        return true;
+    }
+
+    private static bool ShouldUseLegacyPartPose(GeometryIrMeshEmitOptions options, string? partId = null) =>
+        (EntityPreviewDebugSettings.UseLegacyTranslationTimesRotationPartPose ||
+         GeometryIrEmitPolicy.UsesTranslationTimesRotationPartPose(options.OfficialJvmName, partId)) &&
+        !options.ResolveUseColumnTranslationTimesRotationPartPose() &&
+        !GeometryIrEmitPolicy.IgnoresLegacyPartPoseDebugSwitch(options.OfficialJvmName);
+
+    private static bool VisitPart(
+        JsonElement part,
+        Matrix4x4 parentWorldBlock,
+        GeometryIrMeshEmitOptions options,
+        Func<CuboidVisitContext, bool>? onCuboid,
+        Action<string, Matrix4x4>? onPartWorld,
+        ref string? failureReason)
+    {
+        var partId = part.TryGetProperty("id", out var idEl) ? idEl.GetString() ?? "" : "";
+        if (!TryComposePartWorldFromParent(
+                part.TryGetProperty("pose", out var poseEl) ? poseEl : default,
+                parentWorldBlock,
+                options,
+                partId,
+                out var worldBlock,
+                out var worldTexel,
+                out failureReason))
+        {
+            return false;
+        }
+
+        var skipPartCuboids = options.ShouldEmitPartCuboids is { } shouldEmit
+            ? !shouldEmit(partId)
+            : options.IncludePartIds is { Count: > 0 } include && !include.Contains(partId);
+
+        if (options.TryGetPartPoseOverride is { } poseOverride && !skipPartCuboids)
+        {
+            worldTexel = poseOverride(partId, worldTexel);
+            worldBlock = ShouldUseLegacyPartPose(options, partId)
+                ? worldTexel
+                : EntityModelRuntime.TexelRowAffineToBlock(worldTexel);
+        }
+
+        if (partId.Length > 0)
+        {
+            onPartWorld?.Invoke(partId, worldBlock);
+        }
+
+        var partScale = options.ResolvePartScale?.Invoke(partId) ?? options.DefaultPartScale;
+
+        if (!skipPartCuboids &&
+            part.TryGetProperty("cuboids", out var cuboids) &&
+            cuboids.ValueKind == JsonValueKind.Array &&
+            onCuboid is not null)
+        {
+            var cuboidCount = 0;
+            foreach (var cuboidEl in cuboids.EnumerateArray())
+            {
+                if (GeometryIrCuboidMetadata.TryGetFaceMask(cuboidEl, out var emptyMask) && emptyMask.Length == 0)
+                {
+                    continue;
+                }
+
+                if (options.ShouldEmitIrCuboid is { } countFilter && !countFilter(cuboidEl))
+                {
+                    continue;
+                }
+
+                cuboidCount++;
+            }
+
+            var cuboidIndex = 0;
+            foreach (var cuboidEl in cuboids.EnumerateArray())
+            {
+                if (GeometryIrCuboidMetadata.TryGetFaceMask(cuboidEl, out var emptyMask) && emptyMask.Length == 0)
+                {
+                    continue;
+                }
+
+                if (options.ShouldEmitIrCuboid is { } shouldEmitCuboid && !shouldEmitCuboid(cuboidEl))
+                {
+                    continue;
+                }
+
+                if (!onCuboid(new CuboidVisitContext
+                    {
+                        PartId = partId,
+                        PartWorld = worldTexel,
+                        PartScale = partScale,
+                        Cuboid = cuboidEl,
+                        CuboidIndexOnPart = cuboidIndex,
+                        CuboidCountOnPart = cuboidCount,
+                    }))
+                {
+                    return false;
+                }
+
+                cuboidIndex++;
+            }
+        }
+
+        if (part.TryGetProperty("children", out var children) && children.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var child in children.EnumerateArray())
+            {
+                if (!VisitPart(child, worldBlock, options, onCuboid, onPartWorld, ref failureReason))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+}

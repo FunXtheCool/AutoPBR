@@ -11,7 +11,7 @@ public sealed class SlimeMagmaCubeLiftTests
     {
         var jar = ResolveClientJar();
         Assert.True(
-            GeometryLiftPipeline.TryLiftWithJavapFallback(JavapLocator.FindJavap(), jar, null,
+            GeometryLiftPipeline.TryLiftWithJavapFallback(GeometryJavapLocator.FindJavap(), jar, null,
                 "net.minecraft.client.model.monster.slime.MagmaCubeModel", "createBodyLayer", preferAsm: true,
                 out var attempt),
             string.Join("; ", attempt.Notes));
@@ -36,7 +36,7 @@ public sealed class SlimeMagmaCubeLiftTests
     {
         var jar = ResolveClientJar();
         Assert.True(
-            GeometryLiftPipeline.TryLiftWithJavapFallback(JavapLocator.FindJavap(), jar, null,
+            GeometryLiftPipeline.TryLiftWithJavapFallback(GeometryJavapLocator.FindJavap(), jar, null,
                 "net.minecraft.client.model.monster.slime.SlimeModel", "createOuterBodyLayer", preferAsm: true,
                 out var attempt),
             string.Join("; ", attempt.Notes));
