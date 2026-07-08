@@ -35,7 +35,7 @@ float godRayShadowVisibility(vec3 samplePos, vec3 L, mat4 lightVP, sampler2DShad
 
     vec3 sUv = shadowPack.xyz;
     vec3 upN = vec3(0.0, 1.0, 0.0);
-    float bias = computeShadowBias(upN, L, shadowMinBias, shadowMaxBias);
+    float bias = computeShadowBias(upN, L, shadowMinBias, shadowMaxBias, shadowTexelSize);
     sUv.z = clamp(sUv.z - bias, 0.0, 1.0);
     return sampleShadowPcf3x3(shadowMap, sUv, shadowTexelSize);
 }

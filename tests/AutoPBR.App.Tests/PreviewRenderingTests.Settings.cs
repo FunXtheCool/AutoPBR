@@ -14,7 +14,7 @@ public sealed partial class PreviewRenderingTests
         var s = new PreviewRenderSettings();
         Assert.Equal(1f, s.NormalStrength);
         Assert.True(s.EnableParallax);
-        Assert.True(s.NearestTextureFilter);
+        Assert.False(s.NearestTextureFilter);
         Assert.True(s.ShowBackgroundGrid);
         Assert.True(s.ShowGroundMesh);
         Assert.True(s.ShowCornerAxes);
@@ -58,9 +58,9 @@ public sealed partial class PreviewRenderingTests
         var s = new PreviewRenderSettings();
         Assert.True(s.EnableShadows);
         Assert.Equal(1024, s.ShadowMapResolution);
-        Assert.Equal(0.0008f, s.ShadowMinBias);
-        Assert.Equal(0.005f, s.ShadowMaxBias);
-        Assert.Equal(2.25f, s.ShadowSoftnessTexels);
+        Assert.Equal(0.002f, s.ShadowMinBias);
+        Assert.Equal(0.012f, s.ShadowMaxBias);
+        Assert.Equal(1.0f, s.ShadowSoftnessTexels);
         // Phase 3 stub: persisted boolean only, defaults to false in Phase 2.
         Assert.False(s.EnableShadowCascades);
     }
@@ -110,7 +110,9 @@ public sealed partial class PreviewRenderingTests
         Assert.Contains("var batchParallax = frame.EnableParallaxEff && batchAllowsParallax && bHasH;", source, StringComparison.Ordinal);
         Assert.Contains("SetInt(\"uEnableParallax\", batchParallax ? 1 : 0);", source, StringComparison.Ordinal);
         Assert.Contains("? EntityParallaxUvScale(slot)", source, StringComparison.Ordinal);
+        Assert.Contains("? EntityTextureAtlasScale(slot)", source, StringComparison.Ordinal);
         Assert.Contains("return Math.Clamp(16f / atlasMax, 0.02f, 1f);", source, StringComparison.Ordinal);
+        Assert.Contains("frame.EnableTessellationDisplacementEff = PreviewEntityEmulatedShaderGating.EffectiveTessellationDisplacement(", source, StringComparison.Ordinal);
         Assert.Contains("batchAllowsParallax &&", source, StringComparison.Ordinal);
     }
 
@@ -145,7 +147,8 @@ public sealed partial class PreviewRenderingTests
         Assert.Contains("SyncPreviewTaaToggleState(frame.Settings);", source, StringComparison.Ordinal);
         Assert.Contains("if (IsPreviewTaaActive(frame.Settings))", source, StringComparison.Ordinal);
         Assert.Contains("PreviewGlMatrices.ApplyProjectionJitter", source, StringComparison.Ordinal);
-        Assert.Contains("CurrentPreviewTaaJitter(frame.Vw, frame.Vh, frame.Settings)", source, StringComparison.Ordinal);
+        Assert.Contains("CurrentPreviewTaaJitter(jitterW, jitterH, frame.Settings)", source, StringComparison.Ordinal);
+        Assert.Contains("frame.GodRayCaptureActive && frame.SceneCaptureW > 0 ? frame.SceneCaptureW : frame.Vw", source, StringComparison.Ordinal);
         Assert.Contains("frame.UnjitteredProj = frame.Proj;", source, StringComparison.Ordinal);
         Assert.Contains("frame.PreviewTaaJitterNdc", source, StringComparison.Ordinal);
         Assert.Contains("SetMatrix(\"uTaaCurrViewProj\", taaCurrentViewProj);", source, StringComparison.Ordinal);
@@ -256,6 +259,8 @@ public sealed partial class PreviewRenderingTests
         Assert.Contains("TextureUnit.Texture3", source, StringComparison.Ordinal);
         Assert.Contains("TaaSignalTextureHandle", source, StringComparison.Ordinal);
         Assert.Contains("\"uHasTaaSignal\"", source, StringComparison.Ordinal);
+        Assert.Contains("\"uCaptureTexelSize\"", source, StringComparison.Ordinal);
+        Assert.Contains("frame.SceneCaptureW > 0 ? frame.SceneCaptureW : w", source, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -264,8 +269,8 @@ public sealed partial class PreviewRenderingTests
         var view = LoadSource(ThisFilePath(),
             "src",
             "AutoPBR.App",
-            "Views",
-            "MainWindow.axaml");
+            "Controls",
+            "ShaderPreviewTab.axaml");
         var viewModel = LoadSource(ThisFilePath(),
             "src",
             "AutoPBR.App",

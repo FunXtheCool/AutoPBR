@@ -255,8 +255,18 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [NotifyPropertyChangedFor(nameof(UiScaleTransform))]
     private double _uiScale = 1.0;
 
+  private readonly ScaleTransform _uiScaleTransform = new(1.0, 1.0);
+
     /// <summary>Uniform scale for the main window chrome (fonts, spacing, controls) for accessibility.</summary>
-    public ScaleTransform UiScaleTransform => new(UiScale, UiScale);
+    public ScaleTransform UiScaleTransform
+    {
+        get
+        {
+            _uiScaleTransform.ScaleX = UiScale;
+            _uiScaleTransform.ScaleY = UiScale;
+            return _uiScaleTransform;
+        }
+    }
 
     [ObservableProperty] private IBrush _windowBackground = Brushes.Transparent;
     [ObservableProperty] private IBrush _cardBackground = Brushes.Transparent;

@@ -33,4 +33,15 @@ vec3 srgbToLinear(vec3 c)
     return pow(saturate3(c), vec3(2.2));
 }
 
+// Breaks up 8-bit RGBA preview banding from tonemapped lighting gradients (FBO is not sRGB).
+float interleavedGradientNoise(vec2 screenPos)
+{
+    return fract(52.9829189 * fract(dot(screenPos, vec2(0.06711056, 0.00583715))));
+}
+
+vec3 ditherSrgb8(vec3 srgb, vec2 screenPos)
+{
+    return saturate3(srgb + (interleavedGradientNoise(screenPos) - 0.5) / 255.0);
+}
+
 #endif // GENESIS_COMMON_GLSL

@@ -60,6 +60,7 @@ internal ref struct GlRenderFrame
     public bool EnableNormalMapEff;
     public bool EnableSpecularMapEff;
     public bool EnableParallaxShadowEff;
+    public bool EnableTessellationDisplacementEff;
     public bool ShadowAvailable;
     public Vector3 Eye;
     public Vector3 LookTarget;

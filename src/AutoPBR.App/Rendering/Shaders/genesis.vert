@@ -32,6 +32,7 @@ uniform float uEntityGpuSkinning;
 uniform float uEntityBoneCount;
 uniform float uEntityMeshLiftY;
 uniform float uEntityPrevBonePaletteValid;
+uniform vec2 uTextureAtlasScale;
 
 out vec3 vWorldPos;
 out vec3 vWorldNormal;
@@ -94,7 +95,7 @@ void main()
     vWorldNormal = m3 * entityN;
     vec3 t = m3 * entityT;
     vWorldTangent = vec4(normalize(t), aTangent.w);
-    vUv = aUv;
+    vUv = aUv * uTextureAtlasScale;
     vLightClip = uLightViewProj * wp;
     vec4 clip = uProj * uView * wp;
     vCurrClip = uTaaCurrViewProj * wp;

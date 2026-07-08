@@ -137,6 +137,8 @@ public static class PreviewGrassColormapTint
         {
             Width = maps.Width,
             Height = maps.Height,
+            BakeAtlasWidth = maps.BakeAtlasWidth,
+            BakeAtlasHeight = maps.BakeAtlasHeight,
             DiffuseRgba = tinted,
             NormalRgba = maps.NormalRgba,
             SpecularRgba = maps.SpecularRgba,

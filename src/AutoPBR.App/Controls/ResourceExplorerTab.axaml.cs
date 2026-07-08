@@ -7,6 +7,11 @@ namespace AutoPBR.App.Controls;
 
 public partial class ResourceExplorerTab : UserControl
 {
+    public ResourceExplorerTab()
+    {
+        InitializeComponent();
+    }
+
     private void ExploreTreeHeaderSplitter_OnPointerMoved(object? sender, PointerEventArgs e)
     {
         if (sender is GridSplitter splitter && ReferenceEquals(e.Pointer.Captured, splitter))

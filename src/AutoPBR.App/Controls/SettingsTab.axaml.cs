@@ -8,6 +8,11 @@ namespace AutoPBR.App.Controls;
 
 public partial class SettingsTab : UserControl
 {
+    public SettingsTab()
+    {
+        InitializeComponent();
+    }
+
     private async void BrowseOutput_Click(object? sender, RoutedEventArgs e)
     {
         try

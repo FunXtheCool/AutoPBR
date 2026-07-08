@@ -281,7 +281,12 @@ public sealed partial class OpenGlPreviewBackend
         SetIntOnProgram(_taaResolveProgram, "uHasHistory", _taaHistoryValid ? 1 : 0);
         SetMatrixOnProgram(_taaResolveProgram, "uInvViewProj", invViewProj);
         SetMatrixOnProgram(_taaResolveProgram, "uPrevViewProj", _taaPrevViewProj);
-        SetVec2OnProgram(_taaResolveProgram, "uTexelSize", new Vector2(1f / w, 1f / h));
+        var displayTexelSize = new Vector2(1f / w, 1f / h);
+        var captureW = hasSceneDepth && frame.SceneCaptureW > 0 ? frame.SceneCaptureW : w;
+        var captureH = hasSceneDepth && frame.SceneCaptureH > 0 ? frame.SceneCaptureH : h;
+        var captureTexelSize = new Vector2(1f / captureW, 1f / captureH);
+        SetVec2OnProgram(_taaResolveProgram, "uTexelSize", displayTexelSize);
+        SetVec2OnProgram(_taaResolveProgram, "uCaptureTexelSize", captureTexelSize);
         SetVec2OnProgram(_taaResolveProgram, "uCurrentJitterPixels",
             new Vector2(frame.PreviewTaaJitterNdc.X * w * 0.5f, frame.PreviewTaaJitterNdc.Y * h * 0.5f));
         SetFloatOnProgram(_taaResolveProgram, "uTemporalWeight", taa.TemporalWeight);

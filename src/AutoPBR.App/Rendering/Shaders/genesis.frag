@@ -117,7 +117,7 @@ float groundSpecularReceiverFade(vec3 worldPos, vec3 N, vec3 V)
 
 void main()
 {
-    vec4 albRaw = texture(uAlbedo, vUv);
+    vec4 albRaw = textureGrad(uAlbedo, vUv, dFdx(vUv), dFdy(vUv));
     if (uSceneKind == 1)
     {
         if (uItemAlphaBlend < 1 && albRaw.a < uAlphaCutoff)
@@ -211,19 +211,18 @@ void main()
     float shadowVis = 1.0;
     if (uEnableShadowMap > 0)
     {
-        // Use the precomputed light-clip varying so this stays cheap; POM displacement is
-        // intentionally ignored in shadowing (matches Iris/LabPBR conventions; future phases
-        // can promote pomDepth into world-space and refine).
-        if (vLightClip.w > 0.0)
+        // Per-fragment light clip from world position (POM displacement intentionally ignored).
+        vec4 lightClip = uLightViewProj * vec4(vWorldPos, 1.0);
+        if (lightClip.w > 0.0)
         {
-            vec3 ndc = vLightClip.xyz / vLightClip.w;
+            vec3 ndc = lightClip.xyz / lightClip.w;
             vec3 sUv = ndc * 0.5 + 0.5;
             // Manual border check (ES 300 has no CLAMP_TO_BORDER; CLAMP_TO_EDGE would otherwise
             // return the fragment as shadowed when sampled beyond [0,1]).
             if (sUv.x >= 0.0 && sUv.x <= 1.0 && sUv.y >= 0.0 && sUv.y <= 1.0 &&
                 sUv.z >= 0.0 && sUv.z <= 1.0)
             {
-                float bias = computeShadowBias(N, L, uShadowMinBias, uShadowMaxBias);
+                float bias = computeShadowBias(N, L, uShadowMinBias, uShadowMaxBias, uShadowTexelSize);
                 sUv.z = clamp(sUv.z - bias, 0.0, 1.0);
                 shadowVis = sampleShadowPcfSoft(uShadowMap, sUv, uShadowTexelSize, uShadowSoftnessTexels);
             }
@@ -233,10 +232,12 @@ void main()
     // Combined lighting visibility: parallax-local AND directional shadow gate.
     float lightVis = pomShadow * shadowVis;
 
-    // Direct lighting: Cook-Torrance.
+    // Direct lighting: Cook-Torrance. Specular lobe is gated on the LabPBR _s map toggle so
+    // "specular off" is diffuse-only and avoids view-dependent RGBA8 banding on flat faces.
     BrdfResult br = cookTorrance(N, V, L, albedoLinear, mat.f0, mat.roughness, mat.metallic);
     float groundSpecFade = groundSpecularReceiverFade(vWorldPos, N, V);
-    br.specular *= groundSpecFade;
+    float specLobe = uEnableSpecularMap > 0 ? 1.0 : 0.0;
+    br.specular *= groundSpecFade * specLobe;
     vec3 direct = (br.diffuse + br.specular) * uLightColor * lightVis;
 
     // Subsurface scattering contribution (gated; cheap front-wrap + back-translucency).
@@ -262,7 +263,7 @@ void main()
         indirect += metalPreviewIrradiance * albedoLinear * metalBaseVisibility * uIblStrength;
         indirect += fakeIblSpecular(N, V, mat.f0, mat.roughness, mat.metallic, uSkyTint, uGroundTint,
                            uLightDir, uLightColor, uAtmosphereSunIntensity, uEnableAtmosphericSky, uAtmoSkyViewLut) *
-                    uIblStrength * groundSpecFade;
+                    uIblStrength * groundSpecFade * specLobe;
     }
     else
     {
@@ -290,7 +291,7 @@ void main()
         mapped = mix(mapped, fogCol, fogAmt);
     }
 
-    vec3 srgb = linearToSrgb(mapped);
+    vec3 srgb = ditherSrgb8(linearToSrgb(mapped), gl_FragCoord.xy);
 
     float a = 1.0;
     if (uSceneKind == 1 && uItemAlphaBlend > 0)

@@ -33,12 +33,10 @@ public static class PreviewCameraDepthRange
         var minDist = MinDistanceEyeToAabb(eye, sceneMin, sceneMax);
         var maxDist = MaxDistanceEyeToAabb(eye, sceneMin, sceneMax);
 
-        var orbit = Math.Max(orbitDistance, minDist);
-        var near = Math.Clamp(minDist * 0.35f, 0.05f, Math.Max(minDist * 0.92f, 0.05f));
-        if (minDist < 0.15f)
-        {
-            near = Math.Clamp(orbit * 0.04f, 0.05f, orbit * 0.45f);
-        }
+        // Near plane tracks eye-to-geometry distance so fly-to-orbit handoff does not pop when
+        // boom-arm orbit distance is much larger than the current proximity to scene bounds.
+        const float nearFloor = 0.01f;
+        var near = Math.Clamp(minDist * 0.35f, nearFloor, Math.Max(minDist * 0.92f, nearFloor));
 
         var far = Math.Max(maxDist + 2.5f, near * 8f);
         far = Math.Min(far, DefaultFar);

@@ -29,11 +29,21 @@ vec4 worldToShadowUv(vec3 worldPos, mat4 lightVP)
     return vec4(uv, inside);
 }
 
-float computeShadowBias(vec3 N, vec3 L, float minBias, float maxBias)
+float shadowMapTexelDepth(vec2 shadowTexelSize)
+{
+    return max(max(shadowTexelSize.x, shadowTexelSize.y), 1.0 / 4096.0);
+}
+
+// minBias/maxBias are normalized-depth offsets; always enforce ~1.75 texels minimum so fitted
+// subject ortho extents (large world span / 1024) do not acne-strip receivers.
+float computeShadowBias(vec3 N, vec3 L, float minBias, float maxBias, vec2 shadowTexelSize)
 {
     float ndl = clamp(dot(normalize(N), normalize(L)), 0.0, 1.0);
     float slope = 1.0 - ndl;
-    return clamp(maxBias * slope, minBias, maxBias);
+    float texel = shadowMapTexelDepth(shadowTexelSize);
+    float slopeBias = maxBias * slope;
+    float configured = max(minBias, slopeBias);
+    return max(configured, texel * 1.75);
 }
 
 float sampleShadowPcf3x3(sampler2DShadow shadowTex, vec3 shadowUv, vec2 texelSize)

@@ -22,7 +22,7 @@ public sealed class PreviewRenderSettings
     public bool AutoRotate { get; init; } = true;
     public float LightYawDegrees { get; init; } = -35f;
     public float LightPitchDegrees { get; init; } = -55f;
-    public bool NearestTextureFilter { get; init; } = true;
+    public bool NearestTextureFilter { get; init; }
     /// <summary>Item plane: alpha test threshold in linear 0..1.</summary>
     public float AlphaCutoff { get; init; } = 0.5f;
     public bool ItemUseAlphaBlend { get; init; }
@@ -195,13 +195,13 @@ public sealed class PreviewRenderSettings
     public int ShadowMapResolution { get; init; } = 1024;
 
     /// <summary>Genesis Shadows Phase 2: minimum slope-scaled depth bias to combat acne.</summary>
-    public float ShadowMinBias { get; init; } = 0.0008f;
+    public float ShadowMinBias { get; init; } = 0.002f;
 
     /// <summary>Genesis Shadows Phase 2: maximum slope-scaled depth bias (used at grazing N.L).</summary>
-    public float ShadowMaxBias { get; init; } = 0.005f;
+    public float ShadowMaxBias { get; init; } = 0.012f;
 
     /// <summary>Genesis Shadows: receiver-side PCF disk radius in shadow-map texels.</summary>
-    public float ShadowSoftnessTexels { get; init; } = 2.25f;
+    public float ShadowSoftnessTexels { get; init; } = 1.0f;
 
     /// <summary>
     /// PHASE3-CSM stub: persisted boolean so Phase 3 can light up cascades without restructuring.

@@ -10,6 +10,12 @@ public sealed class PreviewTextureMaps
     public required int Width { get; init; }
     public required int Height { get; init; }
 
+    /// <summary>Geometry-IR logical atlas width used during mesh UV bake (0 = same as <see cref="Width"/>).</summary>
+    public int BakeAtlasWidth { get; init; }
+
+    /// <summary>Geometry-IR logical atlas height used during mesh UV bake (0 = same as <see cref="Height"/>).</summary>
+    public int BakeAtlasHeight { get; init; }
+
     public required byte[] DiffuseRgba { get; init; }
 
     /// <summary>Full normal map including alpha (height); null if normals were not written.</summary>

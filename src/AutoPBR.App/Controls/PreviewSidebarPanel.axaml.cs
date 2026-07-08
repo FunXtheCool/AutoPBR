@@ -15,6 +15,11 @@ public partial class PreviewSidebarPanel : UserControl
     private EntityPreviewDebugWindow? _entityPreviewDebugWindow;
     private Preview3DCameraHelpWindow? _preview3DCameraHelpWindow;
 
+    public PreviewSidebarPanel()
+    {
+        InitializeComponent();
+    }
+
     internal void WireViewModel(MainWindowViewModel vm)
     {
         if (GlPbrPreview is { } glPreview)

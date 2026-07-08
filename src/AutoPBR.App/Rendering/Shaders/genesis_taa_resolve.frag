@@ -13,6 +13,7 @@ uniform sampler2D uTaaSignal;
 uniform mat4 uInvViewProj;
 uniform mat4 uPrevViewProj;
 uniform vec2 uTexelSize;
+uniform vec2 uCaptureTexelSize;
 uniform vec2 uCurrentJitterPixels;
 uniform float uTemporalWeight;
 uniform float uStableTemporalBoost;
@@ -166,7 +167,8 @@ vec3 taaMorphologicalEdgeBlend(
     sampler2D colorTex,
     sampler2D depthTex,
     vec2 uv,
-    vec2 texelSize,
+    vec2 colorTexelSize,
+    vec2 depthTexelSize,
     vec3 resolved,
     float depthEdgeAmount,
     float nearbyGeometryW,
@@ -182,10 +184,10 @@ vec3 taaMorphologicalEdgeBlend(
     }
 
     vec3 rgbM = texture(colorTex, uv).rgb;
-    vec3 rgbN = texture(colorTex, clamp(uv + vec2( 0.0, -1.0) * texelSize, vec2(0.001), vec2(0.999))).rgb;
-    vec3 rgbS = texture(colorTex, clamp(uv + vec2( 0.0,  1.0) * texelSize, vec2(0.001), vec2(0.999))).rgb;
-    vec3 rgbW = texture(colorTex, clamp(uv + vec2(-1.0,  0.0) * texelSize, vec2(0.001), vec2(0.999))).rgb;
-    vec3 rgbE = texture(colorTex, clamp(uv + vec2( 1.0,  0.0) * texelSize, vec2(0.001), vec2(0.999))).rgb;
+    vec3 rgbN = texture(colorTex, clamp(uv + vec2( 0.0, -1.0) * colorTexelSize, vec2(0.001), vec2(0.999))).rgb;
+    vec3 rgbS = texture(colorTex, clamp(uv + vec2( 0.0,  1.0) * colorTexelSize, vec2(0.001), vec2(0.999))).rgb;
+    vec3 rgbW = texture(colorTex, clamp(uv + vec2(-1.0,  0.0) * colorTexelSize, vec2(0.001), vec2(0.999))).rgb;
+    vec3 rgbE = texture(colorTex, clamp(uv + vec2( 1.0,  0.0) * colorTexelSize, vec2(0.001), vec2(0.999))).rgb;
 
     float lumaM = trLuminance(rgbM);
     float lumaN = trLuminance(rgbN);
@@ -196,10 +198,10 @@ vec3 taaMorphologicalEdgeBlend(
     vec2 depthGrad = vec2(0.0);
     if (hasDepth > 0)
     {
-        float dN = texture(depthTex, clamp(uv + vec2( 0.0, -1.0) * texelSize, vec2(0.001), vec2(0.999))).r;
-        float dS = texture(depthTex, clamp(uv + vec2( 0.0,  1.0) * texelSize, vec2(0.001), vec2(0.999))).r;
-        float dW = texture(depthTex, clamp(uv + vec2(-1.0,  0.0) * texelSize, vec2(0.001), vec2(0.999))).r;
-        float dE = texture(depthTex, clamp(uv + vec2( 1.0,  0.0) * texelSize, vec2(0.001), vec2(0.999))).r;
+        float dN = texture(depthTex, clamp(uv + vec2( 0.0, -1.0) * depthTexelSize, vec2(0.001), vec2(0.999))).r;
+        float dS = texture(depthTex, clamp(uv + vec2( 0.0,  1.0) * depthTexelSize, vec2(0.001), vec2(0.999))).r;
+        float dW = texture(depthTex, clamp(uv + vec2(-1.0,  0.0) * depthTexelSize, vec2(0.001), vec2(0.999))).r;
+        float dE = texture(depthTex, clamp(uv + vec2( 1.0,  0.0) * depthTexelSize, vec2(0.001), vec2(0.999))).r;
         depthGrad = vec2(dE - dW, dS - dN) * 8.0;
     }
 
@@ -214,10 +216,10 @@ vec3 taaMorphologicalEdgeBlend(
         return resolved;
     }
 
-    vec3 nearA = texture(colorTex, clamp(uv + normal * texelSize * 0.70, vec2(0.001), vec2(0.999))).rgb;
-    vec3 nearB = texture(colorTex, clamp(uv - normal * texelSize * 0.70, vec2(0.001), vec2(0.999))).rgb;
-    vec3 farA = texture(colorTex, clamp(uv + normal * texelSize * 1.35, vec2(0.001), vec2(0.999))).rgb;
-    vec3 farB = texture(colorTex, clamp(uv - normal * texelSize * 1.35, vec2(0.001), vec2(0.999))).rgb;
+    vec3 nearA = texture(colorTex, clamp(uv + normal * colorTexelSize * 0.70, vec2(0.001), vec2(0.999))).rgb;
+    vec3 nearB = texture(colorTex, clamp(uv - normal * colorTexelSize * 0.70, vec2(0.001), vec2(0.999))).rgb;
+    vec3 farA = texture(colorTex, clamp(uv + normal * colorTexelSize * 1.35, vec2(0.001), vec2(0.999))).rgb;
+    vec3 farB = texture(colorTex, clamp(uv - normal * colorTexelSize * 1.35, vec2(0.001), vec2(0.999))).rgb;
     vec3 acrossNormal = mix((nearA + nearB) * 0.5, (farA + farB) * 0.5, 0.35);
     vec3 cardinal = (rgbN + rgbS + rgbW + rgbE) * 0.25;
 
@@ -241,8 +243,8 @@ void main()
     float closestDepth = depth;
     if (uHasSceneDepth > 0)
     {
-        rawDepthEdgeW = trDepthEdgeWeight(uSceneDepth, vUv, uTexelSize);
-        closestDepth = taaClosestGeometryDepth3(uSceneDepth, vUv, uTexelSize);
+        rawDepthEdgeW = trDepthEdgeWeight(uSceneDepth, vUv, uCaptureTexelSize);
+        closestDepth = taaClosestGeometryDepth3(uSceneDepth, vUv, uCaptureTexelSize);
     }
 
     float depthEdgeAmount = 1.0 - rawDepthEdgeW;
@@ -349,6 +351,7 @@ void main()
         uSceneDepth,
         vUv,
         uTexelSize,
+        uCaptureTexelSize,
         resolved,
         depthEdgeAmount,
         nearbyGeometryW,
@@ -362,5 +365,5 @@ void main()
         : clamp(fxaaEdgeMask * uFxaaEdgeStrength * 0.28, 0.0, 0.55);
     resolved = mix(resolved, taaTentBlur3x3(uCurrent, vUv, uTexelSize), postFxaaW);
 
-    FragColor = vec4(resolved, 1.0);
+    FragColor = vec4(ditherSrgb8(resolved, gl_FragCoord.xy), 1.0);
 }

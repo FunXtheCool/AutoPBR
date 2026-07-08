@@ -106,6 +106,9 @@ public class PreviewGlslEsAdaptTests
         var adapted = GlslSourceAdapter.Adapt(src, ShaderType.FragmentShader, useOpenGlEs: true);
 
         Assert.Contains("sampleShadowPcfSoft", adapted, StringComparison.Ordinal);
+        Assert.Contains("shadowMapTexelDepth", adapted, StringComparison.Ordinal);
+        Assert.Contains("texel * 1.75", adapted, StringComparison.Ordinal);
+        Assert.Contains("uLightViewProj * vec4(vWorldPos, 1.0)", adapted, StringComparison.Ordinal);
         Assert.Contains("uShadowSoftnessTexels", adapted, StringComparison.Ordinal);
         Assert.Contains("vec2[16]", adapted, StringComparison.Ordinal);
     }
@@ -118,6 +121,7 @@ public class PreviewGlslEsAdaptTests
 
         Assert.Contains("textureGrad(heightTex", adapted, StringComparison.Ordinal);
         Assert.Contains("textureGrad(uAlbedo, uv, uvDx, uvDy)", adapted, StringComparison.Ordinal);
+        Assert.Contains("textureGrad(uAlbedo, vUv, dFdx(vUv), dFdy(vUv))", adapted, StringComparison.Ordinal);
         Assert.Contains("textureGrad(uNormal, uv, dx, dy)", adapted, StringComparison.Ordinal);
         Assert.Contains("textureGrad(uSpecular, uv, uvDx, uvDy)", adapted, StringComparison.Ordinal);
         Assert.Contains("pomTileUv(tileBase", adapted, StringComparison.Ordinal);
@@ -186,6 +190,7 @@ public class PreviewGlslEsAdaptTests
         Assert.Contains("uDepthEdgeHistoryFloor", adapted, StringComparison.Ordinal);
         Assert.Contains("uEdgeAaBlend", adapted, StringComparison.Ordinal);
         Assert.Contains("uCurrentJitterPixels", adapted, StringComparison.Ordinal);
+        Assert.Contains("uCaptureTexelSize", adapted, StringComparison.Ordinal);
         Assert.Contains("uSourceFilterStrength", adapted, StringComparison.Ordinal);
         Assert.Contains("uSilhouetteHistoryWeight", adapted, StringComparison.Ordinal);
         Assert.Contains("uFxaaEdgeStrength", adapted, StringComparison.Ordinal);
@@ -245,6 +250,17 @@ public class PreviewGlslEsAdaptTests
     }
 
     [Fact]
+    public void GenesisFragment_GatesSpecularLobeAndDithersSrgbOutput()
+    {
+        var src = GlslIncludeResolver.Resolve("genesis.frag", LoadShader);
+        var adapted = GlslSourceAdapter.Adapt(src, ShaderType.FragmentShader, useOpenGlEs: true);
+
+        Assert.Contains("float specLobe = uEnableSpecularMap > 0 ? 1.0 : 0.0;", adapted, StringComparison.Ordinal);
+        Assert.Contains("br.specular *= groundSpecFade * specLobe;", adapted, StringComparison.Ordinal);
+        Assert.Contains("ditherSrgb8(linearToSrgb(mapped), gl_FragCoord.xy)", adapted, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void GenesisVertex_EmitsPreviousClipForTaaMotionSignal()
     {
         var src = GlslIncludeResolver.Resolve("genesis.vert", LoadShader);
@@ -254,6 +270,8 @@ public class PreviewGlslEsAdaptTests
         Assert.Contains("uniform mat4 uTaaCurrViewProj", src, StringComparison.Ordinal);
         Assert.Contains("EntityPrevSkinningBones", src, StringComparison.Ordinal);
         Assert.Contains("uEntityPrevBonePaletteValid", src, StringComparison.Ordinal);
+        Assert.Contains("uniform vec2 uTextureAtlasScale", src, StringComparison.Ordinal);
+        Assert.Contains("vUv = aUv * uTextureAtlasScale", src, StringComparison.Ordinal);
         Assert.Contains("prevEntityPos = prevBone * vec4(aPos, 1.0)", src, StringComparison.Ordinal);
         Assert.Contains("out vec4 vPrevClip", src, StringComparison.Ordinal);
         Assert.Contains("vCurrClip = uTaaCurrViewProj * wp", src, StringComparison.Ordinal);

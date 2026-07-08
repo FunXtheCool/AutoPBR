@@ -78,6 +78,30 @@ public sealed partial class PreviewRenderingTests
     }
 
     [Fact]
+    public void PreviewMaterialMapperPreservesEntityBakeAtlasDimensions()
+    {
+        var maps = new PreviewTextureMaps
+        {
+            Width = 64,
+            Height = 64,
+            BakeAtlasWidth = 64,
+            BakeAtlasHeight = 32,
+            DiffuseRgba = new byte[64 * 64 * 4],
+        };
+        var mat = PreviewMaterialMapper.FromCoreMaps(maps);
+        Assert.Equal(64, mat.BakeAtlasWidth);
+        Assert.Equal(32, mat.BakeAtlasHeight);
+    }
+
+    [Fact]
+    public void EntityEmulatedShaderGating_DisablesTessellationByDefault()
+    {
+        Assert.False(PreviewEntityEmulatedShaderGating.EffectiveTessellationDisplacement(true, entityEmulated: true));
+        Assert.True(PreviewEntityEmulatedShaderGating.EffectiveTessellationDisplacement(true, entityEmulated: false));
+        Assert.False(PreviewEntityEmulatedShaderGating.EffectiveTessellationDisplacement(false, entityEmulated: false));
+    }
+
+    [Fact]
     public void EmptySubjectMeshHasNoIndices()
     {
         var mesh = PreviewMeshFactory.CreateEmptySubjectPlaceholder();

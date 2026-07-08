@@ -18,6 +18,11 @@ public partial class RulesetsTab : UserControl
     private static readonly CompositeFormat LogTagRulesImportedFormat =
         CompositeFormat.Parse(Lang.Resources.Log_TagRulesImported);
 
+    public RulesetsTab()
+    {
+        InitializeComponent();
+    }
+
     private async void ExportTagRules_Click(object? sender, RoutedEventArgs e)
     {
         try

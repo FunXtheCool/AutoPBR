@@ -6,6 +6,12 @@ public sealed class PreviewMaterial
     public required int Width { get; init; }
     public required int Height { get; init; }
 
+    /// <summary>Logical atlas width used during entity UV bake (0 = use <see cref="Width"/>).</summary>
+    public int BakeAtlasWidth { get; init; }
+
+    /// <summary>Logical atlas height used during entity UV bake (0 = use <see cref="Height"/>).</summary>
+    public int BakeAtlasHeight { get; init; }
+
     public required ReadOnlyMemory<byte> AlbedoRgba { get; init; }
     public ReadOnlyMemory<byte>? NormalRgba { get; init; }
     public ReadOnlyMemory<byte>? SpecularRgba { get; init; }

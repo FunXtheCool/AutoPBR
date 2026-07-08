@@ -72,7 +72,7 @@
                 Padding="1">
         <Grid RowDefinitions="Auto,*,Auto" Background="{Binding WindowBackground}">
         <!-- Custom title bar -->
-        <ctrls:MainWindowTitleBar Grid.Row="0" DataContext="{Binding}" />
+        <ctrls:MainWindowTitleBar Grid.Row="0" />
 
         <Grid x:Name="ContentGrid" Grid.Row="1" RowDefinitions="*" Background="{Binding WindowBackground}" ClipToBounds="True">
             <Grid.ColumnDefinitions>
@@ -81,31 +81,31 @@
                 <ColumnDefinition Width="280" MinWidth="260" MaxWidth="600" />
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0" RowDefinitions="Auto,*" MinWidth="0">
-                <ctrls:ScanInputBar Grid.Row="0" DataContext="{Binding}" />
+                <ctrls:ScanInputBar Grid.Row="0" />
                 <Grid Grid.Row="1" MinWidth="0">
             <TabControl x:Name="MainTabControl" Margin="16,8,16,16" ZIndex="0" MinWidth="0">
                 <TabItem Header="{Binding Strings.TabExplore}">
-                    <ctrls:ResourceExplorerTab x:Name="ResourceExplorer" DataContext="{Binding}" />
+                    <ctrls:ResourceExplorerTab x:Name="ResourceExplorer" />
                 </TabItem>
 
                 <TabItem Header="{Binding Strings.TabNormals}">
-                    <ctrls:NormalsTuneTab DataContext="{Binding}" />
+                    <ctrls:NormalsTuneTab />
                 </TabItem>
 
                 <TabItem Header="{Binding Strings.TabRulesets}" IsVisible="{Binding DebugMode}">
-                    <ctrls:RulesetsTab DataContext="{Binding}" />
+                    <ctrls:RulesetsTab />
                 </TabItem>
 
                 <TabItem Header="{Binding Strings.TabShader}">
-                    <ctrls:ShaderPreviewTab DataContext="{Binding}" />
+                    <ctrls:ShaderPreviewTab />
                 </TabItem>
 
                 <TabItem Header="{Binding Strings.TabSettings}">
-                    <ctrls:SettingsTab DataContext="{Binding}" />
+                    <ctrls:SettingsTab />
                 </TabItem>
 
                 <TabItem Header="{Binding Strings.TabDebug}" IsVisible="{Binding DebugMode}">
-                    <ctrls:DebugTab DataContext="{Binding}" />
+                    <ctrls:DebugTab />
                 </TabItem>
             </TabControl>
 
@@ -136,7 +136,7 @@
             <Border Grid.Column="1" Width="1" HorizontalAlignment="Right" Background="{Binding CardBorderBrush}"
                     IsHitTestVisible="False" />
 
-            <ctrls:PreviewSidebarPanel x:Name="PreviewSidebar" Grid.Row="0" Grid.Column="2" DataContext="{Binding}" />
+            <ctrls:PreviewSidebarPanel x:Name="PreviewSidebar" Grid.Row="0" Grid.Column="2" />
         </Grid>
 
         <Border Grid.Row="2" Background="{Binding WindowBackground}" Padding="12" MinWidth="0">

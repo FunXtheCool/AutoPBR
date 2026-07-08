@@ -10,6 +10,8 @@ public static class PreviewMaterialMapper
         {
             Width = maps.Width,
             Height = maps.Height,
+            BakeAtlasWidth = maps.BakeAtlasWidth > 0 ? maps.BakeAtlasWidth : maps.Width,
+            BakeAtlasHeight = maps.BakeAtlasHeight > 0 ? maps.BakeAtlasHeight : maps.Height,
             AlbedoRgba = maps.DiffuseRgba,
             NormalRgba = maps.NormalRgba,
             SpecularRgba = maps.SpecularRgba,

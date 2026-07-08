@@ -174,17 +174,32 @@ public static class ResourcePackPreviewRenderer
                     cancellationToken.ThrowIfCancellationRequested();
 
                     var bakeProfile = ResolvePreviewMeshNativeProfile(previewNativeProfile);
-                    var materials = workOrdered.Select(PreviewTextureMapsLoader.Load).ToArray();
+                    var materials = new PreviewTextureMaps[workOrdered.Count];
                     var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase);
                     for (var i = 0; i < orderedModelTextures.Count; i++)
                     {
+                        var loaded = PreviewTextureMapsLoader.Load(workOrdered[i]);
                         var size = EntityGeometryIrTextureAtlas.ResolveForBake(
                             orderedModelTextures[i],
-                            materials[i].Width,
-                            materials[i].Height,
+                            loaded.Width,
+                            loaded.Height,
                             meshProvenance,
                             bakeProfile);
                         texSizes[orderedModelTextures[i]] = (size.Width, size.Height);
+                        materials[i] = new PreviewTextureMaps
+                        {
+                            Width = loaded.Width,
+                            Height = loaded.Height,
+                            BakeAtlasWidth = size.Width,
+                            BakeAtlasHeight = size.Height,
+                            DiffuseRgba = loaded.DiffuseRgba,
+                            NormalRgba = loaded.NormalRgba,
+                            SpecularRgba = loaded.SpecularRgba,
+                            HeightRgba = loaded.HeightRgba,
+                            IsPlantForNoHeight = loaded.IsPlantForNoHeight,
+                            Sprite2DFoliageTarget = loaded.Sprite2DFoliageTarget,
+                            IsItemTexturePath = loaded.IsItemTexturePath
+                        };
                     }
 
                     var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);

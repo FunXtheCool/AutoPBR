@@ -90,6 +90,7 @@ public static class PreviewSubjectPlacement
             Indices = subject.Indices,
             DrawBatches = subject.DrawBatches,
             Materials = subject.Materials,
+            MaterialArchivePaths = subject.MaterialArchivePaths,
             PrimaryMaterialIndex = subject.PrimaryMaterialIndex,
             Sprite2DFoliageTarget = subject.Sprite2DFoliageTarget,
             EnableRenderTimeAnimation = subject.EnableRenderTimeAnimation,

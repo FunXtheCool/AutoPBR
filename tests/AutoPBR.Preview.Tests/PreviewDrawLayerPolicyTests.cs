@@ -308,6 +308,22 @@ public sealed class PreviewCameraDepthRangeTests
         Assert.True(near < far);
         Assert.True(far <= PreviewCameraDepthRange.DefaultFar);
     }
+
+    [Fact]
+    public void ForOrbitPreview_close_eye_uses_proximity_not_boom_distance_for_near_plane()
+    {
+        var subjectMin = new Vector3(-8f, -0.5f, -8f);
+        var subjectMax = new Vector3(8f, 2f, 8f);
+        var eye = new Vector3(0.05f, 0.8f, 0.05f);
+        var (near, _) = PreviewCameraDepthRange.ForOrbitPreview(
+            subjectMin,
+            subjectMax,
+            orbitDistance: 12f,
+            eye);
+
+        Assert.True(near < 0.1f, $"near={near} should track eye proximity, not boom distance");
+        Assert.True(near < 12f * 0.04f, "near must not inflate from orbit boom distance when close");
+    }
 }
 
 public sealed class PreviewDepthLayerHeuristicsTests

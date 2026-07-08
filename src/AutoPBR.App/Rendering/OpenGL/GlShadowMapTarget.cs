@@ -134,11 +134,14 @@ internal sealed class GlShadowMapTarget : IDisposable
         _gl.Enable(EnableCap.DepthTest);
         _gl.DepthMask(true);
         _gl.DepthFunc(GLEnum.Lequal);
+        _gl.Enable(EnableCap.PolygonOffsetFill);
+        _gl.PolygonOffset(1.75f, 3.0f);
         _gl.Clear(ClearBufferMask.DepthBufferBit);
     }
 
     public void EndShadowPass()
     {
+        _gl.Disable(EnableCap.PolygonOffsetFill);
         _gl.ColorMask(_savedColorWriteR, _savedColorWriteG, _savedColorWriteB, _savedColorWriteA);
         _gl.BindFramebuffer(FramebufferTarget.Framebuffer, (uint)Math.Max(0, _savedDrawFbo));
         _gl.Viewport(_savedVpX, _savedVpY, (uint)_savedVpW, (uint)_savedVpH);

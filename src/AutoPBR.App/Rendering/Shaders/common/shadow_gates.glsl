@@ -20,7 +20,9 @@ float grShadowGate(vec3 worldPos, mat4 lightViewProj, sampler2DShadow shadowMap,
     }
 
     vec3 shadowUv = shadowPack.xyz;
-    shadowUv.z = clamp(shadowUv.z - shadowMinBias, 0.0, 1.0);
+    float texel = shadowMapTexelDepth(shadowTexelSize);
+    float bias = max(shadowMinBias, texel * 1.75);
+    shadowUv.z = clamp(shadowUv.z - bias, 0.0, 1.0);
     return sampleShadowPcf3x3(shadowMap, shadowUv, shadowTexelSize);
 }
 
