@@ -182,6 +182,21 @@ The renderer should still receive `MergedJavaBlockModel` or `PreviewModelSubject
 Data/minecraft-native/geometry/<version>/<jvm>.json
 ```
 
+### Canonical generated-data locations (post–assembly split)
+
+| Role | Canonical path | Shipped via | Notes |
+|------|----------------|-------------|-------|
+| **Authoritative geometry/animation IR corpus** | `docs/generated/geometry/`, `docs/generated/animation/`, indexes (`geometry-index-*.json`, etc.) | `AutoPBR.Preview` csproj `Content` globs → output `Data/minecraft-native/` | Regenerate with `tools/Generate-GeometryIndex.ps1` and related scripts. **Do not hand-edit** committed shards except intentional pilot fixes documented in parity roadmaps. |
+| **JSON Schema validation** | `docs/generated/schema/` | GeometryCompiler.Tests (CI) | Drift checks on every build. |
+| **Hand-written parity docs** | `docs/` (this file, `geometry-ir-conventions.md`, roadmaps) | — | Architecture and process only. |
+| **Conversion-side manifests/policies** | `src/AutoPBR.Core/Data/minecraft-native/` (manifests, policies, class lists) | `AutoPBR.Core` csproj | Not the geometry shard tree; links to generated indexes. |
+| **Reference bake output (dev)** | `tools/MinecraftGeometryReference/reference-output/` | Not shipped | Local Java reference baker; do not treat as a second canonical tree. |
+| **Legacy reference-geometry copy** | `src/AutoPBR.Core/Data/minecraft-native/reference-geometry/` | `AutoPBR.Preview` csproj (linked into output) | Committed reference JSON for strict alignment tests; prefer regenerating from `docs/generated/` when refreshing pilots. |
+
+**Rule:** one write path per artifact class. Regenerate into `docs/generated/`, let Preview `Content` items copy into build output. Avoid editing the same JSON in multiple trees.
+
+See also [`naming-conventions.md`](naming-conventions.md#data-and-generated-output) and [`docs/generated/README.md`](generated/README.md).
+
 Refactor toward source providers:
 
 ```csharp
