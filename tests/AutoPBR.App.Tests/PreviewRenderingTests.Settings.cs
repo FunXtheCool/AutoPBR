@@ -463,13 +463,19 @@ public sealed partial class PreviewRenderingTests
             "AutoPBR.App",
             "Rendering",
             "OpenGL",
-            "OpenGlPreviewBackend.Render.Frame.cs");
+            "GlRenderFrame.cs");
         var godRays = LoadSource(ThisFilePath(),
             "src",
             "AutoPBR.App",
             "Rendering",
             "OpenGL",
             "OpenGlPreviewBackend.GodRays.cs");
+        var godRaysCoordinator = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "GodRaysPassCoordinator.cs");
         var scenePass = LoadSource(ThisFilePath(),
             "src",
             "AutoPBR.App",
@@ -486,13 +492,13 @@ public sealed partial class PreviewRenderingTests
         Assert.Contains("public int SceneCaptureW;", frame, StringComparison.Ordinal);
         Assert.Contains("public int SceneCaptureH;", frame, StringComparison.Ordinal);
         Assert.Contains("public float SceneCaptureScale;", frame, StringComparison.Ordinal);
-        Assert.Contains("PreviewTaaSsaaMaxDimension", godRays, StringComparison.Ordinal);
-        Assert.Contains("ResolvePreviewSceneCaptureScale", godRays, StringComparison.Ordinal);
+        Assert.Contains("PreviewTaaSsaaMaxDimension", godRaysCoordinator, StringComparison.Ordinal);
+        Assert.Contains("ResolveSceneCaptureScale", godRaysCoordinator, StringComparison.Ordinal);
         Assert.Contains("ResolveSceneCaptureSize(ref frame, out var captureW, out var captureH, out var captureScale)", godRays, StringComparison.Ordinal);
         Assert.Contains("_sceneCapture.EnsureSize(captureW, captureH)", godRays, StringComparison.Ordinal);
         Assert.Contains("_sceneCapture.BindDraw(captureW, captureH)", godRays, StringComparison.Ordinal);
-        Assert.Contains("Scene capture AA scale:", godRays, StringComparison.Ordinal);
-        Assert.Contains("if (!frame.Settings.LogPreviewTaaDiagnostics)", godRays, StringComparison.Ordinal);
+        Assert.Contains("Scene capture AA scale:", godRaysCoordinator, StringComparison.Ordinal);
+        Assert.Contains("LogPreviewTaaDiagnostics", godRaysCoordinator, StringComparison.Ordinal);
         Assert.Contains("var sceneVpW = frame.GodRayCaptureActive && frame.SceneCaptureW > 0 ? frame.SceneCaptureW : frame.Vw;", scenePass, StringComparison.Ordinal);
         Assert.Contains("var sceneVpH = frame.GodRayCaptureActive && frame.SceneCaptureH > 0 ? frame.SceneCaptureH : frame.Vh;", scenePass, StringComparison.Ordinal);
         Assert.Contains("frame.Gl.Viewport(sceneVpX, sceneVpY, (uint)sceneVpW, (uint)sceneVpH);", scenePass, StringComparison.Ordinal);
