@@ -71,6 +71,7 @@ jobs:
       - name: Build core stack (no Avalonia App)
         run: |
           dotnet build "src/AutoPBR.Contracts/AutoPBR.Contracts.csproj" -c Release --no-restore -v minimal
+          dotnet build "src/AutoPBR.Ml/AutoPBR.Ml.csproj" -c Release --no-restore -v minimal
           dotnet build "src/AutoPBR.Core/AutoPBR.Core.csproj" -c Release --no-restore -v minimal
           dotnet build "src/AutoPBR.Preview/AutoPBR.Preview.csproj" -c Release --no-restore -v minimal
           dotnet build "src/AutoPBR.Cli/AutoPBR.Cli.csproj" -c Release --no-restore -v minimal

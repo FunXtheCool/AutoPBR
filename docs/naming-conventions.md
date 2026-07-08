@@ -30,6 +30,8 @@ Namespaces mirror the folder path after the project root:
 | `src/AutoPBR.Preview/Preview/Generated/` | `AutoPBR.Preview.Generated` |
 | `src/AutoPBR.Contracts/` | `AutoPBR.Contracts` |
 | `src/AutoPBR.Contracts/GeometryIr/` | `AutoPBR.Contracts.GeometryIr` |
+| `src/AutoPBR.Contracts/Ml/` | `AutoPBR.Contracts.Ml` |
+| `src/AutoPBR.Ml/` | `AutoPBR.Core` (+ `Embeddings`, `HeightFromNormals` sub-namespaces; assembly split only) |
 | `src/AutoPBR.App/Rendering/OpenGL/` | `AutoPBR.App.Rendering.OpenGL` |
 
 Do not use a flat namespace when subfolders exist.
@@ -94,8 +96,9 @@ Deprecate kebab-case script names over time when touching a script.
 | `docs/generated/` | Generated reference corpus (geometry/animation IR indexes, javap dumps). **Do not hand-edit.** Regenerate via `tools/` scripts. |
 | `src/AutoPBR.Preview/` (csproj `Content`) | Shipped preview runtime data: copies `docs/generated/**` and `Data/minecraft-native/**` into build output |
 | `src/AutoPBR.Core/Data/minecraft-native/` | Conversion-side native manifests and policies still owned by Core |
-| `src/AutoPBR.Core/Data/ONNX-AI/` | Bundled ONNX models |
-| `src/AutoPBR.Core/Data/native/` | Redistributed CUDA/cuDNN/ORT native DLLs |
+| `src/AutoPBR.Core/Data/ONNX-AI/` | Bundled ONNX model files on disk (linked into build output by `AutoPBR.Ml`, `AutoPBR.App`, and `AutoPBR.Cli` csproj `Content` items) |
+| `src/AutoPBR.Core/Data/native/` | Redistributed CUDA/cuDNN/ORT native DLLs (same linking pattern as ONNX-AI) |
+| `src/AutoPBR.Ml/` | ONNX inference assembly (`Microsoft.ML.OnnxRuntime.Managed`, specular/DeepBump/MiniLM); references `AutoPBR.Contracts.Ml` only |
 | `tools/MinecraftGeometryReference/reference-output/` | Java reference baker output (dev/parity; not the canonical shipped tree) |
 
 **Canonical geometry IR shards for the app:** `docs/generated/geometry/` → copied into output via `AutoPBR.Preview` project `Content` items (not duplicated under Core).

@@ -4,7 +4,7 @@ namespace AutoPBR.Core.Embeddings;
 
 /// <summary>
 /// Paths and tokenizer setup for the Optimum-exported <c>sentence-transformers/all-MiniLM-L6-v2</c> bundle under
-/// <c>Data/ONNX-AI/all-MiniLM-L6-v2-onnx</c>. Files are shipped next to the app (see Core/App/CLI csproj Content items), same as other ONNX assets.
+/// <c>Data/ONNX-AI/all-MiniLM-L6-v2-onnx</c>. Files are shipped next to the app (see Ml/App/CLI csproj Content items), same as other ONNX assets.
 /// Tokenization uses <see cref="BertTokenizer"/> over <c>vocab.txt</c> (BERT WordPiece), matching the Hugging Face checkpoint.
 /// </summary>
 public static class MiniLmOnnxResources
