@@ -2,11 +2,11 @@
 // for color → normal map generation. GPL-3.0; see LICENSE-DeepBump.txt.
 // GPU: OnnxRuntime.Managed 1.24.x + redistributed CUDA 13 ORT/CUDA/cuDNN/TensorRT DLLs: Data\native → runtimes\win-x64\native.
 
+using AutoPBR.Contracts.Ml;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using AutoPBR.Core.Models;
 
 namespace AutoPBR.Core.HeightFromNormals;
 

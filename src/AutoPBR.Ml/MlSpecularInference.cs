@@ -1,8 +1,8 @@
+using AutoPBR.Contracts.Ml;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using AutoPBR.Core.Models;
 
 namespace AutoPBR.Core;
 
@@ -38,7 +38,8 @@ internal static class MlSpecularInference
     public static bool TryPredictSpecular(
         Image<Rgba32> image,
         float[] edgeMagnitude,
-        AutoPBROptions options,
+        MlSpecularPathOptions pathOptions,
+        MlRuntimePreferences runtime,
         out byte[] r,
         out byte[] g,
         out byte[] b,
@@ -53,7 +54,7 @@ internal static class MlSpecularInference
         a = new byte[n];
 
         var textureSize = Math.Min(image.Width, image.Height);
-        if (!MlSpecularModelResolution.TryResolveModelPath(options, textureSize, out var path, out var selectedRes,
+        if (!MlSpecularModelResolution.TryResolveModelPath(pathOptions, textureSize, out var path, out var selectedRes,
                 out var resolveDiag))
         {
             diagnostic = resolveDiag;
@@ -70,8 +71,8 @@ internal static class MlSpecularInference
         string? loadDiag;
         lock (CacheLock)
         {
-            var preferTrt = options.PreferOnnxTensorRtExecutionProvider;
-            var desiredPoolSize = ResolveCpuRunnerPoolSize(options);
+            var preferTrt = runtime.PreferOnnxTensorRtExecutionProvider;
+            var desiredPoolSize = runtime.CpuRunnerPoolSize;
             var key = (path, preferTrt, desiredPoolSize);
             if (!RunnerCache.TryGetValue(key, out var cached))
             {
@@ -102,8 +103,8 @@ internal static class MlSpecularInference
 
         try
         {
-            var includeEdge = runner.InputChannelCount == 4 && options.MlSpecularUseEdgeChannel;
-            if (!runner.Predict(image, edgeMagnitude, options, r, g, b, a, out var postErr))
+            var includeEdge = runner.InputChannelCount == 4 && runtime.MlSpecularUseEdgeChannel;
+            if (!runner.Predict(image, edgeMagnitude, runtime.MlSpecularUseEdgeChannel, r, g, b, a, out var postErr))
             {
                 diagnostic = string.IsNullOrWhiteSpace(postErr)
                     ? "Specular model ran but output could not be decoded (wrong output shape or layout)."
@@ -111,7 +112,7 @@ internal static class MlSpecularInference
                 return false;
             }
 
-            if (options.SpecularDebugVerboseSpecularMl)
+            if (runtime.SpecularDebugVerboseSpecularMl)
             {
                 var resHint = selectedRes.HasValue ? $"; modelRes={selectedRes}" : "";
                 diagnostic =
@@ -155,14 +156,6 @@ internal static class MlSpecularInference
         }
 
         return runners.ToArray();
-    }
-
-    private static int ResolveCpuRunnerPoolSize(AutoPBROptions options)
-    {
-        // Multiple CPU sessions remove the single-runner lock bottleneck.
-        // Cap pool size to avoid excessive model memory duplication.
-        var conversionParallelism = ThreadingUtil.GetConversionParallelism(options);
-        return Math.Clamp(conversionParallelism, 1, 4);
     }
 
     private sealed class Runner : IDisposable
@@ -283,7 +276,7 @@ internal static class MlSpecularInference
         public bool Predict(
             Image<Rgba32> image,
             float[] edgeMagnitude,
-            AutoPBROptions options,
+            bool useEdgeChannel,
             byte[] r,
             byte[] g,
             byte[] b,
@@ -299,7 +292,7 @@ internal static class MlSpecularInference
                 throw new ArgumentException("Edge magnitude size mismatch.", nameof(edgeMagnitude));
             }
 
-            var includeEdge = _inputChannels == 4 && options.MlSpecularUseEdgeChannel;
+            var includeEdge = _inputChannels == 4 && useEdgeChannel;
             var inputTensor = CreateInputTensor(image, edgeMagnitude, includeEdge);
             var inputs = new List<NamedOnnxValue> { NamedOnnxValue.CreateFromTensor(_inputName, inputTensor) };
 

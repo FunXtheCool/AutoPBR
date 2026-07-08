@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Using Include="AutoPBR.Contracts.Ml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio">
@@ -19,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\AutoPBR.Core\AutoPBR.Core.csproj" />
+    <ProjectReference Include="..\..\src\AutoPBR.Ml\AutoPBR.Ml.csproj" />
     <ProjectReference Include="..\..\src\AutoPBR.Preview\AutoPBR.Preview.csproj" />
     <ProjectReference Include="..\..\src\AutoPBR.Contracts\AutoPBR.Contracts.csproj" />
   </ItemGroup>

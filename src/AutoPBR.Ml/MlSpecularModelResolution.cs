@@ -1,11 +1,11 @@
-using AutoPBR.Core.Models;
+using AutoPBR.Contracts.Ml;
 
 namespace AutoPBR.Core;
 
 /// <summary>
 /// Selects a specular ONNX model path from per-resolution mapping using <b>ceil</b> policy:
 /// smallest configured resolution &gt;= texture size; if none, largest configured resolution.
-/// Falls back to <see cref="AutoPBROptions.MlSpecularModelPath"/> when the map is empty or has no valid entries.
+/// Falls back to <see cref="MlSpecularPathOptions.DefaultModelPath"/> when the map is empty or has no valid entries.
 /// </summary>
 public static class MlSpecularModelResolution
 {
@@ -42,13 +42,8 @@ public static class MlSpecularModelResolution
     /// <summary>
     /// Resolves the model path for <paramref name="textureSize"/> (typically square edge length after crop).
     /// </summary>
-    /// <param name="options">Conversion options including ML specular paths and enable flag.</param>
-    /// <param name="textureSize">Texture edge length used to pick the smallest map key &gt;= size (ceil policy).</param>
-    /// <param name="modelPath">Resolved absolute or relative model path, or null on failure.</param>
-    /// <param name="selectedResolution">The resolution key chosen from the map, or null when using fallback path only.</param>
-    /// <param name="diagnostic">Human-readable failure reason when the method returns false.</param>
     public static bool TryResolveModelPath(
-        AutoPBROptions options,
+        MlSpecularPathOptions options,
         int textureSize,
         out string? modelPath,
         out int? selectedResolution,
@@ -58,16 +53,16 @@ public static class MlSpecularModelResolution
         modelPath = null;
         selectedResolution = null;
 
-        if (!options.UseMlSpecularPredictor)
+        if (!options.Enabled)
         {
             diagnostic = "ML specular is disabled.";
             return false;
         }
 
-        var sanitized = SanitizeMap(options.MlSpecularModelPathsByResolution);
-        var fallback = string.IsNullOrWhiteSpace(options.MlSpecularModelPath)
+        var sanitized = SanitizeMap(options.ModelPathsByResolution);
+        var fallback = string.IsNullOrWhiteSpace(options.DefaultModelPath)
             ? null
-            : options.MlSpecularModelPath!.Trim();
+            : options.DefaultModelPath!.Trim();
 
         if (sanitized.Count == 0)
         {
@@ -95,7 +90,6 @@ public static class MlSpecularModelResolution
             return true;
         }
 
-        // Ceil: smallest key >= size
         foreach (var k in keys)
         {
             if (k >= size)
@@ -106,7 +100,6 @@ public static class MlSpecularModelResolution
             }
         }
 
-        // Larger than all configured: use largest
         var maxKey = keys[^1];
         modelPath = sanitized[maxKey];
         selectedResolution = maxKey;

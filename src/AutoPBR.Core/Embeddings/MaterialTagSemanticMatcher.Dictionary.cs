@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using AutoPBR.Contracts.Ml;
 using AutoPBR.Core.Models;
 
 namespace AutoPBR.Core.Embeddings;

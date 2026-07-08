@@ -5,7 +5,7 @@ using AutoPBR.App.Rendering.Abstractions;
 using AutoPBR.Core;
 using AutoPBR.Core.Models;
 
-using DeepBumpInputModeEnum = AutoPBR.Core.Models.DeepBumpInputMode;
+using DeepBumpInputModeEnum = AutoPBR.Contracts.Ml.DeepBumpInputMode;
 using NormalDerivativeEnum = AutoPBR.Core.Models.NormalDerivative;
 using NormalOperatorEnum = AutoPBR.Core.Models.NormalOperator;
 

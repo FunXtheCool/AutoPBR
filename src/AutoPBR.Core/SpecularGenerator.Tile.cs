@@ -72,7 +72,8 @@ internal static partial class SpecularGenerator
         var useMlSpec = MlSpecularInference.TryPredictSpecular(
             cropped,
             edgeMagnitude,
-            options,
+            options.ToMlSpecularPathOptions(),
+            options.ToMlRuntimePreferences(),
             out var mlSpecR,
             out var mlSpecG,
             out var mlSpecB,

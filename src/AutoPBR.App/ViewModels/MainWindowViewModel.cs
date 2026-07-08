@@ -113,14 +113,14 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     /// <summary>Enum name (SmoothnessOnly, AiMetalAndEmissive, or Full); kept in sync with <see cref="SelectedMlSpecularBlendModeOption"/>.</summary>
     [ObservableProperty] private string _mlSpecularHeuristicBlendMode =
-        nameof(AutoPBR.Core.Models.MlSpecularHeuristicBlendMode.SmoothnessOnly);
+        nameof(AutoPBR.Contracts.Ml.MlSpecularHeuristicBlendMode.SmoothnessOnly);
 
     /// <summary>AI Tuning channel-mode dropdown selection.</summary>
     [ObservableProperty] private FoliageModeOption? _selectedMlSpecularBlendModeOption;
 
     /// <summary>Blend math enum name (Linear, Additive, Multiplicative); kept in sync with <see cref="SelectedMlSpecularBlendMathOption"/>.</summary>
     [ObservableProperty] private string _mlSpecularBlendMath =
-        nameof(AutoPBR.Core.Models.MlSpecularBlendMath.Linear);
+        nameof(AutoPBR.Contracts.Ml.MlSpecularBlendMath.Linear);
 
     /// <summary>AI Tuning blend-math dropdown selection.</summary>
     [ObservableProperty] private FoliageModeOption? _selectedMlSpecularBlendMathOption;
@@ -137,7 +137,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [ObservableProperty] private bool _processParticles = true;
     [ObservableProperty] private bool _useDeepBumpNormals;
     [ObservableProperty] private string _deepBumpOverlap = "Large";
-    [ObservableProperty] private string _deepBumpInputMode = nameof(AutoPBR.Core.Models.DeepBumpInputMode.Auto);
+    [ObservableProperty] private string _deepBumpInputMode = nameof(AutoPBR.Contracts.Ml.DeepBumpInputMode.Auto);
     [ObservableProperty] private bool _deepBumpForceBlue255;
     [ObservableProperty] private double _deepBumpNormalIntensity = AutoPBRDefaults.DefaultNormalIntensity;
     [ObservableProperty] private double _deepBumpNormalSoftClamp;

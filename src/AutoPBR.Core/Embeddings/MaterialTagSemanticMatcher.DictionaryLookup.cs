@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-using AutoPBR.Core.Models;
+using AutoPBR.Contracts.Ml;
 
 namespace AutoPBR.Core.Embeddings;
 

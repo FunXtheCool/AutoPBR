@@ -1,3 +1,5 @@
+using AutoPBR.Contracts.Ml;
+
 namespace AutoPBR.Core.Embeddings;
 
 /// <summary>Host-provided options for optional MiniLM-based material tag suggestions in Explore.</summary>

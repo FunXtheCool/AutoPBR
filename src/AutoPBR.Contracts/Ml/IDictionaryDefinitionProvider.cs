@@ -1,4 +1,4 @@
-namespace AutoPBR.Core.Embeddings;
+namespace AutoPBR.Contracts.Ml;
 
 /// <summary>
 /// Provides dictionary definitions for semantic enrichment of material matching.

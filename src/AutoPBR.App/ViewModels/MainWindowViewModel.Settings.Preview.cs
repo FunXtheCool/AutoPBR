@@ -215,7 +215,7 @@ public partial class MainWindowViewModel
             return;
         }
 
-        DeepBumpInputMode = value?.Value ?? nameof(AutoPBR.Core.Models.DeepBumpInputMode.Auto);
+        DeepBumpInputMode = value?.Value ?? nameof(AutoPBR.Contracts.Ml.DeepBumpInputMode.Auto);
         SaveSettings();
         ScheduleRefreshPreviewIfActive();
     }

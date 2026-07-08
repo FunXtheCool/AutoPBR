@@ -1,6 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
   <ItemGroup>
+    <Using Include="AutoPBR.Contracts.Ml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AutoPBR.Contracts\AutoPBR.Contracts.csproj" />
     <ProjectReference Include="..\AutoPBR.Core\AutoPBR.Core.csproj" />
   </ItemGroup>
 

@@ -7,33 +7,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Using Include="AutoPBR.Contracts.Ml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Colourful" />
     <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="MathNet.Numerics" />
-    <!-- Managed API only. Do NOT use Microsoft.ML.OnnxRuntime.Gpu here: it pulls Gpu.Windows and CUDA 12–linked onnxruntime_providers_cuda.dll (cublasLt64_12). Ship matching 1.24.x GPU natives from onnxruntime-win-x64-gpu_cuda13 in Data\native. -->
-    <PackageReference Include="Microsoft.ML.OnnxRuntime.Managed" />
-    <PackageReference Include="Microsoft.ML.Tokenizers" />
     <PackageReference Include="SixLabors.ImageSharp" />
     <PackageReference Include="System.IO.Hashing" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AutoPBR.Contracts\AutoPBR.Contracts.csproj" />
+    <ProjectReference Include="..\AutoPBR.Ml\AutoPBR.Ml.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Data\textures_data.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Data\ONNX-AI\DeepBump\*.onnx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Data\ONNX-AI\SpecLab\*.onnx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Data\ONNX-AI\all-MiniLM-L6-v2-onnx\**\*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <!-- CUDA/cuDNN/ORT GPU/TensorRT DLLs you redistribute; same layout as App/CLI -->
-    <Content Include="Data\native\*.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Link>runtimes\win-x64\native\%(Filename)%(Extension)</Link>
     </Content>
   </ItemGroup>
 

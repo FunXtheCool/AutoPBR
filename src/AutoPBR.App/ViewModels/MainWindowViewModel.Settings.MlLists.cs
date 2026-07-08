@@ -15,11 +15,11 @@ public partial class MainWindowViewModel
     {
         MlSpecularBlendModeOptions.Clear();
         MlSpecularBlendModeOptions.Add(new FoliageModeOption(LocalizedStrings.MlSpecularBlendModeSmoothnessOnly,
-            nameof(AutoPBR.Core.Models.MlSpecularHeuristicBlendMode.SmoothnessOnly)));
+            nameof(AutoPBR.Contracts.Ml.MlSpecularHeuristicBlendMode.SmoothnessOnly)));
         MlSpecularBlendModeOptions.Add(new FoliageModeOption(LocalizedStrings.MlSpecularBlendModeAiMetalAndEmissive,
-            nameof(AutoPBR.Core.Models.MlSpecularHeuristicBlendMode.AiMetalAndEmissive)));
+            nameof(AutoPBR.Contracts.Ml.MlSpecularHeuristicBlendMode.AiMetalAndEmissive)));
         MlSpecularBlendModeOptions.Add(new FoliageModeOption(LocalizedStrings.MlSpecularBlendModeFull,
-            nameof(AutoPBR.Core.Models.MlSpecularHeuristicBlendMode.Full)));
+            nameof(AutoPBR.Contracts.Ml.MlSpecularHeuristicBlendMode.Full)));
 
         SelectedMlSpecularBlendModeOption =
             MlSpecularBlendModeOptions.FirstOrDefault(x =>
@@ -31,17 +31,17 @@ public partial class MainWindowViewModel
     {
         MlSpecularBlendMathOptions.Clear();
         MlSpecularBlendMathOptions.Add(new FoliageModeOption(LocalizedStrings.MlSpecularBlendMathLinear,
-            nameof(AutoPBR.Core.Models.MlSpecularBlendMath.Linear)));
+            nameof(AutoPBR.Contracts.Ml.MlSpecularBlendMath.Linear)));
         MlSpecularBlendMathOptions.Add(new FoliageModeOption(LocalizedStrings.MlSpecularBlendMathSoftLight,
-            nameof(AutoPBR.Core.Models.MlSpecularBlendMath.SoftLight)));
+            nameof(AutoPBR.Contracts.Ml.MlSpecularBlendMath.SoftLight)));
         MlSpecularBlendMathOptions.Add(new FoliageModeOption(LocalizedStrings.MlSpecularBlendMathOverlay,
-            nameof(AutoPBR.Core.Models.MlSpecularBlendMath.Overlay)));
+            nameof(AutoPBR.Contracts.Ml.MlSpecularBlendMath.Overlay)));
         MlSpecularBlendMathOptions.Add(new FoliageModeOption(LocalizedStrings.MlSpecularBlendMathScreen,
-            nameof(AutoPBR.Core.Models.MlSpecularBlendMath.Screen)));
+            nameof(AutoPBR.Contracts.Ml.MlSpecularBlendMath.Screen)));
         MlSpecularBlendMathOptions.Add(new FoliageModeOption(LocalizedStrings.MlSpecularBlendMathBiasGain,
-            nameof(AutoPBR.Core.Models.MlSpecularBlendMath.BiasGain)));
+            nameof(AutoPBR.Contracts.Ml.MlSpecularBlendMath.BiasGain)));
         MlSpecularBlendMathOptions.Add(new FoliageModeOption(LocalizedStrings.MlSpecularBlendMathSigmoidCrossfade,
-            nameof(AutoPBR.Core.Models.MlSpecularBlendMath.SigmoidCrossfade)));
+            nameof(AutoPBR.Contracts.Ml.MlSpecularBlendMath.SigmoidCrossfade)));
 
         SelectedMlSpecularBlendMathOption =
             MlSpecularBlendMathOptions.FirstOrDefault(x =>

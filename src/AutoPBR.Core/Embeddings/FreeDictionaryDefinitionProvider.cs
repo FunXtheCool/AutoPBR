@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
+using AutoPBR.Contracts.Ml;
 
 namespace AutoPBR.Core.Embeddings;
 

@@ -1,3 +1,4 @@
+using AutoPBR.Contracts.Ml;
 using AutoPBR.Core.Embeddings;
 
 namespace AutoPBR.Core.Models;
@@ -348,62 +349,6 @@ public sealed class AutoPBROptions
     public SpecularData? SpecularData { get; init; }
 }
 
-/// <summary>How ML specular is mixed with heuristic output when both are available.</summary>
-public enum MlSpecularHeuristicBlendMode
-{
-    /// <summary>
-    /// Only smoothness (R) mixes heuristic vs ML. Metallic (G), porosity (B), and emissive (A) use the model only
-    /// (heuristic does not contribute hg/hb/ha in the blend). When blend is 0, all channels match heuristics.
-    /// </summary>
-    SmoothnessOnly = 0,
-
-    /// <summary>Heuristic contributes to every channel: R, G, B, and A each lerp between heuristic and ML.</summary>
-    Full = 1,
-
-    /// <summary>
-    /// Same as <see cref="SmoothnessOnly"/> for R/G/A: only R blends heuristic↔ML while G/A come from ML.
-    /// B (porosity) stays heuristic.
-    /// </summary>
-    AiMetalAndEmissive = 2
-}
-
-/// <summary>Math function for heuristic↔ML channel mixing.</summary>
-public enum MlSpecularBlendMath
-{
-    /// <summary>Linear interpolation: <c>(1-mix)*heuristic + mix*ml</c>.</summary>
-    Linear = 0,
-
-    /// <summary>
-    /// Soft-light composite target with heuristic-preserving crossfade:
-    /// <c>lerp(heuristic, softLight(heuristic, ml), mix)</c>.
-    /// </summary>
-    SoftLight = 1,
-
-    /// <summary>
-    /// Overlay composite target with heuristic-preserving crossfade:
-    /// <c>lerp(heuristic, overlay(heuristic, ml), mix)</c>.
-    /// </summary>
-    Overlay = 2,
-
-    /// <summary>
-    /// Screen composite target with heuristic-preserving crossfade:
-    /// <c>lerp(heuristic, screen(heuristic, ml), mix)</c>.
-    /// </summary>
-    Screen = 3,
-
-    /// <summary>
-    /// Gain-curve remap (controlled by ML) with heuristic-preserving crossfade:
-    /// <c>lerp(heuristic, gain(heuristic, ml), mix)</c>.
-    /// </summary>
-    BiasGain = 4,
-
-    /// <summary>
-    /// Logit-space interpolation between heuristic and ML:
-    /// <c>sigmoid(lerp(logit(heuristic), logit(ml), mix))</c>.
-    /// </summary>
-    SigmoidCrossfade = 5
-}
-
 public enum NormalOperator
 {
     SobelVc,
@@ -423,13 +368,6 @@ public enum NormalDerivative
     Color,
     ColorLuminanceBlend,
     ColorLuminanceMax
-}
-
-public enum DeepBumpInputMode
-{
-    Auto,
-    Grayscale,
-    Rgb
 }
 
 

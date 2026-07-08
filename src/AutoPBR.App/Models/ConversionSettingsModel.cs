@@ -2,9 +2,9 @@ using AutoPBR.Core;
 using AutoPBR.Core.Embeddings;
 using AutoPBR.Core.Models;
 
-using DeepBumpInputModeEnum = AutoPBR.Core.Models.DeepBumpInputMode;
-using MlSpecularBlendMathEnum = AutoPBR.Core.Models.MlSpecularBlendMath;
-using MlSpecularBlendModeEnum = AutoPBR.Core.Models.MlSpecularHeuristicBlendMode;
+using DeepBumpInputModeEnum = AutoPBR.Contracts.Ml.DeepBumpInputMode;
+using MlSpecularBlendMathEnum = AutoPBR.Contracts.Ml.MlSpecularBlendMath;
+using MlSpecularBlendModeEnum = AutoPBR.Contracts.Ml.MlSpecularHeuristicBlendMode;
 using NormalDerivativeEnum = AutoPBR.Core.Models.NormalDerivative;
 using NormalKernelSizeEnum = AutoPBR.Core.Models.NormalKernelSize;
 using NormalOperatorEnum = AutoPBR.Core.Models.NormalOperator;

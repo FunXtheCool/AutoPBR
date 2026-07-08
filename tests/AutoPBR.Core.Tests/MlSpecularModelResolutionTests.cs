@@ -1,3 +1,4 @@
+using AutoPBR.Contracts.Ml;
 using AutoPBR.Core.Models;
 using Xunit;
 
@@ -5,16 +6,11 @@ namespace AutoPBR.Core.Tests;
 
 public sealed class MlSpecularModelResolutionTests
 {
-    private static AutoPBROptions Options(
+    private static MlSpecularPathOptions Options(
         bool useMl,
         string? fallback,
         IReadOnlyDictionary<int, string>? map) =>
-        new()
-        {
-            UseMlSpecularPredictor = useMl,
-            MlSpecularModelPath = fallback,
-            MlSpecularModelPathsByResolution = map
-        };
+        new(useMl, fallback, map);
 
     [Fact]
     public void CeilSmallestKeyGreaterOrEqualTextureSize()
