@@ -37,6 +37,23 @@ Common flags:
 dotnet run --project src/AutoPBR.App
 ```
 
+## Development builds
+
+For daily App UI work, build only the App stack (not the full solution with all test projects):
+
+```bash
+dotnet build src/AutoPBR.App/AutoPBR.App.csproj
+# or open AutoPBR.App.slnf in the IDE
+```
+
+| Work | Build target |
+|------|----------------|
+| App UI / OpenGL preview | `AutoPBR.App.slnf` or App csproj |
+| Core conversion / CLI | Core + Cli csproj |
+| Parity / geometry | `AutoPBR.Core.slnf` or full solution |
+
+See [build performance](docs/build-performance.md) for timings, binlogs, and F5/Cursor launch setup.
+
 ## Build
 
 ```bash

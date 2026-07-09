@@ -1,0 +1,14 @@
+{
+  "solution": {
+    "path": "AutoPBR.sln",
+    "projects": [
+      "src\\AutoPBR.Contracts\\AutoPBR.Contracts.csproj",
+      "src\\AutoPBR.Ml\\AutoPBR.Ml.csproj",
+      "src\\AutoPBR.Core\\AutoPBR.Core.csproj",
+      "src\\AutoPBR.Preview\\AutoPBR.Preview.csproj",
+      "src\\AutoPBR.PreviewGpuAssets\\AutoPBR.PreviewGpuAssets.csproj",
+      "src\\AutoPBR.App\\AutoPBR.App.csproj",
+      "tests\\AutoPBR.App.Tests\\AutoPBR.App.Tests.csproj"
+    ]
+  }
+}

@@ -25,20 +25,17 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\AutoPBR.Core\AutoPBR.Core.csproj" />
     <ProjectReference Include="..\..\src\AutoPBR.Ml\AutoPBR.Ml.csproj" />
-    <ProjectReference Include="..\..\src\AutoPBR.Preview\AutoPBR.Preview.csproj" />
     <ProjectReference Include="..\..\src\AutoPBR.Contracts\AutoPBR.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\Shared\GeometryIrTestTierSupport.cs" Link="Shared\GeometryIrTestTierSupport.cs" />
-    <Compile Include="..\Shared\GhastPreviewTestLandmarks.cs" Link="Shared\GhastPreviewTestLandmarks.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="AutoPBR.Core" />
     <Using Include="AutoPBR.Core.Models" />
     <Using Include="AutoPBR.Contracts.GeometryIr" />
-    <Using Include="AutoPBR.Preview" />
     <Using Include="AutoPBR.Tests.TestSupport" />
     <Using Include="Xunit" />
   </ItemGroup>

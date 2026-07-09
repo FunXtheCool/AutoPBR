@@ -1,0 +1,18 @@
+{
+  "solution": {
+    "path": "AutoPBR.sln",
+    "projects": [
+      "src\\AutoPBR.Contracts\\AutoPBR.Contracts.csproj",
+      "src\\AutoPBR.Ml\\AutoPBR.Ml.csproj",
+      "src\\AutoPBR.Core\\AutoPBR.Core.csproj",
+      "src\\AutoPBR.Preview\\AutoPBR.Preview.csproj",
+      "src\\AutoPBR.Cli\\AutoPBR.Cli.csproj",
+      "src\\AutoPBR.Tools.GeometryCompiler\\AutoPBR.Tools.GeometryCompiler.csproj",
+      "src\\AutoPBR.Tools.AnimationCompiler\\AutoPBR.Tools.AnimationCompiler.csproj",
+      "tests\\AutoPBR.Core.Tests\\AutoPBR.Core.Tests.csproj",
+      "tests\\AutoPBR.Preview.Tests\\AutoPBR.Preview.Tests.csproj",
+      "tests\\AutoPBR.GeometryCompiler.Tests\\AutoPBR.GeometryCompiler.Tests.csproj",
+      "tests\\AutoPBR.AnimationCompiler.Tests\\AutoPBR.AnimationCompiler.Tests.csproj"
+    ]
+  }
+}
