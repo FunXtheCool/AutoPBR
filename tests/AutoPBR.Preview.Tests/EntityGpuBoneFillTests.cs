@@ -29,13 +29,15 @@ public sealed class EntityGpuBoneFillTests
     public void TryFillBoneMatricesFast_matches_TryBuildStaticMesh_for_catalogued_cow()
     {
         var runtime = new EntityModelRuntime();
-        const string path = "assets/minecraft/textures/entity/cow/cow.png";
+        const string path = "assets/minecraft/textures/entity/cow/cow_temperate.png";
         var absent = TestEnvironmentPaths.AbsentNativeRoot;
         var profile = new MinecraftNativeProfile("26.1.2", absent, new Version(26, 1, 2));
         const float idle = 0.37f;
         const float anim = 1.91f;
 
-        Assert.True(runtime.TryBuildStaticMesh(path, profile, idle, anim, out var full));
+        // Match TryFillBoneMatricesFast's default applyGeometryIrSetupAnimMotion: true.
+        Assert.True(runtime.TryBuildStaticMesh(
+            path, profile, idle, anim, out var full, out _, applyGeometryIrSetupAnimMotion: true));
         var scratch = new List<Matrix4x4>(128);
         Assert.True(runtime.TryFillBoneMatricesFast(path, profile, idle, anim, scratch, out var boneCount));
         Assert.Equal(full.Elements.Count, boneCount);
@@ -91,7 +93,7 @@ public sealed class EntityGpuBoneFillTests
     public void TryFillBoneMatricesFast_parity_catalog_route_cache_matches_full_dispatch_for_pig()
     {
         var runtime = new EntityModelRuntime();
-        const string path = "assets/minecraft/textures/entity/pig/pig.png";
+        const string path = "assets/minecraft/textures/entity/pig/pig_temperate.png";
         var absent = TestEnvironmentPaths.AbsentNativeRoot;
         var profile = new MinecraftNativeProfile("26.1.2", absent, new Version(26, 1, 2));
         const float idle = 0.31f;
@@ -114,7 +116,8 @@ public sealed class EntityGpuBoneFillTests
         Assert.Equal(EntityGpuBoneDispatchKind.ParityCatalog, rebake.GpuBoneDispatchRoute!.Value.Kind);
         Assert.True(rebake.GpuBoneDispatchRoute.Value.ParityBuilderMethod?.Contains("Pig", StringComparison.OrdinalIgnoreCase) == true);
 
-        Assert.True(runtime.TryBuildStaticMesh(path, profile, idle, anim, out var full));
+        Assert.True(runtime.TryBuildStaticMesh(
+            path, profile, idle, anim, out var full, out _, applyGeometryIrSetupAnimMotion: true));
         Assert.Equal(full.Elements.Count, boneCount1);
 
         scratch.Clear();

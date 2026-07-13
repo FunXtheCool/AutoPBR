@@ -40,10 +40,12 @@ public sealed class PreviewVolumeInjectShaderEsTests
     public void DesktopVolumeInject_UsesDesktopPackHelper(string fragmentFile)
     {
         var adapted = ResolveAndAdapt(fragmentFile, useOpenGlEs: false);
+        // Desktop Adapt leaves source unchanged: both #ifdef GENESIS_GLES branches remain in the TU;
+        // GLSL compile picks the #else vec4() path when GENESIS_GLES is undefined.
         Assert.Contains("return vec4(mediumRho, sunLit.x, sunLit.y, occ);", adapted, StringComparison.Ordinal);
+        Assert.Contains("#ifdef GENESIS_GLES", adapted, StringComparison.Ordinal);
         Assert.DoesNotContain("#define GENESIS_GLES 1", adapted, StringComparison.Ordinal);
         Assert.DoesNotContain("vec4 packed;", adapted, StringComparison.Ordinal);
-        Assert.DoesNotContain("injectOut.r = mediumRho;", adapted, StringComparison.Ordinal);
     }
 
     [Theory]

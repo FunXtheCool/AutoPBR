@@ -356,34 +356,40 @@ public sealed class BabyFaceMaskUvRoutingTests
     {
         const string texturePath = "assets/minecraft/textures/entity/chicken/chicken_temperate_baby.png";
         var runtime = EntityModelRuntimeFactory.Create();
-        Assert.True(runtime.TryBuildStaticMesh(texturePath, Profile26, 0f, 0f, out var merged, out var provenance));
+        Assert.True(runtime.TryBuildStaticMesh(texturePath, Profile26, 0f, 0f, out var merged, out _));
 
-        var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(merged, "minecraft");
-        var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase);
-        for (var i = 0; i < ordered.Count; i++)
+        // Assert mesh face texels (not baker-normalized verts): per-element BakeAtlasWidth can differ
+        // from ResolveForBake atlas size, which doubles U when denormalizing with the wrong width.
+        var wingNorth = 0;
+        foreach (var el in merged.Elements)
         {
-            pathToIdx[ordered[i]] = i;
-            texSizes[ordered[i]] = EntityGeometryIrTextureAtlas.ResolveForBake(
-                ordered[i], 64, 64, provenance);
-        }
-
-        Assert.True(MinecraftModelBaker.TryBake(merged, "minecraft", pathToIdx, texSizes, out var verts, out _, out _));
-
-        const int stride = MinecraftModelBaker.FloatsPerVertex;
-        var atlasH = texSizes[texturePath].h;
-        var wingNorth = new List<(float u, float v)>();
-        for (var i = 0; i < verts.Length; i += stride)
-        {
-            var u = verts[i + 6] * 64f;
-            var v = verts[i + 7] * atlasH;
-            if (u is >= 1.5f and <= 3.5f && v is >= 1.5f and <= 4.5f)
+            var sx = MathF.Abs(el.To[0] - el.From[0]);
+            var sy = MathF.Abs(el.To[1] - el.From[1]);
+            var sz = MathF.Abs(el.To[2] - el.From[2]);
+            if (sy < 1.5f || sz > 0.2f)
             {
-                wingNorth.Add((u, v));
+                continue;
+            }
+
+            if (!el.Faces.TryGetValue("north", out var north) || north.Uv is null || north.Uv.Length < 4)
+            {
+                continue;
+            }
+
+            var u0 = north.Uv[0];
+            var v0 = north.Uv[1];
+            var u1 = north.Uv[2];
+            var v1 = north.Uv[3];
+            if (u0 is >= 1.5f and <= 3.5f &&
+                u1 is >= 2.5f and <= 4.5f &&
+                v0 is >= 1.5f and <= 3.5f &&
+                v1 is >= 3.5f and <= 5.5f)
+            {
+                wingNorth++;
             }
         }
 
-        Assert.True(wingNorth.Count >= 4, "expected left-wing north/south sheet verts in texCrop anchor region");
+        Assert.True(wingNorth >= 1, "expected left-wing north sheet in texCrop anchor region [2,2,3,4]");
     }
 
     [Fact]

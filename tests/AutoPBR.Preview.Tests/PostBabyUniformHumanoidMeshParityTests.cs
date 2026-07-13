@@ -1,10 +1,10 @@
 
-
 namespace AutoPBR.Core.Tests;
 
 /// <summary>
-/// Post–26.1 profiles: several humanoids reuse the adult <c>HumanoidModel</c> mesh with uniform <c>LivingEntity.getAgeScale()</c>
-/// (<c>DEFAULT_BABY_SCALE = 0.5F</c>) instead of an anisotropic baby scale profile tuple.
+/// Post–26.1 humanoids reuse the adult mesh and apply uniform <c>LivingEntity.getAgeScale()</c>
+/// (<c>DEFAULT_BABY_SCALE = 0.5F</c>) at render time. The 26.1.2 entity texture inventory has no
+/// separate <c>*_baby</c> diffuse paths for skeleton / player / pillager, so mesh bake stays adult-sized.
 /// </summary>
 public sealed class PostBabyUniformHumanoidMeshParityTests
 {
@@ -29,65 +29,86 @@ public sealed class PostBabyUniformHumanoidMeshParityTests
     }
 
     [Fact]
-    public void SkeletonFamily_BabyOn2612_ScalesTorsoToHalfOfAdult()
+    public void SkeletonFamily_AdultOn2612_KeepsTorsoBox_AndBabyPathIsUncatalogued()
     {
         var runtime = EntityModelRuntimeFactory.Create();
+        const string adultPath = "assets/minecraft/textures/entity/skeleton/skeleton.png";
+        const string babyPath = "assets/minecraft/textures/entity/skeleton/skeleton_baby.png";
+
+        Assert.True(EntityTextureParityCatalog.IsCatalogued(adultPath));
+        Assert.False(EntityTextureParityCatalog.IsCatalogued(babyPath));
+
         Assert.True(runtime.TryBuildStaticMesh(
-            "assets/minecraft/textures/entity/skeleton/skeleton.png",
+            adultPath,
             Profile2612,
             idlePhase01: 0f,
             animationTimeSeconds: 0f,
             out var adult));
+        Assert.True(HasElementSize(adult, 8f, 12f, 4f, epsilon: 0.15f));
+
         Assert.True(runtime.TryBuildStaticMesh(
-            "assets/minecraft/textures/entity/skeleton/skeleton_baby.png",
+            babyPath,
             Profile2612,
             idlePhase01: 0f,
             animationTimeSeconds: 0f,
-            out var baby));
-        Assert.True(HasElementSize(adult, 8f, 12f, 4f, epsilon: 0.15f));
-        Assert.True(HasElementSize(baby, 4f, 6f, 2f, epsilon: 0.15f));
-        Assert.False(HasElementSize(baby, 8f, 12f, 4f, epsilon: 0.15f));
+            out _,
+            out var babyProv));
+        Assert.Equal(PreviewMeshDriverKind.ErrorPlaceholder, babyProv.Kind);
     }
 
     [Fact]
-    public void PlayerWide_BabyOn2612_ScalesTorsoToHalfOfAdult()
+    public void PlayerWide_AdultOn2612_KeepsTorsoBox_AndBabyPathIsUncatalogued()
     {
         var runtime = EntityModelRuntimeFactory.Create();
+        const string adultPath = "assets/minecraft/textures/entity/player/wide/steve.png";
+        const string babyPath = "assets/minecraft/textures/entity/player/wide/steve_baby.png";
+
+        Assert.True(EntityTextureParityCatalog.IsCatalogued(adultPath));
+        Assert.False(EntityTextureParityCatalog.IsCatalogued(babyPath));
+
         Assert.True(runtime.TryBuildStaticMesh(
-            "assets/minecraft/textures/entity/player/wide/steve.png",
+            adultPath,
             Profile2612,
             idlePhase01: 0f,
             animationTimeSeconds: 0f,
             out var adult));
+        Assert.True(HasElementSize(adult, 8f, 12f, 4f, epsilon: 0.15f));
+
         Assert.True(runtime.TryBuildStaticMesh(
-            "assets/minecraft/textures/entity/player/wide/steve_baby.png",
+            babyPath,
             Profile2612,
             idlePhase01: 0f,
             animationTimeSeconds: 0f,
-            out var baby));
-        Assert.True(HasElementSize(adult, 8f, 12f, 4f, epsilon: 0.15f));
-        Assert.True(HasElementSize(baby, 4f, 6f, 2f, epsilon: 0.15f));
-        Assert.False(HasElementSize(baby, 8f, 12f, 4f, epsilon: 0.15f));
+            out _,
+            out var babyProv));
+        Assert.Equal(PreviewMeshDriverKind.ErrorPlaceholder, babyProv.Kind);
     }
 
     [Fact]
-    public void Pillager_BabyOn2612_ScalesMainRobeBoxToHalfOfAdult()
+    public void Pillager_AdultOn2612_KeepsMainRobeBox_AndBabyPathIsUncatalogued()
     {
         var runtime = EntityModelRuntimeFactory.Create();
+        const string adultPath = "assets/minecraft/textures/entity/illager/pillager.png";
+        const string babyPath = "assets/minecraft/textures/entity/illager/pillager_baby.png";
+
+        Assert.True(EntityTextureParityCatalog.IsCatalogued(adultPath));
+        Assert.False(EntityTextureParityCatalog.IsCatalogued(babyPath));
+
         Assert.True(runtime.TryBuildStaticMesh(
-            "assets/minecraft/textures/entity/illager/pillager.png",
+            adultPath,
             Profile2612,
             idlePhase01: 0f,
             animationTimeSeconds: 0f,
             out var adult));
-        Assert.True(runtime.TryBuildStaticMesh(
-            "assets/minecraft/textures/entity/illager/pillager_baby.png",
-            Profile2612,
-            idlePhase01: 0f,
-            animationTimeSeconds: 0f,
-            out var baby));
         Assert.True(HasElementSize(adult, 8f, 12f, 6f, epsilon: 0.15f));
-        Assert.True(HasElementSize(baby, 4f, 6f, 3f, epsilon: 0.15f));
-        Assert.False(HasElementSize(baby, 8f, 12f, 6f, epsilon: 0.15f));
+
+        Assert.True(runtime.TryBuildStaticMesh(
+            babyPath,
+            Profile2612,
+            idlePhase01: 0f,
+            animationTimeSeconds: 0f,
+            out _,
+            out var babyProv));
+        Assert.Equal(PreviewMeshDriverKind.ErrorPlaceholder, babyProv.Kind);
     }
 }

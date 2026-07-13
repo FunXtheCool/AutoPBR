@@ -15,7 +15,7 @@ public sealed class ChickenPreviewZClusterTests
     [
         ("assets/minecraft/textures/entity/chicken/chicken_cold.png",
             "net.minecraft.client.model.animal.chicken.ColdChickenModel", 10),
-        ("assets/minecraft/textures/entity/chicken/chicken_baby.png",
+        ("assets/minecraft/textures/entity/chicken/chicken_temperate_baby.png",
             "net.minecraft.client.model.animal.chicken.BabyChickenModel", 7),
     ];
 

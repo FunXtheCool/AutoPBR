@@ -98,7 +98,8 @@ public sealed class EntityTextureParityAssemblyCohesionTests
         Assert.True(runtime.TryBuildStaticMesh(path, Profile26, 0f, 0f, out var model), path);
         var bottom = FindBoatHullBottomSlab(model);
         TransformWorldCorners(bottom, out var min, out var max);
-        Assert.True(max.Y - min.Y <= 2.5f, "bottom slab thickness");
+        // Local 28×16×3 hull bottom; LER/world basis maps the thin axis onto Y (world thickness ≈ 3).
+        Assert.True(max.Y - min.Y <= 3.25f, $"bottom slab thickness was {max.Y - min.Y}");
         Assert.True(max.X - min.X >= 20f, "bottom slab width");
     }
 

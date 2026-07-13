@@ -58,13 +58,15 @@ public sealed class GeometryIrUvAtlasQualityTests
     [Fact]
     public void BuildUpDownTexCropFaceUvRects_down_mask_uses_java_down_unfold_for_decorated_pot_caps()
     {
+        // Both wrapped u=18 and raw u=-14 normalize to DecoratedPotCapTexCropRawU (-14), then
+        // EntityCuboidJavaUvConvention Down/Up unfold (not texCrop anchor).
         var legacy = GeometryIrUvAtlasQuality.BuildUpDownTexCropFaceUvRects(18, 13, 14, 14, ["down"]);
-        Assert.Equal([14f, 13f, 28f, 27f], legacy.Down);
-        Assert.Equal([28f, 27f, 42f, 13f], legacy.Up);
+        Assert.Equal([0f, 13f, 14f, 27f], legacy.Down);
+        Assert.Equal([14f, 27f, 28f, 13f], legacy.Up);
 
         var raw = GeometryIrUvAtlasQuality.BuildUpDownTexCropFaceUvRects(-14, 13, 14, 14, ["down"]);
-        Assert.Equal([14f, 13f, 28f, 27f], raw.Down);
-        Assert.Equal([28f, 27f, 42f, 13f], raw.Up);
+        Assert.Equal([0f, 13f, 14f, 27f], raw.Down);
+        Assert.Equal([14f, 27f, 28f, 13f], raw.Up);
     }
 
     [Fact]
