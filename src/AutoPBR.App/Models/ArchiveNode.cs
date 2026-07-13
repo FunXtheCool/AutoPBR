@@ -157,12 +157,12 @@ public partial class ArchiveNode(
 
     partial void OnIsExpandedChanged(bool value)
     {
-        if (!IsFolder)
+        if (!IsFolder || host is null)
         {
             return;
         }
 
-        if (value && host is not null)
+        if (value)
         {
             // Load this folder's children if needed.
             if (Children.Count == 0)
@@ -179,6 +179,8 @@ public partial class ArchiveNode(
                 }
             }
         }
+
+        host.NotifyExploreStructureChanged();
     }
 
     partial void OnPackIconChanged(Bitmap? value)

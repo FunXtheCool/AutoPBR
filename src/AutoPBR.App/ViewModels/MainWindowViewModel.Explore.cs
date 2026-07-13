@@ -50,8 +50,13 @@ public partial class MainWindowViewModel
     /// <summary>Folder we're currently viewing in Explore; null = root. After scan, defaults to "assets" if present.</summary>
     [ObservableProperty] private ArchiveNode? _focusedArchiveNode;
 
-    /// <summary>Items to show in Explore tree: children of focused folder, or root's children when no focus.</summary>
+    /// <summary>Direct children of the focused folder (or archive root). Source for flattened <see cref="ExploreDisplayItems"/>.</summary>
     public ObservableCollection<ArchiveNode> ExploreViewItems => FocusedArchiveNode?.Children ?? ScannedArchiveTopLevel;
+
+    /// <summary>Virtualized Explore list: visible nodes under the focused folder, including expanded descendants.</summary>
+    public ObservableCollection<ExploreListRow> ExploreDisplayItems { get; } = new();
+
+    private int _exploreDisplayRebuildQueued;
 
     private IReadOnlyList<ExploreTagFilterOption>? _exploreTagFilterOptions;
 
@@ -88,6 +93,57 @@ public partial class MainWindowViewModel
             ExploreBreadcrumb.Add(node);
         }
     }
+
+    /// <summary>Coalesce structure/filter/focus changes into one flat-list rebuild on the UI thread.</summary>
+    private void ScheduleRebuildExploreDisplayItems()
+    {
+        if (Interlocked.Exchange(ref _exploreDisplayRebuildQueued, 1) != 0)
+        {
+            return;
+        }
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            Interlocked.Exchange(ref _exploreDisplayRebuildQueued, 0);
+            RebuildExploreDisplayItems();
+        }, DispatcherPriority.Normal);
+    }
+
+    private void RebuildExploreDisplayItems()
+    {
+        var previousSelected = SelectedExploreNodes.ToList();
+        var previousPrimary = SelectedExploreNode;
+
+        _exploreSelectionSyncing = true;
+        try
+        {
+            ExploreDisplayItems.Clear();
+            if (ScannedArchiveRoot is null)
+            {
+                SelectedExploreRow = null;
+                return;
+            }
+
+            ExploreDisplayListBuilder.BuildInto(ExploreDisplayItems, ExploreViewItems);
+
+            var visible = previousSelected
+                .Where(n => ExploreDisplayItems.Any(r => ReferenceEquals(r.Node, n)))
+                .ToList();
+            ReplaceExploreSelection(visible);
+            SelectedExploreNode = previousPrimary is not null &&
+                                  ExploreDisplayItems.Any(r => ReferenceEquals(r.Node, previousPrimary))
+                ? previousPrimary
+                : SelectedExploreNodes.LastOrDefault();
+            SelectedExploreRow = SelectedExploreNode is null
+                ? null
+                : ExploreDisplayItems.FirstOrDefault(r => ReferenceEquals(r.Node, SelectedExploreNode));
+        }
+        finally
+        {
+            _exploreSelectionSyncing = false;
+        }
+    }
+
     partial void OnPackPathChanged(string? value)
     {
         _ = value;
@@ -117,6 +173,7 @@ public partial class MainWindowViewModel
             ? ExploreTreeController.FindChildByName(ScannedArchiveRoot, "assets")
             : null);
         PreloadExpandersForCurrentView();
+        ScheduleRebuildExploreDisplayItems();
     }
     private void ClearScannedArchive()
     {
@@ -126,6 +183,7 @@ public partial class MainWindowViewModel
         FocusedArchiveNode = null;
         ScannedArchiveRoot = null;
         _exploreController.Clear();
+        ExploreDisplayItems.Clear();
         OnPropertyChanged(nameof(IsBatchScanActive));
         ScanCurrentInputCommand.NotifyCanExecuteChanged();
         ConvertCommand.NotifyCanExecuteChanged();
@@ -211,6 +269,7 @@ public partial class MainWindowViewModel
 
         var root = FocusedArchiveNode ?? ScannedArchiveRoot;
         ExpandAllInSubtree(root, true);
+        ScheduleRebuildExploreDisplayItems();
     }
 
     [RelayCommand]
@@ -224,6 +283,7 @@ public partial class MainWindowViewModel
 
         var root = FocusedArchiveNode ?? ScannedArchiveRoot;
         ExpandAllInSubtree(root, false);
+        ScheduleRebuildExploreDisplayItems();
     }
     partial void OnScannedArchiveRootChanged(ArchiveNode? value)
     {
@@ -236,6 +296,7 @@ public partial class MainWindowViewModel
             OnPropertyChanged(nameof(ScannedArchiveTopLevel));
             OnPropertyChanged(nameof(ExploreViewItems));
             OnPropertyChanged(nameof(IsBatchScanActive));
+            ScheduleRebuildExploreDisplayItems();
             ScanCurrentInputCommand.NotifyCanExecuteChanged();
             ConvertCommand.NotifyCanExecuteChanged();
             ClearTagOverridesCommand.NotifyCanExecuteChanged();
@@ -255,11 +316,55 @@ public partial class MainWindowViewModel
         OnPropertyChanged(nameof(CanGoBackExplore));
         RebuildExploreBreadcrumb();
         GoBackExploreCommand.NotifyCanExecuteChanged();
+        ScheduleRebuildExploreDisplayItems();
     }
 
     [ObservableProperty] private ArchiveNode? _selectedExploreNode;
+    [ObservableProperty] private ExploreListRow? _selectedExploreRow;
     public ObservableCollection<ArchiveNode> SelectedExploreNodes { get; } = new();
     private ArchiveNode? _selectionAnchorExploreNode;
+    private bool _exploreSelectionSyncing;
+
+    partial void OnSelectedExploreRowChanged(ExploreListRow? value)
+    {
+        if (_exploreSelectionSyncing)
+        {
+            return;
+        }
+
+        SelectedExploreNode = value?.Node;
+        if (value?.Node is { } node)
+        {
+            _selectionAnchorExploreNode = node;
+        }
+    }
+
+    /// <summary>Sync ListBox multi-selection into <see cref="SelectedExploreNodes"/> / <see cref="SelectedExploreNode"/>.</summary>
+    public void SyncExploreSelectionFromList(IReadOnlyList<ArchiveNode> selectedNodes, ArchiveNode? primary)
+    {
+        if (_exploreSelectionSyncing)
+        {
+            return;
+        }
+
+        _exploreSelectionSyncing = true;
+        try
+        {
+            ReplaceExploreSelection(selectedNodes);
+            SelectedExploreNode = primary ?? SelectedExploreNodes.LastOrDefault();
+            SelectedExploreRow = SelectedExploreNode is null
+                ? null
+                : ExploreDisplayItems.FirstOrDefault(r => ReferenceEquals(r.Node, SelectedExploreNode));
+            if (SelectedExploreNode is not null)
+            {
+                _selectionAnchorExploreNode = SelectedExploreNode;
+            }
+        }
+        finally
+        {
+            _exploreSelectionSyncing = false;
+        }
+    }
 
     [UsedImplicitly] // Called from view pointer-selection handler.
     public void HandleExploreNodePointerSelection(ArchiveNode node, KeyModifiers modifiers)
@@ -315,6 +420,11 @@ public partial class MainWindowViewModel
 
     private List<ArchiveNode> GetVisibleExploreNodesInDisplayOrder()
     {
+        if (ExploreDisplayItems.Count > 0)
+        {
+            return ExploreDisplayItems.Select(static r => r.Node).ToList();
+        }
+
         var ordered = new List<ArchiveNode>();
 
         void Walk(ArchiveNode n)
@@ -379,6 +489,7 @@ public partial class MainWindowViewModel
 
         SelectedExploreNodes.Clear();
         SelectedExploreNode = null;
+        SelectedExploreRow = null;
         _selectionAnchorExploreNode = null;
     }
 

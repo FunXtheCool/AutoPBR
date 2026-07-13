@@ -56,6 +56,29 @@ public partial class ResourceExplorerTab : UserControl
         vm.ExploreTreeColumnFlagsWidth = grid.ColumnDefinitions[4].Width;
     }
 
+    private void ExploreList_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm || sender is not ListBox list)
+        {
+            return;
+        }
+
+        var selected = new List<ArchiveNode>();
+        if (list.SelectedItems is { } items)
+        {
+            foreach (var item in items)
+            {
+                if (item is ExploreListRow row)
+                {
+                    selected.Add(row.Node);
+                }
+            }
+        }
+
+        var primary = (list.SelectedItem as ExploreListRow)?.Node;
+        vm.SyncExploreSelectionFromList(selected, primary);
+    }
+
     private void ExploreRowContextMenu_OnOpening(object? sender, CancelEventArgs e)
     {
         if (sender is not ContextMenu menu)
@@ -63,8 +86,11 @@ public partial class ResourceExplorerTab : UserControl
             return;
         }
 
-        var node = menu.DataContext as ArchiveNode;
-        node ??= (menu.PlacementTarget as Control)?.DataContext as ArchiveNode;
+        var row = menu.DataContext as ExploreListRow
+                  ?? (menu.PlacementTarget as Control)?.DataContext as ExploreListRow;
+        var node = row?.Node
+                   ?? menu.DataContext as ArchiveNode
+                   ?? (menu.PlacementTarget as Control)?.DataContext as ArchiveNode;
         node?.EnsureTagMenuItems();
     }
 }

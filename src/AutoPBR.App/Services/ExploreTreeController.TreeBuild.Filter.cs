@@ -52,6 +52,7 @@ internal sealed partial class ExploreTreeController
         }
 
         ApplyExploreFilterRecursive(Root, f);
+        ((IArchiveNodeHost)this).NotifyExploreStructureChanged();
     }
 
     private bool ApplyExploreFilterRecursive(ArchiveNode node, string filter)

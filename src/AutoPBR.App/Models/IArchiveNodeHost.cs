@@ -20,4 +20,10 @@ public interface IArchiveNodeHost
 
     /// <summary>All tag rules (for legend and context menu).</summary>
     IReadOnlyList<TagRule> GetTagRules();
+
+    /// <summary>
+    /// Notify that Explore list structure may have changed (expand/collapse or children loaded)
+    /// so the virtualized flat list can rebuild.
+    /// </summary>
+    void NotifyExploreStructureChanged();
 }

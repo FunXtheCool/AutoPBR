@@ -349,6 +349,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             Strings = LocalizationService.ApplyCulture(lang);
             OnPropertyChanged(nameof(Strings));
             _exploreController.SetDebugSink(msg => Dispatcher.UIThread.Post(() => { ExploreMlDebugText = msg; }));
+            _exploreController.SetExploreStructureChangedHandler(ScheduleRebuildExploreDisplayItems);
             SelectedLanguage = SupportedLanguages.FirstOrDefault(x =>
                                    string.Equals(x.CultureCode, _settings.Language,
                                        StringComparison.OrdinalIgnoreCase)) ??

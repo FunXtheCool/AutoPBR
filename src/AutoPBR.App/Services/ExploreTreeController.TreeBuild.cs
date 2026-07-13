@@ -179,6 +179,8 @@ internal sealed partial class ExploreTreeController
 
             PostChunk(0);
         }
+
+        ((IArchiveNodeHost)this).NotifyExploreStructureChanged();
     }
 
     public bool? GetEffectiveOverrideForPath(string fullPath)

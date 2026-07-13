@@ -32,6 +32,7 @@ internal sealed partial class ExploreTreeController : IArchiveNodeHost, IDisposa
     private Func<IReadOnlyList<TagRule>>? _tagRulesProvider;
     private Func<MaterialTagSemanticOptions?>? _materialTagSemanticOptionsProvider;
     private Action<string>? _debugSink;
+    private Action? _exploreStructureChanged;
 
     /// <summary>Maps texture storage key → effective tag ids for &quot;Show tag&quot; filtering (avoids re-running ML/keywords per node on every filter pass).</summary>
     private Dictionary<string, HashSet<string>>? _exploreTagFilterCache;
@@ -65,6 +66,10 @@ internal sealed partial class ExploreTreeController : IArchiveNodeHost, IDisposa
     public ScannedArchiveData? Data { get; private set; }
 
     public void SetDebugSink(Action<string>? sink) => _debugSink = sink;
+
+    public void SetExploreStructureChangedHandler(Action? handler) => _exploreStructureChanged = handler;
+
+    void IArchiveNodeHost.NotifyExploreStructureChanged() => _exploreStructureChanged?.Invoke();
 
     public void Dispose()
     {
