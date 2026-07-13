@@ -656,7 +656,7 @@ public sealed partial class PreviewRenderingTests
     }
 
     [Fact]
-    public void PreviewWglPresentation_WiresSwapIntervalToFpsCapToggle()
+    public void PreviewWglPresentation_WiresSwapIntervalToVSyncToggle()
     {
         var previewControl = LoadSource(ThisFilePath(),
             "src",
@@ -675,12 +675,19 @@ public sealed partial class PreviewRenderingTests
             "Rendering",
             "OpenGL",
             "PreviewWglPresentation.cs");
+        var displayRefresh = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "PreviewDisplayRefreshRate.cs");
 
         Assert.Contains("ApplyPresentationVsync();", previewControl, StringComparison.Ordinal);
-        Assert.Contains("_backend.ConfigurePresentationVsync(_glInterface, _capFpsAt60);", previewControl, StringComparison.Ordinal);
-        Assert.Contains("ConfigurePresentationVsync(GlInterface glInterface, bool capFpsAt60)", lifecycle, StringComparison.Ordinal);
+        Assert.Contains("_backend.ConfigurePresentationVsync(_glInterface, _presentationVsyncEnabled);", previewControl, StringComparison.Ordinal);
+        Assert.Contains("ConfigurePresentationVsync(GlInterface glInterface, bool enabled, int? displayRefreshHz = null)", lifecycle, StringComparison.Ordinal);
         Assert.Contains("PreviewWglPresentation.TrySetSwapInterval(glInterface, interval)", lifecycle, StringComparison.Ordinal);
         Assert.Contains("wglSwapIntervalEXT", wglPresentation, StringComparison.Ordinal);
+        Assert.Contains("GetDeviceCaps(dc, VRefresh)", displayRefresh, StringComparison.Ordinal);
     }
 
     private static string ThisFilePath([System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "") =>

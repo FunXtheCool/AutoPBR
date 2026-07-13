@@ -90,6 +90,9 @@
                                Stretch="Uniform" />
                         <ctrls:GlPbrPreviewControl x:Name="GlPbrPreview"
                                                    IsVisible="{Binding IsPreview3D}"
+                                                   OverlayDebugText="{Binding Preview3DCameraDebugText}"
+                                                   OverlayFpsText="{Binding Preview3DFpsCounterText}"
+                                                   OverlayFpsVisible="{Binding IsPreview3DFpsCounterVisible}"
                                                    HorizontalAlignment="Stretch"
                                                    VerticalAlignment="Stretch"
                                                    MinHeight="120" />

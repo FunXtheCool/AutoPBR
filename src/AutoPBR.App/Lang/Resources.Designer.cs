@@ -546,6 +546,8 @@ public static class Resources
     public static string Preview3DShowAxes => GetString("Preview3DShowAxes");
     public static string Preview3DShowFpsCounter => GetString("Preview3DShowFpsCounter");
     public static string Preview3DShowFpsCounterTooltip => GetString("Preview3DShowFpsCounterTooltip");
+    public static string Preview3DVSync => GetString("Preview3DVSync");
+    public static string Preview3DVSyncTooltip => GetString("Preview3DVSyncTooltip");
     public static string Preview3DCapFpsAt60 => GetString("Preview3DCapFpsAt60");
     public static string Preview3DCapFpsAt60Tooltip => GetString("Preview3DCapFpsAt60Tooltip");
     public static string Preview3DItemUseAlphaBlend => GetString("Preview3DItemUseAlphaBlend");

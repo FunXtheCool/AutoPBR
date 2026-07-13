@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Numerics;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 using AutoPBR.App.Rendering.Abstractions;
@@ -12,36 +13,52 @@ using AutoPBR.Preview;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
+using Avalonia.Platform;
 using Avalonia.Rendering;
 using Avalonia.Threading;
 
 namespace AutoPBR.App.Controls;
 
 /// <summary>
-/// OpenGL PBR preview. Implements <see cref="ICustomHitTest"/> so pointer events are delivered on Avalonia 11+
-/// (composition GPU surfaces otherwise skip normal hit-testing on <see cref="OpenGlControlBase"/>).
+/// OpenGL PBR preview. Hosts either an ANGLE <see cref="OpenGlControlBase"/> or a native WGL child window.
 /// </summary>
-public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDisposable
+public sealed class GlPbrPreviewControl : UserControl, ICustomHitTest, IDisposable
 {
+    public static readonly StyledProperty<string?> OverlayDebugTextProperty =
+        AvaloniaProperty.Register<GlPbrPreviewControl, string?>(nameof(OverlayDebugText));
+
+    public static readonly StyledProperty<string?> OverlayFpsTextProperty =
+        AvaloniaProperty.Register<GlPbrPreviewControl, string?>(nameof(OverlayFpsText));
+
+    public static readonly StyledProperty<bool> OverlayFpsVisibleProperty =
+        AvaloniaProperty.Register<GlPbrPreviewControl, bool>(nameof(OverlayFpsVisible));
+
     private static readonly FieldInfo? UpdateQueuedField = typeof(OpenGlControlBase)
         .GetField("_updateQueued", BindingFlags.Instance | BindingFlags.NonPublic);
 
     private readonly OpenGlPreviewBackend _backend = new();
+    private readonly AngleOpenGlSurface _angleSurface;
+    private readonly PreviewNativeWglHost _nativeHost;
     private long _lastTicks = Stopwatch.GetTimestamp();
     private double _fpsAccumSeconds;
     private int _fpsFrameCount;
     private double _smoothedFps;
-    private bool _capFpsAt60;
-    private long _lastCapFrameTicks;
-    private int _capScheduleGeneration;
+    private bool _presentationVsyncEnabled;
     private bool _disposed;
     private bool _gpuCoreReadyFrameRequested;
     private int _openGlUpdateQueuedResets;
     private long _lastOpenGlRenderTicks;
     private GlInterface? _glInterface;
-    private const double CapFrameIntervalSeconds = 1.0 / 60.0;
+    private GlInterface? _angleGlInterface;
+    private PreviewNativeWglPresenter? _nativeWglPresenter;
+    private bool _anglePathStarted;
+    private bool _backendInitialized;
+    private int _cachedPreviewPixelWidth = 1;
+    private int _cachedPreviewPixelHeight = 1;
     /// <summary>
     /// Only clear Avalonia's <c>_updateQueued</c> after this long without <see cref="OnOpenGlRender"/>.
     /// Clearing a live queued flag races the compositor and recreates Avalonia #17865.
@@ -65,13 +82,62 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
     private const int DoubleClickMs = 400;
     private const double DoubleClickMaxDist = 8;
 
+    internal bool PresentationVsyncEnabled => _presentationVsyncEnabled;
+
+    public string? OverlayDebugText
+    {
+        get => GetValue(OverlayDebugTextProperty);
+        set => SetValue(OverlayDebugTextProperty, value);
+    }
+
+    public string? OverlayFpsText
+    {
+        get => GetValue(OverlayFpsTextProperty);
+        set => SetValue(OverlayFpsTextProperty, value);
+    }
+
+    public bool OverlayFpsVisible
+    {
+        get => GetValue(OverlayFpsVisibleProperty);
+        set => SetValue(OverlayFpsVisibleProperty, value);
+    }
+
     public GlPbrPreviewControl()
     {
         ClipToBounds = true;
         Focusable = true;
         IsTabStop = false;
+        _angleSurface = new AngleOpenGlSurface(this)
+        {
+            IsVisible = !PreviewOpenGlSession.RequestedDesktopGl4
+        };
+        _nativeHost = new PreviewNativeWglHost
+        {
+            IsVisible = PreviewOpenGlSession.RequestedDesktopGl4 && OperatingSystem.IsWindows()
+        };
+        _nativeHost.NativeWindowCreated += OnNativeHostWindowCreated;
+        _nativeHost.NativeWindowDestroyed += OnNativeHostWindowDestroyed;
+        _nativeHost.NativeWindowCreationFailed += StartAngleFallbackFromNativeWgl;
+        _nativeHost.NativePointerPressed += OnNativeHostPointerPressed;
+        _nativeHost.NativePointerMoved += OnNativeHostPointerMoved;
+        _nativeHost.NativePointerReleased += OnNativeHostPointerReleased;
+        _nativeHost.NativePointerWheel += OnNativeHostPointerWheel;
+        _nativeHost.NativeKeyDown += OnNativeHostKeyDown;
+        _nativeHost.NativeKeyUp += OnNativeHostKeyUp;
+        _nativeHost.NativeInputLost += OnNativeHostInputLost;
+        Content = new Grid
+        {
+            ClipToBounds = true,
+            Children =
+            {
+                _angleSurface,
+                _nativeHost
+            }
+        };
+
         // Watchdog / idle recovery: unstick only when OnOpenGlRender has been silent.
         _backend.SetRequestPreviewFrame(RecoverPreviewFrame);
+        EnsureBackendInitialized();
         PointerPressed += OnPreviewPointerPressed;
         PointerMoved += OnPreviewPointerMoved;
         PointerReleased += OnPreviewPointerReleased;
@@ -105,28 +171,33 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
 
     public void InvalidateShaderCaches() => _backend.InvalidateShaderCachesAndReload();
 
-    /// <summary>When true, continuous preview rendering is limited to 60 FPS. Off by default (uncapped).</summary>
-    public void SetPreviewFrameRateCap(bool capAt60)
+    /// <summary>When true, native WGL presentation uses swap interval 1; false sets swap interval 0 and removes app-side frame delays.</summary>
+    public void SetPreviewVSync(bool enabled)
     {
-        if (_capFpsAt60 == capAt60)
+        if (_presentationVsyncEnabled == enabled)
         {
             return;
         }
 
-        _capFpsAt60 = capAt60;
-        Interlocked.Increment(ref _capScheduleGeneration);
+        _presentationVsyncEnabled = enabled;
         ApplyPresentationVsync();
         RecoverPreviewFrame();
     }
 
     private void ApplyPresentationVsync()
     {
+        if (_nativeWglPresenter is { } nativePresenter)
+        {
+            nativePresenter.ConfigureVsync(_presentationVsyncEnabled);
+            return;
+        }
+
         if (_glInterface is null)
         {
             return;
         }
 
-        _backend.ConfigurePresentationVsync(_glInterface, _capFpsAt60);
+        _backend.ConfigurePresentationVsync(_glInterface, _presentationVsyncEnabled);
     }
 
     /// <summary>Updates orbit boom arm length, orbit/pan/zoom sensitivities, and the reset-camera key.</summary>
@@ -236,13 +307,42 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         }
     }
 
-    protected override void OnOpenGlInit(GlInterface gl)
+    private void EnsureBackendInitialized()
     {
-        _glInterface = gl;
-        _gpuCoreReadyFrameRequested = false;
+        if (_backendInitialized)
+        {
+            return;
+        }
+
+        _backendInitialized = true;
         _backend.GpuInitProgressChanged += OnGpuInitProgressChanged;
         _backend.Initialize(new RenderPreviewInitializationOptions());
-        if (PreviewOpenGlCompositionBridge.TryCreate(this, out var compositionBridge))
+    }
+
+    private void OnAngleOpenGlInit(GlInterface gl)
+    {
+        EnsureBackendInitialized();
+        _angleGlInterface = gl;
+        _glInterface = gl;
+        _gpuCoreReadyFrameRequested = false;
+        UpdateCachedPreviewViewportInfo();
+        if (_nativeWglPresenter is not null)
+        {
+            return;
+        }
+
+        StartAngleOpenGlPath(gl);
+    }
+
+    private void StartAngleOpenGlPath(GlInterface gl)
+    {
+        if (_anglePathStarted)
+        {
+            return;
+        }
+
+        _anglePathStarted = true;
+        if (PreviewOpenGlCompositionBridge.TryCreate(_angleSurface, out var compositionBridge))
         {
             _backend.SetCompositionBridge(compositionBridge);
             compositionBridge.TryWarmPresentationCache();
@@ -256,11 +356,76 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         }
     }
 
-    protected override void OnOpenGlDeinit(GlInterface gl)
+    private void OnNativeHostWindowCreated(IntPtr hwnd)
     {
-        _glInterface = null;
-        _backend.GpuInitProgressChanged -= OnGpuInitProgressChanged;
+        EnsureBackendInitialized();
+        if (!PreviewOpenGlSession.RequestedDesktopGl4 || _disposed)
+        {
+            return;
+        }
+
+        UpdateCachedPreviewViewportInfo();
+        if (!TryStartNativeWglPresenter(hwnd))
+        {
+            StartAngleFallbackFromNativeWgl();
+        }
+    }
+
+    private void OnNativeHostWindowDestroyed(IntPtr hwnd)
+    {
+        _ = hwnd;
+        _nativeWglPresenter?.Dispose();
+        _nativeWglPresenter = null;
+    }
+
+    private bool TryStartNativeWglPresenter(IntPtr hwnd)
+    {
+        if (!OperatingSystem.IsWindows() || hwnd == IntPtr.Zero)
+        {
+            return false;
+        }
+
+        _nativeWglPresenter?.Dispose();
+        var presenter = new PreviewNativeWglPresenter(
+            this,
+            _backend,
+            StartAngleFallbackFromNativeWgl,
+            hwnd);
+        if (!presenter.TryAttach())
+        {
+            presenter.Dispose();
+            return false;
+        }
+
+        _nativeWglPresenter = presenter;
+        return true;
+    }
+
+    private void StartAngleFallbackFromNativeWgl()
+    {
+        _nativeWglPresenter?.Dispose();
+        _nativeWglPresenter = null;
+        _backend.SetNativeWglOverlay(null, null, 0);
+        _nativeHost.IsVisible = false;
+        _angleSurface.IsVisible = true;
+        if (_angleGlInterface is { } gl)
+        {
+            StartAngleOpenGlPath(gl);
+            RecoverPreviewFrame();
+        }
+    }
+
+    private void OnAngleOpenGlDeinit(GlInterface gl)
+    {
+        _angleGlInterface = null;
         _backend.SetCompositionBridge(null);
+        if (!_anglePathStarted)
+        {
+            return;
+        }
+
+        _anglePathStarted = false;
+        _glInterface = _nativeWglPresenter?.GlInterface;
         _backend.GlDeinit(gl);
     }
 
@@ -276,8 +441,13 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         Dispatcher.UIThread.Post(RecoverPreviewFrame, DispatcherPriority.Background);
     }
 
-    protected override void OnOpenGlRender(GlInterface gl, int fb)
+    private void OnAngleOpenGlRender(GlInterface gl, int fb)
     {
+        if (_nativeWglPresenter is not null)
+        {
+            return;
+        }
+
         var now = Stopwatch.GetTimestamp();
         var dt = TimeSpan.FromTicks(now - _lastTicks);
         _lastTicks = now;
@@ -286,7 +456,6 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         RecordRenderFrame(dt);
         TryGetPreviewViewportInfo(out var w, out var h, out _, out _, out _);
         _backend.GlRender(gl, fb, w, h);
-        _lastCapFrameTicks = now;
         Volatile.Write(ref _lastOpenGlRenderTicks, now);
         // Avalonia #17865: never call RequestNextFrameRendering synchronously from OnOpenGlRender,
         // and never Post at Render priority (still inside CommitCompositor). Defer to Background.
@@ -310,23 +479,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
             return;
         }
 
-        if (!_capFpsAt60)
-        {
-            RequestNextFrameRenderingCore();
-            return;
-        }
-
-        var now = Stopwatch.GetTimestamp();
-        var elapsed = (now - _lastCapFrameTicks) / (double)Stopwatch.Frequency;
-        if (elapsed >= CapFrameIntervalSeconds)
-        {
-            RequestNextFrameRenderingCore();
-            return;
-        }
-
-        var delayMs = Math.Max(1, (int)Math.Ceiling((CapFrameIntervalSeconds - elapsed) * 1000.0));
-        var generation = Volatile.Read(ref _capScheduleGeneration);
-        _ = ScheduleCappedFrameAsync(generation, delayMs);
+        RequestNextFrameRenderingCore();
     }
 
     /// <summary>
@@ -368,12 +521,24 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
             return;
         }
 
-        RequestNextFrameRendering();
+        if (_nativeWglPresenter is { } nativePresenter)
+        {
+            UpdateCachedPreviewViewportInfo();
+            nativePresenter.RequestFrame();
+            return;
+        }
+
+        _angleSurface.RequestFrame();
     }
 
     private void TryUnstickUpdateQueuedIfStale()
     {
-        if (UpdateQueuedField?.GetValue(this) is not true)
+        if (_nativeWglPresenter is not null)
+        {
+            return;
+        }
+
+        if (UpdateQueuedField?.GetValue(_angleSurface) is not true)
         {
             return;
         }
@@ -387,7 +552,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
             return;
         }
 
-        UpdateQueuedField.SetValue(this, false);
+        UpdateQueuedField.SetValue(_angleSurface, false);
         var resets = Interlocked.Increment(ref _openGlUpdateQueuedResets);
         if (resets == 1 || resets % 10 == 0)
         {
@@ -396,138 +561,147 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         }
     }
 
-    private async Task ScheduleCappedFrameAsync(int generation, int delayMs)
-    {
-        await Task.Delay(delayMs).ConfigureAwait(false);
-        await Dispatcher.UIThread.InvokeAsync(() =>
-        {
-            if (generation != Volatile.Read(ref _capScheduleGeneration) ||
-                !_capFpsAt60 ||
-                !_backend.NeedsContinuousRendering)
-            {
-                return;
-            }
-
-            QueuePreviewFrame();
-        });
-    }
-
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
+        if (change.Property == OverlayDebugTextProperty ||
+            change.Property == OverlayFpsTextProperty ||
+            change.Property == OverlayFpsVisibleProperty)
+        {
+            UpdateNativeWglOverlayBitmaps();
+            return;
+        }
+
         if (change.Property != BoundsProperty)
         {
+            if (change.Property == IsVisibleProperty)
+            {
+                if (IsVisible)
+                {
+                    RecoverPreviewFrame();
+                }
+            }
+
             return;
         }
 
         TryGetPreviewViewportInfo(out var w, out var h, out _, out _, out _);
+        Volatile.Write(ref _cachedPreviewPixelWidth, w);
+        Volatile.Write(ref _cachedPreviewPixelHeight, h);
         _backend.Resize(w, h);
+        UpdateNativeWglOverlayBitmaps();
         RecoverPreviewFrame();
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
-        if (e.Key == _cameraResetKey)
-        {
-            _backend.ResetPreviewCameraToDefaults();
-            RecoverPreviewFrame();
-            e.Handled = true;
-        }
-        else
-        {
-            switch (e.Key)
-            {
-                case Key.W:
-                    _flyKeyW = true;
-                    e.Handled = true;
-                    break;
-                case Key.A:
-                    _flyKeyA = true;
-                    e.Handled = true;
-                    break;
-                case Key.S:
-                    _flyKeyS = true;
-                    e.Handled = true;
-                    break;
-                case Key.D:
-                    _flyKeyD = true;
-                    e.Handled = true;
-                    break;
-                case Key.Q:
-                    _flyKeyQ = true;
-                    e.Handled = true;
-                    break;
-                case Key.E:
-                    _flyKeyE = true;
-                    e.Handled = true;
-                    break;
-                case Key.LeftShift:
-                case Key.RightShift:
-                    _flySpeedBoost = true;
-                    e.Handled = true;
-                    break;
-                case Key.LeftCtrl:
-                case Key.RightCtrl:
-                    _flySpeedSlow = true;
-                    e.Handled = true;
-                    break;
-            }
-        }
-
-        if (e.Handled)
-        {
-            RecoverPreviewFrame();
-        }
+        e.Handled = HandlePreviewKeyDown(e.Key);
 
         base.OnKeyDown(e);
     }
 
     protected override void OnKeyUp(KeyEventArgs e)
     {
-        switch (e.Key)
+        e.Handled = HandlePreviewKeyUp(e.Key);
+
+        base.OnKeyUp(e);
+    }
+
+    private bool HandlePreviewKeyDown(Key key)
+    {
+        if (key == _cameraResetKey)
+        {
+            _backend.ResetPreviewCameraToDefaults();
+            RecoverPreviewFrame();
+            return true;
+        }
+
+        var handled = true;
+        switch (key)
+        {
+            case Key.W:
+                _flyKeyW = true;
+                break;
+            case Key.A:
+                _flyKeyA = true;
+                break;
+            case Key.S:
+                _flyKeyS = true;
+                break;
+            case Key.D:
+                _flyKeyD = true;
+                break;
+            case Key.Q:
+                _flyKeyQ = true;
+                break;
+            case Key.E:
+                _flyKeyE = true;
+                break;
+            case Key.LeftShift:
+            case Key.RightShift:
+                _flySpeedBoost = true;
+                break;
+            case Key.LeftCtrl:
+            case Key.RightCtrl:
+                _flySpeedSlow = true;
+                break;
+            default:
+                handled = false;
+                break;
+        }
+
+        if (handled)
+        {
+            PushDebugFlyInput();
+            RecoverPreviewFrame();
+        }
+
+        return handled;
+    }
+
+    private bool HandlePreviewKeyUp(Key key)
+    {
+        var handled = true;
+        switch (key)
         {
             case Key.W:
                 _flyKeyW = false;
-                e.Handled = true;
                 break;
             case Key.A:
                 _flyKeyA = false;
-                e.Handled = true;
                 break;
             case Key.S:
                 _flyKeyS = false;
-                e.Handled = true;
                 break;
             case Key.D:
                 _flyKeyD = false;
-                e.Handled = true;
                 break;
             case Key.Q:
                 _flyKeyQ = false;
-                e.Handled = true;
                 break;
             case Key.E:
                 _flyKeyE = false;
-                e.Handled = true;
                 break;
             case Key.LeftShift:
             case Key.RightShift:
                 _flySpeedBoost = false;
-                e.Handled = true;
                 break;
             case Key.LeftCtrl:
             case Key.RightCtrl:
                 _flySpeedSlow = false;
-                e.Handled = true;
+                break;
+            default:
+                handled = false;
                 break;
         }
 
-        if (e.Handled)
+        if (handled)
         {
+            PushDebugFlyInput();
             RecoverPreviewFrame();
         }
 
-        base.OnKeyUp(e);
+        return handled;
     }
 
     private void OnPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
@@ -545,6 +719,198 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
     private void OnPreviewPointerEntered(object? sender, PointerEventArgs e)
     {
         Focus();
+    }
+
+    private void OnNativeHostPointerPressed(PreviewNativeWglMouseButton button, PreviewNativeWglPointerEvent e)
+    {
+        Focus();
+        var pos = NativePointToLogical(e);
+        if (button == PreviewNativeWglMouseButton.Right)
+        {
+            _debugFlyRmbLook = true;
+            _cameraDragLast = pos;
+            PushDebugFlyInput();
+            _backend.SetUserCameraDragging(true);
+            RecoverPreviewFrame();
+            return;
+        }
+
+        if (button is not (PreviewNativeWglMouseButton.Left or PreviewNativeWglMouseButton.Middle))
+        {
+            return;
+        }
+
+        var now = DateTime.UtcNow;
+        var clickDx = pos.X - _lastLeftClickPos.X;
+        var clickDy = pos.Y - _lastLeftClickPos.Y;
+        if (button == PreviewNativeWglMouseButton.Left &&
+            (now - _lastLeftClickUtc).TotalMilliseconds <= DoubleClickMs &&
+            clickDx * clickDx + clickDy * clickDy <= DoubleClickMaxDist * DoubleClickMaxDist)
+        {
+            _backend.FocusOrbitOnSubject();
+            _lastLeftClickUtc = DateTime.MinValue;
+            RecoverPreviewFrame();
+            return;
+        }
+
+        if (button == PreviewNativeWglMouseButton.Left)
+        {
+            _lastLeftClickUtc = now;
+            _lastLeftClickPos = pos;
+        }
+
+        _cameraDrag = true;
+        _cameraDragIsOrbit = e.Modifiers.HasFlag(PreviewNativeWglKeyModifiers.Alt);
+        _cameraDragLast = pos;
+        _backend.SetUserCameraDragging(true);
+        RecoverPreviewFrame();
+    }
+
+    private void OnNativeHostPointerMoved(PreviewNativeWglPointerEvent e)
+    {
+        Focus();
+        var pos = NativePointToLogical(e);
+        if (_debugFlyRmbLook)
+        {
+            var dx = (float)(pos.X - _cameraDragLast.X);
+            var dy = (float)(pos.Y - _cameraDragLast.Y);
+            _cameraDragLast = pos;
+            _backend.ApplyFlyLookPixels(dx, dy);
+            RecoverPreviewFrame();
+            return;
+        }
+
+        if (!_cameraDrag)
+        {
+            return;
+        }
+
+        var dx2 = (float)(pos.X - _cameraDragLast.X);
+        var dy2 = (float)(pos.Y - _cameraDragLast.Y);
+        _cameraDragLast = pos;
+        if (_cameraDragIsOrbit)
+        {
+            _backend.ApplyCameraOrbitPixels(dx2, dy2);
+        }
+        else
+        {
+            _backend.ApplyCameraPanPixels(dx2, dy2);
+        }
+
+        RecoverPreviewFrame();
+    }
+
+    private void OnNativeHostPointerReleased(PreviewNativeWglMouseButton button, PreviewNativeWglPointerEvent e)
+    {
+        _ = e;
+        if (button == PreviewNativeWglMouseButton.Right)
+        {
+            _debugFlyRmbLook = false;
+            PushDebugFlyInput();
+            _backend.SetUserCameraDragging(false);
+            RecoverPreviewFrame();
+            return;
+        }
+
+        if (button is not (PreviewNativeWglMouseButton.Left or PreviewNativeWglMouseButton.Middle))
+        {
+            return;
+        }
+
+        _cameraDrag = false;
+        _backend.SetUserCameraDragging(false);
+        RecoverPreviewFrame();
+    }
+
+    private void OnNativeHostPointerWheel(PreviewNativeWglPointerEvent e, int delta)
+    {
+        _ = e;
+        Focus();
+        if (delta == 0)
+        {
+            return;
+        }
+
+        _backend.ApplyCameraZoom(delta / 120.0f);
+        RecoverPreviewFrame();
+    }
+
+    private void OnNativeHostKeyDown(int virtualKey)
+    {
+        if (TryMapVirtualKey(virtualKey, out var key))
+        {
+            _ = HandlePreviewKeyDown(key);
+        }
+    }
+
+    private void OnNativeHostKeyUp(int virtualKey)
+    {
+        if (TryMapVirtualKey(virtualKey, out var key))
+        {
+            _ = HandlePreviewKeyUp(key);
+        }
+    }
+
+    private void OnNativeHostInputLost()
+    {
+        _cameraDrag = false;
+        _debugFlyRmbLook = false;
+        _flyKeyW = _flyKeyA = _flyKeyS = _flyKeyD = _flyKeyQ = _flyKeyE = false;
+        _flySpeedBoost = false;
+        _flySpeedSlow = false;
+        PushDebugFlyInput();
+        _backend.SetUserCameraDragging(false);
+        RecoverPreviewFrame();
+    }
+
+    private Point NativePointToLogical(PreviewNativeWglPointerEvent e)
+    {
+        var scale = TopLevel.GetTopLevel(this)?.RenderScaling ?? 1.0;
+        if (scale <= 0.0)
+        {
+            scale = 1.0;
+        }
+
+        return new Point(e.X / scale, e.Y / scale);
+    }
+
+    private static bool TryMapVirtualKey(int virtualKey, out Key key)
+    {
+        key = virtualKey switch
+        {
+            0x08 => Key.Back,
+            0x1B => Key.Escape,
+            0x20 => Key.Space,
+            0x2E => Key.Delete,
+            0x24 => Key.Home,
+            0x41 => Key.A,
+            0x44 => Key.D,
+            0x45 => Key.E,
+            0x51 => Key.Q,
+            0x52 => Key.R,
+            0x53 => Key.S,
+            0x57 => Key.W,
+            0x70 => Key.F1,
+            0x71 => Key.F2,
+            0x72 => Key.F3,
+            0x73 => Key.F4,
+            0x74 => Key.F5,
+            0x75 => Key.F6,
+            0x76 => Key.F7,
+            0x77 => Key.F8,
+            0x78 => Key.F9,
+            0x79 => Key.F10,
+            0x7A => Key.F11,
+            0x7B => Key.F12,
+            0xA0 => Key.LeftShift,
+            0xA1 => Key.RightShift,
+            0xA2 => Key.LeftCtrl,
+            0xA3 => Key.RightCtrl,
+            0x10 => Key.LeftShift,
+            0x11 => Key.LeftCtrl,
+            _ => Key.None
+        };
+        return key != Key.None;
     }
 
     private static bool IsOrbitPanDragStart(PointerPoint p, KeyModifiers keys, out bool orbit)
@@ -714,6 +1080,184 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         }
 
         _disposed = true;
+        _nativeWglPresenter?.Dispose();
+        _nativeWglPresenter = null;
+        _nativeHost.NativeWindowCreated -= OnNativeHostWindowCreated;
+        _nativeHost.NativeWindowDestroyed -= OnNativeHostWindowDestroyed;
+        _nativeHost.NativeWindowCreationFailed -= StartAngleFallbackFromNativeWgl;
+        _nativeHost.NativePointerPressed -= OnNativeHostPointerPressed;
+        _nativeHost.NativePointerMoved -= OnNativeHostPointerMoved;
+        _nativeHost.NativePointerReleased -= OnNativeHostPointerReleased;
+        _nativeHost.NativePointerWheel -= OnNativeHostPointerWheel;
+        _nativeHost.NativeKeyDown -= OnNativeHostKeyDown;
+        _nativeHost.NativeKeyUp -= OnNativeHostKeyUp;
+        _nativeHost.NativeInputLost -= OnNativeHostInputLost;
+        _backend.GpuInitProgressChanged -= OnGpuInitProgressChanged;
         _backend.Dispose();
+    }
+
+    internal void OnNativeWglReady()
+    {
+        _glInterface = _nativeWglPresenter?.GlInterface;
+        ApplyPresentationVsync();
+        UpdateNativeWglOverlayBitmaps();
+        RecoverPreviewFrame();
+    }
+
+    private void UpdateNativeWglOverlayBitmaps()
+    {
+        if (_nativeWglPresenter is null || _disposed)
+        {
+            return;
+        }
+
+        if (!Dispatcher.UIThread.CheckAccess())
+        {
+            Dispatcher.UIThread.Post(UpdateNativeWglOverlayBitmaps, DispatcherPriority.Background);
+            return;
+        }
+
+        var scale = TopLevel.GetTopLevel(this)?.RenderScaling ?? 1.0;
+        if (scale <= 0.0)
+        {
+            scale = 1.0;
+        }
+
+        var debug = RenderDebugOverlayBitmap(OverlayDebugText, scale);
+        var fps = OverlayFpsVisible ? RenderFpsOverlayBitmap(OverlayFpsText, scale) : null;
+        _backend.SetNativeWglOverlay(debug, fps, Math.Max(1, (int)Math.Round(8.0 * scale)));
+        RecoverPreviewFrame();
+    }
+
+    private static PreviewNativeWglOverlayBitmap? RenderDebugOverlayBitmap(string? text, double renderScale)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return null;
+        }
+
+        var block = new TextBlock
+        {
+            Text = text,
+            FontFamily = new FontFamily("Consolas"),
+            FontSize = 11,
+            Foreground = new SolidColorBrush(Color.FromArgb(0xE8, 0xFF, 0xFF, 0xFF)),
+            TextWrapping = TextWrapping.Wrap,
+            MaxWidth = 520
+        };
+        return RenderOverlayVisualToBitmap(block, renderScale);
+    }
+
+    private static PreviewNativeWglOverlayBitmap? RenderFpsOverlayBitmap(string? text, double renderScale)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return null;
+        }
+
+        var border = new Border
+        {
+            Background = new SolidColorBrush(Color.FromArgb(0x66, 0x00, 0x00, 0x00)),
+            CornerRadius = new CornerRadius(4),
+            Padding = new Thickness(6, 3),
+            Child = new TextBlock
+            {
+                Text = text,
+                FontFamily = new FontFamily("Consolas"),
+                FontSize = 12,
+                Foreground = new SolidColorBrush(Color.FromArgb(0xF0, 0xFF, 0xFF, 0xFF))
+            }
+        };
+        return RenderOverlayVisualToBitmap(border, renderScale);
+    }
+
+    private static PreviewNativeWglOverlayBitmap? RenderOverlayVisualToBitmap(Control visual, double renderScale)
+    {
+        visual.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        var desired = visual.DesiredSize;
+        if (desired.Width <= 0.0 || desired.Height <= 0.0)
+        {
+            return null;
+        }
+
+        visual.Arrange(new Rect(desired));
+        var width = Math.Max(1, (int)Math.Ceiling(desired.Width * renderScale));
+        var height = Math.Max(1, (int)Math.Ceiling(desired.Height * renderScale));
+        using var bitmap = new RenderTargetBitmap(
+            new PixelSize(width, height),
+            new Avalonia.Vector(96.0 * renderScale, 96.0 * renderScale));
+        bitmap.Render(visual);
+        var pixels = new byte[width * height * 4];
+        var handle = GCHandle.Alloc(pixels, GCHandleType.Pinned);
+        try
+        {
+            bitmap.CopyPixels(new PixelRect(0, 0, width, height), handle.AddrOfPinnedObject(), pixels.Length, width * 4);
+        }
+        finally
+        {
+            handle.Free();
+        }
+
+        return new PreviewNativeWglOverlayBitmap(width, height, pixels);
+    }
+
+    internal void RenderNativeWglFrame(PreviewDesktopWglBootstrap.ISwapBuffersContext context)
+    {
+        var now = Stopwatch.GetTimestamp();
+        var dt = TimeSpan.FromTicks(now - _lastTicks);
+        _lastTicks = now;
+        PushDebugFlyInput();
+        _backend.RenderFrame(dt);
+        RecordRenderFrame(dt);
+        var w = Math.Max(1, Volatile.Read(ref _cachedPreviewPixelWidth));
+        var h = Math.Max(1, Volatile.Read(ref _cachedPreviewPixelHeight));
+        _backend.GlRenderNativeWglPresenter(w, h);
+        context.SwapBuffers();
+        Volatile.Write(ref _lastOpenGlRenderTicks, now);
+    }
+
+    internal void OnNativeWglFrameCompleted()
+    {
+        if (_disposed || _nativeWglPresenter is null)
+        {
+            return;
+        }
+
+        QueueContinuousFrameIfNeeded();
+    }
+
+    private void UpdateCachedPreviewViewportInfo()
+    {
+        if (!TryGetPreviewViewportInfo(out var w, out var h, out _, out _, out _))
+        {
+            return;
+        }
+
+        Volatile.Write(ref _cachedPreviewPixelWidth, w);
+        Volatile.Write(ref _cachedPreviewPixelHeight, h);
+        _backend.Resize(w, h);
+    }
+
+    private sealed class AngleOpenGlSurface : OpenGlControlBase, ICustomHitTest
+    {
+        private readonly GlPbrPreviewControl _owner;
+
+        public AngleOpenGlSurface(GlPbrPreviewControl owner)
+        {
+            _owner = owner;
+            ClipToBounds = true;
+            Focusable = false;
+            IsTabStop = false;
+        }
+
+        public bool HitTest(Point point) => _owner.HitTest(point);
+
+        public void RequestFrame() => RequestNextFrameRendering();
+
+        protected override void OnOpenGlInit(GlInterface gl) => _owner.OnAngleOpenGlInit(gl);
+
+        protected override void OnOpenGlDeinit(GlInterface gl) => _owner.OnAngleOpenGlDeinit(gl);
+
+        protected override void OnOpenGlRender(GlInterface gl, int fb) => _owner.OnAngleOpenGlRender(gl, fb);
     }
 }

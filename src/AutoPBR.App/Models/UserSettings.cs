@@ -221,7 +221,10 @@ public sealed class UserSettings
     /// <summary>Show a frames-per-second readout in the top-right corner of the 3D preview.</summary>
     public bool Preview3DShowFpsCounter { get; set; }
 
-    /// <summary>Cap continuous 3D preview rendering to 60 FPS (off = uncapped).</summary>
+    /// <summary>Synchronize native WGL preview presentation to the current display refresh rate.</summary>
+    public bool? Preview3DVSyncEnabled { get; set; }
+
+    /// <summary>Legacy setting migrated to <see cref="Preview3DVSyncEnabled"/>.</summary>
     public bool Preview3DCapFpsAt60 { get; set; }
 
     /// <summary>When true, 3D preview uses parallax occlusion mapping (POM) from the height map.</summary>
@@ -491,4 +494,3 @@ public sealed class UserSettings
         }
     }
 }
-

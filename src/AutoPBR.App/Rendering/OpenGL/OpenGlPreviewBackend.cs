@@ -53,6 +53,11 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private int _gridVertexCount;
     private uint _axesVao;
     private uint _axesVbo;
+    private GlNativeOverlayRenderer? _nativeOverlayRenderer;
+    private PreviewNativeWglOverlayBitmap? _nativeOverlayDebug;
+    private PreviewNativeWglOverlayBitmap? _nativeOverlayFps;
+    private int _nativeOverlayMarginPixels = 8;
+    private bool _nativeOverlayShaderErrorLogged;
     private GlMoonBillboardProgram? _moonProgram;
     private GlTexture2D? _moonAlbedo;
     private uint _moonVao;
@@ -140,6 +145,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private bool _genesisTessellationCompileDisabled;
     private bool _genesisTessellationFailureLogged;
     private int _appliedWglSwapInterval = int.MinValue;
+    private int _appliedWglDisplayRefreshHz = int.MinValue;
     private Action<string>? _diagnosticLog;
     private Action? _requestPreviewFrame;
     private bool _loggedMeshReady;

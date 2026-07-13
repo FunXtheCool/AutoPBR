@@ -278,13 +278,22 @@ public sealed partial class OpenGlPreviewBackend
 
     private void RecordActiveContextSummary()
     {
-        ActiveContextSummary = _desktopWglSidecar is not null
-            ? _desktopWglSidecar.UsesDxInteropPresentation
+        if (_nativeWglPresenterActive)
+        {
+            ActiveContextSummary = $"{_glVersionString} · GLSL 330 core (WGL native child)";
+        }
+        else if (_desktopWglSidecar is not null)
+        {
+            ActiveContextSummary = _desktopWglSidecar.UsesDxInteropPresentation
                 ? $"{_glVersionString} · GLSL 330 core (WGL sidecar · D3D11 interop)"
-                : $"{_glVersionString} · GLSL 330 core (WGL sidecar)"
-            : _useOpenGlEs
+                : $"{_glVersionString} · GLSL 330 core (WGL sidecar)";
+        }
+        else
+        {
+            ActiveContextSummary = _useOpenGlEs
                 ? $"{_glVersionString} · GLSL ES 3.0"
                 : $"{_glVersionString} · GLSL 330 core";
+        }
 
         if (PreviewOpenGlSession.RequestedDesktopGl4 && _useOpenGlEs)
         {

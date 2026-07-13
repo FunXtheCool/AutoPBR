@@ -20,6 +20,7 @@ public sealed partial class OpenGlPreviewBackend
     private bool _forceSyncSidecarPresent;
     private bool _sidecarAdapterMatchAttempted;
     private int _sidecarBootstrapWorkerState;
+    private bool _nativeWglPresenterActive;
 
     private const int SidecarInitIdle = 0;
     private const int SidecarInitRunning = 1;
@@ -71,6 +72,22 @@ public sealed partial class OpenGlPreviewBackend
             }
 
             FinishGlInitLocked(presentationGlInterface, sidecar: null);
+        }
+    }
+
+    internal void BeginNativeWglPresenterGlInit(GlInterface nativeGlInterface)
+    {
+        lock (_sync)
+        {
+            _lastError = null;
+            _presentationGlInterface = nativeGlInterface;
+            _gpuInitStopwatch.Restart();
+            PreviewShaderPrewarm.EnsureStarted();
+            _pendingDesktopWglSidecar = false;
+            _desktopWglSidecarInitState = SidecarInitDone;
+            _nativeWglPresenterActive = true;
+            _useOpenGlEs = false;
+            FinishGlInitLocked(nativeGlInterface, sidecar: null);
         }
     }
 
@@ -367,6 +384,7 @@ public sealed partial class OpenGlPreviewBackend
         _dxInteropSuccessLogged = false;
         _asyncPboReadbackLogged = false;
         _sidecarAdapterMatchAttempted = false;
+        _nativeWglPresenterActive = false;
         Interlocked.Exchange(ref _sidecarBootstrapWorkerState, 0);
     }
 }

@@ -39,6 +39,13 @@ internal static class PreviewDesktopWglBootstrap
 
     public static IntPtr OpenGl32Handle => EnsureOpenGl32Handle();
 
+    internal interface ISwapBuffersContext : IGlContext
+    {
+        IntPtr WindowHandle { get; }
+
+        void SwapBuffers();
+    }
+
     public static IGlContext? TryCreateContext(IReadOnlyList<GlVersion> profiles, Action<string>? log = null)
     {
         if (!OperatingSystem.IsWindows() || !EnsureBootstrapReady())
@@ -92,7 +99,7 @@ internal static class PreviewDesktopWglBootstrap
                 }
 
                 log?.Invoke($"[3D preview] WGL sidecar context created (OpenGL {profile.Major}.{profile.Minor} core).");
-                return new WglSidecarContext(profile, context, window, dc, _defaultPixelFormat, _defaultPfd);
+                return new WglSidecarContext(profile, context, window, dc, _defaultPixelFormat, _defaultPfd, ownsWindow: true);
             }
 
             log?.Invoke("[3D preview] WGL bootstrap could not create any requested OpenGL profile.");
@@ -101,8 +108,77 @@ internal static class PreviewDesktopWglBootstrap
         catch (Exception ex)
         {
             log?.Invoke("[3D preview] WGL bootstrap failed: " + ex.Message);
-            ReleaseDC(window, dc);
-            DestroyWindow(window);
+            _ = ReleaseDC(window, dc);
+            _ = DestroyWindow(window);
+            return null;
+        }
+    }
+
+    internal static ISwapBuffersContext? TryCreateContextForWindow(
+        IntPtr window,
+        IReadOnlyList<GlVersion> profiles,
+        Action<string>? log = null)
+    {
+        if (!OperatingSystem.IsWindows() || window == IntPtr.Zero || !EnsureBootstrapReady())
+        {
+            return null;
+        }
+
+        if (!PreviewDesktopWglOwnerThread.IsOwnerThread)
+        {
+            return PreviewDesktopWglOwnerThread.Run(() => TryCreateContextForWindow(window, profiles, log));
+        }
+
+        var dc = GetDC(window);
+        if (dc == IntPtr.Zero)
+        {
+            log?.Invoke("[3D preview] Native WGL child GetDC failed.");
+            return null;
+        }
+
+        try
+        {
+            var pfd = _defaultPfd;
+            if (!SetPixelFormat(dc, _defaultPixelFormat, ref pfd))
+            {
+                log?.Invoke("[3D preview] Native WGL child SetPixelFormat failed.");
+                _ = ReleaseDC(window, dc);
+                return null;
+            }
+
+            foreach (var profile in profiles)
+            {
+                if (profile.Type != GlProfileType.OpenGL)
+                {
+                    continue;
+                }
+
+                var attribs = new[]
+                {
+                    WglContextMajorVersionArb, profile.Major,
+                    WglContextMinorVersionArb, profile.Minor,
+                    WglContextProfileMaskArb, WglContextCoreProfileBitArb,
+                    0, 0,
+                };
+
+                var context = _createContextAttribsArb!(dc, IntPtr.Zero, attribs);
+                if (context == IntPtr.Zero)
+                {
+                    continue;
+                }
+
+                log?.Invoke($"[3D preview] Native WGL child context created (OpenGL {profile.Major}.{profile.Minor} core).");
+                return new WglSidecarContext(profile, context, window, dc, _defaultPixelFormat, _defaultPfd, ownsWindow: false);
+            }
+
+            log?.Invoke("[3D preview] Native WGL child could not create any requested OpenGL profile.");
+            _ = ReleaseDC(window, dc);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            log?.Invoke("[3D preview] Native WGL child bootstrap failed: " + ex.Message);
+            _ = ReleaseDC(window, dc);
             return null;
         }
     }
@@ -200,7 +276,7 @@ internal static class PreviewDesktopWglBootstrap
                     var formats = new int[1];
                     if (_choosePixelFormatArb(dc, attribs, null, 1, formats, out var count) && count > 0)
                     {
-                        DescribePixelFormat(dc, formats[0], Marshal.SizeOf<PixelFormatDescriptor>(), ref _defaultPfd);
+                        _ = DescribePixelFormat(dc, formats[0], Marshal.SizeOf<PixelFormatDescriptor>(), ref _defaultPfd);
                         _defaultPixelFormat = formats[0];
                     }
                 }
@@ -212,8 +288,8 @@ internal static class PreviewDesktopWglBootstrap
             }
             finally
             {
-                ReleaseDC(window, dc);
-                DestroyWindow(window);
+                _ = ReleaseDC(window, dc);
+                _ = DestroyWindow(window);
             }
         }
     }
@@ -393,7 +469,7 @@ internal static class PreviewDesktopWglBootstrap
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern IntPtr LoadLibraryW(string lpFileName);
 
-    private sealed class WglSidecarContext : IGlContext
+    private sealed class WglSidecarContext : ISwapBuffersContext
     {
         private readonly object _lock = new();
         private readonly IntPtr _context;
@@ -401,6 +477,7 @@ internal static class PreviewDesktopWglBootstrap
         private readonly IntPtr _dc;
         private readonly int _pixelFormat;
         private readonly PixelFormatDescriptor _pfd;
+        private readonly bool _ownsWindow;
         private bool _isLost;
 
         public WglSidecarContext(
@@ -409,7 +486,8 @@ internal static class PreviewDesktopWglBootstrap
             IntPtr window,
             IntPtr dc,
             int pixelFormat,
-            PixelFormatDescriptor pfd)
+            PixelFormatDescriptor pfd,
+            bool ownsWindow)
         {
             Version = version;
             _context = context;
@@ -417,6 +495,7 @@ internal static class PreviewDesktopWglBootstrap
             _dc = dc;
             _pixelFormat = pixelFormat;
             _pfd = pfd;
+            _ownsWindow = ownsWindow;
             StencilSize = pfd.StencilBits;
             using (MakeCurrent())
             {
@@ -424,6 +503,7 @@ internal static class PreviewDesktopWglBootstrap
             }
         }
 
+        public IntPtr WindowHandle => _window;
         public GlVersion Version { get; }
         public GlInterface GlInterface { get; }
         public int SampleCount => 0;
@@ -461,6 +541,16 @@ internal static class PreviewDesktopWglBootstrap
             return new Restore(_dc, _context, _lock);
         }
 
+        public void SwapBuffers()
+        {
+            if (_isLost)
+            {
+                return;
+            }
+
+            _ = PreviewDesktopWglBootstrap.SwapBuffers(_dc);
+        }
+
         public void Dispose()
         {
             if (_isLost)
@@ -469,10 +559,13 @@ internal static class PreviewDesktopWglBootstrap
             }
 
             _isLost = true;
-            wglMakeCurrent(IntPtr.Zero, IntPtr.Zero);
-            wglDeleteContext(_context);
-            ReleaseDC(_window, _dc);
-            DestroyWindow(_window);
+            _ = wglMakeCurrent(IntPtr.Zero, IntPtr.Zero);
+            _ = wglDeleteContext(_context);
+            _ = ReleaseDC(_window, _dc);
+            if (_ownsWindow)
+            {
+                _ = DestroyWindow(_window);
+            }
         }
 
         private sealed class Restore : IDisposable
@@ -516,4 +609,8 @@ internal static class PreviewDesktopWglBootstrap
 
     [DllImport("opengl32.dll")]
     private static extern IntPtr wglGetCurrentDC();
+
+    [DllImport("gdi32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SwapBuffers(IntPtr hdc);
 }

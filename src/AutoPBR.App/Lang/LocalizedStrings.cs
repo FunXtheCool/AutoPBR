@@ -524,6 +524,8 @@ public sealed class LocalizedStrings
     public static string Preview3DShowAxes => Resources.Preview3DShowAxes;
     public static string Preview3DShowFpsCounter => Resources.Preview3DShowFpsCounter;
     public static string Preview3DShowFpsCounterTooltip => Resources.Preview3DShowFpsCounterTooltip;
+    public static string Preview3DVSync => Resources.Preview3DVSync;
+    public static string Preview3DVSyncTooltip => Resources.Preview3DVSyncTooltip;
     public static string Preview3DCapFpsAt60 => Resources.Preview3DCapFpsAt60;
     public static string Preview3DCapFpsAt60Tooltip => Resources.Preview3DCapFpsAt60Tooltip;
     public static string Preview3DItemUseAlphaBlend => Resources.Preview3DItemUseAlphaBlend;

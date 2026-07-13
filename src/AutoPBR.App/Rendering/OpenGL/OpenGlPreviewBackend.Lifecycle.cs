@@ -707,6 +707,8 @@ public sealed partial class OpenGlPreviewBackend
     /// <summary>Called from <see cref="AutoPBR.App.Controls.GlPbrPreviewControl.OnOpenGlInit"/> only.</summary>
     internal void GlInit(GlInterface glInterface) => BeginGlInit(glInterface);
 
+    internal void GlInitNativeWglPresenter(GlInterface glInterface) => BeginNativeWglPresenterGlInit(glInterface);
+
     private void FinishGlInitLocked(GlInterface renderGlInterface, PreviewDesktopWglContext? sidecar)
     {
         try
@@ -747,8 +749,8 @@ public sealed partial class OpenGlPreviewBackend
         }
     }
 
-    /// <summary>Desktop WGL only: map preview FPS cap to native swap interval (ANGLE/GLES uses Avalonia pacing).</summary>
-    internal void ConfigurePresentationVsync(GlInterface glInterface, bool capFpsAt60)
+    /// <summary>Desktop WGL only: maps the preview VSync setting to native swap interval (ANGLE/GLES uses Avalonia pacing).</summary>
+    internal void ConfigurePresentationVsync(GlInterface glInterface, bool enabled, int? displayRefreshHz = null)
     {
         lock (_sync)
         {
@@ -757,8 +759,9 @@ public sealed partial class OpenGlPreviewBackend
                 return;
             }
 
-            var interval = capFpsAt60 ? 1 : 0;
-            if (_appliedWglSwapInterval == interval)
+            var interval = enabled ? 1 : 0;
+            var detectedRefreshHz = displayRefreshHz.GetValueOrDefault();
+            if (_appliedWglSwapInterval == interval && _appliedWglDisplayRefreshHz == detectedRefreshHz)
             {
                 return;
             }
@@ -766,9 +769,10 @@ public sealed partial class OpenGlPreviewBackend
             if (PreviewWglPresentation.TrySetSwapInterval(glInterface, interval))
             {
                 _appliedWglSwapInterval = interval;
+                _appliedWglDisplayRefreshHz = detectedRefreshHz;
                 EmitDiagnostic(interval == 0
-                    ? "[3D preview] WGL swap interval 0 (uncapped presentation)."
-                    : "[3D preview] WGL swap interval 1 (vsync presentation).");
+                    ? FormatWglSwapIntervalDiagnostic("off; uncapped presentation", detectedRefreshHz)
+                    : FormatWglSwapIntervalDiagnostic("on; pacing to current display", detectedRefreshHz));
             }
             else if (_appliedWglSwapInterval == int.MinValue)
             {
@@ -776,6 +780,11 @@ public sealed partial class OpenGlPreviewBackend
             }
         }
     }
+
+    private static string FormatWglSwapIntervalDiagnostic(string mode, int detectedRefreshHz) =>
+        detectedRefreshHz > 1
+            ? $"[3D preview] WGL VSync {mode} ({detectedRefreshHz} Hz detected)."
+            : $"[3D preview] WGL VSync {mode} (display refresh unknown).";
 
     /// <summary>Called from <see cref="AutoPBR.App.Controls.GlPbrPreviewControl.OnOpenGlDeinit"/> only.</summary>
     internal void GlDeinit(GlInterface glInterface)
@@ -785,6 +794,7 @@ public sealed partial class OpenGlPreviewBackend
         lock (_sync)
         {
             _appliedWglSwapInterval = int.MinValue;
+            _appliedWglDisplayRefreshHz = int.MinValue;
             _gpuAlive = false;
             _gpuBootstrap = null;
             _pendingShaderReload = false;
@@ -842,6 +852,7 @@ public sealed partial class OpenGlPreviewBackend
             DisposeAllGpuObjectsLocked();
             DisposeEntityRebakeWorker();
             _gl = null;
+            _nativeWglPresenterActive = false;
             _gpuInitTier = PreviewGpuInitTier.None;
             _shadowAwareGodRayInitAttempted = false;
             _gpuInitProgress = PreviewGpuInitProgress.Starting;
@@ -894,6 +905,7 @@ public sealed partial class OpenGlPreviewBackend
         DestroyPreviewTaaResources();
         DestroyMoonBillboard();
         DestroyLineOverlay();
+        DestroyNativeWglOverlay();
         DestroySunDebugOverlay();
         _shaderCtx = null;
 
@@ -951,6 +963,8 @@ public sealed partial class OpenGlPreviewBackend
         DestroyPreviewTaaResources();
         DestroyMoonBillboard();
         DestroyLineOverlay();
+        _nativeOverlayRenderer = null;
+        _nativeOverlayShaderErrorLogged = false;
         DestroySunDebugOverlay();
     }
 

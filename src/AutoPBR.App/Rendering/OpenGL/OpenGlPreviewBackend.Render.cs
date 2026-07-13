@@ -148,6 +148,9 @@ public sealed partial class OpenGlPreviewBackend
         GlRenderCore(framebuffer, pixelWidth, pixelHeight);
     }
 
+    internal void GlRenderNativeWglPresenter(int pixelWidth, int pixelHeight) =>
+        GlRenderCore(framebuffer: 0, pixelWidth, pixelHeight);
+
     private void GlRenderCore(int framebuffer, int pixelWidth, int pixelHeight)
     {
         PreviewRenderSettingsSnapshot settings;
@@ -334,6 +337,7 @@ public sealed partial class OpenGlPreviewBackend
         GlRenderPassShadow(ref frame);
         GlRenderPassScene(ref frame);
         GlRenderPassPost(ref frame);
+        DrawNativeWglOverlayIfNeeded(gl, vw, vh);
     }
 
     private static void ClearPresentationFramebuffer(GlInterface glInterface, int framebuffer, int width, int height)

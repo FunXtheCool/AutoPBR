@@ -56,7 +56,7 @@ public partial class MainWindowViewModel
     [ObservableProperty] private bool _preview3DShowGroundMesh = true;
     [ObservableProperty] private bool _preview3DShowAxes = true;
     [ObservableProperty] private bool _preview3DShowFpsCounter;
-    [ObservableProperty] private bool _preview3DCapFpsAt60;
+    [ObservableProperty] private bool _preview3DVSyncEnabled;
     [ObservableProperty] private string? _preview3DFpsCounterText;
     [ObservableProperty] private bool _preview3DEnableParallax = true;
     [ObservableProperty] private bool _preview3DEnableNormalMap = true;
@@ -325,9 +325,9 @@ public partial class MainWindowViewModel
         }
     }
 
-    partial void OnPreview3DCapFpsAt60Changed(bool value) => OnPreview3DFrameRateCapSettingChanged(value);
+    partial void OnPreview3DVSyncEnabledChanged(bool value) => OnPreview3DVSyncSettingChanged(value);
 
-    private void OnPreview3DFrameRateCapSettingChanged(bool _)
+    private void OnPreview3DVSyncSettingChanged(bool _)
     {
         if (_loadingSettings)
         {
@@ -335,7 +335,7 @@ public partial class MainWindowViewModel
         }
 
         SaveSettings();
-        PushPreview3DFrameRateCap();
+        PushPreview3DVSync();
     }
     partial void OnPreview3DEnableParallaxChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DEnableNormalMapChanged(bool value) => OnPreview3DGpuSettingChanged(value);
@@ -715,7 +715,7 @@ public partial class MainWindowViewModel
         };
     }
 
-    private void PushPreview3DFrameRateCap() => _glPreview?.SetPreviewFrameRateCap(Preview3DCapFpsAt60);
+    private void PushPreview3DVSync() => _glPreview?.SetPreviewVSync(Preview3DVSyncEnabled);
 
     private void PushPreview3DCamera()
     {
@@ -724,7 +724,7 @@ public partial class MainWindowViewModel
             return;
         }
 
-        PushPreview3DFrameRateCap();
+        PushPreview3DVSync();
         var resetKey = Enum.TryParse<Key>(Preview3DCameraResetKey, ignoreCase: true, out var parsedKey)
             ? parsedKey
             : Key.R;

@@ -1756,6 +1756,12 @@
   <data name="Preview3DShowFpsCounterTooltip" xml:space="preserve">
     <value>Show a frames-per-second readout in the top-right corner of the 3D preview.</value>
   </data>
+  <data name="Preview3DVSync" xml:space="preserve">
+    <value>VSync</value>
+  </data>
+  <data name="Preview3DVSyncTooltip" xml:space="preserve">
+    <value>Sync native OpenGL preview presentation to the current display refresh rate. When off, WGL uses swap interval 0 and the preview render loop is fully uncapped.</value>
+  </data>
   <data name="Preview3DCapFpsAt60" xml:space="preserve">
     <value>Limit to 60 FPS</value>
   </data>
