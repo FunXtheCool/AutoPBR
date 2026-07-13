@@ -30,7 +30,7 @@ internal static class GlslSourceAdapter
             // Vertex skinning uses int bone indices + UBO scalars; default int precision on GLES can be too low for ANGLE.
             : "precision highp float;\nprecision highp int;\n";
 
-        return "#version 300 es\n" + prec + body;
+        return "#version 300 es\n" + prec + "#define GENESIS_GLES 1\n" + body;
     }
 
     // ANGLE's GLSL ES lexer can choke on non-ASCII bytes (e.g. en/em dashes in comments),

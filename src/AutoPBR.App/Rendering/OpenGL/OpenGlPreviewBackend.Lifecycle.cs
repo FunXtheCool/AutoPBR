@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.InteropServices;
 
 using AutoPBR.App.Lang;
@@ -57,7 +58,7 @@ public sealed partial class OpenGlPreviewBackend
         UploadMaterialToTextures(gl, material, nearest, _albedo, _normal, _spec, _height, out _, out _, out _);
     }
 
-    private static void UploadMaterialToTextures(
+    private void UploadMaterialToTextures(
         GL gl,
         PreviewMaterial? material,
         bool nearest,
@@ -77,10 +78,10 @@ public sealed partial class OpenGlPreviewBackend
         {
             if (material is null || material.AlbedoRgba.Length < 4)
             {
-                albedo.UploadRgba(1, 1, [180, 180, 190, 255], nearest);
-                normal.UploadRgba(1, 1, [128, 128, 255, 255], nearest);
-                spec.UploadRgba(1, 1, [120, 60, 40, 255], nearest);
-                height.UploadRgba(1, 1, [128, 128, 128, 255], nearest);
+                albedo.UploadRgbaIfChanged(1, 1, [180, 180, 190, 255], nearest);
+                normal.UploadRgbaIfChanged(1, 1, [128, 128, 255, 255], nearest);
+                spec.UploadRgbaIfChanged(1, 1, [120, 60, 40, 255], nearest);
+                height.UploadRgbaIfChanged(1, 1, [128, 128, 128, 255], nearest);
                 return;
             }
 
@@ -90,15 +91,13 @@ public sealed partial class OpenGlPreviewBackend
             var albPx = albW * albH * 4;
             if (alb.Length < albPx)
             {
-                albedo.UploadRgba(1, 1, [180, 180, 190, 255], nearest);
+                albedo.UploadRgbaIfChanged(1, 1, [180, 180, 190, 255], nearest);
             }
             else
             {
                 var albSpan = alb[..albPx];
-                var albUpload = material.GlUploadFlipRows
-                    ? OpenGlRgbaUpload.EnsureBottomRowFirst(albSpan, albW, albH)
-                    : albSpan.ToArray();
-                albedo.UploadRgba(albW, albH, albUpload, nearest);
+                var albUpload = PrepareRgbaUploadSpan(albSpan, albW, albH, material.GlUploadFlipRows);
+                albedo.UploadRgbaIfChanged(albW, albH, albUpload, nearest);
             }
 
             if (material.NormalRgba is { Length: >= 4 } nr)
@@ -108,20 +107,18 @@ public sealed partial class OpenGlPreviewBackend
                 if (nr.Length >= nPx)
                 {
                     var nSpan = nr[..nPx].Span;
-                    var nUpload = material.GlUploadFlipRows
-                        ? OpenGlRgbaUpload.EnsureBottomRowFirst(nSpan, nw, nh)
-                        : nSpan.ToArray();
-                    normal.UploadRgba(nw, nh, nUpload, nearest);
+                    var nUpload = PrepareRgbaUploadSpan(nSpan, nw, nh, material.GlUploadFlipRows);
+                    normal.UploadRgbaIfChanged(nw, nh, nUpload, nearest);
                     hasNormal = true;
                 }
                 else
                 {
-                    normal.UploadRgba(1, 1, [128, 128, 255, 255], nearest);
+                    normal.UploadRgbaIfChanged(1, 1, [128, 128, 255, 255], nearest);
                 }
             }
             else
             {
-                normal.UploadRgba(1, 1, [128, 128, 255, 255], nearest);
+                normal.UploadRgbaIfChanged(1, 1, [128, 128, 255, 255], nearest);
             }
 
             if (material.SpecularRgba is { Length: >= 4 } sr)
@@ -131,20 +128,18 @@ public sealed partial class OpenGlPreviewBackend
                 if (sr.Length >= sPx)
                 {
                     var sSpan = sr[..sPx].Span;
-                    var sUpload = material.GlUploadFlipRows
-                        ? OpenGlRgbaUpload.EnsureBottomRowFirst(sSpan, sw, sh)
-                        : sSpan.ToArray();
-                    spec.UploadRgba(sw, sh, sUpload, nearest);
+                    var sUpload = PrepareRgbaUploadSpan(sSpan, sw, sh, material.GlUploadFlipRows);
+                    spec.UploadRgbaIfChanged(sw, sh, sUpload, nearest);
                     hasSpecular = true;
                 }
                 else
                 {
-                    spec.UploadRgba(1, 1, [120, 60, 40, 255], nearest);
+                    spec.UploadRgbaIfChanged(1, 1, [120, 60, 40, 255], nearest);
                 }
             }
             else
             {
-                spec.UploadRgba(1, 1, [120, 60, 40, 255], nearest);
+                spec.UploadRgbaIfChanged(1, 1, [120, 60, 40, 255], nearest);
             }
 
             if (material.HeightRgba is { Length: >= 4 } hr)
@@ -154,26 +149,41 @@ public sealed partial class OpenGlPreviewBackend
                 if (hr.Length >= hPx)
                 {
                     var hSpan = hr[..hPx].Span;
-                    var hUpload = material.GlUploadFlipRows
-                        ? OpenGlRgbaUpload.EnsureBottomRowFirst(hSpan, hw, hh)
-                        : hSpan.ToArray();
-                    height.UploadRgba(hw, hh, hUpload, nearest);
+                    var hUpload = PrepareRgbaUploadSpan(hSpan, hw, hh, material.GlUploadFlipRows);
+                    height.UploadRgbaIfChanged(hw, hh, hUpload, nearest);
                     hasHeight = true;
                 }
                 else
                 {
-                    height.UploadRgba(1, 1, [128, 128, 128, 255], nearest);
+                    height.UploadRgbaIfChanged(1, 1, [128, 128, 128, 255], nearest);
                 }
             }
             else
             {
-                height.UploadRgba(1, 1, [128, 128, 128, 255], nearest);
+                height.UploadRgbaIfChanged(1, 1, [128, 128, 128, 255], nearest);
             }
         }
         finally
         {
             gl.PixelStore(PixelStoreParameter.UnpackAlignment, 4);
         }
+    }
+
+    private ReadOnlySpan<byte> PrepareRgbaUploadSpan(ReadOnlySpan<byte> rgba, int width, int height, bool flipRows)
+    {
+        if (!flipRows)
+        {
+            return rgba;
+        }
+
+        var needed = width * height * 4;
+        if (_rgbaUploadScratch is null || _rgbaUploadScratch.Length < needed)
+        {
+            _rgbaUploadScratch = new byte[needed];
+        }
+
+        OpenGlRgbaUpload.CopyBottomRowFirst(rgba, width, height, _rgbaUploadScratch);
+        return _rgbaUploadScratch.AsSpan(0, needed);
     }
 
     private static (int W, int H) ResolveRgbaDimensions(int declaredW, int declaredH, int byteLength)
@@ -238,16 +248,22 @@ public sealed partial class OpenGlPreviewBackend
 
         const string blockName = "EntitySkinningBones";
         const string prevBlockName = "EntityPrevSkinningBones";
+        const string normalBlockName = "EntitySkinningNormals";
         _entityBoneUbo = gl.GenBuffer();
         _entityPrevBoneUbo = gl.GenBuffer();
+        _entityNormalBoneUbo = gl.GenBuffer();
         Array.Clear(_entitySkinningUboScratch);
         Array.Clear(_entityPrevSkinningUboScratch);
+        Array.Clear(_entityNormalSkinningUboScratch);
         gl.BindBuffer(BufferTargetARB.UniformBuffer, _entityBoneUbo);
         gl.BufferData<byte>(BufferTargetARB.UniformBuffer, _entitySkinningUboScratch.AsSpan(), BufferUsageARB.DynamicDraw);
         gl.BindBufferBase(BufferTargetARB.UniformBuffer, EntitySkinningUboBindingPoint, _entityBoneUbo);
         gl.BindBuffer(BufferTargetARB.UniformBuffer, _entityPrevBoneUbo);
         gl.BufferData<byte>(BufferTargetARB.UniformBuffer, _entityPrevSkinningUboScratch.AsSpan(), BufferUsageARB.DynamicDraw);
         gl.BindBufferBase(BufferTargetARB.UniformBuffer, EntityPrevSkinningUboBindingPoint, _entityPrevBoneUbo);
+        gl.BindBuffer(BufferTargetARB.UniformBuffer, _entityNormalBoneUbo);
+        gl.BufferData<byte>(BufferTargetARB.UniformBuffer, _entityNormalSkinningUboScratch.AsSpan(), BufferUsageARB.DynamicDraw);
+        gl.BindBufferBase(BufferTargetARB.UniformBuffer, EntityNormalSkinningUboBindingPoint, _entityNormalBoneUbo);
 
         var mainProg = _program.Program;
         var mainBlock = gl.GetUniformBlockIndex(mainProg, blockName);
@@ -261,6 +277,12 @@ public sealed partial class OpenGlPreviewBackend
         if (mainPrevBlock != uint.MaxValue)
         {
             gl.UniformBlockBinding(mainProg, mainPrevBlock, EntityPrevSkinningUboBindingPoint);
+        }
+
+        var mainNormalBlock = gl.GetUniformBlockIndex(mainProg, normalBlockName);
+        if (mainNormalBlock != uint.MaxValue)
+        {
+            gl.UniformBlockBinding(mainProg, mainNormalBlock, EntityNormalSkinningUboBindingPoint);
         }
 
         if (_shadowProgram is { IsValid: true })
@@ -323,6 +345,25 @@ public sealed partial class OpenGlPreviewBackend
         }
     }
 
+    private void BindEntityBoneSkinningUboBlocks()
+    {
+        if (_entityBoneUbo == 0)
+        {
+            return;
+        }
+
+        _gl!.BindBufferBase(BufferTargetARB.UniformBuffer, EntitySkinningUboBindingPoint, _entityBoneUbo);
+        if (_entityPrevBoneUbo != 0)
+        {
+            _gl!.BindBufferBase(BufferTargetARB.UniformBuffer, EntityPrevSkinningUboBindingPoint, _entityPrevBoneUbo);
+        }
+
+        if (_entityNormalBoneUbo != 0)
+        {
+            _gl!.BindBufferBase(BufferTargetARB.UniformBuffer, EntityNormalSkinningUboBindingPoint, _entityNormalBoneUbo);
+        }
+    }
+
     private void ApplyEntityBoneSkinningUniformsBeforeDraw(
         GlShaderProgram? program,
         EntitySkinningUniformLocs locs,
@@ -332,15 +373,12 @@ public sealed partial class OpenGlPreviewBackend
         int boneSnapshotCount,
         bool setupAnimMotion,
         bool bonePaletteUploaded,
-        string passLabel)
+        string passLabel,
+        bool bindBoneUboBlocks = true)
     {
-        if (bonePaletteUploaded && _entityBoneUbo != 0)
+        if (bindBoneUboBlocks && bonePaletteUploaded)
         {
-            _gl!.BindBufferBase(BufferTargetARB.UniformBuffer, EntitySkinningUboBindingPoint, _entityBoneUbo);
-            if (_entityPrevBoneUbo != 0)
-            {
-                _gl!.BindBufferBase(BufferTargetARB.UniformBuffer, EntityPrevSkinningUboBindingPoint, _entityPrevBoneUbo);
-            }
+            BindEntityBoneSkinningUboBlocks();
         }
 
         var resolveOk = TryApplyEntityBoneSkinningUniforms(
@@ -524,19 +562,39 @@ public sealed partial class OpenGlPreviewBackend
         return true;
     }
 
-    private void UploadEntitySkinningBoneMatrices(GL gl, int boneSnapshotCount)
+    private readonly byte[] _entityBonePaletteLastUploadScratch = new byte[EntitySkinningUboMatrixBytes];
+    private int _entityBonePaletteLastUploadedCount;
+
+    private bool ShouldUploadEntityBonePalette(int boneSnapshotCount, bool setupAnimMotion)
     {
-        if (_entityBoneUbo == 0)
+        if (!setupAnimMotion || boneSnapshotCount <= 0)
         {
-            return;
+            return false;
         }
 
+        if (boneSnapshotCount != _entityBonePaletteLastUploadedCount)
+        {
+            return true;
+        }
+
+        PackEntitySkinningBoneMatrices(boneSnapshotCount);
+        return !_entitySkinningUboScratch.AsSpan(0, EntitySkinningUboMatrixBytes)
+            .SequenceEqual(_entityBonePaletteLastUploadScratch);
+    }
+
+    private void SnapshotUploadedEntityBonePalette(int boneSnapshotCount)
+    {
+        _entityBonePaletteLastUploadedCount = boneSnapshotCount;
+        _entitySkinningUboScratch.AsSpan(0, EntitySkinningUboMatrixBytes)
+            .CopyTo(_entityBonePaletteLastUploadScratch);
+    }
+
+    private void PackEntitySkinningBoneMatrices(int boneSnapshotCount)
+    {
         var matrixFloats = MemoryMarshal.Cast<byte, float>(_entitySkinningUboScratch.AsSpan(0, EntitySkinningUboMatrixBytes));
         var n = Math.Clamp(boneSnapshotCount, 0, EntityGpuSkinningLimits.MaxBones);
         for (var i = 0; i < n; i++)
         {
-            // Numerics row-major storage; GLSL std140 mat4 is column-major. Copying M11..M44 in order matches
-            // glUniformMatrix4(..., transpose:false) so mat4 * vec4 agrees with Vector3.Transform (see MatrixTransformGlColumnParityTests).
             var m = _entityBoneScratch[i];
             MemoryMarshal.CreateReadOnlySpan(ref m.M11, 16).CopyTo(matrixFloats.Slice(i * 16, 16));
         }
@@ -545,6 +603,53 @@ public sealed partial class OpenGlPreviewBackend
         {
             matrixFloats.Slice(n * 16, (EntityGpuSkinningLimits.MaxBones - n) * 16).Clear();
         }
+    }
+
+    private void PackEntityNormalSkinningBoneMatrices(int boneSnapshotCount)
+    {
+        var matrixFloats = MemoryMarshal.Cast<byte, float>(_entityNormalSkinningUboScratch.AsSpan(0, EntitySkinningUboMatrixBytes));
+        var n = Math.Clamp(boneSnapshotCount, 0, EntityGpuSkinningLimits.MaxBones);
+        for (var i = 0; i < n; i++)
+        {
+            var bone = _entityBoneScratch[i];
+            if (!Matrix4x4.Invert(bone, out var invBone))
+            {
+                invBone = Matrix4x4.Identity;
+            }
+
+            var normalBone = Matrix4x4.Transpose(invBone);
+            MemoryMarshal.CreateReadOnlySpan(ref normalBone.M11, 16).CopyTo(matrixFloats.Slice(i * 16, 16));
+        }
+
+        if (n < EntityGpuSkinningLimits.MaxBones)
+        {
+            matrixFloats.Slice(n * 16, (EntityGpuSkinningLimits.MaxBones - n) * 16).Clear();
+        }
+    }
+
+    private void UploadEntityNormalSkinningBoneMatrices(GL gl, int boneSnapshotCount)
+    {
+        if (_entityNormalBoneUbo == 0)
+        {
+            return;
+        }
+
+        PackEntityNormalSkinningBoneMatrices(boneSnapshotCount);
+        gl.BindBuffer(BufferTargetARB.UniformBuffer, _entityNormalBoneUbo);
+        gl.BufferSubData<byte>(BufferTargetARB.UniformBuffer, 0, _entityNormalSkinningUboScratch.AsSpan(0, EntitySkinningUboMatrixBytes));
+        gl.BindBufferBase(BufferTargetARB.UniformBuffer, EntityNormalSkinningUboBindingPoint, _entityNormalBoneUbo);
+        gl.BindBuffer(BufferTargetARB.UniformBuffer, 0);
+    }
+
+    private void UploadEntitySkinningBoneMatrices(GL gl, int boneSnapshotCount)
+    {
+        if (_entityBoneUbo == 0)
+        {
+            return;
+        }
+
+        PackEntitySkinningBoneMatrices(boneSnapshotCount);
+        UploadEntityNormalSkinningBoneMatrices(gl, boneSnapshotCount);
 
         gl.BindBuffer(BufferTargetARB.UniformBuffer, _entityBoneUbo);
         gl.BufferSubData<byte>(BufferTargetARB.UniformBuffer, 0, _entitySkinningUboScratch.AsSpan(0, EntitySkinningUboMatrixBytes));
@@ -600,36 +705,75 @@ public sealed partial class OpenGlPreviewBackend
     }
 
     /// <summary>Called from <see cref="AutoPBR.App.Controls.GlPbrPreviewControl.OnOpenGlInit"/> only.</summary>
-    internal void GlInit(GlInterface glInterface)
+    internal void GlInit(GlInterface glInterface) => BeginGlInit(glInterface);
+
+    private void FinishGlInitLocked(GlInterface renderGlInterface, PreviewDesktopWglContext? sidecar)
+    {
+        try
+        {
+            _gl = GL.GetApi(renderGlInterface.GetProcAddress);
+        }
+        catch (Exception ex)
+        {
+            _lastError = ex.ToString();
+            EmitDiagnostic("[3D preview] " + _lastError);
+            return;
+        }
+
+        string versionStr;
+        if (sidecar is not null)
+        {
+            versionStr = sidecar.VersionString;
+        }
+        else
+        {
+            versionStr = ReadGlVersionString(_gl);
+        }
+
+        _glVersionString = versionStr;
+        _useOpenGlEs = sidecar is null &&
+                       versionStr.Contains("OpenGL ES", StringComparison.OrdinalIgnoreCase);
+        _gpuBootstrap = new GpuBootstrapRunner();
+        _gpuBootstrapAborted = false;
+        RaiseGpuInitProgress(PreviewGpuInitPhases.Preparing, _settings);
+    }
+
+    private static string ReadGlVersionString(GL gl)
+    {
+        unsafe
+        {
+            var p = gl.GetString(StringName.Version);
+            return p is null ? "(unknown)" : Marshal.PtrToStringUTF8((nint)p) ?? "(unknown)";
+        }
+    }
+
+    /// <summary>Desktop WGL only: map preview FPS cap to native swap interval (ANGLE/GLES uses Avalonia pacing).</summary>
+    internal void ConfigurePresentationVsync(GlInterface glInterface, bool capFpsAt60)
     {
         lock (_sync)
         {
-            _lastError = null;
-            try
+            if (_useOpenGlEs || _desktopWglSidecar is not null)
             {
-                _gl = GL.GetApi(glInterface.GetProcAddress);
-            }
-            catch (Exception ex)
-            {
-                _lastError = ex.ToString();
-                EmitDiagnostic("[3D preview] " + _lastError);
                 return;
             }
 
-            var gl = _gl;
-            string versionStr;
-            unsafe
+            var interval = capFpsAt60 ? 1 : 0;
+            if (_appliedWglSwapInterval == interval)
             {
-                var p = gl.GetString(StringName.Version);
-                versionStr = p is null ? "(unknown)" : Marshal.PtrToStringUTF8((nint)p) ?? "(unknown)";
+                return;
             }
 
-            _glVersionString = versionStr;
-            _useOpenGlEs = versionStr.Contains("OpenGL ES", StringComparison.OrdinalIgnoreCase);
-            _gpuInitStopwatch.Restart();
-            PreviewShaderPrewarm.EnsureStarted();
-            _gpuBootstrap = new GpuBootstrapRunner();
-            RaiseGpuInitProgress(PreviewGpuInitPhases.Preparing, _settings);
+            if (PreviewWglPresentation.TrySetSwapInterval(glInterface, interval))
+            {
+                _appliedWglSwapInterval = interval;
+                EmitDiagnostic(interval == 0
+                    ? "[3D preview] WGL swap interval 0 (uncapped presentation)."
+                    : "[3D preview] WGL swap interval 1 (vsync presentation).");
+            }
+            else if (_appliedWglSwapInterval == int.MinValue)
+            {
+                EmitDiagnostic("[3D preview] wglSwapIntervalEXT unavailable; preview FPS may follow display vsync.");
+            }
         }
     }
 
@@ -637,73 +781,177 @@ public sealed partial class OpenGlPreviewBackend
     internal void GlDeinit(GlInterface glInterface)
     {
         _ = glInterface;
+        PreviewDesktopWglContext? sidecar;
         lock (_sync)
         {
+            _appliedWglSwapInterval = int.MinValue;
             _gpuAlive = false;
-            _mesh?.Dispose();
-            _mesh = null;
-            _groundMesh?.Dispose();
-            _groundMesh = null;
-            _grassGroundAlbedo?.Dispose();
-            _grassGroundAlbedo = null;
-            _grassGroundNormal?.Dispose();
-            _grassGroundNormal = null;
-            _grassGroundSpec?.Dispose();
-            _grassGroundSpec = null;
-            _grassGroundHeight?.Dispose();
-            _grassGroundHeight = null;
-            _neutralNormal?.Dispose();
-            _neutralNormal = null;
-            _neutralSpec?.Dispose();
-            _neutralSpec = null;
-            _neutralHeight?.Dispose();
-            _neutralHeight = null;
-            _grassGroundReady = false;
-            _albedo?.Dispose();
-            _albedo = null;
-            _normal?.Dispose();
-            _normal = null;
-            _spec?.Dispose();
-            _spec = null;
-            _height?.Dispose();
-            _height = null;
-            _program?.Dispose();
-            _program = null;
-            _shadowProgram?.Dispose();
-            _shadowProgram = null;
-            _shadowTarget?.Dispose();
-            _shadowTarget = null;
-            _shadowTargetCascadeNear?.Dispose();
-            _shadowTargetCascadeNear = null;
-            DestroyAtmosphereResources();
-            DestroyGodRayResources();
-            DestroyVolumeResources();
-            DestroyVolumetricCloudResources();
-            DestroyPreviewTaaResources();
-            DestroyMoonBillboard();
-            DestroyLineOverlay();
-            DestroySunDebugOverlay();
-            _shaderCtx = null;
+            _gpuBootstrap = null;
+            _pendingShaderReload = false;
+            sidecar = _desktopWglSidecar;
+        }
+
+        // Stop the async sidecar bootstrap worker before touching GL objects / the WGL context.
+        var spin = 0;
+        while (Volatile.Read(ref _sidecarBootstrapWorkerState) != 0 && spin < 5000)
+        {
+            Thread.Sleep(1);
+            spin++;
+        }
+
+        if (sidecar is not null)
+        {
+            try
+            {
+                // Sidecar-owned GL objects must be deleted with the WGL context current.
+                sidecar.Invoke(() =>
+                {
+                    using (sidecar.BindOnOwnerThread())
+                    {
+                        lock (_sync)
+                        {
+                            DisposeAllGpuObjectsLocked();
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                EmitDiagnostic($"[3D preview] Sidecar GPU teardown: {ex.GetType().Name}: {ex.Message}");
+                lock (_sync)
+                {
+                    AbandonGpuObjectReferencesLocked();
+                }
+            }
+
+            lock (_sync)
+            {
+                DestroyDesktopWglSidecar();
+                DisposeEntityRebakeWorker();
+                _gl = null;
+                _gpuInitTier = PreviewGpuInitTier.None;
+                _shadowAwareGodRayInitAttempted = false;
+                _gpuInitProgress = PreviewGpuInitProgress.Starting;
+            }
+
+            return;
+        }
+
+        lock (_sync)
+        {
+            DisposeAllGpuObjectsLocked();
+            DisposeEntityRebakeWorker();
+            _gl = null;
             _gpuInitTier = PreviewGpuInitTier.None;
             _shadowAwareGodRayInitAttempted = false;
             _gpuInitProgress = PreviewGpuInitProgress.Starting;
-            _gpuBootstrap = null;
-            _pendingShaderReload = false;
-            if (_entityBoneUbo != 0)
-            {
-                _gl?.DeleteBuffer(_entityBoneUbo);
-                _entityBoneUbo = 0;
-            }
-
-            if (_entityPrevBoneUbo != 0)
-            {
-                _gl?.DeleteBuffer(_entityPrevBoneUbo);
-                _entityPrevBoneUbo = 0;
-            }
-
-            InvalidatePreviousEntitySkinningBones();
-            _gl = null;
         }
+    }
+
+    /// <summary>Deletes GL objects. Caller must hold <see cref="_sync"/> and have the owning GL context current.</summary>
+    private void DisposeAllGpuObjectsLocked()
+    {
+        _mesh?.Dispose();
+        _mesh = null;
+        _groundMesh?.Dispose();
+        _groundMesh = null;
+        _grassGroundAlbedo?.Dispose();
+        _grassGroundAlbedo = null;
+        _grassGroundNormal?.Dispose();
+        _grassGroundNormal = null;
+        _grassGroundSpec?.Dispose();
+        _grassGroundSpec = null;
+        _grassGroundHeight?.Dispose();
+        _grassGroundHeight = null;
+        _neutralNormal?.Dispose();
+        _neutralNormal = null;
+        _neutralSpec?.Dispose();
+        _neutralSpec = null;
+        _neutralHeight?.Dispose();
+        _neutralHeight = null;
+        _grassGroundReady = false;
+        _albedo?.Dispose();
+        _albedo = null;
+        _normal?.Dispose();
+        _normal = null;
+        _spec?.Dispose();
+        _spec = null;
+        _height?.Dispose();
+        _height = null;
+        DestroyGenesisProgramCache();
+        _program?.Dispose();
+        _program = null;
+        _shadowProgram?.Dispose();
+        _shadowProgram = null;
+        _shadowTarget?.Dispose();
+        _shadowTarget = null;
+        _shadowTargetCascadeNear?.Dispose();
+        _shadowTargetCascadeNear = null;
+        DestroyAtmosphereResources();
+        DestroyGodRayResources();
+        DestroyVolumeResources();
+        DestroyVolumetricCloudResources();
+        DestroyPreviewTaaResources();
+        DestroyMoonBillboard();
+        DestroyLineOverlay();
+        DestroySunDebugOverlay();
+        _shaderCtx = null;
+
+        if (_entityBoneUbo != 0)
+        {
+            _gl?.DeleteBuffer(_entityBoneUbo);
+            _entityBoneUbo = 0;
+        }
+
+        if (_entityPrevBoneUbo != 0)
+        {
+            _gl?.DeleteBuffer(_entityPrevBoneUbo);
+            _entityPrevBoneUbo = 0;
+        }
+
+        if (_entityNormalBoneUbo != 0)
+        {
+            _gl?.DeleteBuffer(_entityNormalBoneUbo);
+            _entityNormalBoneUbo = 0;
+        }
+    }
+
+    /// <summary>Drops managed references without issuing GL deletes (context already gone).</summary>
+    private void AbandonGpuObjectReferencesLocked()
+    {
+        _gl = null;
+        _mesh = null;
+        _groundMesh = null;
+        _grassGroundAlbedo = null;
+        _grassGroundNormal = null;
+        _grassGroundSpec = null;
+        _grassGroundHeight = null;
+        _neutralNormal = null;
+        _neutralSpec = null;
+        _neutralHeight = null;
+        _grassGroundReady = false;
+        _albedo = null;
+        _normal = null;
+        _spec = null;
+        _height = null;
+        _genesisPrograms.Clear();
+        _genesisProgramLru.Clear();
+        _program = null;
+        _shadowProgram = null;
+        _shadowTarget = null;
+        _shadowTargetCascadeNear = null;
+        _shaderCtx = null;
+        _entityBoneUbo = 0;
+        _entityPrevBoneUbo = 0;
+        _entityNormalBoneUbo = 0;
+        DestroyAtmosphereResources();
+        DestroyGodRayResources();
+        DestroyVolumeResources();
+        DestroyVolumetricCloudResources();
+        DestroyPreviewTaaResources();
+        DestroyMoonBillboard();
+        DestroyLineOverlay();
+        DestroySunDebugOverlay();
     }
 
     public void Dispose()
@@ -714,6 +962,7 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         _disposed = true;
+        DisposeEntityRebakeWorker();
         if (_shaderPrewarmProgressHooked)
         {
             PreviewShaderPrewarm.ProgressChanged -= OnShaderPrewarmProgress;

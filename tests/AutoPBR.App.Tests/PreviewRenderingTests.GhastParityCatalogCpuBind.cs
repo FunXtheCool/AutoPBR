@@ -13,6 +13,33 @@ public sealed partial class PreviewRenderingTests
     private const string HappyGhastTexturePath = "assets/minecraft/textures/entity/ghast/happy_ghast.png";
 
     [Theory]
+    [InlineData(GhastTexturePath, 128, 64, 64, 32)]
+    [InlineData(HappyGhastTexturePath, 128, 128, 64, 64)]
+    public void Ghast_slot_materials_use_identity_texture_atlas_scale_for_padded_vanilla_pngs(
+        string texturePath,
+        int physicalW,
+        int physicalH,
+        int bakeW,
+        int bakeH)
+    {
+        var maps = new PreviewTextureMaps
+        {
+            Width = physicalW,
+            Height = physicalH,
+            BakeAtlasWidth = bakeW,
+            BakeAtlasHeight = bakeH,
+            DiffuseRgba = new byte[physicalW * physicalH * 4],
+        };
+        var slot = PreviewMaterialMapper.FromCoreMaps(maps, texturePath);
+        var scale = PreviewEntityTextureAtlasScale.Resolve(
+            slot.Width,
+            slot.Height,
+            slot.BakeAtlasWidth,
+            slot.BakeAtlasHeight);
+        Assert.Equal(System.Numerics.Vector2.One, scale);
+    }
+
+    [Theory]
     [InlineData(GhastTexturePath)]
     [InlineData(HappyGhastTexturePath)]
     public void SetBlockModelPreview_drops_stale_ghast_parity_cpu_when_pack_fingerprint_differs_from_committed_mesh(

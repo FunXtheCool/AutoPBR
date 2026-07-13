@@ -187,6 +187,136 @@ public sealed class GhastPreviewAttachmentTests
     [Theory]
     [InlineData(GhastPreviewTestLandmarks.MonsterTexturePath, GhastPreviewTestLandmarks.MonsterJvm, 64, 32)]
     [InlineData(GhastPreviewTestLandmarks.HappyTexturePath, GhastPreviewTestLandmarks.HappyJvm, 64, 64)]
+    public void Ghast_family_tentacles_retain_bake_atlas_after_animate_tentacles_pass(
+        string path,
+        string jvm,
+        int atlasW,
+        int atlasH)
+    {
+        var bind = BuildGhastBindPose(path, jvm, atlasW, atlasH, out var partIds);
+        for (var i = 0; i < bind.Elements.Count; i++)
+        {
+            if (!partIds[i].StartsWith("tentacle", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            Assert.Equal(atlasW, bind.Elements[i].BakeAtlasWidth);
+            Assert.Equal(atlasH, bind.Elements[i].BakeAtlasHeight);
+        }
+    }
+
+    [Fact]
+    public void Ghast_monster_rebake_with_padded_png_uses_shard_atlas_for_tentacle_uvs()
+    {
+        const string texturePath = GhastPreviewTestLandmarks.MonsterTexturePath;
+        const string jvm = GhastPreviewTestLandmarks.MonsterJvm;
+        const int physicalWidth = 128;
+        const int physicalHeight = 64;
+        const int logicalWidth = 64;
+        const int logicalHeight = 32;
+        const ulong goldenFingerprint = 1082496271659415717UL;
+
+        var profile = new MinecraftNativeProfile(
+            "26.1.2",
+            Path.Combine(AppContext.BaseDirectory, "Data", "minecraft-native", "26.1.2"),
+            new Version(26, 1, 2));
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(
+            texturePath,
+            profile,
+            idlePhase01: 0f,
+            animationTimeSeconds: 0f,
+            out var bind,
+            out var provenance,
+            applyGeometryIrSetupAnimMotion: false));
+
+        var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(bind, "minecraft");
+        var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase) { [ordered[0]] = 0 };
+        var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase)
+        {
+            [ordered[0]] = EntityGeometryIrTextureAtlas.ResolveForBake(
+                ordered[0],
+                physicalWidth,
+                physicalHeight,
+                provenance,
+                profile),
+        };
+        Assert.Equal((logicalWidth, logicalHeight), texSizes[ordered[0]]);
+
+        Assert.True(MinecraftModelBaker.TryBake(bind, "minecraft", pathToIdx, texSizes, out var verts, out _, out _));
+        Assert.Equal(goldenFingerprint, ComputeGhastUvFingerprint(verts, MinecraftModelBaker.FloatsPerVertex));
+
+        var partIds = LoadPartIds(jvm, logicalWidth, logicalHeight);
+        AssertGhastBodyTentacleUvsWithinAtlas(verts!, bind, partIds, texturePath);
+    }
+
+    [Fact]
+    public void Ghast_emulated_rebake_uv_fingerprint_matches_golden_with_padded_png_materials()
+    {
+        const string texturePath = GhastPreviewTestLandmarks.MonsterTexturePath;
+        var profile = new MinecraftNativeProfile(
+            "26.1.2",
+            AppContext.BaseDirectory,
+            new Version(26, 1, 2));
+        var materials = new[]
+        {
+            new PreviewTextureMaps
+            {
+                Width = 128,
+                Height = 64,
+                BakeAtlasWidth = 64,
+                BakeAtlasHeight = 32,
+                DiffuseRgba = new byte[128 * 64 * 4],
+                NormalRgba = new byte[128 * 64 * 4],
+                SpecularRgba = new byte[128 * 64 * 4],
+                HeightRgba = new byte[128 * 64 * 4],
+            }
+        };
+        var rebake = new EntityEmulatedPreviewRebakeContext
+        {
+            PackZipPath = "test.zip",
+            AssetArchivePath = texturePath,
+            NativeRootDirectory = profile.RootDirectory,
+            NativeProfileName = profile.Name,
+            NativeParsedVersion = profile.ParsedVersion?.ToString(),
+            ModelDefaultNamespace = "minecraft",
+            IdlePhase01 = 0.3f,
+            OrderedTextureZipPaths = [texturePath],
+        };
+        Assert.True(EntityEmulatedPreviewRebaker.TryRebakeMesh(
+            rebake,
+            materials,
+            animationTimeSeconds: 0f,
+            out var verts,
+            out _,
+            out _,
+            applyGeometryIrSetupAnimMotion: false));
+
+        const ulong goldenFingerprint = 1082496271659415717UL;
+        var fp = PreviewMeshGeometryFingerprint.ComputeCpuPreviewMeshUvFingerprint(
+            verts!,
+            MinecraftModelBaker.FloatsPerVertex);
+        Assert.Equal(goldenFingerprint, fp);
+    }
+
+    [Theory]
+    [InlineData(128, 64, 64, 32)]
+    [InlineData(128, 128, 64, 64)]
+    [InlineData(64, 64, 64, 64)]
+    public void Ghast_family_entity_texture_atlas_scale_uses_identity_for_uniform_upscaled_pngs(
+        int physicalW,
+        int physicalH,
+        int bakeW,
+        int bakeH)
+    {
+        var scale = PreviewEntityTextureAtlasScale.Resolve(physicalW, physicalH, bakeW, bakeH);
+        Assert.Equal(System.Numerics.Vector2.One, scale);
+    }
+
+    [Theory]
+    [InlineData(GhastPreviewTestLandmarks.MonsterTexturePath, GhastPreviewTestLandmarks.MonsterJvm, 64, 32)]
+    [InlineData(GhastPreviewTestLandmarks.HappyTexturePath, GhastPreviewTestLandmarks.HappyJvm, 64, 64)]
     public void Ghast_family_body_and_tentacle_elements_emit_all_six_faces(
         string texturePath,
         string jvm,
@@ -484,6 +614,23 @@ public sealed class GhastPreviewAttachmentTests
         var tentacle = mesh.Elements[tentacleIdx];
         Assert.Equal(0f, MathF.Min(tentacle.From[1], tentacle.To[1]), 3);
         Assert.Equal(expectedHeight, MathF.Max(tentacle.From[1], tentacle.To[1]), 3);
+    }
+
+    private static ulong ComputeGhastUvFingerprint(ReadOnlySpan<float> verts, int stride)
+    {
+        unchecked
+        {
+            ulong hash = 14695981039346656037UL;
+            for (var i = 6; i < verts.Length; i += stride)
+            {
+                hash ^= BitConverter.SingleToUInt32Bits(verts[i]);
+                hash *= 1099511628211UL;
+                hash ^= BitConverter.SingleToUInt32Bits(verts[i + 1]);
+                hash *= 1099511628211UL;
+            }
+
+            return hash;
+        }
     }
 
     private static void AssertGhastBodyTentacleUvsWithinAtlas(

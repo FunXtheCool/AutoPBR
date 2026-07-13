@@ -12,6 +12,10 @@ internal sealed partial class ExploreTreeController
     /// <param name="packPath">Single-pack .zip/.jar path, or when <paramref name="data"/>.<see cref="ScannedArchiveData.IsBatch"/> is true, the scanned folder path (used for tag persistence).</param>
     public ArchiveNode SetData(ScannedArchiveData data, string packPath)
     {
+        _tagRefreshCts?.Cancel();
+        _refreshDisplayTagsDebounceCts?.Cancel();
+        _refreshDisplayTagsDebounceCts = null;
+        Interlocked.Increment(ref _effectiveTagEpoch);
         ClearBatchPackIconCache();
         Data = data;
         _scannedArchivePath = data.IsBatch ? data.BatchFolderPath ?? packPath : packPath;
@@ -20,6 +24,7 @@ internal sealed partial class ExploreTreeController
         _effectiveTagCache.Clear();
         _effectiveTagIdsByStorageKey.Clear();
         _optifineFolderMaterialHintIdsByRuleKey.Clear();
+        _effectiveTagComputeInFlight.Clear();
         _finalSemanticTagPaths.Clear();
         var snapshot = TagOverridesPersistence.Load(_scannedArchivePath);
         if (snapshot?.Overrides is not null)

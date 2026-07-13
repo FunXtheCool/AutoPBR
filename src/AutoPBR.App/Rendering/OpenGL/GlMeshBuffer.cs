@@ -9,8 +9,12 @@ internal sealed class GlMeshBuffer : IDisposable
     private readonly uint _vbo;
     private readonly uint _ebo;
     private int _indexCount;
+    private int _vertexByteCapacity;
+    private int _indexByteCapacity;
     private DrawElementsType _indexElementType = DrawElementsType.UnsignedShort;
+    private ushort[]? _indexScratchUshort;
     private bool _disposed;
+    private bool _vaoBound;
 
     public GlMeshBuffer(GL gl)
     {
@@ -23,8 +27,18 @@ internal sealed class GlMeshBuffer : IDisposable
     public void Upload(float[] interleavedVertices, uint[] indices, int floatsPerVertex = 12)
     {
         _gl.BindVertexArray(_vao);
+        _vaoBound = true;
         _gl.BindBuffer(BufferTargetARB.ArrayBuffer, _vbo);
-        _gl.BufferData<float>(GLEnum.ArrayBuffer, interleavedVertices.AsSpan(), GLEnum.StaticDraw);
+        var vertexBytes = interleavedVertices.Length * sizeof(float);
+        if (vertexBytes <= _vertexByteCapacity)
+        {
+            _gl.BufferSubData<float>(GLEnum.ArrayBuffer, 0, interleavedVertices.AsSpan());
+        }
+        else
+        {
+            _gl.BufferData<float>(GLEnum.ArrayBuffer, interleavedVertices.AsSpan(), GLEnum.StaticDraw);
+            _vertexByteCapacity = vertexBytes;
+        }
 
         _gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, _ebo);
         var maxIndex = 0u;
@@ -35,21 +49,56 @@ internal sealed class GlMeshBuffer : IDisposable
 
         if (maxIndex <= ushort.MaxValue)
         {
-            var us = new ushort[indices.Length];
+            EnsureUshortScratch(indices.Length);
             for (var j = 0; j < indices.Length; j++)
             {
-                us[j] = (ushort)indices[j];
+                _indexScratchUshort![j] = (ushort)indices[j];
             }
 
-            _gl.BufferData<ushort>(GLEnum.ElementArrayBuffer, us.AsSpan(), GLEnum.StaticDraw);
+            var indexBytes = indices.Length * sizeof(ushort);
+            if (_indexElementType == DrawElementsType.UnsignedShort && indexBytes <= _indexByteCapacity)
+            {
+                _gl.BufferSubData<ushort>(GLEnum.ElementArrayBuffer, 0, _indexScratchUshort.AsSpan(0, indices.Length));
+            }
+            else
+            {
+                _gl.BufferData<ushort>(GLEnum.ElementArrayBuffer, _indexScratchUshort.AsSpan(0, indices.Length), GLEnum.StaticDraw);
+                _indexByteCapacity = indexBytes;
+            }
+
             _indexElementType = DrawElementsType.UnsignedShort;
         }
         else
         {
-            _gl.BufferData<uint>(GLEnum.ElementArrayBuffer, indices.AsSpan(), GLEnum.StaticDraw);
+            var indexBytes = indices.Length * sizeof(uint);
+            if (_indexElementType == DrawElementsType.UnsignedInt && indexBytes <= _indexByteCapacity)
+            {
+                _gl.BufferSubData<uint>(GLEnum.ElementArrayBuffer, 0, indices.AsSpan());
+            }
+            else
+            {
+                _gl.BufferData<uint>(GLEnum.ElementArrayBuffer, indices.AsSpan(), GLEnum.StaticDraw);
+                _indexByteCapacity = indexBytes;
+            }
+
             _indexElementType = DrawElementsType.UnsignedInt;
         }
 
+        ConfigureVertexAttribs(floatsPerVertex);
+        UnbindVertexArray();
+        _indexCount = indices.Length;
+    }
+
+    private void EnsureUshortScratch(int requiredLength)
+    {
+        if (_indexScratchUshort is null || _indexScratchUshort.Length < requiredLength)
+        {
+            _indexScratchUshort = new ushort[Math.Max(requiredLength, 256)];
+        }
+    }
+
+    private void ConfigureVertexAttribs(int floatsPerVertex)
+    {
         var stride = (uint)(floatsPerVertex * sizeof(float));
         unsafe
         {
@@ -72,14 +121,28 @@ internal sealed class GlMeshBuffer : IDisposable
                 _gl.DisableVertexAttribArray(4);
             }
         }
+    }
+
+    public void BindVertexArray()
+    {
+        _gl.BindVertexArray(_vao);
+        _vaoBound = true;
+    }
+
+    public void UnbindVertexArray()
+    {
+        if (!_vaoBound)
+        {
+            return;
+        }
 
         _gl.BindVertexArray(0);
-        _indexCount = indices.Length;
+        _vaoBound = false;
     }
 
     public void Draw(bool patches = false)
     {
-        _gl.BindVertexArray(_vao);
+        BindVertexArray();
         if (patches)
         {
             _gl.PatchParameter(PatchParameterName.Vertices, 3);
@@ -90,18 +153,26 @@ internal sealed class GlMeshBuffer : IDisposable
             _gl.DrawElements(patches ? PrimitiveType.Patches : PrimitiveType.Triangles, (uint)_indexCount, _indexElementType, (void*)0);
         }
 
-        _gl.BindVertexArray(0);
+        UnbindVertexArray();
     }
 
     /// <summary>Draw a subrange of the index buffer (indices are measured in elements, not bytes).</summary>
-    public void DrawRange(int firstIndex, int indexCount, bool patches = false)
+    public void DrawRange(int firstIndex, int indexCount, bool patches = false, bool keepBound = false)
     {
         if (indexCount <= 0)
         {
             return;
         }
 
-        _gl.BindVertexArray(_vao);
+        if (!keepBound)
+        {
+            BindVertexArray();
+        }
+        else if (!_vaoBound)
+        {
+            BindVertexArray();
+        }
+
         if (patches)
         {
             _gl.PatchParameter(PatchParameterName.Vertices, 3);
@@ -115,7 +186,10 @@ internal sealed class GlMeshBuffer : IDisposable
             _gl.DrawElements(patches ? PrimitiveType.Patches : PrimitiveType.Triangles, (uint)indexCount, _indexElementType, byteOffset);
         }
 
-        _gl.BindVertexArray(0);
+        if (!keepBound)
+        {
+            UnbindVertexArray();
+        }
     }
 
     public int IndexCount => _indexCount;
@@ -128,8 +202,15 @@ internal sealed class GlMeshBuffer : IDisposable
         }
 
         _disposed = true;
-        _gl.DeleteBuffer(_vbo);
-        _gl.DeleteBuffer(_ebo);
-        _gl.DeleteVertexArray(_vao);
+        try
+        {
+            _gl.DeleteBuffer(_vbo);
+            _gl.DeleteBuffer(_ebo);
+            _gl.DeleteVertexArray(_vao);
+        }
+        catch (Exception)
+        {
+            // Context may already be destroyed (e.g. Avalonia OpenGlDeinit after WGL sidecar teardown).
+        }
     }
 }

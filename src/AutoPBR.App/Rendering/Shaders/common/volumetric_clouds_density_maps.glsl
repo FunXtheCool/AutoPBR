@@ -106,13 +106,11 @@ float vcCloudBaseDensity(vec3 worldPos, float layerBase, float layerTop, float c
     return baseShaped;
 }
 
-// Full density: base shape eroded by high-frequency detail at cloud edges.
-float vcCloudDensityEx(vec3 worldPos, float layerBase, float layerTop, float densityMul, float coverageScale,
-    float volumeSize, sampler3D cloudNoise, int hasCloudNoise, sampler3D detailNoise, int hasDetailNoise,
-    sampler2D coverageMap, int hasCoverageMap, vec3 windOffset)
+
+// Full density from a precomputed base shape (avoids duplicate base-density work in the march loop).
+float vcCloudDensityFromBase(float base, vec3 worldPos, float layerBase, float layerTop, float densityMul,
+    float volumeSize, sampler3D detailNoise, int hasDetailNoise, vec3 windOffset)
 {
-    float base = vcCloudBaseDensity(worldPos, layerBase, layerTop, coverageScale, volumeSize,
-        cloudNoise, hasCloudNoise, coverageMap, hasCoverageMap, windOffset);
     if (base <= 1e-4)
     {
         return 0.0;
@@ -127,13 +125,23 @@ float vcCloudDensityEx(vec3 worldPos, float layerBase, float layerTop, float den
         vec3 detailUvw = fract((worldPos + windOffset * 0.5) / detailScale);
         vec3 dn = texture(detailNoise, detailUvw).rgb;
         float detailFbm = dn.r * 0.625 + dn.g * 0.25 + dn.b * 0.125;
-        // Wispy shreds near the base, billowy bulges toward the top.
         detailFbm = mix(detailFbm, 1.0 - detailFbm, saturate1(h * 5.0));
         erode = detailFbm * 0.35;
     }
 
     float density = vcRemap01(base, erode, 1.0);
     return density * densityMul;
+}
+
+// Full density: base shape eroded by high-frequency detail at cloud edges.
+float vcCloudDensityEx(vec3 worldPos, float layerBase, float layerTop, float densityMul, float coverageScale,
+    float volumeSize, sampler3D cloudNoise, int hasCloudNoise, sampler3D detailNoise, int hasDetailNoise,
+    sampler2D coverageMap, int hasCoverageMap, vec3 windOffset)
+{
+    float base = vcCloudBaseDensity(worldPos, layerBase, layerTop, coverageScale, volumeSize,
+        cloudNoise, hasCloudNoise, coverageMap, hasCoverageMap, windOffset);
+    return vcCloudDensityFromBase(base, worldPos, layerBase, layerTop, densityMul, volumeSize,
+        detailNoise, hasDetailNoise, windOffset);
 }
 
 #endif // GENESIS_VOLUMETRIC_CLOUDS_DENSITY_MAPS_GLSL

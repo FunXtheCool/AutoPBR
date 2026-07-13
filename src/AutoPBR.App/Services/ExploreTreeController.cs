@@ -40,7 +40,7 @@ internal sealed partial class ExploreTreeController : IArchiveNodeHost, IDisposa
     private readonly ConcurrentDictionary<string, IReadOnlyList<(string Id, string DisplayName, TagRuleKind Kind)>> _effectiveTagCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, IReadOnlyList<string>> _effectiveTagIdsByStorageKey = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, IReadOnlyList<string>> _optifineFolderMaterialHintIdsByRuleKey = new(StringComparer.OrdinalIgnoreCase);
-    private readonly ConcurrentDictionary<string, byte> _effectiveTagComputeInFlight = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, int> _effectiveTagComputeInFlight = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, byte> _finalSemanticTagPaths = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>Bumped when tag semantics are refreshed so in-flight per-path background computes cannot overwrite newer cache entries.</summary>
@@ -55,8 +55,11 @@ internal sealed partial class ExploreTreeController : IArchiveNodeHost, IDisposa
     /// <summary>Last full-tree tag refresh; conversion may await this so ONNX work does not overlap convert.</summary>
     private Task? _tagRefreshAllTask;
 
-    /// <summary>Limits parallel per-texture ML/dictionary work so completion callbacks do not flood the UI thread.</summary>
-    private readonly SemaphoreSlim _tagComputeConcurrency = new(4, 4);
+    /// <summary>
+    /// Limits per-texture MiniLM/dictionary enrichment. Keep this single-lane so Explore
+    /// folder expansion cannot starve the high-FPS OpenGL preview with background ML work.
+    /// </summary>
+    private readonly SemaphoreSlim _tagComputeConcurrency = new(1, 1);
 
     public ArchiveNode? Root { get; private set; }
     public ScannedArchiveData? Data { get; private set; }

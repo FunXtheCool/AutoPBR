@@ -10,6 +10,8 @@ namespace AutoPBR.Core.Embeddings;
 /// </summary>
 public sealed class FreeDictionaryDefinitionProvider : IDictionaryDefinitionProvider
 {
+    private static readonly IReadOnlyList<string> EmptyDefinitions = Array.Empty<string>();
+
     private static readonly HttpClient Client = new()
     {
         BaseAddress = new Uri("https://freedictionaryapi.com/")
@@ -47,13 +49,15 @@ public sealed class FreeDictionaryDefinitionProvider : IDictionaryDefinitionProv
             if ((int)response.StatusCode == 429)
             {
                 diagnostic = "dictionary-rate-limited-429";
-                return [];
+                _cache[cacheKey] = EmptyDefinitions;
+                return EmptyDefinitions;
             }
 
             if (!response.IsSuccessStatusCode)
             {
                 diagnostic = $"dictionary-http-{(int)response.StatusCode}";
-                return [];
+                _cache[cacheKey] = EmptyDefinitions;
+                return EmptyDefinitions;
             }
 
             var json = response.Content.ReadAsStringAsync(cts.Token).GetAwaiter().GetResult();
@@ -64,12 +68,14 @@ public sealed class FreeDictionaryDefinitionProvider : IDictionaryDefinitionProv
         catch (OperationCanceledException)
         {
             diagnostic = "dictionary-timeout";
-            return [];
+            _cache[cacheKey] = EmptyDefinitions;
+            return EmptyDefinitions;
         }
         catch (Exception ex)
         {
             diagnostic = $"dictionary-error-{ex.GetType().Name}";
-            return [];
+            _cache[cacheKey] = EmptyDefinitions;
+            return EmptyDefinitions;
         }
     }
 

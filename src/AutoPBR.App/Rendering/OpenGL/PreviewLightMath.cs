@@ -164,7 +164,7 @@ internal static class PreviewLightMath
     }
 
     /// <summary>Clock hours for rendering, advancing when <see cref="Abstractions.PreviewRenderSettings.AnimateTimeOfDay"/> is on.</summary>
-    public static float EffectiveTimeOfDayHours(in Abstractions.PreviewRenderSettings settings, double renderTime)
+    public static float EffectiveTimeOfDayHours(in Abstractions.PreviewRenderSettingsSnapshot settings, double renderTime)
     {
         if (!settings.AnimateTimeOfDay)
         {
@@ -177,7 +177,7 @@ internal static class PreviewLightMath
 
     /// <summary>Light yaw/pitch for shadow and sky passes; respects animated time-of-day.</summary>
     public static (double YawDegrees, double PitchDegrees) EffectiveLightYawPitch(
-        in Abstractions.PreviewRenderSettings settings,
+        in Abstractions.PreviewRenderSettingsSnapshot settings,
         double renderTime)
     {
         if (!settings.AnimateTimeOfDay)

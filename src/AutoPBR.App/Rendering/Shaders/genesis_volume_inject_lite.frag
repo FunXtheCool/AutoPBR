@@ -55,7 +55,8 @@ uniform float uDebugDensity;
 
 
 
-out vec4 FragColor;
+layout(location = 0) out vec4 FragColor;
+layout(location = 1) out float FragOccupancy;
 
 
 
@@ -76,6 +77,7 @@ void main()
         uCloudDensity, uHeightFogStrength) + max(uDebugDensity, 0.0);
 
     FragColor = viPackFroxelInject(mediumRho, uLightColor, 1.0);
+    FragOccupancy = mediumRho;
 
 }
 

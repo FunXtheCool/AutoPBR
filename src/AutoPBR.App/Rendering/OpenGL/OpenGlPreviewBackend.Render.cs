@@ -22,8 +22,136 @@ public sealed partial class OpenGlPreviewBackend
     /// <summary>Called from <see cref="AutoPBR.App.Controls.GlPbrPreviewControl.OnOpenGlRender"/> only.</summary>
     internal void GlRender(GlInterface glInterface, int framebuffer, int pixelWidth, int pixelHeight)
     {
-        _ = glInterface;
-        PreviewRenderSettings settings;
+        if (IsAwaitingDesktopWglSidecar)
+        {
+            return;
+        }
+
+        PreviewDesktopWglContext? sidecar;
+        lock (_sync)
+        {
+            sidecar = _desktopWglSidecar;
+        }
+
+        if (sidecar is not null)
+        {
+            PreviewOpenGlCompositionBridge? compositionBridge;
+            lock (_sync)
+            {
+                compositionBridge = _compositionBridge;
+            }
+
+            if (compositionBridge is not null &&
+                sidecar is not null &&
+                IsSidecarAdapterMatchComplete &&
+                sidecar.CanAttemptDxInterop &&
+                sidecar.TryRenderViaDxInterop(
+                    compositionBridge,
+                    glInterface,
+                    framebuffer,
+                    pixelWidth,
+                    pixelHeight,
+                    fbo => GlRenderCore(fbo, pixelWidth, pixelHeight)))
+            {
+                lock (_sync)
+                {
+                    if (!_dxInteropSuccessLogged)
+                    {
+                        _dxInteropSuccessLogged = true;
+                        sidecar.EnableDxInteropHangDiagnostics(EmitDiagnostic, RequestPreviewFrame);
+                        EmitDiagnostic("[3D preview] D3D11/WGL interop active; async GPU present (timed mutex + timed GPU drain).");
+                        RecordActiveContextSummary();
+                    }
+                }
+
+                return;
+            }
+
+            if (compositionBridge is not null)
+            {
+                lock (_sync)
+                {
+                    if (!_dxInteropFallbackLogged)
+                    {
+                        _dxInteropFallbackLogged = true;
+                        EmitDiagnostic(sidecar.DxInteropOptInEnabled
+                            ? "[3D preview] D3D11/WGL interop unavailable; using async PBO sidecar presentation. " +
+                              sidecar.LastInteropFailureSummary
+                            : "[3D preview] D3D11/WGL interop skipped; using stable async PBO sidecar presentation.");
+                    }
+                }
+            }
+
+            var forceSyncPresent = false;
+            if (sidecar.IsOwnerThreadLikelyWedged)
+            {
+                ClearPresentationFramebuffer(glInterface, framebuffer, pixelWidth, pixelHeight);
+                return;
+            }
+
+            try
+            {
+                sidecar.Invoke(() =>
+                {
+                    using (sidecar.BindOnOwnerThread())
+                    {
+                        sidecar.EnsureRenderTargetCore(pixelWidth, pixelHeight);
+                        GlRenderCore(sidecar.RenderFbo, pixelWidth, pixelHeight);
+                    }
+                }, TimeSpan.FromSeconds(2));
+            }
+            catch (TimeoutException)
+            {
+                EmitDiagnostic("[3D preview] Sidecar WGL render timed out (owner thread likely wedged); skipping frame.");
+                ClearPresentationFramebuffer(glInterface, framebuffer, pixelWidth, pixelHeight);
+                return;
+            }
+            catch (Exception ex)
+            {
+                EmitDiagnostic($"[3D preview] Sidecar WGL render failed: {ex.GetType().Name}: {ex.Message}");
+                return;
+            }
+
+            lock (_sync)
+            {
+                if (_forceSyncSidecarPresent)
+                {
+                    forceSyncPresent = true;
+                    _forceSyncSidecarPresent = false;
+                }
+            }
+
+            try
+            {
+                sidecar.CopyColorToEsFbo(glInterface, framebuffer, pixelWidth, pixelHeight, forceSyncPresent);
+            }
+            catch (Exception ex)
+            {
+                EmitDiagnostic($"[3D preview] Sidecar CPU presentation failed: {ex.GetType().Name}: {ex.Message}");
+                return;
+            }
+            if (sidecar.UsesAsyncPboReadback)
+            {
+                lock (_sync)
+                {
+                    if (!_asyncPboReadbackLogged)
+                    {
+                        _asyncPboReadbackLogged = true;
+                        EmitDiagnostic("[3D preview] Async PBO readback active for sidecar CPU presentation fallback.");
+                    }
+                }
+            }
+
+            return;
+        }
+
+        GlRenderCore(framebuffer, pixelWidth, pixelHeight);
+    }
+
+    private void GlRenderCore(int framebuffer, int pixelWidth, int pixelHeight)
+    {
+        PreviewRenderSettingsSnapshot settings;
+        int settingsRevision;
         IRenderPreviewScene? scene;
         PreviewMaterial? material;
         PreviewModelSubject? blockModel;
@@ -40,6 +168,10 @@ public sealed partial class OpenGlPreviewBackend
         float orbitPitch;
         float orbitDistance;
         var drawBootstrapOnly = false;
+        var previewPixelWidth = 0;
+        var previewPixelHeight = 0;
+        var meshDirty = false;
+        var materialDirty = false;
         lock (_sync)
         {
             if (_gl is null)
@@ -47,21 +179,42 @@ public sealed partial class OpenGlPreviewBackend
                 return;
             }
 
-            settings = CloneSettings(_settings);
+            settings = _settings;
+            settingsRevision = _settingsRevision;
+            _previewPixelWidth = Math.Max(1, pixelWidth);
+            _previewPixelHeight = Math.Max(1, pixelHeight);
+            previewPixelWidth = _previewPixelWidth;
+            previewPixelHeight = _previewPixelHeight;
+            meshDirty = _meshDirty;
+            materialDirty = _materialDirty;
 
             HandlePendingShaderReloadLocked();
-            if (_gpuBootstrap is not null)
+            if (_gpuBootstrap is not null && _desktopWglSidecar is null)
             {
                 if (!_gpuBootstrap.IsComplete)
                 {
                     _gpuBootstrap.Advance(this, 14.0);
                 }
 
-                var phase = _gpuBootstrap.IsComplete ? PreviewGpuInitPhases.CoreReady : _gpuBootstrap.Phase;
-                RaiseGpuInitProgress(phase, settings);
-                if (_gpuBootstrap.IsComplete)
+                // Advance may abort bootstrap (e.g. shader link failure) and clear the runner.
+                var bootstrap = _gpuBootstrap;
+                if (bootstrap is not null)
                 {
-                    _gpuBootstrap = null;
+                    var phase = bootstrap.IsComplete ? PreviewGpuInitPhases.CoreReady : bootstrap.Phase;
+                    RaiseGpuInitProgress(phase, settings);
+                    if (bootstrap.IsComplete || _gpuBootstrapAborted)
+                    {
+                        _gpuBootstrap = null;
+                        _gpuBootstrapAborted = false;
+                    }
+                }
+            }
+            else if (_gpuBootstrap is not null && _desktopWglSidecar is not null)
+            {
+                var bootstrap = _gpuBootstrap;
+                if (bootstrap is not null)
+                {
+                    RaiseGpuInitProgress(bootstrap.Phase, settings);
                 }
             }
 
@@ -116,13 +269,8 @@ public sealed partial class OpenGlPreviewBackend
         var defaultFbo = framebuffer;
         var vpX = 0;
         var vpY = 0;
-        var vw = Math.Max(1, pixelWidth);
-        var vh = Math.Max(1, pixelHeight);
-        lock (_sync)
-        {
-            _previewPixelWidth = vw;
-            _previewPixelHeight = vh;
-        }
+        var vw = previewPixelWidth;
+        var vh = previewPixelHeight;
 
         if (defaultFbo != 0)
         {
@@ -153,14 +301,6 @@ public sealed partial class OpenGlPreviewBackend
             return;
         }
 
-        bool meshDirty;
-        bool materialDirty;
-        lock (_sync)
-        {
-            meshDirty = _meshDirty;
-            materialDirty = _materialDirty;
-        }
-
         var frame = new GlRenderFrame
         {
             Gl = gl,
@@ -170,6 +310,7 @@ public sealed partial class OpenGlPreviewBackend
             Vw = vw,
             Vh = vh,
             Settings = settings,
+            SettingsRevision = settingsRevision,
             Scene = scene,
             Material = material,
             BlockModel = blockModel,
@@ -193,5 +334,14 @@ public sealed partial class OpenGlPreviewBackend
         GlRenderPassShadow(ref frame);
         GlRenderPassScene(ref frame);
         GlRenderPassPost(ref frame);
+    }
+
+    private static void ClearPresentationFramebuffer(GlInterface glInterface, int framebuffer, int width, int height)
+    {
+        var esGl = GL.GetApi(glInterface.GetProcAddress);
+        esGl.BindFramebuffer(FramebufferTarget.Framebuffer, (uint)framebuffer);
+        esGl.Viewport(0, 0, (uint)Math.Max(1, width), (uint)Math.Max(1, height));
+        esGl.ClearColor(0.01f, 0.012f, 0.02f, 1f);
+        esGl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
     }
 }

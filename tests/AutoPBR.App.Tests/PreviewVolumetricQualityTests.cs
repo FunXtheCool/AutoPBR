@@ -106,7 +106,7 @@ public sealed class PreviewVolumetricQualityTests
             VolumetricQuality = quality,
         };
 
-        Assert.Equal(expected, PreviewVolumetricQuality.EffectivePassTemporalWeight(passWeight, settings));
+        Assert.Equal(expected, PreviewVolumetricQuality.EffectivePassTemporalWeight(passWeight, PreviewRenderSettingsSnapshot.From(settings)));
     }
 
     [Fact]
@@ -119,6 +119,6 @@ public sealed class PreviewVolumetricQualityTests
             PreviewTaaTemporalScale = 0f,
         };
 
-        Assert.Equal(0.55f, PreviewVolumetricQuality.EffectivePassTemporalWeight(0.55f, settings));
+        Assert.Equal(0.55f, PreviewVolumetricQuality.EffectivePassTemporalWeight(0.55f, PreviewRenderSettingsSnapshot.From(settings)));
     }
 }

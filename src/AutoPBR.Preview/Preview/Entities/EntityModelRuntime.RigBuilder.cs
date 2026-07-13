@@ -80,7 +80,9 @@ internal sealed partial class EntityModelRuntime
             PreviewDepthLayerKind depthLayerKind = PreviewDepthLayerKind.Base,
             int layerOrdinal = 0,
             bool castsShadow = false,
-            bool texCropNorthSouthFaceUv = false)
+            bool texCropNorthSouthFaceUv = false,
+            int bakeAtlasWidth = 0,
+            int bakeAtlasHeight = 0)
         {
             var extentX = MathF.Abs(x1 - x0);
             var extentY = MathF.Abs(y1 - y0);
@@ -167,13 +169,22 @@ internal sealed partial class EntityModelRuntime
                 faceMask is { Length: > 0 } &&
                 IsNorthSouthFaceMaskOnly(faceMask);
 
+            var useDecoratedPotCapUvSpan =
+                uh == 0 &&
+                uw > 0 &&
+                ud > 0 &&
+                faceMask is { Length: 1 } &&
+                IsUpDownFaceMaskOnly(faceMask) &&
+                GeometryIrUvAtlasQuality.TryIsDecoratedPotCapDownCuboid(texU, texV, uw, ud);
+
             var useUpDownUvSpan =
                 uh == 0 &&
                 uw > 0 &&
                 ud > 0 &&
                 faceMask is { Length: > 0 } &&
                 IsUpDownFaceMaskOnly(faceMask) &&
-                faceMask[0].Equals("down", StringComparison.OrdinalIgnoreCase);
+                faceMask[0].Equals("down", StringComparison.OrdinalIgnoreCase) &&
+                !useDecoratedPotCapUvSpan;
 
             var useJavaHorizontalMembraneUv =
                 uh == 0 &&
@@ -181,12 +192,13 @@ internal sealed partial class EntityModelRuntime
                 ud > 0 &&
                 faceMask is { Length: > 0 } &&
                 IsUpDownFaceMaskOnly(faceMask) &&
-                !faceMask[0].Equals("down", StringComparison.OrdinalIgnoreCase);
+                !faceMask[0].Equals("down", StringComparison.OrdinalIgnoreCase) &&
+                !useDecoratedPotCapUvSpan;
 
             (float[] North, float[] South, float[] West, float[] East, float[] Up, float[] Down) uv =
                 useNorthSouthUvSpan
                     ? BuildNorthSouthUvSpanLayout(texU, texV, uw, uh, texCropNorthSouthFaceUv, mirrorCuboidUv)
-                    : useUpDownUvSpan
+                    : useDecoratedPotCapUvSpan || useUpDownUvSpan
                         ? BuildUpDownUvSpanLayout(texU, texV, uw, ud, faceMask!, mirrorCuboidUv)
                         : useJavaHorizontalMembraneUv
                             ? BuildJavaHorizontalMembraneUvLayout(texU, texV, uw, ud, mirrorCuboidUv)
@@ -252,6 +264,8 @@ internal sealed partial class EntityModelRuntime
                 CastsShadow = castsShadow,
                 EnableParallax = enableParallax,
                 MirrorCuboidUv = mirrorCuboidUv,
+                BakeAtlasWidth = bakeAtlasWidth,
+                BakeAtlasHeight = bakeAtlasHeight,
             });
         }
 

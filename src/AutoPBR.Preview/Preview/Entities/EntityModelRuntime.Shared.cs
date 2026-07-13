@@ -137,6 +137,12 @@ internal sealed partial class EntityModelRuntime
         /// </summary>
         public bool TexCropNorthSouthFaceUv { get; init; }
 
+        /// <summary>Per-cuboid logical atlas from lifted IR or emit options; 0 defers to texture-path bake size.</summary>
+        public int BakeAtlasWidth { get; init; }
+
+        /// <summary>See <see cref="BakeAtlasWidth"/>.</summary>
+        public int BakeAtlasHeight { get; init; }
+
         public void Emit(RigBuilder builder, Matrix4x4 parentPose, float partScale, string texKey = "#skin")
         {
             var key = TextureKey ?? texKey;
@@ -163,7 +169,9 @@ internal sealed partial class EntityModelRuntime
                 DepthLayerKind,
                 LayerOrdinal,
                 CastsShadow,
-                TexCropNorthSouthFaceUv);
+                TexCropNorthSouthFaceUv,
+                BakeAtlasWidth,
+                BakeAtlasHeight);
         }
     }
 
@@ -276,6 +284,8 @@ internal sealed partial class EntityModelRuntime
                 ShellInflateTexels = e.ShellInflateTexels,
                 EnableParallax = e.EnableParallax,
                 MirrorCuboidUv = e.MirrorCuboidUv,
+                BakeAtlasWidth = e.BakeAtlasWidth,
+                BakeAtlasHeight = e.BakeAtlasHeight,
             });
         }
 
@@ -328,6 +338,8 @@ internal sealed partial class EntityModelRuntime
                 ShellInflateTexels = e.ShellInflateTexels,
                 EnableParallax = e.EnableParallax,
                 MirrorCuboidUv = e.MirrorCuboidUv,
+                BakeAtlasWidth = e.BakeAtlasWidth,
+                BakeAtlasHeight = e.BakeAtlasHeight,
             });
         }
 
@@ -446,6 +458,8 @@ internal sealed partial class EntityModelRuntime
                     ShellInflateTexels = overlay.ShellInflateTexels,
                     EnableParallax = overlay.EnableParallax,
                     MirrorCuboidUv = overlay.MirrorCuboidUv,
+                    BakeAtlasWidth = twin.BakeAtlasWidth,
+                    BakeAtlasHeight = twin.BakeAtlasHeight,
                 };
                 break;
             }

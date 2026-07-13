@@ -7,6 +7,11 @@ internal sealed class GlTexture2D : IDisposable
     private readonly GL _gl;
     private readonly uint _id;
     private bool _disposed;
+    private int _cachedWidth;
+    private int _cachedHeight;
+    private bool _cachedNearest;
+    private ulong _cachedFingerprint;
+    private bool _hasCache;
 
     public GlTexture2D(GL gl, bool nearestFilter = true)
     {
@@ -37,10 +42,44 @@ internal sealed class GlTexture2D : IDisposable
 
     public void UploadRgba(int width, int height, ReadOnlySpan<byte> rgba, bool nearestFilter = true)
     {
+        UploadRgbaIfChanged(width, height, rgba, nearestFilter);
+    }
+
+    public bool UploadRgbaIfChanged(int width, int height, ReadOnlySpan<byte> rgba, bool nearestFilter = true)
+    {
+        var fingerprint = GlRgbaFingerprint.Compute(rgba);
+        if (_hasCache &&
+            _cachedWidth == width &&
+            _cachedHeight == height &&
+            _cachedNearest == nearestFilter &&
+            _cachedFingerprint == fingerprint)
+        {
+            return false;
+        }
+
         Bind(0);
-        ApplyFilter(nearestFilter);
-        _gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgba8, (uint)width, (uint)height, 0, PixelFormat.Rgba,
-            PixelType.UnsignedByte, rgba);
+        if (!_hasCache || _cachedNearest != nearestFilter)
+        {
+            ApplyFilter(nearestFilter);
+        }
+
+        if (_hasCache && _cachedWidth == width && _cachedHeight == height)
+        {
+            _gl.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, (uint)width, (uint)height, PixelFormat.Rgba,
+                PixelType.UnsignedByte, rgba);
+        }
+        else
+        {
+            _gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgba8, (uint)width, (uint)height, 0, PixelFormat.Rgba,
+                PixelType.UnsignedByte, rgba);
+        }
+
+        _cachedWidth = width;
+        _cachedHeight = height;
+        _cachedNearest = nearestFilter;
+        _cachedFingerprint = fingerprint;
+        _hasCache = true;
+        return true;
     }
 
     public void Dispose()
@@ -51,6 +90,13 @@ internal sealed class GlTexture2D : IDisposable
         }
 
         _disposed = true;
-        _gl.DeleteTexture(_id);
+        try
+        {
+            _gl.DeleteTexture(_id);
+        }
+        catch (Exception)
+        {
+            // Context may already be destroyed during teardown.
+        }
     }
 }

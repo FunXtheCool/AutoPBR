@@ -59,6 +59,12 @@ internal static class EntityGeometryIrTextureAtlas
             return (shardW, shardH);
         }
 
+        if (provenance.Kind == PreviewMeshDriverKind.RuntimeGeometryIrJson &&
+            TryResolveManifestGeometryIrBakeAtlas(normalizedTexturePath, out var manifestAtlas))
+        {
+            return manifestAtlas;
+        }
+
         if (provenance.Kind != PreviewMeshDriverKind.RuntimeGeometryIrJson)
         {
             return (physicalWidth, physicalHeight);
@@ -66,22 +72,37 @@ internal static class EntityGeometryIrTextureAtlas
 
         var stem = Path.GetFileNameWithoutExtension(normalizedTexturePath);
         var rule = EntityTextureParityCatalog.ResolveRule(normalizedTexturePath, stem);
-        if (rule?.GeometryIrTextureWidth is > 0 and var width &&
-            rule.GeometryIrTextureHeight is > 0 and var height)
-        {
-            return (width, height);
-        }
-
         if (rule is not null &&
             GeometryIrParityAtlasDefaults.TryGetForBuilderMethod(
                 rule.BuilderMethod,
-                out width,
-                out height))
+                out var width,
+                out var height))
         {
             return (width, height);
         }
 
         return (physicalWidth, physicalHeight);
+    }
+
+    private static bool TryResolveManifestGeometryIrBakeAtlas(
+        string normalizedTexturePath,
+        out (int Width, int Height) size)
+    {
+        size = default;
+        var path = normalizedTexturePath.Replace('\\', '/').TrimStart('/');
+        var stem = Path.GetFileNameWithoutExtension(path);
+        var rule = EntityTextureParityCatalog.ResolveRule(path, stem);
+        if (rule is null ||
+            rule.GeometryIrTextureWidth is not int manifestW ||
+            manifestW <= 0 ||
+            rule.GeometryIrTextureHeight is not int manifestH ||
+            manifestH <= 0)
+        {
+            return false;
+        }
+
+        size = (manifestW, manifestH);
+        return true;
     }
 
     /// <summary>

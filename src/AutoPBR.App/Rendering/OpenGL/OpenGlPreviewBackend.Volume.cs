@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
 
@@ -32,7 +33,7 @@ public sealed partial class OpenGlPreviewBackend
 
     private const float VolumeHeightFogScale = 0.42f;
 
-    private static float ResolveCloudLayerWorldBase(in PreviewRenderSettings settings) =>
+    private static float ResolveCloudLayerWorldBase(in PreviewRenderSettingsSnapshot settings) =>
         PreviewStageConstants.CloudLayerBaseWorldY(settings.CloudLayerHeight);
 
     private void TryInitVolume(GL gl, bool useOpenGlEs)
@@ -108,14 +109,20 @@ public sealed partial class OpenGlPreviewBackend
             return false;
         }
 
+        _volumeInjectUniformLocs = ResolveVolumeInjectUniformLocs(_volumeInjectProgram);
+
+        var integrateDefines = BuildVolumeIntegrateDefines(useOpenGlEs, temporal: !_settings.GodRayStabilizeDebug);
         _volumeIntegrateProgram = CreatePreviewProgram("genesis_godrays.vert", integrateFile, out var intErr,
-            lite ? "volume-integrate-lite" : "volume-integrate-full");
+            lite ? "volume-integrate-lite" : "volume-integrate-full",
+            integrateDefines);
         if (_volumeIntegrateProgram is not { IsValid: true })
         {
             RecordVolumeShaderFailure(lite, "integrate", intErr);
             EmitDiagnostic("[3D preview] Volume integrate shader: " + TrimShaderDiagnostic(intErr));
             return false;
         }
+
+        _volumeIntegrateUniformLocs = ResolveVolumeIntegrateUniformLocs(_volumeIntegrateProgram);
 
         return true;
     }
@@ -137,7 +144,7 @@ public sealed partial class OpenGlPreviewBackend
         _volumeUseLiteShaders = false;
     }
 
-    private bool CanUseVolumeGodRays(in PreviewRenderSettings settings) =>
+    private bool CanUseVolumeGodRays(in PreviewRenderSettingsSnapshot settings) =>
         settings is { EnableVolumeGodRays: true, EnableGodRays: true } &&
         _volumeFroxelTarget is not null &&
         _volumeInjectProgram is { IsValid: true } &&
@@ -191,8 +198,25 @@ public sealed partial class OpenGlPreviewBackend
         return ComputeFroxelHalfExtent(fovRad, aspect, forwardDist);
     }
 
-    private static float ResolveVolumeHeightFogStrength(in PreviewRenderSettings settings) =>
+    private static float ResolveVolumeHeightFogStrength(in PreviewRenderSettingsSnapshot settings) =>
         settings.EnableAtmosphericSky ? settings.AerialFogStrength * VolumeHeightFogScale : 0f;
+
+    private static IReadOnlyDictionary<string, int>? BuildVolumeIntegrateDefines(bool useOpenGlEs, bool temporal)
+    {
+        Dictionary<string, int>? defines = null;
+        if (useOpenGlEs)
+        {
+            defines = new Dictionary<string, int> { ["GENESIS_VOLUME_MEDIUMP_ACCUM"] = 1 };
+        }
+
+        if (temporal)
+        {
+            defines ??= new Dictionary<string, int>();
+            defines["GENESIS_VOLUME_TEMPORAL"] = 1;
+        }
+
+        return defines;
+    }
 
     private bool InjectVolumeFroxels(ref GlRenderFrame frame, Vector3 halfExtent, int froxelW, int froxelH, int froxelSlices)
     {
@@ -223,33 +247,25 @@ public sealed partial class OpenGlPreviewBackend
         var layerWorldY = ResolveCloudLayerWorldBase(frame.Settings);
 
         _volumeInjectProgram.Use();
-        SetVec3OnProgram(_volumeInjectProgram, "uCameraPos", frame.Eye);
-        SetVec3OnProgram(_volumeInjectProgram, "uCamRight", camRight);
-        SetVec3OnProgram(_volumeInjectProgram, "uCamUp", camUp);
-        SetVec3OnProgram(_volumeInjectProgram, "uCamForward", camForward);
-        SetVec3OnProgram(_volumeInjectProgram, "uLightDir", frame.LightDir);
-        SetVec3OnProgram(_volumeInjectProgram, "uLightColor", frame.Scene.Light.Color);
-        SetVec3OnProgram(_volumeInjectProgram, "uHalfExtent", halfExtent);
-        SetIntOnProgram(_volumeInjectProgram, "uSliceCount", _volumeFroxelTarget.Slices);
-        SetFloatOnProgram(_volumeInjectProgram, "uDepthDistribution", quality.FroxelDepthExp);
-        SetFloatOnProgram(_volumeInjectProgram, "uLayerHeight", layerWorldY);
-        SetFloatOnProgram(_volumeInjectProgram, "uVolumeHeight", frame.Settings.CloudVolumeHeight);
-        SetFloatOnProgram(_volumeInjectProgram, "uCloudDensity", frame.Settings.CloudDensity);
-        SetFloatOnProgram(_volumeInjectProgram, "uVolumeSize", frame.Settings.CloudVolumeSize);
-        SetFloatOnProgram(_volumeInjectProgram, "uGroundWorldY", PreviewStageConstants.GroundPlaneWorldY);
-        SetFloatOnProgram(_volumeInjectProgram, "uFogSlabHeight", PreviewStageConstants.GroundFogSlabHeight);
-        SetFloatOnProgram(_volumeInjectProgram, "uHeightFogStrength", ResolveVolumeHeightFogStrength(frame.Settings));
-        SetFloatOnProgram(_volumeInjectProgram, "uDebugDensity", Math.Max(0f, frame.Settings.GodRayDebugDensity));
+        var vi = _volumeInjectUniformLocs;
+        SetVec3OnProgramLoc(_volumeInjectProgram, vi.CameraPos, frame.Eye);
+        SetVec3OnProgramLoc(_volumeInjectProgram, vi.CamRight, camRight);
+        SetVec3OnProgramLoc(_volumeInjectProgram, vi.CamUp, camUp);
+        SetVec3OnProgramLoc(_volumeInjectProgram, vi.CamForward, camForward);
+        SetVec3OnProgramLoc(_volumeInjectProgram, vi.LightDir, frame.LightDir);
+        SetVec3OnProgramLoc(_volumeInjectProgram, vi.LightColor, frame.Scene.Light.Color);
+        SetVec3OnProgramLoc(_volumeInjectProgram, vi.HalfExtent, halfExtent);
+        SetIntOnProgramLoc(_volumeInjectProgram, vi.SliceCount, _volumeFroxelTarget.Slices);
         if (!_volumeUseLiteShaders)
         {
-            SetMatrixOnProgram(_volumeInjectProgram, "uLightViewProj", frame.ShadowVp);
-            SetMatrixOnProgram(_volumeInjectProgram, "uLightViewProjNear", frame.ShadowVpNear);
-            SetVec2OnProgram(_volumeInjectProgram, "uShadowTexelSize", shadowTexelSize);
-            SetFloatOnProgram(_volumeInjectProgram, "uShadowMinBias", frame.Settings.ShadowMinBias);
+            SetMatrixOnProgramLoc(_volumeInjectProgram, vi.LightViewProj, frame.ShadowVp);
+            SetMatrixOnProgramLoc(_volumeInjectProgram, vi.LightViewProjNear, frame.ShadowVpNear);
+            SetVec2OnProgramLoc(_volumeInjectProgram, vi.ShadowTexelSize, shadowTexelSize);
             var cascadesActive = shadowAvailable && frame.ShadowCascadesActive;
-            SetIntOnProgram(_volumeInjectProgram, "uEnableShadowMap", shadowAvailable ? 1 : 0);
-            SetIntOnProgram(_volumeInjectProgram, "uEnableShadowCascades", cascadesActive ? 1 : 0);
-            SetFloatOnProgram(_volumeInjectProgram, "uCascadeSplitDistance", frame.CascadeSplitWorldDistance);
+            SetIntOnProgramLoc(_volumeInjectProgram, vi.EnableShadowMap, shadowAvailable ? 1 : 0);
+            SetIntOnProgramLoc(_volumeInjectProgram, vi.EnableShadowCascades, cascadesActive ? 1 : 0);
+            SetFloatOnProgramLoc(_volumeInjectProgram, vi.CascadeSplitDistance, frame.CascadeSplitWorldDistance);
+            SetFloatOnProgramLoc(_volumeInjectProgram, vi.CascadeBlendWidth, frame.CascadeBlendWorldWidth);
             gl.ActiveTexture(TextureUnit.Texture0);
             if (_shadowTarget is not null)
             {
@@ -260,7 +276,7 @@ public sealed partial class OpenGlPreviewBackend
                 gl.BindTexture(TextureTarget.Texture2D, _sceneCapture.DepthTextureHandle);
             }
 
-            SetIntOnProgram(_volumeInjectProgram, "uShadowMap", 0);
+            SetIntOnProgramLoc(_volumeInjectProgram, vi.ShadowMap, 0);
             gl.ActiveTexture(TextureUnit.Texture1);
             if (cascadesActive && _shadowTargetCascadeNear is not null)
             {
@@ -275,7 +291,7 @@ public sealed partial class OpenGlPreviewBackend
                 gl.BindTexture(TextureTarget.Texture2D, _sceneCapture.DepthTextureHandle);
             }
 
-            SetIntOnProgram(_volumeInjectProgram, "uShadowMapNear", 1);
+            SetIntOnProgramLoc(_volumeInjectProgram, vi.ShadowMapNear, 1);
         }
 
         gl.BindVertexArray(_godRayQuadVao);
@@ -288,7 +304,7 @@ public sealed partial class OpenGlPreviewBackend
             }
 
             gl.Clear(ClearBufferMask.ColorBufferBit);
-            SetIntOnProgram(_volumeInjectProgram, "uSliceIndex", layer);
+            SetIntOnProgramLoc(_volumeInjectProgram, vi.SliceIndex, layer);
             gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
         }
 
@@ -302,7 +318,7 @@ public sealed partial class OpenGlPreviewBackend
         return true;
     }
 
-    private string DescribeVolumeGodRayUnavailableReason(in PreviewRenderSettings settings)
+    private string DescribeVolumeGodRayUnavailableReason(in PreviewRenderSettingsSnapshot settings)
     {
         if (!settings.EnableGodRays)
         {
@@ -362,32 +378,32 @@ public sealed partial class OpenGlPreviewBackend
         var viewProj = frame.Proj * frame.View;
         Matrix4x4.Invert(viewProj, out var invViewProj);
         ComputeCameraBasis(frame.Eye, frame.LookTarget, out var camRight, out var camUp, out var camForward);
+        var iu = _volumeIntegrateUniformLocs;
 
         if (_volumeUseLiteShaders)
         {
             _volumeIntegrateProgram.Use();
             gl.ActiveTexture(TextureUnit.Texture0);
             gl.BindTexture(TextureTarget.Texture2DArray, _volumeFroxelTarget.ArrayTextureHandle);
-            SetIntOnProgram(_volumeIntegrateProgram, "uFroxelVolume", 0);
+            SetIntOnProgramLoc(_volumeIntegrateProgram, iu.FroxelVolume, 0);
             gl.ActiveTexture(TextureUnit.Texture1);
             gl.BindTexture(TextureTarget.Texture2D, _sceneCapture.DepthTextureHandle);
-            SetIntOnProgram(_volumeIntegrateProgram, "uSceneDepth", 1);
-            SetMatrixOnProgram(_volumeIntegrateProgram, "uInvViewProj", invViewProj);
-            SetVec3OnProgram(_volumeIntegrateProgram, "uCameraPos", frame.Eye);
-            SetVec3OnProgram(_volumeIntegrateProgram, "uCamRight", camRight);
-            SetVec3OnProgram(_volumeIntegrateProgram, "uCamUp", camUp);
-            SetVec3OnProgram(_volumeIntegrateProgram, "uCamForward", camForward);
-            SetVec3OnProgram(_volumeIntegrateProgram, "uLightDir", frame.LightDir);
-            SetVec3OnProgram(_volumeIntegrateProgram, "uHalfExtent", halfExtent);
-            SetIntOnProgram(_volumeIntegrateProgram, "uSliceCount", _volumeFroxelTarget.Slices);
-            SetVec2OnProgram(_volumeIntegrateProgram, "uFroxelTexelSize",
+            SetIntOnProgramLoc(_volumeIntegrateProgram, iu.SceneDepth, 1);
+            gl.ActiveTexture(TextureUnit.Texture2);
+            gl.BindTexture(TextureTarget.Texture2DArray, _volumeFroxelTarget.OccupancyTextureHandle);
+            SetIntOnProgramLoc(_volumeIntegrateProgram, iu.FroxelOccupancy, 2);
+            SetMatrixOnProgramLoc(_volumeIntegrateProgram, iu.InvViewProj, invViewProj);
+            SetVec3OnProgramLoc(_volumeIntegrateProgram, iu.CameraPos, frame.Eye);
+            SetVec3OnProgramLoc(_volumeIntegrateProgram, iu.CamRight, camRight);
+            SetVec3OnProgramLoc(_volumeIntegrateProgram, iu.CamUp, camUp);
+            SetVec3OnProgramLoc(_volumeIntegrateProgram, iu.CamForward, camForward);
+            SetVec3OnProgramLoc(_volumeIntegrateProgram, iu.LightDir, frame.LightDir);
+            SetVec3OnProgramLoc(_volumeIntegrateProgram, iu.HalfExtent, halfExtent);
+            SetIntOnProgramLoc(_volumeIntegrateProgram, iu.SliceCount, _volumeFroxelTarget.Slices);
+            SetVec2OnProgramLoc(_volumeIntegrateProgram, iu.FroxelTexelSize,
                 new Vector2(1f / _volumeFroxelTarget.Width, 1f / _volumeFroxelTarget.Height));
-            SetFloatOnProgram(_volumeIntegrateProgram, "uStrength", strength);
-            SetFloatOnProgram(_volumeIntegrateProgram, "uJitter", jitter);
-            SetFloatOnProgram(_volumeIntegrateProgram, "uScatterGain", frame.Settings.GodRayScatterGain);
-            SetFloatOnProgram(_volumeIntegrateProgram, "uExtinction", Math.Max(1e-3f, frame.Settings.GodRayExtinction));
-            var liteQuality = PreviewVolumetricQuality.Resolve(frame.Settings.VolumetricQuality);
-            SetFloatOnProgram(_volumeIntegrateProgram, "uDepthDistribution", liteQuality.FroxelDepthExp);
+            SetFloatOnProgramLoc(_volumeIntegrateProgram, iu.Strength, strength);
+            SetFloatOnProgramLoc(_volumeIntegrateProgram, iu.Jitter, jitter);
             return;
         }
 
@@ -403,67 +419,68 @@ public sealed partial class OpenGlPreviewBackend
         _volumeIntegrateProgram.Use();
         gl.ActiveTexture(TextureUnit.Texture0);
         gl.BindTexture(TextureTarget.Texture2DArray, _volumeFroxelTarget.ArrayTextureHandle);
-        SetIntOnProgram(_volumeIntegrateProgram, "uFroxelVolume", 0);
+        SetIntOnProgramLoc(_volumeIntegrateProgram, iu.FroxelVolume, 0);
         gl.ActiveTexture(TextureUnit.Texture1);
         gl.BindTexture(TextureTarget.Texture2D, _sceneCapture.DepthTextureHandle);
-        SetIntOnProgram(_volumeIntegrateProgram, "uSceneDepth", 1);
+        SetIntOnProgramLoc(_volumeIntegrateProgram, iu.SceneDepth, 1);
         var stabilize = frame.Settings.GodRayStabilizeDebug;
         gl.ActiveTexture(TextureUnit.Texture2);
         if (!stabilize && _volumeIntegrateHistory is not null && _volumeIntegrateHistoryValid)
         {
             gl.BindTexture(TextureTarget.Texture2D, _volumeIntegrateHistory.ColorTextureHandle);
-            SetIntOnProgram(_volumeIntegrateProgram, "uPrevIntegrate", 2);
-            SetIntOnProgram(_volumeIntegrateProgram, "uHasPrevIntegrate", 1);
+            SetIntOnProgramLoc(_volumeIntegrateProgram, iu.PrevIntegrate, 2);
+            SetIntOnProgramLoc(_volumeIntegrateProgram, iu.HasPrevIntegrate, 1);
         }
         else
         {
             gl.BindTexture(TextureTarget.Texture2D, _sceneCapture.DepthTextureHandle);
-            SetIntOnProgram(_volumeIntegrateProgram, "uPrevIntegrate", 2);
-            SetIntOnProgram(_volumeIntegrateProgram, "uHasPrevIntegrate", 0);
+            SetIntOnProgramLoc(_volumeIntegrateProgram, iu.PrevIntegrate, 2);
+            SetIntOnProgramLoc(_volumeIntegrateProgram, iu.HasPrevIntegrate, 0);
         }
 
         gl.ActiveTexture(TextureUnit.Texture3);
         if (!stabilize && _volumeFroxelHistory is not null && _volumeFroxelHistoryValid && _volumeFroxelHistory.IsValid)
         {
             gl.BindTexture(TextureTarget.Texture2DArray, _volumeFroxelHistory.ArrayTextureHandle);
-            SetIntOnProgram(_volumeIntegrateProgram, "uPrevFroxelVolume", 3);
-            SetIntOnProgram(_volumeIntegrateProgram, "uHasPrevFroxel", 1);
+            SetIntOnProgramLoc(_volumeIntegrateProgram, iu.PrevFroxelVolume, 3);
+            SetIntOnProgramLoc(_volumeIntegrateProgram, iu.HasPrevFroxel, 1);
         }
         else
         {
             gl.BindTexture(TextureTarget.Texture2DArray, _volumeFroxelTarget.ArrayTextureHandle);
-            SetIntOnProgram(_volumeIntegrateProgram, "uPrevFroxelVolume", 3);
-            SetIntOnProgram(_volumeIntegrateProgram, "uHasPrevFroxel", 0);
+            SetIntOnProgramLoc(_volumeIntegrateProgram, iu.PrevFroxelVolume, 3);
+            SetIntOnProgramLoc(_volumeIntegrateProgram, iu.HasPrevFroxel, 0);
         }
 
-        SetMatrixOnProgram(_volumeIntegrateProgram, "uInvViewProj", invViewProj);
-        SetMatrixOnProgram(_volumeIntegrateProgram, "uPrevViewProj", _volumePrevViewProj);
-        SetVec3OnProgram(_volumeIntegrateProgram, "uCameraPos", frame.Eye);
-        SetVec3OnProgram(_volumeIntegrateProgram, "uPrevCameraPos", _volumePrevEye);
-        SetVec3OnProgram(_volumeIntegrateProgram, "uCamRight", camRight);
-        SetVec3OnProgram(_volumeIntegrateProgram, "uCamUp", camUp);
-        SetVec3OnProgram(_volumeIntegrateProgram, "uCamForward", camForward);
-        SetVec3OnProgram(_volumeIntegrateProgram, "uPrevCamRight", _volumePrevCamRight);
-        SetVec3OnProgram(_volumeIntegrateProgram, "uPrevCamUp", _volumePrevCamUp);
-        SetVec3OnProgram(_volumeIntegrateProgram, "uPrevCamForward", _volumePrevCamForward);
-        SetVec3OnProgram(_volumeIntegrateProgram, "uLightDir", frame.LightDir);
-        SetVec3OnProgram(_volumeIntegrateProgram, "uHalfExtent", halfExtent);
-        SetVec3OnProgram(_volumeIntegrateProgram, "uPrevHalfExtent", _volumePrevHalfExtent);
-        SetIntOnProgram(_volumeIntegrateProgram, "uSliceCount", _volumeFroxelTarget.Slices);
-        SetVec2OnProgram(_volumeIntegrateProgram, "uFroxelTexelSize",
+        gl.ActiveTexture(TextureUnit.Texture4);
+        gl.BindTexture(TextureTarget.Texture2DArray, _volumeFroxelTarget.OccupancyTextureHandle);
+        SetIntOnProgramLoc(_volumeIntegrateProgram, iu.FroxelOccupancy, 4);
+
+        SetMatrixOnProgramLoc(_volumeIntegrateProgram, iu.InvViewProj, invViewProj);
+        SetMatrixOnProgramLoc(_volumeIntegrateProgram, iu.PrevViewProj, _volumePrevViewProj);
+        SetVec3OnProgramLoc(_volumeIntegrateProgram, iu.CameraPos, frame.Eye);
+        SetVec3OnProgramLoc(_volumeIntegrateProgram, iu.PrevCameraPos, _volumePrevEye);
+        SetVec3OnProgramLoc(_volumeIntegrateProgram, iu.CamRight, camRight);
+        SetVec3OnProgramLoc(_volumeIntegrateProgram, iu.CamUp, camUp);
+        SetVec3OnProgramLoc(_volumeIntegrateProgram, iu.CamForward, camForward);
+        SetVec3OnProgramLoc(_volumeIntegrateProgram, iu.PrevCamRight, _volumePrevCamRight);
+        SetVec3OnProgramLoc(_volumeIntegrateProgram, iu.PrevCamUp, _volumePrevCamUp);
+        SetVec3OnProgramLoc(_volumeIntegrateProgram, iu.PrevCamForward, _volumePrevCamForward);
+        SetVec3OnProgramLoc(_volumeIntegrateProgram, iu.LightDir, frame.LightDir);
+        SetVec3OnProgramLoc(_volumeIntegrateProgram, iu.HalfExtent, halfExtent);
+        SetVec3OnProgramLoc(_volumeIntegrateProgram, iu.PrevHalfExtent, _volumePrevHalfExtent);
+        SetIntOnProgramLoc(_volumeIntegrateProgram, iu.SliceCount, _volumeFroxelTarget.Slices);
+        SetVec2OnProgramLoc(_volumeIntegrateProgram, iu.FroxelTexelSize,
             new Vector2(1f / _volumeFroxelTarget.Width, 1f / _volumeFroxelTarget.Height));
-        SetFloatOnProgram(_volumeIntegrateProgram, "uStrength", strength);
-        SetFloatOnProgram(_volumeIntegrateProgram, "uJitter", jitter);
+        SetFloatOnProgramLoc(_volumeIntegrateProgram, iu.Strength, strength);
+        SetFloatOnProgramLoc(_volumeIntegrateProgram, iu.Jitter, jitter);
         var quality = PreviewVolumetricQuality.Resolve(frame.Settings.VolumetricQuality);
-        SetFloatOnProgram(_volumeIntegrateProgram, "uTemporalWeight",
+        SetFloatOnProgramLoc(_volumeIntegrateProgram, iu.TemporalWeight,
             stabilize ? 0f : PreviewVolumetricQuality.EffectivePassTemporalWeight(
                 quality.VolumeIntegrateTemporalWeight, frame.Settings));
-        SetFloatOnProgram(_volumeIntegrateProgram, "uFroxelTemporalWeight",
+        SetFloatOnProgramLoc(_volumeIntegrateProgram, iu.FroxelTemporalWeight,
             stabilize ? 0f : PreviewVolumetricQuality.EffectivePassTemporalWeight(
                 quality.FroxelTemporal3DWeight, frame.Settings));
-        SetFloatOnProgram(_volumeIntegrateProgram, "uDepthDistribution", quality.FroxelDepthExp);
-        SetFloatOnProgram(_volumeIntegrateProgram, "uScatterGain", frame.Settings.GodRayScatterGain);
-        SetFloatOnProgram(_volumeIntegrateProgram, "uExtinction", Math.Max(1e-3f, frame.Settings.GodRayExtinction));
     }
 
     private void CommitFroxelHistory(

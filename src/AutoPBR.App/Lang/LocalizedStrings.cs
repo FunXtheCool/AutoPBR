@@ -262,6 +262,11 @@ public sealed class LocalizedStrings
     public static string OutputPathWatermark => Resources.OutputPathWatermark;
     public static string Engine => Resources.Engine;
     public static string DebugMode => Resources.DebugMode;
+    public static string PreviewOpenGl4Toggle => Resources.PreviewOpenGl4Toggle;
+    public static string PreviewOpenGl4Tooltip => Resources.PreviewOpenGl4Tooltip;
+    public static string PreviewOpenGlRestartRequired => Resources.PreviewOpenGlRestartRequired;
+    public static string PreviewOpenGlActiveContext => Resources.PreviewOpenGlActiveContext;
+    public static string PreviewOpenGlFallbackWarning => Resources.PreviewOpenGlFallbackWarning;
     public static string MaxThreads => Resources.MaxThreads;
     public static string MaxThreadsTooltip => Resources.MaxThreadsTooltip;
     public static string ForceShaderCacheInvalidation => Resources.ForceShaderCacheInvalidation;

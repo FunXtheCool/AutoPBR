@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 using AutoPBR.App.Lang;
@@ -29,7 +30,7 @@ public sealed partial class OpenGlPreviewBackend
 
     public event Action<PreviewGpuInitProgress>? GpuInitProgressChanged;
 
-    private void RaiseGpuInitProgress(string phase, in PreviewRenderSettings settings)
+    private void RaiseGpuInitProgress(string phase, in PreviewRenderSettingsSnapshot settings)
     {
         var desired = ComputeDesiredGpuTier(settings);
         var bootstrapFrac = _gpuBootstrap?.Fraction ?? (_gpuAlive ? 1.0 : 0.0);
@@ -105,7 +106,7 @@ public sealed partial class OpenGlPreviewBackend
         return total == 0 ? 1.0 : (double)ready / total;
     }
 
-    private static PreviewGpuInitTier ComputeDesiredGpuTier(in PreviewRenderSettings settings)
+    private static PreviewGpuInitTier ComputeDesiredGpuTier(in PreviewRenderSettingsSnapshot settings)
     {
         var tier = PreviewGpuInitTier.Core;
         if (settings.EnableGodRays)
@@ -128,7 +129,7 @@ public sealed partial class OpenGlPreviewBackend
         return tier;
     }
 
-    private void EnsureGpuTier(in PreviewRenderSettings settings)
+    private void EnsureGpuTier(in PreviewRenderSettingsSnapshot settings)
     {
         if (_gl is null || _shaderCtx is null || !_gpuInitTier.HasAll(PreviewGpuInitTier.Core))
         {
@@ -183,8 +184,8 @@ public sealed partial class OpenGlPreviewBackend
     }
 
     private GlShaderProgram CreatePreviewProgram(string vertexFile, string fragmentFile, out string? error,
-        string? debugLabel = null) =>
-        _shaderCtx!.CreateProgram(vertexFile, fragmentFile, out error, debugLabel);
+        string? debugLabel = null, IReadOnlyDictionary<string, int>? defines = null) =>
+        _shaderCtx!.CreateProgram(vertexFile, fragmentFile, out error, debugLabel, defines);
 
     private GlShaderProgram CreatePreviewProgram(
         string vertexFile,
@@ -192,8 +193,9 @@ public sealed partial class OpenGlPreviewBackend
         string tessEvaluationFile,
         string fragmentFile,
         out string? error,
-        string? debugLabel = null) =>
-        _shaderCtx!.CreateProgram(vertexFile, tessControlFile, tessEvaluationFile, fragmentFile, out error, debugLabel);
+        string? debugLabel = null,
+        IReadOnlyDictionary<string, int>? defines = null) =>
+        _shaderCtx!.CreateProgram(vertexFile, tessControlFile, tessEvaluationFile, fragmentFile, out error, debugLabel, defines);
 
     private bool TryEnsureProceduralSkyProgram()
     {
@@ -212,6 +214,7 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         EmitDiagnostic("[3D preview] Using embedded procedural sky (LUT sky shader unavailable).");
+        _proceduralSkyUniformLocs = ResolveProceduralSkyUniformLocs(_proceduralSkyProgram);
         return true;
     }
 
@@ -223,13 +226,18 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         _shadowAwareGodRayInitAttempted = true;
+        var godRayDefines = BuildGodRaySparseMarchDefines(_settings.GodRaySparseMarch);
         _shadowAwareGodRayProgram = CreatePreviewProgram("genesis_godrays.vert", "genesis_godrays_shadow.frag",
-            out var shErr);
+            out var shErr, defines: godRayDefines);
         if (_shadowAwareGodRayProgram is not { IsValid: true })
         {
             EmitDiagnostic("[3D preview] Shadow-aware god-ray shader: " + TrimShaderDiagnostic(shErr));
             _shadowAwareGodRayProgram?.Dispose();
             _shadowAwareGodRayProgram = null;
+        }
+        else
+        {
+            _shadowAwareGodRayUniformLocs = ResolveShadowAwareGodRayUniformLocs(_shadowAwareGodRayProgram);
         }
     }
 }

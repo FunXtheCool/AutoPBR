@@ -31,6 +31,31 @@ internal static partial class GeometryIrPartTreeRepair
     }
 
     /// <summary>
+    /// Baby armadillo (and similar) bind ears under <c>head_cube</c>; the global ear→head rule must not hoist them.
+    /// </summary>
+    private static bool ShouldSkipHeadCubeEarReparent(string childId, string parentId, JsonArray rootChildren)
+    {
+        if (!string.Equals(parentId, "head", StringComparison.Ordinal) ||
+            childId is not ("left_ear" or "right_ear"))
+        {
+            return false;
+        }
+
+        return TryFindPartById(rootChildren, "head_cube", out _) &&
+               PartIsNestedUnder(rootChildren, childId, "head_cube");
+    }
+
+    private static bool PartIsNestedUnder(JsonArray rootChildren, string childId, string ancestorId)
+    {
+        if (!TryFindPartById(rootChildren, ancestorId, out var ancestorNode) || ancestorNode is null)
+        {
+            return false;
+        }
+
+        return PartTreeContainsId(ancestorNode, childId);
+    }
+
+    /// <summary>
     /// Skip global reparent rules when the flat root bind is already correct: entity-space siblings share a Y anchor,
     /// or <c>reference_java</c> binds the child elsewhere (e.g. Cod <c>nose</c> on mesh root, not under <c>head</c>).
     /// </summary>
@@ -41,6 +66,11 @@ internal static partial class GeometryIrPartTreeRepair
         string? officialJvmName)
     {
         if (ShouldSkipFelineFlatTailReparent(childId, parentId, rootChildren, officialJvmName))
+        {
+            return true;
+        }
+
+        if (ShouldSkipHeadCubeEarReparent(childId, parentId, rootChildren))
         {
             return true;
         }

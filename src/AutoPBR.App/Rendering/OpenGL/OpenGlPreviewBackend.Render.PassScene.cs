@@ -12,9 +12,19 @@ namespace AutoPBR.App.Rendering.OpenGL;
 /// <summary>OpenGL implementation of <see cref="IRenderPreviewBackend"/>; GPU entry points must run on the OpenGL thread (Avalonia <see cref="AutoPBR.App.Controls.GlPbrPreviewControl"/> callbacks).</summary>
 public sealed partial class OpenGlPreviewBackend
 {
+    private const int MainPassShadowFarUnit = 4;
+    private const int MainPassShadowNearUnit = 5;
+    private const int MainPassSkyLutUnit = 6;
+
     private void GlRenderPassScene(ref GlRenderFrame frame)
     {
         if (_program is null || _albedo is null || _normal is null || _spec is null || _height is null || _mesh is null)
+        {
+            return;
+        }
+
+        EnsureGenesisProgramForFrame(ref frame);
+        if (_program is not { IsValid: true })
         {
             return;
         }
@@ -47,7 +57,7 @@ public sealed partial class OpenGlPreviewBackend
         frame.Gl.Enable(EnableCap.DepthTest);
         frame.Gl.DepthFunc(GLEnum.Lequal);
         frame.Gl.DepthMask(true);
-        if (ShouldCullSolidBackFaces(frame.Scene.SceneKind, frame.BlockModel))
+        if (ShouldCullSolidBackFaces(frame.Scene.SceneKind, frame.BlockModel, frame.Settings))
         {
             frame.Gl.Enable(EnableCap.CullFace);
             frame.Gl.CullFace(GLEnum.Back);
@@ -151,81 +161,39 @@ public sealed partial class OpenGlPreviewBackend
             frame.Settings.AtmosphereMoonDiscSize,
             frame.Settings.AtmosphereMoonGlowStrength,
             frame.Settings.AtmosphereMoonTextureSharpness,
-            ShouldCullSolidBackFaces(frame.Scene.SceneKind, frame.BlockModel));
+            ShouldCullSolidBackFaces(frame.Scene.SceneKind, frame.BlockModel, frame.Settings));
 
         _program.Use();
-        var taaCurrentViewProj = frame.UnjitteredProj * frame.View;
-        SetMatrix("uTaaCurrViewProj", taaCurrentViewProj);
-        SetMatrix("uPrevViewProj", ResolvePreviewTaaPrevViewProj(taaCurrentViewProj));
-        SetMatrix("uView", frame.View);
-        SetMatrix("uProj", frame.Proj);
-        SetMatrix("uLightViewProj", frame.ShadowVp);
+        var u = _mainUniformLocs;
+        if (frame.SettingsRevision != _lastMainPassAppliedSettingsRevision)
+        {
+            ApplyMainPassPerSettingsUniforms(ref frame, u);
+            _lastMainPassAppliedSettingsRevision = frame.SettingsRevision;
+        }
 
-        SetVec3("uCameraPos", frame.Eye);
-        SetVec3("uLightDir", frame.LightDir);
-        SetVec3("uLightColor", PreviewLightMath.SceneLightColorFromCelestialCycle(
+        var taaCurrentViewProj = frame.UnjitteredProj * frame.View;
+        SetMatrixLoc(u.TaaCurrViewProj, taaCurrentViewProj);
+        SetMatrixLoc(u.PrevViewProj, ResolvePreviewTaaPrevViewProj(taaCurrentViewProj));
+        SetMatrixLoc(u.View, frame.View);
+        SetMatrixLoc(u.Proj, frame.Proj);
+        SetMatrixLoc(u.LightViewProj, frame.ShadowVp);
+        SetMatrixLoc(u.LightViewProjNear, frame.ShadowVpNear);
+
+        SetVec3Loc(u.CameraPos, frame.Eye);
+        SetVec3Loc(u.LightDir, frame.LightDir);
+        SetVec3Loc(u.LightColor, PreviewLightMath.SceneLightColorFromCelestialCycle(
             frame.WorldLightDir,
             frame.Scene.Light.Color,
             frame.Settings.MoonWorldLightIntensity));
-        SetFloat("uAmbient", frame.Settings.AmbientStrength);
-        SetFloat("uNormalStrength", frame.Settings.NormalStrength);
-        SetFloat("uHeightStrength", frame.Settings.HeightStrength);
-        SetFloat("uSpecularStrength", frame.Settings.SpecularStrength);
-        SetFloat("uRoughnessScale", frame.Settings.RoughnessScale);
-        SetFloat("uExposure", frame.Settings.Exposure);
-        SetFloat("uParallaxAoStrength", frame.Settings.ParallaxAoStrength);
-        SetInt("uParallaxTraceLayers", Math.Clamp(frame.Settings.ParallaxTraceLayers, 8, 128));
-        SetInt("uParallaxRefineSteps", Math.Clamp(frame.Settings.ParallaxRefineSteps, 0, 8));
-        SetInt("uParallaxShadowSamples", Math.Clamp(frame.Settings.ParallaxShadowSamples, 4, 64));
-        SetFloat("uParallaxShadowSoftness", Math.Clamp(frame.Settings.ParallaxShadowSoftness, 0f, 4f));
-        SetFloat("uParallaxMaxUvShift", Math.Clamp(frame.Settings.ParallaxMaxUvShift, 0.05f, 0.75f));
-        SetFloat("uParallaxUvScale", 1f);
-        SetVec2("uTextureAtlasScale", Vector2.One);
-        SetInt("uEnableTessellationDisplacement",
-            _mainProgramUsesTessellation && frame.EnableTessellationDisplacementEff ? 1 : 0);
-        SetFloat("uTessellationLevel", Math.Clamp(frame.Settings.TessellationLevel, 1f, 16f));
-        SetFloat("uTessellationDisplacementStrength", Math.Clamp(frame.Settings.TessellationDisplacementStrength, 0f, 0.20f));
-        SetInt("uEnableParallax", frame.EnableParallaxEff ? 1 : 0);
-        SetInt("uEnableParallaxAo", frame.EnableParallaxAoEff ? 1 : 0);
-        SetInt("uEnableNormalMap", frame.EnableNormalMapEff ? 1 : 0);
-        SetInt("uEnableSpecularMap", frame.EnableSpecularMapEff ? 1 : 0);
-        SetInt("uSceneKind", frame.Scene.SceneKind == PreviewSceneKind.ItemPlane ? 1 : 0);
-        SetInt("uIsGroundPass", 0);
-        SetFloat("uAlphaCutoff", frame.Settings.AlphaCutoff);
-        SetInt("uItemAlphaBlend", frame.Settings.ItemUseAlphaBlend ? 1 : 0);
-        SetInt("uEntityAlphaMode", 0);
-        SetInt("uPreviewDepthLayerDebug", EntityPreviewDebugSettings.ShowDepthLayerDebug ? 1 : 0);
-        SetVec3("uPreviewLayerDebugTint", Vector3.One);
 
-        // Genesis-specific uniforms.
-        SetInt("uEnableSss", frame.Settings.EnableSss ? 1 : 0);
-        SetInt("uEnableParallaxShadow", frame.EnableParallaxShadowEff ? 1 : 0);
-        SetInt("uEnableIbl", frame.Settings.EnableIbl ? 1 : 0);
-        SetFloat("uSssStrength", frame.Settings.SssStrength);
-        SetFloat("uIblStrength", frame.Settings.IblStrength);
-        SetFloat("uEmissionStrength", frame.Settings.EmissionStrength);
-        SetInt("uEnableAtmosphericSky", frame.Settings.EnableAtmosphericSky ? 1 : 0);
-        SetFloat("uAtmosphereTurbidity", frame.Settings.AtmosphereTurbidity);
-        SetFloat("uAtmosphereSunIntensity", frame.Settings.AtmosphereSunIntensity);
-        SetFloat("uAtmosphereHorizonFalloff", frame.Settings.AtmosphereHorizonFalloff);
-        // Soft neutral sky/ground tints; future plan can expose these as user frame.Settings.
-        SetVec3("uSkyTint", new Vector3(0.55f, 0.62f, 0.74f));
-        SetVec3("uGroundTint", new Vector3(0.22f, 0.20f, 0.18f));
-
-        // Directional shadow map (Genesis Shadows Phase 2). Bound to texture unit 4.
+        // genesis.frag always declares shadow + sky samplers; pin unique units every main-pass bind so
+        // GLES/ANGLE never leaves sampler2DShadow on unit 0 alongside uAlbedo.
         var shadowEnabledForShader = frame.ShadowAvailable;
-        SetInt("uEnableShadowMap", shadowEnabledForShader ? 1 : 0);
-        SetFloat("uShadowMinBias", frame.Settings.ShadowMinBias);
-        SetFloat("uShadowMaxBias", frame.Settings.ShadowMaxBias);
-        SetFloat("uShadowSoftnessTexels", Math.Clamp(frame.Settings.ShadowSoftnessTexels, 0f, 8f));
-        var shadowRes = _shadowTarget?.Resolution ?? Math.Clamp(frame.Settings.ShadowMapResolution, 256, 4096);
-        SetVec2("uShadowTexelSize", new Vector2(1f / shadowRes, 1f / shadowRes));
-        if (_shadowTarget is not null)
-        {
-            frame.Gl.ActiveTexture(TextureUnit.Texture4);
-            frame.Gl.BindTexture(TextureTarget.Texture2D, _shadowTarget.DepthTextureHandle);
-            SetInt("uShadowMap", 4);
-        }
+        SetIntLoc(u.EnableShadowMap, shadowEnabledForShader ? 1 : 0);
+        SetIntLoc(u.EnableShadowCascades, frame.ShadowCascadesActive ? 1 : 0);
+        SetFloatLoc(u.CascadeSplitDistance, frame.CascadeSplitWorldDistance);
+        SetFloatLoc(u.CascadeBlendWidth, frame.CascadeBlendWorldWidth);
+        BindAndPinMainPassGlobalTextures(ref frame, u);
 
         // LabPBR grass plane under the grid; one texture tile per world unit (nearest + repeat).
         if (frame.Settings.ShowGroundMesh &&
@@ -233,35 +201,38 @@ public sealed partial class OpenGlPreviewBackend
         {
             var restoreCull = frame.Gl.IsEnabled(EnableCap.CullFace);
             frame.Gl.Disable(EnableCap.CullFace);
-            SetMatrix("uModel", Matrix4x4.Identity);
-            SetMatrix("uPrevModel", Matrix4x4.Identity);
+            SetMatrixLoc(u.Model, Matrix4x4.Identity);
+            SetMatrixLoc(u.PrevModel, Matrix4x4.Identity);
             var groundParallax = frame.Settings.EnableParallax && _grassGroundHasHeight;
             var groundNormal = frame.Settings.EnableNormalMap && _grassGroundHasNormal;
             var groundSpec = frame.Settings.EnableSpecularMap && _grassGroundHasSpecular;
-            SetInt("uEnableParallax", groundParallax ? 1 : 0);
-            SetFloat("uParallaxUvScale", 1f);
-            SetVec2("uTextureAtlasScale", Vector2.One);
-            SetInt("uEnableParallaxAo", groundParallax && frame.Settings.EnableParallaxAo ? 1 : 0);
-            SetInt("uEnableParallaxShadow", groundParallax && frame.Settings.EnableParallaxShadow ? 1 : 0);
-            SetInt("uEnableNormalMap", groundNormal ? 1 : 0);
-            SetInt("uEnableSpecularMap", groundSpec ? 1 : 0);
-            SetInt("uSceneKind", 0);
-            SetInt("uIsGroundPass", 1);
-            SetInt("uEntityAlphaMode", 0);
+            SetIntLoc(u.EnableParallax, groundParallax ? 1 : 0);
+            SetFloatLoc(u.ParallaxUvScale, 1f);
+            SetVec2Loc(u.TextureAtlasScale, Vector2.One);
+            SetIntLoc(u.EnableParallaxAo, groundParallax && frame.Settings.EnableParallaxAo ? 1 : 0);
+            SetIntLoc(u.EnableParallaxShadow, groundParallax && frame.Settings.EnableParallaxShadow ? 1 : 0);
+            SetIntLoc(u.EnableNormalMap, groundNormal ? 1 : 0);
+            SetIntLoc(u.EnableSpecularMap, groundSpec ? 1 : 0);
+            SetIntLoc(u.SceneKind, 0);
+            SetIntLoc(u.IsGroundPass, 1);
+            SetIntLoc(u.EntityAlphaMode, 0);
             ApplyEntitySkinningUniforms(_program, 0, 0, 0f);
-            SetInt("uHasNormal", _grassGroundHasNormal ? 1 : 0);
-            SetInt("uHasSpecular", _grassGroundHasSpecular ? 1 : 0);
-            SetInt("uHasHeight", _grassGroundHasHeight ? 1 : 0);
+            SetIntLoc(u.HasNormal, _grassGroundHasNormal ? 1 : 0);
+            SetIntLoc(u.HasSpecular, _grassGroundHasSpecular ? 1 : 0);
+            SetIntLoc(u.HasHeight, _grassGroundHasHeight ? 1 : 0);
+            SetVec2Loc(u.ParallaxHeightTexSize, _grassGroundHasHeight && _grassGroundMaterial is not null
+                ? new Vector2(Math.Max(1, _grassGroundMaterial.Width), Math.Max(1, _grassGroundMaterial.Height))
+                : Vector2.One);
             _grassGroundAlbedo.Bind(0);
             _grassGroundNormal!.Bind(1);
             _grassGroundSpec!.Bind(2);
             _grassGroundHeight!.Bind(3);
-            SetInt("uAlbedo", 0);
-            SetInt("uNormal", 1);
-            SetInt("uSpecular", 2);
-            SetInt("uHeight", 3);
+            SetIntLoc(u.Albedo, 0);
+            SetIntLoc(u.Normal, 1);
+            SetIntLoc(u.Specular, 2);
+            SetIntLoc(u.Height, 3);
             _groundMesh.Draw(_mainProgramUsesTessellation);
-            SetInt("uIsGroundPass", 0);
+            SetIntLoc(u.IsGroundPass, 0);
             if (restoreCull)
             {
                 frame.Gl.Enable(EnableCap.CullFace);
@@ -274,27 +245,22 @@ public sealed partial class OpenGlPreviewBackend
             DrawBackgroundGrid(frame.Gl, frame.Proj, frame.View);
             // DrawBackgroundGrid binds the line program; restore main frame.Material program before mesh uniforms.
             _program.Use();
+            BindAndPinMainPassGlobalTextures(ref frame, u);
         }
 
-        SetMatrix("uModel", frame.ModelMatrix);
-        SetMatrix("uPrevModel", ResolvePreviewTaaPrevSubjectModel(frame.ModelMatrix));
-        SetFloat("uParallaxUvScale", 1f);
-        SetVec2("uTextureAtlasScale", Vector2.One);
-        SetInt("uEnableParallax", frame.EnableParallaxEff ? 1 : 0);
-        SetInt("uEnableParallaxAo", frame.EnableParallaxAoEff ? 1 : 0);
-        SetInt("uEnableParallaxShadow", frame.EnableParallaxShadowEff ? 1 : 0);
-        SetInt("uEnableNormalMap", frame.EnableNormalMapEff ? 1 : 0);
-        SetInt("uEnableSpecularMap", frame.EnableSpecularMapEff ? 1 : 0);
-        SetInt("uSceneKind", frame.Scene.SceneKind == PreviewSceneKind.ItemPlane ? 1 : 0);
-        SetInt("uIsGroundPass", 0);
-        SetInt("uEntityAlphaMode", frame.EntityAlphaModeUniform);
-        if (_atmoSkyViewTex != 0)
-        {
-            frame.Gl.ActiveTexture(TextureUnit.Texture5);
-            frame.Gl.BindTexture(TextureTarget.Texture2D, _atmoSkyViewTex);
-        }
-
-        SetInt("uAtmoSkyViewLut", 5);
+        SetMatrixLoc(u.Model, frame.ModelMatrix);
+        SetMatrixLoc(u.PrevModel, ResolvePreviewTaaPrevSubjectModel(frame.ModelMatrix));
+        SetFloatLoc(u.ParallaxUvScale, 1f);
+        SetVec2Loc(u.ParallaxHeightTexSize, Vector2.One);
+        SetVec2Loc(u.TextureAtlasScale, Vector2.One);
+        SetIntLoc(u.EnableParallax, frame.EnableParallaxEff ? 1 : 0);
+        SetIntLoc(u.EnableParallaxAo, frame.EnableParallaxAoEff ? 1 : 0);
+        SetIntLoc(u.EnableParallaxShadow, frame.EnableParallaxShadowEff ? 1 : 0);
+        SetIntLoc(u.EnableNormalMap, frame.EnableNormalMapEff ? 1 : 0);
+        SetIntLoc(u.EnableSpecularMap, frame.EnableSpecularMapEff ? 1 : 0);
+        SetIntLoc(u.SceneKind, frame.Scene.SceneKind == PreviewSceneKind.ItemPlane ? 1 : 0);
+        SetIntLoc(u.IsGroundPass, 0);
+        SetIntLoc(u.EntityAlphaMode, frame.EntityAlphaModeUniform);
 
         if (!frame.Settings.DrawPreviewSubject || _mesh.IndexCount <= 0)
         {
@@ -318,8 +284,15 @@ public sealed partial class OpenGlPreviewBackend
                 EmitDepthLayerDiagnostic(frame.BlockModel, nearPlane, farPlane, frame.Gl);
             }
             var blendWasEnabled = frame.Gl.IsEnabled(EnableCap.Blend);
+            var activeBatchBlend = blendWasEnabled;
             var uploadedMaterialIndex = -1;
+            var entityBoneUniformsApplied = false;
+            if (frame.EntityBonePaletteUploaded)
+            {
+                BindEntityBoneSkinningUboBlocks();
+            }
 
+            _mesh.BindVertexArray();
             foreach (var batch in frame.BlockModel.DrawBatches)
             {
                 if ((uint)batch.MaterialIndex >= (uint)frame.BlockSlots.Length)
@@ -335,76 +308,89 @@ public sealed partial class OpenGlPreviewBackend
                 var batchBlend = frame.EntityBlendDraw || batchUsesTranslucentOverlay;
                 if (batchBlend)
                 {
-                    frame.Gl.Enable(EnableCap.Blend);
-                    frame.Gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+                    if (!activeBatchBlend)
+                    {
+                        frame.Gl.Enable(EnableCap.Blend);
+                        frame.Gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+                    }
+
+                    activeBatchBlend = true;
                 }
-                else if (blendWasEnabled)
+                else if (activeBatchBlend)
                 {
                     frame.Gl.Disable(EnableCap.Blend);
+                    activeBatchBlend = false;
                 }
 
-                SetInt("uEntityAlphaMode", batchAlphaMode);
+                SetIntLoc(u.EntityAlphaMode, batchAlphaMode);
 
                 var slot = frame.BlockSlots[batch.MaterialIndex];
-                if (batch.MaterialIndex != uploadedMaterialIndex)
+                var materialChanged = batch.MaterialIndex != uploadedMaterialIndex;
+                if (materialChanged)
                 {
-                    UploadMaterial(frame.Gl, slot, frame.Settings.NearestTextureFilter);
+                    UploadMaterial(frame.Gl, slot, nearest: true);
                     uploadedMaterialIndex = batch.MaterialIndex;
+                    BindSubjectMaterialTextures();
+                    PinMainPassMaterialSamplerUniforms(u);
                 }
+
                 var bHasN = slot.NormalRgba is { Length: > 0 };
                 var bHasS = slot.SpecularRgba is { Length: > 0 };
                 var bHasH = slot.HeightRgba is { Length: > 0 };
                 var batchAllowsParallax = !frame.EntityEmulatedPreview || batch.EnableParallax;
                 var batchParallax = frame.EnableParallaxEff && batchAllowsParallax && bHasH;
-                SetInt("uEnableParallax", batchParallax ? 1 : 0);
-                SetInt("uEnableParallaxAo", batchParallax && frame.EnableParallaxAoEff ? 1 : 0);
-                SetInt("uEnableParallaxShadow", batchParallax && frame.EnableParallaxShadowEff ? 1 : 0);
-                SetFloat("uParallaxUvScale", frame.EntityEmulatedPreview
+                SetIntLoc(u.EnableParallax, batchParallax ? 1 : 0);
+                SetIntLoc(u.EnableParallaxAo, batchParallax && frame.EnableParallaxAoEff ? 1 : 0);
+                SetIntLoc(u.EnableParallaxShadow, batchParallax && frame.EnableParallaxShadowEff ? 1 : 0);
+                SetFloatLoc(u.ParallaxUvScale, frame.EntityEmulatedPreview
                     ? EntityParallaxUvScale(slot)
                     : 1f);
-                SetVec2("uTextureAtlasScale", frame.EntityEmulatedPreview
+                SetVec2Loc(u.TextureAtlasScale, frame.EntityEmulatedPreview
                     ? EntityTextureAtlasScale(slot)
                     : Vector2.One);
-                SetInt("uEnableTessellationDisplacement",
+                SetIntLoc(u.EnableTessellationDisplacement,
                     _mainProgramUsesTessellation &&
                     frame.EnableTessellationDisplacementEff &&
                     batchAllowsParallax &&
                     bHasH
                         ? 1
                         : 0);
-                SetInt("uHasNormal", bHasN ? 1 : 0);
-                SetInt("uHasSpecular", bHasS ? 1 : 0);
-                SetInt("uHasHeight", bHasH ? 1 : 0);
-                _albedo.Bind(0);
-                _normal.Bind(1);
-                _spec.Bind(2);
-                _height.Bind(3);
-                SetInt("uAlbedo", 0);
-                SetInt("uNormal", 1);
-                SetInt("uSpecular", 2);
-                SetInt("uHeight", 3);
-                ApplyEntityBoneSkinningUniformsBeforeDraw(
-                    _program,
-                    _mainEntityUniformLocs,
-                    frame.BlockModel,
-                    frame.BlockModel.EntityGpuMeshSpaceLiftY,
-                    frame.EntityBoneSnapshotValid,
-                    frame.EntityBoneSnapshotCount,
-                    frame.Settings.EnableEntityAnimation,
-                    frame.EntityBonePaletteUploaded,
-                    "main");
+                SetIntLoc(u.HasNormal, bHasN ? 1 : 0);
+                SetIntLoc(u.HasSpecular, bHasS ? 1 : 0);
+                SetIntLoc(u.HasHeight, bHasH ? 1 : 0);
+                SetVec2Loc(u.ParallaxHeightTexSize, bHasH
+                    ? new Vector2(Math.Max(1, slot.Width), Math.Max(1, slot.Height))
+                    : Vector2.One);
+                if (!entityBoneUniformsApplied)
+                {
+                    ApplyEntityBoneSkinningUniformsBeforeDraw(
+                        _program,
+                        _mainEntityUniformLocs,
+                        frame.BlockModel,
+                        frame.BlockModel.EntityGpuMeshSpaceLiftY,
+                        frame.EntityBoneSnapshotValid,
+                        frame.EntityBoneSnapshotCount,
+                        frame.Settings.EnableEntityAnimation,
+                        frame.EntityBonePaletteUploaded,
+                        "main",
+                        bindBoneUboBlocks: !frame.EntityBonePaletteUploaded);
+                    entityBoneUniformsApplied = true;
+                }
+
                 using (OpenGlPreviewLayerDepthState.Apply(frame.Gl, batch.LayerPolicy))
                 {
                     if (EntityPreviewDebugSettings.ShowDepthLayerDebug)
                     {
-                        SetVec3(
-                            "uPreviewLayerDebugTint",
+                        SetVec3Loc(
+                            u.PreviewLayerDebugTint,
                             PreviewDrawLayerPolicy.GetDebugTint(batch.LayerPolicy.Kind));
                     }
 
-                    _mesh.DrawRange(batch.FirstIndex, batch.IndexCount, _mainProgramUsesTessellation);
+                    _mesh.DrawRange(batch.FirstIndex, batch.IndexCount, _mainProgramUsesTessellation, keepBound: true);
                 }
             }
+
+            _mesh.UnbindVertexArray();
 
             if (!blendWasEnabled)
             {
@@ -415,28 +401,31 @@ public sealed partial class OpenGlPreviewBackend
                 frame.Gl.Enable(EnableCap.Blend);
             }
 
-            SetInt("uEntityAlphaMode", frame.EntityAlphaModeUniform);
+            SetIntLoc(u.EntityAlphaMode, frame.EntityAlphaModeUniform);
         }
         else
         {
             var hasN = frame.Material?.NormalRgba is { Length: > 0 };
             var hasS = frame.Material?.SpecularRgba is { Length: > 0 };
             var hasH = frame.Material?.HeightRgba is { Length: > 0 };
-            SetFloat("uParallaxUvScale", 1f);
-            SetVec2("uTextureAtlasScale", Vector2.One);
-            SetInt("uEnableTessellationDisplacement",
+            SetFloatLoc(u.ParallaxUvScale, 1f);
+            SetVec2Loc(u.TextureAtlasScale, Vector2.One);
+            SetIntLoc(u.EnableTessellationDisplacement,
                 _mainProgramUsesTessellation && frame.EnableTessellationDisplacementEff && hasH ? 1 : 0);
-            SetInt("uHasNormal", hasN ? 1 : 0);
-            SetInt("uHasSpecular", hasS ? 1 : 0);
-            SetInt("uHasHeight", hasH ? 1 : 0);
+            SetIntLoc(u.HasNormal, hasN ? 1 : 0);
+            SetIntLoc(u.HasSpecular, hasS ? 1 : 0);
+            SetIntLoc(u.HasHeight, hasH ? 1 : 0);
+            SetVec2Loc(u.ParallaxHeightTexSize, hasH && frame.Material is not null
+                ? new Vector2(Math.Max(1, frame.Material.Width), Math.Max(1, frame.Material.Height))
+                : Vector2.One);
             _albedo.Bind(0);
             _normal.Bind(1);
             _spec.Bind(2);
             _height.Bind(3);
-            SetInt("uAlbedo", 0);
-            SetInt("uNormal", 1);
-            SetInt("uSpecular", 2);
-            SetInt("uHeight", 3);
+            SetIntLoc(u.Albedo, 0);
+            SetIntLoc(u.Normal, 1);
+            SetIntLoc(u.Specular, 2);
+            SetIntLoc(u.Height, 3);
             if (!_loggedMeshReady)
             {
                 EmitDiagnostic(
@@ -462,17 +451,120 @@ public sealed partial class OpenGlPreviewBackend
         return Math.Clamp(16f / atlasMax, 0.02f, 1f);
     }
 
-    private static Vector2 EntityTextureAtlasScale(PreviewMaterial slot)
+    private static Vector2 EntityTextureAtlasScale(PreviewMaterial slot) =>
+        PreviewEntityTextureAtlasScale.Resolve(
+            slot.Width,
+            slot.Height,
+            slot.BakeAtlasWidth,
+            slot.BakeAtlasHeight);
+
+    private void BindAndPinMainPassGlobalTextures(ref GlRenderFrame frame, MainProgramUniformLocs u)
     {
-        if (slot.Width <= 0 || slot.Height <= 0)
+        PinMainPassMaterialSamplerUniforms(u);
+
+        if (_shadowTarget is not null)
         {
-            return Vector2.One;
+            frame.Gl.ActiveTexture(TextureUnit.Texture0 + MainPassShadowFarUnit);
+            frame.Gl.BindTexture(TextureTarget.Texture2D, _shadowTarget.DepthTextureHandle);
         }
 
-        var bakeW = slot.BakeAtlasWidth > 0 ? slot.BakeAtlasWidth : slot.Width;
-        var bakeH = slot.BakeAtlasHeight > 0 ? slot.BakeAtlasHeight : slot.Height;
-        return new Vector2(
-            Math.Min(1f, (float)bakeW / slot.Width),
-            Math.Min(1f, (float)bakeH / slot.Height));
+        if (frame.ShadowCascadesActive && _shadowTargetCascadeNear is not null)
+        {
+            frame.Gl.ActiveTexture(TextureUnit.Texture0 + MainPassShadowNearUnit);
+            frame.Gl.BindTexture(TextureTarget.Texture2D, _shadowTargetCascadeNear.DepthTextureHandle);
+        }
+        else if (_shadowTarget is not null)
+        {
+            frame.Gl.ActiveTexture(TextureUnit.Texture0 + MainPassShadowNearUnit);
+            frame.Gl.BindTexture(TextureTarget.Texture2D, _shadowTarget.DepthTextureHandle);
+        }
+
+        if (_atmoSkyViewTex != 0)
+        {
+            frame.Gl.ActiveTexture(TextureUnit.Texture0 + MainPassSkyLutUnit);
+            frame.Gl.BindTexture(TextureTarget.Texture2D, _atmoSkyViewTex);
+        }
+
+        if (u.ShadowMap >= 0)
+        {
+            SetIntLoc(u.ShadowMap, MainPassShadowFarUnit);
+        }
+
+        if (u.ShadowMapNear >= 0)
+        {
+            SetIntLoc(u.ShadowMapNear, MainPassShadowNearUnit);
+        }
+
+        if (u.AtmoSkyViewLut >= 0 && _atmoSkyViewTex != 0)
+        {
+            SetIntLoc(u.AtmoSkyViewLut, MainPassSkyLutUnit);
+        }
+    }
+
+    private void BindSubjectMaterialTextures()
+    {
+        _albedo!.Bind(0);
+        _normal!.Bind(1);
+        _spec!.Bind(2);
+        _height!.Bind(3);
+    }
+
+    private void PinMainPassMaterialSamplerUniforms(MainProgramUniformLocs u)
+    {
+        if (u.Albedo >= 0)
+        {
+            SetIntLoc(u.Albedo, 0);
+        }
+
+        if (u.Normal >= 0)
+        {
+            SetIntLoc(u.Normal, 1);
+        }
+
+        if (u.Specular >= 0)
+        {
+            SetIntLoc(u.Specular, 2);
+        }
+
+        if (u.Height >= 0)
+        {
+            SetIntLoc(u.Height, 3);
+        }
+    }
+
+    private void ApplyMainPassPerSettingsUniforms(ref GlRenderFrame frame, MainProgramUniformLocs u)
+    {
+        SetFloatLoc(u.Ambient, frame.Settings.AmbientStrength);
+        SetFloatLoc(u.NormalStrength, frame.Settings.NormalStrength);
+        SetFloatLoc(u.HeightStrength, frame.Settings.HeightStrength);
+        SetFloatLoc(u.SpecularStrength, frame.Settings.SpecularStrength);
+        SetFloatLoc(u.RoughnessScale, frame.Settings.RoughnessScale);
+        SetFloatLoc(u.Exposure, frame.Settings.Exposure);
+        SetFloatLoc(u.ParallaxAoStrength, frame.Settings.ParallaxAoStrength);
+        SetIntLoc(u.ParallaxTraceLayers, Math.Clamp(frame.Settings.ParallaxTraceLayers, 8, 128));
+        SetIntLoc(u.ParallaxRefineSteps, Math.Clamp(frame.Settings.ParallaxRefineSteps, 0, 8));
+        SetIntLoc(u.ParallaxShadowSamples, Math.Clamp(frame.Settings.ParallaxShadowSamples, 4, 64));
+        SetFloatLoc(u.ParallaxShadowSoftness, Math.Clamp(frame.Settings.ParallaxShadowSoftness, 0f, 4f));
+        SetFloatLoc(u.ParallaxMaxUvShift, Math.Clamp(frame.Settings.ParallaxMaxUvShift, 0.05f, 0.75f));
+        SetFloatLoc(u.TessellationLevel, Math.Clamp(frame.Settings.TessellationLevel, 1f, 16f));
+        SetFloatLoc(u.TessellationDisplacementStrength, Math.Clamp(frame.Settings.TessellationDisplacementStrength, 0f, 0.20f));
+        SetFloatLoc(u.AlphaCutoff, frame.Settings.AlphaCutoff);
+        SetIntLoc(u.ItemAlphaBlend, frame.Settings.ItemUseAlphaBlend ? 1 : 0);
+        SetIntLoc(u.PreviewDepthLayerDebug, EntityPreviewDebugSettings.ShowDepthLayerDebug ? 1 : 0);
+        SetVec3Loc(u.PreviewLayerDebugTint, Vector3.One);
+        SetIntLoc(u.EnableSss, frame.Settings.EnableSss ? 1 : 0);
+        SetIntLoc(u.EnableIbl, frame.Settings.EnableIbl ? 1 : 0);
+        SetFloatLoc(u.SssStrength, frame.Settings.SssStrength);
+        SetFloatLoc(u.IblStrength, frame.Settings.IblStrength);
+        SetFloatLoc(u.EmissionStrength, frame.Settings.EmissionStrength);
+        SetIntLoc(u.EnableAtmosphericSky, frame.Settings.EnableAtmosphericSky ? 1 : 0);
+        SetFloatLoc(u.AtmosphereSunIntensity, frame.Settings.AtmosphereSunIntensity);
+        SetVec3Loc(u.SkyTint, new Vector3(0.55f, 0.62f, 0.74f));
+        SetVec3Loc(u.GroundTint, new Vector3(0.22f, 0.20f, 0.18f));
+        SetFloatLoc(u.ShadowMinBias, frame.Settings.ShadowMinBias);
+        SetFloatLoc(u.ShadowMaxBias, frame.Settings.ShadowMaxBias);
+        SetFloatLoc(u.ShadowSoftnessTexels, Math.Clamp(frame.Settings.ShadowSoftnessTexels, 0f, 8f));
+        var shadowRes = _shadowTarget?.Resolution ?? Math.Clamp(frame.Settings.ShadowMapResolution, 256, 4096);
+        SetVec2Loc(u.ShadowTexelSize, new Vector2(1f / shadowRes, 1f / shadowRes));
     }
 }

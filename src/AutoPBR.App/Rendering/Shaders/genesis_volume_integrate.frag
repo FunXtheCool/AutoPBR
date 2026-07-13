@@ -11,9 +11,11 @@
 //!include "common/temporal_reproject.glsl"
 //!include "common/volume_froxel_math.glsl"
 //!include "common/volume_integrate_sample.glsl"
+//!include "common/volume_integrate_sparse.glsl"
 
 in vec2 vUv;
 uniform sampler2DArray uFroxelVolume;
+uniform sampler2DArray uFroxelOccupancy;
 uniform sampler2DArray uPrevFroxelVolume;
 uniform sampler2D uSceneDepth;
 uniform sampler2D uPrevIntegrate;
@@ -47,11 +49,6 @@ out vec4 FragColor;
 const int VM_STEPS = 36;
 const float SKY_DEPTH_EPS = 0.9992;
 
-vec3 softKnee(vec3 x, float knee)
-{
-    return x / (x + vec3(knee));
-}
-
 void main()
 {
     if (uStrength <= 0.0)
@@ -71,14 +68,31 @@ void main()
     float miePhase = atmosphereMiePhase(dot(rd, sunToward));
 
     float stepLen = uHalfExtent.z * 2.0 / float(VM_STEPS);
+    float stepLenCoarse = stepLen;
+    float stepLenFine = stepLenCoarse * 0.5;
+#ifdef GENESIS_VOLUME_MEDIUMP_ACCUM
+    mediump vec3 accum = vec3(0.0);
+    mediump float transmittance = 1.0;
+#else
     vec3 accum = vec3(0.0);
     float transmittance = 1.0;
+#endif
     float jitter = uJitter * stepLen;
+#ifdef GENESIS_VOLUME_TEMPORAL
     float froxelTemporal = (uHasPrevFroxel > 0) ? uFroxelTemporalWeight : 0.0;
+#else
+    float froxelTemporal = 0.0;
+#endif
 
     for (int i = 0; i < VM_STEPS; ++i)
     {
-        float t = jitter + (float(i) + 0.5) * stepLen;
+        if (viSparseMarchSkipOddStep(i, jitter, stepLenCoarse, rd, uCameraPos, uCamRight, uCamUp, uCamForward,
+            uHalfExtent, uSliceCount, uDepthDistribution, uFroxelOccupancy))
+        {
+            continue;
+        }
+
+        float t = viSparseMarchT(i, jitter, stepLenCoarse, stepLenFine);
         vec3 worldPos = uCameraPos + rd * t;
         vec3 froxelUv = vfWorldToFroxelUv(worldPos, uCameraPos, uCamRight, uCamUp, uCamForward,
             uHalfExtent, uSliceCount, uDepthDistribution);
@@ -88,7 +102,13 @@ void main()
             continue;
         }
 
+        if (viSampleFroxelOccupancy(uFroxelOccupancy, froxelUv, uSliceCount) <= 1e-5)
+        {
+            continue;
+        }
+
         vec4 voxel = viSampleFroxel(uFroxelVolume, froxelUv, uSliceCount);
+#ifdef GENESIS_VOLUME_TEMPORAL
         if (froxelTemporal > 0.0)
         {
             vec3 prevUv = vfWorldToFroxelUv(worldPos, uPrevCameraPos, uPrevCamRight, uPrevCamUp, uPrevCamForward,
@@ -99,6 +119,7 @@ void main()
                 voxel = mix(voxel, prevVoxel, froxelTemporal);
             }
         }
+#endif
 
         float density = voxel.r;
         if (density <= 1e-5)
@@ -118,6 +139,7 @@ void main()
 
     vec3 vol = softKnee(accum * uStrength, 0.2);
 
+#ifdef GENESIS_VOLUME_TEMPORAL
     if (uHasPrevIntegrate > 0 && uTemporalWeight > 0.0)
     {
         vec2 prevUv = trReprojectUvFromDepth(vUv, receiverDepth, uInvViewProj, uPrevViewProj);
@@ -129,6 +151,7 @@ void main()
             vol = mix(vol, history, uTemporalWeight * depthValid);
         }
     }
+#endif
 
     float luma = max(max(vol.r, vol.g), vol.b);
     if (luma <= 1e-6)

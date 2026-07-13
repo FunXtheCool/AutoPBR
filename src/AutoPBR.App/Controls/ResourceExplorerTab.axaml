@@ -184,18 +184,27 @@
                                                        Opacity="0.85"
                                                        FontSize="13" />
                                         </Grid>
-                                    <ScrollViewer x:Name="ExploreTreeScrollViewer"
-                                                  HorizontalScrollBarVisibility="Auto"
-                                                  VerticalScrollBarVisibility="Auto"
-                                                  IsVisible="{Binding HasScannedArchive}">
                                         <TreeView ItemsSource="{Binding ExploreViewItems}"
                                                   x:Name="ExploreTreeView"
                                                   SelectionMode="Multiple"
-                                                  SelectedItem="{Binding SelectedExploreNode, Mode=TwoWay}">
+                                                  SelectedItem="{Binding SelectedExploreNode, Mode=TwoWay}"
+                                                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                  IsVisible="{Binding HasScannedArchive}">
+                                            <TreeView.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <VirtualizingStackPanel />
+                                                </ItemsPanelTemplate>
+                                            </TreeView.ItemsPanel>
                                             <TreeView.Styles>
                                                 <Style Selector="TreeViewItem">
                                                     <Setter Property="IsExpanded"
                                                             Value="{Binding $self.((m:ArchiveNode)DataContext).IsExpanded, Mode=TwoWay, FallbackValue=False, TargetNullValue=False}" />
+                                                    <Setter Property="ItemsPanel">
+                                                        <ItemsPanelTemplate>
+                                                            <VirtualizingStackPanel />
+                                                        </ItemsPanelTemplate>
+                                                    </Setter>
                                                     <Setter Property="IsVisible">
                                                         <Setter.Value>
                                                             <Binding Path="$self.((m:ArchiveNode)DataContext).IsVisibleByFilter"
@@ -217,7 +226,8 @@
                                                 <TreeDataTemplate DataType="m:ArchiveNode" ItemsSource="{Binding Children}">
                                                     <Border Classes="preview-row-host" Background="Transparent" Padding="0">
                                                         <Border.ContextMenu>
-                                                            <ContextMenu IsVisible="{Binding !IsFolder}">
+                                                            <ContextMenu IsVisible="{Binding !IsFolder}"
+                                                                         Opening="ExploreRowContextMenu_OnOpening">
                                                                 <MenuItem Header="{Binding #ExploreTreeView.((vm:MainWindowViewModel)DataContext).Strings.TagLegendMaterials, FallbackValue='', TargetNullValue=''}"
                                                                           ItemsSource="{Binding MaterialTagMenuItems}">
                                                                     <MenuItem.ItemTemplate>
@@ -339,7 +349,6 @@
                                                 </TreeDataTemplate>
                                             </TreeView.DataTemplates>
                                         </TreeView>
-                                    </ScrollViewer>
                                     </Grid>
                                 </Border>
                             </Grid>

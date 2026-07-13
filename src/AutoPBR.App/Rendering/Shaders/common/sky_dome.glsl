@@ -3,6 +3,8 @@
 #ifndef GENESIS_SKY_DOME_GLSL
 #define GENESIS_SKY_DOME_GLSL
 
+//!include "common.glsl"
+//!include "sky_view_lut.glsl"
 //!include "atmosphere.glsl"
 
 const float SKY_PI = 3.14159265358979323846;
@@ -241,9 +243,6 @@ vec3 skyMoonDiscShading(vec3 viewDir, vec3 lightPropagationDir, float cosDiscEdg
     return moonCol * disc;
 }
 
-// Must match OpenGlPreviewBackend.Lighting.cs sky-view LUT width (192).
-const float SKY_VIEW_LUT_WIDTH = 192.0;
-
 // Reconstruct a unit view direction from sky-view LUT UV (matches atmo_skyview.frag).
 // Edge columns share azimuth = π so texel 0 and texel W-1 bake identical radiance for Repeat.
 vec3 skyViewDirFromLutUv(vec2 uv)
@@ -261,41 +260,9 @@ vec3 skyViewDirFromLutUv(vec2 uv)
     return normalize(vec3(sinTheta * sin(azimuth), cosTheta, sinTheta * cos(azimuth)));
 }
 
-// Map a world-space view direction to sky-view LUT UV. Azimuth wraps at u=0/1 on the -Z meridian
-// (Repeat on S); never use a [0,2π) remap that parks the atan branch cut at u=0.5 in texture space.
-vec2 skyViewLutUv(vec3 viewDir)
-{
-    vec3 d = normalize(viewDir);
-    float viewZenith = acos(clamp(d.y, -1.0, 1.0)) / SKY_PI;
-    float u = atan(d.x, d.z) / (2.0 * SKY_PI) + 0.5;
-    return vec2(u, viewZenith);
-}
-
-// Bilinear sample with explicit azimuth wrap (Repeat alone can still leak a meridian seam on ANGLE).
-vec3 sampleSkyViewLutSrgb(sampler2D lut, vec3 viewDir)
-{
-    vec2 uv = skyViewLutUv(viewDir);
-    float u = uv.x;
-    float v = clamp(uv.y, 0.0, 1.0);
-    float texelU = 1.0 / SKY_VIEW_LUT_WIDTH;
-    vec3 c0 = texture(lut, vec2(u, v)).rgb;
-    if (u < texelU)
-    {
-        vec3 c1 = texture(lut, vec2(u + 1.0, v)).rgb;
-        c0 = mix(c1, c0, u / texelU);
-    }
-    else if (u > 1.0 - texelU)
-    {
-        vec3 c1 = texture(lut, vec2(u - 1.0, v)).rgb;
-        c0 = mix(c0, c1, (u - (1.0 - texelU)) / texelU);
-    }
-
-    return c0;
-}
-
 vec3 skySoftKnee(vec3 x, float knee)
 {
-    return x / (x + vec3(knee));
+    return softKnee(x, knee);
 }
 
 #endif // GENESIS_SKY_DOME_GLSL

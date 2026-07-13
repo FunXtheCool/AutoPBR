@@ -6,6 +6,62 @@ namespace AutoPBR.App.Tests;
 
 public class PreviewGlslEsAdaptTests
 {
+    [Fact]
+    public void PreparedSource_DefinesAreInsertedAfterVersionHeader()
+    {
+        var defines = new Dictionary<string, int> { ["GENESIS_ENABLE_SHADOW"] = 1 };
+        var prepared = GlslPreparedSourceCache.GetOrPrepare(
+            "genesis.vert",
+            ShaderType.VertexShader,
+            useOpenGlEs: true,
+            defines);
+
+        Assert.StartsWith("#version 300 es", prepared.TrimStart(), StringComparison.Ordinal);
+        var versionIdx = prepared.IndexOf("#version 300 es", StringComparison.Ordinal);
+        var defineIdx = prepared.IndexOf("#define GENESIS_ENABLE_SHADOW", StringComparison.Ordinal);
+        Assert.True(versionIdx >= 0);
+        Assert.True(defineIdx > versionIdx, "defines must follow #version on GLES");
+        Assert.Contains("precision highp float;", prepared, StringComparison.Ordinal);
+        var precisionIdx = prepared.IndexOf("precision highp float;", StringComparison.Ordinal);
+        Assert.True(defineIdx > precisionIdx, "defines must follow precision qualifiers on GLES");
+        Assert.Contains("#define GENESIS_GLES 1", prepared, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AtmoSky_DoesNotRedefineSkyViewLutWidth()
+    {
+        foreach (var file in new[] { "atmo_sky.frag", "atmo_skyview.frag", "genesis_clouds.frag" })
+        {
+            var src = GlslIncludeResolver.Resolve(file, LoadShader);
+            var adapted = GlslSourceAdapter.Adapt(src, ShaderType.FragmentShader, useOpenGlEs: true);
+            var count = CountSubstringOccurrences(adapted, "const float SKY_VIEW_LUT_WIDTH");
+            Assert.Equal(1, count);
+        }
+    }
+
+    [Fact]
+    public void VolumeInject_MultiOutput_FragColorHasExplicitLocation()
+    {
+        foreach (var file in new[] { "genesis_volume_inject.frag", "genesis_volume_inject_lite.frag" })
+        {
+            var src = GlslIncludeResolver.Resolve(file, LoadShader);
+            var adapted = GlslSourceAdapter.Adapt(src, ShaderType.FragmentShader, useOpenGlEs: true);
+            Assert.Contains("layout(location = 0) out vec4 FragColor;", adapted, StringComparison.Ordinal);
+            Assert.Contains("layout(location = 1) out float FragOccupancy;", adapted, StringComparison.Ordinal);
+        }
+    }
+
+    [Fact]
+    public void GodRayShadowSparseMarch_DeclaresMarchTOutsideConditionalBranches()
+    {
+        var raw = GlslIncludeResolver.Resolve("genesis_godrays_shadow.frag", LoadShader);
+        var withDefine = "#define GENESIS_GODRAY_SPARSE_MARCH 1\n" + raw;
+        var adapted = GlslSourceAdapter.Adapt(withDefine, ShaderType.FragmentShader, useOpenGlEs: true);
+        Assert.Contains("float t;", adapted, StringComparison.Ordinal);
+        Assert.Contains("t = grSparseMarchT(i, GR_SAMPLES);", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("#endif        vec2 marchUv", adapted, StringComparison.Ordinal);
+    }
+
     [Theory]
     [InlineData("genesis.frag")]
     [InlineData("genesis_godrays.frag")]
@@ -76,7 +132,7 @@ public class PreviewGlslEsAdaptTests
 
         Assert.Contains("metalPreviewBaseVisibility", adapted, StringComparison.Ordinal);
         Assert.Contains("mat.metallic * metalPreviewBaseVisibility(mat.roughness)", adapted, StringComparison.Ordinal);
-        Assert.Contains("metalPreviewIrradiance * albedoLinear * metalBaseVisibility", adapted, StringComparison.Ordinal);
+        Assert.Contains("metalPreviewIrradiance * albedoLinear * metalBaseVis", adapted, StringComparison.Ordinal);
         Assert.DoesNotContain(
             "indirect += iblDiff * albedoLinear * (1.0 - mat.metallic) * uIblStrength;",
             adapted,
@@ -102,15 +158,107 @@ public class PreviewGlslEsAdaptTests
     [Fact]
     public void GenesisShadowSampling_UsesSoftPcfKernel()
     {
-        var src = GlslIncludeResolver.Resolve("genesis.frag", LoadShader);
+        var shadowSrc = GlslIncludeResolver.Resolve("common/shadow.glsl", LoadShader);
+        var shadowAdapted = GlslSourceAdapter.Adapt(shadowSrc, ShaderType.FragmentShader, useOpenGlEs: true);
+
+        Assert.Contains("sampleSceneShadowCascaded", shadowAdapted, StringComparison.Ordinal);
+        Assert.Contains("sampleShadowPcfSoft", shadowAdapted, StringComparison.Ordinal);
+        Assert.Contains("sampleSceneShadowFromClip", shadowAdapted, StringComparison.Ordinal);
+        Assert.Contains("lightClip.w <= 0.0", shadowAdapted, StringComparison.Ordinal);
+
+        var genesisSrc = "#define GENESIS_ENABLE_SHADOW 1\n" +
+                         GlslIncludeResolver.Resolve("genesis.frag", LoadShader);
+        var adapted = GlslSourceAdapter.Adapt(genesisSrc, ShaderType.FragmentShader, useOpenGlEs: true);
+
+        Assert.Contains("uShadowMapNear", adapted, StringComparison.Ordinal);
+        Assert.Contains("uEnableShadowCascades", adapted, StringComparison.Ordinal);
+        Assert.Contains("uCascadeSplitDistance", adapted, StringComparison.Ordinal);
+        Assert.Contains("uCascadeBlendWidth", adapted, StringComparison.Ordinal);
+        Assert.Contains("sampleSceneShadowCascaded", adapted, StringComparison.Ordinal);
+        Assert.Contains("mix(nearVis, farVis, blendT)", shadowAdapted, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void CloudMarch_UsesLightOpticalDepthFromBase()
+    {
+        var clouds = GlslIncludeResolver.Resolve("genesis_clouds.frag", LoadShader);
+        var adapted = GlslSourceAdapter.Adapt(clouds, ShaderType.FragmentShader, useOpenGlEs: true);
+
+        Assert.Contains("vcLightOpticalDepthFromBase", adapted, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GodRaySparseMarch_CompilesWithDefineOnEs()
+    {
+        var raw = GlslIncludeResolver.Resolve("genesis_godrays.frag", LoadShader);
+        var withDefine = "#define GENESIS_GODRAY_SPARSE_MARCH 1\n" + raw;
+        var adapted = GlslSourceAdapter.Adapt(withDefine, ShaderType.FragmentShader, useOpenGlEs: true);
+
+        Assert.Contains("grSparseMarchT", adapted, StringComparison.Ordinal);
+        Assert.Contains("grSparseMarchSkipOddStepScreen", adapted, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GodRayShadowSparseMarch_CompilesWithDefineOnEs()
+    {
+        var raw = GlslIncludeResolver.Resolve("genesis_godrays_shadow.frag", LoadShader);
+        var withDefine = "#define GENESIS_GODRAY_SPARSE_MARCH 1\n" + raw;
+        var adapted = GlslSourceAdapter.Adapt(withDefine, ShaderType.FragmentShader, useOpenGlEs: true);
+
+        Assert.Contains("grSparseMarchSkipOddStepShadow", adapted, StringComparison.Ordinal);
+        Assert.Contains("uCascadeBlendWidth", adapted, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void VolumeIntegrate_TemporalVariant_IsGuardedByCompileDefine()
+    {
+        var raw = GlslIncludeResolver.Resolve("genesis_volume_integrate.frag", LoadShader);
+        var prevUse = raw.IndexOf("texture(uPrevIntegrate", StringComparison.Ordinal);
+        Assert.True(prevUse >= 0, "temporal history sample must exist behind compile define");
+        var guard = raw.LastIndexOf("#ifdef GENESIS_VOLUME_TEMPORAL", prevUse, StringComparison.Ordinal);
+        Assert.True(guard >= 0 && guard < prevUse,
+            "uPrevIntegrate sampling must be wrapped in #ifdef GENESIS_VOLUME_TEMPORAL");
+    }
+
+    [Fact]
+    public void LabPbrMetalF0_UsesConstTableLookup()
+    {
+        var src = GlslIncludeResolver.Resolve("common/material_labpbr.glsl", LoadShader);
         var adapted = GlslSourceAdapter.Adapt(src, ShaderType.FragmentShader, useOpenGlEs: true);
 
-        Assert.Contains("sampleShadowPcfSoft", adapted, StringComparison.Ordinal);
-        Assert.Contains("shadowMapTexelDepth", adapted, StringComparison.Ordinal);
-        Assert.Contains("texel * 1.75", adapted, StringComparison.Ordinal);
-        Assert.Contains("uLightViewProj * vec4(vWorldPos, 1.0)", adapted, StringComparison.Ordinal);
-        Assert.Contains("uShadowSoftnessTexels", adapted, StringComparison.Ordinal);
-        Assert.Contains("vec2[16]", adapted, StringComparison.Ordinal);
+        Assert.Contains("LABPBR_METAL_F0", adapted, StringComparison.Ordinal);
+        Assert.Contains("gIndex - 230", adapted, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void VolumeIntegrate_IncludesSparseOccupancyMarch()
+    {
+        var src = GlslIncludeResolver.Resolve("genesis_volume_integrate.frag", LoadShader);
+        var adapted = GlslSourceAdapter.Adapt(src, ShaderType.FragmentShader, useOpenGlEs: true);
+
+        Assert.Contains("uFroxelOccupancy", adapted, StringComparison.Ordinal);
+        Assert.Contains("viSampleFroxelOccupancy", adapted, StringComparison.Ordinal);
+        Assert.Contains("viSparseMarchT", adapted, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void VolumeInject_WritesOccupancyTarget()
+    {
+        var src = GlslIncludeResolver.Resolve("genesis_volume_inject.frag", LoadShader);
+        var adapted = GlslSourceAdapter.Adapt(src, ShaderType.FragmentShader, useOpenGlEs: true);
+
+        Assert.Contains("FragOccupancy", adapted, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void VolumeIntegrate_MediumpAccum_PreservesQualifierOnEs()
+    {
+        var raw = GlslIncludeResolver.Resolve("genesis_volume_integrate.frag", LoadShader);
+        var withDefine = "#define GENESIS_VOLUME_MEDIUMP_ACCUM 1\n" + raw;
+        var adapted = GlslSourceAdapter.Adapt(withDefine, ShaderType.FragmentShader, useOpenGlEs: true);
+
+        Assert.Contains("mediump vec3 accum", adapted, StringComparison.Ordinal);
+        Assert.Contains("mediump float transmittance", adapted, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -121,7 +269,8 @@ public class PreviewGlslEsAdaptTests
 
         Assert.Contains("textureGrad(heightTex", adapted, StringComparison.Ordinal);
         Assert.Contains("textureGrad(uAlbedo, uv, uvDx, uvDy)", adapted, StringComparison.Ordinal);
-        Assert.Contains("textureGrad(uAlbedo, vUv, dFdx(vUv), dFdy(vUv))", adapted, StringComparison.Ordinal);
+        Assert.Contains("texture(uAlbedo, vUv)", adapted, StringComparison.Ordinal);
+        Assert.Contains("pomActiveEarly", adapted, StringComparison.Ordinal);
         Assert.Contains("textureGrad(uNormal, uv, dx, dy)", adapted, StringComparison.Ordinal);
         Assert.Contains("textureGrad(uSpecular, uv, uvDx, uvDy)", adapted, StringComparison.Ordinal);
         Assert.Contains("pomTileUv(tileBase", adapted, StringComparison.Ordinal);
@@ -135,7 +284,7 @@ public class PreviewGlslEsAdaptTests
             "pomUvDisplacementScale(strength) * clamp(uParallaxUvScale, 0.02, 1.0)",
             adapted,
             StringComparison.Ordinal);
-        Assert.Contains("textureSize(heightTex, 0)", adapted, StringComparison.Ordinal);
+        Assert.Contains("uParallaxHeightTexSize", adapted, StringComparison.Ordinal);
         Assert.Contains("if (Vtan.z <= 0.0)", adapted, StringComparison.Ordinal);
         Assert.Contains("Vtan.xy / max(Vtan.z, GEN_POM_MIN_VIEW_Z)", adapted, StringComparison.Ordinal);
         Assert.DoesNotContain("if (Vtan.z < GEN_POM_MIN_VIEW_Z)", adapted, StringComparison.Ordinal);
@@ -179,7 +328,8 @@ public class PreviewGlslEsAdaptTests
         Assert.Contains("objectMotion", adapted, StringComparison.Ordinal);
         Assert.Contains("smoothstep(0.08, 0.75, objectMotion)", adapted, StringComparison.Ordinal);
         Assert.Contains("smoothstep(0.18, 0.90, reactivity)", adapted, StringComparison.Ordinal);
-        Assert.Contains("trNeighborhoodMinMax3YCoCg", adapted, StringComparison.Ordinal);
+        Assert.Contains("taaFetchNeighborhood3x3", adapted, StringComparison.Ordinal);
+        Assert.Contains("trNeighborhoodMinMax3YCoCgFromTaps", adapted, StringComparison.Ordinal);
         Assert.Contains("trClipHistoryToNeighborhoodYCoCg", adapted, StringComparison.Ordinal);
         Assert.Contains("trLuminanceReactiveWeight", adapted, StringComparison.Ordinal);
         Assert.Contains("trDepthEdgeWeight", adapted, StringComparison.Ordinal);
@@ -200,9 +350,9 @@ public class PreviewGlslEsAdaptTests
         Assert.Contains("taaCurrentResolveFilter", adapted, StringComparison.Ordinal);
         Assert.Contains("taaFxaaLite", adapted, StringComparison.Ordinal);
         Assert.Contains("taaTentBlur3x3", adapted, StringComparison.Ordinal);
-        Assert.Contains("taaMorphologicalEdgeBlend", adapted, StringComparison.Ordinal);
-        Assert.Contains("taaClosestGeometryDepth3", adapted, StringComparison.Ordinal);
-        Assert.Contains("taaLumaEdgeMask", adapted, StringComparison.Ordinal);
+        Assert.Contains("taaMorphologicalEdgeBlendFromTaps", adapted, StringComparison.Ordinal);
+        Assert.Contains("taaClosestGeometryDepthFromTaps", adapted, StringComparison.Ordinal);
+        Assert.Contains("taaLumaEdgeMaskFromTaps", adapted, StringComparison.Ordinal);
         Assert.Contains("depthGeometryW", adapted, StringComparison.Ordinal);
         Assert.Contains("signalGeometryW", adapted, StringComparison.Ordinal);
         Assert.Contains("silhouetteW", adapted, StringComparison.Ordinal);
@@ -255,7 +405,8 @@ public class PreviewGlslEsAdaptTests
         var src = GlslIncludeResolver.Resolve("genesis.frag", LoadShader);
         var adapted = GlslSourceAdapter.Adapt(src, ShaderType.FragmentShader, useOpenGlEs: true);
 
-        Assert.Contains("float specLobe = uEnableSpecularMap > 0 ? 1.0 : 0.0;", adapted, StringComparison.Ordinal);
+        Assert.Contains("#if defined(GENESIS_ENABLE_SPECULAR_MAP)", adapted, StringComparison.Ordinal);
+        Assert.Contains("float specLobe = 1.0;", adapted, StringComparison.Ordinal);
         Assert.Contains("br.specular *= groundSpecFade * specLobe;", adapted, StringComparison.Ordinal);
         Assert.Contains("ditherSrgb8(linearToSrgb(mapped), gl_FragCoord.xy)", adapted, StringComparison.Ordinal);
     }
@@ -269,6 +420,9 @@ public class PreviewGlslEsAdaptTests
         Assert.Contains("uniform mat4 uPrevViewProj", src, StringComparison.Ordinal);
         Assert.Contains("uniform mat4 uTaaCurrViewProj", src, StringComparison.Ordinal);
         Assert.Contains("EntityPrevSkinningBones", src, StringComparison.Ordinal);
+        Assert.Contains("EntitySkinningNormals", src, StringComparison.Ordinal);
+        Assert.Contains("uNormalBoneMatrices", src, StringComparison.Ordinal);
+        Assert.DoesNotContain("inverse(bone)", src, StringComparison.Ordinal);
         Assert.Contains("uEntityPrevBonePaletteValid", src, StringComparison.Ordinal);
         Assert.Contains("uniform vec2 uTextureAtlasScale", src, StringComparison.Ordinal);
         Assert.Contains("vUv = aUv * uTextureAtlasScale", src, StringComparison.Ordinal);
@@ -286,6 +440,19 @@ public class PreviewGlslEsAdaptTests
         var adapted = GlslSourceAdapter.Adapt(src, ShaderType.FragmentShader, useOpenGlEs: true);
 
         Assert.Contains("// plain ascii", adapted, StringComparison.Ordinal);
+    }
+
+    private static int CountSubstringOccurrences(string source, string needle)
+    {
+        var count = 0;
+        var start = 0;
+        while ((start = source.IndexOf(needle, start, StringComparison.Ordinal)) >= 0)
+        {
+            count++;
+            start += needle.Length;
+        }
+
+        return count;
     }
 
     private static string LoadShader(string fileName) => LoadShaderCore(fileName, ThisFilePath());

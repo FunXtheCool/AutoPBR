@@ -263,8 +263,8 @@ internal static partial class JavapFloatGeometryMeshLift
     }
 
     /// <summary>
-    /// After <c>addOrReplaceChild</c>, the receiver local is re-mapped to the child part id; walk
-    /// <see cref="ReceiverSlotEntry.ParentReceiverSlot"/> to find the parent mesh part id.
+    /// The <c>aload</c> receiver local for <c>addOrReplaceChild</c> holds the parent <c>PartDefinition</c>;
+    /// return that slot's mesh part id (null for <c>getRoot()</c>).
     /// </summary>
     private static string? ResolveParentPartIdFromReceiverSlot(int receiverSlot,
         Dictionary<int, ReceiverSlotEntry> receiverSlotGraph)
@@ -272,13 +272,6 @@ internal static partial class JavapFloatGeometryMeshLift
         if (!receiverSlotGraph.TryGetValue(receiverSlot, out var entry))
         {
             return null;
-        }
-
-        if (entry.ParentReceiverSlot is { } parentSlot &&
-            receiverSlotGraph.TryGetValue(parentSlot, out var parentEntry) &&
-            !string.IsNullOrEmpty(parentEntry.PartId))
-        {
-            return parentEntry.PartId;
         }
 
         return entry.PartId;

@@ -24,6 +24,12 @@ internal static partial class GeometryIrPartTreeRepair
 
         ("right_ear", "head"),
 
+        ("right_horn", "head"),
+
+        ("left_horn", "head"),
+
+        ("mouth", "head"),
+
         ("head_r1", "head"),
 
         ("neck_r1", "head_parts"),
@@ -43,6 +49,12 @@ internal static partial class GeometryIrPartTreeRepair
         ("left_leg_r1", "left_hind_leg"),
 
         ("rods", "body"),
+
+        ("rod_1", "rods"),
+
+        ("rod_2", "rods"),
+
+        ("rod_3", "rods"),
 
         ("tail2", "tail1"),
 
@@ -238,7 +250,9 @@ internal static partial class GeometryIrPartTreeRepair
 
 
         RepairObjectChestModelCuboidOrigins(doc);
-        RepairDecoratedPotCapUvOrigins(doc);
+        RepairDecoratedPotCapCuboids(doc);
+        RepairBreezeMultiLayerAtlasTags(doc);
+        RepairBreezeRodPartHierarchy(doc);
         if (doc["roots"] is JsonArray repairedRoots)
         {
             RepairTexCropUvSpanDuplicateAnchors(repairedRoots);

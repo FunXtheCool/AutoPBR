@@ -1,7 +1,9 @@
 using System.Runtime.Loader;
 
+using AutoPBR.App.Models;
+using AutoPBR.App.Rendering.OpenGL;
+
 using Avalonia;
-using Avalonia.Win32;
 
 namespace AutoPBR.App;
 
@@ -41,19 +43,12 @@ sealed class Program
 
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
+    {
+        var settings = UserSettings.Load();
+        return AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            // WinUI/DirectComposition sync to the display refresh rate (uncapped on high-Hz monitors).
-            // RedirectionSurface is legacy and hard-capped at 60 FPS — keep it last as a fallback only.
-            .With(new Win32PlatformOptions
-            {
-                CompositionMode =
-                [
-                    Win32CompositionMode.WinUIComposition,
-                    Win32CompositionMode.DirectComposition,
-                    Win32CompositionMode.RedirectionSurface,
-                ],
-            })
+            .With(PreviewOpenGlPlatformConfigurator.CreateWin32PlatformOptions(settings))
             .WithInterFont()
             .LogToTrace();
+    }
 }

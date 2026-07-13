@@ -113,10 +113,46 @@ public sealed class GeometryIrParityEmitTests
         var built = b.Build("entity/decorated_pot/decorated_pot_base");
         var capEl = Assert.Single(built.Elements);
         var down = capEl.Faces["down"];
-        Assert.Equal(14f, down.Uv![0], 0.01f);
+        Assert.Equal(0f, down.Uv![0], 0.01f);
         Assert.Equal(13f, down.Uv![1], 0.01f);
-        Assert.Equal(28f, down.Uv![2], 0.01f);
+        Assert.Equal(14f, down.Uv![2], 0.01f);
         Assert.Equal(27f, down.Uv![3], 0.01f);
+    }
+
+    [Fact]
+    public void DecoratedPot_top_cap_cuboid_uses_java_up_exterior_slot()
+    {
+        const string cap = """
+            {
+              "from": [0, 0, 0],
+              "to": [14, 0, 14],
+              "uvOrigin": [-14, 13],
+              "uvSpan": [14, 0, 14],
+              "textureKey": "#base",
+              "faceMask": ["up"],
+              "liftKind": "exact"
+            }
+            """;
+
+        using var doc = JsonDocument.Parse(cap);
+        Assert.True(EntityModelRuntime.TryToEntityCuboidForTests(
+            doc.RootElement,
+            new GeometryIrMeshEmitOptions
+            {
+                Fidelity = GeometryIrEmitFidelity.Parity,
+                AtlasWidth = 32,
+                AtlasHeight = 32,
+            },
+            out var cuboidOut,
+            out var failure), failure);
+
+        var b = new EntityModelRuntime.RigBuilder(32, 32);
+        cuboidOut.Emit(b, Matrix4x4.Identity, 1f, "#base");
+        var up = Assert.Single(b.Build("entity/decorated_pot/decorated_pot_base").Elements).Faces["up"];
+        Assert.Equal(14f, up.Uv![0], 0.01f);
+        Assert.Equal(27f, up.Uv![1], 0.01f);
+        Assert.Equal(28f, up.Uv![2], 0.01f);
+        Assert.Equal(13f, up.Uv![3], 0.01f);
     }
 
     [Fact]
@@ -154,9 +190,9 @@ public sealed class GeometryIrParityEmitTests
         var built = b.Build("entity/decorated_pot/decorated_pot_base");
         var capEl = Assert.Single(built.Elements);
         var down = capEl.Faces["down"];
-        Assert.Equal(14f, down.Uv![0], 0.01f);
+        Assert.Equal(0f, down.Uv![0], 0.01f);
         Assert.Equal(13f, down.Uv![1], 0.01f);
-        Assert.Equal(28f, down.Uv![2], 0.01f);
+        Assert.Equal(14f, down.Uv![2], 0.01f);
         Assert.Equal(27f, down.Uv![3], 0.01f);
     }
 

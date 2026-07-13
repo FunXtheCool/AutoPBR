@@ -284,6 +284,11 @@ public static class Resources
     public static string OutputPathWatermark => GetString("OutputPathWatermark");
     public static string Engine => GetString("Engine");
     public static string DebugMode => GetString("DebugMode");
+    public static string PreviewOpenGl4Toggle => GetString("PreviewOpenGl4Toggle");
+    public static string PreviewOpenGl4Tooltip => GetString("PreviewOpenGl4Tooltip");
+    public static string PreviewOpenGlRestartRequired => GetString("PreviewOpenGlRestartRequired");
+    public static string PreviewOpenGlActiveContext => GetString("PreviewOpenGlActiveContext");
+    public static string PreviewOpenGlFallbackWarning => GetString("PreviewOpenGlFallbackWarning");
     public static string MaxThreads => GetString("MaxThreads");
     public static string MaxThreadsTooltip => GetString("MaxThreadsTooltip");
     public static string ForceShaderCacheInvalidation => GetString("ForceShaderCacheInvalidation");

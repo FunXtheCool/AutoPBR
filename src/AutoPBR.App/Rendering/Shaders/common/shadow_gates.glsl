@@ -28,7 +28,7 @@ float grShadowGate(vec3 worldPos, mat4 lightViewProj, sampler2DShadow shadowMap,
 
 float grShadowGateCascaded(vec3 worldPos, vec3 cameraPos, mat4 lightViewProjNear, mat4 lightViewProjFar,
     sampler2DShadow shadowNear, sampler2DShadow shadowFar, vec2 shadowTexelSize, float shadowMinBias,
-    int enableShadowMap, int enableCascades, float cascadeSplitDistance)
+    int enableShadowMap, int enableCascades, float cascadeSplitDistance, float cascadeBlendWidth)
 {
     if (enableShadowMap < 1)
     {
@@ -41,12 +41,24 @@ float grShadowGateCascaded(vec3 worldPos, vec3 cameraPos, mat4 lightViewProjNear
     }
 
     float dist = length(worldPos - cameraPos);
-    if (dist < cascadeSplitDistance)
+    float halfBand = max(cascadeBlendWidth, 0.0) * 0.5;
+    float blendStart = cascadeSplitDistance - halfBand;
+    float blendEnd = cascadeSplitDistance + halfBand;
+
+    if (halfBand <= 1e-5 || dist <= blendStart)
     {
         return grShadowGate(worldPos, lightViewProjNear, shadowNear, shadowTexelSize, shadowMinBias, enableShadowMap);
     }
 
-    return grShadowGate(worldPos, lightViewProjFar, shadowFar, shadowTexelSize, shadowMinBias, enableShadowMap);
+    if (dist >= blendEnd)
+    {
+        return grShadowGate(worldPos, lightViewProjFar, shadowFar, shadowTexelSize, shadowMinBias, enableShadowMap);
+    }
+
+    float nearVis = grShadowGate(worldPos, lightViewProjNear, shadowNear, shadowTexelSize, shadowMinBias, enableShadowMap);
+    float farVis = grShadowGate(worldPos, lightViewProjFar, shadowFar, shadowTexelSize, shadowMinBias, enableShadowMap);
+    float blendT = smoothstep(blendStart, blendEnd, dist);
+    return mix(nearVis, farVis, blendT);
 }
 
 #endif // GENESIS_SHADOW_GATES_GLSL

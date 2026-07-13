@@ -92,7 +92,7 @@ public partial class ArchiveNode(
         }
 
         OnPropertyChanged(nameof(DisplayTags));
-        RebuildTagMenuItems();
+        _tagMenuItemsDirty = true;
     }
 
     /// <summary>Material tag rows for the context submenu (icon, label, checkbox).</summary>
@@ -100,6 +100,8 @@ public partial class ArchiveNode(
 
     /// <summary>Flag tag rows for the context submenu (icon, label, checkbox).</summary>
     public ObservableCollection<TagMenuEntry> FlagTagMenuItems { get; } = new();
+
+    private bool _tagMenuItemsDirty = true;
 
     /// <summary>Syncs manual add/remove from a checkbox; host refreshes effective tags.</summary>
     internal void ApplyTagMenuToggle(string tagId, bool wantApplied)
@@ -117,6 +119,17 @@ public partial class ArchiveNode(
         }
 
         host.ApplyManualTagToggle(FullPath, tagId, wantApplied);
+    }
+
+    internal void EnsureTagMenuItems()
+    {
+        if (!_tagMenuItemsDirty)
+        {
+            return;
+        }
+
+        RebuildTagMenuItems();
+        _tagMenuItemsDirty = false;
     }
 
     private void RebuildTagMenuItems()

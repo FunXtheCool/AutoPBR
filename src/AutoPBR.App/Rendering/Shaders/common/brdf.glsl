@@ -34,12 +34,6 @@ vec3 F_Schlick(float VoH, vec3 f0)
     return f0 + (vec3(1.0) - f0) * pow5(1.0 - saturate1(VoH));
 }
 
-vec3 F_SchlickRoughness(float NoV, vec3 f0, float roughness)
-{
-    vec3 fmax = max(vec3(1.0 - roughness), f0);
-    return f0 + (fmax - f0) * pow5(1.0 - saturate1(NoV));
-}
-
 // Epic split-sum DFG approximation (Lazarov / UE4 mobile notes).
 // Specular IBL = prefilteredEnv * (f0 * scale + bias). Do not multiply by F again.
 vec2 iblEnvBrdfFactor(float NoV, float roughness)

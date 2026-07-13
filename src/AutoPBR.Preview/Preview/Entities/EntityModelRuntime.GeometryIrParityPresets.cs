@@ -208,6 +208,8 @@ internal sealed partial class EntityModelRuntime
                 {
                     ShouldEmitPartCuboids = static partId =>
                         string.Equals(partId, "eyes", StringComparison.OrdinalIgnoreCase),
+                    // Supplementary PNG paths bind the primary #skin slot; lifted IR may tag eyes cuboids #eyes.
+                    ResolvePartTextureKey = static _ => "#skin",
                 };
             }
 
@@ -216,6 +218,8 @@ internal sealed partial class EntityModelRuntime
                 return opts with
                 {
                     ShouldEmitPartCuboids = IsBreezeWindPartId,
+                    // breeze_wind.png is the primary sheet; lifted IR tags wind tiers #wind on 128².
+                    ResolvePartTextureKey = static _ => "#skin",
                 };
             }
 

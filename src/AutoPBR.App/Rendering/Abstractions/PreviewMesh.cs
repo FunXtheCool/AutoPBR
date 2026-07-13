@@ -12,5 +12,8 @@ public sealed class PreviewMesh
     public required float[] InterleavedVertices { get; init; }
     public required uint[] Indices { get; init; }
 
+    /// <summary>Opaque texel count when built by <see cref="Scene.SpriteVoxelMeshBuilder"/>; otherwise 0.</summary>
+    public int OpaqueVoxelCount { get; init; }
+
     public int VertexCount => InterleavedVertices.Length / FloatsPerVertex;
 }

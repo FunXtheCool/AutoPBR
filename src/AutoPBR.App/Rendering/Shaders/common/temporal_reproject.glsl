@@ -101,6 +101,18 @@ void trNeighborhoodMinMax3YCoCg(sampler2D currentTex, vec2 uv, vec2 texelSize, o
     }
 }
 
+void trNeighborhoodMinMax3YCoCgFromTaps(vec3 taps[9], out vec3 nMin, out vec3 nMax)
+{
+    nMin = vec3(1e6);
+    nMax = vec3(-1e6);
+    for (int i = 0; i < 9; ++i)
+    {
+        vec3 tap = trRgbToYCoCg(taps[i]);
+        nMin = min(nMin, tap);
+        nMax = max(nMax, tap);
+    }
+}
+
 vec3 trClipHistoryToNeighborhoodYCoCg(vec3 historyRgb, vec3 currentRgb, vec3 nMin, vec3 nMax)
 {
     vec3 history = trRgbToYCoCg(historyRgb);

@@ -5,6 +5,8 @@ using AutoPBR.App.Rendering.Abstractions;
 using AutoPBR.Core.Models;
 using AutoPBR.Preview;
 
+using Avalonia.Threading;
+
 using Silk.NET.OpenGL;
 
 namespace AutoPBR.App.Rendering.OpenGL;
@@ -29,6 +31,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private GlTexture2D? _normal;
     private GlTexture2D? _spec;
     private GlTexture2D? _height;
+    private byte[]? _rgbaUploadScratch;
     private GlMeshBuffer? _mesh;
     private GlMeshBuffer? _groundMesh;
     private GlTexture2D? _grassGroundAlbedo;
@@ -69,13 +72,14 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private float _lastAtmoSunIntensity = -1f;
     private float _lastAtmoHorizonFalloff = -1f;
     private bool _atmoLutsValid;
-    private PreviewRenderSettings _settings = new();
+    private PreviewRenderSettingsSnapshot _settings = PreviewRenderSettingsSnapshot.From(new PreviewRenderSettings());
     private IRenderPreviewScene? _scene;
     private PreviewMaterial? _material;
     private PreviewModelSubject? _blockModelSubject;
     private PreviewMaterial[]? _blockModelSlots;
     private bool _materialDirty = true;
     private bool _meshDirty = true;
+    private PreviewMaterialContentKey.Value _lastMaterialContentKey;
     private double _rotationAccum;
     private double _renderTimeAccum;
     private bool _prevPauseEntityIdleAnimation;
@@ -100,13 +104,16 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
 
     private readonly byte[] _entitySkinningUboScratch = new byte[EntitySkinningUboTotalBytes];
     private readonly byte[] _entityPrevSkinningUboScratch = new byte[EntitySkinningUboTotalBytes];
+    private readonly byte[] _entityNormalSkinningUboScratch = new byte[EntitySkinningUboMatrixBytes];
     private uint _entityBoneUbo;
     private uint _entityPrevBoneUbo;
+    private uint _entityNormalBoneUbo;
     private int _entityPrevBoneSnapshotCount;
     private bool _entityPrevBoneSnapshotValid;
 
     private const uint EntitySkinningUboBindingPoint = 2;
     private const uint EntityPrevSkinningUboBindingPoint = 3;
+    private const uint EntityNormalSkinningUboBindingPoint = 4;
 
     private readonly record struct EntitySkinningUniformLocs(
         int PreviewSpaceVerts,
@@ -122,6 +129,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
 
     private EntitySkinningUniformLocs _mainEntityUniformLocs;
     private EntitySkinningUniformLocs _shadowEntityUniformLocs;
+
     private bool _loggedEntityShaderInit;
     private bool _entityBoneUboBlockBoundMain;
     private bool _entityBoneUboBlockBoundShadow;
@@ -129,10 +137,19 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private bool _disposed;
     private string? _lastError;
     private bool _gpuAlive;
+    private bool _genesisTessellationCompileDisabled;
+    private bool _genesisTessellationFailureLogged;
+    private int _appliedWglSwapInterval = int.MinValue;
     private Action<string>? _diagnosticLog;
+    private Action? _requestPreviewFrame;
     private bool _loggedMeshReady;
     private bool _loggedZeroIndex;
     private int _lastMeshUploadStride = PreviewMesh.FloatsPerVertex;
+    private bool _shadowCasterBoundsValid;
+    private Vector3 _shadowCasterBoundsMin;
+    private Vector3 _shadowCasterBoundsMax;
+    private int _settingsRevision;
+    private int _lastMainPassAppliedSettingsRevision = -1;
     private string? _entityBindPosePrepDiagKey;
 
     /// <summary>Orbit camera is re-synced from the scene only when this changes (block vs item), so texture swaps keep user framing.</summary>
@@ -251,6 +268,34 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         log?.Invoke(message);
     }
 
+    /// <summary>Public diagnostic sink for preview-host controls (e.g. OpenGL frame-queue recovery).</summary>
+    public void EmitPreviewDiagnostic(string message) => EmitDiagnostic(message);
+
+    public void SetRequestPreviewFrame(Action? requestFrame)
+    {
+        lock (_sync)
+        {
+            _requestPreviewFrame = requestFrame;
+        }
+    }
+
+    private void RequestPreviewFrame()
+    {
+        Action? request;
+        lock (_sync)
+        {
+            request = _requestPreviewFrame;
+        }
+
+        if (request is null)
+        {
+            return;
+        }
+
+        // Always defer — sync UI-thread calls during OnOpenGlRender recreate Avalonia #17865.
+        Dispatcher.UIThread.Post(request, DispatcherPriority.Background);
+    }
+
     public void Resize(int width, int height)
     {
         lock (_sync)
@@ -264,6 +309,8 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     {
         lock (_sync)
         {
+            var prevKind = _scene?.SceneKind;
+            var nextKind = scene.SceneKind;
             var orbitKey = ResolveOrbitSyncKey(scene, _blockModelSubject);
             var reseedOrbit = _orbitSyncedKey is null || !string.Equals(_orbitSyncedKey, orbitKey, StringComparison.Ordinal);
             if (reseedOrbit)
@@ -272,9 +319,22 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
                 _orbitSyncedKey = orbitKey;
             }
 
+            var kindChanged = prevKind != nextKind;
             _scene = scene;
-            _meshDirty = true;
-            InvalidatePreviewTaaHistory();
+            if (kindChanged || reseedOrbit)
+            {
+                InvalidatePreviewTaaHistory();
+            }
+
+            if (kindChanged)
+            {
+                _meshDirty = true;
+            }
+            else if (nextKind != PreviewSceneKind.ItemPlane)
+            {
+                // Block/entity scenes carry authoritative mesh refs on the scene object.
+                _meshDirty = true;
+            }
         }
     }
 
@@ -297,9 +357,20 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     {
         lock (_sync)
         {
+            var nextKey = PreviewMaterialContentKey.Compute(material);
+            if (PreviewMaterialContentKey.Equals(_lastMaterialContentKey, nextKey))
+            {
+                return;
+            }
+
+            _lastMaterialContentKey = nextKey;
             _material = material;
             _materialDirty = true;
             InvalidatePreviewTaaHistory();
+            if (_scene?.SceneKind == PreviewSceneKind.ItemPlane)
+            {
+                _meshDirty = true;
+            }
         }
     }
 
@@ -396,6 +467,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         _emulatedRebakeSubjectKey = null;
         _entityBindPoseCommittedKey = null;
         _entityBindPosePrepDiagKey = null;
+        _entityBonePaletteLastUploadedCount = 0;
         _parityPlacementDiagKey = null;
         _entityCpuRebakeDiagKey = null;
         _parityCatalogCpuBindDiagKey = null;
@@ -407,6 +479,11 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
 
     private static bool BlockModelGeometryChanged(PreviewModelSubject? prev, PreviewModelSubject? next)
     {
+        if (prev is null && next is null)
+        {
+            return false;
+        }
+
         if (ReferenceEquals(prev, next))
         {
             return false;
@@ -424,15 +501,57 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
                !SameEntityPreviewAsset(prev, next);
     }
 
-    private void RecordMeshUpload(int strideFloats)
+    private static bool BlockModelPreviewSubjectChanged(PreviewModelSubject? prev, PreviewModelSubject? next)
+    {
+        if (prev is null && next is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(prev, next))
+        {
+            return false;
+        }
+
+        if (prev is null || next is null)
+        {
+            return true;
+        }
+
+        if (!SameEntityPreviewAsset(prev, next))
+        {
+            return true;
+        }
+
+        if (!SameEntityPreviewPose(prev, next) ||
+            !SameEntityPreviewSize(prev, next) ||
+            !SameEntityPreviewContextType(prev, next))
+        {
+            return true;
+        }
+
+        return prev.EmulatedRebake is null && BlockModelGeometryChanged(prev, next);
+    }
+
+    private void RecordMeshUpload(ReadOnlySpan<float> interleavedVertices, int strideFloats)
     {
         _lastMeshUploadStride = strideFloats;
+        if (TryComputeVertexBounds(interleavedVertices, strideFloats, out var min, out var max))
+        {
+            _shadowCasterBoundsMin = min;
+            _shadowCasterBoundsMax = max;
+            _shadowCasterBoundsValid = true;
+        }
+        else
+        {
+            _shadowCasterBoundsValid = false;
+        }
     }
 
     private void UploadPreviewMesh(float[] interleavedVertices, uint[] indices, int strideFloats = PreviewMesh.FloatsPerVertex)
     {
         _mesh!.Upload(interleavedVertices, indices, strideFloats);
-        RecordMeshUpload(strideFloats);
+        RecordMeshUpload(interleavedVertices, strideFloats);
     }
 
     /// <summary>Multi-material Java block model preview. Pass <c>null</c> to clear it.</summary>
@@ -487,12 +606,25 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
                 SameEntityPreviewAsset(prev, subject))
             {
                 var incomingFp = subject.EmulatedRebake?.PackConverterCpuMeshFingerprint ?? 0;
+                var prevFp = prev.EmulatedRebake?.PackConverterCpuMeshFingerprint ?? 0;
+                var committedMeshStride = prev.VertexStrideFloats > 0
+                    ? prev.VertexStrideFloats
+                    : PreviewMesh.FloatsPerVertex;
+                var committedMeshFp = prev.InterleavedVertices.Length > 0
+                    ? PreviewMeshGeometryFingerprint.ComputeCpuPreviewMesh(
+                        prev.InterleavedVertices,
+                        committedMeshStride)
+                    : 0UL;
                 if (previewPoseChanged ||
                     (_entityBindPoseCommittedKey is not null &&
                      !PreviewRenderPassSetup.ParityCatalogCpuBindCommitKeyMatchesCurrentRevision(_entityBindPoseCommittedKey)) ||
+                    (incomingFp != 0 && prevFp != 0 && incomingFp != prevFp) ||
                     (_lastParityCatalogIncomingPackFingerprint != 0 &&
                      incomingFp != 0 &&
-                     incomingFp != _lastParityCatalogIncomingPackFingerprint))
+                     incomingFp != _lastParityCatalogIncomingPackFingerprint) ||
+                    (incomingFp != 0 &&
+                     committedMeshFp != 0 &&
+                     incomingFp != committedMeshFp))
                 {
                     InvalidateParityCatalogBindCommitState();
                 }
@@ -543,14 +675,29 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
             _blockModelSubject = subject;
             _blockModelSlots = slotMaterials;
             _prevPauseEntityIdleAnimation = false;
-            InvalidatePreviewTaaHistory();
+            var subjectChanged = BlockModelPreviewSubjectChanged(prev, subject);
+            if (subjectChanged)
+            {
+                InvalidatePreviewTaaHistory();
+            }
+
             if (subject is not null && slotMaterials is { Length: > 0 })
             {
                 var pi = Math.Clamp(subject.PrimaryMaterialIndex, 0, slotMaterials.Length - 1);
-                _material = slotMaterials[pi];
+                var slotMat = slotMaterials[pi];
+                var slotKey = PreviewMaterialContentKey.Compute(slotMat);
+                if (!PreviewMaterialContentKey.Equals(_lastMaterialContentKey, slotKey))
+                {
+                    _lastMaterialContentKey = slotKey;
+                    _material = slotMat;
+                    _materialDirty = true;
+                }
+            }
+            else if (subjectChanged)
+            {
+                _materialDirty = true;
             }
 
-            _materialDirty = true;
             if (BlockModelGeometryChanged(prev, subject))
             {
                 var hasCommittedParityCpu = PreviewRenderPassSetup.IsParityCatalogEmulatedAsset(nextPath) &&
@@ -596,16 +743,22 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     /// <summary>
     /// Entity rigs baked from clean-room Java cuboids can disagree with AutoPBR-generated tangent-space maps;
     /// disable solid back-face culling for those previews so occasional winding mismatches do not punch holes.
+    /// Extruded sprite voxels are watertight cuboids and benefit from back-face culling.
     /// </summary>
-    private static bool ShouldCullSolidBackFaces(PreviewSceneKind sceneKind, PreviewModelSubject? blockModel) =>
-        IsSolidBlockGeometry(sceneKind) && !IsEntityEmulatedPreview(blockModel);
+    private static bool ShouldCullSolidBackFaces(
+        PreviewSceneKind sceneKind,
+        PreviewModelSubject? blockModel,
+        in PreviewRenderSettingsSnapshot settings) =>
+        (IsSolidBlockGeometry(sceneKind) && !IsEntityEmulatedPreview(blockModel)) ||
+        (sceneKind == PreviewSceneKind.ItemPlane && settings.SpriteThickness > 1e-6f);
 
     public void SetRenderSettings(PreviewRenderSettings settings)
     {
         lock (_sync)
         {
             var prev = _settings;
-            _settings = CloneSettings(settings);
+            _settings = PreviewRenderSettingsSnapshot.From(settings);
+            _settingsRevision++;
             if (_settings.DrawPreviewSubject != prev.DrawPreviewSubject ||
                 _settings.EnableEntityAnimation != prev.EnableEntityAnimation ||
                 _settings.ForceEntityCpuSkinning != prev.ForceEntityCpuSkinning ||
@@ -1066,111 +1219,17 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
         lookTarget = position + ForwardFromYawPitch(yaw, pitch);
     }
 
-    private static PreviewRenderSettings CloneSettings(PreviewRenderSettings s) => new()
+    private bool TryGetCachedShadowCasterBounds(out Vector3 min, out Vector3 max)
     {
-        NormalStrength = s.NormalStrength,
-        HeightStrength = s.HeightStrength,
-        SpecularStrength = s.SpecularStrength,
-        RoughnessScale = s.RoughnessScale,
-        AmbientStrength = s.AmbientStrength,
-        Exposure = s.Exposure,
-        EnableParallax = s.EnableParallax,
-        EnableNormalMap = s.EnableNormalMap,
-        EnableSpecularMap = s.EnableSpecularMap,
-        AutoRotate = s.AutoRotate,
-        LightYawDegrees = s.LightYawDegrees,
-        LightPitchDegrees = s.LightPitchDegrees,
-        NearestTextureFilter = s.NearestTextureFilter,
-        AlphaCutoff = s.AlphaCutoff,
-        ItemUseAlphaBlend = s.ItemUseAlphaBlend,
-        EntityAlphaMode = s.EntityAlphaMode,
-        EnableEntityLabPbrShading = s.EnableEntityLabPbrShading,
-        EnableEntityParallax = s.EnableEntityParallax,
-        SpritePlaneCount = s.SpritePlaneCount,
-        SpriteThickness = s.SpriteThickness,
-        ItemFlatSpritePreview = s.ItemFlatSpritePreview,
-        ShowBackgroundGrid = s.ShowBackgroundGrid,
-        ShowGroundMesh = s.ShowGroundMesh,
-        ShowCornerAxes = s.ShowCornerAxes,
-        DrawPreviewSubject = s.DrawPreviewSubject,
-        EnableSss = s.EnableSss,
-        EnableParallaxShadow = s.EnableParallaxShadow,
-        ParallaxTraceLayers = s.ParallaxTraceLayers,
-        ParallaxRefineSteps = s.ParallaxRefineSteps,
-        ParallaxShadowSamples = s.ParallaxShadowSamples,
-        ParallaxShadowSoftness = s.ParallaxShadowSoftness,
-        ParallaxMaxUvShift = s.ParallaxMaxUvShift,
-        EnableParallaxAo = s.EnableParallaxAo,
-        ParallaxAoStrength = s.ParallaxAoStrength,
-        EnableIbl = s.EnableIbl,
-        EnableAtmosphericSky = s.EnableAtmosphericSky,
-        AtmosphereTurbidity = s.AtmosphereTurbidity,
-        AtmosphereSunIntensity = s.AtmosphereSunIntensity,
-        AtmosphereHorizonFalloff = s.AtmosphereHorizonFalloff,
-        AtmosphereSkyExposure = s.AtmosphereSkyExposure,
-        AtmosphereSunDiscStrength = s.AtmosphereSunDiscStrength,
-        AtmosphereSunDiscBrightness = s.AtmosphereSunDiscBrightness,
-        AtmosphereSunDiscSize = s.AtmosphereSunDiscSize,
-        AtmosphereMoonDiscStrength = s.AtmosphereMoonDiscStrength,
-        AtmosphereMoonDiscSize = s.AtmosphereMoonDiscSize,
-        AtmosphereMoonGlowStrength = s.AtmosphereMoonGlowStrength,
-        AtmosphereMoonTextureSharpness = s.AtmosphereMoonTextureSharpness,
-        MoonWorldLightIntensity = s.MoonWorldLightIntensity,
-        AerialFogStrength = s.AerialFogStrength,
-        TimeOfDayHours = s.TimeOfDayHours,
-        AnimateTimeOfDay = s.AnimateTimeOfDay,
-        TimeOfDaySpeed = s.TimeOfDaySpeed,
-        CapturePreviewFingerprint = s.CapturePreviewFingerprint,
-        SssStrength = s.SssStrength,
-        IblStrength = s.IblStrength,
-        EmissionStrength = s.EmissionStrength,
-        EntityAnimationSpeed = s.EntityAnimationSpeed,
-        EntityAnimationAmplitude = s.EntityAnimationAmplitude,
-        EnableEntityAnimation = s.EnableEntityAnimation,
-        PauseEntityIdleAnimation = s.PauseEntityIdleAnimation,
-        EnableLegacyEntityWobble = s.EnableLegacyEntityWobble,
-        ForceEntityCpuSkinning = s.ForceEntityCpuSkinning,
-        EnableShadows = s.EnableShadows,
-        ShadowMapResolution = s.ShadowMapResolution,
-        ShadowMinBias = s.ShadowMinBias,
-        ShadowMaxBias = s.ShadowMaxBias,
-        ShadowSoftnessTexels = s.ShadowSoftnessTexels,
-        EnableShadowCascades = s.EnableShadowCascades,
-        EnableGodRays = s.EnableGodRays,
-        EnableVolumeGodRays = s.EnableVolumeGodRays,
-        EnableVolumetricClouds = s.EnableVolumetricClouds,
-        VolumetricQuality = s.VolumetricQuality,
-        GodRayStrength = s.GodRayStrength,
-        GodRayConeScale = s.GodRayConeScale,
-        GodRayScatterGain = s.GodRayScatterGain,
-        GodRayExtinction = s.GodRayExtinction,
-        GodRayDebugDensity = s.GodRayDebugDensity,
-        GodRayStabilizeDebug = s.GodRayStabilizeDebug,
-        CloudDensity = s.CloudDensity,
-        CloudVolumeSize = s.CloudVolumeSize,
-        CloudLayerHeight = s.CloudLayerHeight,
-        CloudVolumeHeight = s.CloudVolumeHeight,
-        CloudQuality = s.CloudQuality,
-        CloudCoverageScale = s.CloudCoverageScale,
-        CloudWindSpeed = s.CloudWindSpeed,
-        CloudWindHeadingDegrees = s.CloudWindHeadingDegrees,
-        CloudCirrusStrength = s.CloudCirrusStrength,
-        CloudDebugView = s.CloudDebugView,
-        CloudDisableTemporal = s.CloudDisableTemporal,
-        CloudMarchStepOverride = s.CloudMarchStepOverride,
-        CloudFreezeWind = s.CloudFreezeWind,
-        EnablePreviewTaa = s.EnablePreviewTaa,
-        PreviewTaaMode = s.PreviewTaaMode,
-        PreviewTaaTemporalScale = s.PreviewTaaTemporalScale,
-        PreviewTaaJitterScale = s.PreviewTaaJitterScale,
-        PreviewTaaSourceFilterScale = s.PreviewTaaSourceFilterScale,
-        PreviewTaaEdgeBlendScale = s.PreviewTaaEdgeBlendScale,
-        PreviewTaaFxaaStrengthScale = s.PreviewTaaFxaaStrengthScale,
-        PreviewTaaFxaaLumaEdgeScale = s.PreviewTaaFxaaLumaEdgeScale,
-        PreviewTaaFxaaLumaThreshold = s.PreviewTaaFxaaLumaThreshold,
-        PreviewTaaForceFxaa = s.PreviewTaaForceFxaa,
-        LogVolumetricTiming = s.LogVolumetricTiming,
-        LogPreviewTaaDiagnostics = s.LogPreviewTaaDiagnostics,
-        ShowSunProjectionDebug = s.ShowSunProjectionDebug
-    };
+        if (_shadowCasterBoundsValid)
+        {
+            min = _shadowCasterBoundsMin;
+            max = _shadowCasterBoundsMax;
+            return true;
+        }
+
+        min = default;
+        max = default;
+        return false;
+    }
 }

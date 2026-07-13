@@ -1,5 +1,7 @@
 using System.Numerics;
+using System.Text.Json;
 using AutoPBR.Preview;
+using AutoPBR.Preview.GeometryIr;
 
 namespace AutoPBR.Core.Tests;
 
@@ -51,12 +53,13 @@ public sealed class GeometryIrBreezeParityEmitTests
 
         Assert.True(MinecraftModelBaker.TryBake(merged, "minecraft", pathToIdx, texSizes, out var logicalVerts, out _, out _));
 
+        var wrongMerged = ZeroElementBakeAtlases(merged);
         for (var i = 0; i < ordered.Count; i++)
         {
             texSizes[ordered[i]] = (32, 32);
         }
 
-        Assert.True(MinecraftModelBaker.TryBake(merged, "minecraft", pathToIdx, texSizes, out var wrongVerts, out _, out _));
+        Assert.True(MinecraftModelBaker.TryBake(wrongMerged, "minecraft", pathToIdx, texSizes, out var wrongVerts, out _, out _));
         Assert.NotEqual(ComputeUvFingerprint(logicalVerts), ComputeUvFingerprint(wrongVerts));
     }
 
@@ -152,6 +155,235 @@ public sealed class GeometryIrBreezeParityEmitTests
     }
 
     [Fact]
+    public void Breeze_main_skin_emit_pixel_uvs_remain_on_32_atlas()
+    {
+        const string path = "assets/minecraft/textures/entity/breeze/breeze.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.3f, animationTimeSeconds: 0f,
+            out var mesh, out _, applyGeometryIrSetupAnimMotion: false));
+
+        var skinMaxPixelU = 0f;
+        var skinCount = 0;
+        var windMaxPixelU = 0f;
+        var windCount = 0;
+        foreach (var el in mesh.Elements)
+        {
+            if (!TryGetElementPrimaryTextureKey(el, out var key))
+            {
+                continue;
+            }
+
+            var maxU = MaxFacePixelU(el);
+            if (string.Equals(key, "#skin", StringComparison.OrdinalIgnoreCase))
+            {
+                skinCount++;
+                skinMaxPixelU = MathF.Max(skinMaxPixelU, maxU);
+            }
+            else if (string.Equals(key, "#wind", StringComparison.OrdinalIgnoreCase))
+            {
+                windCount++;
+                windMaxPixelU = MathF.Max(windMaxPixelU, maxU);
+            }
+        }
+
+        Assert.True(skinCount >= 3, $"expected head + rods on #skin (count={skinCount})");
+        Assert.True(windCount >= 3, $"expected wind tiers on #wind (count={windCount})");
+        Assert.True(skinMaxPixelU <= 36f, $"skin texels must stay on 32² sheet (maxU={skinMaxPixelU:F1})");
+        Assert.True(windMaxPixelU > 40f, $"wind texels must use 128² sheet (maxU={windMaxPixelU:F1})");
+    }
+
+    [Fact]
+    public void Breeze_main_rebake_resolve_for_bake_uses_per_path_atlas_not_shard_only()
+    {
+        const string path = "assets/minecraft/textures/entity/breeze/breeze.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.3f, animationTimeSeconds: 0f,
+            out var merged, out var provenance));
+
+        var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(merged, "minecraft");
+        foreach (var texPath in ordered)
+        {
+            var physicalW = texPath.Contains("breeze_wind", StringComparison.OrdinalIgnoreCase) ? 128 : 32;
+            var physicalH = physicalW;
+            var bake = EntityGeometryIrTextureAtlas.ResolveForBake(
+                texPath, physicalW, physicalH, provenance, Profile26);
+            if (texPath.Contains("breeze_wind", StringComparison.OrdinalIgnoreCase))
+            {
+                Assert.Equal((128, 128), bake);
+            }
+            else if (texPath.Contains("breeze.png", StringComparison.OrdinalIgnoreCase))
+            {
+                Assert.Equal((32, 32), bake);
+            }
+            else
+            {
+                Assert.Equal((32, 32), bake);
+            }
+        }
+    }
+
+    [Fact]
+    public void Breeze_main_skin_baked_uvs_use_32_atlas_not_wind_128()
+    {
+        const string path = "assets/minecraft/textures/entity/breeze/breeze.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.3f, animationTimeSeconds: 0f,
+            out var merged, out var provenance));
+
+        var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(merged, "minecraft");
+        var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase);
+        for (var i = 0; i < ordered.Count; i++)
+        {
+            pathToIdx[ordered[i]] = i;
+            texSizes[ordered[i]] = EntityGeometryIrTextureAtlas.ResolveForBake(
+                ordered[i], 32, 32, provenance, Profile26);
+        }
+
+        Assert.True(MinecraftModelBaker.TryBake(merged, "minecraft", pathToIdx, texSizes, out var logicalVerts, out _, out var batches));
+
+        var skinIdx = ordered.FindIndex(p => p.Contains("breeze.png", StringComparison.OrdinalIgnoreCase) &&
+                                              !p.Contains("breeze_eyes", StringComparison.OrdinalIgnoreCase) &&
+                                              !p.Contains("breeze_wind", StringComparison.OrdinalIgnoreCase));
+        Assert.True(skinIdx >= 0);
+
+        var skinBatch = batches.FirstOrDefault(b => b.MaterialIndex == skinIdx);
+        Assert.True(skinBatch.IndexCount > 0, "expected #skin draw batch on main breeze composite");
+
+        Assert.True(TryReadBatchUvSpan(logicalVerts, skinBatch, out var minU, out var maxU, out var minV, out var maxV));
+        Assert.True(maxU > 0.15f, $"skin UV span too narrow for 32² head/rod layout (maxU={maxU:F3})");
+        Assert.True(maxV > 0.15f, $"skin UV span too narrow for 32² head/rod layout (maxV={maxV:F3})");
+
+        for (var i = 0; i < ordered.Count; i++)
+        {
+            texSizes[ordered[i]] = (128, 128);
+        }
+
+        Assert.True(MinecraftModelBaker.TryBake(ZeroElementBakeAtlases(merged), "minecraft", pathToIdx, texSizes, out var wrongVerts, out _, out _));
+        Assert.NotEqual(ComputeUvFingerprint(logicalVerts), ComputeUvFingerprint(wrongVerts));
+    }
+
+    [Fact]
+    public void Breeze_part_tree_repair_stamps_missing_wind_layer_atlas_tags()
+    {
+        const string jvm = "net.minecraft.client.model.monster.breeze.BreezeModel";
+        var shardPath = Path.Combine(
+            AppContext.BaseDirectory,
+            "Data",
+            "minecraft-native",
+            "geometry",
+            "26.1.2",
+            $"{jvm}.json");
+        Assert.True(File.Exists(shardPath), shardPath);
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
+        Assert.True(TryFindCuboid(repaired, "wind_bottom", out var windCuboid));
+        Assert.Equal("#wind", windCuboid.GetProperty("textureKey").GetString());
+        Assert.Equal(128, windCuboid.GetProperty("textureWidth").GetInt32());
+        Assert.True(TryFindCuboid(repaired, "head", out var headCuboid));
+        Assert.Equal("#skin", headCuboid.GetProperty("textureKey").GetString());
+        Assert.Equal(32, headCuboid.GetProperty("textureWidth").GetInt32());
+    }
+
+    [Fact]
+    public void Breeze_main_skin_baked_uvs_survive_hd_primary_physical_texture()
+    {
+        const string path = "assets/minecraft/textures/entity/breeze/breeze.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.3f, animationTimeSeconds: 0f,
+            out var merged, out var provenance, applyGeometryIrSetupAnimMotion: false));
+
+        var ordered = JavaModelPreviewPipeline.CollectOrderedTextureZipPaths(merged, "minecraft");
+        var pathToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var texSizes = new Dictionary<string, (int w, int h)>(StringComparer.OrdinalIgnoreCase);
+        for (var i = 0; i < ordered.Count; i++)
+        {
+            pathToIdx[ordered[i]] = i;
+            texSizes[ordered[i]] = EntityGeometryIrTextureAtlas.ResolveForBake(
+                ordered[i], 128, 128, provenance, Profile26);
+        }
+
+        Assert.True(MinecraftModelBaker.TryBake(merged, "minecraft", pathToIdx, texSizes, out var verts, out _, out var batches));
+
+        var skinIdx = ordered.FindIndex(p => p.Contains("breeze.png", StringComparison.OrdinalIgnoreCase) &&
+                                              !p.Contains("breeze_eyes", StringComparison.OrdinalIgnoreCase) &&
+                                              !p.Contains("breeze_wind", StringComparison.OrdinalIgnoreCase));
+        Assert.True(skinIdx >= 0);
+        var skinBatch = batches.FirstOrDefault(b => b.MaterialIndex == skinIdx);
+        Assert.True(skinBatch.IndexCount > 0);
+        Assert.True(TryReadBatchUvSpan(verts, skinBatch, out _, out var maxU, out _, out var maxV));
+        Assert.True(maxU > 0.15f, $"skin batch UV span too narrow with HD primary (maxU={maxU:F3})");
+        Assert.True(maxV > 0.15f, $"skin batch UV span too narrow with HD primary (maxV={maxV:F3})");
+    }
+
+    [Fact]
+    public void Breeze_main_elements_stamp_per_cuboid_bake_atlas_dimensions()
+    {
+        const string path = "assets/minecraft/textures/entity/breeze/breeze.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0.3f, animationTimeSeconds: 0f,
+            out var mesh, out _, applyGeometryIrSetupAnimMotion: false));
+
+        var skinElements = mesh.Elements.Where(el =>
+            el.Faces.Values.Any(f => string.Equals(f.TextureKey, "#skin", StringComparison.OrdinalIgnoreCase))).ToList();
+        var windElements = mesh.Elements.Where(el =>
+            el.Faces.Values.Any(f => string.Equals(f.TextureKey, "#wind", StringComparison.OrdinalIgnoreCase))).ToList();
+        Assert.NotEmpty(skinElements);
+        Assert.NotEmpty(windElements);
+        Assert.All(skinElements.Where(el => el.DepthLayerKind == PreviewDepthLayerKind.Base),
+            el => Assert.Equal(32, el.BakeAtlasWidth));
+        Assert.All(windElements, el => Assert.Equal(128, el.BakeAtlasWidth));
+    }
+
+    [Fact]
+    public void Breeze_part_tree_repair_nests_rods_under_rods_anchor()
+    {
+        const string jvm = "net.minecraft.client.model.monster.breeze.BreezeModel";
+        var shardPath = Path.Combine(
+            AppContext.BaseDirectory,
+            "Data",
+            "minecraft-native",
+            "geometry",
+            "26.1.2",
+            $"{jvm}.json");
+        Assert.True(File.Exists(shardPath), shardPath);
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
+        Assert.True(TryFindPart(repaired, "rods", out var rodsPart));
+        Assert.True(TryFindChildPart(rodsPart, "rod_1", out _));
+        Assert.True(TryFindChildPart(rodsPart, "rod_2", out _));
+        Assert.True(TryFindChildPart(rodsPart, "rod_3", out _));
+    }
+
+    [Fact]
+    public void Breeze_main_bind_pose_rods_cluster_near_head_not_at_floor()
+    {
+        const string path = "assets/minecraft/textures/entity/breeze/breeze.png";
+        var runtime = EntityModelRuntimeFactory.Create();
+        Assert.True(runtime.TryBuildStaticMesh(path, Profile26, idlePhase01: 0f, animationTimeSeconds: 0f,
+            out var mesh, out _, applyGeometryIrSetupAnimMotion: false));
+
+        Assert.True(TryFindElementWithSize(mesh, 8f, 8f, 8f, out var headBody));
+        var rodElements = mesh.Elements.Where(el =>
+        {
+            var w = MathF.Abs(el.To[0] - el.From[0]);
+            var h = MathF.Abs(el.To[1] - el.From[1]);
+            var d = MathF.Abs(el.To[2] - el.From[2]);
+            return MathF.Abs(w - 2f) <= 0.6f && MathF.Abs(h - 8f) <= 0.6f && MathF.Abs(d - 2f) <= 0.6f;
+        }).ToList();
+        Assert.Equal(3, rodElements.Count);
+
+        static float CentroidY(ModelElement el) => (el.From[1] + el.To[1]) * 0.5f;
+        static Vector3 WorldCorner(ModelElement el) =>
+            new(el.LocalToParent.M41, el.LocalToParent.M42, el.LocalToParent.M43);
+
+        var headWorldY = WorldCorner(headBody).Y + CentroidY(headBody);
+        var rodWorldY = rodElements.Average(el => WorldCorner(el).Y + CentroidY(el));
+        Assert.InRange(MathF.Abs(rodWorldY - headWorldY), 0f, 10f);
+        Assert.True(rodWorldY > -4f, $"rods should stay attached to torso (rodWorldY={rodWorldY:F2})");
+    }
+
+    [Fact]
     public void Breeze_eyes_geometry_ir_path_emits_eyes_part_only()
     {
         const string path = "assets/minecraft/textures/entity/breeze/breeze_eyes.png";
@@ -163,6 +395,37 @@ public sealed class GeometryIrBreezeParityEmitTests
         Assert.True(HasElementSize(mesh, 10f, 3f, 4f));
         Assert.False(HasElementSize(mesh, 18f, 8f, 18f));
         Assert.False(HasElementSize(mesh, 2f, 8f, 2f));
+    }
+
+    private static MergedJavaBlockModel ZeroElementBakeAtlases(MergedJavaBlockModel source)
+    {
+        var elements = new ModelElement[source.Elements.Count];
+        for (var i = 0; i < source.Elements.Count; i++)
+        {
+            var e = source.Elements[i];
+            elements[i] = new ModelElement
+            {
+                From = e.From,
+                To = e.To,
+                Faces = e.Faces,
+                LocalToParent = e.LocalToParent,
+                DepthLayerKind = e.DepthLayerKind,
+                LayerOrdinal = e.LayerOrdinal,
+                CastsShadow = e.CastsShadow,
+                ShellInflateTexels = e.ShellInflateTexels,
+                EnableParallax = e.EnableParallax,
+                MirrorCuboidUv = e.MirrorCuboidUv,
+                BakeAtlasWidth = 0,
+                BakeAtlasHeight = 0,
+            };
+        }
+
+        return new MergedJavaBlockModel
+        {
+            Elements = elements.ToList(),
+            Textures = source.Textures,
+            UsesLivingEntityRendererColumnYFlip = source.UsesLivingEntityRendererColumnYFlip,
+        };
     }
 
     private static bool HasElementSize(MergedJavaBlockModel model, float w, float h, float d, float tol = 0.6f)
@@ -240,6 +503,182 @@ public sealed class GeometryIrBreezeParityEmitTests
 
         element = null!;
         return false;
+    }
+
+    private static float MaxFacePixelU(ModelElement el)
+    {
+        var maxU = 0f;
+        foreach (var face in el.Faces.Values)
+        {
+            if (face.Uv is not { Length: >= 4 } uv)
+            {
+                continue;
+            }
+
+            maxU = MathF.Max(maxU, MathF.Max(uv[0], uv[2]));
+        }
+
+        return maxU;
+    }
+
+    private static bool TryGetElementPrimaryTextureKey(ModelElement el, out string key)
+    {
+        key = "";
+        foreach (var face in el.Faces.Values)
+        {
+            if (!string.IsNullOrEmpty(face.TextureKey))
+            {
+                key = face.TextureKey;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool TryFindPart(JsonElement geometryRoot, string partId, out JsonElement part)
+    {
+        part = default;
+        if (!geometryRoot.TryGetProperty("roots", out var roots) || roots.ValueKind != JsonValueKind.Array)
+        {
+            return false;
+        }
+
+        foreach (var root in roots.EnumerateArray())
+        {
+            if (TryFindPartRecursive(root, partId, out part))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool TryFindPartRecursive(JsonElement node, string partId, out JsonElement part)
+    {
+        part = default;
+        if (node.TryGetProperty("id", out var idEl) &&
+            string.Equals(idEl.GetString(), partId, StringComparison.Ordinal))
+        {
+            part = node;
+            return true;
+        }
+
+        if (!node.TryGetProperty("children", out var children) || children.ValueKind != JsonValueKind.Array)
+        {
+            return false;
+        }
+
+        foreach (var child in children.EnumerateArray())
+        {
+            if (TryFindPartRecursive(child, partId, out part))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool TryFindChildPart(JsonElement parent, string childId, out JsonElement child)
+    {
+        child = default;
+        if (!parent.TryGetProperty("children", out var children) || children.ValueKind != JsonValueKind.Array)
+        {
+            return false;
+        }
+
+        foreach (var node in children.EnumerateArray())
+        {
+            if (node.TryGetProperty("id", out var idEl) &&
+                string.Equals(idEl.GetString(), childId, StringComparison.Ordinal))
+            {
+                child = node;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool TryFindCuboid(JsonElement geometryRoot, string partId, out JsonElement cuboid)
+    {
+        cuboid = default;
+        if (!geometryRoot.TryGetProperty("roots", out var roots) || roots.ValueKind != JsonValueKind.Array)
+        {
+            return false;
+        }
+
+        foreach (var root in roots.EnumerateArray())
+        {
+            if (TryFindCuboidRecursive(root, partId, out cuboid))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool TryFindCuboidRecursive(JsonElement part, string partId, out JsonElement cuboid)
+    {
+        cuboid = default;
+        if (part.TryGetProperty("id", out var idEl) &&
+            string.Equals(idEl.GetString(), partId, StringComparison.Ordinal) &&
+            part.TryGetProperty("cuboids", out var cuboids) &&
+            cuboids.ValueKind == JsonValueKind.Array &&
+            cuboids.GetArrayLength() > 0)
+        {
+            cuboid = cuboids[0];
+            return true;
+        }
+
+        if (!part.TryGetProperty("children", out var children) || children.ValueKind != JsonValueKind.Array)
+        {
+            return false;
+        }
+
+        foreach (var child in children.EnumerateArray())
+        {
+            if (TryFindCuboidRecursive(child, partId, out cuboid))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool TryReadBatchUvSpan(
+        ReadOnlySpan<float> verts,
+        PreviewDrawBatch batch,
+        out float minU,
+        out float maxU,
+        out float minV,
+        out float maxV)
+    {
+        minU = minV = float.MaxValue;
+        maxU = maxV = float.MinValue;
+        const int stride = MinecraftModelBaker.FloatsPerVertex;
+        var end = batch.FirstIndex + batch.IndexCount;
+        if (end > verts.Length / stride)
+        {
+            return false;
+        }
+
+        for (var vi = batch.FirstIndex; vi < end; vi++)
+        {
+            var baseIdx = (int)vi * stride;
+            var u = verts[baseIdx + 6];
+            var v = verts[baseIdx + 7];
+            minU = MathF.Min(minU, u);
+            maxU = MathF.Max(maxU, u);
+            minV = MathF.Min(minV, v);
+            maxV = MathF.Max(maxV, v);
+        }
+
+        return minU <= maxU && minV <= maxV;
     }
 
     private static ulong ComputeUvFingerprint(ReadOnlySpan<float> verts)

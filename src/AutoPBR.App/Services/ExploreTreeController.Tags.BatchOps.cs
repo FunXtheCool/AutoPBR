@@ -13,7 +13,8 @@ internal sealed partial class ExploreTreeController
 {
     private async Task QueueBackgroundEffectiveTagComputeAsync(string archivePath)
     {
-        if (!_effectiveTagComputeInFlight.TryAdd(archivePath, 0))
+        var queuedEpoch = Volatile.Read(ref _effectiveTagEpoch);
+        if (!_effectiveTagComputeInFlight.TryAdd(archivePath, queuedEpoch))
         {
             return;
         }
@@ -24,13 +25,17 @@ internal sealed partial class ExploreTreeController
             await _tagComputeConcurrency.WaitAsync().ConfigureAwait(false);
             try
             {
-                var epoch = Volatile.Read(ref _effectiveTagEpoch);
+                if (Volatile.Read(ref _effectiveTagEpoch) != queuedEpoch)
+                {
+                    return;
+                }
+
                 try
                 {
                     var computed = await Task.Run(() =>
                             ComputeEffectiveTags(archivePath, includeDictionaryEvidence: true, deferSemanticMl: false))
                         .ConfigureAwait(false);
-                    if (Volatile.Read(ref _effectiveTagEpoch) != epoch)
+                    if (Volatile.Read(ref _effectiveTagEpoch) != queuedEpoch)
                     {
                         return;
                     }
@@ -67,7 +72,7 @@ internal sealed partial class ExploreTreeController
             finally
             {
                 _tagComputeConcurrency.Release();
-                _effectiveTagComputeInFlight.TryRemove(archivePath, out _);
+                RemoveEffectiveTagComputeInFlight(archivePath, queuedEpoch);
             }
         }
         finally
@@ -83,25 +88,45 @@ internal sealed partial class ExploreTreeController
             return;
         }
 
-        _debugSink?.Invoke($"Explore ML batch: queued {archivePaths.Count} path(s).");
+        var queuedEpoch = Volatile.Read(ref _effectiveTagEpoch);
+        var queued = new List<string>(archivePaths.Count);
+        foreach (var archivePath in archivePaths.Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            if (_effectiveTagComputeInFlight.TryAdd(archivePath, queuedEpoch))
+            {
+                queued.Add(archivePath);
+            }
+        }
+
+        if (queued.Count == 0)
+        {
+            return;
+        }
+
+        var remaining = new HashSet<string>(queued, StringComparer.OrdinalIgnoreCase);
+        _debugSink?.Invoke($"Explore ML batch: queued {queued.Count} path(s).");
         Interlocked.Increment(ref _tagAsyncWorkPending);
         try
         {
-            foreach (var archivePath in archivePaths)
+            foreach (var archivePath in queued)
             {
-                if (!_effectiveTagComputeInFlight.TryAdd(archivePath, 0))
+                if (Volatile.Read(ref _effectiveTagEpoch) != queuedEpoch)
                 {
-                    continue;
+                    break;
                 }
 
                 await _tagComputeConcurrency.WaitAsync().ConfigureAwait(false);
                 try
                 {
-                    var epoch = Volatile.Read(ref _effectiveTagEpoch);
+                    if (Volatile.Read(ref _effectiveTagEpoch) != queuedEpoch)
+                    {
+                        break;
+                    }
+
                     var computed = await Task.Run(() =>
                             ComputeEffectiveTags(archivePath, includeDictionaryEvidence: true, deferSemanticMl: false))
                         .ConfigureAwait(false);
-                    if (Volatile.Read(ref _effectiveTagEpoch) != epoch)
+                    if (Volatile.Read(ref _effectiveTagEpoch) != queuedEpoch)
                     {
                         continue;
                     }
@@ -135,16 +160,28 @@ internal sealed partial class ExploreTreeController
                 finally
                 {
                     _tagComputeConcurrency.Release();
-                    _effectiveTagComputeInFlight.TryRemove(archivePath, out _);
+                    remaining.Remove(archivePath);
+                    RemoveEffectiveTagComputeInFlight(archivePath, queuedEpoch);
                 }
             }
         }
         finally
         {
+            foreach (var archivePath in remaining)
+            {
+                RemoveEffectiveTagComputeInFlight(archivePath, queuedEpoch);
+            }
+
             Interlocked.Decrement(ref _tagAsyncWorkPending);
             PersistEffectiveTagCache();
             _debugSink?.Invoke("Explore ML batch: complete.");
         }
+    }
+
+    private void RemoveEffectiveTagComputeInFlight(string archivePath, int queuedEpoch)
+    {
+        ((ICollection<KeyValuePair<string, int>>)_effectiveTagComputeInFlight)
+            .Remove(new KeyValuePair<string, int>(archivePath, queuedEpoch));
     }
 
     public int GetPendingTagWorkCount()
@@ -265,6 +302,7 @@ internal sealed partial class ExploreTreeController
         _finalSemanticTagPaths.Clear();
         _optifineFolderMaterialHintIdsByRuleKey.Clear();
         InvalidateExploreTagFilterCache();
+        var refreshEpoch = Volatile.Read(ref _effectiveTagEpoch);
 
         var paths = CollectFileNodePaths(Root);
         if (paths.Count == 0)
@@ -279,25 +317,38 @@ internal sealed partial class ExploreTreeController
         {
             try
             {
-                await Task.Run(() =>
+                await _tagComputeConcurrency.WaitAsync(cts.Token).ConfigureAwait(false);
+                try
                 {
-                    for (var i = 0; i < paths.Count; i++)
+                    await Task.Run(() =>
                     {
-                        cts.Token.ThrowIfCancellationRequested();
-                        var path = paths[i];
-                        // During a full refresh we want final semantic ranking (including fused score), not deferred keyword placeholders.
-                        var tags = ComputeEffectiveTags(path, includeDictionaryEvidence: true, deferSemanticMl: false);
-                        _effectiveTagCache[path] = tags;
-                        _finalSemanticTagPaths[path] = 0;
-                    }
-                }, cts.Token).ConfigureAwait(false);
+                        for (var i = 0; i < paths.Count; i++)
+                        {
+                            cts.Token.ThrowIfCancellationRequested();
+                            if (Volatile.Read(ref _effectiveTagEpoch) != refreshEpoch)
+                            {
+                                return;
+                            }
+
+                            var path = paths[i];
+                            // During a full refresh we want final semantic ranking (including fused score), not deferred keyword placeholders.
+                            var tags = ComputeEffectiveTags(path, includeDictionaryEvidence: true, deferSemanticMl: false);
+                            _effectiveTagCache[path] = tags;
+                            _finalSemanticTagPaths[path] = 0;
+                        }
+                    }, cts.Token).ConfigureAwait(false);
+                }
+                finally
+                {
+                    _tagComputeConcurrency.Release();
+                }
             }
             catch (OperationCanceledException)
             {
                 return;
             }
 
-            if (cts.Token.IsCancellationRequested)
+            if (cts.Token.IsCancellationRequested || Volatile.Read(ref _effectiveTagEpoch) != refreshEpoch)
             {
                 return;
             }

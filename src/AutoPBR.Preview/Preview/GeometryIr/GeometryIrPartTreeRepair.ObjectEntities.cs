@@ -52,9 +52,10 @@ internal static partial class GeometryIrPartTreeRepair
     }
 
     /// <summary>
-    /// Hand-lift and bytecode shards may store wrapped <c>uvOrigin [18,13]</c> for javap <c>texOffs(-14,13)</c> caps.
+    /// Cap rings: raw <c>texOffs(-14,13)</c>, top exterior <c>faceMask:["up"]</c>, bottom exterior <c>["down"]</c>.
+    /// Legacy lifts may store wrapped <c>uvOrigin [18,13]</c> or dual <c>["down"]</c> on both caps.
     /// </summary>
-    private static void RepairDecoratedPotCapUvOrigins(JsonObject shardDoc)
+    private static void RepairDecoratedPotCapCuboids(JsonObject shardDoc)
     {
         if (shardDoc["officialJvmName"]?.GetValue<string>() is not { } officialJvm ||
             !officialJvm.StartsWith("net.minecraft.client.model.DecoratedPotModel", StringComparison.Ordinal) ||
@@ -67,13 +68,15 @@ internal static partial class GeometryIrPartTreeRepair
         {
             if (root is JsonObject rootObj)
             {
-                RepairDecoratedPotCapUvOriginsRecursive(rootObj);
+                RepairDecoratedPotCapCuboidsRecursive(rootObj, null);
             }
         }
     }
 
-    private static void RepairDecoratedPotCapUvOriginsRecursive(JsonObject part)
+    private static void RepairDecoratedPotCapCuboidsRecursive(JsonObject part, string? partId)
     {
+        partId ??= part["id"]?.GetValue<string>();
+
         if (part["cuboids"] is JsonArray cuboids)
         {
             foreach (var cuboidNode in cuboids)
@@ -83,7 +86,6 @@ internal static partial class GeometryIrPartTreeRepair
                     uv.Count < 2 ||
                     cuboid["faceMask"] is not JsonArray faceMask ||
                     faceMask.Count != 1 ||
-                    !string.Equals(faceMask[0]?.GetValue<string>(), "down", StringComparison.OrdinalIgnoreCase) ||
                     cuboid["from"] is not JsonArray from ||
                     cuboid["to"] is not JsonArray to ||
                     from.Count < 3 ||
@@ -101,20 +103,28 @@ internal static partial class GeometryIrPartTreeRepair
 
                 var texU = uv[0]?.GetValue<int>() ?? 0;
                 var texV = uv[1]?.GetValue<int>() ?? 0;
-                if (texU == EntityModelRuntime.DecoratedPotCapTexCropRawU &&
-                    texV == EntityModelRuntime.DecoratedPotCapTexCropV)
+                if (!GeometryIrUvAtlasQuality.TryIsDecoratedPotCapDownCuboid(texU, texV, 14, 14))
                 {
                     continue;
                 }
 
-                if (!GeometryIrUvAtlasQuality.TryResolveDecoratedPotCapDownTexCropEmitU(
-                        texU, texV, 14, 14, out _))
+                if (texU != EntityModelRuntime.DecoratedPotCapTexCropRawU ||
+                    texV != EntityModelRuntime.DecoratedPotCapTexCropV)
                 {
-                    continue;
+                    uv[0] = EntityModelRuntime.DecoratedPotCapTexCropRawU;
+                    uv[1] = EntityModelRuntime.DecoratedPotCapTexCropV;
                 }
 
-                uv[0] = EntityModelRuntime.DecoratedPotCapTexCropRawU;
-                uv[1] = EntityModelRuntime.DecoratedPotCapTexCropV;
+                var expectedFace = string.Equals(partId, "top", StringComparison.OrdinalIgnoreCase)
+                    ? "up"
+                    : string.Equals(partId, "bottom", StringComparison.OrdinalIgnoreCase)
+                        ? "down"
+                        : null;
+                if (expectedFace is not null &&
+                    !string.Equals(faceMask[0]?.GetValue<string>(), expectedFace, StringComparison.OrdinalIgnoreCase))
+                {
+                    faceMask[0] = expectedFace;
+                }
             }
         }
 
@@ -127,7 +137,7 @@ internal static partial class GeometryIrPartTreeRepair
         {
             if (child is JsonObject childObj)
             {
-                RepairDecoratedPotCapUvOriginsRecursive(childObj);
+                RepairDecoratedPotCapCuboidsRecursive(childObj, childObj["id"]?.GetValue<string>());
             }
         }
     }
@@ -223,6 +233,117 @@ internal static partial class GeometryIrPartTreeRepair
             if (child is JsonObject childObj)
             {
                 RepairChestSingleBodyFaceMasksRecursive(childObj);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Older merged lifts kept every cuboid on <c>#skin</c> with the primary 32² shard atlas. Re-stamp wind tiers to
+    /// <c>#wind</c> / 128² and eyes to <c>#eyes</c> / 32² so UV quality gates and emit match
+    /// <see cref="AutoPBR.Tools.GeometryCompiler.LayerDefinitionRetainAtlasStamp"/>.
+    /// </summary>
+    private static void RepairBreezeMultiLayerAtlasTags(JsonObject shardDoc)
+    {
+        if (!string.Equals(
+                shardDoc["officialJvmName"]?.GetValue<string>(),
+                "net.minecraft.client.model.monster.breeze.BreezeModel",
+                StringComparison.Ordinal) ||
+            shardDoc["roots"] is not JsonArray roots)
+        {
+            return;
+        }
+
+        foreach (var root in roots)
+        {
+            if (root is JsonObject rootObj)
+            {
+                RepairBreezeMultiLayerAtlasTagsRecursive(rootObj, inheritedWind: false, inheritedEyes: false);
+            }
+        }
+    }
+
+    private static void RepairBreezeMultiLayerAtlasTagsRecursive(
+        JsonObject part,
+        bool inheritedWind,
+        bool inheritedEyes)
+    {
+        var partId = part["id"]?.GetValue<string>() ?? "";
+        var isWind = inheritedWind || partId.StartsWith("wind", StringComparison.OrdinalIgnoreCase);
+        var isEyes = inheritedEyes || string.Equals(partId, "eyes", StringComparison.OrdinalIgnoreCase);
+
+        if (part["cuboids"] is JsonArray cuboids)
+        {
+            foreach (var cuboidNode in cuboids)
+            {
+                if (cuboidNode is not JsonObject cuboid)
+                {
+                    continue;
+                }
+
+                if (isWind)
+                {
+                    cuboid["textureWidth"] = 128;
+                    cuboid["textureHeight"] = 128;
+                    cuboid["textureKey"] = "#wind";
+                }
+                else if (isEyes)
+                {
+                    cuboid["textureWidth"] = 32;
+                    cuboid["textureHeight"] = 32;
+                    cuboid["textureKey"] = "#eyes";
+                }
+                else if (cuboid["textureWidth"] is not JsonValue tw ||
+                         cuboid["textureHeight"] is not JsonValue th ||
+                         !tw.TryGetValue<int>(out var atlasW) ||
+                         !th.TryGetValue<int>(out var atlasH) ||
+                         atlasW <= 0 ||
+                         atlasH <= 0)
+                {
+                    cuboid["textureWidth"] = 32;
+                    cuboid["textureHeight"] = 32;
+                }
+            }
+        }
+
+        if (part["children"] is not JsonArray children)
+        {
+            return;
+        }
+
+        foreach (var child in children)
+        {
+            if (child is JsonObject childObj)
+            {
+                RepairBreezeMultiLayerAtlasTagsRecursive(childObj, isWind, isEyes);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Body-layer lifts keep <c>rod_1</c>/<c>rod_2</c>/<c>rod_3</c> as <c>body</c> siblings beside the empty
+    /// <c>rods</c> anchor (y=8). Java binds rods under <c>rods</c>; without renesting they miss the anchor offset.
+    /// </summary>
+    private static void RepairBreezeRodPartHierarchy(JsonObject shardDoc)
+    {
+        if (!string.Equals(
+                shardDoc["officialJvmName"]?.GetValue<string>(),
+                "net.minecraft.client.model.monster.breeze.BreezeModel",
+                StringComparison.Ordinal) ||
+            shardDoc["roots"] is not JsonArray roots)
+        {
+            return;
+        }
+
+        foreach (var root in roots)
+        {
+            if (root is not JsonObject rootObj || rootObj["children"] is not JsonArray rootKids)
+            {
+                continue;
+            }
+
+            foreach (var rodId in new[] { "rod_1", "rod_2", "rod_3" })
+            {
+                ReparentFlatPart(rootKids, rodId, "rods");
             }
         }
     }

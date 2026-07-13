@@ -20,7 +20,6 @@ uniform float uRenderTime;
 uniform float uViewportAspect;
 uniform float uTurbidity;
 uniform float uHorizonFalloff;
-uniform int uLutValid;
 uniform float uSunDiscRadiusUv;
 uniform float uGroundWorldY;
 out vec4 FragColor;

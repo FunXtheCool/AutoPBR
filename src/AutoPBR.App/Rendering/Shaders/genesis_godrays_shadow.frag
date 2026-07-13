@@ -3,9 +3,11 @@
 
 //!include "common/common.glsl"
 //!include "common/godray_integration.glsl"
+#ifdef GENESIS_GODRAY_SPARSE_MARCH
+//!include "common/godray_march_sparse.glsl"
+#endif
 
-in vec2 vUv;
-uniform sampler2D uSceneDepth;
+in vec2 vUv;uniform sampler2D uSceneDepth;
 uniform sampler2DShadow uShadowMap;
 uniform sampler2DShadow uShadowMapNear;
 uniform mat4 uInvViewProj;
@@ -28,17 +30,13 @@ uniform float uShadowMinBias;
 uniform int uEnableShadowMap;
 uniform int uEnableShadowCascades;
 uniform float uCascadeSplitDistance;
+uniform float uCascadeBlendWidth;
 uniform int uEnableCloudAttenuation;
 
 out vec4 FragColor;
 
 const int GR_SAMPLES = 48;
 const float SKY_DEPTH_EPS = 0.9992;
-
-vec3 softKnee(vec3 x, float knee)
-{
-    return x / (x + vec3(knee));
-}
 
 void main()
 {
@@ -66,16 +64,36 @@ void main()
     const float decay = 0.90;
     const float weight = 1.0 / float(GR_SAMPLES);
 
+#ifdef GENESIS_GODRAY_SPARSE_MARCH
+    bool grCoarseOccluded = false;
+    bool grCoarseWasSky = false;
+    float grCoarseBeamFalloff = 1.0;
+#endif
+
     for (int i = 0; i < GR_SAMPLES; ++i)
     {
-        float t = float(i) / max(float(GR_SAMPLES - 1), 1.0);
+#ifdef GENESIS_GODRAY_SPARSE_MARCH
+        if (grSparseMarchSkipOddStepShadow(i, grCoarseBeamFalloff, grCoarseOccluded, grCoarseWasSky))
+        {
+            visibility *= decay;
+            continue;
+        }
+#endif
+
+        float t;
+#ifdef GENESIS_GODRAY_SPARSE_MARCH
+        t = grSparseMarchT(i, GR_SAMPLES);
+#else
+        t = float(i) / max(float(GR_SAMPLES - 1), 1.0);
+#endif
         vec2 marchUv = mix(vUv, uSunUv, t);
         if (marchUv.x < 0.002 || marchUv.x > 0.998 || marchUv.y < 0.002 || marchUv.y > 0.998)
         {
             break;
         }
 
-        float beamFalloff = 1.0 - smoothstep(uSunDiscRadius, uSunConeRadius, length(marchUv - uSunUv));
+        float beamDist = (1.0 - t) * distFromSun;
+        float beamFalloff = 1.0 - smoothstep(uSunDiscRadius, uSunConeRadius, beamDist);
         if (beamFalloff <= 0.01)
         {
             visibility *= decay;
@@ -99,11 +117,20 @@ void main()
             vec3 worldPos = grMarchWorldPos(marchUv, sampleDepth, uInvViewProj, uCameraPos, uLayerHeight, layerTop);
             float lightVis = grShadowGateCascaded(worldPos, uCameraPos, uLightViewProjNear, uLightViewProj,
                 uShadowMapNear, uShadowMap, uShadowTexelSize, uShadowMinBias, uEnableShadowMap,
-                uEnableShadowCascades, uCascadeSplitDistance);
+                uEnableShadowCascades, uCascadeSplitDistance, uCascadeBlendWidth);
             float cloudAtten = grCloudAttenuation(worldPos, uGroundWorldY, uFogSlabHeight, uLayerHeight, layerTop,
                 uCloudDensity, uVolumeSize, uHeightFogStrength, uEnableCloudAttenuation);
             shaft += visibility * weight * beamFalloff * lightVis * cloudAtten;
         }
+
+#ifdef GENESIS_GODRAY_SPARSE_MARCH
+        if (mod(float(i), 2.0) < 0.5)
+        {
+            grCoarseOccluded = sampleDepth < expectedDepth - 0.0006;
+            grCoarseWasSky = sampleDepth >= SKY_DEPTH_EPS;
+            grCoarseBeamFalloff = beamFalloff;
+        }
+#endif
 
         visibility *= decay;
     }

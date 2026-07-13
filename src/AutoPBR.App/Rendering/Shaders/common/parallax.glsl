@@ -25,6 +25,7 @@ uniform int   uParallaxShadowSamples;
 uniform float uParallaxShadowSoftness;
 uniform float uParallaxMaxUvShift;
 uniform float uParallaxUvScale;
+uniform vec2 uParallaxHeightTexSize;
 
 vec2 pomTileLocal(vec2 uv)
 {
@@ -96,6 +97,7 @@ vec2 traceParallaxPom(sampler2D heightTex, vec2 uv0, vec3 Vtan, float strength, 
 
     // Linear march until ray depth crosses sampled height.
     int marchSteps = 0;
+    float prevHeightSample = curHeightSample;
     for (int i = 0; i < GEN_POM_TRACE_LAYERS_MAX; ++i)
     {
         if (i >= layers)
@@ -108,6 +110,7 @@ vec2 traceParallaxPom(sampler2D heightTex, vec2 uv0, vec3 Vtan, float strength, 
             break;
         }
 
+        prevHeightSample = curHeightSample;
         curLocal -= deltaUv;
         curUv = pomTileUv(tileBase, curLocal);
         curLayer += layerStep;
@@ -119,7 +122,7 @@ vec2 traceParallaxPom(sampler2D heightTex, vec2 uv0, vec3 Vtan, float strength, 
     {
         vec2  prevLocal = curLocal + deltaUv;
         float prevLayer = curLayer - layerStep;
-        float prevHeight = sampleHeight01Grad(heightTex, pomTileUv(tileBase, prevLocal), dx, dy);
+        float prevHeight = prevHeightSample;
 
         float afterDelta = curLayer - curHeightSample;
         float beforeDelta = prevLayer - prevHeight;
@@ -242,7 +245,7 @@ float traceParallaxAo(sampler2D heightTex, vec2 uvHit, float refDepth, float str
 
     vec2 tileBase = floor(uvHit);
     vec2 localHit = pomTileLocal(uvHit);
-    vec2 texelSize = 1.0 / vec2(textureSize(heightTex, 0));
+    vec2 texelSize = vec2(1.0) / max(uParallaxHeightTexSize, vec2(GEN_EPS));
     float radiusTexels = mix(0.75, 2.25, clamp(refDepth, 0.0, 1.0)) * clamp(strength, 0.0, 1.0);
     if (radiusTexels <= GEN_EPS)
     {

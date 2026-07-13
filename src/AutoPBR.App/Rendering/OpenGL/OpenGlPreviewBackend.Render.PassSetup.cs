@@ -331,68 +331,35 @@ public sealed partial class OpenGlPreviewBackend
                     frame.EntityRebakeCtx.GpuBindPoseInterleavedVertices = null;
                 }
 
-                var needsCpuRebake = frame.MeshDirty ||
+                var shouldEnqueueCpuRebake = (frame.MeshDirty ||
                     frame.EntityEmulatedPauseEdge ||
-                    (frame.RenderTime - _lastEmulatedEntityRebakeRenderTime >= MinEmulatedEntityRebakeIntervalSeconds);
-                if (needsCpuRebake &&
-                    !frame.BlockModel.GpuEntityBoneSkinning &&
-                    EntityEmulatedPreviewRebaker.TryRebakeMesh(
-                        frame.EntityRebakeCtx,
-                        frame.BlockModel.Materials,
-                        frame.EntityEmulatedAnimClock,
-                        out var rbVerts,
-                        out var rbIdx,
-                        out var rbBatches,
-                        applyGeometryIrSetupAnimMotion: setupAnimMotion) &&
-                    rbVerts is not null &&
-                    rbIdx is not null &&
-                    rbBatches is not null)
+                    frame.RenderTime - _lastEmulatedEntityRebakeRenderTime >= MinEmulatedEntityRebakeIntervalSeconds) &&
+                    !frame.BlockModel.GpuEntityBoneSkinning;
+                if (shouldEnqueueCpuRebake)
                 {
-                    var rebaked = new PreviewModelSubject
+                    if (TryConsumeEntityRebakeResult(ref frame, setupAnimMotion, rebakeKey))
                     {
-                        InterleavedVertices = rbVerts,
-                        Indices = rbIdx,
-                        DrawBatches = rbBatches,
-                        Materials = frame.BlockModel.Materials,
-                        PrimaryMaterialIndex = frame.BlockModel.PrimaryMaterialIndex,
-                        Sprite2DFoliageTarget = frame.BlockModel.Sprite2DFoliageTarget,
-                        EnableRenderTimeAnimation = frame.BlockModel.EnableRenderTimeAnimation,
-                        AnimationPreset = frame.BlockModel.AnimationPreset,
-                        EmulatedRebake = frame.BlockModel.EmulatedRebake,
-                        GpuEntityBoneSkinning = false,
-                        EntityGpuMeshSpaceLiftY = 0f,
-                        EntityPreviewAnchorOffset = frame.BlockModel.EntityPreviewAnchorOffset,
-                        EntityPreviewPlacementApplied = true,
-                        MeshProvenance = frame.EntityRebakeCtx.MeshProvenance ?? frame.BlockModel.MeshProvenance
-                    };
-                    frame.BlockModel = rebaked;
-                    UploadPreviewMesh(rebaked.InterleavedVertices, rebaked.Indices);
-                    frame.UploadedLiveEntityAnim = true;
-                    _lastEmulatedEntityRebakeRenderTime = frame.RenderTime;
-                    lock (_sync)
-                    {
-                        _blockModelSubject = rebaked;
-                        if (frame.MeshDirty)
+                        var rebaked = frame.BlockModel!;
+                        var rebakeDiagKey =
+                            $"{rebakeKey}|verts={rebaked.InterleavedVertices.Length / PreviewMesh.FloatsPerVertex}|idx={rebaked.Indices.Length}";
+                        if (!string.Equals(rebakeDiagKey, _entityCpuRebakeDiagKey, StringComparison.Ordinal))
                         {
-                            _meshDirty = false;
+                            _entityCpuRebakeDiagKey = rebakeDiagKey;
+                            EmitDiagnostic(
+                                $"[3D preview] Emulated entity mesh rebake: verts={rebaked.InterleavedVertices.Length / PreviewMesh.FloatsPerVertex}, indices={rebaked.Indices.Length}.");
                         }
-                    }
 
-                    var rebakeDiagKey =
-                        $"{rebakeKey}|verts={rebaked.InterleavedVertices.Length / PreviewMesh.FloatsPerVertex}|idx={rebaked.Indices.Length}";
-                    if (!string.Equals(rebakeDiagKey, _entityCpuRebakeDiagKey, StringComparison.Ordinal))
+                        EmitParityCatalogPlacementDiagnostic(
+                            frame.BlockModel,
+                            frame.EntityRebakeCtx,
+                            setupAnimMotion,
+                            gpuSkinning: false,
+                            frame.EntityEmulatedAnimClock);
+                    }
+                    else
                     {
-                        _entityCpuRebakeDiagKey = rebakeDiagKey;
-                        EmitDiagnostic(
-                            $"[3D preview] Emulated entity mesh rebake: verts={rebaked.InterleavedVertices.Length / PreviewMesh.FloatsPerVertex}, indices={rebaked.Indices.Length}.");
+                        EnqueueEntityRebakeRequest(ref frame, setupAnimMotion);
                     }
-
-                    EmitParityCatalogPlacementDiagnostic(
-                        frame.BlockModel,
-                        frame.EntityRebakeCtx,
-                        setupAnimMotion,
-                        gpuSkinning: false,
-                        frame.EntityEmulatedAnimClock);
                 }
             }
         }
@@ -462,7 +429,11 @@ public sealed partial class OpenGlPreviewBackend
                 var uploadMesh = ItemPreviewSceneFactory.CreateMesh(frame.Settings, frame.Material);
                 UploadPreviewMesh(uploadMesh.InterleavedVertices, uploadMesh.Indices);
                 var meshKind = uploadMesh.Name == "sprite_voxels" ? "sprite voxels" : "item plane";
-                var voxelCount = uploadMesh.Name == "sprite_voxels" ? uploadMesh.VertexCount / 24 : 0;
+                var voxelCount = uploadMesh.OpaqueVoxelCount > 0
+                    ? uploadMesh.OpaqueVoxelCount
+                    : uploadMesh.Name == "sprite_voxels"
+                        ? uploadMesh.VertexCount / 24
+                        : 0;
                 EmitDiagnostic(
                     voxelCount > 0
                         ? $"[3D preview] Mesh upload: {meshKind} (itemFlat={(frame.Settings.ItemFlatSpritePreview ? 1 : 0)}, thickness={frame.Settings.SpriteThickness:0.###}, voxels={voxelCount}), verts={uploadMesh.VertexCount}, indices={uploadMesh.Indices.Length}."
@@ -618,9 +589,14 @@ public sealed partial class OpenGlPreviewBackend
             if (frame.EntityBoneSnapshotValid &&
                 frame.EntityBoneSnapshotCount > 0)
             {
-                UploadPreviousEntitySkinningBoneMatrices(frame.Gl);
-                UploadEntitySkinningBoneMatrices(frame.Gl, frame.EntityBoneSnapshotCount);
-                bonePaletteUploaded = true;
+                if (ShouldUploadEntityBonePalette(frame.EntityBoneSnapshotCount, setupAnimMotion))
+                {
+                    UploadPreviousEntitySkinningBoneMatrices(frame.Gl);
+                    UploadEntitySkinningBoneMatrices(frame.Gl, frame.EntityBoneSnapshotCount);
+                    SnapshotUploadedEntityBonePalette(frame.EntityBoneSnapshotCount);
+                }
+
+                bonePaletteUploaded = _entityBonePaletteLastUploadedCount > 0;
             }
 
             TryApplyForceEntityCpuSkinningUpload(ref frame, setupAnimMotion);

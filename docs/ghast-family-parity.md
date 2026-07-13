@@ -67,6 +67,8 @@ Geometry UV texels are authored against the logical atlas. `EntityGeometryIrText
 
 The physical dimensions remain correct for texture upload. Baking UVs against the padded PNG dimensions produces partial faces and washed/misaligned previews while many mesh tests still pass.
 
+**GPU sampling:** 26.1.2 ghast-family PNGs are uniform integer upscales of the logical sheet (each texel becomes a 2×2 block), not empty corner padding. Vertex UVs are normalized against the logical atlas during bake; the fragment shader must use `uTextureAtlasScale = (1,1)` for those uploads. Scaling by `(logical ÷ physical)` — e.g. `(0.5, 0.5)` for monster ghast — mis-samples side faces and produces white or washed body panels while baby variants at 64×64 still look correct.
+
 **Baby-entity caveat:** manifest rows often still declare placeholder `64×64` (or other adult-sized atlases) while the lifted shard carries the true sheet size (`BabyAxolotl` `32×32`, `BabyChicken` `16×16`, etc.). `BabyCow` happens to match manifest and shard (`64×64`, no `faceMask` sheets), so it stayed correct when rebake used manifest-only sizing. Rebake must follow the shard so emit and bake normalize UVs identically.
 
 ## Regression coverage

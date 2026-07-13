@@ -414,6 +414,8 @@ internal sealed partial class EntityModelRuntime
                 ShellInflateTexels = e.ShellInflateTexels,
                 EnableParallax = e.EnableParallax,
                 MirrorCuboidUv = e.MirrorCuboidUv,
+                BakeAtlasWidth = e.BakeAtlasWidth,
+                BakeAtlasHeight = e.BakeAtlasHeight,
             };
         }
     }

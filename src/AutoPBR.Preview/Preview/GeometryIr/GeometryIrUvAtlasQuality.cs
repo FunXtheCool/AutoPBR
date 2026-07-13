@@ -240,17 +240,18 @@ public static class GeometryIrUvAtlasQuality
             return (up, down);
         }
 
-        // Decorated pot caps: javap texOffs(-14,13).addBox(14,0,14) with faceMask:["down"] uses ModelPart.Cube DOWN
-        // cross-unfold (u+d, v, u+d+w, v+d), not the texCrop [u,v,u+w,v+d] anchor used by dual-mask sheets.
+        // Decorated pot caps: javap texOffs(-14,13).addBox(14,0,14) cross-unfold — top exterior uses UP,
+        // bottom exterior uses DOWN (ModelPart$Cube slots, not texCrop anchor).
         if (faceMask.Count == 1 &&
-            faceMask[0].Equals("down", StringComparison.OrdinalIgnoreCase) &&
             d > 0 &&
-            TryResolveDecoratedPotCapDownTexCropEmitU(u, v, w, d, out var emitU))
+            TryNormalizeDecoratedPotCapTexU(u, out var capTexU) &&
+            (faceMask[0].Equals("down", StringComparison.OrdinalIgnoreCase) ||
+             faceMask[0].Equals("up", StringComparison.OrdinalIgnoreCase)))
         {
             var down = EntityCuboidJavaUvConvention.GetUvRect(
-                EntityCuboidJavaUvConvention.JavaDirection.Down, emitU, v, w, 0, d);
+                EntityCuboidJavaUvConvention.JavaDirection.Down, capTexU, v, w, 0, d);
             var up = EntityCuboidJavaUvConvention.GetUvRect(
-                EntityCuboidJavaUvConvention.JavaDirection.Up, emitU, v, w, 0, d);
+                EntityCuboidJavaUvConvention.JavaDirection.Up, capTexU, v, w, 0, d);
             return (up, down);
         }
 
@@ -265,26 +266,27 @@ public static class GeometryIrUvAtlasQuality
     }
 
     /// <summary>
-    /// javap <c>texOffs(-14,13)</c> on 32×32 <c>#base</c>: DOWN slot is <see cref="EntityCuboidJavaUvConvention.GetUvRect"/>
-    /// with emit U = <c>texU + d</c> when <c>texU &lt; 0</c>, or repaired from legacy wrapped <c>uvOrigin[18]</c>.
+    /// javap <c>DecoratedPotRenderer.createBaseLayer</c> cap ring: <c>texOffs(-14,13).addBox(14,0,14)</c> on 32×32 <c>#base</c>.
+  /// Legacy lifts may store wrapped <c>uvOrigin[18]</c> instead of raw <c>-14</c>.
     /// </summary>
-    internal static bool TryResolveDecoratedPotCapDownTexCropEmitU(
-        int texU,
-        int texV,
-        int spanW,
-        int spanD,
-        out int emitU)
+    internal static bool TryIsDecoratedPotCapDownCuboid(int texU, int texV, int spanW, int spanD) =>
+        spanW == 14 && spanD == 14 && texV == 13 && TryNormalizeDecoratedPotCapTexU(texU, out _);
+
+    internal static bool TryNormalizeDecoratedPotCapTexU(int texU, out int normalizedU)
     {
-        emitU = texU;
-        if (spanW != 14 || spanD != 14 || texV != 13)
+        normalizedU = EntityModelRuntime.DecoratedPotCapTexCropRawU;
+        if (texU == EntityModelRuntime.DecoratedPotCapTexCropRawU)
         {
-            return false;
+            return true;
         }
 
-        emitU = texU < 0
-            ? texU + spanD
-            : texU - spanD - (2 * TexCropOppositeFaceDepthGap);
-        return true;
+        if (texU == EntityModelRuntime.DecoratedPotCapTexCropRawU + 32 ||
+            texU == EntityModelRuntime.DecoratedPotCapTexCropRawU + 14 + (2 * TexCropOppositeFaceDepthGap))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>

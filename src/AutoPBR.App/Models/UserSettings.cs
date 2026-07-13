@@ -60,6 +60,10 @@ public sealed class UserSettings
     public string? MinecraftAssetsDirectory { get; set; }
 
     public bool DebugMode { get; set; }
+
+    /// <summary>When true, request native desktop OpenGL 4.x (WGL) for the 3D preview on next launch. Default false = OpenGL ES 3.0 via ANGLE.</summary>
+    public bool PreviewUseOpenGl4 { get; set; }
+
     public string ColorScheme { get; set; } = "Dark";
 
     /// <summary>Interface scale (typically 0.75–1.75). 1.0 = 100%.</summary>

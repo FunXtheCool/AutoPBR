@@ -112,7 +112,7 @@ public sealed class PreviewLightMathTimeOfDayTests
             TimeOfDaySpeed = 2f
         };
 
-        Assert.Equal(14f, PreviewLightMath.EffectiveTimeOfDayHours(settings, 1.0), 0.01f);
+        Assert.Equal(14f, PreviewLightMath.EffectiveTimeOfDayHours(PreviewRenderSettingsSnapshot.From(settings), 1.0), 0.01f);
     }
 
     [Fact]
@@ -125,7 +125,7 @@ public sealed class PreviewLightMathTimeOfDayTests
             AnimateTimeOfDay = false
         };
 
-        var (yaw, pitch) = PreviewLightMath.EffectiveLightYawPitch(settings, 99.0);
+        var (yaw, pitch) = PreviewLightMath.EffectiveLightYawPitch(PreviewRenderSettingsSnapshot.From(settings), 99.0);
         Assert.Equal(-20.0, yaw);
         Assert.Equal(-40.0, pitch);
     }

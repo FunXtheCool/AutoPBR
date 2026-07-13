@@ -7,8 +7,11 @@ namespace AutoPBR.App.Rendering.OpenGL;
 public sealed partial class OpenGlPreviewBackend
 {
     private GpuBootstrapRunner? _gpuBootstrap;
+    private bool _gpuBootstrapAborted;
     private bool _pendingShaderReload;
     private string _glVersionString = "(unknown)";
+
+    public string? ActiveContextSummary { get; private set; }
 
     private sealed class GpuBootstrapRunner
     {
@@ -62,6 +65,7 @@ public sealed partial class OpenGlPreviewBackend
 
         ReleaseGpuResourceObjectsLocked();
         _gpuBootstrap = new GpuBootstrapRunner();
+        _gpuBootstrapAborted = false;
         _pendingShaderReload = false;
     }
 
@@ -130,8 +134,11 @@ public sealed partial class OpenGlPreviewBackend
                 EmitDiagnostic(_useOpenGlEs
                     ? $"[3D preview] Context: {_glVersionString} (Genesis shader path, GLSL ES 3.0)."
                     : $"[3D preview] Context: {_glVersionString} (Genesis shader path, GLSL 330 core).");
+                RecordActiveContextSummary();
                 _mainProgramUsesTessellation = false;
                 string? err = null;
+                var bootMask = GenesisShaderFeatureMaskBuilder.Build(_settings, entityEmulatedPreview: false);
+                var bootDefines = GenesisShaderFeatureMaskBuilder.ToDefines(bootMask);
                 if (!_useOpenGlEs)
                 {
                     _program = CreatePreviewProgram(
@@ -140,7 +147,8 @@ public sealed partial class OpenGlPreviewBackend
                         "genesis.tes",
                         "genesis.frag",
                         out err,
-                        "genesis+tessellation");
+                        "genesis+tessellation",
+                        bootDefines);
                     if (_program.IsValid)
                     {
                         _mainProgramUsesTessellation = true;
@@ -148,24 +156,28 @@ public sealed partial class OpenGlPreviewBackend
                     }
                     else
                     {
-                        EmitDiagnostic("[3D preview] Genesis tessellation unavailable; falling back. " + (err ?? "link failed"));
+                        DisableGenesisTessellationCompile(err ?? "link failed");
                         _program.Dispose();
                         _program = null;
                     }
                 }
 
-                _program ??= CreatePreviewProgram("genesis.vert", "genesis.frag", out err);
+                _program ??= CreatePreviewProgram("genesis.vert", "genesis.frag", out err, defines: bootDefines);
                 if (!_program.IsValid)
                 {
                     _lastError = err ?? "Shader link failed.";
                     EmitDiagnostic("[3D preview] " + _lastError);
                     _program.Dispose();
                     _program = null;
-                    _gpuBootstrap = null;
+                    _gpuBootstrapAborted = true;
                     return false;
                 }
 
                 _mainEntityUniformLocs = ResolveEntitySkinningUniformLocs(_program);
+                _mainUniformLocs = ResolveMainProgramUniformLocs(_program);
+                _activeGenesisProgramKey = new GenesisProgramCacheKey(bootMask, _mainProgramUsesTessellation);
+                _genesisPrograms[_activeGenesisProgramKey] = _program;
+                _genesisProgramLru.AddFirst(_activeGenesisProgramKey);
                 return true;
 
             case 1:
@@ -179,6 +191,7 @@ public sealed partial class OpenGlPreviewBackend
                 else
                 {
                     _shadowEntityUniformLocs = ResolveEntitySkinningUniformLocs(_shadowProgram);
+                    _shadowUniformLocs = ResolveShadowProgramUniformLocs(_shadowProgram);
                 }
 
                 InitEntitySkinningBoneUbo(gl);
@@ -238,6 +251,7 @@ public sealed partial class OpenGlPreviewBackend
                 return true;
 
             case 7:
+                PrewarmCommonGenesisProgramsOnGpu();
                 _gpuInitTier = PreviewGpuInitTier.Core;
                 EmitDiagnostic(
                     "[3D preview] Core GPU init: " +
@@ -259,6 +273,22 @@ public sealed partial class OpenGlPreviewBackend
 
             default:
                 return true;
+        }
+    }
+
+    private void RecordActiveContextSummary()
+    {
+        ActiveContextSummary = _desktopWglSidecar is not null
+            ? _desktopWglSidecar.UsesDxInteropPresentation
+                ? $"{_glVersionString} · GLSL 330 core (WGL sidecar · D3D11 interop)"
+                : $"{_glVersionString} · GLSL 330 core (WGL sidecar)"
+            : _useOpenGlEs
+                ? $"{_glVersionString} · GLSL ES 3.0"
+                : $"{_glVersionString} · GLSL 330 core";
+
+        if (PreviewOpenGlSession.RequestedDesktopGl4 && _useOpenGlEs)
+        {
+            EmitDiagnostic("[3D preview] " + Resources.PreviewOpenGlFallbackWarning);
         }
     }
 }

@@ -8,6 +8,7 @@
 //!include "common/volumetric_medium.glsl"
 //!include "common/volumetric_clouds_density_maps.glsl"
 //!include "common/temporal_reproject.glsl"
+//!include "common/ray_reconstruct.glsl"
 
 in vec2 vUv;
 uniform mat4 uInvViewProj;
@@ -46,20 +47,6 @@ out vec4 FragColor;
 
 const int CLOUD_STEPS = 24;
 const float SKY_DEPTH_EPS = 0.9992;
-
-vec3 worldRayDir(vec2 uv, mat4 invViewProj, vec3 cameraPos)
-{
-    vec2 ndc = vec2(uv.x * 2.0 - 1.0, uv.y * 2.0 - 1.0);
-    vec4 worldH = invViewProj * vec4(ndc, 1.0, 1.0);
-    vec3 farPt = worldH.xyz / max(worldH.w, 1e-6);
-    vec3 rd = farPt - cameraPos;
-    float len2 = dot(rd, rd);
-    if (len2 < 1e-12)
-    {
-        return vec3(0.0, 1.0, 0.0);
-    }
-    return rd * inversesqrt(len2);
-}
 
 // Ambient in-scatter from the sky dome, blended toward the night zenith as the sun sets.
 // Uses the sky-view LUT's actual parameterization and decodes its sRGB storage; sampling
@@ -236,7 +223,7 @@ void main()
         }
     }
 
-    vec3 rd = worldRayDir(vUv, uInvViewProj, uCameraPos);
+    vec3 rd = grWorldRayDir(vUv, uInvViewProj, uCameraPos);
     float layerTop = uLayerHeight + uVolumeHeight;
     float underSlab = cloudUnderSlabFactor(uCameraPos.y, uLayerHeight);
     float insideSlab = cloudInsideSlabFactor(uCameraPos.y, uLayerHeight, layerTop);
@@ -365,15 +352,22 @@ void main()
             float segLen = prevT < 0.0 ? stepLen : max(abs(t - prevT), 1e-3);
             prevT = t;
             vec3 worldPos = uCameraPos + rd * t;
-            float density = vcCloudDensityEx(worldPos, uLayerHeight, layerTop, uDensity, uCoverageScale, uVolumeSize,
-                uCloudNoise, uHasCloudNoise, uDetailNoise, uHasDetailNoise, uCoverageMap, uHasCoverageMap, uWindOffset);
+            float baseShape = vcCloudBaseDensity(worldPos, uLayerHeight, layerTop, uCoverageScale, uVolumeSize,
+                uCloudNoise, uHasCloudNoise, uCoverageMap, uHasCoverageMap, uWindOffset);
+            if (baseShape <= 1e-5)
+            {
+                continue;
+            }
+
+            float density = vcCloudDensityFromBase(baseShape, worldPos, uLayerHeight, layerTop, uDensity, uVolumeSize,
+                uDetailNoise, uHasDetailNoise, uWindOffset);
             density *= lifetime;
             if (density <= 1e-5)
             {
                 continue;
             }
 
-            float lightOd = vcLightOpticalDepth(worldPos, sunToward, uLayerHeight, layerTop, uDensity, uCoverageScale,
+            float lightOd = vcLightOpticalDepthFromBase(baseShape, worldPos, sunToward, uLayerHeight, layerTop, uDensity, uCoverageScale,
                 uVolumeSize, lightSteps, uCloudNoise, uHasCloudNoise, uCoverageMap, uHasCoverageMap, uWindOffset);
             float hSample = saturate1((worldPos.y - uLayerHeight) / max(uVolumeHeight, 0.001));
             vec3 radiance = vcSunScatter(sunColor, cosTheta, lightOd);
@@ -394,11 +388,11 @@ void main()
     if (uCirrusStrength > 0.0 && tCirrus > 0.0 && rd.y > mix(0.025, 0.12, aboveDeck))
     {
         vec3 cirrusPos = uCameraPos + rd * tCirrus;
+        float cirrusLife = cloudCirrusLifetime(rd, underSlab);
         float cirrusDensity = vcCirrusDensity(cirrusPos.xz, uCirrusWindOffset, uVolumeSize);
-        cirrusDensity *= cloudCirrusLifetime(rd, underSlab);
+        cirrusDensity *= cirrusLife;
         if (cirrusDensity > 1e-3)
         {
-            float cirrusLife = cloudCirrusLifetime(rd, underSlab);
             float slant = mix(1.0, clamp(1.0 / max(rd.y, 0.12), 1.0, 2.2), 1.0 - cirrusLife);
             float cirrusAlpha = saturate1(cirrusDensity * uCirrusStrength * 0.62 * slant);
             vec3 cirrusRad = vcSunScatter(sunColor, cosTheta, cirrusDensity * 1.6) + skyAmbient * 0.82;

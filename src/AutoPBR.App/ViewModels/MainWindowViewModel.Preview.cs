@@ -215,6 +215,7 @@ public partial class MainWindowViewModel
         glPreview.SetRendererLog(line => RunOnUiThread(() => AddLogLine(line)));
         glPreview.Backend.GpuInitProgressChanged += OnPreviewGpuInitProgressChanged;
         ApplyPreviewGpuInitOverlay(glPreview.Backend.GpuInitProgress);
+        UpdatePreviewOpenGlActiveContextFromBackend();
         PushPreview3DCamera();
         RefreshPreviewGrassColormapState();
         Apply3DPreviewIfNeeded();
@@ -222,7 +223,11 @@ public partial class MainWindowViewModel
     }
 
     private void OnPreviewGpuInitProgressChanged(PreviewGpuInitProgress progress) =>
-        RunOnUiThread(() => ApplyPreviewGpuInitOverlay(progress));
+        RunOnUiThread(() =>
+        {
+            ApplyPreviewGpuInitOverlay(progress);
+            UpdatePreviewOpenGlActiveContextFromBackend();
+        });
 
     private void ApplyPreviewGpuInitOverlay(PreviewGpuInitProgress progress)
     {
@@ -230,6 +235,14 @@ public partial class MainWindowViewModel
         Preview3DGpuInitOverlayText = progress.Phase;
         Preview3DGpuInitProgressFraction = progress.ProgressFraction;
         Preview3DGpuInitProgressIndeterminate = progress.ProgressFraction <= 0.001;
+    }
+
+    private void UpdatePreviewOpenGlActiveContextFromBackend()
+    {
+        if (_glPreview?.Backend is OpenGlPreviewBackend glBackend)
+        {
+            UpdatePreviewOpenGlActiveContextText(glBackend.ActiveContextSummary);
+        }
     }
 
     [RelayCommand]

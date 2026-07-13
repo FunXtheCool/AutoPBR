@@ -165,9 +165,12 @@ internal static partial class MinecraftModelBaker
                     continue;
                 }
 
+                var faceAtlasW = el.BakeAtlasWidth > 0 ? el.BakeAtlasWidth : wh.w;
+                var faceAtlasH = el.BakeAtlasHeight > 0 ? el.BakeAtlasHeight : wh.h;
+
                 CloseBatchIfNeeded(matIdx, ResolveElementLayerPolicy(el, texZip, model.Textures), el.EnableParallax);
 
-                _ = TryEmitFace(effectiveFaceName, fx, fy, fz, tx, ty, tz, face, wh.w, wh.h, el.LocalToParent, v, idx,
+                _ = TryEmitFace(effectiveFaceName, fx, fy, fz, tx, ty, tz, face, faceAtlasW, faceAtlasH, el.LocalToParent, v, idx,
                     appendBoneIndex, appendBoneIndex ? elementIndex : 0, skipPreviewCuboidScale, in uvPolicy, el.MirrorCuboidUv,
                     el.RescaleRotation);
             }

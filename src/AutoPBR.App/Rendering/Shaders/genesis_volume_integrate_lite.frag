@@ -9,9 +9,11 @@
 //!include "common/ray_reconstruct.glsl"
 //!include "common/volume_froxel_math.glsl"
 //!include "common/volume_integrate_sample.glsl"
+//!include "common/volume_integrate_sparse.glsl"
 
 in vec2 vUv;
 uniform sampler2DArray uFroxelVolume;
+uniform sampler2DArray uFroxelOccupancy;
 uniform sampler2D uSceneDepth;
 uniform mat4 uInvViewProj;
 uniform vec3 uCameraPos;
@@ -33,11 +35,6 @@ out vec4 FragColor;
 const int VM_STEPS = 24;
 const float SKY_DEPTH_EPS = 0.9992;
 
-vec3 softKnee(vec3 x, float knee)
-{
-    return x / (x + vec3(knee));
-}
-
 void main()
 {
     if (uStrength <= 0.0)
@@ -55,18 +52,36 @@ void main()
     float miePhase = atmosphereMiePhase(dot(rd, sunToward));
 
     float stepLen = uHalfExtent.z * 2.0 / float(VM_STEPS);
+    float stepLenCoarse = stepLen;
+    float stepLenFine = stepLenCoarse * 0.5;
+#ifdef GENESIS_VOLUME_MEDIUMP_ACCUM
+    mediump vec3 accum = vec3(0.0);
+    mediump float transmittance = 1.0;
+#else
     vec3 accum = vec3(0.0);
     float transmittance = 1.0;
+#endif
     float jitter = uJitter * stepLen;
 
     for (int i = 0; i < VM_STEPS; ++i)
     {
-        float t = jitter + (float(i) + 0.5) * stepLen;
+        if (viSparseMarchSkipOddStep(i, jitter, stepLenCoarse, rd, uCameraPos, uCamRight, uCamUp, uCamForward,
+            uHalfExtent, uSliceCount, uDepthDistribution, uFroxelOccupancy))
+        {
+            continue;
+        }
+
+        float t = viSparseMarchT(i, jitter, stepLenCoarse, stepLenFine);
         vec3 worldPos = uCameraPos + rd * t;
         vec3 froxelUv = vfWorldToFroxelUv(worldPos, uCameraPos, uCamRight, uCamUp, uCamForward,
             uHalfExtent, uSliceCount, uDepthDistribution);
         float edgeW = vfFroxelEdgeWeight(froxelUv);
         if (edgeW <= 1e-5)
+        {
+            continue;
+        }
+
+        if (viSampleFroxelOccupancy(uFroxelOccupancy, froxelUv, uSliceCount) <= 1e-5)
         {
             continue;
         }

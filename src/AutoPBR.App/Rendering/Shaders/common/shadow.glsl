@@ -48,16 +48,19 @@ float computeShadowBias(vec3 N, vec3 L, float minBias, float maxBias, vec2 shado
 
 float sampleShadowPcf3x3(sampler2DShadow shadowTex, vec3 shadowUv, vec2 texelSize)
 {
-    float sum = 0.0;
-    for (int dy = -1; dy <= 1; ++dy)
-    {
-        for (int dx = -1; dx <= 1; ++dx)
-        {
-            vec2 off = vec2(float(dx), float(dy)) * texelSize;
-            vec3 p = vec3(shadowUv.xy + off, shadowUv.z);
-            sum += texture(shadowTex, p);
-        }
-    }
+    vec2 t = texelSize;
+    vec2 uv = shadowUv.xy;
+    float z = shadowUv.z;
+    float sum =
+        texture(shadowTex, vec3(uv + vec2(-t.x, -t.y), z)) +
+        texture(shadowTex, vec3(uv + vec2( 0.0, -t.y), z)) +
+        texture(shadowTex, vec3(uv + vec2( t.x, -t.y), z)) +
+        texture(shadowTex, vec3(uv + vec2(-t.x,  0.0), z)) +
+        texture(shadowTex, vec3(uv + vec2( 0.0,  0.0), z)) +
+        texture(shadowTex, vec3(uv + vec2( t.x,  0.0), z)) +
+        texture(shadowTex, vec3(uv + vec2(-t.x,  t.y), z)) +
+        texture(shadowTex, vec3(uv + vec2( 0.0,  t.y), z)) +
+        texture(shadowTex, vec3(uv + vec2( t.x,  t.y), z));
 
     return sum * (1.0 / 9.0);
 }
@@ -101,6 +104,82 @@ float sampleShadowPcfSoft(sampler2DShadow shadowTex, vec3 shadowUv, vec2 texelSi
     }
 
     return sum / totalWeight;
+}
+
+float sampleSceneShadowFromWorld(vec3 worldPos, mat4 lightVp, sampler2DShadow shadowMap, vec2 texelSize,
+    float minBias, float maxBias, vec3 N, vec3 L, float softnessTexels)
+{
+    vec4 shadowPack = worldToShadowUv(worldPos, lightVp);
+    if (shadowPack.w < 0.5)
+    {
+        return 1.0;
+    }
+
+    vec3 sUv = shadowPack.xyz;
+    float bias = computeShadowBias(N, L, minBias, maxBias, texelSize);
+    sUv.z = clamp(sUv.z - bias, 0.0, 1.0);
+    return sampleShadowPcfSoft(shadowMap, sUv, texelSize, softnessTexels);
+}
+
+float sampleSceneShadowFromClip(vec4 lightClip, sampler2DShadow shadowMap, vec2 texelSize,
+    float minBias, float maxBias, vec3 N, vec3 L, float softnessTexels)
+{
+    if (lightClip.w <= 0.0)
+    {
+        return 1.0;
+    }
+
+    vec3 sUv = lightClip.xyz / lightClip.w;
+    sUv = sUv * 0.5 + 0.5;
+    if (sUv.x < 0.0 || sUv.x > 1.0 || sUv.y < 0.0 || sUv.y > 1.0 || sUv.z < 0.0 || sUv.z > 1.0)
+    {
+        return 1.0;
+    }
+
+    float bias = computeShadowBias(N, L, minBias, maxBias, texelSize);
+    sUv.z = clamp(sUv.z - bias, 0.0, 1.0);
+    return sampleShadowPcfSoft(shadowMap, sUv, texelSize, softnessTexels);
+}
+
+float sampleSceneShadowCascaded(vec3 worldPos, vec3 cameraPos, vec4 lightClipFar,
+    mat4 lightVpNear, mat4 lightVpFar,
+    sampler2DShadow shadowNear, sampler2DShadow shadowFar, vec2 texelSize,
+    float minBias, float maxBias, vec3 N, vec3 L, float softnessTexels,
+    int enableShadow, int enableCascades, float splitDist, float blendWidth)
+{
+    if (enableShadow < 1)
+    {
+        return 1.0;
+    }
+
+    if (enableCascades < 1)
+    {
+        return sampleSceneShadowFromClip(lightClipFar, shadowFar, texelSize, minBias, maxBias, N, L, softnessTexels);
+    }
+
+    float dist = length(worldPos - cameraPos);
+    float halfBand = max(blendWidth, 0.0) * 0.5;
+    float blendStart = splitDist - halfBand;
+    float blendEnd = splitDist + halfBand;
+
+    if (halfBand <= 1e-5 || dist <= blendStart)
+    {
+        return sampleSceneShadowFromWorld(worldPos, lightVpNear, shadowNear, texelSize,
+            minBias, maxBias, N, L, softnessTexels);
+    }
+
+    if (dist >= blendEnd)
+    {
+        return sampleSceneShadowFromWorld(worldPos, lightVpFar, shadowFar, texelSize,
+            minBias, maxBias, N, L, softnessTexels);
+    }
+
+    float nearVis = sampleSceneShadowFromWorld(worldPos, lightVpNear, shadowNear, texelSize,
+        minBias, maxBias, N, L, softnessTexels);
+    float farVis = sampleSceneShadowFromWorld(worldPos, lightVpFar, shadowFar, texelSize,
+        minBias, maxBias, N, L, softnessTexels);
+    float blendT = smoothstep(blendStart, blendEnd, dist);
+    return mix(nearVis, farVis, blendT);
 }
 
 #endif // GENESIS_SHADOW_GLSL

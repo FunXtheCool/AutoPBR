@@ -29,6 +29,7 @@ uniform sampler2D uSpecular;
 uniform sampler2D uHeight;
 uniform sampler2D uAtmoSkyViewLut;
 uniform sampler2DShadow uShadowMap;
+uniform sampler2DShadow uShadowMapNear;
 
 uniform vec3  uCameraPos;
 uniform vec3  uLightDir;
@@ -66,14 +67,16 @@ uniform float uIblStrength;
 uniform float uEmissionStrength;
 uniform vec3  uSkyTint;
 uniform vec3  uGroundTint;
-uniform float uAtmosphereTurbidity;
 uniform float uAtmosphereSunIntensity;
-uniform float uAtmosphereHorizonFalloff;
 uniform float uAerialFogStrength;
 
 // Genesis directional shadow map (Phase 2).
 uniform mat4  uLightViewProj;
+uniform mat4  uLightViewProjNear;
 uniform int   uEnableShadowMap;
+uniform int   uEnableShadowCascades;
+uniform float uCascadeSplitDistance;
+uniform float uCascadeBlendWidth;
 uniform float uShadowMinBias;
 uniform float uShadowMaxBias;
 uniform vec2  uShadowTexelSize;
@@ -84,6 +87,7 @@ layout(location = 1) out vec4 TaaSignal;
 
 vec3 sampleNormal(vec2 uv, vec2 dx, vec2 dy, vec3 Nw, vec3 Tw, vec3 Bw)
 {
+#if defined(GENESIS_ENABLE_NORMAL_MAP)
     if (uEnableNormalMap < 1 || uHasNormal < 1)
     {
         return normalize(Nw);
@@ -92,8 +96,10 @@ vec3 sampleNormal(vec2 uv, vec2 dx, vec2 dy, vec3 Nw, vec3 Tw, vec3 Bw)
     vec3 tn = textureGrad(uNormal, uv, dx, dy).xyz * 2.0 - 1.0;
     tn.xy *= uNormalStrength;
     tn = normalize(tn);
-    mat3 tbn = mat3(normalize(Tw), normalize(Bw), normalize(Nw));
-    return normalize(tbn * tn);
+    return normalize(mat3(Tw, Bw, Nw) * tn);
+#else
+    return normalize(Nw);
+#endif
 }
 
 float metalPreviewBaseVisibility(float roughness)
@@ -110,14 +116,24 @@ float groundSpecularReceiverFade(vec3 worldPos, vec3 N, vec3 V)
 
     float dist = length(worldPos - uCameraPos);
     float distFade = 1.0 - smoothstep(18.0, 48.0, dist);
-    float noV = max(dot(normalize(N), normalize(V)), 0.0);
+    float noV = max(dot(N, V), 0.0);
     float grazingFade = smoothstep(0.045, 0.22, noV);
     return clamp(mix(0.08, 1.0, distFade * grazingFade), 0.08, 1.0);
 }
 
 void main()
 {
-    vec4 albRaw = textureGrad(uAlbedo, vUv, dFdx(vUv), dFdy(vUv));
+    vec2 uvDx = dFdx(vUv);
+    vec2 uvDy = dFdy(vUv);
+#if defined(GENESIS_ENABLE_POM)
+    bool  pomActiveEarly = (uEnableParallax > 0 && uHasHeight > 0 && uHeightStrength > 0.0);
+    vec4 albRaw = pomActiveEarly
+        ? textureGrad(uAlbedo, vUv, uvDx, uvDy)
+        : texture(uAlbedo, vUv);
+#else
+    bool  pomActiveEarly = false;
+    vec4 albRaw = texture(uAlbedo, vUv);
+#endif
     if (uSceneKind == 1)
     {
         if (uItemAlphaBlend < 1 && albRaw.a < uAlphaCutoff)
@@ -143,17 +159,19 @@ void main()
     // Parallax occlusion mapping in tangent space.
     vec2 uvDisp = vUv;
     vec2 uv = vUv;
-    vec2 uvDx = dFdx(vUv);
-    vec2 uvDy = dFdy(vUv);
     float pomDepth = 0.0;
     float pomStrengthTrace = uHeightStrength;
-    bool  pomActive = (uEnableParallax > 0 && uHasHeight > 0 && uHeightStrength > 0.0);
+#if defined(GENESIS_ENABLE_POM)
+    bool  pomActive = pomActiveEarly;
     if (pomActive)
     {
         // Trace in tile-local space; height/albedo/normal/spec samples wrap so repeated ground tiles and cube-face edges stay seamless.
         uvDisp = traceParallaxPom(uHeight, vUv, Vtan, pomStrengthTrace, uvDx, uvDy, pomDepth);
         uv = uvDisp;
     }
+#else
+    bool  pomActive = false;
+#endif
 
     // Re-sample albedo at displaced UV when POM is on.
     vec4 alb = pomActive ? textureGrad(uAlbedo, uv, uvDx, uvDy) : albRaw;
@@ -176,12 +194,14 @@ void main()
 
     // LabPBR _s decode (or neutral defaults when no spec map / spec map disabled).
     LabPbrMaterial mat;
-    if (uEnableSpecularMap > 0 && uHasSpecular > 0)
+#if defined(GENESIS_ENABLE_SPECULAR_MAP)
+    if (uHasSpecular > 0 && uEnableSpecularMap > 0)
     {
         vec4 sp = textureGrad(uSpecular, uv, uvDx, uvDy);
         mat = decodeLabPbrSpec(sp, albedoLinear, uRoughnessScale, uSpecularStrength);
     }
     else
+#endif
     {
         mat.smoothness = 0.0;
         mat.roughness = 0.9;
@@ -198,36 +218,34 @@ void main()
     // Parallax self-shadow trace toward the light (fragment-local; complements the directional shadow map).
     float pomShadow = 1.0;
     float pomAo = 1.0;
-    if (pomActive && uEnableParallaxShadow > 0 && uHasHeight > 0)
+#if defined(GENESIS_ENABLE_POM)
+    if (pomActive && uHasHeight > 0)
     {
-        pomShadow = traceParallaxShadow(uHeight, uv, Ltan, pomDepth, pomStrengthTrace, uvDx, uvDy);
+#if defined(GENESIS_ENABLE_POM_SHADOW)
+        if (uEnableParallaxShadow > 0)
+        {
+            pomShadow = traceParallaxShadow(uHeight, uv, Ltan, pomDepth, pomStrengthTrace, uvDx, uvDy);
+        }
+#endif
+#if defined(GENESIS_ENABLE_POM_AO)
         if (uEnableParallaxAo > 0)
         {
             pomAo = traceParallaxAo(uHeight, uv, pomDepth, pomStrengthTrace, uParallaxAoStrength, uvDx, uvDy);
         }
+#endif
     }
+#endif
 
-    // Directional shadow map visibility (Phase 2).
+    // Directional shadow map visibility (Phase 2 + cascade split).
     float shadowVis = 1.0;
-    if (uEnableShadowMap > 0)
-    {
-        // Per-fragment light clip from world position (POM displacement intentionally ignored).
-        vec4 lightClip = uLightViewProj * vec4(vWorldPos, 1.0);
-        if (lightClip.w > 0.0)
-        {
-            vec3 ndc = lightClip.xyz / lightClip.w;
-            vec3 sUv = ndc * 0.5 + 0.5;
-            // Manual border check (ES 300 has no CLAMP_TO_BORDER; CLAMP_TO_EDGE would otherwise
-            // return the fragment as shadowed when sampled beyond [0,1]).
-            if (sUv.x >= 0.0 && sUv.x <= 1.0 && sUv.y >= 0.0 && sUv.y <= 1.0 &&
-                sUv.z >= 0.0 && sUv.z <= 1.0)
-            {
-                float bias = computeShadowBias(N, L, uShadowMinBias, uShadowMaxBias, uShadowTexelSize);
-                sUv.z = clamp(sUv.z - bias, 0.0, 1.0);
-                shadowVis = sampleShadowPcfSoft(uShadowMap, sUv, uShadowTexelSize, uShadowSoftnessTexels);
-            }
-        }
-    }
+#if defined(GENESIS_ENABLE_SHADOW)
+    shadowVis = sampleSceneShadowCascaded(
+        vWorldPos, uCameraPos, vLightClip,
+        uLightViewProjNear, uLightViewProj,
+        uShadowMapNear, uShadowMap,
+        uShadowTexelSize, uShadowMinBias, uShadowMaxBias, N, L, uShadowSoftnessTexels,
+        uEnableShadowMap, uEnableShadowCascades, uCascadeSplitDistance, uCascadeBlendWidth);
+#endif
 
     // Combined lighting visibility: parallax-local AND directional shadow gate.
     float lightVis = pomShadow * shadowVis;
@@ -236,42 +254,43 @@ void main()
     // "specular off" is diffuse-only and avoids view-dependent RGBA8 banding on flat faces.
     BrdfResult br = cookTorrance(N, V, L, albedoLinear, mat.f0, mat.roughness, mat.metallic);
     float groundSpecFade = groundSpecularReceiverFade(vWorldPos, N, V);
-    float specLobe = uEnableSpecularMap > 0 ? 1.0 : 0.0;
+#if defined(GENESIS_ENABLE_SPECULAR_MAP)
+    float specLobe = 1.0;
+#else
+    float specLobe = 0.0;
+#endif
     br.specular *= groundSpecFade * specLobe;
     vec3 direct = (br.diffuse + br.specular) * uLightColor * lightVis;
 
     // Subsurface scattering contribution (gated; cheap front-wrap + back-translucency).
-    if (uEnableSss > 0 && mat.sssAmount > 0.0)
+#if defined(GENESIS_ENABLE_SSS)
+    if (mat.sssAmount > 0.0)
     {
         float sssScale = uSssStrength * lightVis;
         direct += sssWrappedDiffuse(N, L, albedoLinear, mat.sssAmount, uLightColor) * sssScale;
         direct += sssTransmission(V, L, albedoLinear, mat.sssAmount, uLightColor) * sssScale;
     }
+#endif
 
     // Indirect lighting: environment IBL (LUT + sun when atmospheric sky is on).
     vec3 indirect = vec3(0.0);
-    if (uEnableIbl > 0)
-    {
-        vec3 iblDiff = fakeIblAmbientDiffuse(N, uSkyTint, uGroundTint, uLightDir, uLightColor,
-            uAtmosphereSunIntensity, uEnableAtmosphericSky, uAtmoSkyViewLut);
-        float dielectricDiffuseVisibility = 1.0 - mat.metallic;
-        // The preview has no captured scene cubemap. Keep a small irradiance-backed base
-        // for LabPBR metal IDs so valid G>=230 pixels do not crush to black off-highlight.
-        float metalBaseVisibility = mat.metallic * metalPreviewBaseVisibility(mat.roughness);
-        vec3 metalPreviewIrradiance = max(iblDiff, vec3(uAmbient * 0.75));
-        indirect += iblDiff * albedoLinear * dielectricDiffuseVisibility * uIblStrength;
-        indirect += metalPreviewIrradiance * albedoLinear * metalBaseVisibility * uIblStrength;
-        indirect += fakeIblSpecular(N, V, mat.f0, mat.roughness, mat.metallic, uSkyTint, uGroundTint,
-                           uLightDir, uLightColor, uAtmosphereSunIntensity, uEnableAtmosphericSky, uAtmoSkyViewLut) *
-                    uIblStrength * groundSpecFade * specLobe;
-    }
-    else
-    {
-        // Constant ambient fallback so previews are not pitch-black with IBL off.
-        float dielectricAmbientVisibility = 1.0 - mat.metallic;
-        float metalAmbientVisibility = mat.metallic * metalPreviewBaseVisibility(mat.roughness);
-        indirect = albedoLinear * uAmbient * (dielectricAmbientVisibility + metalAmbientVisibility);
-    }
+    float metalBaseVis = mat.metallic * metalPreviewBaseVisibility(mat.roughness);
+#if defined(GENESIS_ENABLE_IBL)
+    PreviewEnvCtx iblCtx = buildPreviewEnvCtx(uLightDir, uLightColor, uAtmosphereSunIntensity, uSkyTint, uGroundTint);
+    vec3 iblProbe = previewAmbientProbeIrradianceCtx(iblCtx, N, uEnableAtmosphericSky, uAtmoSkyViewLut);
+    float dielectricDiffuseVisibility = 1.0 - mat.metallic;
+    // The preview has no captured scene cubemap. Keep a small irradiance-backed base
+    // for LabPBR metal IDs so valid G>=230 pixels do not crush to black off-highlight.
+    vec3 metalPreviewIrradiance = max(iblProbe, vec3(uAmbient * 0.75));
+    indirect += iblProbe * albedoLinear * dielectricDiffuseVisibility * uIblStrength;
+    indirect += metalPreviewIrradiance * albedoLinear * metalBaseVis * uIblStrength;
+    indirect += fakeIblSpecularWithProbe(iblCtx, iblProbe, N, V, mat.f0, mat.roughness, mat.metallic,
+        uEnableAtmosphericSky, uAtmoSkyViewLut) * uIblStrength * groundSpecFade * specLobe;
+#else
+    // Constant ambient fallback so previews are not pitch-black with IBL off.
+    float dielectricAmbientVisibility = 1.0 - mat.metallic;
+    indirect = albedoLinear * uAmbient * (dielectricAmbientVisibility + metalBaseVis);
+#endif
 
     // Parallax contact AO mostly darkens indirect/cavity light while keeping direct lobe readable.
     indirect *= pomAo;

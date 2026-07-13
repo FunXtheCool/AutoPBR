@@ -7,6 +7,8 @@ public sealed partial class OpenGlPreviewBackend
 {
     private void GlRenderPassPost(ref GlRenderFrame frame)
     {
+        EnsurePostPassPerSettingsUniforms(ref frame);
+
         var cloudsActive = frame.Settings.EnableVolumetricClouds && CanDrawVolumetricClouds(frame.Settings);
         var godRaysActive = frame.Settings.EnableGodRays && frame.GodRayCaptureActive && _sceneCapture is { IsValid: true };
         var bothVolumetrics = cloudsActive && godRaysActive;

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Numerics;
+using System.Reflection;
 using System.Threading;
 
 using AutoPBR.App.Rendering.Abstractions;
@@ -24,6 +25,9 @@ namespace AutoPBR.App.Controls;
 /// </summary>
 public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDisposable
 {
+    private static readonly FieldInfo? UpdateQueuedField = typeof(OpenGlControlBase)
+        .GetField("_updateQueued", BindingFlags.Instance | BindingFlags.NonPublic);
+
     private readonly OpenGlPreviewBackend _backend = new();
     private long _lastTicks = Stopwatch.GetTimestamp();
     private double _fpsAccumSeconds;
@@ -33,7 +37,16 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
     private long _lastCapFrameTicks;
     private int _capScheduleGeneration;
     private bool _disposed;
+    private bool _gpuCoreReadyFrameRequested;
+    private int _openGlUpdateQueuedResets;
+    private long _lastOpenGlRenderTicks;
+    private GlInterface? _glInterface;
     private const double CapFrameIntervalSeconds = 1.0 / 60.0;
+    /// <summary>
+    /// Only clear Avalonia's <c>_updateQueued</c> after this long without <see cref="OnOpenGlRender"/>.
+    /// Clearing a live queued flag races the compositor and recreates Avalonia #17865.
+    /// </summary>
+    private const double StuckOpenGlUpdateQueuedMs = 250.0;
     private Key _cameraResetKey = Key.R;
     private bool _cameraDrag;
     private bool _cameraDragIsOrbit;
@@ -57,6 +70,8 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         ClipToBounds = true;
         Focusable = true;
         IsTabStop = false;
+        // Watchdog / idle recovery: unstick only when OnOpenGlRender has been silent.
+        _backend.SetRequestPreviewFrame(RecoverPreviewFrame);
         PointerPressed += OnPreviewPointerPressed;
         PointerMoved += OnPreviewPointerMoved;
         PointerReleased += OnPreviewPointerReleased;
@@ -100,7 +115,18 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
 
         _capFpsAt60 = capAt60;
         Interlocked.Increment(ref _capScheduleGeneration);
-        RequestNextFrameRendering();
+        ApplyPresentationVsync();
+        RecoverPreviewFrame();
+    }
+
+    private void ApplyPresentationVsync()
+    {
+        if (_glInterface is null)
+        {
+            return;
+        }
+
+        _backend.ConfigurePresentationVsync(_glInterface, _capFpsAt60);
     }
 
     /// <summary>Updates orbit boom arm length, orbit/pan/zoom sensitivities, and the reset-camera key.</summary>
@@ -120,7 +146,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         void Core()
         {
             _backend.SetRenderSettings(settings);
-            RequestNextFrameRendering();
+            RecoverPreviewFrame();
         }
 
         if (Dispatcher.UIThread.CheckAccess())
@@ -178,7 +204,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
             _backend.SetRenderSettings(settings);
             _backend.SetMaterial(material);
             _backend.SetBlockModelPreview(javaBlockModel, javaSlotMaterials);
-            RequestNextFrameRendering();
+            RecoverPreviewFrame();
         }
 
         if (Dispatcher.UIThread.CheckAccess())
@@ -197,7 +223,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         void Core()
         {
             _backend.SetGroundMaterial(material);
-            RequestNextFrameRendering();
+            RecoverPreviewFrame();
         }
 
         if (Dispatcher.UIThread.CheckAccess())
@@ -212,13 +238,42 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
 
     protected override void OnOpenGlInit(GlInterface gl)
     {
+        _glInterface = gl;
+        _gpuCoreReadyFrameRequested = false;
+        _backend.GpuInitProgressChanged += OnGpuInitProgressChanged;
         _backend.Initialize(new RenderPreviewInitializationOptions());
+        if (PreviewOpenGlCompositionBridge.TryCreate(this, out var compositionBridge))
+        {
+            _backend.SetCompositionBridge(compositionBridge);
+            compositionBridge.TryWarmPresentationCache();
+        }
+
         _backend.GlInit(gl);
+        ApplyPresentationVsync();
+        if (PreviewOpenGlSession.RequestedDesktopGl4)
+        {
+            _backend.ScheduleDesktopWglSidecarInit(RecoverPreviewFrame);
+        }
     }
 
     protected override void OnOpenGlDeinit(GlInterface gl)
     {
+        _glInterface = null;
+        _backend.GpuInitProgressChanged -= OnGpuInitProgressChanged;
+        _backend.SetCompositionBridge(null);
         _backend.GlDeinit(gl);
+    }
+
+    private void OnGpuInitProgressChanged(PreviewGpuInitProgress progress)
+    {
+        if (!progress.CoreReady || _gpuCoreReadyFrameRequested)
+        {
+            return;
+        }
+
+        _gpuCoreReadyFrameRequested = true;
+        // GpuInitProgressChanged can fire from the WGL owner thread during sidecar bootstrap/render.
+        Dispatcher.UIThread.Post(RecoverPreviewFrame, DispatcherPriority.Background);
     }
 
     protected override void OnOpenGlRender(GlInterface gl, int fb)
@@ -232,19 +287,32 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         TryGetPreviewViewportInfo(out var w, out var h, out _, out _, out _);
         _backend.GlRender(gl, fb, w, h);
         _lastCapFrameTicks = now;
-        RequestContinuousFrameIfNeeded();
+        Volatile.Write(ref _lastOpenGlRenderTicks, now);
+        // Avalonia #17865: never call RequestNextFrameRendering synchronously from OnOpenGlRender,
+        // and never Post at Render priority (still inside CommitCompositor). Defer to Background.
+        QueueContinuousFrameIfNeeded();
     }
 
-    private void RequestContinuousFrameIfNeeded()
+    private void QueueContinuousFrameIfNeeded()
     {
         if (!_backend.NeedsContinuousRendering)
         {
             return;
         }
 
+        Dispatcher.UIThread.Post(RequestContinuousFrameIfNeeded, DispatcherPriority.Background);
+    }
+
+    private void RequestContinuousFrameIfNeeded()
+    {
+        if (_disposed || !_backend.NeedsContinuousRendering)
+        {
+            return;
+        }
+
         if (!_capFpsAt60)
         {
-            RequestNextFrameRendering();
+            RequestNextFrameRenderingCore();
             return;
         }
 
@@ -252,13 +320,80 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         var elapsed = (now - _lastCapFrameTicks) / (double)Stopwatch.Frequency;
         if (elapsed >= CapFrameIntervalSeconds)
         {
-            RequestNextFrameRendering();
+            RequestNextFrameRenderingCore();
             return;
         }
 
         var delayMs = Math.Max(1, (int)Math.Ceiling((CapFrameIntervalSeconds - elapsed) * 1000.0));
         var generation = Volatile.Read(ref _capScheduleGeneration);
         _ = ScheduleCappedFrameAsync(generation, delayMs);
+    }
+
+    /// <summary>
+    /// Requests the next OpenGL frame after the current dispatcher turn (Avalonia #17865-safe).
+    /// </summary>
+    private void QueuePreviewFrame()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        Dispatcher.UIThread.Post(RequestNextFrameRenderingCore, DispatcherPriority.Background);
+    }
+
+    /// <summary>
+    /// Recovery path for present-idle / user input when Avalonia left <c>_updateQueued</c> stuck.
+    /// </summary>
+    private void RecoverPreviewFrame()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        Dispatcher.UIThread.Post(
+            () =>
+            {
+                TryUnstickUpdateQueuedIfStale();
+                RequestNextFrameRenderingCore();
+            },
+            DispatcherPriority.Background);
+    }
+
+    private void RequestNextFrameRenderingCore()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        RequestNextFrameRendering();
+    }
+
+    private void TryUnstickUpdateQueuedIfStale()
+    {
+        if (UpdateQueuedField?.GetValue(this) is not true)
+        {
+            return;
+        }
+
+        var last = Volatile.Read(ref _lastOpenGlRenderTicks);
+        var ageMs = last == 0
+            ? double.PositiveInfinity
+            : (Stopwatch.GetTimestamp() - last) * 1000.0 / Stopwatch.Frequency;
+        if (ageMs < StuckOpenGlUpdateQueuedMs)
+        {
+            return;
+        }
+
+        UpdateQueuedField.SetValue(this, false);
+        var resets = Interlocked.Increment(ref _openGlUpdateQueuedResets);
+        if (resets == 1 || resets % 10 == 0)
+        {
+            _backend.EmitPreviewDiagnostic(
+                $"[3D preview] Cleared stuck OpenGlControlBase._updateQueued after {ageMs:0}ms without render (count={resets}).");
+        }
     }
 
     private async Task ScheduleCappedFrameAsync(int generation, int delayMs)
@@ -273,7 +408,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
                 return;
             }
 
-            RequestNextFrameRendering();
+            QueuePreviewFrame();
         });
     }
 
@@ -287,7 +422,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
 
         TryGetPreviewViewportInfo(out var w, out var h, out _, out _, out _);
         _backend.Resize(w, h);
-        RequestNextFrameRendering();
+        RecoverPreviewFrame();
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -295,7 +430,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         if (e.Key == _cameraResetKey)
         {
             _backend.ResetPreviewCameraToDefaults();
-            RequestNextFrameRendering();
+            RecoverPreviewFrame();
             e.Handled = true;
         }
         else
@@ -341,7 +476,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
 
         if (e.Handled)
         {
-            RequestNextFrameRendering();
+            RecoverPreviewFrame();
         }
 
         base.OnKeyDown(e);
@@ -389,7 +524,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
 
         if (e.Handled)
         {
-            RequestNextFrameRendering();
+            RecoverPreviewFrame();
         }
 
         base.OnKeyUp(e);
@@ -438,7 +573,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
             _backend.SetUserCameraDragging(true);
             e.Pointer.Capture(this);
             e.Handled = true;
-            RequestNextFrameRendering();
+            RecoverPreviewFrame();
             return;
         }
 
@@ -458,7 +593,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
             _backend.FocusOrbitOnSubject();
             _lastLeftClickUtc = DateTime.MinValue;
             e.Handled = true;
-            RequestNextFrameRendering();
+            RecoverPreviewFrame();
             return;
         }
 
@@ -474,7 +609,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         _backend.SetUserCameraDragging(true);
         e.Pointer.Capture(this);
         e.Handled = true;
-        RequestNextFrameRendering();
+        RecoverPreviewFrame();
     }
 
     private void OnPreviewPointerMoved(object? sender, PointerEventArgs e)
@@ -487,7 +622,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
             _cameraDragLast = cur;
             _backend.ApplyFlyLookPixels(dx, dy);
             e.Handled = true;
-            RequestNextFrameRendering();
+            RecoverPreviewFrame();
             return;
         }
 
@@ -510,7 +645,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         }
 
         e.Handled = true;
-        RequestNextFrameRendering();
+        RecoverPreviewFrame();
     }
 
     private void OnPreviewPointerReleased(object? sender, PointerReleasedEventArgs e)
@@ -522,7 +657,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
             _backend.SetUserCameraDragging(false);
             e.Pointer.Capture(null);
             e.Handled = true;
-            RequestNextFrameRendering();
+            RecoverPreviewFrame();
             return;
         }
 
@@ -535,7 +670,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
         _backend.SetUserCameraDragging(false);
         e.Pointer.Capture(null);
         e.Handled = true;
-        RequestNextFrameRendering();
+        RecoverPreviewFrame();
     }
 
     private void OnPreviewPointerWheelChanged(object? sender, PointerWheelEventArgs e)
@@ -554,7 +689,7 @@ public sealed class GlPbrPreviewControl : OpenGlControlBase, ICustomHitTest, IDi
 
         _backend.ApplyCameraZoom(notches);
         e.Handled = true;
-        RequestNextFrameRendering();
+        RecoverPreviewFrame();
     }
 
     private void RecordRenderFrame(TimeSpan dt)

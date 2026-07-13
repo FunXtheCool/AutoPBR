@@ -26,6 +26,10 @@ layout(std140) uniform EntityPrevSkinningBones {
     mat4 uPrevBoneMatrices[64];
 };
 
+layout(std140) uniform EntitySkinningNormals {
+    mat4 uNormalBoneMatrices[64];
+};
+
 uniform float uEntityPreviewSpaceVerts;
 uniform float uEntityBindMesh;
 uniform float uEntityGpuSkinning;
@@ -65,9 +69,9 @@ void main()
             entityPos = bone * entityPos;
             mat4 prevBone = uEntityPrevBonePaletteValid > 0.5 ? uPrevBoneMatrices[bi] : bone;
             prevEntityPos = prevBone * vec4(aPos, 1.0);
-            mat3 nBone = mat3(transpose(inverse(bone)));
-            entityN = normalize(nBone * aNormal * 16.0);
-            entityT = normalize(nBone * aTangent.xyz * 16.0);
+            mat4 nBone = uNormalBoneMatrices[bi];
+            entityN = normalize(mat3(nBone) * aNormal * 16.0);
+            entityT = normalize(mat3(nBone) * aTangent.xyz * 16.0);
         }
         else
         {

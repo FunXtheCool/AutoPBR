@@ -35,6 +35,34 @@ out vec4 FragColor;
 
 const float SKY_DEPTH_EPS = 0.9992;
 
+void taaFetchNeighborhood3x3(sampler2D tex, vec2 uv, vec2 texelSize, out vec3 taps[9])
+{
+    int idx = 0;
+    for (int oy = -1; oy <= 1; ++oy)
+    {
+        for (int ox = -1; ox <= 1; ++ox)
+        {
+            vec2 tapUv = clamp(uv + vec2(float(ox), float(oy)) * texelSize, vec2(0.001), vec2(0.999));
+            taps[idx] = texture(tex, tapUv).rgb;
+            idx++;
+        }
+    }
+}
+
+void taaFetchDepthNeighborhood3x3(sampler2D depthTex, vec2 uv, vec2 texelSize, out float taps[9])
+{
+    int idx = 0;
+    for (int oy = -1; oy <= 1; ++oy)
+    {
+        for (int ox = -1; ox <= 1; ++ox)
+        {
+            vec2 tapUv = clamp(uv + vec2(float(ox), float(oy)) * texelSize, vec2(0.001), vec2(0.999));
+            taps[idx] = texture(depthTex, tapUv).r;
+            idx++;
+        }
+    }
+}
+
 float taaMitchell(float x)
 {
     x = abs(x);
@@ -72,28 +100,24 @@ vec3 taaCurrentResolveFilter(sampler2D tex, vec2 uv, vec2 texelSize, vec2 jitter
     return clamp(sum / max(weightSum, 1e-5), vec3(0.0), vec3(1.0));
 }
 
-float taaClosestGeometryDepth3(sampler2D depthTex, vec2 uv, vec2 texelSize)
+float taaClosestGeometryDepthFromTaps(float depthTaps[9])
 {
     float closestDepth = 1.0;
-    for (int oy = -1; oy <= 1; ++oy)
+    for (int i = 0; i < 9; ++i)
     {
-        for (int ox = -1; ox <= 1; ++ox)
-        {
-            vec2 tapUv = clamp(uv + vec2(float(ox), float(oy)) * texelSize, vec2(0.001), vec2(0.999));
-            closestDepth = min(closestDepth, texture(depthTex, tapUv).r);
-        }
+        closestDepth = min(closestDepth, depthTaps[i]);
     }
 
     return closestDepth;
 }
 
-float taaLumaEdgeMask(sampler2D tex, vec2 uv, vec2 texelSize)
+float taaLumaEdgeMaskFromTaps(vec3 colorTaps[9])
 {
-    vec3 rgbM = texture(tex, uv).rgb;
-    vec3 rgbN = texture(tex, clamp(uv + vec2( 0.0, -1.0) * texelSize, vec2(0.001), vec2(0.999))).rgb;
-    vec3 rgbS = texture(tex, clamp(uv + vec2( 0.0,  1.0) * texelSize, vec2(0.001), vec2(0.999))).rgb;
-    vec3 rgbW = texture(tex, clamp(uv + vec2(-1.0,  0.0) * texelSize, vec2(0.001), vec2(0.999))).rgb;
-    vec3 rgbE = texture(tex, clamp(uv + vec2( 1.0,  0.0) * texelSize, vec2(0.001), vec2(0.999))).rgb;
+    vec3 rgbM = colorTaps[4];
+    vec3 rgbN = colorTaps[1];
+    vec3 rgbS = colorTaps[7];
+    vec3 rgbW = colorTaps[3];
+    vec3 rgbE = colorTaps[5];
 
     float lumaM = trLuminance(rgbM);
     float lumaN = trLuminance(rgbN);
@@ -105,6 +129,14 @@ float taaLumaEdgeMask(sampler2D tex, vec2 uv, vec2 texelSize)
     float thresholdLow = clamp(uFxaaLumaThreshold, 0.001, 0.12);
     float thresholdHigh = max(thresholdLow + 0.02, thresholdLow * 7.75);
     return smoothstep(thresholdLow, thresholdHigh, range);
+}
+
+vec3 taaTentBlur3x3FromTaps(vec3 colorTaps[9])
+{
+    vec3 center = colorTaps[4] * 4.0;
+    vec3 cardinals = colorTaps[3] + colorTaps[5] + colorTaps[1] + colorTaps[7];
+    vec3 diagonals = colorTaps[0] + colorTaps[2] + colorTaps[6] + colorTaps[8];
+    return (center + cardinals * 2.0 + diagonals) * (1.0 / 16.0);
 }
 
 vec3 taaFxaaLite(sampler2D tex, vec2 uv, vec2 texelSize, vec3 resolved, float edgeMask, float strength)
@@ -149,26 +181,18 @@ vec3 taaFxaaLite(sampler2D tex, vec2 uv, vec2 texelSize, vec3 resolved, float ed
 
 vec3 taaTentBlur3x3(sampler2D tex, vec2 uv, vec2 texelSize)
 {
-    vec3 center = texture(tex, uv).rgb * 4.0;
-    vec3 cardinals =
-        texture(tex, clamp(uv + vec2(-1.0,  0.0) * texelSize, vec2(0.001), vec2(0.999))).rgb +
-        texture(tex, clamp(uv + vec2( 1.0,  0.0) * texelSize, vec2(0.001), vec2(0.999))).rgb +
-        texture(tex, clamp(uv + vec2( 0.0, -1.0) * texelSize, vec2(0.001), vec2(0.999))).rgb +
-        texture(tex, clamp(uv + vec2( 0.0,  1.0) * texelSize, vec2(0.001), vec2(0.999))).rgb;
-    vec3 diagonals =
-        texture(tex, clamp(uv + vec2(-1.0, -1.0) * texelSize, vec2(0.001), vec2(0.999))).rgb +
-        texture(tex, clamp(uv + vec2( 1.0, -1.0) * texelSize, vec2(0.001), vec2(0.999))).rgb +
-        texture(tex, clamp(uv + vec2(-1.0,  1.0) * texelSize, vec2(0.001), vec2(0.999))).rgb +
-        texture(tex, clamp(uv + vec2( 1.0,  1.0) * texelSize, vec2(0.001), vec2(0.999))).rgb;
-    return (center + cardinals * 2.0 + diagonals) * (1.0 / 16.0);
+    vec3 taps[9];
+    taaFetchNeighborhood3x3(tex, uv, texelSize, taps);
+    return taaTentBlur3x3FromTaps(taps);
 }
 
-vec3 taaMorphologicalEdgeBlend(
+vec3 taaMorphologicalEdgeBlendFromTaps(
     sampler2D colorTex,
     sampler2D depthTex,
     vec2 uv,
     vec2 colorTexelSize,
     vec2 depthTexelSize,
+    vec3 colorTaps[9],
     vec3 resolved,
     float depthEdgeAmount,
     float nearbyGeometryW,
@@ -183,11 +207,11 @@ vec3 taaMorphologicalEdgeBlend(
         return resolved;
     }
 
-    vec3 rgbM = texture(colorTex, uv).rgb;
-    vec3 rgbN = texture(colorTex, clamp(uv + vec2( 0.0, -1.0) * colorTexelSize, vec2(0.001), vec2(0.999))).rgb;
-    vec3 rgbS = texture(colorTex, clamp(uv + vec2( 0.0,  1.0) * colorTexelSize, vec2(0.001), vec2(0.999))).rgb;
-    vec3 rgbW = texture(colorTex, clamp(uv + vec2(-1.0,  0.0) * colorTexelSize, vec2(0.001), vec2(0.999))).rgb;
-    vec3 rgbE = texture(colorTex, clamp(uv + vec2( 1.0,  0.0) * colorTexelSize, vec2(0.001), vec2(0.999))).rgb;
+    vec3 rgbM = colorTaps[4];
+    vec3 rgbN = colorTaps[1];
+    vec3 rgbS = colorTaps[7];
+    vec3 rgbW = colorTaps[3];
+    vec3 rgbE = colorTaps[5];
 
     float lumaM = trLuminance(rgbM);
     float lumaN = trLuminance(rgbN);
@@ -237,14 +261,19 @@ vec3 taaMorphologicalEdgeBlend(
 
 void main()
 {
-    vec3 currentPoint = texture(uCurrent, vUv).rgb;
-    float depth = uHasSceneDepth > 0 ? texture(uSceneDepth, vUv).r : 1.0;
+    vec3 colorTaps[9];
+    taaFetchNeighborhood3x3(uCurrent, vUv, uTexelSize, colorTaps);
+    vec3 currentPoint = colorTaps[4];
+    float depthTaps[9];
+    float depth = 1.0;
     float rawDepthEdgeW = 1.0;
     float closestDepth = depth;
     if (uHasSceneDepth > 0)
     {
+        taaFetchDepthNeighborhood3x3(uSceneDepth, vUv, uCaptureTexelSize, depthTaps);
+        depth = depthTaps[4];
         rawDepthEdgeW = trDepthEdgeWeight(uSceneDepth, vUv, uCaptureTexelSize);
-        closestDepth = taaClosestGeometryDepth3(uSceneDepth, vUv, uCaptureTexelSize);
+        closestDepth = taaClosestGeometryDepthFromTaps(depthTaps);
     }
 
     float depthEdgeAmount = 1.0 - rawDepthEdgeW;
@@ -287,7 +316,7 @@ void main()
 
             vec3 nMin;
             vec3 nMax;
-            trNeighborhoodMinMax3YCoCg(uCurrent, vUv, uTexelSize, nMin, nMax);
+            trNeighborhoodMinMax3YCoCgFromTaps(colorTaps, nMin, nMax);
             vec3 history = texture(uHistory, prevUv).rgb;
             history = trClipHistoryToNeighborhoodYCoCg(history, current, nMin, nMax);
             float reactiveW = trLuminanceReactiveWeight(current, history);
@@ -325,10 +354,10 @@ void main()
     {
         vec3 edgeMin;
         vec3 edgeMax;
-        trNeighborhoodMinMax3YCoCg(uCurrent, vUv, uTexelSize, edgeMin, edgeMax);
+        trNeighborhoodMinMax3YCoCgFromTaps(colorTaps, edgeMin, edgeMax);
         vec3 edgeHistory = texture(uHistory, vUv).rgb;
         edgeHistory = trClipHistoryToNeighborhoodYCoCg(edgeHistory, resolved, edgeMin, edgeMax);
-        float colorEdgeAmount = taaLumaEdgeMask(uCurrent, vUv, uTexelSize);
+        float colorEdgeAmount = taaLumaEdgeMaskFromTaps(colorTaps);
         float edgeHistoryW = (depthEdgeAmount * nearbyGeometryW + colorEdgeAmount * 0.35) *
             clamp(uEdgeAaBlend, 0.0, 1.0) *
             clamp(uTemporalWeight, 0.0, 0.98) *
@@ -340,18 +369,19 @@ void main()
     float depthFxaaMask = uHasSceneDepth > 0
         ? smoothstep(0.04, 0.55, depthEdgeAmount) * nearbyGeometryW
         : 0.0;
-    float lumaFxaaMask = uForceFxaa > 0 ? 1.0 : taaLumaEdgeMask(uCurrent, vUv, uTexelSize);
+    float lumaFxaaMask = uForceFxaa > 0 ? 1.0 : taaLumaEdgeMaskFromTaps(colorTaps);
     float geometryFxaaW = uForceFxaa > 0 ? 1.0 : (uHasTaaSignal > 0 ? max(geometryW, nearbyGeometryW) : 1.0);
     float fxaaEdgeMask = uForceFxaa > 0
         ? 1.0
         : max(depthFxaaMask, lumaFxaaMask * geometryFxaaW * clamp(uFxaaLumaEdgeStrength, 0.0, 2.0));
     resolved = taaFxaaLite(uCurrent, vUv, uTexelSize, resolved, fxaaEdgeMask, uFxaaEdgeStrength);
-    resolved = taaMorphologicalEdgeBlend(
+    resolved = taaMorphologicalEdgeBlendFromTaps(
         uCurrent,
         uSceneDepth,
         vUv,
         uTexelSize,
         uCaptureTexelSize,
+        colorTaps,
         resolved,
         depthEdgeAmount,
         nearbyGeometryW,
@@ -363,7 +393,7 @@ void main()
     float postFxaaW = uForceFxaa > 0
         ? clamp(uFxaaEdgeStrength * 0.34, 0.0, 0.90)
         : clamp(fxaaEdgeMask * uFxaaEdgeStrength * 0.28, 0.0, 0.55);
-    resolved = mix(resolved, taaTentBlur3x3(uCurrent, vUv, uTexelSize), postFxaaW);
+    resolved = mix(resolved, taaTentBlur3x3FromTaps(colorTaps), postFxaaW);
 
     FragColor = vec4(ditherSrgb8(resolved, gl_FragCoord.xy), 1.0);
 }

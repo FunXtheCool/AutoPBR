@@ -72,10 +72,12 @@ uniform int uEnableShadowMap;
 uniform int uEnableShadowCascades;
 
 uniform float uCascadeSplitDistance;
+uniform float uCascadeBlendWidth;
 
 
 
-out vec4 FragColor;
+layout(location = 0) out vec4 FragColor;
+layout(location = 1) out float FragOccupancy;
 
 
 
@@ -99,9 +101,10 @@ void main()
 
         uShadowMapNear, uShadowMap, uShadowTexelSize, uShadowMinBias, uEnableShadowMap,
 
-        uEnableShadowCascades, uCascadeSplitDistance);
+        uEnableShadowCascades, uCascadeSplitDistance, uCascadeBlendWidth);
 
     FragColor = viPackFroxelInject(mediumRho, uLightColor, shadowGate);
+    FragOccupancy = mediumRho;
 
 }
 

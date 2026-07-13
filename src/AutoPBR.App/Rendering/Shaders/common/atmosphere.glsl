@@ -14,8 +14,8 @@ float atmosphereMiePhase(float cosTheta)
     // Henyey-Greenstein phase with moderate forward scattering.
     const float g = 0.76;
     float gg = g * g;
-    float denom = pow(max(1.0 + gg - 2.0 * g * cosTheta, 1e-3), 1.5);
-    return (1.0 - gg) / (4.0 * ATM_PI * denom);
+    float base = max(1.0 + gg - 2.0 * g * cosTheta, 1e-3);
+    return (1.0 - gg) / (4.0 * ATM_PI * base * sqrt(base));
 }
 
 float atmosphereRayleighPhase(float cosTheta)

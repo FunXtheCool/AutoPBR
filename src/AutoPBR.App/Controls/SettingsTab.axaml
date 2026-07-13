@@ -79,6 +79,24 @@
                                                   IsChecked="{Binding DebugMode, Mode=TwoWay}" />
                                 </StackPanel>
 
+                                <StackPanel Spacing="4">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock VerticalAlignment="Center"
+                                                   Text="{Binding Strings.PreviewOpenGl4Toggle}"
+                                                   ToolTip.Tip="{Binding Strings.PreviewOpenGl4Tooltip}" />
+                                        <ToggleSwitch VerticalAlignment="Center"
+                                                      OnContent=""
+                                                      OffContent=""
+                                                      IsChecked="{Binding PreviewUseOpenGl4, Mode=TwoWay}"
+                                                      ToolTip.Tip="{Binding Strings.PreviewOpenGl4Tooltip}" />
+                                    </StackPanel>
+                                    <TextBlock FontSize="12" Opacity="0.85"
+                                               IsVisible="{Binding PreviewOpenGlRestartHintVisible}"
+                                               Text="{Binding Strings.PreviewOpenGlRestartRequired}" />
+                                    <TextBlock FontSize="12" Opacity="0.85"
+                                               Text="{Binding PreviewOpenGlActiveContextText}" />
+                                </StackPanel>
+
                                 <Button HorizontalAlignment="Left"
                                         Command="{Binding ForceInvalidateShaderCacheCommand}"
                                         ToolTip.Tip="{Binding Strings.ForceShaderCacheInvalidationTooltip}">

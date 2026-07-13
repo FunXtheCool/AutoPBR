@@ -73,6 +73,7 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         gl.BindVertexArray(0);
+        _lineUniformLocs = ResolveLineProgramUniformLocs(_lineProgram);
     }
 
     private void DestroyLineOverlay()
@@ -173,13 +174,6 @@ public sealed partial class OpenGlPreviewBackend
             return;
         }
 
-        var loc = _lineProgram.GetUniformLocation("uMvp");
-        if (loc < 0)
-        {
-            return;
-        }
-
-        var mt = Matrix4x4.Transpose(mvp);
-        gl.UniformMatrix4(loc, 1, false, in mt.M11);
+        SetMatrixLoc(_lineUniformLocs.Mvp, mvp);
     }
 }

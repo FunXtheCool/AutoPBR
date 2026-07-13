@@ -4,7 +4,7 @@ namespace AutoPBR.App.Rendering.Scene;
 
 public static class ItemPreviewSceneFactory
 {
-    public static PreviewMesh CreateMesh(PreviewRenderSettings settings, PreviewMaterial? material = null)
+    public static PreviewMesh CreateMesh(PreviewRenderSettingsSnapshot settings, PreviewMaterial? material = null)
     {
         var thickness = Math.Max(0f, settings.SpriteThickness);
         if (settings.ItemFlatSpritePreview || settings.SpritePlaneCount <= 1)
@@ -13,7 +13,7 @@ public static class ItemPreviewSceneFactory
                 material is { Width: > 0, Height: > 0 } &&
                 !material.AlbedoRgba.IsEmpty)
             {
-                return PreviewMeshFactory.CreateSpritePixelCuboids(
+                return SpriteVoxelMeshCache.GetOrBuild(
                     material.AlbedoRgba.Span,
                     material.Width,
                     material.Height,
@@ -30,7 +30,10 @@ public static class ItemPreviewSceneFactory
 
     public static PreviewScene Create(PreviewRenderSettings settings, PreviewMaterial? material = null)
     {
-        var mesh = CreateMesh(settings, material);
+        // Item voxel geometry is uploaded from cached CPU meshes on the GL thread; keep scene mesh lightweight.
+        var mesh = settings.ItemFlatSpritePreview
+            ? PreviewMeshFactory.CreateItemPlane(name: "item_plane_pending")
+            : CreateMesh(PreviewRenderSettingsSnapshot.From(settings), material);
         var lightDir = BlockPreviewSceneFactory.LightDirectionFromYawPitch(settings.LightYawDegrees,
             settings.LightPitchDegrees);
         return new PreviewScene(

@@ -248,6 +248,7 @@ internal static class UserSettingsSynchronizer
             vm.MinecraftAssetsDirectory = settings.MinecraftAssetsDirectory;
         }
         vm.DebugMode = settings.DebugMode;
+        vm.PreviewUseOpenGl4 = settings.PreviewUseOpenGl4;
         vm.ColorScheme = string.IsNullOrWhiteSpace(settings.ColorScheme) ? "Dark" : settings.ColorScheme;
         vm.UiScale = settings.UiScale <= 0
             ? 1.0
@@ -483,6 +484,7 @@ internal static class UserSettingsSynchronizer
         settings.TempDirectory = vm.TempDirectory;
         settings.MinecraftAssetsDirectory = vm.MinecraftAssetsDirectory;
         settings.DebugMode = vm.DebugMode;
+        settings.PreviewUseOpenGl4 = vm.PreviewUseOpenGl4;
         settings.ColorScheme = vm.ColorScheme;
         settings.UiScale = Math.Clamp(vm.UiScale, MainWindowViewModel.MinUiScale, MainWindowViewModel.MaxUiScale);
         settings.Language = vm.SelectedLanguage?.CultureCode ?? "en";

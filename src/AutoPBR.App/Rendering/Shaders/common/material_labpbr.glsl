@@ -19,17 +19,24 @@ struct LabPbrMaterial
 };
 
 // Predefined-metal F0 RGB lookup for LabPBR g indices 230..237.
-// Falls back to scaled albedo for indices 238..254 ("custom" reserved). Index 255 is custom metal == albedo.
+const vec3 LABPBR_METAL_F0[8] = vec3[8](
+    vec3(0.531229, 0.512357, 0.495829), // Iron 230
+    vec3(0.944230, 0.776102, 0.373402), // Gold 231
+    vec3(0.912298, 0.913851, 0.919681), // Aluminum 232
+    vec3(0.555597, 0.554537, 0.554779), // Chrome 233
+    vec3(0.925952, 0.720902, 0.504154), // Copper 234
+    vec3(0.632484, 0.625937, 0.641479), // Lead 235
+    vec3(0.678849, 0.642401, 0.588410), // Platinum 236
+    vec3(0.962000, 0.949468, 0.922116)  // Silver 237
+);
+
 vec3 labPbrPredefinedMetalF0(int gIndex, vec3 albedo)
 {
-    if (gIndex == 230) return vec3(0.531229, 0.512357, 0.495829); // Iron
-    if (gIndex == 231) return vec3(0.944230, 0.776102, 0.373402); // Gold
-    if (gIndex == 232) return vec3(0.912298, 0.913851, 0.919681); // Aluminum
-    if (gIndex == 233) return vec3(0.555597, 0.554537, 0.554779); // Chrome
-    if (gIndex == 234) return vec3(0.925952, 0.720902, 0.504154); // Copper
-    if (gIndex == 235) return vec3(0.632484, 0.625937, 0.641479); // Lead
-    if (gIndex == 236) return vec3(0.678849, 0.642401, 0.588410); // Platinum
-    if (gIndex == 237) return vec3(0.962000, 0.949468, 0.922116); // Silver
+    if (gIndex >= 230 && gIndex <= 237)
+    {
+        return LABPBR_METAL_F0[gIndex - 230];
+    }
+
     return albedo;
 }
 

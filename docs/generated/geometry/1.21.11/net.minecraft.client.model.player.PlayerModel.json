@@ -111,7 +111,8 @@
                   "faceMask": [
                     "north",
                     "south"
-                  ]
+                  ],
+                  "previewDepthLayer": "cutoutOverlay"
                 }
               ],
               "children": []
@@ -160,7 +161,8 @@
               "faceMask": [
                 "north",
                 "south"
-              ]
+              ],
+              "previewDepthLayer": "cutoutOverlay"
             }
           ],
           "children": []
@@ -249,7 +251,8 @@
                   "faceMask": [
                     "north",
                     "south"
-                  ]
+                  ],
+                  "previewDepthLayer": "cutoutOverlay"
                 }
               ],
               "children": []
@@ -298,58 +301,59 @@
               "faceMask": [
                 "north",
                 "south"
-              ]
+              ],
+              "previewDepthLayer": "cutoutOverlay"
             }
           ],
-          "children": [
+          "children": []
+        },
+        {
+          "id": "jacket",
+          "pose": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotationEulerRad": [
+              0,
+              0,
+              0
+            ],
+            "eulerOrder": "XYZ",
+            "setupAnimPivot": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cuboids": [
             {
-              "id": "jacket",
-              "pose": {
-                "translation": [
-                  0,
-                  0,
-                  0
-                ],
-                "rotationEulerRad": [
-                  0,
-                  0,
-                  0
-                ],
-                "eulerOrder": "XYZ",
-                "setupAnimPivot": [
-                  0,
-                  0,
-                  0
-                ]
-              },
-              "cuboids": [
-                {
-                  "from": [
-                    0,
-                    -2,
-                    8
-                  ],
-                  "to": [
-                    12,
-                    2,
-                    8.25
-                  ],
-                  "uvOrigin": [
-                    16,
-                    32
-                  ],
-                  "textureKey": "#skin",
-                  "liftKind": "exact",
-                  "provenance": "javap lift fluent addBox profile_proguard_obf",
-                  "faceMask": [
-                    "north",
-                    "south"
-                  ]
-                }
+              "from": [
+                0,
+                -2,
+                8
               ],
-              "children": []
+              "to": [
+                12,
+                2,
+                8.25
+              ],
+              "uvOrigin": [
+                16,
+                32
+              ],
+              "textureKey": "#skin",
+              "liftKind": "exact",
+              "provenance": "javap lift fluent addBox profile_proguard_obf",
+              "faceMask": [
+                "north",
+                "south"
+              ],
+              "previewDepthLayer": "cutoutOverlay"
             }
-          ]
+          ],
+          "children": []
         }
       ]
     }

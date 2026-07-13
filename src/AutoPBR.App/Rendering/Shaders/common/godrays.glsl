@@ -8,8 +8,8 @@ float godRayPhase(float cosTheta)
 {
     const float g = 0.62;
     float gg = g * g;
-    float denom = pow(max(1.0 + gg - 2.0 * g * cosTheta, 1e-3), 1.5);
-    return (1.0 - gg) / (4.0 * 3.14159265358979323846 * denom);
+    float base = max(1.0 + gg - 2.0 * g * cosTheta, 1e-3);
+    return (1.0 - gg) / (4.0 * 3.14159265358979323846 * base * sqrt(base));
 }
 
 float godRayParticipatingDensity(vec3 worldPos, float densityScale)

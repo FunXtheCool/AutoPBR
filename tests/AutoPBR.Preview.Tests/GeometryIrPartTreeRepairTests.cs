@@ -251,11 +251,38 @@ public sealed class GeometryIrPartTreeRepairTests
         var raw = shard.RootElement;
         var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, raw);
 
+        Assert.True(PartNestedUnder(repaired, "head_cube", "head"));
+        Assert.True(PartNestedUnder(repaired, "right_ear", "head"));
+        Assert.True(PartNestedUnder(repaired, "left_ear", "head"));
+        Assert.True(PartNestedUnder(repaired, "right_ear_cube", "right_ear"));
+        Assert.True(PartNestedUnder(repaired, "left_ear_cube", "left_ear"));
         Assert.False(PartNestedUnder(repaired, "left_hind_leg", "body"));
         Assert.False(PartNestedUnder(repaired, "right_front_leg", "body"));
 
         var cmp = GeometryIrReferenceComparer.CompareReferenceWorldPartOrigins(raw, repaired, tolerance: 0.05);
         Assert.True(cmp.IsMatch, cmp.Message);
+    }
+
+    [Fact]
+    public void Baby_armadillo_repair_preserves_javap_tail_and_head_cube_nesting()
+    {
+        const string jvm = "net.minecraft.client.model.animal.armadillo.BabyArmadilloModel";
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
+        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
+            !string.Equals(status, "ok", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
+
+        Assert.True(PartNestedUnder(repaired, "right_ear_cube", "tail"));
+        Assert.True(PartNestedUnder(repaired, "head_cube", "head"));
+        Assert.True(PartNestedUnder(repaired, "right_ear", "head_cube"));
+        Assert.True(PartNestedUnder(repaired, "left_ear", "head_cube"));
+        Assert.False(PartNestedUnder(repaired, "left_hind_leg", "body"));
     }
 
     [Theory]
@@ -576,6 +603,95 @@ public sealed class GeometryIrPartTreeRepairTests
         var armTy = rightArm["pose"]!["translation"]![1]!.GetValue<double>();
         Assert.InRange(armTy, 1.5, 2.5);
     }
+
+    [Fact]
+    public void Ravager_repair_nests_horns_and_mouth_under_head()
+    {
+        const string jvm = "net.minecraft.client.model.monster.ravager.RavagerModel";
+        var repo = GeometryIrTestTierSupport.FindRepoRoot();
+        var shardPath = Path.Combine(repo, "docs", "generated", "geometry", "26.1.2", $"{jvm}.json");
+        var referencePath = Path.Combine(
+            repo,
+            "tools",
+            "MinecraftGeometryReference",
+            "reference-output",
+            $"{jvm}.json");
+        if (!GeometryIrTestTierSupport.TryReadCommittedShardStatus(shardPath, out var status) ||
+            !string.Equals(status, "ok", StringComparison.Ordinal) ||
+            !File.Exists(referencePath))
+        {
+            return;
+        }
+
+        using var shard = JsonDocument.Parse(File.ReadAllText(shardPath));
+        using var reference = JsonDocument.Parse(File.ReadAllText(referencePath));
+        var repaired = GeometryIrPartTreeRepair.ApplyForParityCatalog(jvm, shard.RootElement);
+
+        Assert.True(PartNestedUnder(repaired, "right_horn", "head"));
+        Assert.True(PartNestedUnder(repaired, "left_horn", "head"));
+        Assert.True(PartNestedUnder(repaired, "mouth", "head"));
+        Assert.False(PartNestedUnder(repaired, "right_horn", "neck"));
+
+        Assert.True(repaired.TryGetProperty("roots", out var rootsEl) && rootsEl.GetArrayLength() > 0);
+        var factoryKids = rootsEl[0].GetProperty("children");
+        Assert.True(TryFindPart(factoryKids, "neck", out var neck));
+        Assert.True(TryFindPart(factoryKids, "head", out var head));
+        Assert.True(TryFindPart(factoryKids, "right_horn", out var horn));
+
+        Assert.True(EntityModelRuntime.TryComposePartPosePublic(
+            neck.GetProperty("pose"), Matrix4x4.Identity, out var neckWorld, "neck"));
+        Assert.True(EntityModelRuntime.TryComposePartPosePublic(
+            head.GetProperty("pose"), neckWorld, out var headWorld, "head"));
+        Assert.True(EntityModelRuntime.TryComposePartPosePublic(
+            horn.GetProperty("pose"), headWorld, out var hornWorld, "right_horn"));
+
+        Matrix4x4? jvmHorn = null;
+        foreach (var entry in reference.RootElement.GetProperty("renderPartAffines").EnumerateArray())
+        {
+            if (entry.GetProperty("id").GetString() != "right_horn")
+            {
+                continue;
+            }
+
+            jvmHorn = ParseRowMajor(entry.GetProperty("matrixRowMajor"));
+        }
+
+        Assert.NotNull(jvmHorn);
+        var jvmTexel = EntityModelRuntime.BlockRowAffineToTexel(jvmHorn.Value);
+        Assert.True(MatrixDistance(hornWorld, jvmTexel) <= 0.05f,
+            $"horn={FormatMatrixTranslation(hornWorld)} jvm={FormatMatrixTranslation(jvmTexel)}");
+    }
+
+    private static Matrix4x4 ParseRowMajor(JsonElement rows)
+    {
+        var m = new float[16];
+        var i = 0;
+        foreach (var row in rows.EnumerateArray())
+        {
+            foreach (var v in row.EnumerateArray())
+            {
+                m[i++] = (float)v.GetDouble();
+            }
+        }
+
+        return new Matrix4x4(
+            m[0], m[1], m[2], m[3],
+            m[4], m[5], m[6], m[7],
+            m[8], m[9], m[10], m[11],
+            m[12], m[13], m[14], m[15]);
+    }
+
+    private static float MatrixDistance(Matrix4x4 a, Matrix4x4 b)
+    {
+        float s = 0;
+        s += MathF.Abs(a.M41 - b.M41) + MathF.Abs(a.M42 - b.M42) + MathF.Abs(a.M43 - b.M43);
+        s += MathF.Abs(a.M11 - b.M11) + MathF.Abs(a.M12 - b.M12) + MathF.Abs(a.M13 - b.M13);
+        s += MathF.Abs(a.M21 - b.M21) + MathF.Abs(a.M22 - b.M22) + MathF.Abs(a.M23 - b.M23);
+        s += MathF.Abs(a.M31 - b.M31) + MathF.Abs(a.M32 - b.M32) + MathF.Abs(a.M33 - b.M33);
+        return s;
+    }
+
+    private static string FormatMatrixTranslation(Matrix4x4 m) => $"[{m.M41:R},{m.M42:R},{m.M43:R}]";
 
     private static bool PartTreeContainsPartId(JsonElement root, string partId) => FindPart(root, partId) is not null;
 

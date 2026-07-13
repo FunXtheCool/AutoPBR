@@ -22,7 +22,7 @@ public sealed class PreviewRenderSettings
     public bool AutoRotate { get; init; } = true;
     public float LightYawDegrees { get; init; } = -35f;
     public float LightPitchDegrees { get; init; } = -55f;
-    public bool NearestTextureFilter { get; init; }
+    public bool NearestTextureFilter { get; init; } = true;
     /// <summary>Item plane: alpha test threshold in linear 0..1.</summary>
     public float AlphaCutoff { get; init; } = 0.5f;
     public bool ItemUseAlphaBlend { get; init; }
@@ -236,6 +236,9 @@ public sealed class PreviewRenderSettings
 
     /// <summary>Debug: disable froxel/integrate/upsample temporal reuse and freeze march jitter to stop pulsing.</summary>
     public bool GodRayStabilizeDebug { get; init; } = true;
+
+    /// <summary>When true, screen-space god-ray shaders skip odd march steps in empty/occluded segments.</summary>
+    public bool GodRaySparseMarch { get; init; } = true;
 
     public float CloudDensity { get; init; } = 0.35f;
     public float CloudVolumeSize { get; init; } = 48f;

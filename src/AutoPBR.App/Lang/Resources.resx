@@ -907,6 +907,21 @@
   <data name="DebugMode" xml:space="preserve">
     <value>Debug</value>
   </data>
+  <data name="PreviewOpenGl4Toggle" xml:space="preserve">
+    <value>OpenGL 4.x preview</value>
+  </data>
+  <data name="PreviewOpenGl4Tooltip" xml:space="preserve">
+    <value>Uses native desktop OpenGL 4.x (WGL sidecar) for 3D preview rendering while ANGLE keeps high-refresh compositor pacing. Enables tessellation displacement and higher-precision volume shaders. Requires a restart. Keep off for maximum compatibility (OpenGL ES 3.0 via ANGLE).</value>
+  </data>
+  <data name="PreviewOpenGlRestartRequired" xml:space="preserve">
+    <value>Restart AutoPBR to apply the OpenGL preview change.</value>
+  </data>
+  <data name="PreviewOpenGlActiveContext" xml:space="preserve">
+    <value>Active preview context: {0}</value>
+  </data>
+  <data name="PreviewOpenGlFallbackWarning" xml:space="preserve">
+    <value>OpenGL 4.x was requested but the app started on OpenGL ES (ANGLE). Update GPU drivers or leave the toggle off.</value>
+  </data>
   <data name="MaxThreads" xml:space="preserve">
     <value>Max Threads</value>
   </data>
@@ -1745,7 +1760,7 @@
     <value>Limit to 60 FPS</value>
   </data>
   <data name="Preview3DCapFpsAt60Tooltip" xml:space="preserve">
-    <value>Cap continuous 3D preview rendering to 60 frames per second to reduce GPU use. Off by default (follows display refresh rate).</value>
+    <value>Cap continuous 3D preview rendering to 60 frames per second to reduce GPU use. Off by default (uncapped). On OpenGL 4.x (WGL), off disables vsync so the FPS counter can exceed your display refresh rate.</value>
   </data>
   <data name="Preview3DItemUseAlphaBlend" xml:space="preserve">
     <value>Item alpha blend</value>

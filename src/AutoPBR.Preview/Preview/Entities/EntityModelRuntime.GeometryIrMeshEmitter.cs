@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Text.Json;
 
 using AutoPBR.Core.Models;
+using AutoPBR.Preview.GeometryIr;
 
 namespace AutoPBR.Preview.Entities;
 
@@ -539,8 +540,54 @@ internal sealed partial class EntityModelRuntime
         {
             RotationPivot = rotationPivot,
             TexCropNorthSouthFaceUv = texCropNorthSouthFaceUv,
+            BakeAtlasWidth = ResolveEmitBakeAtlasWidth(cuboid, partId, options),
+            BakeAtlasHeight = ResolveEmitBakeAtlasHeight(cuboid, partId, options),
         };
         return true;
+    }
+
+    private static int ResolveEmitBakeAtlasWidth(
+        JsonElement cuboid,
+        string partId,
+        in GeometryIrMeshEmitOptions options)
+    {
+        if (GeometryIrCuboidMetadata.TryGetAtlasDimensions(cuboid, out var atlasW, out _))
+        {
+            return atlasW;
+        }
+
+        if (!string.IsNullOrEmpty(partId) && options.ResolvePartAtlasDimensions is { } resolvePartAtlas)
+        {
+            var partAtlas = resolvePartAtlas(partId);
+            if (partAtlas.Width > 0)
+            {
+                return partAtlas.Width;
+            }
+        }
+
+        return options.AtlasWidth > 0 ? options.AtlasWidth : 0;
+    }
+
+    private static int ResolveEmitBakeAtlasHeight(
+        JsonElement cuboid,
+        string partId,
+        in GeometryIrMeshEmitOptions options)
+    {
+        if (GeometryIrCuboidMetadata.TryGetAtlasDimensions(cuboid, out _, out var atlasH))
+        {
+            return atlasH;
+        }
+
+        if (!string.IsNullOrEmpty(partId) && options.ResolvePartAtlasDimensions is { } resolvePartAtlas)
+        {
+            var partAtlas = resolvePartAtlas(partId);
+            if (partAtlas.Height > 0)
+            {
+                return partAtlas.Height;
+            }
+        }
+
+        return options.AtlasHeight > 0 ? options.AtlasHeight : 0;
     }
 
     private static bool TryBuildMeshFromGeometryIr(

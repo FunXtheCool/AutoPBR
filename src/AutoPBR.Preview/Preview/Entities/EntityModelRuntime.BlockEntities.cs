@@ -239,26 +239,32 @@ internal sealed partial class EntityModelRuntime
             return false;
         }
 
-        // javap texOffs(-14,13) down unfold on 32×32 #base → [14,13,28,27] (legacy lifts may still emit [18,13,32,27]).
-        var corrected = uv[0] >= 13.5f && uv[2] <= 28.5f && uv[1] >= 12.5f && uv[3] <= 27.5f;
-        var legacy = uv[0] >= 17.5f && uv[2] <= 32.5f && uv[1] >= 12.5f && uv[3] <= 27.5f;
-        return corrected || legacy;
+        // javap texOffs(-14,13): UP exterior [14,27,28,13], DOWN exterior [0,13,14,27] on 32×32 #base.
+        var down = uv[0] >= -0.5f && uv[2] <= 14.5f && uv[1] >= 12.5f && uv[3] <= 27.5f;
+        var up = uv[0] >= 13.5f && uv[2] <= 28.5f &&
+                 ((uv[1] >= 26.5f && uv[3] <= 13.5f) || (uv[1] >= 12.5f && uv[3] <= 27.5f));
+        return down || up;
     }
 
     private static bool IsDecoratedPotCapRingElement(ModelElement element)
     {
-        if (!element.Faces.TryGetValue("up", out var face) || face.Uv is not { Length: 4 })
+        if (element.Faces.TryGetValue("up", out var upFace) &&
+            upFace.Uv is { Length: 4 } &&
+            (upFace.TextureKey ?? "").Contains("base", StringComparison.OrdinalIgnoreCase) &&
+            IsDecoratedPotCapRingBaseUv(upFace.Uv))
         {
-            return false;
+            return true;
         }
 
-        var texKey = face.TextureKey ?? "";
-        if (!texKey.Contains("base", StringComparison.OrdinalIgnoreCase))
+        if (element.Faces.TryGetValue("down", out var downFace) &&
+            downFace.Uv is { Length: 4 } &&
+            (downFace.TextureKey ?? "").Contains("base", StringComparison.OrdinalIgnoreCase) &&
+            IsDecoratedPotCapRingBaseUv(downFace.Uv))
         {
-            return false;
+            return true;
         }
 
-        return IsDecoratedPotCapRingBaseUv(face.Uv);
+        return false;
     }
 
     /// <summary>After cap down→up orientation, extend Y toward body for side junction seal (preview-only; no X/Z widen).</summary>
@@ -342,7 +348,28 @@ internal sealed partial class EntityModelRuntime
         else if (faces.TryGetValue("down", out var loneDown))
         {
             faces.Remove("down");
-            faces["up"] = loneDown;
+            var reflectedUpFace = loneDown;
+            if (IsDecoratedPotCapRingBaseUv(loneDown.Uv!) &&
+                GeometryIrUvAtlasQuality.TryNormalizeDecoratedPotCapTexU(
+                    EntityModelRuntime.DecoratedPotCapTexCropRawU,
+                    out _))
+            {
+                var upUv = EntityCuboidJavaUvConvention.GetUvRect(
+                    EntityCuboidJavaUvConvention.JavaDirection.Up,
+                    EntityModelRuntime.DecoratedPotCapTexCropRawU,
+                    EntityModelRuntime.DecoratedPotCapTexCropV,
+                    14,
+                    0,
+                    14);
+                reflectedUpFace = new ModelFace
+                {
+                    TextureKey = loneDown.TextureKey,
+                    Uv = upUv,
+                    RotationDegrees = loneDown.RotationDegrees,
+                };
+            }
+
+            faces["up"] = reflectedUpFace;
         }
 
         return new ModelElement
@@ -357,6 +384,8 @@ internal sealed partial class EntityModelRuntime
             ShellInflateTexels = element.ShellInflateTexels,
             EnableParallax = element.EnableParallax,
             MirrorCuboidUv = element.MirrorCuboidUv,
+            BakeAtlasWidth = element.BakeAtlasWidth,
+            BakeAtlasHeight = element.BakeAtlasHeight,
         };
     }
 

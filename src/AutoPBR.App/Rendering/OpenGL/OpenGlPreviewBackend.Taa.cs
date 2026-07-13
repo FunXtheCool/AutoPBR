@@ -42,6 +42,8 @@ public sealed partial class OpenGlPreviewBackend
             return;
         }
 
+        _taaResolveUniformLocs = ResolveTaaResolveUniformLocs(_taaResolveProgram);
+
         EmitPreviewTaaShaderDiagnostic(useOpenGlEs);
 
         _taaScratchTarget = new GlColorRenderTarget(gl, useOpenGlEs);
@@ -66,7 +68,7 @@ public sealed partial class OpenGlPreviewBackend
         _taaHistoryValid = false;
     }
 
-    private void SyncPreviewTaaToggleState(in PreviewRenderSettings settings)
+    private void SyncPreviewTaaToggleState(in PreviewRenderSettingsSnapshot settings)
     {
         var active = IsPreviewTaaActive(settings);
         var settingsKey = ComputePreviewTaaSettingsKey(settings);
@@ -86,7 +88,7 @@ public sealed partial class OpenGlPreviewBackend
         _taaFrameIndex = 0;
     }
 
-    private bool IsPreviewTaaActive(in PreviewRenderSettings settings)
+    private bool IsPreviewTaaActive(in PreviewRenderSettingsSnapshot settings)
     {
         if (!settings.EnablePreviewTaa || _taaResolveProgram is not { IsValid: true } ||
             _taaScratchTarget is null || _taaResolveTarget is null || _taaHistoryTarget is null || _godRayQuadVao == 0)
@@ -98,7 +100,7 @@ public sealed partial class OpenGlPreviewBackend
         return taa.TemporalWeight > 0f || taa.FxaaEdgeStrength > 0f || settings.PreviewTaaForceFxaa;
     }
 
-    private bool ShouldContinuouslyAccumulatePreviewTaa(in PreviewRenderSettings settings)
+    private bool ShouldContinuouslyAccumulatePreviewTaa(in PreviewRenderSettingsSnapshot settings)
     {
         if (!IsPreviewTaaActive(settings))
         {
@@ -109,7 +111,7 @@ public sealed partial class OpenGlPreviewBackend
         return taa.TemporalWeight > 0f && taa.JitterScale > 0f;
     }
 
-    private Vector2 CurrentPreviewTaaJitter(int width, int height, in PreviewRenderSettings settings)
+    private Vector2 CurrentPreviewTaaJitter(int width, int height, in PreviewRenderSettingsSnapshot settings)
     {
         if (!_taaHistoryValid)
         {
@@ -129,7 +131,7 @@ public sealed partial class OpenGlPreviewBackend
             2f * pixelJitter.Y / Math.Max(1, height));
     }
 
-    private static PreviewVolumetricQuality.TaaProfile ResolveEffectivePreviewTaa(in PreviewRenderSettings settings)
+    private static PreviewVolumetricQuality.TaaProfile ResolveEffectivePreviewTaa(in PreviewRenderSettingsSnapshot settings)
     {
         var taa = PreviewVolumetricQuality.ResolvePreviewTaa(settings.VolumetricQuality, settings.PreviewTaaMode);
         var temporal = Math.Clamp(taa.TemporalWeight * Math.Clamp(settings.PreviewTaaTemporalScale, 0f, 1.25f), 0f, 0.98f);
@@ -150,7 +152,7 @@ public sealed partial class OpenGlPreviewBackend
             FxaaEdgeStrength: fxaa);
     }
 
-    private static int ComputePreviewTaaSettingsKey(in PreviewRenderSettings settings)
+    private static int ComputePreviewTaaSettingsKey(in PreviewRenderSettingsSnapshot settings)
     {
         var hasher = new HashCode();
         hasher.Add(settings.EnablePreviewTaa);
@@ -256,53 +258,40 @@ public sealed partial class OpenGlPreviewBackend
         gl.ColorMask(true, true, true, true);
         gl.BindVertexArray(_godRayQuadVao);
         _taaResolveProgram!.Use();
+        var tu = _taaResolveUniformLocs;
         gl.ActiveTexture(TextureUnit.Texture0);
         gl.BindTexture(TextureTarget.Texture2D, scratchTarget.ColorTextureHandle);
-        SetIntOnProgram(_taaResolveProgram, "uCurrent", 0);
+        SetIntOnProgramLoc(_taaResolveProgram, tu.Current, 0);
         gl.ActiveTexture(TextureUnit.Texture1);
         gl.BindTexture(TextureTarget.Texture2D, historyTarget.ColorTextureHandle);
-        SetIntOnProgram(_taaResolveProgram, "uHistory", 1);
+        SetIntOnProgramLoc(_taaResolveProgram, tu.History, 1);
         if (hasSceneDepth)
         {
             gl.ActiveTexture(TextureUnit.Texture2);
             gl.BindTexture(TextureTarget.Texture2D, _sceneCapture!.DepthTextureHandle);
-            SetIntOnProgram(_taaResolveProgram, "uSceneDepth", 2);
+            SetIntOnProgramLoc(_taaResolveProgram, tu.SceneDepth, 2);
         }
 
         if (hasTaaSignal)
         {
             gl.ActiveTexture(TextureUnit.Texture3);
             gl.BindTexture(TextureTarget.Texture2D, _sceneCapture!.TaaSignalTextureHandle);
-            SetIntOnProgram(_taaResolveProgram, "uTaaSignal", 3);
+            SetIntOnProgramLoc(_taaResolveProgram, tu.TaaSignal, 3);
         }
 
-        SetIntOnProgram(_taaResolveProgram, "uHasSceneDepth", hasSceneDepth ? 1 : 0);
-        SetIntOnProgram(_taaResolveProgram, "uHasTaaSignal", hasTaaSignal ? 1 : 0);
-        SetIntOnProgram(_taaResolveProgram, "uHasHistory", _taaHistoryValid ? 1 : 0);
-        SetMatrixOnProgram(_taaResolveProgram, "uInvViewProj", invViewProj);
-        SetMatrixOnProgram(_taaResolveProgram, "uPrevViewProj", _taaPrevViewProj);
+        SetIntOnProgramLoc(_taaResolveProgram, tu.HasSceneDepth, hasSceneDepth ? 1 : 0);
+        SetIntOnProgramLoc(_taaResolveProgram, tu.HasTaaSignal, hasTaaSignal ? 1 : 0);
+        SetIntOnProgramLoc(_taaResolveProgram, tu.HasHistory, _taaHistoryValid ? 1 : 0);
+        SetMatrixOnProgramLoc(_taaResolveProgram, tu.InvViewProj, invViewProj);
+        SetMatrixOnProgramLoc(_taaResolveProgram, tu.PrevViewProj, _taaPrevViewProj);
         var displayTexelSize = new Vector2(1f / w, 1f / h);
         var captureW = hasSceneDepth && frame.SceneCaptureW > 0 ? frame.SceneCaptureW : w;
         var captureH = hasSceneDepth && frame.SceneCaptureH > 0 ? frame.SceneCaptureH : h;
         var captureTexelSize = new Vector2(1f / captureW, 1f / captureH);
-        SetVec2OnProgram(_taaResolveProgram, "uTexelSize", displayTexelSize);
-        SetVec2OnProgram(_taaResolveProgram, "uCaptureTexelSize", captureTexelSize);
-        SetVec2OnProgram(_taaResolveProgram, "uCurrentJitterPixels",
+        SetVec2OnProgramLoc(_taaResolveProgram, tu.TexelSize, displayTexelSize);
+        SetVec2OnProgramLoc(_taaResolveProgram, tu.CaptureTexelSize, captureTexelSize);
+        SetVec2OnProgramLoc(_taaResolveProgram, tu.CurrentJitterPixels,
             new Vector2(frame.PreviewTaaJitterNdc.X * w * 0.5f, frame.PreviewTaaJitterNdc.Y * h * 0.5f));
-        SetFloatOnProgram(_taaResolveProgram, "uTemporalWeight", taa.TemporalWeight);
-        SetFloatOnProgram(_taaResolveProgram, "uStableTemporalBoost", taa.StableTemporalBoost);
-        SetFloatOnProgram(_taaResolveProgram, "uMaxStableTemporal", taa.MaxStableTemporal);
-        SetFloatOnProgram(_taaResolveProgram, "uTaaSharpenStrength", taa.SharpenStrength);
-        SetFloatOnProgram(_taaResolveProgram, "uDepthEdgeHistoryFloor", taa.DepthEdgeHistoryFloor);
-        SetFloatOnProgram(_taaResolveProgram, "uEdgeAaBlend", taa.EdgeAaBlend);
-        SetFloatOnProgram(_taaResolveProgram, "uSourceFilterStrength", taa.SourceFilterStrength);
-        SetFloatOnProgram(_taaResolveProgram, "uSilhouetteHistoryWeight", taa.SilhouetteHistoryWeight);
-        SetFloatOnProgram(_taaResolveProgram, "uFxaaEdgeStrength", taa.FxaaEdgeStrength);
-        SetFloatOnProgram(_taaResolveProgram, "uFxaaLumaEdgeStrength",
-            Math.Clamp(frame.Settings.PreviewTaaFxaaLumaEdgeScale, 0f, 2f));
-        SetFloatOnProgram(_taaResolveProgram, "uFxaaLumaThreshold",
-            Math.Clamp(frame.Settings.PreviewTaaFxaaLumaThreshold, 0.001f, 0.12f));
-        SetIntOnProgram(_taaResolveProgram, "uForceFxaa", frame.Settings.PreviewTaaForceFxaa ? 1 : 0);
         gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
         var drawErr = gl.GetError();
         if (drawErr != GLEnum.NoError)
@@ -386,7 +375,7 @@ public sealed partial class OpenGlPreviewBackend
         _scenePresentProgram.Use();
         gl.ActiveTexture(TextureUnit.Texture0);
         gl.BindTexture(TextureTarget.Texture2D, resolveTarget.ColorTextureHandle);
-        SetIntOnProgram(_scenePresentProgram, "uSceneColor", 0);
+        SetIntOnProgramLoc(_scenePresentProgram, _scenePresentUniformLocs.SceneColor, 0);
         gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
         var err = gl.GetError();
         gl.BindVertexArray(0);

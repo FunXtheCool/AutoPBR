@@ -26,7 +26,7 @@ internal sealed class GodRaysPassCoordinator
     private bool _prevGodRayStabilizeDebug = true;
     private bool _prevCloudDisableTemporal;
 
-    public GodRaysPassInvalidation SyncGodRayToggleState(in PreviewRenderSettings settings)
+    public GodRaysPassInvalidation SyncGodRayToggleState(in PreviewRenderSettingsSnapshot settings)
     {
         var godRaysChanged = _prevEnableGodRays != settings.EnableGodRays;
         var stabilizeChanged = _prevGodRayStabilizeDebug != settings.GodRayStabilizeDebug;
@@ -49,7 +49,7 @@ internal sealed class GodRaysPassCoordinator
         };
     }
 
-    public GodRaysPassInvalidation SyncVolumetricToggleState(in PreviewRenderSettings settings)
+    public GodRaysPassInvalidation SyncVolumetricToggleState(in PreviewRenderSettingsSnapshot settings)
     {
         var cloudsChanged = _prevEnableVolumetricClouds != settings.EnableVolumetricClouds;
         var temporalChanged = _prevCloudDisableTemporal != settings.CloudDisableTemporal;
@@ -71,9 +71,9 @@ internal sealed class GodRaysPassCoordinator
     }
 
     public static float ResolveSceneCaptureScale(
-        in PreviewRenderSettings settings,
-        Func<PreviewRenderSettings, bool> isTaaActive,
-        Func<PreviewRenderSettings, PreviewVolumetricQuality.TaaProfile> resolveEffectiveTaa)
+        in PreviewRenderSettingsSnapshot settings,
+        Func<PreviewRenderSettingsSnapshot, bool> isTaaActive,
+        Func<PreviewRenderSettingsSnapshot, PreviewVolumetricQuality.TaaProfile> resolveEffectiveTaa)
     {
         if (!isTaaActive(settings))
         {
@@ -99,8 +99,8 @@ internal sealed class GodRaysPassCoordinator
 
     public static void ResolveSceneCaptureSize(
         in GlRenderFrame frame,
-        Func<PreviewRenderSettings, bool> isTaaActive,
-        Func<PreviewRenderSettings, PreviewVolumetricQuality.TaaProfile> resolveEffectiveTaa,
+        Func<PreviewRenderSettingsSnapshot, bool> isTaaActive,
+        Func<PreviewRenderSettingsSnapshot, PreviewVolumetricQuality.TaaProfile> resolveEffectiveTaa,
         out int captureW,
         out int captureH,
         out float captureScale)
@@ -148,7 +148,7 @@ internal sealed class GodRaysPassCoordinator
     }
 
     public bool TryLogVolumetricTiming(
-        in PreviewRenderSettings settings,
+        in PreviewRenderSettingsSnapshot settings,
         double injectMs,
         double integrateMs,
         Action<string> emitDiagnostic)
@@ -177,7 +177,7 @@ internal sealed class GodRaysPassCoordinator
         return true;
     }
 
-    public void SeedToggleBaseline(in PreviewRenderSettings settings)
+    public void SeedToggleBaseline(in PreviewRenderSettingsSnapshot settings)
     {
         _prevEnableGodRays = settings.EnableGodRays;
         _prevGodRayStabilizeDebug = settings.GodRayStabilizeDebug;

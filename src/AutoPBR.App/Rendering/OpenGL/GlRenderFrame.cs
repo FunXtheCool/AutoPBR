@@ -20,7 +20,8 @@ internal ref struct GlRenderFrame
     public int SceneCaptureW;
     public int SceneCaptureH;
     public float SceneCaptureScale;
-    public PreviewRenderSettings Settings;
+    public PreviewRenderSettingsSnapshot Settings;
+    public int SettingsRevision;
     public IRenderPreviewScene Scene;
     public PreviewMaterial? Material;
     public PreviewModelSubject? BlockModel;
@@ -52,6 +53,7 @@ internal ref struct GlRenderFrame
     public Matrix4x4 ShadowVpNear;
     public bool ShadowCascadesActive;
     public float CascadeSplitWorldDistance;
+    public float CascadeBlendWorldWidth;
     public Matrix4x4 ModelMatrix;
     public int EntityAlphaModeUniform;
     public bool EntityBlendDraw;

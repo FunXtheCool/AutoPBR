@@ -139,8 +139,8 @@ public sealed partial class ObjectEntityBlockStateParityTests
                         RefPart("neck", 0, 37, 16, pi, 0, 0,
                             RefCuboid(4, 17, 4, 12, 20, 12, 0, 0),
                             RefCuboid(5, 20, 5, 11, 21, 11, 0, 5)),
-                        RefPart("top", 1, 16, 1, 0, 0, 0, RefCapCuboid()),
-                        RefPart("bottom", 1, 0, 1, 0, 0, 0, RefCapCuboid()),
+                        RefPart("top", 1, 16, 1, 0, 0, 0, RefCapCuboid("up")),
+                        RefPart("bottom", 1, 0, 1, 0, 0, 0, RefCapCuboid("down")),
                         RefPart("back", 15, 16, 1, 0, 0, pi, RefSideCuboid()),
                         RefPart("left", 1, 16, 1, 0, -pi / 2f, pi, RefSideCuboid()),
                         RefPart("right", 15, 16, 15, 0, pi / 2f, pi, RefSideCuboid()),
@@ -197,10 +197,10 @@ public sealed partial class ObjectEntityBlockStateParityTests
 
     private static JsonObject RefSideCuboid() => RefCuboid(0, 0, 0, 14, 16, 0, 1, 0, 14, 16, 0);
 
-    private static JsonObject RefCapCuboid()
+    private static JsonObject RefCapCuboid(string exteriorFace)
     {
         var c = RefCuboid(0, 0, 0, 14, 0, 14, -14, 13, 14, 0, 14);
-        c["faceMask"] = new JsonArray { "down" };
+        c["faceMask"] = new JsonArray { exteriorFace };
         return c;
     }
 
@@ -226,8 +226,8 @@ public sealed partial class ObjectEntityBlockStateParityTests
                         upFace.Uv is { Length: 4 } &&
                         upFace.Uv[0] >= 13.5f &&
                         upFace.Uv[2] <= 28.5f &&
-                        upFace.Uv[1] >= 12.5f &&
-                        upFace.Uv[3] <= 27.5f;
+                        upFace.Uv[1] >= 26.5f &&
+                        upFace.Uv[3] <= 13.5f;
             if (isCap)
             {
                 bottomCapMaxY = MathF.Min(bottomCapMaxY, cMax.Y);
@@ -433,10 +433,23 @@ public sealed partial class ObjectEntityBlockStateParityTests
         var capCount = 0;
         foreach (var el in model.Elements)
         {
-            if (!el.Faces.TryGetValue("up", out var capFace) ||
-                capFace.Uv is not { Length: 4 } ||
-                capFace.Uv[0] < 13.5f || capFace.Uv[2] > 28.5f ||
-                capFace.Uv[1] < 12.5f || capFace.Uv[3] > 27.5f)
+            ModelFace? capFace = null;
+            if (el.Faces.TryGetValue("up", out var upFace) &&
+                upFace.Uv is { Length: 4 } &&
+                upFace.Uv[0] >= 13.5f && upFace.Uv[2] <= 28.5f &&
+                upFace.Uv[1] >= 26.5f && upFace.Uv[3] <= 13.5f)
+            {
+                capFace = upFace;
+            }
+            else if (el.Faces.TryGetValue("down", out var downFace) &&
+                     downFace.Uv is { Length: 4 } &&
+                     downFace.Uv[0] >= -0.5f && downFace.Uv[2] <= 14.5f &&
+                     downFace.Uv[1] >= 12.5f && downFace.Uv[3] <= 27.5f)
+            {
+                capFace = downFace;
+            }
+
+            if (capFace is null)
             {
                 continue;
             }
@@ -652,7 +665,7 @@ public sealed partial class ObjectEntityBlockStateParityTests
                 if (texKey.Contains("base", StringComparison.OrdinalIgnoreCase) &&
                     faceName.Equals("up", StringComparison.OrdinalIgnoreCase) &&
                     face.Uv[0] >= 13.5f && face.Uv[2] <= 28.5f &&
-                    face.Uv[1] >= 12.5f && face.Uv[3] <= 27.5f)
+                    face.Uv[1] >= 26.5f && face.Uv[3] <= 13.5f)
                 {
                     capFaces.Add(face.Uv);
                 }
@@ -668,9 +681,9 @@ public sealed partial class ObjectEntityBlockStateParityTests
         foreach (var uv in capFaces)
         {
             Assert.InRange(uv[0], 13.9f, 14.1f);
-            Assert.InRange(uv[1], 12.9f, 13.1f);
+            Assert.InRange(uv[1], 26.9f, 27.1f);
             Assert.InRange(uv[2], 27.9f, 28.1f);
-            Assert.InRange(uv[3], 26.9f, 27.1f);
+            Assert.InRange(uv[3], 12.9f, 13.1f);
         }
 
         Assert.Equal(4, sideFaces.Count);

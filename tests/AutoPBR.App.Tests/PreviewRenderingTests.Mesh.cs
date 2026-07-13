@@ -2,6 +2,7 @@ using AutoPBR.App.Rendering;
 using AutoPBR.App.Rendering.Abstractions;
 using AutoPBR.App.Rendering.Scene;
 using AutoPBR.Core.Models;
+using AutoPBR.Preview;
 
 using System.Numerics;
 
@@ -45,8 +46,90 @@ public sealed partial class PreviewRenderingTests
         };
         var mesh = PreviewMeshFactory.CreateSpritePixelCuboids(rgba, 2, 2, thickness: 0.10f, alphaCutoff: 0.5f);
         Assert.Equal("sprite_voxels", mesh.Name);
+        Assert.Equal(2, mesh.OpaqueVoxelCount);
         Assert.Equal(48, mesh.VertexCount);
         Assert.Equal(72, mesh.Indices.Length);
+    }
+
+    [Fact]
+    public void SpriteVoxelMesh_culls_internal_faces_and_merges_side_quads()
+    {
+        var rgba = new byte[16];
+        for (var i = 0; i < 4; i++)
+        {
+            rgba[i * 4 + 3] = 255;
+        }
+
+        var mesh = PreviewMeshFactory.CreateSpritePixelCuboids(rgba, 2, 2, thickness: 0.10f, alphaCutoff: 0.5f);
+        Assert.Equal(4, mesh.OpaqueVoxelCount);
+        Assert.True(mesh.VertexCount < 96, $"expected fewer than 96 verts after culling/merge, got {mesh.VertexCount}");
+        Assert.True(mesh.Indices.Length < 144, $"expected fewer than 144 indices after culling/merge, got {mesh.Indices.Length}");
+    }
+
+    [Fact]
+    public void SpriteVoxelMesh_merges_horizontal_side_run()
+    {
+        var rgba = new byte[8];
+        rgba[3] = 255;
+        rgba[7] = 255;
+
+        var mesh = PreviewMeshFactory.CreateSpritePixelCuboids(rgba, 2, 1, thickness: 0.10f, alphaCutoff: 0.5f);
+        Assert.Equal(2, mesh.OpaqueVoxelCount);
+        Assert.True(mesh.VertexCount < 48, $"expected merged side faces, got {mesh.VertexCount} verts");
+    }
+
+    [Fact]
+    public void SpriteVoxelMeshCache_returns_same_mesh_for_same_input()
+    {
+        var rgba = new byte[]
+        {
+            255, 0, 0, 255, 0, 0, 0, 0,
+            0, 0, 0, 0, 255, 0, 0, 255
+        };
+        var a = SpriteVoxelMeshCache.GetOrBuild(rgba, 2, 2, thickness: 0.10f, alphaCutoff: 0.5f);
+        var b = SpriteVoxelMeshCache.GetOrBuild(rgba, 2, 2, thickness: 0.10f, alphaCutoff: 0.5f);
+        Assert.Same(a, b);
+    }
+
+    [Fact]
+    public void PreviewMaterialContentKey_detects_identical_payloads()
+    {
+        var rgba = new byte[] { 1, 2, 3, 255 };
+        var a = PreviewMaterialMapper.FromCoreMaps(new PreviewTextureMaps
+        {
+            Width = 1,
+            Height = 1,
+            DiffuseRgba = rgba
+        });
+        var b = PreviewMaterialMapper.FromCoreMaps(new PreviewTextureMaps
+        {
+            Width = 1,
+            Height = 1,
+            DiffuseRgba = (byte[])rgba.Clone()
+        });
+        Assert.True(PreviewMaterialContentKey.Equals(
+            PreviewMaterialContentKey.Compute(a),
+            PreviewMaterialContentKey.Compute(b)));
+    }
+
+    [Fact]
+    public void ItemFlatSceneCreate_uses_lightweight_placeholder_mesh()
+    {
+        var rgba = new byte[] { 255, 0, 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 255, 0, 0, 255 };
+        var material = PreviewMaterialMapper.FromCoreMaps(new PreviewTextureMaps
+        {
+            Width = 2,
+            Height = 2,
+            DiffuseRgba = rgba
+        });
+        var settings = new PreviewRenderSettings
+        {
+            ItemFlatSpritePreview = true,
+            SpriteThickness = 0.10f
+        };
+        var scene = ItemPreviewSceneFactory.Create(settings, material);
+        Assert.Equal("item_plane_pending", scene.Meshes[0].Name);
+        Assert.Equal(4, scene.Meshes[0].VertexCount);
     }
 
     [Fact]

@@ -14,7 +14,7 @@ public sealed partial class PreviewRenderingTests
         var s = new PreviewRenderSettings();
         Assert.Equal(1f, s.NormalStrength);
         Assert.True(s.EnableParallax);
-        Assert.False(s.NearestTextureFilter);
+        Assert.True(s.NearestTextureFilter);
         Assert.True(s.ShowBackgroundGrid);
         Assert.True(s.ShowGroundMesh);
         Assert.True(s.ShowCornerAxes);
@@ -89,11 +89,11 @@ public sealed partial class PreviewRenderingTests
             "OpenGlPreviewBackend.Render.PassScene.cs");
 
         Assert.Contains("var groundParallax = frame.Settings.EnableParallax && _grassGroundHasHeight;", source, StringComparison.Ordinal);
-        Assert.Contains("SetInt(\"uEnableParallaxAo\", groundParallax && frame.Settings.EnableParallaxAo ? 1 : 0);", source, StringComparison.Ordinal);
-        Assert.Contains("SetInt(\"uEnableParallaxShadow\", groundParallax && frame.Settings.EnableParallaxShadow ? 1 : 0);", source, StringComparison.Ordinal);
-        Assert.Contains("SetInt(\"uEnableParallax\", frame.EnableParallaxEff ? 1 : 0);", source, StringComparison.Ordinal);
-        Assert.Contains("SetInt(\"uEnableParallaxAo\", frame.EnableParallaxAoEff ? 1 : 0);", source, StringComparison.Ordinal);
-        Assert.Contains("SetInt(\"uEnableParallaxShadow\", frame.EnableParallaxShadowEff ? 1 : 0);", source, StringComparison.Ordinal);
+        Assert.Contains("SetIntLoc(u.EnableParallaxAo, groundParallax && frame.Settings.EnableParallaxAo ? 1 : 0);", source, StringComparison.Ordinal);
+        Assert.Contains("SetIntLoc(u.EnableParallaxShadow, groundParallax && frame.Settings.EnableParallaxShadow ? 1 : 0);", source, StringComparison.Ordinal);
+        Assert.Contains("SetIntLoc(u.EnableParallax, frame.EnableParallaxEff ? 1 : 0);", source, StringComparison.Ordinal);
+        Assert.Contains("SetIntLoc(u.EnableParallaxAo, frame.EnableParallaxAoEff ? 1 : 0);", source, StringComparison.Ordinal);
+        Assert.Contains("SetIntLoc(u.EnableParallaxShadow, frame.EnableParallaxShadowEff ? 1 : 0);", source, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -108,11 +108,12 @@ public sealed partial class PreviewRenderingTests
 
         Assert.Contains("var batchAllowsParallax = !frame.EntityEmulatedPreview || batch.EnableParallax;", source, StringComparison.Ordinal);
         Assert.Contains("var batchParallax = frame.EnableParallaxEff && batchAllowsParallax && bHasH;", source, StringComparison.Ordinal);
-        Assert.Contains("SetInt(\"uEnableParallax\", batchParallax ? 1 : 0);", source, StringComparison.Ordinal);
+        Assert.Contains("SetIntLoc(u.EnableParallax, batchParallax ? 1 : 0);", source, StringComparison.Ordinal);
+        Assert.Contains("UploadMaterial(frame.Gl, slot, nearest: true);", source, StringComparison.Ordinal);
         Assert.Contains("? EntityParallaxUvScale(slot)", source, StringComparison.Ordinal);
         Assert.Contains("? EntityTextureAtlasScale(slot)", source, StringComparison.Ordinal);
         Assert.Contains("return Math.Clamp(16f / atlasMax, 0.02f, 1f);", source, StringComparison.Ordinal);
-        Assert.Contains("frame.EnableTessellationDisplacementEff = PreviewEntityEmulatedShaderGating.EffectiveTessellationDisplacement(", source, StringComparison.Ordinal);
+        Assert.Contains("SetIntLoc(u.EnableTessellationDisplacement,", source, StringComparison.Ordinal);
         Assert.Contains("batchAllowsParallax &&", source, StringComparison.Ordinal);
     }
 
@@ -151,7 +152,7 @@ public sealed partial class PreviewRenderingTests
         Assert.Contains("frame.GodRayCaptureActive && frame.SceneCaptureW > 0 ? frame.SceneCaptureW : frame.Vw", source, StringComparison.Ordinal);
         Assert.Contains("frame.UnjitteredProj = frame.Proj;", source, StringComparison.Ordinal);
         Assert.Contains("frame.PreviewTaaJitterNdc", source, StringComparison.Ordinal);
-        Assert.Contains("SetMatrix(\"uTaaCurrViewProj\", taaCurrentViewProj);", source, StringComparison.Ordinal);
+        Assert.Contains("SetMatrixLoc(u.TaaCurrViewProj, taaCurrentViewProj);", source, StringComparison.Ordinal);
         Assert.Contains("ResolvePreviewTaaPrevViewProj(taaCurrentViewProj)", source, StringComparison.Ordinal);
     }
 
@@ -258,8 +259,8 @@ public sealed partial class PreviewRenderingTests
         Assert.Contains("var hasTaaSignal", source, StringComparison.Ordinal);
         Assert.Contains("TextureUnit.Texture3", source, StringComparison.Ordinal);
         Assert.Contains("TaaSignalTextureHandle", source, StringComparison.Ordinal);
-        Assert.Contains("\"uHasTaaSignal\"", source, StringComparison.Ordinal);
-        Assert.Contains("\"uCaptureTexelSize\"", source, StringComparison.Ordinal);
+        Assert.Contains("SetIntOnProgramLoc(_taaResolveProgram, tu.HasTaaSignal, hasTaaSignal ? 1 : 0);", source, StringComparison.Ordinal);
+        Assert.Contains("SetVec2OnProgramLoc(_taaResolveProgram, tu.CaptureTexelSize, captureTexelSize);", source, StringComparison.Ordinal);
         Assert.Contains("frame.SceneCaptureW > 0 ? frame.SceneCaptureW : w", source, StringComparison.Ordinal);
     }
 
@@ -282,6 +283,12 @@ public sealed partial class PreviewRenderingTests
             "Rendering",
             "Abstractions",
             "PreviewRenderSettings.cs");
+        var settingsSnapshot = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "Abstractions",
+            "PreviewRenderSettingsSnapshot.cs");
         var userSettings = LoadSource(ThisFilePath(),
             "src",
             "AutoPBR.App",
@@ -340,6 +347,13 @@ public sealed partial class PreviewRenderingTests
             "OpenGL",
             "GlslPreparedSourceCache.cs");
 
+        var postPassSettings = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "OpenGlPreviewBackend.PostPassSettings.cs");
+
         Assert.Contains("Preview3DTaaModeOptions", view, StringComparison.Ordinal);
         Assert.Contains("FlyoutSection Header=\"{Binding Strings.Preview3DTaaSection}\"", view, StringComparison.Ordinal);
         Assert.Contains("SelectedIndex=\"{Binding Preview3DTaaMode, Mode=TwoWay}\"", view, StringComparison.Ordinal);
@@ -376,7 +390,7 @@ public sealed partial class PreviewRenderingTests
         Assert.Contains("ResolvePreview3DTaaMode(settings)", synchronizer, StringComparison.Ordinal);
         Assert.Contains("DefaultPreview3DTaaMode = 0", synchronizer, StringComparison.Ordinal);
         Assert.Contains("settings.Preview3DTaaFxaaStrengthScale = Math.Clamp(vm.Preview3DTaaFxaaStrengthScale, 0.0, 5.0);", synchronizer, StringComparison.Ordinal);
-        Assert.Contains("PreviewTaaFxaaStrengthScale = s.PreviewTaaFxaaStrengthScale", backend, StringComparison.Ordinal);
+        Assert.Contains("PreviewTaaFxaaStrengthScale = s.PreviewTaaFxaaStrengthScale", settingsSnapshot, StringComparison.Ordinal);
         Assert.Contains("Math.Clamp(settings.PreviewTaaFxaaStrengthScale, 0f, 5f)", taa, StringComparison.Ordinal);
         Assert.Contains("ConfigureDefaultFramebufferColorOutput(gl, defaultFbo);", render, StringComparison.Ordinal);
         Assert.Contains("private void ConfigureDefaultFramebufferColorOutput", godRays, StringComparison.Ordinal);
@@ -384,17 +398,17 @@ public sealed partial class PreviewRenderingTests
         Assert.Contains("DrawBufferMode.ColorAttachment0", godRays, StringComparison.Ordinal);
         Assert.Contains("ResolveEffectivePreviewTaa", taa, StringComparison.Ordinal);
         Assert.Contains("ResolvePreviewTaa(settings.VolumetricQuality, settings.PreviewTaaMode)", taa, StringComparison.Ordinal);
-        Assert.Contains("\"uStableTemporalBoost\"", taa, StringComparison.Ordinal);
-        Assert.Contains("\"uTaaSharpenStrength\"", taa, StringComparison.Ordinal);
-        Assert.Contains("\"uDepthEdgeHistoryFloor\"", taa, StringComparison.Ordinal);
-        Assert.Contains("\"uEdgeAaBlend\"", taa, StringComparison.Ordinal);
-        Assert.Contains("\"uCurrentJitterPixels\"", taa, StringComparison.Ordinal);
-        Assert.Contains("\"uSourceFilterStrength\"", taa, StringComparison.Ordinal);
-        Assert.Contains("\"uSilhouetteHistoryWeight\"", taa, StringComparison.Ordinal);
-        Assert.Contains("\"uFxaaEdgeStrength\"", taa, StringComparison.Ordinal);
-        Assert.Contains("\"uFxaaLumaEdgeStrength\"", taa, StringComparison.Ordinal);
-        Assert.Contains("\"uFxaaLumaThreshold\"", taa, StringComparison.Ordinal);
-        Assert.Contains("\"uForceFxaa\"", taa, StringComparison.Ordinal);
+        Assert.Contains("SetFloatOnProgramLoc(_taaResolveProgram, tu.StableTemporalBoost, taa.StableTemporalBoost);", postPassSettings, StringComparison.Ordinal);
+        Assert.Contains("SetFloatOnProgramLoc(_taaResolveProgram, tu.TaaSharpenStrength, taa.SharpenStrength);", postPassSettings, StringComparison.Ordinal);
+        Assert.Contains("SetFloatOnProgramLoc(_taaResolveProgram, tu.DepthEdgeHistoryFloor, taa.DepthEdgeHistoryFloor);", postPassSettings, StringComparison.Ordinal);
+        Assert.Contains("SetFloatOnProgramLoc(_taaResolveProgram, tu.EdgeAaBlend, taa.EdgeAaBlend);", postPassSettings, StringComparison.Ordinal);
+        Assert.Contains("SetVec2OnProgramLoc(_taaResolveProgram, tu.CurrentJitterPixels,", taa, StringComparison.Ordinal);
+        Assert.Contains("SetFloatOnProgramLoc(_taaResolveProgram, tu.SourceFilterStrength, taa.SourceFilterStrength);", postPassSettings, StringComparison.Ordinal);
+        Assert.Contains("SetFloatOnProgramLoc(_taaResolveProgram, tu.SilhouetteHistoryWeight, taa.SilhouetteHistoryWeight);", postPassSettings, StringComparison.Ordinal);
+        Assert.Contains("SetFloatOnProgramLoc(_taaResolveProgram, tu.FxaaEdgeStrength, taa.FxaaEdgeStrength);", postPassSettings, StringComparison.Ordinal);
+        Assert.Contains("SetFloatOnProgramLoc(_taaResolveProgram, tu.FxaaLumaEdgeStrength,", postPassSettings, StringComparison.Ordinal);
+        Assert.Contains("SetFloatOnProgramLoc(_taaResolveProgram, tu.FxaaLumaThreshold,", postPassSettings, StringComparison.Ordinal);
+        Assert.Contains("SetIntOnProgramLoc(_taaResolveProgram, tu.ForceFxaa, settings.PreviewTaaForceFxaa ? 1 : 0);", postPassSettings, StringComparison.Ordinal);
         Assert.Contains("ComputePreviewTaaSettingsKey", taa, StringComparison.Ordinal);
         Assert.Contains("gl.Disable(EnableCap.CullFace);", taa, StringComparison.Ordinal);
         Assert.Contains("gl.Disable(EnableCap.ScissorTest);", taa, StringComparison.Ordinal);
@@ -405,7 +419,7 @@ public sealed partial class PreviewRenderingTests
         Assert.Contains("resolveTarget.EnsureSize(w, h)", taa, StringComparison.Ordinal);
         Assert.Contains("resolveTarget.BindDraw();", taa, StringComparison.Ordinal);
         Assert.Contains("TryPresentPreviewTaaResolveToDefault", taa, StringComparison.Ordinal);
-        Assert.Contains("SetIntOnProgram(_scenePresentProgram, \"uSceneColor\", 0);", taa, StringComparison.Ordinal);
+        Assert.Contains("SetIntOnProgramLoc(_scenePresentProgram, _scenePresentUniformLocs.SceneColor, 0);", taa, StringComparison.Ordinal);
         Assert.Contains("resolveTarget.BlitColorToFramebuffer(readFbo, frame.VpX, frame.VpY, w, h)", taa, StringComparison.Ordinal);
         Assert.Contains("historyTarget.CopyColorFrom(resolveTarget)", taa, StringComparison.Ordinal);
         Assert.Contains("MaybeLogPreviewTaaDiagnostics", taa, StringComparison.Ordinal);
@@ -595,6 +609,78 @@ public sealed partial class PreviewRenderingTests
         Assert.Contains("SetMaterial(PreviewMaterial? material)", backend, StringComparison.Ordinal);
         Assert.Contains("SetBlockModelPreview(PreviewModelSubject? subject", backend, StringComparison.Ordinal);
         Assert.True(backend.Split("InvalidatePreviewTaaHistory()", StringSplitOptions.None).Length >= 5);
+    }
+
+    [Fact]
+    public void PreviewOpenGl4Setting_IsPersistedAndSynced()
+    {
+        var userSettings = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Models",
+            "UserSettings.cs");
+        var synchronizer = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Services",
+            "UserSettingsSynchronizer.cs");
+        var settingsTab = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Controls",
+            "SettingsTab.axaml");
+        var engineVm = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "ViewModels",
+            "MainWindowViewModel.Settings.Engine.cs");
+        var program = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Program.cs");
+        var configurator = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "PreviewOpenGlPlatformConfigurator.cs");
+
+        Assert.Contains("public bool PreviewUseOpenGl4 { get; set; }", userSettings, StringComparison.Ordinal);
+        Assert.Contains("vm.PreviewUseOpenGl4 = settings.PreviewUseOpenGl4;", synchronizer, StringComparison.Ordinal);
+        Assert.Contains("settings.PreviewUseOpenGl4 = vm.PreviewUseOpenGl4;", synchronizer, StringComparison.Ordinal);
+        Assert.Contains("IsChecked=\"{Binding PreviewUseOpenGl4, Mode=TwoWay}\"", settingsTab, StringComparison.Ordinal);
+        Assert.Contains("[ObservableProperty] private bool _previewUseOpenGl4;", engineVm, StringComparison.Ordinal);
+        Assert.Contains("PreviewOpenGlRestartRequired", engineVm, StringComparison.Ordinal);
+        Assert.Contains("PreviewOpenGlPlatformConfigurator.CreateWin32PlatformOptions(settings)", program, StringComparison.Ordinal);
+        Assert.Contains("PreviewOpenGlSession.RequestedDesktopGl4 = settings.PreviewUseOpenGl4;", configurator, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void PreviewWglPresentation_WiresSwapIntervalToFpsCapToggle()
+    {
+        var previewControl = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Controls",
+            "GlPbrPreviewControl.cs");
+        var lifecycle = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "OpenGlPreviewBackend.Lifecycle.cs");
+        var wglPresentation = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "PreviewWglPresentation.cs");
+
+        Assert.Contains("ApplyPresentationVsync();", previewControl, StringComparison.Ordinal);
+        Assert.Contains("_backend.ConfigurePresentationVsync(_glInterface, _capFpsAt60);", previewControl, StringComparison.Ordinal);
+        Assert.Contains("ConfigurePresentationVsync(GlInterface glInterface, bool capFpsAt60)", lifecycle, StringComparison.Ordinal);
+        Assert.Contains("PreviewWglPresentation.TrySetSwapInterval(glInterface, interval)", lifecycle, StringComparison.Ordinal);
+        Assert.Contains("wglSwapIntervalEXT", wglPresentation, StringComparison.Ordinal);
     }
 
     private static string ThisFilePath([System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "") =>

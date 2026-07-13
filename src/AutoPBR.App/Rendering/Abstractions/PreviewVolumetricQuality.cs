@@ -135,7 +135,7 @@ public static class PreviewVolumetricQuality
     /// When final preview TAA is active, per-pass temporal can be reduced so histories do not double-smear
     /// the same noise/shimmer the composited TAA pass already stabilizes.
     /// </summary>
-    public static float EffectivePassTemporalWeight(float passWeight, in PreviewRenderSettings settings)
+    public static float EffectivePassTemporalWeight(float passWeight, in PreviewRenderSettingsSnapshot settings)
     {
         if (passWeight <= 0f || !settings.EnablePreviewTaa || settings.PreviewTaaTemporalScale <= 0f)
         {

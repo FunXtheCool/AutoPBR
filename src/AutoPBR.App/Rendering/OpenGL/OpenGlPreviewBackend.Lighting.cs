@@ -58,6 +58,7 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         gl.BindVertexArray(0);
+        _moonUniformLocs = ResolveMoonProgramUniformLocs(_moonProgram);
     }
 
     private void DestroyMoonBillboard()
@@ -129,55 +130,21 @@ public sealed partial class OpenGlPreviewBackend
 
         var viewProj = proj * view;
         _moonProgram.Use();
-        var vpLoc = _moonProgram.GetUniformLocation("uViewProj");
-        if (vpLoc >= 0)
-        {
-            var vpT = Matrix4x4.Transpose(viewProj);
-            gl.UniformMatrix4(vpLoc, 1, false, in vpT.M11);
-        }
-
-        SetMoonVec3(gl, "uMoonCenter", placement.Center);
-        SetMoonVec3(gl, "uMoonRight", placement.Right);
-        SetMoonVec3(gl, "uMoonUp", placement.Up);
-        SetMoonVec3(gl, "uMoonFacing", placement.Facing);
-        SetMoonVec3(gl, "uCameraPos", eye);
-        var rLoc = _moonProgram.GetUniformLocation("uRadius");
-        if (rLoc >= 0)
-        {
-            gl.Uniform1(rLoc, placement.Radius);
-        }
-
-        var moonCosLoc = _moonProgram.GetUniformLocation("uMoonCosDiscEdge");
-        if (moonCosLoc >= 0)
-        {
-            gl.Uniform1(moonCosLoc, placement.CosDiscEdge);
-        }
-
-        var strengthLoc = _moonProgram.GetUniformLocation("uDiscStrength");
-        if (strengthLoc >= 0)
-        {
-            gl.Uniform1(strengthLoc, Math.Max(discStrength, 0f));
-        }
-
-        var glowLoc = _moonProgram.GetUniformLocation("uGlowStrength");
-        if (glowLoc >= 0)
-        {
-            gl.Uniform1(glowLoc, Math.Max(glowStrength, 0f));
-        }
-
-        var sharpLoc = _moonProgram.GetUniformLocation("uTextureSharpness");
-        if (sharpLoc >= 0)
-        {
-            gl.Uniform1(sharpLoc, Math.Clamp(textureSharpness, 0f, 4f));
-        }
-
+        var m = _moonUniformLocs;
+        SetMatrixLoc(m.ViewProj, viewProj);
+        SetVec3Loc(m.MoonCenter, placement.Center);
+        SetVec3Loc(m.MoonRight, placement.Right);
+        SetVec3Loc(m.MoonUp, placement.Up);
+        SetVec3Loc(m.MoonFacing, placement.Facing);
+        SetVec3Loc(m.CameraPos, eye);
+        SetFloatLoc(m.Radius, placement.Radius);
+        SetFloatLoc(m.MoonCosDiscEdge, placement.CosDiscEdge);
+        SetFloatLoc(m.DiscStrength, Math.Max(discStrength, 0f));
+        SetFloatLoc(m.GlowStrength, Math.Max(glowStrength, 0f));
+        SetFloatLoc(m.TextureSharpness, Math.Clamp(textureSharpness, 0f, 4f));
         gl.ActiveTexture(TextureUnit.Texture0);
         _moonAlbedo.Bind(0);
-        var texLoc = _moonProgram.GetUniformLocation("uMoonAlbedo");
-        if (texLoc >= 0)
-        {
-            gl.Uniform1(texLoc, 0);
-        }
+        SetIntLoc(m.MoonAlbedo, 0);
 
         var blendWasEnabled = gl.IsEnabled(EnableCap.Blend);
         var depthTestWasEnabled = gl.IsEnabled(EnableCap.DepthTest);
@@ -314,6 +281,21 @@ public sealed partial class OpenGlPreviewBackend
             _atmoSkyViewProgram = null;
         }
 
+        if (_atmoTransProgram is { IsValid: true })
+        {
+            _atmoTransUniformLocs = ResolveAtmoTransUniformLocs(_atmoTransProgram);
+        }
+
+        if (_atmoSkyViewProgram is { IsValid: true })
+        {
+            _atmoSkyViewUniformLocs = ResolveAtmoSkyViewUniformLocs(_atmoSkyViewProgram);
+        }
+
+        if (_atmoSkyProgram is { IsValid: true })
+        {
+            _atmoSkyUniformLocs = ResolveAtmoSkyUniformLocs(_atmoSkyProgram);
+        }
+
         if (!TryCreateAtmosphereTargets(gl))
         {
             EmitDiagnostic("[3D preview] Atmosphere LUT targets unavailable; procedural sky only.");
@@ -428,7 +410,7 @@ public sealed partial class OpenGlPreviewBackend
         return userIntensity * (0.08f + 0.92f * dayFactor);
     }
 
-    private void EnsureAtmosphereLuts(GL gl, Vector3 worldLightDir, PreviewRenderSettings settings)
+    private void EnsureAtmosphereLuts(GL gl, Vector3 worldLightDir, PreviewRenderSettingsSnapshot settings)
     {
         if (_atmoTransProgram is not { IsValid: true } || _atmoSkyViewProgram is not { IsValid: true } ||
             _atmoTransmittanceFbo == 0 || _atmoSkyViewFbo == 0 || _atmoQuadVao == 0)
@@ -474,8 +456,9 @@ public sealed partial class OpenGlPreviewBackend
         gl.Viewport(0, 0, 256u, 64u);
         gl.Clear(ClearBufferMask.ColorBufferBit);
         _atmoTransProgram!.Use();
-        SetFloatOnProgram(_atmoTransProgram, "uTurbidity", settings.AtmosphereTurbidity);
-        SetFloatOnProgram(_atmoTransProgram, "uHorizonFalloff", settings.AtmosphereHorizonFalloff);
+        var trans = _atmoTransUniformLocs;
+        SetFloatOnProgramLoc(_atmoTransProgram, trans.Turbidity, settings.AtmosphereTurbidity);
+        SetFloatOnProgramLoc(_atmoTransProgram, trans.HorizonFalloff, settings.AtmosphereHorizonFalloff);
         gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
 
         gl.BindFramebuffer(FramebufferTarget.Framebuffer, _atmoSkyViewFbo);
@@ -485,12 +468,13 @@ public sealed partial class OpenGlPreviewBackend
         _atmoSkyViewProgram!.Use();
         gl.ActiveTexture(TextureUnit.Texture0);
         gl.BindTexture(TextureTarget.Texture2D, _atmoTransmittanceTex);
-        SetIntOnProgram(_atmoSkyViewProgram, "uTransmittanceLut", 0);
-        SetVec3OnProgram(_atmoSkyViewProgram, "uSunDir", worldLightDir);
-        SetFloatOnProgram(_atmoSkyViewProgram, "uTurbidity", settings.AtmosphereTurbidity);
-        SetFloatOnProgram(_atmoSkyViewProgram, "uSunIntensity",
+        var skyView = _atmoSkyViewUniformLocs;
+        SetIntOnProgramLoc(_atmoSkyViewProgram, skyView.TransmittanceLut, 0);
+        SetVec3OnProgramLoc(_atmoSkyViewProgram, skyView.SunDir, worldLightDir);
+        SetFloatOnProgramLoc(_atmoSkyViewProgram, skyView.Turbidity, settings.AtmosphereTurbidity);
+        SetFloatOnProgramLoc(_atmoSkyViewProgram, skyView.SunIntensity,
             EffectiveAtmosphereSunIntensity(worldLightDir, settings.AtmosphereSunIntensity));
-        SetFloatOnProgram(_atmoSkyViewProgram, "uHorizonFalloff", settings.AtmosphereHorizonFalloff);
+        SetFloatOnProgramLoc(_atmoSkyViewProgram, skyView.HorizonFalloff, settings.AtmosphereHorizonFalloff);
         gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
 
         gl.BindVertexArray(0);
@@ -585,25 +569,25 @@ public sealed partial class OpenGlPreviewBackend
                 gl.BindTexture(TextureTarget.Texture2D, _atmoSkyViewTex);
             }
 
-            SetIntOnProgram(_atmoSkyProgram, "uSkyViewLut", 0);
-            SetIntOnProgram(_atmoSkyProgram, "uLutValid", lutSkyReady && _atmoSkyViewTex != 0 ? 1 : 0);
-            SetFloatOnProgram(_atmoSkyProgram, "uTurbidity", frame.Settings.AtmosphereTurbidity);
-            SetFloatOnProgram(_atmoSkyProgram, "uHorizonFalloff", frame.Settings.AtmosphereHorizonFalloff);
-            SetMatrixOnProgram(_atmoSkyProgram, "uInvViewProj", invViewProj);
-            SetVec3OnProgram(_atmoSkyProgram, "uCameraPos", frame.Eye);
-            SetVec3OnProgram(_atmoSkyProgram, "uLightDir", frame.WorldLightDir);
-            SetFloatOnProgram(_atmoSkyProgram, "uSunIntensity", frame.Settings.AtmosphereSunIntensity);
-            SetFloatOnProgram(_atmoSkyProgram, "uHorizonFogStrength",
+            var sky = _atmoSkyUniformLocs;
+            SetIntOnProgramLoc(_atmoSkyProgram, sky.SkyViewLut, 0);
+            SetFloatOnProgramLoc(_atmoSkyProgram, sky.Turbidity, frame.Settings.AtmosphereTurbidity);
+            SetFloatOnProgramLoc(_atmoSkyProgram, sky.HorizonFalloff, frame.Settings.AtmosphereHorizonFalloff);
+            SetMatrixOnProgramLoc(_atmoSkyProgram, sky.InvViewProj, invViewProj);
+            SetVec3OnProgramLoc(_atmoSkyProgram, sky.CameraPos, frame.Eye);
+            SetVec3OnProgramLoc(_atmoSkyProgram, sky.LightDir, frame.WorldLightDir);
+            SetFloatOnProgramLoc(_atmoSkyProgram, sky.SunIntensity, frame.Settings.AtmosphereSunIntensity);
+            SetFloatOnProgramLoc(_atmoSkyProgram, sky.HorizonFogStrength,
                 frame.Settings.EnableAtmosphericSky ? frame.Settings.AerialFogStrength : 0f);
-            SetFloatOnProgram(_atmoSkyProgram, "uGroundWorldY", PreviewStageConstants.GroundPlaneWorldY);
-            SetFloatOnProgram(_atmoSkyProgram, "uSkyExposure", frame.Settings.AtmosphereSkyExposure);
-            SetFloatOnProgram(_atmoSkyProgram, "uSunDiscStrength", frame.Settings.AtmosphereSunDiscStrength);
-            SetFloatOnProgram(_atmoSkyProgram, "uSunDiscBrightness", frame.Settings.AtmosphereSunDiscBrightness);
-            SetFloatOnProgram(_atmoSkyProgram, "uSunCosDiscEdge", sunCosDiscEdge);
-            SetFloatOnProgram(_atmoSkyProgram, "uMoonCosDiscEdge", moonCosDiscEdge);
-            SetFloatOnProgram(_atmoSkyProgram, "uRenderTime", (float)frame.RenderTime);
-            SetFloatOnProgram(_atmoSkyProgram, "uViewportAspect", aspect);
-            SetFloatOnProgram(_atmoSkyProgram, "uSunDiscRadiusUv", sunDiscRadiusUv);
+            SetFloatOnProgramLoc(_atmoSkyProgram, sky.GroundWorldY, PreviewStageConstants.GroundPlaneWorldY);
+            SetFloatOnProgramLoc(_atmoSkyProgram, sky.SkyExposure, frame.Settings.AtmosphereSkyExposure);
+            SetFloatOnProgramLoc(_atmoSkyProgram, sky.SunDiscStrength, frame.Settings.AtmosphereSunDiscStrength);
+            SetFloatOnProgramLoc(_atmoSkyProgram, sky.SunDiscBrightness, frame.Settings.AtmosphereSunDiscBrightness);
+            SetFloatOnProgramLoc(_atmoSkyProgram, sky.SunCosDiscEdge, sunCosDiscEdge);
+            SetFloatOnProgramLoc(_atmoSkyProgram, sky.MoonCosDiscEdge, moonCosDiscEdge);
+            SetFloatOnProgramLoc(_atmoSkyProgram, sky.RenderTime, (float)frame.RenderTime);
+            SetFloatOnProgramLoc(_atmoSkyProgram, sky.ViewportAspect, aspect);
+            SetFloatOnProgramLoc(_atmoSkyProgram, sky.SunDiscRadiusUv, sunDiscRadiusUv);
             gl.BindVertexArray(_atmoQuadVao);
             gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
             gl.BindVertexArray(0);
@@ -620,27 +604,28 @@ public sealed partial class OpenGlPreviewBackend
         if (TryEnsureProceduralSkyProgram())
         {
             _proceduralSkyProgram!.Use();
-            SetMatrixOnProgram(_proceduralSkyProgram, "uInvViewProj", invViewProj);
-            SetVec3OnProgram(_proceduralSkyProgram, "uCameraPos", frame.Eye);
-            SetVec3OnProgram(_proceduralSkyProgram, "uLightDir", frame.WorldLightDir);
-            SetFloatOnProgram(_proceduralSkyProgram, "uSunIntensity", frame.Settings.AtmosphereSunIntensity);
-            SetFloatOnProgram(_proceduralSkyProgram, "uSkyExposure", frame.Settings.AtmosphereSkyExposure);
-            SetFloatOnProgram(_proceduralSkyProgram, "uRenderTime", (float)frame.RenderTime);
-            SetFloatOnProgram(_proceduralSkyProgram, "uTurbidity", frame.Settings.AtmosphereTurbidity);
-            SetFloatOnProgram(_proceduralSkyProgram, "uHorizonFalloff", frame.Settings.AtmosphereHorizonFalloff);
-            SetFloatOnProgram(_proceduralSkyProgram, "uHorizonFogStrength",
+            var proc = _proceduralSkyUniformLocs;
+            SetMatrixLoc(proc.InvViewProj, invViewProj);
+            SetVec3Loc(proc.CameraPos, frame.Eye);
+            SetVec3Loc(proc.LightDir, frame.WorldLightDir);
+            SetFloatLoc(proc.SunIntensity, frame.Settings.AtmosphereSunIntensity);
+            SetFloatLoc(proc.SkyExposure, frame.Settings.AtmosphereSkyExposure);
+            SetFloatLoc(proc.RenderTime, (float)frame.RenderTime);
+            SetFloatLoc(proc.Turbidity, frame.Settings.AtmosphereTurbidity);
+            SetFloatLoc(proc.HorizonFalloff, frame.Settings.AtmosphereHorizonFalloff);
+            SetFloatLoc(proc.HorizonFogStrength,
                 frame.Settings.EnableAtmosphericSky ? frame.Settings.AerialFogStrength : 0f);
-            SetFloatOnProgram(_proceduralSkyProgram, "uGroundWorldY", PreviewStageConstants.GroundPlaneWorldY);
-            SetFloatOnProgram(_proceduralSkyProgram, "uSunDiscStrength", frame.Settings.AtmosphereSunDiscStrength);
-            SetFloatOnProgram(_proceduralSkyProgram, "uSunDiscBrightness", frame.Settings.AtmosphereSunDiscBrightness);
-            SetFloatOnProgram(_proceduralSkyProgram, "uSunCosDiscEdge", sunCosDiscEdge);
-            SetFloatOnProgram(_proceduralSkyProgram, "uMoonCosDiscEdge", moonCosDiscEdge);
-            SetFloatOnProgram(_proceduralSkyProgram, "uViewportAspect", aspect);
-            SetFloatOnProgram(_proceduralSkyProgram, "uSunDiscRadiusUv", sunDiscRadiusUv);
+            SetFloatLoc(proc.GroundWorldY, PreviewStageConstants.GroundPlaneWorldY);
+            SetFloatLoc(proc.SunDiscStrength, frame.Settings.AtmosphereSunDiscStrength);
+            SetFloatLoc(proc.SunDiscBrightness, frame.Settings.AtmosphereSunDiscBrightness);
+            SetFloatLoc(proc.SunCosDiscEdge, sunCosDiscEdge);
+            SetFloatLoc(proc.MoonCosDiscEdge, moonCosDiscEdge);
+            SetFloatLoc(proc.ViewportAspect, aspect);
+            SetFloatLoc(proc.SunDiscRadiusUv, sunDiscRadiusUv);
             var sunElev = frame.WorldLightDir.LengthSquared() > 1e-12f
                 ? Math.Max(Vector3.Normalize(-frame.WorldLightDir).Y, 0f)
                 : 0f;
-            SetFloatOnProgram(_proceduralSkyProgram, "uSunElevation", sunElev);
+            SetFloatLoc(proc.SunElevation, sunElev);
             gl.BindVertexArray(_atmoQuadVao);
             gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
             gl.BindVertexArray(0);

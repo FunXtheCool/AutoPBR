@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 
 using Silk.NET.OpenGL;
@@ -23,9 +24,9 @@ internal sealed class GlShaderCompileContext
     }
 
     public GlShaderProgram CreateProgram(string vertexFile, string fragmentFile, out string? error,
-        string? debugLabel = null)
+        string? debugLabel = null, IReadOnlyDictionary<string, int>? defines = null)
     {
-        return CreateProgram(vertexFile, tessControlFile: null, tessEvaluationFile: null, fragmentFile, out error, debugLabel);
+        return CreateProgram(vertexFile, tessControlFile: null, tessEvaluationFile: null, fragmentFile, out error, debugLabel, defines);
     }
 
     public GlShaderProgram CreateProgram(
@@ -34,7 +35,8 @@ internal sealed class GlShaderCompileContext
         string? tessEvaluationFile,
         string fragmentFile,
         out string? error,
-        string? debugLabel = null)
+        string? debugLabel = null,
+        IReadOnlyDictionary<string, int>? defines = null)
     {
         error = null;
         var label = string.IsNullOrWhiteSpace(debugLabel) ? fragmentFile : debugLabel;
@@ -58,7 +60,7 @@ internal sealed class GlShaderCompileContext
                 (vertexFile, ShaderType.VertexShader),
                 (fragmentFile, ShaderType.FragmentShader)
             };
-        var programKey = GlslPreparedSourceCache.ComputeProgramKey(_useOpenGlEs, _cacheIdentity, stages);
+        var programKey = GlslPreparedSourceCache.ComputeProgramKey(_useOpenGlEs, _cacheIdentity, stages, defines);
 
         if (_binaryCache.TryLoad(programKey, out var binaryFormat, out var binaryBytes) &&
             TryLinkFromBinary(binaryBytes, binaryFormat, label, ref error, out var fromCache))
@@ -72,14 +74,14 @@ internal sealed class GlShaderCompileContext
         string fSrc;
         try
         {
-            vSrc = GlslPreparedSourceCache.GetOrPrepare(vertexFile, ShaderType.VertexShader, _useOpenGlEs);
+            vSrc = GlslPreparedSourceCache.GetOrPrepare(vertexFile, ShaderType.VertexShader, _useOpenGlEs, defines);
             if (hasTessellation)
             {
-                tcSrc = GlslPreparedSourceCache.GetOrPrepare(tessControlFile!, ShaderType.TessControlShader, _useOpenGlEs);
-                teSrc = GlslPreparedSourceCache.GetOrPrepare(tessEvaluationFile!, ShaderType.TessEvaluationShader, _useOpenGlEs);
+                tcSrc = GlslPreparedSourceCache.GetOrPrepare(tessControlFile!, ShaderType.TessControlShader, _useOpenGlEs, defines);
+                teSrc = GlslPreparedSourceCache.GetOrPrepare(tessEvaluationFile!, ShaderType.TessEvaluationShader, _useOpenGlEs, defines);
             }
 
-            fSrc = GlslPreparedSourceCache.GetOrPrepare(fragmentFile, ShaderType.FragmentShader, _useOpenGlEs);
+            fSrc = GlslPreparedSourceCache.GetOrPrepare(fragmentFile, ShaderType.FragmentShader, _useOpenGlEs, defines);
         }
         catch (Exception ex)
         {

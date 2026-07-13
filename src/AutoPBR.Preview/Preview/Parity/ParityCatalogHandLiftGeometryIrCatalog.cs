@@ -306,17 +306,17 @@ internal static class ParityCatalogHandLiftGeometryIrCatalog
                 "neck",
                 new JsonArray
                 {
-                    PotBaseCuboid(4, 17, 4, 12, 20, 12, 0, 0),
-                    PotBaseCuboid(5, 20, 5, 11, 21, 11, 0, 5),
+                    PotBaseCuboid(4, 17, 4, 12, 20, 12, 0, 0, inflate: -0.1f),
+                    PotBaseCuboid(5, 20, 5, 11, 21, 11, 0, 5, inflate: 0.2f),
                 },
                 0, 37, 16, pi, 0, 0),
             PartWithCuboidPose(
                 "top",
-                PotCapCuboid(EntityModelRuntime.DecoratedPotCapTexCropRawU, EntityModelRuntime.DecoratedPotCapTexCropV),
+                PotCapCuboid("up", EntityModelRuntime.DecoratedPotCapTexCropRawU, EntityModelRuntime.DecoratedPotCapTexCropV),
                 1, 16, 1),
             PartWithCuboidPose(
                 "bottom",
-                PotCapCuboid(EntityModelRuntime.DecoratedPotCapTexCropRawU, EntityModelRuntime.DecoratedPotCapTexCropV),
+                PotCapCuboid("down", EntityModelRuntime.DecoratedPotCapTexCropRawU, EntityModelRuntime.DecoratedPotCapTexCropV),
                 1, 0, 1),
             PartWithCuboidPose(
                 "back",
@@ -363,7 +363,7 @@ internal static class ParityCatalogHandLiftGeometryIrCatalog
         return ("net.minecraft.client.model.DecoratedPotModel.previewComposite", JsonDocument.Parse(doc.ToJsonString()));
     }
 
-    private static JsonObject PotCapCuboid(int u, int v)
+    private static JsonObject PotCapCuboid(string exteriorFace, int u, int v)
     {
         var c = new JsonObject
         {
@@ -372,7 +372,7 @@ internal static class ParityCatalogHandLiftGeometryIrCatalog
             ["uvOrigin"] = new JsonArray { u, v },
             ["uvSpan"] = new JsonArray { 14, 0, 14 },
             ["textureKey"] = "#base",
-            ["faceMask"] = new JsonArray { "down" },
+            ["faceMask"] = new JsonArray { exteriorFace },
             ["liftKind"] = "exact",
         };
         return c;
@@ -380,10 +380,16 @@ internal static class ParityCatalogHandLiftGeometryIrCatalog
 
     private static JsonObject PotBaseCuboid(
         float x0, float y0, float z0, float x1, float y1, float z1, int u, int v,
-        int? uvW = null, int? uvH = null, int? uvD = null)
+        int? uvW = null, int? uvH = null, int? uvD = null,
+        float? inflate = null)
     {
         var c = CuboidNode(x0, y0, z0, x1, y1, z1, u, v, uvW, uvH, uvD);
         c["textureKey"] = "#base";
+        if (inflate is not null)
+        {
+            c["inflate"] = inflate.Value;
+        }
+
         return c;
     }
 

@@ -29,6 +29,7 @@ public sealed partial class OpenGlPreviewBackend
     private int _cloudDeferredCompositeRetries;
     private int _loggedCloudDeferredCompositeMiss;
     private int _cloudTierReadyWarmupDraws;
+    private int _loggedCloudDrawGlError;
 
     private void TryInitVolumetricClouds(GL gl, bool useOpenGlEs)
     {
@@ -42,6 +43,8 @@ public sealed partial class OpenGlPreviewBackend
             return;
         }
 
+        _cloudUniformLocs = ResolveCloudUniformLocs(_cloudProgram);
+
         // Depth-aware half-res upsample; non-fatal, falls back to the god-ray composite blit.
         _cloudUpsampleProgram = CreatePreviewProgram("genesis_godrays.vert", "genesis_clouds_upsample.frag",
             out var upErr, "clouds-upsample");
@@ -50,6 +53,15 @@ public sealed partial class OpenGlPreviewBackend
             EmitDiagnostic("[3D preview] Cloud upsample shader: " + (upErr ?? "link failed"));
             _cloudUpsampleProgram?.Dispose();
             _cloudUpsampleProgram = null;
+        }
+        else
+        {
+            _cloudUpsampleUniformLocs = ResolveCloudUpsampleUniformLocs(_cloudUpsampleProgram);
+        }
+
+        if (_godRayCompositeProgram is { IsValid: true })
+        {
+            _cloudCompositeUniformLocs = ResolveCloudCompositeUniformLocs(_godRayCompositeProgram);
         }
 
         _cloudNoiseTex = new GlTexture3D(gl);
@@ -146,6 +158,7 @@ public sealed partial class OpenGlPreviewBackend
         _loggedCloudDraw = false;
         _cloudDeferredCompositeRetries = 0;
         _loggedCloudDeferredCompositeMiss = 0;
+        _loggedCloudDrawGlError = 0;
         _cloudTierReadyWarmupDraws = 0;
 
         if (gl is null)
@@ -167,7 +180,7 @@ public sealed partial class OpenGlPreviewBackend
         }
     }
 
-    private bool CanDrawVolumetricClouds(in PreviewRenderSettings settings) =>
+    private bool CanDrawVolumetricClouds(in PreviewRenderSettingsSnapshot settings) =>
         settings.EnableVolumetricClouds &&
         _cloudProgram is { IsValid: true } &&
         _cloudQuadVao != 0;
@@ -193,7 +206,7 @@ public sealed partial class OpenGlPreviewBackend
     /// Disabled when god rays are active: god-ray history + preview TAA already stabilize the composited
     /// frame; stacking cloud history caused a visible frustum over the sky layer.
     /// </summary>
-    private static bool ShouldUseCloudShaderTemporal(in PreviewRenderSettings settings, bool godRaysActive)
+    private static bool ShouldUseCloudShaderTemporal(in PreviewRenderSettingsSnapshot settings, bool godRaysActive)
     {
         if (godRaysActive || settings.CloudDisableTemporal ||
             settings.CloudDebugView != PreviewCloudDebugView.Off)
@@ -205,7 +218,7 @@ public sealed partial class OpenGlPreviewBackend
         return profile.CloudTemporalWeight > 0f;
     }
 
-    private static bool CanUseCloudTemporalReproject(in PreviewRenderSettings settings)
+    private static bool CanUseCloudTemporalReproject(in PreviewRenderSettingsSnapshot settings)
     {
         return ShouldUseCloudShaderTemporal(settings, godRaysActive: false);
     }
@@ -278,6 +291,9 @@ public sealed partial class OpenGlPreviewBackend
         BindCloudShaderUniforms(frame, invViewProj, viewProj, layerWorldY, profile, useDepthGate, useTemporalReproject);
 
         var priorBlend = gl.IsEnabled(EnableCap.Blend);
+        var priorScissor = gl.IsEnabled(EnableCap.ScissorTest);
+        var priorColorMask = new bool[4];
+        gl.GetBoolean(GetPName.ColorWritemask, priorColorMask);
         if (!useOffscreen)
         {
             gl.Enable(EnableCap.Blend);
@@ -286,11 +302,26 @@ public sealed partial class OpenGlPreviewBackend
 
         gl.Disable(EnableCap.DepthTest);
         gl.DepthMask(false);
+        gl.Disable(EnableCap.ScissorTest);
+        gl.ColorMask(true, true, true, true);
+        FlushPendingGlErrors(gl);
         gl.BindVertexArray(_cloudQuadVao);
         gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
+        var cloudDrawErr = gl.GetError();
         gl.BindVertexArray(0);
         gl.DepthMask(true);
         gl.Enable(EnableCap.DepthTest);
+        gl.ColorMask(priorColorMask[0], priorColorMask[1], priorColorMask[2], priorColorMask[3]);
+        if (priorScissor)
+        {
+            gl.Enable(EnableCap.ScissorTest);
+        }
+
+        if (cloudDrawErr != GLEnum.NoError && _loggedCloudDrawGlError == 0)
+        {
+            _loggedCloudDrawGlError = 1;
+            EmitDiagnostic($"[3D preview] Volumetric cloud draw GL error: {cloudDrawErr}");
+        }
 
         if (useOffscreen)
         {
@@ -310,6 +341,11 @@ public sealed partial class OpenGlPreviewBackend
                     _cloudFramePhase -= 1f;
                 }
             }
+        }
+
+        if (useOffscreen && deferComposite)
+        {
+            BindDefaultFramebuffer(ref frame);
         }
 
         if (!priorBlend && !useOffscreen)
@@ -341,7 +377,7 @@ public sealed partial class OpenGlPreviewBackend
     {
         var gl = frame.Gl;
         var settings = frame.Settings;
-        _cloudProgram!.Use();
+        var cu = _cloudUniformLocs;
 
         // GLES/ANGLE: sampler uniforms default to texture unit 0, and draw validation
         // rejects a program whose samplers of different types (sampler3D uCloudNoise vs
@@ -352,42 +388,42 @@ public sealed partial class OpenGlPreviewBackend
         // happened to route through the clouds-only path that assigns them. Pin every
         // sampler to its own unit unconditionally; the uHas*/uGateSkyDepth flags keep
         // unbound units from being sampled.
-        SetIntOnProgram(_cloudProgram, "uCloudNoise", 0);
-        SetIntOnProgram(_cloudProgram, "uCoverageMap", 1);
-        SetIntOnProgram(_cloudProgram, "uSkyViewLut", 2);
-        SetIntOnProgram(_cloudProgram, "uDetailNoise", 3);
-        SetIntOnProgram(_cloudProgram, "uSceneDepth", 5);
-        SetIntOnProgram(_cloudProgram, "uPrevClouds", 6);
+        SetIntOnProgramLoc(_cloudProgram, cu.CloudNoise, 0);
+        SetIntOnProgramLoc(_cloudProgram, cu.CoverageMap, 1);
+        SetIntOnProgramLoc(_cloudProgram, cu.SkyViewLut, 2);
+        SetIntOnProgramLoc(_cloudProgram, cu.DetailNoise, 3);
+        SetIntOnProgramLoc(_cloudProgram, cu.SceneDepth, 5);
+        SetIntOnProgramLoc(_cloudProgram, cu.PrevClouds, 6);
 
-        SetMatrixOnProgram(_cloudProgram, "uInvViewProj", invViewProj);
-        SetMatrixOnProgram(_cloudProgram, "uPrevViewProj", _cloudPrevViewProj);
-        SetVec3OnProgram(_cloudProgram, "uCameraPos", frame.Eye);
-        SetVec3OnProgram(_cloudProgram, "uSunDir", frame.LightDir);
-        SetFloatOnProgram(_cloudProgram, "uSunIntensity", settings.AtmosphereSunIntensity);
-        SetFloatOnProgram(_cloudProgram, "uSkyExposure", settings.AtmosphereSkyExposure);
-        SetFloatOnProgram(_cloudProgram, "uLayerHeight", layerWorldY);
-        SetFloatOnProgram(_cloudProgram, "uVolumeHeight", settings.CloudVolumeHeight);
-        SetFloatOnProgram(_cloudProgram, "uDensity", settings.CloudDensity);
-        SetFloatOnProgram(_cloudProgram, "uCoverageScale", settings.CloudCoverageScale);
-        SetFloatOnProgram(_cloudProgram, "uVolumeSize", settings.CloudVolumeSize);
+        SetFloatOnProgramLoc(_cloudProgram, cu.SunIntensity, settings.AtmosphereSunIntensity);
+        SetFloatOnProgramLoc(_cloudProgram, cu.SkyExposure, settings.AtmosphereSkyExposure);
+        SetFloatOnProgramLoc(_cloudProgram, cu.LayerHeight, layerWorldY);
+        SetFloatOnProgramLoc(_cloudProgram, cu.VolumeHeight, settings.CloudVolumeHeight);
+        SetFloatOnProgramLoc(_cloudProgram, cu.Density, settings.CloudDensity);
+        SetFloatOnProgramLoc(_cloudProgram, cu.CoverageScale, settings.CloudCoverageScale);
+        SetFloatOnProgramLoc(_cloudProgram, cu.VolumeSize, settings.CloudVolumeSize);
+        SetIntOnProgramLoc(_cloudProgram, cu.Quality, profile.CloudQuality);
+        SetIntOnProgramLoc(_cloudProgram, cu.MarchSteps, Math.Clamp(settings.CloudMarchStepOverride, 0, 64));
+        SetIntOnProgramLoc(_cloudProgram, cu.DebugView, (int)settings.CloudDebugView);
+        SetMatrixOnProgramLoc(_cloudProgram, cu.InvViewProj, invViewProj);
+        SetMatrixOnProgramLoc(_cloudProgram, cu.PrevViewProj, _cloudPrevViewProj);
+        SetVec3OnProgramLoc(_cloudProgram, cu.CameraPos, frame.Eye);
+        SetVec3OnProgramLoc(_cloudProgram, cu.SunDir, frame.LightDir);
         var windTime = settings.CloudFreezeWind ? 0.0 : frame.RenderTime;
-        SetVec3OnProgram(_cloudProgram, "uWindOffset", ComputeCloudWindOffset(windTime, settings));
-        SetFloatOnProgram(_cloudProgram, "uCirrusStrength", settings.CloudCirrusStrength);
-        SetVec2OnProgram(_cloudProgram, "uCirrusWindOffset", ComputeCirrusWindOffset(windTime, settings));
-        SetIntOnProgram(_cloudProgram, "uQuality", profile.CloudQuality);
-        SetIntOnProgram(_cloudProgram, "uMarchSteps", Math.Clamp(settings.CloudMarchStepOverride, 0, 64));
-        SetIntOnProgram(_cloudProgram, "uDebugView", (int)settings.CloudDebugView);
-        SetIntOnProgram(_cloudProgram, "uGateSkyDepth", useDepthGate ? 1 : 0);
-        SetFloatOnProgram(_cloudProgram, "uTemporalWeight",
+        SetVec3OnProgramLoc(_cloudProgram, cu.WindOffset, ComputeCloudWindOffset(windTime, settings));
+        SetFloatOnProgramLoc(_cloudProgram, cu.CirrusStrength, settings.CloudCirrusStrength);
+        SetVec2OnProgramLoc(_cloudProgram, cu.CirrusWindOffset, ComputeCirrusWindOffset(windTime, settings));
+        SetIntOnProgramLoc(_cloudProgram, cu.GateSkyDepth, useDepthGate ? 1 : 0);
+        SetFloatOnProgramLoc(_cloudProgram, cu.TemporalWeight,
             useTemporalReproject
                 ? PreviewVolumetricQuality.EffectivePassTemporalWeight(profile.CloudTemporalWeight, settings)
                 : 0f);
-        SetFloatOnProgram(_cloudProgram, "uFramePhase", _cloudFramePhase);
-        SetIntOnProgram(_cloudProgram, "uHasCloudNoise", _cloudNoiseTex is not null ? 1 : 0);
-        SetIntOnProgram(_cloudProgram, "uHasDetailNoise", _cloudDetailTex is not null ? 1 : 0);
-        SetIntOnProgram(_cloudProgram, "uHasCoverageMap", _cloudCoverageTex is not null ? 1 : 0);
-        SetIntOnProgram(_cloudProgram, "uHasSkyLut", _atmoLutsValid && _atmoSkyViewTex != 0 ? 1 : 0);
-        SetIntOnProgram(_cloudProgram, "uHasPrevClouds",
+        SetFloatOnProgramLoc(_cloudProgram, cu.FramePhase, _cloudFramePhase);
+        SetIntOnProgramLoc(_cloudProgram, cu.HasCloudNoise, _cloudNoiseTex is not null ? 1 : 0);
+        SetIntOnProgramLoc(_cloudProgram, cu.HasDetailNoise, _cloudDetailTex is not null ? 1 : 0);
+        SetIntOnProgramLoc(_cloudProgram, cu.HasCoverageMap, _cloudCoverageTex is not null ? 1 : 0);
+        SetIntOnProgramLoc(_cloudProgram, cu.HasSkyLut, _atmoLutsValid && _atmoSkyViewTex != 0 ? 1 : 0);
+        SetIntOnProgramLoc(_cloudProgram, cu.HasPrevClouds,
             useTemporalReproject && _cloudHistoryValid ? 1 : 0);
 
         if (_cloudNoiseTex is not null)
@@ -429,7 +465,7 @@ public sealed partial class OpenGlPreviewBackend
     /// (volumeSize * 4); the shape (×2) and detail (×1 in offset space) periods divide it evenly,
     /// so the wrap never produces a visible snap, and floats stay small over long sessions.
     /// </summary>
-    private static Vector3 ComputeCloudWindOffset(double renderTime, in PreviewRenderSettings settings)
+    private static Vector3 ComputeCloudWindOffset(double renderTime, in PreviewRenderSettingsSnapshot settings)
     {
         var period = Math.Max(settings.CloudVolumeSize, 8f) * 4f;
         var heading = settings.CloudWindHeadingDegrees * (MathF.PI / 180f);
@@ -444,7 +480,7 @@ public sealed partial class OpenGlPreviewBackend
     /// veered, as real upper winds are. The cirrus noise is procedural (non-tiling), so the
     /// offset stays unwrapped; float precision is ample for multi-hour preview sessions.
     /// </summary>
-    private static Vector2 ComputeCirrusWindOffset(double renderTime, in PreviewRenderSettings settings)
+    private static Vector2 ComputeCirrusWindOffset(double renderTime, in PreviewRenderSettingsSnapshot settings)
     {
         var heading = (settings.CloudWindHeadingDegrees + 18f) * (MathF.PI / 180f);
         var travel = (float)(renderTime * settings.CloudWindSpeed * 2.4);
@@ -464,36 +500,49 @@ public sealed partial class OpenGlPreviewBackend
         var gl = frame.Gl;
         BindDefaultFramebuffer(ref frame);
         var priorBlend = gl.IsEnabled(EnableCap.Blend);
+        var priorScissor = gl.IsEnabled(EnableCap.ScissorTest);
+        var priorColorMask = new bool[4];
+        gl.GetBoolean(GetPName.ColorWritemask, priorColorMask);
         gl.Enable(EnableCap.Blend);
         gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
         gl.Disable(EnableCap.DepthTest);
+        gl.Disable(EnableCap.ScissorTest);
+        gl.ColorMask(true, true, true, true);
+        FlushPendingGlErrors(gl);
         gl.BindVertexArray(_godRayQuadVao);
         program.Use();
         gl.ActiveTexture(TextureUnit.Texture0);
         gl.BindTexture(TextureTarget.Texture2D, _cloudRenderTarget.ColorTextureHandle);
         if (useUpsample)
         {
-            SetIntOnProgram(program, "uClouds", 0);
-            SetVec2OnProgram(program, "uCloudTexelSize", new Vector2(
+            var upu = _cloudUpsampleUniformLocs;
+            SetIntOnProgramLoc(program, upu.Clouds, 0);
+            SetVec2OnProgramLoc(program, upu.CloudTexelSize, new Vector2(
                 1f / Math.Max(_cloudRenderTarget.Width, 1),
                 1f / Math.Max(_cloudRenderTarget.Height, 1)));
             var hasDepth = _sceneCapture is { IsValid: true };
-            SetIntOnProgram(program, "uHasSceneDepth", hasDepth ? 1 : 0);
+            SetIntOnProgramLoc(program, upu.HasSceneDepth, hasDepth ? 1 : 0);
             if (hasDepth)
             {
                 gl.ActiveTexture(TextureUnit.Texture1);
                 gl.BindTexture(TextureTarget.Texture2D, _sceneCapture!.DepthTextureHandle);
-                SetIntOnProgram(program, "uSceneDepth", 1);
+                SetIntOnProgramLoc(program, upu.SceneDepth, 1);
             }
         }
         else
         {
-            SetIntOnProgram(program, "uRays", 0);
+            SetIntOnProgramLoc(program, _cloudCompositeUniformLocs.Rays, 0);
         }
 
         gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
         gl.BindVertexArray(0);
         gl.Enable(EnableCap.DepthTest);
+        gl.ColorMask(priorColorMask[0], priorColorMask[1], priorColorMask[2], priorColorMask[3]);
+        if (priorScissor)
+        {
+            gl.Enable(EnableCap.ScissorTest);
+        }
+
         if (!priorBlend)
         {
             gl.Disable(EnableCap.Blend);

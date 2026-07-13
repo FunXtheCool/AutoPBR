@@ -26,9 +26,24 @@ public sealed class PreviewVolumeInjectShaderEsTests
     {
         var adapted = ResolveAndAdapt(fragmentFile);
         Assert.Contains("FragColor = viPackFroxelInject(mediumRho, uLightColor", adapted, StringComparison.Ordinal);
+        Assert.Contains("#define GENESIS_GLES 1", adapted, StringComparison.Ordinal);
+        Assert.Contains("injectOut.r = mediumRho;", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("vec4 packed;", adapted, StringComparison.Ordinal);
         Assert.DoesNotContain("return;", adapted, StringComparison.Ordinal);
         Assert.DoesNotContain("vcFbm", adapted, StringComparison.Ordinal);
         Assert.DoesNotContain("vmMediumDensity", adapted, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData("genesis_volume_inject.frag")]
+    [InlineData("genesis_volume_inject_lite.frag")]
+    public void DesktopVolumeInject_UsesDesktopPackHelper(string fragmentFile)
+    {
+        var adapted = ResolveAndAdapt(fragmentFile, useOpenGlEs: false);
+        Assert.Contains("return vec4(mediumRho, sunLit.x, sunLit.y, occ);", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("#define GENESIS_GLES 1", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("vec4 packed;", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("injectOut.r = mediumRho;", adapted, StringComparison.Ordinal);
     }
 
     [Theory]
@@ -93,11 +108,11 @@ public sealed class PreviewVolumeInjectShaderEsTests
         // the clouds toggle had no visible effect.
         var adapted = ResolveAndAdapt("genesis_clouds.frag");
         var densityEx = adapted.IndexOf("float vcCloudDensityEx(", StringComparison.Ordinal);
-        var lightMarch = adapted.IndexOf("float vcLightOpticalDepth(", StringComparison.Ordinal);
-        var marchUse = adapted.IndexOf("vcLightOpticalDepth(worldPos", StringComparison.Ordinal);
+        var lightMarch = adapted.IndexOf("float vcLightOpticalDepthFromBase(", StringComparison.Ordinal);
+        var marchUse = adapted.IndexOf("vcLightOpticalDepthFromBase(baseShape", StringComparison.Ordinal);
         Assert.True(densityEx >= 0, "vcCloudDensityEx definition missing from flattened genesis_clouds.frag");
-        Assert.True(lightMarch >= 0, "vcLightOpticalDepth definition missing from flattened genesis_clouds.frag");
-        Assert.True(marchUse > lightMarch, "main() must call vcLightOpticalDepth after its definition");
+        Assert.True(lightMarch >= 0, "vcLightOpticalDepthFromBase definition missing from flattened genesis_clouds.frag");
+        Assert.True(marchUse > lightMarch, "main() must call vcLightOpticalDepthFromBase after its definition");
         Assert.True(densityEx < lightMarch,
             "cloud density functions must be defined before the sun light march that samples them");
     }
@@ -120,7 +135,7 @@ public sealed class PreviewVolumeInjectShaderEsTests
         }
     }
 
-    private static string ResolveAndAdapt(string fragmentFile)
+    private static string ResolveAndAdapt(string fragmentFile, bool useOpenGlEs = true)
     {
         var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..",
             "src", "AutoPBR.App", "Rendering", "Shaders"));
@@ -130,6 +145,6 @@ public sealed class PreviewVolumeInjectShaderEsTests
         return GlslSourceAdapter.Adapt(
             GlslIncludeResolver.Resolve(fragmentFile, Read),
             ShaderType.FragmentShader,
-            useOpenGlEs: true);
+            useOpenGlEs);
     }
 }

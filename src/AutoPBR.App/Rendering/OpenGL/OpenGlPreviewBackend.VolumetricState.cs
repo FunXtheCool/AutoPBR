@@ -14,7 +14,7 @@ public sealed partial class OpenGlPreviewBackend
     /// invalidate histories; this covers the startup path where god rays ran for one or
     /// more frames before clouds finished loading.
     /// </summary>
-    private void OnLazyCloudGpuTierReady(in PreviewRenderSettings settings, int viewportWidth, int viewportHeight)
+    private void OnLazyCloudGpuTierReady(in PreviewRenderSettingsSnapshot settings, int viewportWidth, int viewportHeight)
     {
         InvalidateVolumetricTemporalHistories();
         _godRaysPassCoordinator.SeedToggleBaseline(settings);
@@ -61,7 +61,7 @@ public sealed partial class OpenGlPreviewBackend
         _cloudTierReadyWarmupDraws--;
     }
 
-    private void TryInitCloudGpuTierIfNeeded(in PreviewRenderSettings settings, int viewportWidth, int viewportHeight)
+    private void TryInitCloudGpuTierIfNeeded(in PreviewRenderSettingsSnapshot settings, int viewportWidth, int viewportHeight)
     {
         if (_gpuInitTier.HasAll(PreviewGpuInitTier.Clouds) || !settings.EnableVolumetricClouds || _gl is null)
         {

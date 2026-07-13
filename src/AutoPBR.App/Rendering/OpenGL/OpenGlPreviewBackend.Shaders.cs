@@ -76,9 +76,8 @@ public sealed partial class OpenGlPreviewBackend
         }
     }
 
-    private void SetMatrix(string name, Matrix4x4 m)
+    private void SetMatrixLoc(int loc, Matrix4x4 m)
     {
-        var loc = _program!.GetUniformLocation(name);
         if (loc < 0)
         {
             return;
@@ -88,39 +87,83 @@ public sealed partial class OpenGlPreviewBackend
         _gl!.UniformMatrix4(loc, 1, false, in mt.M11);
     }
 
-    private void SetVec2(string name, Vector2 v)
+    private void SetMatrixOnProgramLoc(GlShaderProgram program, int loc, Matrix4x4 m)
     {
-        var loc = _program!.GetUniformLocation(name);
+        if (loc < 0)
+        {
+            return;
+        }
+
+        program.Use();
+        var mt = Matrix4x4.Transpose(m);
+        _gl!.UniformMatrix4(loc, 1, false, in mt.M11);
+    }
+
+    private void SetVec2Loc(int loc, Vector2 v)
+    {
         if (loc >= 0)
         {
             _gl!.Uniform2(loc, v.X, v.Y);
         }
     }
 
-    private void SetVec3(string name, Vector3 v)
+    private void SetVec3Loc(int loc, Vector3 v)
     {
-        var loc = _program!.GetUniformLocation(name);
         if (loc >= 0)
         {
             _gl!.Uniform3(loc, v.X, v.Y, v.Z);
         }
     }
 
-    private void SetFloat(string name, float v)
+    private void SetFloatLoc(int loc, float v)
     {
-        var loc = _program!.GetUniformLocation(name);
         if (loc >= 0)
         {
             _gl!.Uniform1(loc, v);
         }
     }
 
-    private void SetInt(string name, int v)
+    private void SetIntLoc(int loc, int v)
     {
-        var loc = _program!.GetUniformLocation(name);
         if (loc >= 0)
         {
             _gl!.Uniform1(loc, v);
+        }
+    }
+
+    private void SetFloatOnProgramLoc(GlShaderProgram program, int loc, float v)
+    {
+        if (loc >= 0)
+        {
+            program.Use();
+            _gl!.Uniform1(loc, v);
+        }
+    }
+
+    private void SetIntOnProgramLoc(GlShaderProgram program, int loc, int v)
+    {
+        if (loc >= 0)
+        {
+            program.Use();
+            _gl!.Uniform1(loc, v);
+        }
+    }
+
+    private void SetVec2OnProgramLoc(GlShaderProgram program, int loc, Vector2 v)
+    {
+        if (loc >= 0)
+        {
+            program.Use();
+            _gl!.Uniform2(loc, v.X, v.Y);
+        }
+    }
+
+    private void SetVec3OnProgramLoc(GlShaderProgram program, int loc, Vector3 v)
+    {
+        if (loc >= 0)
+        {
+            program.Use();
+            _gl!.Uniform3(loc, v.X, v.Y, v.Z);
         }
     }
 }

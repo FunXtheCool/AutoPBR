@@ -26,17 +26,16 @@ uniform float uTessellationLevel;
 
 void main()
 {
-    int id = gl_InvocationID;
-    tcWorldPos[id] = vWorldPos[id];
-    tcWorldNormal[id] = vWorldNormal[id];
-    tcUv[id] = vUv[id];
-    tcWorldTangent[id] = vWorldTangent[id];
-    tcLightClip[id] = vLightClip[id];
-    tcCurrClip[id] = vCurrClip[id];
-    tcPrevClip[id] = vPrevClip[id];
-    gl_out[id].gl_Position = gl_in[id].gl_Position;
+    tcWorldPos[gl_InvocationID] = vWorldPos[gl_InvocationID];
+    tcWorldNormal[gl_InvocationID] = vWorldNormal[gl_InvocationID];
+    tcUv[gl_InvocationID] = vUv[gl_InvocationID];
+    tcWorldTangent[gl_InvocationID] = vWorldTangent[gl_InvocationID];
+    tcLightClip[gl_InvocationID] = vLightClip[gl_InvocationID];
+    tcCurrClip[gl_InvocationID] = vCurrClip[gl_InvocationID];
+    tcPrevClip[gl_InvocationID] = vPrevClip[gl_InvocationID];
+    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 
-    if (id == 0)
+    if (gl_InvocationID == 0)
     {
         float level = (uEnableTessellationDisplacement > 0 && uHasHeight > 0)
             ? clamp(uTessellationLevel, 1.0, 16.0)

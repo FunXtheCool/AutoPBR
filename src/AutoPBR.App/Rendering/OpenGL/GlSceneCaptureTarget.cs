@@ -130,12 +130,15 @@ internal sealed class GlSceneCaptureTarget(GL gl, bool useOpenGlEs) : IDisposabl
     }
 
     public uint ColorTextureHandle => _colorTexture;
-    public bool BlitColorToDefault(int defaultFbo, int vpX, int vpY, int width, int height)
+    public bool BlitColorToDefault(int defaultFbo, int vpX, int vpY, int destW, int destH)
     {
         if (!IsValid)
         {
             return false;
         }
+
+        destW = Math.Max(1, destW);
+        destH = Math.Max(1, destH);
 
         var priorRead = gl.GetInteger(GetPName.ReadFramebufferBinding);
         var priorDraw = gl.GetInteger(GetPName.DrawFramebufferBinding);
@@ -143,13 +146,14 @@ internal sealed class GlSceneCaptureTarget(GL gl, bool useOpenGlEs) : IDisposabl
         gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, _fbo);
         gl.ReadBuffer(ReadBufferMode.ColorAttachment0);
         gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, (uint)Math.Max(0, defaultFbo));
-        gl.Viewport(vpX, vpY, (uint)Math.Max(1, width), (uint)Math.Max(1, height));
-        gl.BlitFramebuffer(0, 0, width, height, 0, 0, width, height,
+        gl.Viewport(vpX, vpY, (uint)destW, (uint)destH);
+        ConfigureDefaultDrawBuffer(defaultFbo);
+        gl.BlitFramebuffer(0, 0, _width, _height, 0, 0, destW, destH,
             ClearBufferMask.ColorBufferBit, GLEnum.Linear);
         var err = gl.GetError();
         if (err != GLEnum.NoError)
         {
-            gl.BlitFramebuffer(0, 0, width, height, 0, height, width, 0,
+            gl.BlitFramebuffer(0, 0, _width, _height, 0, destH, destW, 0,
                 ClearBufferMask.ColorBufferBit, GLEnum.Linear);
             err = gl.GetError();
         }
@@ -188,6 +192,22 @@ internal sealed class GlSceneCaptureTarget(GL gl, bool useOpenGlEs) : IDisposabl
         else
         {
             gl.DrawBuffer(DrawBufferMode.ColorAttachment0);
+        }
+    }
+
+    private void ConfigureDefaultDrawBuffer(int defaultFbo)
+    {
+        if (useOpenGlEs)
+        {
+            unsafe
+            {
+                var buf = defaultFbo == 0 ? DrawBufferMode.Back : DrawBufferMode.ColorAttachment0;
+                gl.DrawBuffers(1, &buf);
+            }
+        }
+        else
+        {
+            gl.DrawBuffer(defaultFbo == 0 ? DrawBufferMode.Back : DrawBufferMode.ColorAttachment0);
         }
     }
 

@@ -7,7 +7,7 @@
   "extractionNotes": [
     "Preview composite from DecoratedPotRenderer.createBaseLayer / createSidesLayer javap (26.1.2).",
     "Base cuboids use #base (32x32); sides use #skin north-only sheets (16x16 pattern).",
-    "Neck PartPose.offset(0,37,16).rotationX(PI)."
+    "Neck PartPose.offset(0,37,16).rotationX(PI); neck cuboids use CubeDeformation(-0.1) and (0.2)."
   ],
   "factoryMethod": "createBaseLayer",
   "roots": [
@@ -32,17 +32,19 @@
               "from": [4, 17, 4],
               "to": [12, 20, 12],
               "uvOrigin": [0, 0],
+              "inflate": -0.1,
               "textureKey": "#base",
               "liftKind": "exact",
-              "provenance": "DecoratedPotRenderer.createBaseLayer texOffs(0,0)"
+              "provenance": "DecoratedPotRenderer.createBaseLayer texOffs(0,0) CubeDeformation(-0.1)"
             },
             {
               "from": [5, 20, 5],
               "to": [11, 21, 11],
               "uvOrigin": [0, 5],
+              "inflate": 0.2,
               "textureKey": "#base",
               "liftKind": "exact",
-              "provenance": "DecoratedPotRenderer.createBaseLayer texOffs(0,5)"
+              "provenance": "DecoratedPotRenderer.createBaseLayer texOffs(0,5) CubeDeformation(0.2)"
             }
           ],
           "children": []
@@ -61,9 +63,9 @@
               "uvOrigin": [-14, 13],
               "uvSpan": [14, 0, 14],
               "textureKey": "#base",
-              "faceMask": ["down"],
+              "faceMask": ["up"],
               "liftKind": "exact",
-              "provenance": "DecoratedPotRenderer.createBaseLayer texOffs(-14,13) top"
+              "provenance": "DecoratedPotRenderer.createBaseLayer texOffs(-14,13) top exterior UP"
             }
           ],
           "children": []
@@ -84,7 +86,7 @@
               "textureKey": "#base",
               "faceMask": ["down"],
               "liftKind": "exact",
-              "provenance": "DecoratedPotRenderer.createBaseLayer texOffs(-14,13) bottom"
+              "provenance": "DecoratedPotRenderer.createBaseLayer texOffs(-14,13) bottom exterior DOWN"
             }
           ],
           "children": []

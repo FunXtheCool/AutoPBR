@@ -44,4 +44,9 @@ vec3 ditherSrgb8(vec3 srgb, vec2 screenPos)
     return saturate3(srgb + (interleavedGradientNoise(screenPos) - 0.5) / 255.0);
 }
 
+vec3 softKnee(vec3 x, float knee)
+{
+    return x / (x + vec3(knee));
+}
+
 #endif // GENESIS_COMMON_GLSL

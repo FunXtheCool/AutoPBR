@@ -43,6 +43,15 @@ internal sealed class ModelElement
     /// polygon construction and reversing polygon vertices after UV remap; it is not just a UV U-bound swap.
     /// </summary>
     public bool MirrorCuboidUv { get; init; }
+
+    /// <summary>
+    /// Optional per-element logical atlas for UV normalization (multi-<c>LayerDefinition</c> geometry IR, e.g. Breeze body 32² vs wind 128²).
+    /// Zero uses the baked texture path atlas from <see cref="MinecraftModelBaker.TryBake"/>.
+    /// </summary>
+    public int BakeAtlasWidth { get; init; }
+
+    /// <summary>See <see cref="BakeAtlasWidth"/>.</summary>
+    public int BakeAtlasHeight { get; init; }
 }
 
 internal sealed class ModelFace

@@ -361,6 +361,8 @@ internal static class PreviewDepthLayerResolver
             ShellInflateTexels = element.ShellInflateTexels,
             EnableParallax = element.EnableParallax && kind == PreviewDepthLayerKind.Base,
             MirrorCuboidUv = element.MirrorCuboidUv,
+            BakeAtlasWidth = element.BakeAtlasWidth,
+            BakeAtlasHeight = element.BakeAtlasHeight,
         };
 
     private static bool TryInferFromFaceTextureKeys(
