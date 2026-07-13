@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 using Avalonia;
@@ -104,7 +105,9 @@ internal sealed class PreviewOpenGlCompositionBridge
         return context.MakeCurrent();
     }
 
-    public static bool TryCreate(OpenGlControlBase control, out PreviewOpenGlCompositionBridge? bridge)
+    public static bool TryCreate(
+        OpenGlControlBase control,
+        [NotNullWhen(true)] out PreviewOpenGlCompositionBridge? bridge)
     {
         bridge = null;
         if (ResourcesField?.GetValue(control) is not { } resources)
@@ -202,11 +205,13 @@ internal sealed class PreviewOpenGlCompositionBridge
     private static bool TryResolveExternalObjects(
         IGlContext context,
         object resources,
-        out IGlContextExternalObjectsFeature externalObjects)
+        [NotNullWhen(true)] out IGlContextExternalObjectsFeature? externalObjects)
     {
-        if (context.TryGetFeature<IGlContextExternalObjectsFeature>(out externalObjects) &&
-            SupportsD3D11SharedExport(externalObjects))
+        if (context.TryGetFeature<IGlContextExternalObjectsFeature>(out var feature) &&
+            feature is not null &&
+            SupportsD3D11SharedExport(feature))
         {
+            externalObjects = feature;
             return true;
         }
 
@@ -224,7 +229,7 @@ internal sealed class PreviewOpenGlCompositionBridge
             }
         }
 
-        externalObjects = null!;
+        externalObjects = null;
         return false;
     }
 

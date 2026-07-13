@@ -111,7 +111,10 @@ internal static class PreviewDesktopWglOwnerThread
                 IsBackground = true,
                 Name = "AutoPBR.WglOwner",
             };
-            _thread.SetApartmentState(ApartmentState.STA);
+            if (OperatingSystem.IsWindows())
+            {
+                _thread.SetApartmentState(ApartmentState.STA);
+            }
             _thread.Start();
         }
     }

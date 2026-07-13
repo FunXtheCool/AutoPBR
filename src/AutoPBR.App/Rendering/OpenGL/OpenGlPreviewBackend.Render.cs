@@ -35,6 +35,7 @@ public sealed partial class OpenGlPreviewBackend
 
         if (sidecar is not null)
         {
+            var activeSidecar = sidecar;
             PreviewOpenGlCompositionBridge? compositionBridge;
             lock (_sync)
             {
@@ -42,10 +43,9 @@ public sealed partial class OpenGlPreviewBackend
             }
 
             if (compositionBridge is not null &&
-                sidecar is not null &&
                 IsSidecarAdapterMatchComplete &&
-                sidecar.CanAttemptDxInterop &&
-                sidecar.TryRenderViaDxInterop(
+                activeSidecar.CanAttemptDxInterop &&
+                activeSidecar.TryRenderViaDxInterop(
                     compositionBridge,
                     glInterface,
                     framebuffer,
@@ -58,7 +58,7 @@ public sealed partial class OpenGlPreviewBackend
                     if (!_dxInteropSuccessLogged)
                     {
                         _dxInteropSuccessLogged = true;
-                        sidecar.EnableDxInteropHangDiagnostics(EmitDiagnostic, RequestPreviewFrame);
+                        activeSidecar.EnableDxInteropHangDiagnostics(EmitDiagnostic, RequestPreviewFrame);
                         EmitDiagnostic("[3D preview] D3D11/WGL interop active; async GPU present (timed mutex + timed GPU drain).");
                         RecordActiveContextSummary();
                     }
@@ -74,16 +74,16 @@ public sealed partial class OpenGlPreviewBackend
                     if (!_dxInteropFallbackLogged)
                     {
                         _dxInteropFallbackLogged = true;
-                        EmitDiagnostic(sidecar.DxInteropOptInEnabled
+                        EmitDiagnostic(activeSidecar.DxInteropOptInEnabled
                             ? "[3D preview] D3D11/WGL interop unavailable; using async PBO sidecar presentation. " +
-                              sidecar.LastInteropFailureSummary
+                              activeSidecar.LastInteropFailureSummary
                             : "[3D preview] D3D11/WGL interop skipped; using stable async PBO sidecar presentation.");
                     }
                 }
             }
 
             var forceSyncPresent = false;
-            if (sidecar.IsOwnerThreadLikelyWedged)
+            if (activeSidecar.IsOwnerThreadLikelyWedged)
             {
                 ClearPresentationFramebuffer(glInterface, framebuffer, pixelWidth, pixelHeight);
                 return;
@@ -91,12 +91,12 @@ public sealed partial class OpenGlPreviewBackend
 
             try
             {
-                sidecar.Invoke(() =>
+                activeSidecar.Invoke(() =>
                 {
-                    using (sidecar.BindOnOwnerThread())
+                    using (activeSidecar.BindOnOwnerThread())
                     {
-                        sidecar.EnsureRenderTargetCore(pixelWidth, pixelHeight);
-                        GlRenderCore(sidecar.RenderFbo, pixelWidth, pixelHeight);
+                        activeSidecar.EnsureRenderTargetCore(pixelWidth, pixelHeight);
+                        GlRenderCore(activeSidecar.RenderFbo, pixelWidth, pixelHeight);
                     }
                 }, TimeSpan.FromSeconds(2));
             }
@@ -123,14 +123,14 @@ public sealed partial class OpenGlPreviewBackend
 
             try
             {
-                sidecar.CopyColorToEsFbo(glInterface, framebuffer, pixelWidth, pixelHeight, forceSyncPresent);
+                activeSidecar.CopyColorToEsFbo(glInterface, framebuffer, pixelWidth, pixelHeight, forceSyncPresent);
             }
             catch (Exception ex)
             {
                 EmitDiagnostic($"[3D preview] Sidecar CPU presentation failed: {ex.GetType().Name}: {ex.Message}");
                 return;
             }
-            if (sidecar.UsesAsyncPboReadback)
+            if (activeSidecar.UsesAsyncPboReadback)
             {
                 lock (_sync)
                 {

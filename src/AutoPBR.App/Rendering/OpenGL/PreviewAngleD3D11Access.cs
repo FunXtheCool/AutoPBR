@@ -305,7 +305,7 @@ internal static class PreviewAngleD3D11Access
         target.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
             .FirstOrDefault(m => string.Equals(m.Name, name, StringComparison.Ordinal) && m.GetParameters().Length == parameterCount);
 
-    private static void ReleaseComObject(object comObject)
+    private static void ReleaseComObject(object? comObject)
     {
         if (comObject is IDisposable disposable)
         {

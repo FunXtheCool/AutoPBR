@@ -85,7 +85,9 @@ public sealed class BabyRabbitUvDiagnosticTests
             MathF.Abs(e.From[0] + 2.5f) < 0.01f && MathF.Abs(e.From[1] + 3f) < 0.01f);
         Assert.Equal(32, head.BakeAtlasWidth);
         Assert.True(head.Faces.TryGetValue("north", out var northFace));
-        Assert.Equal(4f, northFace!.Uv[0], 0.01f);
+        Assert.NotNull(northFace);
+        Assert.NotNull(northFace.Uv);
+        Assert.Equal(4f, northFace.Uv[0], 0.01f);
         Assert.Equal(4f, northFace.Uv[1], 0.01f);
         Assert.Equal(9f, northFace.Uv[2], 0.01f);
         Assert.Equal(8f, northFace.Uv[3], 0.01f);

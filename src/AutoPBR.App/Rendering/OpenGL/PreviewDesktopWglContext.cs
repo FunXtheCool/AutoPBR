@@ -199,7 +199,7 @@ internal sealed partial class PreviewDesktopWglContext : IDisposable
         var esGl = GL.GetApi(esGlInterface.GetProcAddress);
         esGl.BindFramebuffer(FramebufferTarget.Framebuffer, (uint)destFbo);
         esGl.GetFramebufferAttachmentParameter(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0,
-            FramebufferAttachmentParameterName.FramebufferAttachmentObjectName, out int texObj);
+            FramebufferAttachmentParameterName.ObjectName, out int texObj);
         esGl.BindTexture(TextureTarget.Texture2D, (uint)texObj);
         fixed (byte* p = pixels)
         {

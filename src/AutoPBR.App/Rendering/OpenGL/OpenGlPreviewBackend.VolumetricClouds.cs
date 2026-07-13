@@ -375,6 +375,11 @@ public sealed partial class OpenGlPreviewBackend
         bool useDepthGate,
         bool useTemporalReproject)
     {
+        if (_cloudProgram is not { } program)
+        {
+            return;
+        }
+
         var gl = frame.Gl;
         var settings = frame.Settings;
         var cu = _cloudUniformLocs;
@@ -388,42 +393,42 @@ public sealed partial class OpenGlPreviewBackend
         // happened to route through the clouds-only path that assigns them. Pin every
         // sampler to its own unit unconditionally; the uHas*/uGateSkyDepth flags keep
         // unbound units from being sampled.
-        SetIntOnProgramLoc(_cloudProgram, cu.CloudNoise, 0);
-        SetIntOnProgramLoc(_cloudProgram, cu.CoverageMap, 1);
-        SetIntOnProgramLoc(_cloudProgram, cu.SkyViewLut, 2);
-        SetIntOnProgramLoc(_cloudProgram, cu.DetailNoise, 3);
-        SetIntOnProgramLoc(_cloudProgram, cu.SceneDepth, 5);
-        SetIntOnProgramLoc(_cloudProgram, cu.PrevClouds, 6);
+        SetIntOnProgramLoc(program, cu.CloudNoise, 0);
+        SetIntOnProgramLoc(program, cu.CoverageMap, 1);
+        SetIntOnProgramLoc(program, cu.SkyViewLut, 2);
+        SetIntOnProgramLoc(program, cu.DetailNoise, 3);
+        SetIntOnProgramLoc(program, cu.SceneDepth, 5);
+        SetIntOnProgramLoc(program, cu.PrevClouds, 6);
 
-        SetFloatOnProgramLoc(_cloudProgram, cu.SunIntensity, settings.AtmosphereSunIntensity);
-        SetFloatOnProgramLoc(_cloudProgram, cu.SkyExposure, settings.AtmosphereSkyExposure);
-        SetFloatOnProgramLoc(_cloudProgram, cu.LayerHeight, layerWorldY);
-        SetFloatOnProgramLoc(_cloudProgram, cu.VolumeHeight, settings.CloudVolumeHeight);
-        SetFloatOnProgramLoc(_cloudProgram, cu.Density, settings.CloudDensity);
-        SetFloatOnProgramLoc(_cloudProgram, cu.CoverageScale, settings.CloudCoverageScale);
-        SetFloatOnProgramLoc(_cloudProgram, cu.VolumeSize, settings.CloudVolumeSize);
-        SetIntOnProgramLoc(_cloudProgram, cu.Quality, profile.CloudQuality);
-        SetIntOnProgramLoc(_cloudProgram, cu.MarchSteps, Math.Clamp(settings.CloudMarchStepOverride, 0, 64));
-        SetIntOnProgramLoc(_cloudProgram, cu.DebugView, (int)settings.CloudDebugView);
-        SetMatrixOnProgramLoc(_cloudProgram, cu.InvViewProj, invViewProj);
-        SetMatrixOnProgramLoc(_cloudProgram, cu.PrevViewProj, _cloudPrevViewProj);
-        SetVec3OnProgramLoc(_cloudProgram, cu.CameraPos, frame.Eye);
-        SetVec3OnProgramLoc(_cloudProgram, cu.SunDir, frame.LightDir);
+        SetFloatOnProgramLoc(program, cu.SunIntensity, settings.AtmosphereSunIntensity);
+        SetFloatOnProgramLoc(program, cu.SkyExposure, settings.AtmosphereSkyExposure);
+        SetFloatOnProgramLoc(program, cu.LayerHeight, layerWorldY);
+        SetFloatOnProgramLoc(program, cu.VolumeHeight, settings.CloudVolumeHeight);
+        SetFloatOnProgramLoc(program, cu.Density, settings.CloudDensity);
+        SetFloatOnProgramLoc(program, cu.CoverageScale, settings.CloudCoverageScale);
+        SetFloatOnProgramLoc(program, cu.VolumeSize, settings.CloudVolumeSize);
+        SetIntOnProgramLoc(program, cu.Quality, profile.CloudQuality);
+        SetIntOnProgramLoc(program, cu.MarchSteps, Math.Clamp(settings.CloudMarchStepOverride, 0, 64));
+        SetIntOnProgramLoc(program, cu.DebugView, (int)settings.CloudDebugView);
+        SetMatrixOnProgramLoc(program, cu.InvViewProj, invViewProj);
+        SetMatrixOnProgramLoc(program, cu.PrevViewProj, _cloudPrevViewProj);
+        SetVec3OnProgramLoc(program, cu.CameraPos, frame.Eye);
+        SetVec3OnProgramLoc(program, cu.SunDir, frame.LightDir);
         var windTime = settings.CloudFreezeWind ? 0.0 : frame.RenderTime;
-        SetVec3OnProgramLoc(_cloudProgram, cu.WindOffset, ComputeCloudWindOffset(windTime, settings));
-        SetFloatOnProgramLoc(_cloudProgram, cu.CirrusStrength, settings.CloudCirrusStrength);
-        SetVec2OnProgramLoc(_cloudProgram, cu.CirrusWindOffset, ComputeCirrusWindOffset(windTime, settings));
-        SetIntOnProgramLoc(_cloudProgram, cu.GateSkyDepth, useDepthGate ? 1 : 0);
-        SetFloatOnProgramLoc(_cloudProgram, cu.TemporalWeight,
+        SetVec3OnProgramLoc(program, cu.WindOffset, ComputeCloudWindOffset(windTime, settings));
+        SetFloatOnProgramLoc(program, cu.CirrusStrength, settings.CloudCirrusStrength);
+        SetVec2OnProgramLoc(program, cu.CirrusWindOffset, ComputeCirrusWindOffset(windTime, settings));
+        SetIntOnProgramLoc(program, cu.GateSkyDepth, useDepthGate ? 1 : 0);
+        SetFloatOnProgramLoc(program, cu.TemporalWeight,
             useTemporalReproject
                 ? PreviewVolumetricQuality.EffectivePassTemporalWeight(profile.CloudTemporalWeight, settings)
                 : 0f);
-        SetFloatOnProgramLoc(_cloudProgram, cu.FramePhase, _cloudFramePhase);
-        SetIntOnProgramLoc(_cloudProgram, cu.HasCloudNoise, _cloudNoiseTex is not null ? 1 : 0);
-        SetIntOnProgramLoc(_cloudProgram, cu.HasDetailNoise, _cloudDetailTex is not null ? 1 : 0);
-        SetIntOnProgramLoc(_cloudProgram, cu.HasCoverageMap, _cloudCoverageTex is not null ? 1 : 0);
-        SetIntOnProgramLoc(_cloudProgram, cu.HasSkyLut, _atmoLutsValid && _atmoSkyViewTex != 0 ? 1 : 0);
-        SetIntOnProgramLoc(_cloudProgram, cu.HasPrevClouds,
+        SetFloatOnProgramLoc(program, cu.FramePhase, _cloudFramePhase);
+        SetIntOnProgramLoc(program, cu.HasCloudNoise, _cloudNoiseTex is not null ? 1 : 0);
+        SetIntOnProgramLoc(program, cu.HasDetailNoise, _cloudDetailTex is not null ? 1 : 0);
+        SetIntOnProgramLoc(program, cu.HasCoverageMap, _cloudCoverageTex is not null ? 1 : 0);
+        SetIntOnProgramLoc(program, cu.HasSkyLut, _atmoLutsValid && _atmoSkyViewTex != 0 ? 1 : 0);
+        SetIntOnProgramLoc(program, cu.HasPrevClouds,
             useTemporalReproject && _cloudHistoryValid ? 1 : 0);
 
         if (_cloudNoiseTex is not null)
