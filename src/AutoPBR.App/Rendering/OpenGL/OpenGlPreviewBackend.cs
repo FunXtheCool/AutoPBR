@@ -110,6 +110,9 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private readonly byte[] _entitySkinningUboScratch = new byte[EntitySkinningUboTotalBytes];
     private readonly byte[] _entityPrevSkinningUboScratch = new byte[EntitySkinningUboTotalBytes];
     private readonly byte[] _entityNormalSkinningUboScratch = new byte[EntitySkinningUboMatrixBytes];
+    private GlPersistentMappedUploadBuffer? _entityBoneUpload;
+    private GlPersistentMappedUploadBuffer? _entityPrevBoneUpload;
+    private GlPersistentMappedUploadBuffer? _entityNormalBoneUpload;
     private uint _entityBoneUbo;
     private uint _entityPrevBoneUbo;
     private uint _entityNormalBoneUbo;
@@ -142,6 +145,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private bool _disposed;
     private string? _lastError;
     private bool _gpuAlive;
+    private PreviewGlCapabilities? _glCapabilities;
     private bool _genesisTessellationCompileDisabled;
     private bool _genesisTessellationFailureLogged;
     private int _appliedWglSwapInterval = int.MinValue;

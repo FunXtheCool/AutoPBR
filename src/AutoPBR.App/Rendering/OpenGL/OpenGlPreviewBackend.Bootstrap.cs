@@ -118,6 +118,7 @@ public sealed partial class OpenGlPreviewBackend
         DestroySunDebugOverlay();
         _proceduralSkyProgram?.Dispose();
         _proceduralSkyProgram = null;
+        DisposeEntitySkinningUploadBuffers();
         _shaderCtx = null;
         _gpuInitTier = PreviewGpuInitTier.None;
         _shadowAwareGodRayInitAttempted = false;
@@ -134,6 +135,11 @@ public sealed partial class OpenGlPreviewBackend
                 EmitDiagnostic(_useOpenGlEs
                     ? $"[3D preview] Context: {_glVersionString} (Genesis shader path, GLSL ES 3.0)."
                     : $"[3D preview] Context: {_glVersionString} (Genesis shader path, GLSL 330 core).");
+                if (_glCapabilities is not null)
+                {
+                    EmitDiagnostic(_glCapabilities.FormatDiagnostic());
+                }
+
                 RecordActiveContextSummary();
                 _mainProgramUsesTessellation = false;
                 string? err = null;
@@ -278,21 +284,22 @@ public sealed partial class OpenGlPreviewBackend
 
     private void RecordActiveContextSummary()
     {
+        var capabilitySuffix = _glCapabilities?.FormatContextSuffix() ?? string.Empty;
         if (_nativeWglPresenterActive)
         {
-            ActiveContextSummary = $"{_glVersionString} · GLSL 330 core (WGL native child)";
+            ActiveContextSummary = $"{_glVersionString} · GLSL 330 core (WGL native child){capabilitySuffix}";
         }
         else if (_desktopWglSidecar is not null)
         {
             ActiveContextSummary = _desktopWglSidecar.UsesDxInteropPresentation
-                ? $"{_glVersionString} · GLSL 330 core (WGL sidecar · D3D11 interop)"
-                : $"{_glVersionString} · GLSL 330 core (WGL sidecar)";
+                ? $"{_glVersionString} · GLSL 330 core (WGL sidecar · D3D11 interop){capabilitySuffix}"
+                : $"{_glVersionString} · GLSL 330 core (WGL sidecar){capabilitySuffix}";
         }
         else
         {
             ActiveContextSummary = _useOpenGlEs
-                ? $"{_glVersionString} · GLSL ES 3.0"
-                : $"{_glVersionString} · GLSL 330 core";
+                ? $"{_glVersionString} · GLSL ES 3.0{capabilitySuffix}"
+                : $"{_glVersionString} · GLSL 330 core{capabilitySuffix}";
         }
 
         if (PreviewOpenGlSession.RequestedDesktopGl4 && _useOpenGlEs)

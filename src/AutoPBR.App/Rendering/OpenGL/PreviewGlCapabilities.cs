@@ -1,0 +1,192 @@
+using System.Globalization;
+using System.Runtime.InteropServices;
+
+using Silk.NET.OpenGL;
+
+namespace AutoPBR.App.Rendering.OpenGL;
+
+internal sealed record PreviewGlCapabilities(
+    string VersionString,
+    string Vendor,
+    string Renderer,
+    int Major,
+    int Minor,
+    bool IsOpenGlEs,
+    bool BufferStorage,
+    bool PersistentMappedBuffers,
+    bool ShaderStorageBuffers,
+    bool ComputeShaders,
+    bool ImageLoadStore,
+    bool ShaderAtomics,
+    bool MultiDrawIndirect,
+    bool TimerQuery,
+    bool TextureArrays,
+    bool BindlessTextures,
+    bool SpirV,
+    bool SeparablePrograms)
+{
+    public bool CanUsePersistentUploadRing => !IsOpenGlEs && PersistentMappedBuffers;
+
+    public string UploadTransportLabel => CanUsePersistentUploadRing ? "persistent-mapped UBO uploads" : "BufferSubData uploads";
+
+    public string FormatDiagnostic()
+    {
+        var api = IsOpenGlEs ? "GLES" : "desktop GL";
+        return "[3D preview] GL capabilities: " +
+               $"{api} {Major}.{Minor}; " +
+               $"persistentUpload={(CanUsePersistentUploadRing ? "on" : "off")}, " +
+               $"ssbo={(ShaderStorageBuffers ? "yes" : "no")}, " +
+               $"compute={(ComputeShaders ? "yes" : "no")}, " +
+               $"imageStore={(ImageLoadStore ? "yes" : "no")}, " +
+               $"multiDrawIndirect={(MultiDrawIndirect ? "yes" : "no")}, " +
+               $"timerQuery={(TimerQuery ? "yes" : "no")}, " +
+               $"spirv={(SpirV ? "yes" : "no")}.";
+    }
+
+    public string FormatContextSuffix() =>
+        CanUsePersistentUploadRing ? " · persistent uploads" : " · GLES-safe uploads";
+
+    public static PreviewGlCapabilities FromGl(GL gl, bool useOpenGlEs, string versionString)
+    {
+        var vendor = ReadGlString(gl, StringName.Vendor);
+        var renderer = ReadGlString(gl, StringName.Renderer);
+        var extensions = ReadExtensionString(gl);
+        return FromStrings(versionString, vendor, renderer, extensions, useOpenGlEs);
+    }
+
+    internal static PreviewGlCapabilities FromStrings(
+        string versionString,
+        string vendor,
+        string renderer,
+        string extensions,
+        bool? forceOpenGlEs = null)
+    {
+        var isEs = forceOpenGlEs ?? versionString.Contains("OpenGL ES", StringComparison.OrdinalIgnoreCase);
+        var (major, minor) = ParseVersion(versionString);
+        var extensionSet = BuildExtensionSet(extensions);
+
+        bool HasExtension(string name) => extensionSet.Contains(name);
+        bool VersionAtLeast(int reqMajor, int reqMinor) =>
+            major > reqMajor || (major == reqMajor && minor >= reqMinor);
+
+        var textureArrays = isEs
+            ? VersionAtLeast(3, 0)
+            : VersionAtLeast(3, 0) || HasExtension("GL_EXT_texture_array");
+        var bufferStorage = !isEs && (VersionAtLeast(4, 4) || HasExtension("GL_ARB_buffer_storage"));
+        var ssbo = !isEs && (VersionAtLeast(4, 3) || HasExtension("GL_ARB_shader_storage_buffer_object"));
+        var compute = !isEs && (VersionAtLeast(4, 3) || HasExtension("GL_ARB_compute_shader"));
+        var imageStore = !isEs && (VersionAtLeast(4, 2) || HasExtension("GL_ARB_shader_image_load_store"));
+        var atomics = !isEs && (VersionAtLeast(4, 2) || HasExtension("GL_ARB_shader_atomic_counters"));
+        var mdi = !isEs && (VersionAtLeast(4, 3) || HasExtension("GL_ARB_multi_draw_indirect"));
+        var timerQuery = isEs
+            ? HasExtension("GL_EXT_disjoint_timer_query")
+            : VersionAtLeast(3, 3) || HasExtension("GL_ARB_timer_query");
+        var bindless = !isEs && HasExtension("GL_ARB_bindless_texture");
+        var spirv = !isEs && (VersionAtLeast(4, 6) || HasExtension("GL_ARB_gl_spirv"));
+        var separable = !isEs && (VersionAtLeast(4, 1) || HasExtension("GL_ARB_separate_shader_objects"));
+
+        return new PreviewGlCapabilities(
+            string.IsNullOrWhiteSpace(versionString) ? "(unknown)" : versionString,
+            string.IsNullOrWhiteSpace(vendor) ? "unknown" : vendor,
+            string.IsNullOrWhiteSpace(renderer) ? "unknown" : renderer,
+            major,
+            minor,
+            isEs,
+            bufferStorage,
+            bufferStorage,
+            ssbo,
+            compute,
+            imageStore,
+            atomics,
+            mdi,
+            timerQuery,
+            textureArrays,
+            bindless,
+            spirv,
+            separable);
+    }
+
+    private static (int Major, int Minor) ParseVersion(string versionString)
+    {
+        if (string.IsNullOrWhiteSpace(versionString))
+        {
+            return (0, 0);
+        }
+
+        var span = versionString.AsSpan().TrimStart();
+        var digitStart = -1;
+        for (var i = 0; i < span.Length; i++)
+        {
+            if (char.IsDigit(span[i]))
+            {
+                digitStart = i;
+                break;
+            }
+        }
+
+        if (digitStart < 0)
+        {
+            return (0, 0);
+        }
+
+        span = span[digitStart..];
+        var dot = span.IndexOf('.');
+        if (dot <= 0)
+        {
+            return (0, 0);
+        }
+
+        var minorEnd = dot + 1;
+        while (minorEnd < span.Length && char.IsDigit(span[minorEnd]))
+        {
+            minorEnd++;
+        }
+
+        if (!int.TryParse(span[..dot], NumberStyles.None, CultureInfo.InvariantCulture, out var major) ||
+            !int.TryParse(span[(dot + 1)..minorEnd], NumberStyles.None, CultureInfo.InvariantCulture, out var minor))
+        {
+            return (0, 0);
+        }
+
+        return (major, minor);
+    }
+
+    private static HashSet<string> BuildExtensionSet(string extensions)
+    {
+        var set = new HashSet<string>(StringComparer.Ordinal);
+        if (string.IsNullOrWhiteSpace(extensions))
+        {
+            return set;
+        }
+
+        foreach (var extension in extensions.Split([' ', '\r', '\n', '\t'], StringSplitOptions.RemoveEmptyEntries))
+        {
+            set.Add(extension);
+        }
+
+        return set;
+    }
+
+    private static string ReadGlString(GL gl, StringName name)
+    {
+        unsafe
+        {
+            var ptr = gl.GetString(name);
+            return ptr is null ? string.Empty : Marshal.PtrToStringUTF8((nint)ptr) ?? string.Empty;
+        }
+    }
+
+    private static string ReadExtensionString(GL gl)
+    {
+        while (gl.GetError() != GLEnum.NoError)
+        {
+        }
+
+        var extensions = ReadGlString(gl, StringName.Extensions);
+        while (gl.GetError() != GLEnum.NoError)
+        {
+        }
+
+        return extensions;
+    }
+}

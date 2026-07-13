@@ -100,6 +100,26 @@ public class PreviewGlslEsAdaptTests
         }
     }
 
+    [Theory]
+    [InlineData("genesis.vert", ShaderType.VertexShader)]
+    [InlineData("genesis.frag", ShaderType.FragmentShader)]
+    [InlineData("genesis_shadow.vert", ShaderType.VertexShader)]
+    [InlineData("genesis_volume_inject.frag", ShaderType.FragmentShader)]
+    [InlineData("genesis_volume_integrate.frag", ShaderType.FragmentShader)]
+    public void EsAdaptedShaders_DoNotEnableDesktopOnlyAccelerationDefines(string shaderFile, ShaderType shaderType)
+    {
+        var src = GlslIncludeResolver.Resolve(shaderFile, LoadShader);
+        var adapted = GlslSourceAdapter.Adapt(src, shaderType, useOpenGlEs: true);
+
+        Assert.DoesNotContain("GENESIS_GL46", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("GENESIS_USE_SSBO", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("GENESIS_USE_COMPUTE", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("GENESIS_USE_IMAGE_STORE", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("layout(std430", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("writeonly image", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("layout(local_size", adapted, StringComparison.Ordinal);
+    }
+
     [Fact]
     public void EsAdapt_StripsNonAsciiCommentChars_PreservingLength()
     {

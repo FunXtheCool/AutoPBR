@@ -246,24 +246,46 @@ public sealed partial class OpenGlPreviewBackend
             return;
         }
 
+        DisposeEntitySkinningUploadBuffers();
         const string blockName = "EntitySkinningBones";
         const string prevBlockName = "EntityPrevSkinningBones";
         const string normalBlockName = "EntitySkinningNormals";
-        _entityBoneUbo = gl.GenBuffer();
-        _entityPrevBoneUbo = gl.GenBuffer();
-        _entityNormalBoneUbo = gl.GenBuffer();
         Array.Clear(_entitySkinningUboScratch);
         Array.Clear(_entityPrevSkinningUboScratch);
         Array.Clear(_entityNormalSkinningUboScratch);
-        gl.BindBuffer(BufferTargetARB.UniformBuffer, _entityBoneUbo);
-        gl.BufferData<byte>(BufferTargetARB.UniformBuffer, _entitySkinningUboScratch.AsSpan(), BufferUsageARB.DynamicDraw);
-        gl.BindBufferBase(BufferTargetARB.UniformBuffer, EntitySkinningUboBindingPoint, _entityBoneUbo);
-        gl.BindBuffer(BufferTargetARB.UniformBuffer, _entityPrevBoneUbo);
-        gl.BufferData<byte>(BufferTargetARB.UniformBuffer, _entityPrevSkinningUboScratch.AsSpan(), BufferUsageARB.DynamicDraw);
-        gl.BindBufferBase(BufferTargetARB.UniformBuffer, EntityPrevSkinningUboBindingPoint, _entityPrevBoneUbo);
-        gl.BindBuffer(BufferTargetARB.UniformBuffer, _entityNormalBoneUbo);
-        gl.BufferData<byte>(BufferTargetARB.UniformBuffer, _entityNormalSkinningUboScratch.AsSpan(), BufferUsageARB.DynamicDraw);
-        gl.BindBufferBase(BufferTargetARB.UniformBuffer, EntityNormalSkinningUboBindingPoint, _entityNormalBoneUbo);
+        var usePersistent = _glCapabilities?.CanUsePersistentUploadRing == true;
+        var uniformBufferOffsetAlignment = Math.Max(16, gl.GetInteger((GetPName)0x8A34));
+        _entityBoneUpload = new GlPersistentMappedUploadBuffer(
+            gl,
+            BufferTargetARB.UniformBuffer,
+            EntitySkinningUboBindingPoint,
+            EntitySkinningUboTotalBytes,
+            uniformBufferOffsetAlignment,
+            usePersistent);
+        _entityPrevBoneUpload = new GlPersistentMappedUploadBuffer(
+            gl,
+            BufferTargetARB.UniformBuffer,
+            EntityPrevSkinningUboBindingPoint,
+            EntitySkinningUboTotalBytes,
+            uniformBufferOffsetAlignment,
+            usePersistent);
+        _entityNormalBoneUpload = new GlPersistentMappedUploadBuffer(
+            gl,
+            BufferTargetARB.UniformBuffer,
+            EntityNormalSkinningUboBindingPoint,
+            EntitySkinningUboMatrixBytes,
+            uniformBufferOffsetAlignment,
+            usePersistent);
+        _entityBoneUbo = _entityBoneUpload.Handle;
+        _entityPrevBoneUbo = _entityPrevBoneUpload.Handle;
+        _entityNormalBoneUbo = _entityNormalBoneUpload.Handle;
+        _entityBoneUpload.Upload(_entitySkinningUboScratch);
+        _entityPrevBoneUpload.Upload(_entityPrevSkinningUboScratch);
+        _entityNormalBoneUpload.Upload(_entityNormalSkinningUboScratch);
+        EmitDiagnostic("[3D preview] Entity bone uploads: " +
+                       (_entityBoneUpload.UsesPersistentMapping
+                           ? "persistent mapped UBO transport."
+                           : "BufferSubData UBO transport."));
 
         var mainProg = _program.Program;
         var mainBlock = gl.GetUniformBlockIndex(mainProg, blockName);
@@ -352,16 +374,9 @@ public sealed partial class OpenGlPreviewBackend
             return;
         }
 
-        _gl!.BindBufferBase(BufferTargetARB.UniformBuffer, EntitySkinningUboBindingPoint, _entityBoneUbo);
-        if (_entityPrevBoneUbo != 0)
-        {
-            _gl!.BindBufferBase(BufferTargetARB.UniformBuffer, EntityPrevSkinningUboBindingPoint, _entityPrevBoneUbo);
-        }
-
-        if (_entityNormalBoneUbo != 0)
-        {
-            _gl!.BindBufferBase(BufferTargetARB.UniformBuffer, EntityNormalSkinningUboBindingPoint, _entityNormalBoneUbo);
-        }
+        _entityBoneUpload?.BindBase();
+        _entityPrevBoneUpload?.BindBase();
+        _entityNormalBoneUpload?.BindBase();
     }
 
     private void ApplyEntityBoneSkinningUniformsBeforeDraw(
@@ -635,10 +650,7 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         PackEntityNormalSkinningBoneMatrices(boneSnapshotCount);
-        gl.BindBuffer(BufferTargetARB.UniformBuffer, _entityNormalBoneUbo);
-        gl.BufferSubData<byte>(BufferTargetARB.UniformBuffer, 0, _entityNormalSkinningUboScratch.AsSpan(0, EntitySkinningUboMatrixBytes));
-        gl.BindBufferBase(BufferTargetARB.UniformBuffer, EntityNormalSkinningUboBindingPoint, _entityNormalBoneUbo);
-        gl.BindBuffer(BufferTargetARB.UniformBuffer, 0);
+        _entityNormalBoneUpload?.Upload(_entityNormalSkinningUboScratch.AsSpan(0, EntitySkinningUboMatrixBytes));
     }
 
     private void UploadEntitySkinningBoneMatrices(GL gl, int boneSnapshotCount)
@@ -651,10 +663,7 @@ public sealed partial class OpenGlPreviewBackend
         PackEntitySkinningBoneMatrices(boneSnapshotCount);
         UploadEntityNormalSkinningBoneMatrices(gl, boneSnapshotCount);
 
-        gl.BindBuffer(BufferTargetARB.UniformBuffer, _entityBoneUbo);
-        gl.BufferSubData<byte>(BufferTargetARB.UniformBuffer, 0, _entitySkinningUboScratch.AsSpan(0, EntitySkinningUboMatrixBytes));
-        gl.BindBufferBase(BufferTargetARB.UniformBuffer, EntitySkinningUboBindingPoint, _entityBoneUbo);
-        gl.BindBuffer(BufferTargetARB.UniformBuffer, 0);
+        _entityBoneUpload?.Upload(_entitySkinningUboScratch.AsSpan(0, EntitySkinningUboMatrixBytes));
     }
 
     private void UploadPreviousEntitySkinningBoneMatrices(GL gl)
@@ -677,10 +686,7 @@ public sealed partial class OpenGlPreviewBackend
             matrixFloats.Slice(n * 16, (EntityGpuSkinningLimits.MaxBones - n) * 16).Clear();
         }
 
-        gl.BindBuffer(BufferTargetARB.UniformBuffer, _entityPrevBoneUbo);
-        gl.BufferSubData<byte>(BufferTargetARB.UniformBuffer, 0, _entityPrevSkinningUboScratch.AsSpan(0, EntitySkinningUboMatrixBytes));
-        gl.BindBufferBase(BufferTargetARB.UniformBuffer, EntityPrevSkinningUboBindingPoint, _entityPrevBoneUbo);
-        gl.BindBuffer(BufferTargetARB.UniformBuffer, 0);
+        _entityPrevBoneUpload?.Upload(_entityPrevSkinningUboScratch.AsSpan(0, EntitySkinningUboMatrixBytes));
     }
 
     private void CapturePreviousEntitySkinningBones()
@@ -735,6 +741,7 @@ public sealed partial class OpenGlPreviewBackend
         _glVersionString = versionStr;
         _useOpenGlEs = sidecar is null &&
                        versionStr.Contains("OpenGL ES", StringComparison.OrdinalIgnoreCase);
+        _glCapabilities = PreviewGlCapabilities.FromGl(_gl, _useOpenGlEs, _glVersionString);
         _gpuBootstrap = new GpuBootstrapRunner();
         _gpuBootstrapAborted = false;
         RaiseGpuInitProgress(PreviewGpuInitPhases.Preparing, _settings);
@@ -909,23 +916,7 @@ public sealed partial class OpenGlPreviewBackend
         DestroySunDebugOverlay();
         _shaderCtx = null;
 
-        if (_entityBoneUbo != 0)
-        {
-            _gl?.DeleteBuffer(_entityBoneUbo);
-            _entityBoneUbo = 0;
-        }
-
-        if (_entityPrevBoneUbo != 0)
-        {
-            _gl?.DeleteBuffer(_entityPrevBoneUbo);
-            _entityPrevBoneUbo = 0;
-        }
-
-        if (_entityNormalBoneUbo != 0)
-        {
-            _gl?.DeleteBuffer(_entityNormalBoneUbo);
-            _entityNormalBoneUbo = 0;
-        }
+        DisposeEntitySkinningUploadBuffers();
     }
 
     /// <summary>Drops managed references without issuing GL deletes (context already gone).</summary>
@@ -956,6 +947,9 @@ public sealed partial class OpenGlPreviewBackend
         _entityBoneUbo = 0;
         _entityPrevBoneUbo = 0;
         _entityNormalBoneUbo = 0;
+        _entityBoneUpload = null;
+        _entityPrevBoneUpload = null;
+        _entityNormalBoneUpload = null;
         DestroyAtmosphereResources();
         DestroyGodRayResources();
         DestroyVolumeResources();
@@ -987,5 +981,18 @@ public sealed partial class OpenGlPreviewBackend
         {
             _gpuAlive = false;
         }
+    }
+
+    private void DisposeEntitySkinningUploadBuffers()
+    {
+        _entityBoneUpload?.Dispose();
+        _entityBoneUpload = null;
+        _entityPrevBoneUpload?.Dispose();
+        _entityPrevBoneUpload = null;
+        _entityNormalBoneUpload?.Dispose();
+        _entityNormalBoneUpload = null;
+        _entityBoneUbo = 0;
+        _entityPrevBoneUbo = 0;
+        _entityNormalBoneUbo = 0;
     }
 }
