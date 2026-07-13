@@ -95,6 +95,9 @@ tests/_out*/
 # Extracted vanilla client asset trees (local preview fallback; IR lives in docs/generated/)
 src/AutoPBR.Core/Data/minecraft-native/*/assets/
 
+# Root Mojang entity/texture drops — never commit Minecraft PNGs or other client assets
+/assets/minecraft/
+
 # Mojang client JARs (local download; see tools/minecraft-parity/*/README.md)
 tools/minecraft-parity/**/client.jar
 
@@ -102,12 +105,8 @@ tools/minecraft-parity/**/client.jar
 tools/MinecraftGeometryReference/.gradle/
 tools/MinecraftGeometryReference/build/
 
-# Cursor IDE local state; share project rules with future agents.
-.cursor/*
-!.cursor/rules/
-.cursor/rules/*
-!.cursor/rules/test-guidance-geometry-animation-ir.mdc
-!.cursor/rules/ghast-family-parity.mdc
+# Cursor IDE local state and project rules (keep local only)
+.cursor/
 
 # Ephemeral one-off scripts and agent diagnostics at repo root
 /_list_diag.py
