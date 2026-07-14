@@ -27,6 +27,12 @@ internal sealed record PreviewGlCapabilities(
 {
     public bool CanUsePersistentUploadRing => !IsOpenGlEs && PersistentMappedBuffers;
 
+    public bool CanUseEntitySkinningSsbo => !IsOpenGlEs && ShaderStorageBuffers;
+
+    public bool CanUseMaterialDrawRecordSsbo => !IsOpenGlEs && ShaderStorageBuffers;
+
+    public bool CanUseComputeFroxelInject => !IsOpenGlEs && ComputeShaders && ImageLoadStore;
+
     public string UploadTransportLabel => CanUsePersistentUploadRing ? "persistent-mapped UBO uploads" : "BufferSubData uploads";
 
     public string FormatDiagnostic()
@@ -36,6 +42,9 @@ internal sealed record PreviewGlCapabilities(
                $"{api} {Major}.{Minor}; " +
                $"persistentUpload={(CanUsePersistentUploadRing ? "on" : "off")}, " +
                $"ssbo={(ShaderStorageBuffers ? "yes" : "no")}, " +
+               $"entitySsbo={(CanUseEntitySkinningSsbo ? "on" : "off")}, " +
+               $"materialDrawSsbo={(CanUseMaterialDrawRecordSsbo ? "on" : "off")}, " +
+               $"computeFroxels={(CanUseComputeFroxelInject ? "on" : "off")}, " +
                $"compute={(ComputeShaders ? "yes" : "no")}, " +
                $"imageStore={(ImageLoadStore ? "yes" : "no")}, " +
                $"multiDrawIndirect={(MultiDrawIndirect ? "yes" : "no")}, " +
@@ -43,8 +52,14 @@ internal sealed record PreviewGlCapabilities(
                $"spirv={(SpirV ? "yes" : "no")}.";
     }
 
-    public string FormatContextSuffix() =>
-        CanUsePersistentUploadRing ? " · persistent uploads" : " · GLES-safe uploads";
+    public string FormatContextSuffix()
+    {
+        var upload = CanUsePersistentUploadRing ? "persistent uploads" : "GLES-safe uploads";
+        var entitySkinning = CanUseEntitySkinningSsbo ? "entity SSBO" : "entity UBO";
+        var drawRecords = CanUseMaterialDrawRecordSsbo ? "draw SSBO" : "draw uniforms";
+        var froxelInject = CanUseComputeFroxelInject ? "compute froxels" : "fragment froxels";
+        return $" · {upload} · {entitySkinning} · {drawRecords} · {froxelInject}";
+    }
 
     public static PreviewGlCapabilities FromGl(GL gl, bool useOpenGlEs, string versionString)
     {

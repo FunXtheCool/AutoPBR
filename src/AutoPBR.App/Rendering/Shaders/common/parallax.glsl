@@ -8,6 +8,18 @@
 
 //!include "common.glsl"
 
+#ifndef GENESIS_DRAW_RECORD_GLSL
+float genesisParallaxUvScale(float fallbackValue)
+{
+    return fallbackValue;
+}
+
+vec2 genesisParallaxHeightTexSize(vec2 fallbackValue)
+{
+    return fallbackValue;
+}
+#endif
+
 const int GEN_POM_TRACE_LAYERS_MAX = 128;
 const int GEN_POM_REFINE_STEPS_MAX = 8;
 const int GEN_POM_SHADOW_TAPS_MAX = 64;
@@ -78,7 +90,7 @@ vec2 traceParallaxPom(sampler2D heightTex, vec2 uv0, vec3 Vtan, float strength, 
         steer *= GEN_POM_STEER_TAN_CAP / max(tanMag, GEN_EPS);
     }
 
-    float parallaxScale = pomUvDisplacementScale(strength) * clamp(uParallaxUvScale, 0.02, 1.0);
+    float parallaxScale = pomUvDisplacementScale(strength) * clamp(genesisParallaxUvScale(uParallaxUvScale), 0.02, 1.0);
     vec2 totalOffset = steer * parallaxScale;
     float maxUvShift = clamp(uParallaxMaxUvShift, 0.05, 0.75);
     float totalLen = length(totalOffset);
@@ -196,7 +208,7 @@ float traceParallaxShadow(sampler2D heightTex, vec2 uvHit, vec3 Ltan, float refD
         return 1.0;
     }
 
-    float uvScale = pomUvDisplacementScale(strength) * clamp(uParallaxUvScale, 0.02, 1.0);
+    float uvScale = pomUvDisplacementScale(strength) * clamp(genesisParallaxUvScale(uParallaxUvScale), 0.02, 1.0);
     vec2 tileBase = floor(uvHit);
     vec2 localUv = pomTileLocal(uvHit);
     vec2 uvStep = (Ltan.xy / lz) * uvScale * stepLen;
@@ -245,7 +257,7 @@ float traceParallaxAo(sampler2D heightTex, vec2 uvHit, float refDepth, float str
 
     vec2 tileBase = floor(uvHit);
     vec2 localHit = pomTileLocal(uvHit);
-    vec2 texelSize = vec2(1.0) / max(uParallaxHeightTexSize, vec2(GEN_EPS));
+    vec2 texelSize = vec2(1.0) / max(genesisParallaxHeightTexSize(uParallaxHeightTexSize), vec2(GEN_EPS));
     float radiusTexels = mix(0.75, 2.25, clamp(refDepth, 0.0, 1.0)) * clamp(strength, 0.0, 1.0);
     if (radiusTexels <= GEN_EPS)
     {

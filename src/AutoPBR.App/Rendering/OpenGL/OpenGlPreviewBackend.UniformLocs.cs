@@ -71,7 +71,9 @@ public sealed partial class OpenGlPreviewBackend
         int EnableShadowCascades,
         int CascadeSplitDistance,
         int CascadeBlendWidth,
-        int AtmoSkyViewLut);
+        int AtmoSkyViewLut,
+        int GenesisUseMaterialDrawRecord,
+        int GenesisDrawRecordIndex);
 
     private readonly record struct ShadowProgramUniformLocs(
         int LightViewProj,
@@ -80,7 +82,9 @@ public sealed partial class OpenGlPreviewBackend
         int EntityAlphaMode,
         int ItemAlphaBlend,
         int Albedo,
-        int AlphaCutoff);
+        int AlphaCutoff,
+        int GenesisUseMaterialDrawRecord,
+        int GenesisDrawRecordIndex);
 
     private readonly record struct LineProgramUniformLocs(int Mvp);
 
@@ -172,7 +176,9 @@ public sealed partial class OpenGlPreviewBackend
             program.GetUniformLocation("uEnableShadowCascades"),
             program.GetUniformLocation("uCascadeSplitDistance"),
             program.GetUniformLocation("uCascadeBlendWidth"),
-            program.GetUniformLocation("uAtmoSkyViewLut"));
+            program.GetUniformLocation("uAtmoSkyViewLut"),
+            program.GetUniformLocation("uGenesisUseMaterialDrawRecord"),
+            program.GetUniformLocation("uGenesisDrawRecordIndex"));
 
     private static ShadowProgramUniformLocs ResolveShadowProgramUniformLocs(GlShaderProgram program) =>
         new(
@@ -182,7 +188,9 @@ public sealed partial class OpenGlPreviewBackend
             program.GetUniformLocation("uEntityAlphaMode"),
             program.GetUniformLocation("uItemAlphaBlend"),
             program.GetUniformLocation("uAlbedo"),
-            program.GetUniformLocation("uAlphaCutoff"));
+            program.GetUniformLocation("uAlphaCutoff"),
+            program.GetUniformLocation("uGenesisUseMaterialDrawRecord"),
+            program.GetUniformLocation("uGenesisDrawRecordIndex"));
 
     private static LineProgramUniformLocs ResolveLineProgramUniformLocs(GlLineShaderProgram program) =>
         new(program.GetUniformLocation("uMvp"));

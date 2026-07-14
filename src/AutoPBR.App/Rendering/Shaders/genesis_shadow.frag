@@ -1,4 +1,8 @@
 #version 330 core
+#ifdef GENESIS_MATERIAL_DRAW_RECORD_SSBO
+#extension GL_ARB_shader_storage_buffer_object : require
+#endif
+//!include "common/genesis_draw_record.glsl"
 
 // AutoPBR Genesis preview shader - depth-only shadow fragment stage.
 
@@ -37,14 +41,14 @@ void main()
             discard;
         }
     }
-    else if (uEntityAlphaMode == 1)
+    else if (genesisEntityAlphaMode(uEntityAlphaMode) == 1)
     {
         if (aTex < uAlphaCutoff)
         {
             discard;
         }
     }
-    else if (uEntityAlphaMode == 2)
+    else if (genesisEntityAlphaMode(uEntityAlphaMode) == 2)
     {
         float refBlend = max(uAlphaCutoff, 0.42);
         if (aTex < refBlend)

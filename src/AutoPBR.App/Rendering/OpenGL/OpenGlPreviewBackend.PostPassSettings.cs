@@ -93,6 +93,21 @@ public sealed partial class OpenGlPreviewBackend
             SetFloatOnProgramLoc(_volumeInjectProgram, vi.ShadowMinBias, settings.ShadowMinBias);
         }
 
+        if (_volumeInjectComputeProgram is { IsValid: true })
+        {
+            var vci = _volumeInjectComputeUniformLocs;
+            SetFloatOnProgramLoc(_volumeInjectComputeProgram, vci.DepthDistribution, quality.FroxelDepthExp);
+            SetFloatOnProgramLoc(_volumeInjectComputeProgram, vci.LayerHeight, layerWorldY);
+            SetFloatOnProgramLoc(_volumeInjectComputeProgram, vci.VolumeHeight, settings.CloudVolumeHeight);
+            SetFloatOnProgramLoc(_volumeInjectComputeProgram, vci.CloudDensity, settings.CloudDensity);
+            SetFloatOnProgramLoc(_volumeInjectComputeProgram, vci.VolumeSize, settings.CloudVolumeSize);
+            SetFloatOnProgramLoc(_volumeInjectComputeProgram, vci.GroundWorldY, PreviewStageConstants.GroundPlaneWorldY);
+            SetFloatOnProgramLoc(_volumeInjectComputeProgram, vci.FogSlabHeight, PreviewStageConstants.GroundFogSlabHeight);
+            SetFloatOnProgramLoc(_volumeInjectComputeProgram, vci.HeightFogStrength, ResolveVolumeHeightFogStrength(settings));
+            SetFloatOnProgramLoc(_volumeInjectComputeProgram, vci.DebugDensity, Math.Max(0f, settings.GodRayDebugDensity));
+            SetFloatOnProgramLoc(_volumeInjectComputeProgram, vci.ShadowMinBias, settings.ShadowMinBias);
+        }
+
         if (_volumeIntegrateProgram is { IsValid: true })
         {
             var iu = _volumeIntegrateUniformLocs;

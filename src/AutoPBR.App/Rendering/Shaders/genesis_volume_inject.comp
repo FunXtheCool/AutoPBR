@@ -1,0 +1,75 @@
+#version 430 core
+
+// Desktop GL compute froxel inject prototype. GLES/ANGLE keeps the fragment slice path.
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(rgba8, binding = 0) writeonly uniform image2DArray uFroxelOut;
+layout(r8, binding = 1) writeonly uniform image2DArray uFroxelOccupancyOut;
+
+uniform sampler2DShadow uShadowMap;
+uniform sampler2DShadow uShadowMapNear;
+
+uniform mat4 uLightViewProj;
+uniform mat4 uLightViewProjNear;
+
+uniform vec3 uCameraPos;
+uniform vec3 uCamRight;
+uniform vec3 uCamUp;
+uniform vec3 uCamForward;
+uniform vec3 uLightDir;
+uniform vec3 uLightColor;
+uniform vec3 uHalfExtent;
+uniform ivec3 uFroxelSize;
+
+uniform int uSliceCount;
+uniform float uDepthDistribution;
+uniform float uLayerHeight;
+uniform float uVolumeHeight;
+uniform float uCloudDensity;
+uniform float uVolumeSize;
+uniform float uGroundWorldY;
+uniform float uFogSlabHeight;
+uniform float uHeightFogStrength;
+uniform float uDebugDensity;
+
+uniform vec2 uShadowTexelSize;
+uniform float uShadowMinBias;
+uniform int uEnableShadowMap;
+uniform int uEnableShadowCascades;
+uniform float uCascadeSplitDistance;
+uniform float uCascadeBlendWidth;
+
+//!include "common/common.glsl"
+//!include "common/shadow_gates.glsl"
+//!include "common/volumetric_inject_density.glsl"
+//!include "common/volume_froxel_math.glsl"
+//!include "common/volume_inject_pack.glsl"
+
+void main()
+{
+    ivec3 gid = ivec3(gl_GlobalInvocationID.xyz);
+    if (gid.x >= uFroxelSize.x || gid.y >= uFroxelSize.y || gid.z >= uFroxelSize.z)
+    {
+        return;
+    }
+
+    vec2 uv = (vec2(gid.xy) + vec2(0.5)) / vec2(max(uFroxelSize.xy, ivec2(1)));
+    int sliceIndex = gid.z;
+    vec3 worldPos = vfFroxelWorldPos(uv, sliceIndex, uSliceCount, uCameraPos,
+        uCamRight, uCamUp, uCamForward, uHalfExtent, uDepthDistribution);
+
+    float layerBase = uLayerHeight;
+    float layerTop = layerBase + uVolumeHeight;
+    float mediumRho = viInjectMediumDensity(worldPos, uGroundWorldY, uFogSlabHeight, layerBase, layerTop,
+        uCloudDensity, uHeightFogStrength) + max(uDebugDensity, 0.0);
+    mediumRho = clamp(mediumRho, 0.0, 1.0);
+
+    float shadowGate = grShadowGateCascaded(worldPos, uCameraPos, uLightViewProjNear, uLightViewProj,
+        uShadowMapNear, uShadowMap, uShadowTexelSize, uShadowMinBias,
+        uEnableShadowMap, uEnableShadowCascades, uCascadeSplitDistance, uCascadeBlendWidth);
+
+    vec4 froxel = viPackFroxelInject(mediumRho, uLightColor, shadowGate);
+    imageStore(uFroxelOut, gid, froxel);
+    imageStore(uFroxelOccupancyOut, gid, vec4(mediumRho, 0.0, 0.0, 1.0));
+}

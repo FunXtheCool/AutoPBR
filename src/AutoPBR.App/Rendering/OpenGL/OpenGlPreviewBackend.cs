@@ -113,15 +113,26 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private GlPersistentMappedUploadBuffer? _entityBoneUpload;
     private GlPersistentMappedUploadBuffer? _entityPrevBoneUpload;
     private GlPersistentMappedUploadBuffer? _entityNormalBoneUpload;
+    private GlPersistentMappedUploadBuffer? _genesisMaterialDrawRecordUpload;
     private uint _entityBoneUbo;
     private uint _entityPrevBoneUbo;
     private uint _entityNormalBoneUbo;
+    private uint _genesisMaterialDrawRecordSsbo;
     private int _entityPrevBoneSnapshotCount;
     private bool _entityPrevBoneSnapshotValid;
 
     private const uint EntitySkinningUboBindingPoint = 2;
     private const uint EntityPrevSkinningUboBindingPoint = 3;
     private const uint EntityNormalSkinningUboBindingPoint = 4;
+    private const uint EntitySkinningSsboBindingPoint = 5;
+    private const uint EntityPrevSkinningSsboBindingPoint = 6;
+    private const uint EntityNormalSkinningSsboBindingPoint = 7;
+    private const uint GenesisMaterialDrawRecordSsboBindingPoint = 8;
+    private const int GenesisMaterialDrawRecordFloats = 16;
+    private const int GenesisMaterialDrawRecordBytes = GenesisMaterialDrawRecordFloats * sizeof(float);
+    private const int GenesisMaterialDrawRecordMaxRecords = 4096;
+    private readonly byte[] _genesisMaterialDrawRecordScratch =
+        new byte[GenesisMaterialDrawRecordMaxRecords * GenesisMaterialDrawRecordBytes];
 
     private readonly record struct EntitySkinningUniformLocs(
         int PreviewSpaceVerts,
@@ -146,6 +157,11 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private string? _lastError;
     private bool _gpuAlive;
     private PreviewGlCapabilities? _glCapabilities;
+    private bool _entitySkinningUsesSsbo;
+    private bool _entitySkinningSsboCompileDisabled;
+    private bool _genesisMaterialDrawRecordsUseSsbo;
+    private bool _materialDrawRecordSsboCompileDisabled;
+    private bool _loggedMaterialDrawRecordOverflow;
     private bool _genesisTessellationCompileDisabled;
     private bool _genesisTessellationFailureLogged;
     private int _appliedWglSwapInterval = int.MinValue;

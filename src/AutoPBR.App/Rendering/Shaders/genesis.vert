@@ -1,4 +1,8 @@
 #version 330 core
+#if defined(GENESIS_ENTITY_SKINNING_SSBO) || defined(GENESIS_MATERIAL_DRAW_RECORD_SSBO)
+#extension GL_ARB_shader_storage_buffer_object : require
+#endif
+//!include "common/genesis_draw_record.glsl"
 // AutoPBR Genesis preview shader - vertex stage.
 // Algorithms inspired by LabPBR 1.3 spec and Glimmer Shaders (MIT).
 
@@ -16,8 +20,21 @@ uniform mat4 uTaaCurrViewProj;
 uniform mat4 uPrevViewProj;
 uniform mat4 uLightViewProj;
 
-// Bone palette only in UBO (std140 mat4[64]). Scalars are plain float uniforms - avoids std140 tail
-// layout mismatches and GLES/ANGLE int-uniform quirks on Windows preview contexts.
+// Bone palettes use SSBOs on capable desktop GL and UBOs everywhere else. Scalars stay as plain
+// uniforms to preserve the GLES/ANGLE fallback and avoid std140 tail-layout quirks.
+#ifdef GENESIS_ENTITY_SKINNING_SSBO
+layout(std430, binding = 5) readonly buffer EntitySkinningBonesSsbo {
+    mat4 uBoneMatrices[];
+};
+
+layout(std430, binding = 6) readonly buffer EntityPrevSkinningBonesSsbo {
+    mat4 uPrevBoneMatrices[];
+};
+
+layout(std430, binding = 7) readonly buffer EntitySkinningNormalsSsbo {
+    mat4 uNormalBoneMatrices[];
+};
+#else
 layout(std140) uniform EntitySkinningBones {
     mat4 uBoneMatrices[64];
 };
@@ -29,6 +46,7 @@ layout(std140) uniform EntityPrevSkinningBones {
 layout(std140) uniform EntitySkinningNormals {
     mat4 uNormalBoneMatrices[64];
 };
+#endif
 
 uniform float uEntityPreviewSpaceVerts;
 uniform float uEntityBindMesh;
@@ -99,7 +117,7 @@ void main()
     vWorldNormal = m3 * entityN;
     vec3 t = m3 * entityT;
     vWorldTangent = vec4(normalize(t), aTangent.w);
-    vUv = aUv * uTextureAtlasScale;
+    vUv = aUv * genesisTextureAtlasScale(uTextureAtlasScale);
     vLightClip = uLightViewProj * wp;
     vec4 clip = uProj * uView * wp;
     vCurrClip = uTaaCurrViewProj * wp;

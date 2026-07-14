@@ -55,6 +55,14 @@ public sealed partial class OpenGlPreviewBackend
     internal static string TestBuildParityCatalogCpuBindCommitKey(EntityEmulatedPreviewRebakeContext ctx) =>
         PreviewRenderPassSetup.BuildParityCatalogCpuBindCommitKey(ctx);
 
+    internal static IReadOnlyDictionary<string, int> TestBuildGenesisProgramDefines(
+        bool entitySkinningSsbo,
+        bool materialDrawRecordSsbo) =>
+        BuildGenesisProgramDefines(
+            GenesisShaderFeatureMask.None,
+            entitySkinningSsbo,
+            materialDrawRecordSsbo);
+
     internal static bool TestTryResolveEntitySkinningDrawState(
         PreviewModelSubject? model,
         float meshSpaceLiftY,

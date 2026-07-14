@@ -109,6 +109,36 @@ public sealed partial class OpenGlPreviewBackend
         int ShadowMapNear,
         int SliceIndex);
 
+    private readonly record struct VolumeInjectComputeUniformLocs(
+        int CameraPos,
+        int CamRight,
+        int CamUp,
+        int CamForward,
+        int LightDir,
+        int LightColor,
+        int HalfExtent,
+        int FroxelSize,
+        int SliceCount,
+        int DepthDistribution,
+        int LayerHeight,
+        int VolumeHeight,
+        int CloudDensity,
+        int VolumeSize,
+        int GroundWorldY,
+        int FogSlabHeight,
+        int HeightFogStrength,
+        int DebugDensity,
+        int LightViewProj,
+        int LightViewProjNear,
+        int ShadowTexelSize,
+        int ShadowMinBias,
+        int EnableShadowMap,
+        int EnableShadowCascades,
+        int CascadeSplitDistance,
+        int CascadeBlendWidth,
+        int ShadowMap,
+        int ShadowMapNear);
+
     private readonly record struct VolumeIntegrateUniformLocs(
         int FroxelVolume,
         int FroxelOccupancy,
@@ -241,6 +271,7 @@ public sealed partial class OpenGlPreviewBackend
     private GodRayUpsampleUniformLocs _godRayUpsampleUniformLocs;
     private GodRayCompositeUniformLocs _godRayCompositeUniformLocs;
     private VolumeInjectUniformLocs _volumeInjectUniformLocs;
+    private VolumeInjectComputeUniformLocs _volumeInjectComputeUniformLocs;
     private VolumeIntegrateUniformLocs _volumeIntegrateUniformLocs;
     private CloudUniformLocs _cloudUniformLocs;
     private CloudUpsampleUniformLocs _cloudUpsampleUniformLocs;
@@ -363,6 +394,37 @@ public sealed partial class OpenGlPreviewBackend
             program.GetUniformLocation("uShadowMap"),
             program.GetUniformLocation("uShadowMapNear"),
             program.GetUniformLocation("uSliceIndex"));
+
+    private static VolumeInjectComputeUniformLocs ResolveVolumeInjectComputeUniformLocs(GlShaderProgram program) =>
+        new(
+            program.GetUniformLocation("uCameraPos"),
+            program.GetUniformLocation("uCamRight"),
+            program.GetUniformLocation("uCamUp"),
+            program.GetUniformLocation("uCamForward"),
+            program.GetUniformLocation("uLightDir"),
+            program.GetUniformLocation("uLightColor"),
+            program.GetUniformLocation("uHalfExtent"),
+            program.GetUniformLocation("uFroxelSize"),
+            program.GetUniformLocation("uSliceCount"),
+            program.GetUniformLocation("uDepthDistribution"),
+            program.GetUniformLocation("uLayerHeight"),
+            program.GetUniformLocation("uVolumeHeight"),
+            program.GetUniformLocation("uCloudDensity"),
+            program.GetUniformLocation("uVolumeSize"),
+            program.GetUniformLocation("uGroundWorldY"),
+            program.GetUniformLocation("uFogSlabHeight"),
+            program.GetUniformLocation("uHeightFogStrength"),
+            program.GetUniformLocation("uDebugDensity"),
+            program.GetUniformLocation("uLightViewProj"),
+            program.GetUniformLocation("uLightViewProjNear"),
+            program.GetUniformLocation("uShadowTexelSize"),
+            program.GetUniformLocation("uShadowMinBias"),
+            program.GetUniformLocation("uEnableShadowMap"),
+            program.GetUniformLocation("uEnableShadowCascades"),
+            program.GetUniformLocation("uCascadeSplitDistance"),
+            program.GetUniformLocation("uCascadeBlendWidth"),
+            program.GetUniformLocation("uShadowMap"),
+            program.GetUniformLocation("uShadowMapNear"));
 
     private static VolumeIntegrateUniformLocs ResolveVolumeIntegrateUniformLocs(GlShaderProgram program) =>
         new(

@@ -197,6 +197,13 @@ public sealed partial class OpenGlPreviewBackend
         IReadOnlyDictionary<string, int>? defines = null) =>
         _shaderCtx!.CreateProgram(vertexFile, tessControlFile, tessEvaluationFile, fragmentFile, out error, debugLabel, defines);
 
+    private GlShaderProgram CreatePreviewComputeProgram(
+        string computeFile,
+        out string? error,
+        string? debugLabel = null,
+        IReadOnlyDictionary<string, int>? defines = null) =>
+        _shaderCtx!.CreateComputeProgram(computeFile, out error, debugLabel, defines);
+
     private bool TryEnsureProceduralSkyProgram()
     {
         if (_proceduralSkyProgram is { IsValid: true } || _gl is null)

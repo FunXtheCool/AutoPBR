@@ -12,8 +12,10 @@ namespace AutoPBR.App.Rendering.OpenGL;
 public sealed partial class OpenGlPreviewBackend
 {
     private GlShaderProgram? _volumeInjectProgram;
+    private GlShaderProgram? _volumeInjectComputeProgram;
     private GlShaderProgram? _volumeIntegrateProgram;
     private bool _volumeUseLiteShaders;
+    private bool _volumeComputeInjectCompileDisabled;
     private string? _volumeInitFailureDetail;
     private string? _godRayInitFailureDetail;
     private GlVolumeFroxelTarget? _volumeFroxelTarget;
@@ -32,6 +34,12 @@ public sealed partial class OpenGlPreviewBackend
     private int _volumeHistoryHalfH;
 
     private const float VolumeHeightFogScale = 0.42f;
+    private const uint VolumeFroxelImageUnit = 0;
+    private const uint VolumeFroxelOccupancyImageUnit = 1;
+    private const uint ShaderImageAccessBarrierBit = 0x00000020;
+    private const uint TextureFetchBarrierBit = 0x00000008;
+    private const uint VolumeComputeLocalSizeX = 8;
+    private const uint VolumeComputeLocalSizeY = 8;
 
     private static float ResolveCloudLayerWorldBase(in PreviewRenderSettingsSnapshot settings) =>
         PreviewStageConstants.CloudLayerBaseWorldY(settings.CloudLayerHeight);
@@ -40,9 +48,11 @@ public sealed partial class OpenGlPreviewBackend
     {
         DestroyVolumeResources();
         _volumeUseLiteShaders = false;
+        _volumeComputeInjectCompileDisabled = false;
         _volumeInitFailureDetail = null;
         if (TryLoadVolumePrograms(gl, useOpenGlEs, lite: false))
         {
+            _lastPostPassAppliedSettingsRevision = -1;
             EmitDiagnostic("[3D preview] Volume shaders ready (gles-pack rev 29 (froxel march), full path).");
             return;
         }
@@ -52,6 +62,7 @@ public sealed partial class OpenGlPreviewBackend
         _volumeUseLiteShaders = true;
         if (TryLoadVolumePrograms(gl, useOpenGlEs, lite: true))
         {
+            _lastPostPassAppliedSettingsRevision = -1;
             EmitDiagnostic("[3D preview] Volume lite god-ray path ready (gles-pack rev 29 (froxel march)).");
             return;
         }
@@ -110,6 +121,7 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         _volumeInjectUniformLocs = ResolveVolumeInjectUniformLocs(_volumeInjectProgram);
+        TryLoadVolumeComputeInject(lite);
 
         var integrateDefines = BuildVolumeIntegrateDefines(useOpenGlEs, temporal: !_settings.GodRayStabilizeDebug);
         _volumeIntegrateProgram = CreatePreviewProgram("genesis_godrays.vert", integrateFile, out var intErr,
@@ -127,6 +139,31 @@ public sealed partial class OpenGlPreviewBackend
         return true;
     }
 
+    private void TryLoadVolumeComputeInject(bool lite)
+    {
+        if (lite || _volumeComputeInjectCompileDisabled || _glCapabilities?.CanUseComputeFroxelInject != true)
+        {
+            return;
+        }
+
+        _volumeInjectComputeProgram = CreatePreviewComputeProgram(
+            "genesis_volume_inject.comp",
+            out var computeErr,
+            "volume-inject-compute");
+        if (_volumeInjectComputeProgram is not { IsValid: true })
+        {
+            _volumeComputeInjectCompileDisabled = true;
+            EmitDiagnostic("[3D preview] Compute froxel inject unavailable; using fragment slice path. " +
+                           TrimShaderDiagnostic(computeErr));
+            _volumeInjectComputeProgram?.Dispose();
+            _volumeInjectComputeProgram = null;
+            return;
+        }
+
+        _volumeInjectComputeUniformLocs = ResolveVolumeInjectComputeUniformLocs(_volumeInjectComputeProgram);
+        EmitDiagnostic("[3D preview] Compute froxel inject ready (desktop GL image-store path).");
+    }
+
     private void DestroyVolumeResources()
     {
         _volumeFroxelTarget?.Dispose();
@@ -135,6 +172,8 @@ public sealed partial class OpenGlPreviewBackend
         _volumeFroxelHistory = null;
         _volumeIntegrateHistory?.Dispose();
         _volumeIntegrateHistory = null;
+        _volumeInjectComputeProgram?.Dispose();
+        _volumeInjectComputeProgram = null;
         _volumeInjectProgram?.Dispose();
         _volumeInjectProgram = null;
         _volumeIntegrateProgram?.Dispose();
@@ -238,13 +277,29 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         var injectSw = frame.Settings.LogVolumetricTiming ? Stopwatch.StartNew() : null;
-        var quality = PreviewVolumetricQuality.Resolve(frame.Settings.VolumetricQuality);
         ComputeCameraBasis(frame.Eye, frame.LookTarget, out var camRight, out var camUp, out var camForward);
 
         var shadowAvailable = frame.ShadowAvailable && _shadowTarget is not null;
         var shadowRes = _shadowTarget?.Resolution ?? Math.Clamp(frame.Settings.ShadowMapResolution, 256, 4096);
         var shadowTexelSize = new Vector2(1f / shadowRes, 1f / shadowRes);
-        var layerWorldY = ResolveCloudLayerWorldBase(frame.Settings);
+
+        if (TryInjectVolumeFroxelsCompute(
+                ref frame,
+                halfExtent,
+                camRight,
+                camUp,
+                camForward,
+                shadowAvailable,
+                shadowTexelSize))
+        {
+            injectSw?.Stop();
+            if (injectSw is not null)
+            {
+                frame.LastVolumeInjectMs = injectSw.Elapsed.TotalMilliseconds;
+            }
+
+            return true;
+        }
 
         _volumeInjectProgram.Use();
         var vi = _volumeInjectUniformLocs;
@@ -315,6 +370,86 @@ public sealed partial class OpenGlPreviewBackend
             frame.LastVolumeInjectMs = injectSw.Elapsed.TotalMilliseconds;
         }
 
+        return true;
+    }
+
+    private bool TryInjectVolumeFroxelsCompute(
+        ref GlRenderFrame frame,
+        Vector3 halfExtent,
+        Vector3 camRight,
+        Vector3 camUp,
+        Vector3 camForward,
+        bool shadowAvailable,
+        Vector2 shadowTexelSize)
+    {
+        if (_volumeUseLiteShaders ||
+            _glCapabilities?.CanUseComputeFroxelInject != true ||
+            _volumeInjectComputeProgram is not { IsValid: true } ||
+            _volumeFroxelTarget is not { IsValid: true })
+        {
+            return false;
+        }
+
+        if (!_volumeFroxelTarget.BindImagesForCompute(VolumeFroxelImageUnit, VolumeFroxelOccupancyImageUnit))
+        {
+            return false;
+        }
+
+        var gl = frame.Gl;
+        _volumeInjectComputeProgram.Use();
+        var vci = _volumeInjectComputeUniformLocs;
+        SetVec3OnProgramLoc(_volumeInjectComputeProgram, vci.CameraPos, frame.Eye);
+        SetVec3OnProgramLoc(_volumeInjectComputeProgram, vci.CamRight, camRight);
+        SetVec3OnProgramLoc(_volumeInjectComputeProgram, vci.CamUp, camUp);
+        SetVec3OnProgramLoc(_volumeInjectComputeProgram, vci.CamForward, camForward);
+        SetVec3OnProgramLoc(_volumeInjectComputeProgram, vci.LightDir, frame.LightDir);
+        SetVec3OnProgramLoc(_volumeInjectComputeProgram, vci.LightColor, frame.Scene.Light.Color);
+        SetVec3OnProgramLoc(_volumeInjectComputeProgram, vci.HalfExtent, halfExtent);
+        SetInt3OnProgramLoc(_volumeInjectComputeProgram, vci.FroxelSize,
+            _volumeFroxelTarget.Width, _volumeFroxelTarget.Height, _volumeFroxelTarget.Slices);
+        SetIntOnProgramLoc(_volumeInjectComputeProgram, vci.SliceCount, _volumeFroxelTarget.Slices);
+
+        SetMatrixOnProgramLoc(_volumeInjectComputeProgram, vci.LightViewProj, frame.ShadowVp);
+        SetMatrixOnProgramLoc(_volumeInjectComputeProgram, vci.LightViewProjNear, frame.ShadowVpNear);
+        SetVec2OnProgramLoc(_volumeInjectComputeProgram, vci.ShadowTexelSize, shadowTexelSize);
+        var cascadesActive = shadowAvailable && frame.ShadowCascadesActive;
+        SetIntOnProgramLoc(_volumeInjectComputeProgram, vci.EnableShadowMap, shadowAvailable ? 1 : 0);
+        SetIntOnProgramLoc(_volumeInjectComputeProgram, vci.EnableShadowCascades, cascadesActive ? 1 : 0);
+        SetFloatOnProgramLoc(_volumeInjectComputeProgram, vci.CascadeSplitDistance, frame.CascadeSplitWorldDistance);
+        SetFloatOnProgramLoc(_volumeInjectComputeProgram, vci.CascadeBlendWidth, frame.CascadeBlendWorldWidth);
+
+        gl.ActiveTexture(TextureUnit.Texture0);
+        if (_shadowTarget is not null)
+        {
+            gl.BindTexture(TextureTarget.Texture2D, _shadowTarget.DepthTextureHandle);
+        }
+        else if (_sceneCapture is not null)
+        {
+            gl.BindTexture(TextureTarget.Texture2D, _sceneCapture.DepthTextureHandle);
+        }
+
+        SetIntOnProgramLoc(_volumeInjectComputeProgram, vci.ShadowMap, 0);
+        gl.ActiveTexture(TextureUnit.Texture1);
+        if (cascadesActive && _shadowTargetCascadeNear is not null)
+        {
+            gl.BindTexture(TextureTarget.Texture2D, _shadowTargetCascadeNear.DepthTextureHandle);
+        }
+        else if (_shadowTarget is not null)
+        {
+            gl.BindTexture(TextureTarget.Texture2D, _shadowTarget.DepthTextureHandle);
+        }
+        else if (_sceneCapture is not null)
+        {
+            gl.BindTexture(TextureTarget.Texture2D, _sceneCapture.DepthTextureHandle);
+        }
+
+        SetIntOnProgramLoc(_volumeInjectComputeProgram, vci.ShadowMapNear, 1);
+
+        var groupsX = (uint)((_volumeFroxelTarget.Width + (int)VolumeComputeLocalSizeX - 1) / (int)VolumeComputeLocalSizeX);
+        var groupsY = (uint)((_volumeFroxelTarget.Height + (int)VolumeComputeLocalSizeY - 1) / (int)VolumeComputeLocalSizeY);
+        var groupsZ = (uint)_volumeFroxelTarget.Slices;
+        gl.DispatchCompute(groupsX, groupsY, groupsZ);
+        gl.MemoryBarrier(ShaderImageAccessBarrierBit | TextureFetchBarrierBit);
         return true;
     }
 

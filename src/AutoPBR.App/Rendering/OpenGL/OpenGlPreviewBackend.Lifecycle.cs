@@ -247,34 +247,49 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         DisposeEntitySkinningUploadBuffers();
+        DisposeGenesisMaterialDrawRecordBuffer();
         const string blockName = "EntitySkinningBones";
         const string prevBlockName = "EntityPrevSkinningBones";
         const string normalBlockName = "EntitySkinningNormals";
+        _entitySkinningUsesSsbo = ShouldUseEntitySkinningSsbo();
+        _entityBoneUboBlockBoundMain = false;
+        _entityBoneUboBlockBoundShadow = false;
         Array.Clear(_entitySkinningUboScratch);
         Array.Clear(_entityPrevSkinningUboScratch);
         Array.Clear(_entityNormalSkinningUboScratch);
         var usePersistent = _glCapabilities?.CanUsePersistentUploadRing == true;
-        var uniformBufferOffsetAlignment = Math.Max(16, gl.GetInteger((GetPName)0x8A34));
+        var uploadTarget = _entitySkinningUsesSsbo ? (BufferTargetARB)0x90D2 : BufferTargetARB.UniformBuffer;
+        var boneBindingPoint = _entitySkinningUsesSsbo
+            ? EntitySkinningSsboBindingPoint
+            : EntitySkinningUboBindingPoint;
+        var prevBoneBindingPoint = _entitySkinningUsesSsbo
+            ? EntityPrevSkinningSsboBindingPoint
+            : EntityPrevSkinningUboBindingPoint;
+        var normalBoneBindingPoint = _entitySkinningUsesSsbo
+            ? EntityNormalSkinningSsboBindingPoint
+            : EntityNormalSkinningUboBindingPoint;
+        var offsetAlignmentPName = _entitySkinningUsesSsbo ? (GetPName)0x90DF : (GetPName)0x8A34;
+        var bufferOffsetAlignment = Math.Max(16, gl.GetInteger(offsetAlignmentPName));
         _entityBoneUpload = new GlPersistentMappedUploadBuffer(
             gl,
-            BufferTargetARB.UniformBuffer,
-            EntitySkinningUboBindingPoint,
+            uploadTarget,
+            boneBindingPoint,
             EntitySkinningUboTotalBytes,
-            uniformBufferOffsetAlignment,
+            bufferOffsetAlignment,
             usePersistent);
         _entityPrevBoneUpload = new GlPersistentMappedUploadBuffer(
             gl,
-            BufferTargetARB.UniformBuffer,
-            EntityPrevSkinningUboBindingPoint,
+            uploadTarget,
+            prevBoneBindingPoint,
             EntitySkinningUboTotalBytes,
-            uniformBufferOffsetAlignment,
+            bufferOffsetAlignment,
             usePersistent);
         _entityNormalBoneUpload = new GlPersistentMappedUploadBuffer(
             gl,
-            BufferTargetARB.UniformBuffer,
-            EntityNormalSkinningUboBindingPoint,
+            uploadTarget,
+            normalBoneBindingPoint,
             EntitySkinningUboMatrixBytes,
-            uniformBufferOffsetAlignment,
+            bufferOffsetAlignment,
             usePersistent);
         _entityBoneUbo = _entityBoneUpload.Handle;
         _entityPrevBoneUbo = _entityPrevBoneUpload.Handle;
@@ -282,10 +297,19 @@ public sealed partial class OpenGlPreviewBackend
         _entityBoneUpload.Upload(_entitySkinningUboScratch);
         _entityPrevBoneUpload.Upload(_entityPrevSkinningUboScratch);
         _entityNormalBoneUpload.Upload(_entityNormalSkinningUboScratch);
+        var bufferLabel = _entitySkinningUsesSsbo ? "SSBO" : "UBO";
         EmitDiagnostic("[3D preview] Entity bone uploads: " +
                        (_entityBoneUpload.UsesPersistentMapping
-                           ? "persistent mapped UBO transport."
-                           : "BufferSubData UBO transport."));
+                           ? $"persistent mapped {bufferLabel} transport."
+                           : $"BufferSubData {bufferLabel} transport."));
+
+        if (_entitySkinningUsesSsbo)
+        {
+            _entityBoneUboBlockBoundMain = true;
+            _entityBoneUboBlockBoundShadow = _shadowProgram is { IsValid: true };
+            gl.BindBuffer(uploadTarget, 0);
+            return;
+        }
 
         var mainProg = _program.Program;
         var mainBlock = gl.GetUniformBlockIndex(mainProg, blockName);
@@ -318,7 +342,7 @@ public sealed partial class OpenGlPreviewBackend
             }
         }
 
-        gl.BindBuffer(BufferTargetARB.UniformBuffer, 0);
+        gl.BindBuffer(uploadTarget, 0);
     }
 
     private static EntitySkinningUniformLocs ResolveEntitySkinningUniformLocs(GlShaderProgram program) =>
@@ -338,6 +362,9 @@ public sealed partial class OpenGlPreviewBackend
         }
 
         _loggedEntityShaderInit = true;
+        EmitDiagnostic(
+            "[3D preview] Entity skinning buffer source: " +
+            (_entitySkinningUsesSsbo ? "desktop SSBO matrix palettes." : "UBO matrix palettes."));
         EmitDiagnostic(EntityGpuShaderDiagnostics.FormatEntityShaderInitLine(
             "main",
             _mainEntityUniformLocs.PreviewSpaceVerts,
@@ -362,8 +389,9 @@ public sealed partial class OpenGlPreviewBackend
 
         if (!_entityBoneUboBlockBoundMain || (_shadowProgram is { IsValid: true } && !_entityBoneUboBlockBoundShadow))
         {
+            var bufferLabel = _entitySkinningUsesSsbo ? "SSBO" : "UBO";
             EmitDiagnostic(
-                "[3D preview] GPU WARN: EntitySkinningBones UBO block not bound on one or more programs; anim-on bone multiply will not run.");
+                $"[3D preview] GPU WARN: EntitySkinningBones {bufferLabel} block not bound on one or more programs; anim-on bone multiply will not run.");
         }
     }
 
@@ -950,6 +978,9 @@ public sealed partial class OpenGlPreviewBackend
         _entityBoneUpload = null;
         _entityPrevBoneUpload = null;
         _entityNormalBoneUpload = null;
+        _genesisMaterialDrawRecordSsbo = 0;
+        _genesisMaterialDrawRecordUpload = null;
+        _genesisMaterialDrawRecordsUseSsbo = false;
         DestroyAtmosphereResources();
         DestroyGodRayResources();
         DestroyVolumeResources();
@@ -994,5 +1025,8 @@ public sealed partial class OpenGlPreviewBackend
         _entityBoneUbo = 0;
         _entityPrevBoneUbo = 0;
         _entityNormalBoneUbo = 0;
+        _entitySkinningUsesSsbo = false;
+        _entityBoneUboBlockBoundMain = false;
+        _entityBoneUboBlockBoundShadow = false;
     }
 }

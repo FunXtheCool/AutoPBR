@@ -385,6 +385,8 @@ public sealed partial class OpenGlPreviewBackend
         SetIntOnProgramLoc(_shadowProgram, su.SceneKind, 0);
 
         SetIntOnProgramLoc(_shadowProgram, su.EntityAlphaMode, 0);
+        SetIntOnProgramLoc(_shadowProgram, su.GenesisUseMaterialDrawRecord, 0);
+        SetIntOnProgramLoc(_shadowProgram, su.GenesisDrawRecordIndex, 0);
 
         ApplyEntitySkinningUniforms(_shadowProgram, 0, 0, 0f);
 
@@ -501,14 +503,24 @@ public sealed partial class OpenGlPreviewBackend
             SetIntOnProgramLoc(_shadowProgram!, su.EntityAlphaMode, frame.EntityAlphaModeUniform);
 
             var uploadedMaterialIndex = -1;
+            var blockModel = frame.BlockModel;
+            var blockSlots = frame.BlockSlots;
+            var useMaterialDrawRecords = TryUploadGenesisMaterialDrawRecords(ref frame);
+            if (useMaterialDrawRecords)
+            {
+                BindGenesisMaterialDrawRecordBuffer();
+            }
+
+            SetIntOnProgramLoc(_shadowProgram!, su.GenesisUseMaterialDrawRecord, useMaterialDrawRecords ? 1 : 0);
 
             _mesh.BindVertexArray();
 
-            foreach (var batch in frame.BlockModel.DrawBatches)
+            for (var batchIndex = 0; batchIndex < blockModel.DrawBatches.Length; batchIndex++)
 
             {
+                var batch = blockModel.DrawBatches[batchIndex];
 
-                if ((uint)batch.MaterialIndex >= (uint)frame.BlockSlots.Length)
+                if ((uint)batch.MaterialIndex >= (uint)blockSlots.Length)
 
                 {
 
@@ -526,13 +538,15 @@ public sealed partial class OpenGlPreviewBackend
 
                 }
 
+                SetIntOnProgramLoc(_shadowProgram!, su.GenesisDrawRecordIndex, useMaterialDrawRecords ? batchIndex : 0);
+
 
 
                 if (batch.MaterialIndex != uploadedMaterialIndex)
 
                 {
 
-                    UploadMaterial(frame.Gl, frame.BlockSlots[batch.MaterialIndex], nearest: true);
+                    UploadMaterial(frame.Gl, blockSlots[batch.MaterialIndex], nearest: true);
 
                     uploadedMaterialIndex = batch.MaterialIndex;
 
@@ -556,9 +570,9 @@ public sealed partial class OpenGlPreviewBackend
 
                         _shadowEntityUniformLocs,
 
-                        frame.BlockModel,
+                        blockModel,
 
-                        frame.BlockModel.EntityGpuMeshSpaceLiftY,
+                        blockModel.EntityGpuMeshSpaceLiftY,
 
                         frame.EntityBoneSnapshotValid,
 
@@ -585,6 +599,8 @@ public sealed partial class OpenGlPreviewBackend
 
 
             _mesh.UnbindVertexArray();
+            SetIntOnProgramLoc(_shadowProgram!, su.GenesisUseMaterialDrawRecord, 0);
+            SetIntOnProgramLoc(_shadowProgram!, su.GenesisDrawRecordIndex, 0);
 
         }
 

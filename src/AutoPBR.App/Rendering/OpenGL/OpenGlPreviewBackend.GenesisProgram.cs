@@ -4,7 +4,11 @@ namespace AutoPBR.App.Rendering.OpenGL;
 
 public sealed partial class OpenGlPreviewBackend
 {
-    private readonly record struct GenesisProgramCacheKey(GenesisShaderFeatureMask Mask, bool Tessellation);
+    private readonly record struct GenesisProgramCacheKey(
+        GenesisShaderFeatureMask Mask,
+        bool Tessellation,
+        bool EntitySkinningSsbo,
+        bool MaterialDrawRecordSsbo);
 
     private const int MaxGenesisProgramCacheEntries = 32;
 
@@ -42,6 +46,16 @@ public sealed partial class OpenGlPreviewBackend
         _genesisTessellationFailureLogged = false;
     }
 
+    private void ResetEntitySkinningSsboCompileState()
+    {
+        _entitySkinningSsboCompileDisabled = false;
+    }
+
+    private void ResetMaterialDrawRecordSsboCompileState()
+    {
+        _materialDrawRecordSsboCompileDisabled = false;
+    }
+
     private void EnsureGenesisProgramForFrame(ref GlRenderFrame frame)
     {
         if (_shaderCtx is null)
@@ -53,29 +67,19 @@ public sealed partial class OpenGlPreviewBackend
         var wantsTessellation = !_useOpenGlEs &&
                                 !_genesisTessellationCompileDisabled &&
                                 frame.EnableTessellationDisplacementEff;
-        var cacheKey = new GenesisProgramCacheKey(mask, wantsTessellation);
+        var cacheKey = new GenesisProgramCacheKey(
+            mask,
+            wantsTessellation,
+            ShouldUseEntitySkinningSsbo(),
+            ShouldUseMaterialDrawRecordSsbo());
         if (_program is { IsValid: true } && cacheKey == _activeGenesisProgramKey)
         {
             return;
         }
 
-        if (!TryGetOrCreateGenesisProgram(cacheKey, out var program, out var err))
+        if (!TryGetOrCreateGenesisProgramWithFallback(cacheKey, out cacheKey, out var program, out _))
         {
-            if (wantsTessellation)
-            {
-                DisableGenesisTessellationCompile(err);
-                var fallbackKey = cacheKey with { Tessellation = false };
-                if (!TryGetOrCreateGenesisProgram(fallbackKey, out program, out _))
-                {
-                    return;
-                }
-
-                cacheKey = fallbackKey;
-            }
-            else
-            {
-                return;
-            }
+            return;
         }
 
         if (_program is not null && !_genesisPrograms.ContainsValue(_program))
@@ -111,7 +115,13 @@ public sealed partial class OpenGlPreviewBackend
             return true;
         }
 
-        var defines = GenesisShaderFeatureMaskBuilder.ToDefines(cacheKey.Mask);
+        var defines = BuildGenesisProgramDefines(
+            cacheKey.Mask,
+            cacheKey.EntitySkinningSsbo,
+            cacheKey.MaterialDrawRecordSsbo);
+        var debugSuffix = string.Concat(
+            cacheKey.EntitySkinningSsbo ? "+entity-ssbo" : string.Empty,
+            cacheKey.MaterialDrawRecordSsbo ? "+draw-ssbo" : string.Empty);
         if (cacheKey.Tessellation)
         {
             program = CreatePreviewProgram(
@@ -120,7 +130,7 @@ public sealed partial class OpenGlPreviewBackend
                 "genesis.tes",
                 "genesis.frag",
                 out error,
-                $"genesis+tess+{(byte)cacheKey.Mask:X2}",
+                $"genesis+tess+{(byte)cacheKey.Mask:X2}{debugSuffix}",
                 defines);
         }
         else
@@ -129,7 +139,7 @@ public sealed partial class OpenGlPreviewBackend
                 "genesis.vert",
                 "genesis.frag",
                 out error,
-                $"genesis+{(byte)cacheKey.Mask:X2}",
+                $"genesis+{(byte)cacheKey.Mask:X2}{debugSuffix}",
                 defines);
         }
 
@@ -184,6 +194,8 @@ public sealed partial class OpenGlPreviewBackend
         _genesisProgramLru.Clear();
         _activeGenesisProgramKey = default;
         ResetGenesisTessellationCompileState();
+        ResetEntitySkinningSsboCompileState();
+        ResetMaterialDrawRecordSsboCompileState();
     }
 
     private void PrewarmCommonGenesisProgramsOnGpu()
@@ -202,7 +214,11 @@ public sealed partial class OpenGlPreviewBackend
 
         foreach (var mask in masks)
         {
-            var cacheKey = new GenesisProgramCacheKey(mask, Tessellation: false);
+            var cacheKey = new GenesisProgramCacheKey(
+                mask,
+                Tessellation: false,
+                ShouldUseEntitySkinningSsbo(),
+                ShouldUseMaterialDrawRecordSsbo());
             if (_genesisPrograms.ContainsKey(cacheKey))
             {
                 continue;
@@ -210,5 +226,107 @@ public sealed partial class OpenGlPreviewBackend
 
             _ = TryGetOrCreateGenesisProgram(cacheKey, out _, out _);
         }
+    }
+
+    private bool ShouldUseEntitySkinningSsbo() =>
+        !_entitySkinningSsboCompileDisabled &&
+        _glCapabilities?.CanUseEntitySkinningSsbo == true;
+
+    private bool ShouldUseMaterialDrawRecordSsbo() =>
+        !_materialDrawRecordSsboCompileDisabled &&
+        _glCapabilities?.CanUseMaterialDrawRecordSsbo == true;
+
+    private static IReadOnlyDictionary<string, int> BuildGenesisProgramDefines(
+        GenesisShaderFeatureMask mask,
+        bool entitySkinningSsbo,
+        bool materialDrawRecordSsbo = false)
+    {
+        var baseDefines = GenesisShaderFeatureMaskBuilder.ToDefines(mask);
+        if (!entitySkinningSsbo && !materialDrawRecordSsbo)
+        {
+            return baseDefines;
+        }
+
+        var defines = new Dictionary<string, int>(baseDefines);
+        if (entitySkinningSsbo)
+        {
+            defines["GENESIS_ENTITY_SKINNING_SSBO"] = 1;
+        }
+
+        if (materialDrawRecordSsbo)
+        {
+            defines["GENESIS_MATERIAL_DRAW_RECORD_SSBO"] = 1;
+        }
+
+        return defines;
+    }
+
+    private bool TryGetOrCreateGenesisProgramWithFallback(
+        GenesisProgramCacheKey requestedKey,
+        out GenesisProgramCacheKey resolvedKey,
+        out GlShaderProgram program,
+        out string? error)
+    {
+        resolvedKey = requestedKey;
+        if (TryGetOrCreateGenesisProgram(resolvedKey, out program, out error))
+        {
+            return true;
+        }
+
+        if (resolvedKey.Tessellation)
+        {
+            DisableGenesisTessellationCompile(error);
+            resolvedKey = resolvedKey with { Tessellation = false };
+            if (TryGetOrCreateGenesisProgram(resolvedKey, out program, out error))
+            {
+                return true;
+            }
+        }
+
+        if (resolvedKey.MaterialDrawRecordSsbo)
+        {
+            DisableMaterialDrawRecordSsboCompile(error);
+            resolvedKey = resolvedKey with { MaterialDrawRecordSsbo = false };
+            if (TryGetOrCreateGenesisProgram(resolvedKey, out program, out error))
+            {
+                return true;
+            }
+        }
+
+        if (resolvedKey.EntitySkinningSsbo)
+        {
+            DisableEntitySkinningSsboCompile(error);
+            resolvedKey = resolvedKey with { EntitySkinningSsbo = false };
+            if (TryGetOrCreateGenesisProgram(resolvedKey, out program, out error))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void DisableEntitySkinningSsboCompile(string? reason)
+    {
+        if (_entitySkinningSsboCompileDisabled)
+        {
+            return;
+        }
+
+        _entitySkinningSsboCompileDisabled = true;
+        var detail = string.IsNullOrWhiteSpace(reason) ? "compile failed" : TrimTessellationFailureReason(reason);
+        EmitDiagnostic("[3D preview] Entity skinning SSBO path disabled for this session; using UBO fallback. " + detail);
+    }
+
+    private void DisableMaterialDrawRecordSsboCompile(string? reason)
+    {
+        if (_materialDrawRecordSsboCompileDisabled)
+        {
+            return;
+        }
+
+        _materialDrawRecordSsboCompileDisabled = true;
+        var detail = string.IsNullOrWhiteSpace(reason) ? "compile failed" : TrimTessellationFailureReason(reason);
+        EmitDiagnostic("[3D preview] Material/draw record SSBO path disabled for this session; using uniform fallback. " + detail);
     }
 }

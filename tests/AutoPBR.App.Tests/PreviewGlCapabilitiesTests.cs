@@ -22,10 +22,18 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.False(caps.BufferStorage);
         Assert.False(caps.CanUsePersistentUploadRing);
         Assert.False(caps.ShaderStorageBuffers);
+        Assert.False(caps.CanUseEntitySkinningSsbo);
+        Assert.False(caps.CanUseMaterialDrawRecordSsbo);
         Assert.False(caps.ComputeShaders);
+        Assert.False(caps.CanUseComputeFroxelInject);
         Assert.False(caps.ImageLoadStore);
         Assert.Contains("persistentUpload=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("entitySsbo=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("materialDrawSsbo=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("computeFroxels=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
         Assert.Contains("GLES-safe uploads", caps.FormatContextSuffix(), StringComparison.Ordinal);
+        Assert.Contains("draw uniforms", caps.FormatContextSuffix(), StringComparison.Ordinal);
+        Assert.Contains("fragment froxels", caps.FormatContextSuffix(), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -44,7 +52,10 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.False(caps.BufferStorage);
         Assert.False(caps.CanUsePersistentUploadRing);
         Assert.False(caps.ShaderStorageBuffers);
+        Assert.False(caps.CanUseEntitySkinningSsbo);
+        Assert.False(caps.CanUseMaterialDrawRecordSsbo);
         Assert.False(caps.ComputeShaders);
+        Assert.False(caps.CanUseComputeFroxelInject);
         Assert.False(caps.MultiDrawIndirect);
     }
 
@@ -64,7 +75,10 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.False(caps.BufferStorage);
         Assert.False(caps.CanUsePersistentUploadRing);
         Assert.False(caps.ShaderStorageBuffers);
+        Assert.False(caps.CanUseEntitySkinningSsbo);
+        Assert.False(caps.CanUseMaterialDrawRecordSsbo);
         Assert.False(caps.ComputeShaders);
+        Assert.False(caps.CanUseComputeFroxelInject);
         Assert.False(caps.ImageLoadStore);
         Assert.False(caps.SpirV);
     }
@@ -83,8 +97,11 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.True(caps.BufferStorage);
         Assert.True(caps.CanUsePersistentUploadRing);
         Assert.True(caps.ShaderStorageBuffers);
+        Assert.True(caps.CanUseEntitySkinningSsbo);
+        Assert.True(caps.CanUseMaterialDrawRecordSsbo);
         Assert.True(caps.ComputeShaders);
         Assert.True(caps.ImageLoadStore);
+        Assert.True(caps.CanUseComputeFroxelInject);
         Assert.True(caps.ShaderAtomics);
         Assert.True(caps.MultiDrawIndirect);
         Assert.True(caps.TimerQuery);
@@ -93,7 +110,12 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.True(caps.SpirV);
         Assert.True(caps.SeparablePrograms);
         Assert.Contains("persistentUpload=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("entitySsbo=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("materialDrawSsbo=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("computeFroxels=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
         Assert.Contains("persistent uploads", caps.FormatContextSuffix(), StringComparison.Ordinal);
+        Assert.Contains("draw SSBO", caps.FormatContextSuffix(), StringComparison.Ordinal);
+        Assert.Contains("compute froxels", caps.FormatContextSuffix(), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -109,8 +131,11 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.True(caps.BufferStorage);
         Assert.True(caps.CanUsePersistentUploadRing);
         Assert.True(caps.ShaderStorageBuffers);
+        Assert.True(caps.CanUseEntitySkinningSsbo);
+        Assert.True(caps.CanUseMaterialDrawRecordSsbo);
         Assert.True(caps.ComputeShaders);
         Assert.True(caps.ImageLoadStore);
+        Assert.True(caps.CanUseComputeFroxelInject);
         Assert.True(caps.MultiDrawIndirect);
         Assert.True(caps.SpirV);
     }

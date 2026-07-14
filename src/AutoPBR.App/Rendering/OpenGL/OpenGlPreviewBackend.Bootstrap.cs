@@ -119,6 +119,7 @@ public sealed partial class OpenGlPreviewBackend
         _proceduralSkyProgram?.Dispose();
         _proceduralSkyProgram = null;
         DisposeEntitySkinningUploadBuffers();
+        DisposeGenesisMaterialDrawRecordBuffer();
         _shaderCtx = null;
         _gpuInitTier = PreviewGpuInitTier.None;
         _shadowAwareGodRayInitAttempted = false;
@@ -144,7 +145,12 @@ public sealed partial class OpenGlPreviewBackend
                 _mainProgramUsesTessellation = false;
                 string? err = null;
                 var bootMask = GenesisShaderFeatureMaskBuilder.Build(_settings, entityEmulatedPreview: false);
-                var bootDefines = GenesisShaderFeatureMaskBuilder.ToDefines(bootMask);
+                var bootUseEntitySkinningSsbo = ShouldUseEntitySkinningSsbo();
+                var bootUseMaterialDrawRecordSsbo = ShouldUseMaterialDrawRecordSsbo();
+                var bootDefines = BuildGenesisProgramDefines(
+                    bootMask,
+                    bootUseEntitySkinningSsbo,
+                    bootUseMaterialDrawRecordSsbo);
                 if (!_useOpenGlEs)
                 {
                     _program = CreatePreviewProgram(
@@ -169,6 +175,32 @@ public sealed partial class OpenGlPreviewBackend
                 }
 
                 _program ??= CreatePreviewProgram("genesis.vert", "genesis.frag", out err, defines: bootDefines);
+                if (_program is { IsValid: false } && bootUseMaterialDrawRecordSsbo)
+                {
+                    _program.Dispose();
+                    _program = null;
+                    DisableMaterialDrawRecordSsboCompile(err);
+                    bootUseMaterialDrawRecordSsbo = false;
+                    bootDefines = BuildGenesisProgramDefines(
+                        bootMask,
+                        bootUseEntitySkinningSsbo,
+                        materialDrawRecordSsbo: false);
+                    _program = CreatePreviewProgram("genesis.vert", "genesis.frag", out err, defines: bootDefines);
+                }
+
+                if (_program is { IsValid: false } && bootUseEntitySkinningSsbo)
+                {
+                    _program.Dispose();
+                    _program = null;
+                    DisableEntitySkinningSsboCompile(err);
+                    bootUseEntitySkinningSsbo = false;
+                    bootDefines = BuildGenesisProgramDefines(
+                        bootMask,
+                        entitySkinningSsbo: false,
+                        materialDrawRecordSsbo: bootUseMaterialDrawRecordSsbo);
+                    _program = CreatePreviewProgram("genesis.vert", "genesis.frag", out err, defines: bootDefines);
+                }
+
                 if (!_program.IsValid)
                 {
                     _lastError = err ?? "Shader link failed.";
@@ -181,13 +213,100 @@ public sealed partial class OpenGlPreviewBackend
 
                 _mainEntityUniformLocs = ResolveEntitySkinningUniformLocs(_program);
                 _mainUniformLocs = ResolveMainProgramUniformLocs(_program);
-                _activeGenesisProgramKey = new GenesisProgramCacheKey(bootMask, _mainProgramUsesTessellation);
+                _activeGenesisProgramKey = new GenesisProgramCacheKey(
+                    bootMask,
+                    _mainProgramUsesTessellation,
+                    bootUseEntitySkinningSsbo,
+                    bootUseMaterialDrawRecordSsbo);
                 _genesisPrograms[_activeGenesisProgramKey] = _program;
                 _genesisProgramLru.AddFirst(_activeGenesisProgramKey);
                 return true;
 
             case 1:
-                _shadowProgram = CreatePreviewProgram("genesis_shadow.vert", "genesis_shadow.frag", out var shadowErr);
+                var shadowUseEntitySkinningSsbo = ShouldUseEntitySkinningSsbo();
+                var shadowUseMaterialDrawRecordSsbo = ShouldUseMaterialDrawRecordSsbo();
+                var shadowDefines = BuildGenesisProgramDefines(
+                    GenesisShaderFeatureMask.None,
+                    shadowUseEntitySkinningSsbo,
+                    shadowUseMaterialDrawRecordSsbo);
+                _shadowProgram = CreatePreviewProgram(
+                    "genesis_shadow.vert",
+                    "genesis_shadow.frag",
+                    out var shadowErr,
+                    defines: shadowDefines);
+                if (_shadowProgram is { IsValid: false } && shadowUseMaterialDrawRecordSsbo)
+                {
+                    var fallbackMainKey = _activeGenesisProgramKey with { MaterialDrawRecordSsbo = false };
+                    if (TryGetOrCreateGenesisProgram(fallbackMainKey, out var fallbackMainProgram, out var fallbackMainErr))
+                    {
+                        _shadowProgram.Dispose();
+                        _shadowProgram = null;
+                        DisableMaterialDrawRecordSsboCompile(shadowErr);
+                        if (_program is not null && !_genesisPrograms.ContainsValue(_program))
+                        {
+                            _program.Dispose();
+                        }
+
+                        _program = fallbackMainProgram;
+                        _activeGenesisProgramKey = fallbackMainKey;
+                        _mainProgramUsesTessellation = fallbackMainKey.Tessellation;
+                        _mainEntityUniformLocs = ResolveEntitySkinningUniformLocs(_program);
+                        _mainUniformLocs = ResolveMainProgramUniformLocs(_program);
+                        shadowUseMaterialDrawRecordSsbo = false;
+                        shadowDefines = BuildGenesisProgramDefines(
+                            GenesisShaderFeatureMask.None,
+                            shadowUseEntitySkinningSsbo,
+                            materialDrawRecordSsbo: false);
+                        _shadowProgram = CreatePreviewProgram(
+                            "genesis_shadow.vert",
+                            "genesis_shadow.frag",
+                            out shadowErr,
+                            defines: shadowDefines);
+                    }
+                    else
+                    {
+                        EmitDiagnostic(
+                            "[3D preview] Material/draw record SSBO fallback main program failed: " +
+                            (fallbackMainErr ?? "link failed"));
+                    }
+                }
+
+                if (_shadowProgram is { IsValid: false } && shadowUseEntitySkinningSsbo)
+                {
+                    var fallbackMainKey = _activeGenesisProgramKey with { EntitySkinningSsbo = false };
+                    if (TryGetOrCreateGenesisProgram(fallbackMainKey, out var fallbackMainProgram, out var fallbackMainErr))
+                    {
+                        _shadowProgram.Dispose();
+                        _shadowProgram = null;
+                        DisableEntitySkinningSsboCompile(shadowErr);
+                        if (_program is not null && !_genesisPrograms.ContainsValue(_program))
+                        {
+                            _program.Dispose();
+                        }
+
+                        _program = fallbackMainProgram;
+                        _activeGenesisProgramKey = fallbackMainKey;
+                        _mainProgramUsesTessellation = fallbackMainKey.Tessellation;
+                        _mainEntityUniformLocs = ResolveEntitySkinningUniformLocs(_program);
+                        _mainUniformLocs = ResolveMainProgramUniformLocs(_program);
+                        shadowDefines = BuildGenesisProgramDefines(
+                            GenesisShaderFeatureMask.None,
+                            entitySkinningSsbo: false,
+                            materialDrawRecordSsbo: shadowUseMaterialDrawRecordSsbo);
+                        _shadowProgram = CreatePreviewProgram(
+                            "genesis_shadow.vert",
+                            "genesis_shadow.frag",
+                            out shadowErr,
+                            defines: shadowDefines);
+                    }
+                    else
+                    {
+                        EmitDiagnostic(
+                            "[3D preview] Entity skinning SSBO fallback main program failed: " +
+                            (fallbackMainErr ?? "link failed"));
+                    }
+                }
+
                 if (!_shadowProgram.IsValid)
                 {
                     EmitDiagnostic("[3D preview] Shadow program: " + (shadowErr ?? "link failed"));
@@ -201,6 +320,7 @@ public sealed partial class OpenGlPreviewBackend
                 }
 
                 InitEntitySkinningBoneUbo(gl);
+                InitGenesisMaterialDrawRecordSsbo(gl);
                 LogEntityShaderInitDiagnosticsOnce();
                 return true;
 

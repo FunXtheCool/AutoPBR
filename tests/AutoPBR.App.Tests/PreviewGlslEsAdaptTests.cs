@@ -104,6 +104,7 @@ public class PreviewGlslEsAdaptTests
     [InlineData("genesis.vert", ShaderType.VertexShader)]
     [InlineData("genesis.frag", ShaderType.FragmentShader)]
     [InlineData("genesis_shadow.vert", ShaderType.VertexShader)]
+    [InlineData("genesis_shadow.frag", ShaderType.FragmentShader)]
     [InlineData("genesis_volume_inject.frag", ShaderType.FragmentShader)]
     [InlineData("genesis_volume_integrate.frag", ShaderType.FragmentShader)]
     public void EsAdaptedShaders_DoNotEnableDesktopOnlyAccelerationDefines(string shaderFile, ShaderType shaderType)
@@ -115,9 +116,97 @@ public class PreviewGlslEsAdaptTests
         Assert.DoesNotContain("GENESIS_USE_SSBO", adapted, StringComparison.Ordinal);
         Assert.DoesNotContain("GENESIS_USE_COMPUTE", adapted, StringComparison.Ordinal);
         Assert.DoesNotContain("GENESIS_USE_IMAGE_STORE", adapted, StringComparison.Ordinal);
-        Assert.DoesNotContain("layout(std430", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("#define GENESIS_ENTITY_SKINNING_SSBO", adapted, StringComparison.Ordinal);
+        Assert.DoesNotContain("#define GENESIS_MATERIAL_DRAW_RECORD_SSBO", adapted, StringComparison.Ordinal);
         Assert.DoesNotContain("writeonly image", adapted, StringComparison.Ordinal);
         Assert.DoesNotContain("layout(local_size", adapted, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData("genesis.vert")]
+    [InlineData("genesis_shadow.vert")]
+    public void DesktopPreparedGenesisEntitySkinningSsbo_DefinesStorageBufferVariant(string shaderFile)
+    {
+        var prepared = GlslPreparedSourceCache.GetOrPrepare(
+            shaderFile,
+            ShaderType.VertexShader,
+            useOpenGlEs: false,
+            new Dictionary<string, int> { ["GENESIS_ENTITY_SKINNING_SSBO"] = 1 });
+
+        Assert.StartsWith("#version 330 core", prepared.TrimStart(), StringComparison.Ordinal);
+        Assert.Contains("#define GENESIS_ENTITY_SKINNING_SSBO 1", prepared, StringComparison.Ordinal);
+        Assert.Contains("#extension GL_ARB_shader_storage_buffer_object : require", prepared, StringComparison.Ordinal);
+        Assert.Contains("layout(std430, binding = 5) readonly buffer EntitySkinningBonesSsbo", prepared, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData("genesis.vert", ShaderType.VertexShader)]
+    [InlineData("genesis.frag", ShaderType.FragmentShader)]
+    [InlineData("genesis_shadow.vert", ShaderType.VertexShader)]
+    [InlineData("genesis_shadow.frag", ShaderType.FragmentShader)]
+    public void DesktopPreparedGenesisMaterialDrawRecordSsbo_DefinesStorageBufferVariant(
+        string shaderFile,
+        ShaderType shaderType)
+    {
+        var prepared = GlslPreparedSourceCache.GetOrPrepare(
+            shaderFile,
+            shaderType,
+            useOpenGlEs: false,
+            new Dictionary<string, int> { ["GENESIS_MATERIAL_DRAW_RECORD_SSBO"] = 1 });
+
+        Assert.StartsWith("#version 330 core", prepared.TrimStart(), StringComparison.Ordinal);
+        Assert.Contains("#define GENESIS_MATERIAL_DRAW_RECORD_SSBO 1", prepared, StringComparison.Ordinal);
+        Assert.Contains("#extension GL_ARB_shader_storage_buffer_object : require", prepared, StringComparison.Ordinal);
+        Assert.Contains("layout(std430, binding = 8) readonly buffer GenesisMaterialDrawRecords", prepared, StringComparison.Ordinal);
+        Assert.Contains("uGenesisMaterialDrawRecords", prepared, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GenesisProgramDefines_KeepDesktopSsboLanesCapabilityGated()
+    {
+        var fallback = OpenGlPreviewBackend.TestBuildGenesisProgramDefines(
+            entitySkinningSsbo: false,
+            materialDrawRecordSsbo: false);
+        Assert.DoesNotContain("GENESIS_ENTITY_SKINNING_SSBO", fallback.Keys);
+        Assert.DoesNotContain("GENESIS_MATERIAL_DRAW_RECORD_SSBO", fallback.Keys);
+
+        var desktop = OpenGlPreviewBackend.TestBuildGenesisProgramDefines(
+            entitySkinningSsbo: true,
+            materialDrawRecordSsbo: true);
+        Assert.Equal(1, desktop["GENESIS_ENTITY_SKINNING_SSBO"]);
+        Assert.Equal(1, desktop["GENESIS_MATERIAL_DRAW_RECORD_SSBO"]);
+    }
+
+    [Fact]
+    public void DesktopPreparedVolumeInjectCompute_UsesImageStorePath()
+    {
+        var prepared = GlslPreparedSourceCache.GetOrPrepare(
+            "genesis_volume_inject.comp",
+            ShaderType.ComputeShader,
+            useOpenGlEs: false);
+
+        Assert.StartsWith("#version 430 core", prepared.TrimStart(), StringComparison.Ordinal);
+        Assert.Contains("layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;", prepared, StringComparison.Ordinal);
+        Assert.Contains("writeonly uniform image2DArray uFroxelOut", prepared, StringComparison.Ordinal);
+        Assert.Contains("writeonly uniform image2DArray uFroxelOccupancyOut", prepared, StringComparison.Ordinal);
+        Assert.Contains("imageStore(uFroxelOut", prepared, StringComparison.Ordinal);
+        Assert.Contains("grShadowGateCascaded", prepared, StringComparison.Ordinal);
+        Assert.DoesNotContain("#define GENESIS_GLES 1", prepared, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void DesktopPreparedVolumeInjectCompute_InsertsDefinesAfterComputeVersion()
+    {
+        var prepared = GlslPreparedSourceCache.GetOrPrepare(
+            "genesis_volume_inject.comp",
+            ShaderType.ComputeShader,
+            useOpenGlEs: false,
+            new Dictionary<string, int> { ["GENESIS_VOLUME_COMPUTE_INJECT"] = 1 });
+
+        var versionIdx = prepared.IndexOf("#version 430 core", StringComparison.Ordinal);
+        var defineIdx = prepared.IndexOf("#define GENESIS_VOLUME_COMPUTE_INJECT 1", StringComparison.Ordinal);
+        Assert.True(versionIdx >= 0);
+        Assert.True(defineIdx > versionIdx, "compute defines must follow #version");
     }
 
     [Fact]
@@ -301,7 +390,7 @@ public class PreviewGlslEsAdaptTests
         Assert.Contains("uParallaxShadowSoftness", adapted, StringComparison.Ordinal);
         Assert.Contains("uParallaxUvScale", adapted, StringComparison.Ordinal);
         Assert.Contains(
-            "pomUvDisplacementScale(strength) * clamp(uParallaxUvScale, 0.02, 1.0)",
+            "pomUvDisplacementScale(strength) * clamp(genesisParallaxUvScale(uParallaxUvScale), 0.02, 1.0)",
             adapted,
             StringComparison.Ordinal);
         Assert.Contains("uParallaxHeightTexSize", adapted, StringComparison.Ordinal);
@@ -414,8 +503,8 @@ public class PreviewGlslEsAdaptTests
         Assert.Contains("alphaEdge", adapted, StringComparison.Ordinal);
         Assert.Contains("vPrevClip", adapted, StringComparison.Ordinal);
         Assert.Contains("motion = clamp", adapted, StringComparison.Ordinal);
-        Assert.Contains("uEntityAlphaMode == 1", adapted, StringComparison.Ordinal);
-        Assert.Contains("uEntityAlphaMode == 2", adapted, StringComparison.Ordinal);
+        Assert.Contains("genesisEntityAlphaMode(uEntityAlphaMode) == 1", adapted, StringComparison.Ordinal);
+        Assert.Contains("genesisEntityAlphaMode(uEntityAlphaMode) == 2", adapted, StringComparison.Ordinal);
         Assert.Contains("TaaSignal = vec4", adapted, StringComparison.Ordinal);
     }
 
@@ -445,7 +534,7 @@ public class PreviewGlslEsAdaptTests
         Assert.DoesNotContain("inverse(bone)", src, StringComparison.Ordinal);
         Assert.Contains("uEntityPrevBonePaletteValid", src, StringComparison.Ordinal);
         Assert.Contains("uniform vec2 uTextureAtlasScale", src, StringComparison.Ordinal);
-        Assert.Contains("vUv = aUv * uTextureAtlasScale", src, StringComparison.Ordinal);
+        Assert.Contains("vUv = aUv * genesisTextureAtlasScale(uTextureAtlasScale)", src, StringComparison.Ordinal);
         Assert.Contains("prevEntityPos = prevBone * vec4(aPos, 1.0)", src, StringComparison.Ordinal);
         Assert.Contains("out vec4 vPrevClip", src, StringComparison.Ordinal);
         Assert.Contains("vCurrClip = uTaaCurrViewProj * wp", src, StringComparison.Ordinal);

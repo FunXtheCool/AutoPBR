@@ -1,4 +1,7 @@
 #version 330 core
+#ifdef GENESIS_MATERIAL_DRAW_RECORD_SSBO
+#extension GL_ARB_shader_storage_buffer_object : require
+#endif
 // AutoPBR Genesis preview shader - fragment stage.
 // Algorithms inspired by LabPBR 1.3 spec (https://shaderlabs.org/wiki/LabPBR_Material_Standard)
 // and Glimmer Shaders (MIT, https://github.com/jbritain/glimmer-shaders).
@@ -6,6 +9,7 @@
 // LabPBR-aware metal/dielectric F0, subsurface scattering, environment IBL,
 // emission, directional shadow map (Phase 2) and ACES Filmic tonemapping.
 
+//!include "common/genesis_draw_record.glsl"
 //!include "common/common.glsl"
 //!include "common/material_labpbr.glsl"
 //!include "common/brdf.glsl"
@@ -88,7 +92,7 @@ layout(location = 1) out vec4 TaaSignal;
 vec3 sampleNormal(vec2 uv, vec2 dx, vec2 dy, vec3 Nw, vec3 Tw, vec3 Bw)
 {
 #if defined(GENESIS_ENABLE_NORMAL_MAP)
-    if (uEnableNormalMap < 1 || uHasNormal < 1)
+    if (uEnableNormalMap < 1 || genesisHasNormal(uHasNormal) < 1)
     {
         return normalize(Nw);
     }
@@ -126,7 +130,7 @@ void main()
     vec2 uvDx = dFdx(vUv);
     vec2 uvDy = dFdy(vUv);
 #if defined(GENESIS_ENABLE_POM)
-    bool  pomActiveEarly = (uEnableParallax > 0 && uHasHeight > 0 && uHeightStrength > 0.0);
+    bool  pomActiveEarly = (genesisEnableParallax(uEnableParallax) > 0 && genesisHasHeight(uHasHeight) > 0 && uHeightStrength > 0.0);
     vec4 albRaw = pomActiveEarly
         ? textureGrad(uAlbedo, vUv, uvDx, uvDy)
         : texture(uAlbedo, vUv);
@@ -141,7 +145,7 @@ void main()
             discard;
         }
     }
-    else if (uEntityAlphaMode == 1 && albRaw.a < uAlphaCutoff)
+    else if (genesisEntityAlphaMode(uEntityAlphaMode) == 1 && albRaw.a < uAlphaCutoff)
     {
         discard;
     }
@@ -175,7 +179,7 @@ void main()
 
     // Re-sample albedo at displaced UV when POM is on.
     vec4 alb = pomActive ? textureGrad(uAlbedo, uv, uvDx, uvDy) : albRaw;
-    if (uEntityAlphaMode == 1 && alb.a < uAlphaCutoff)
+    if (genesisEntityAlphaMode(uEntityAlphaMode) == 1 && alb.a < uAlphaCutoff)
     {
         discard;
     }
@@ -195,7 +199,7 @@ void main()
     // LabPBR _s decode (or neutral defaults when no spec map / spec map disabled).
     LabPbrMaterial mat;
 #if defined(GENESIS_ENABLE_SPECULAR_MAP)
-    if (uHasSpecular > 0 && uEnableSpecularMap > 0)
+    if (genesisHasSpecular(uHasSpecular) > 0 && uEnableSpecularMap > 0)
     {
         vec4 sp = textureGrad(uSpecular, uv, uvDx, uvDy);
         mat = decodeLabPbrSpec(sp, albedoLinear, uRoughnessScale, uSpecularStrength);
@@ -219,16 +223,16 @@ void main()
     float pomShadow = 1.0;
     float pomAo = 1.0;
 #if defined(GENESIS_ENABLE_POM)
-    if (pomActive && uHasHeight > 0)
+    if (pomActive && genesisHasHeight(uHasHeight) > 0)
     {
 #if defined(GENESIS_ENABLE_POM_SHADOW)
-        if (uEnableParallaxShadow > 0)
+        if (genesisEnableParallaxShadow(uEnableParallaxShadow) > 0)
         {
             pomShadow = traceParallaxShadow(uHeight, uv, Ltan, pomDepth, pomStrengthTrace, uvDx, uvDy);
         }
 #endif
 #if defined(GENESIS_ENABLE_POM_AO)
-        if (uEnableParallaxAo > 0)
+        if (genesisEnableParallaxAo(uEnableParallaxAo) > 0)
         {
             pomAo = traceParallaxAo(uHeight, uv, pomDepth, pomStrengthTrace, uParallaxAoStrength, uvDx, uvDy);
         }
@@ -317,7 +321,7 @@ void main()
     {
         a = alb.a;
     }
-    else if (uEntityAlphaMode == 2)
+    else if (genesisEntityAlphaMode(uEntityAlphaMode) == 2)
     {
         a = alb.a;
     }
@@ -327,8 +331,8 @@ void main()
     float reactivity = 0.0;
     reactivity = max(reactivity, uIsGroundPass > 0 ? 0.08 : 0.0);
     reactivity = max(reactivity, uSceneKind == 1 ? 0.25 : 0.0);
-    reactivity = max(reactivity, uEntityAlphaMode == 1 ? mix(0.20, 0.72, alphaEdge) : 0.0);
-    reactivity = max(reactivity, uEntityAlphaMode == 2 ? max(0.65, 1.0 - alb.a) : 0.0);
+    reactivity = max(reactivity, genesisEntityAlphaMode(uEntityAlphaMode) == 1 ? mix(0.20, 0.72, alphaEdge) : 0.0);
+    reactivity = max(reactivity, genesisEntityAlphaMode(uEntityAlphaMode) == 2 ? max(0.65, 1.0 - alb.a) : 0.0);
 
     FragColor = vec4(srgb, a);
     float motion = 0.0;

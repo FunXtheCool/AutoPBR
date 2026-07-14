@@ -149,6 +149,15 @@ public sealed partial class OpenGlPreviewBackend
         }
     }
 
+    private void SetInt3OnProgramLoc(GlShaderProgram program, int loc, int x, int y, int z)
+    {
+        if (loc >= 0)
+        {
+            program.Use();
+            _gl!.Uniform3(loc, x, y, z);
+        }
+    }
+
     private void SetVec2OnProgramLoc(GlShaderProgram program, int loc, Vector2 v)
     {
         if (loc >= 0)

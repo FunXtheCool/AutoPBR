@@ -29,6 +29,62 @@ internal sealed class GlShaderCompileContext
         return CreateProgram(vertexFile, tessControlFile: null, tessEvaluationFile: null, fragmentFile, out error, debugLabel, defines);
     }
 
+    public GlShaderProgram CreateComputeProgram(
+        string computeFile,
+        out string? error,
+        string? debugLabel = null,
+        IReadOnlyDictionary<string, int>? defines = null)
+    {
+        error = null;
+        var label = string.IsNullOrWhiteSpace(debugLabel) ? computeFile : debugLabel;
+        if (_useOpenGlEs)
+        {
+            error = "Compute shaders require the desktop OpenGL preview path.";
+            return new GlShaderProgram(_gl, 0);
+        }
+
+        var stages = new[] { (computeFile, ShaderType.ComputeShader) };
+        var programKey = GlslPreparedSourceCache.ComputeProgramKey(_useOpenGlEs, _cacheIdentity, stages, defines);
+        if (_binaryCache.TryLoad(programKey, out var binaryFormat, out var binaryBytes) &&
+            TryLinkFromBinary(binaryBytes, binaryFormat, label, ref error, out var fromCache))
+        {
+            return fromCache;
+        }
+
+        string cSrc;
+        try
+        {
+            cSrc = GlslPreparedSourceCache.GetOrPrepare(computeFile, ShaderType.ComputeShader, _useOpenGlEs, defines);
+        }
+        catch (Exception ex)
+        {
+            error = ex.ToString();
+            return new GlShaderProgram(_gl, 0);
+        }
+
+        var cs = CompileShader(ShaderType.ComputeShader, cSrc, label, ref error);
+        if (cs == 0)
+        {
+            return new GlShaderProgram(_gl, 0);
+        }
+
+        var program = _gl.CreateProgram();
+        _gl.AttachShader(program, cs);
+        _gl.LinkProgram(program);
+        _gl.GetProgram(program, GLEnum.LinkStatus, out var ok);
+        _gl.DeleteShader(cs);
+        if (ok == 0)
+        {
+            var linkLog = _gl.GetProgramInfoLog(program);
+            error = string.IsNullOrEmpty(error) ? linkLog : error + "\n" + linkLog;
+            _gl.DeleteProgram(program);
+            return new GlShaderProgram(_gl, 0);
+        }
+
+        TryStoreProgramBinary(program, programKey);
+        return new GlShaderProgram(_gl, program);
+    }
+
     public GlShaderProgram CreateProgram(
         string vertexFile,
         string? tessControlFile,

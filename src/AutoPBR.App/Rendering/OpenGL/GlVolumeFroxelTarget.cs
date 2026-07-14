@@ -87,6 +87,18 @@ internal sealed class GlVolumeFroxelTarget(GL gl, bool useOpenGlEs) : IDisposabl
         return gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer) == GLEnum.FramebufferComplete;
     }
 
+    public bool BindImagesForCompute(uint froxelImageUnit, uint occupancyImageUnit)
+    {
+        if (!IsValid)
+        {
+            return false;
+        }
+
+        gl.BindImageTexture(froxelImageUnit, _arrayTexture, 0, true, 0, GLEnum.WriteOnly, GLEnum.Rgba8);
+        gl.BindImageTexture(occupancyImageUnit, _occupancyTexture, 0, true, 0, GLEnum.WriteOnly, GLEnum.R8);
+        return true;
+    }
+
     public void Unbind()
     {
         gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);

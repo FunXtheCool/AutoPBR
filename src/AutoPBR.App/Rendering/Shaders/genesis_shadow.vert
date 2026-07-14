@@ -1,4 +1,8 @@
 #version 330 core
+#if defined(GENESIS_ENTITY_SKINNING_SSBO) || defined(GENESIS_MATERIAL_DRAW_RECORD_SSBO)
+#extension GL_ARB_shader_storage_buffer_object : require
+#endif
+//!include "common/genesis_draw_record.glsl"
 
 // AutoPBR Genesis preview shader - depth-only shadow vertex stage.
 
@@ -24,11 +28,19 @@ uniform mat4 uLightViewProj;
 
 
 
+#ifdef GENESIS_ENTITY_SKINNING_SSBO
+layout(std430, binding = 5) readonly buffer EntitySkinningBonesSsbo {
+
+    mat4 uBoneMatrices[];
+
+};
+#else
 layout(std140) uniform EntitySkinningBones {
 
     mat4 uBoneMatrices[64];
 
 };
+#endif
 
 
 
@@ -48,7 +60,7 @@ void main()
 
 {
 
-    vUv = aUv;
+    vUv = aUv * genesisTextureAtlasScale(vec2(1.0));
 
     vec4 entityPos;
 
@@ -96,4 +108,3 @@ void main()
     gl_Position = uLightViewProj * uModel * entityPos;
 
 }
-

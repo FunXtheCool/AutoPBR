@@ -261,6 +261,8 @@ public sealed partial class OpenGlPreviewBackend
         SetIntLoc(u.SceneKind, frame.Scene.SceneKind == PreviewSceneKind.ItemPlane ? 1 : 0);
         SetIntLoc(u.IsGroundPass, 0);
         SetIntLoc(u.EntityAlphaMode, frame.EntityAlphaModeUniform);
+        SetIntLoc(u.GenesisUseMaterialDrawRecord, 0);
+        SetIntLoc(u.GenesisDrawRecordIndex, 0);
 
         if (!frame.Settings.DrawPreviewSubject || _mesh.IndexCount <= 0)
         {
@@ -287,15 +289,25 @@ public sealed partial class OpenGlPreviewBackend
             var activeBatchBlend = blendWasEnabled;
             var uploadedMaterialIndex = -1;
             var entityBoneUniformsApplied = false;
+            var blockModel = frame.BlockModel;
+            var blockSlots = frame.BlockSlots;
+            var useMaterialDrawRecords = TryUploadGenesisMaterialDrawRecords(ref frame);
+            if (useMaterialDrawRecords)
+            {
+                BindGenesisMaterialDrawRecordBuffer();
+            }
+
+            SetIntLoc(u.GenesisUseMaterialDrawRecord, useMaterialDrawRecords ? 1 : 0);
             if (frame.EntityBonePaletteUploaded)
             {
                 BindEntityBoneSkinningUboBlocks();
             }
 
             _mesh.BindVertexArray();
-            foreach (var batch in frame.BlockModel.DrawBatches)
+            for (var batchIndex = 0; batchIndex < blockModel.DrawBatches.Length; batchIndex++)
             {
-                if ((uint)batch.MaterialIndex >= (uint)frame.BlockSlots.Length)
+                var batch = blockModel.DrawBatches[batchIndex];
+                if ((uint)batch.MaterialIndex >= (uint)blockSlots.Length)
                 {
                     continue;
                 }
@@ -323,8 +335,9 @@ public sealed partial class OpenGlPreviewBackend
                 }
 
                 SetIntLoc(u.EntityAlphaMode, batchAlphaMode);
+                SetIntLoc(u.GenesisDrawRecordIndex, useMaterialDrawRecords ? batchIndex : 0);
 
-                var slot = frame.BlockSlots[batch.MaterialIndex];
+                var slot = blockSlots[batch.MaterialIndex];
                 var materialChanged = batch.MaterialIndex != uploadedMaterialIndex;
                 if (materialChanged)
                 {
@@ -366,8 +379,8 @@ public sealed partial class OpenGlPreviewBackend
                     ApplyEntityBoneSkinningUniformsBeforeDraw(
                         _program,
                         _mainEntityUniformLocs,
-                        frame.BlockModel,
-                        frame.BlockModel.EntityGpuMeshSpaceLiftY,
+                        blockModel,
+                        blockModel.EntityGpuMeshSpaceLiftY,
                         frame.EntityBoneSnapshotValid,
                         frame.EntityBoneSnapshotCount,
                         frame.Settings.EnableEntityAnimation,
@@ -402,6 +415,8 @@ public sealed partial class OpenGlPreviewBackend
             }
 
             SetIntLoc(u.EntityAlphaMode, frame.EntityAlphaModeUniform);
+            SetIntLoc(u.GenesisUseMaterialDrawRecord, 0);
+            SetIntLoc(u.GenesisDrawRecordIndex, 0);
         }
         else
         {
