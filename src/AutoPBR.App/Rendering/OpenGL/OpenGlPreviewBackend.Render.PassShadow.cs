@@ -418,7 +418,7 @@ public sealed partial class OpenGlPreviewBackend
 
         SetMatrixOnProgramLoc(_shadowProgram!, _shadowUniformLocs.LightViewProj, shadowVp);
 
-        DrawShadowCasters(ref frame, ref entityBoneUniformsApplied);
+        DrawShadowCasters(ref frame, shadowVp, ref entityBoneUniformsApplied);
 
         target.EndShadowPass();
 
@@ -426,7 +426,10 @@ public sealed partial class OpenGlPreviewBackend
 
 
 
-    private void DrawShadowCasters(ref GlRenderFrame frame, ref bool entityBoneUniformsApplied)
+    private void DrawShadowCasters(
+        ref GlRenderFrame frame,
+        Matrix4x4 shadowViewProjection,
+        ref bool entityBoneUniformsApplied)
 
     {
 
@@ -506,6 +509,7 @@ public sealed partial class OpenGlPreviewBackend
             var blockModel = frame.BlockModel;
             var blockSlots = frame.BlockSlots;
             var useMaterialDrawRecords = TryUploadGenesisMaterialDrawRecords(ref frame);
+            var useIndirectDrawCommands = TryUploadGenesisIndirectDrawCommands(blockModel);
             if (useMaterialDrawRecords)
             {
                 BindGenesisMaterialDrawRecordBuffer();
@@ -592,7 +596,35 @@ public sealed partial class OpenGlPreviewBackend
 
 
 
-                _mesh.DrawRange(batch.FirstIndex, batch.IndexCount, keepBound: true);
+                var batchGroupCount = CountShadowPassMultiDrawGroup(
+                    blockModel.DrawBatches,
+                    batchIndex,
+                    blockSlots.Length,
+                    useIndirectDrawCommands && CanUseGenesisMultiDrawGroups(useMaterialDrawRecords, patches: false));
+
+                var gpuCulledDrawn =
+                    batchGroupCount > 1 &&
+                    TryDrawGpuCulledBatchGroup(
+                        blockModel,
+                        batchIndex,
+                        batchGroupCount,
+                        shadowViewProjection,
+                        frame.Eye,
+                        frame.ModelMatrix,
+                        _shadowProgram!,
+                        "shadow");
+                if (!gpuCulledDrawn)
+                {
+                    DrawPreviewBatchRange(
+                        batch,
+                        batchIndex,
+                        patches: false,
+                        useIndirectDrawCommands,
+                        useMultiDrawGroups: batchGroupCount > 1,
+                        groupCount: batchGroupCount);
+                }
+
+                batchIndex += batchGroupCount - 1;
 
             }
 

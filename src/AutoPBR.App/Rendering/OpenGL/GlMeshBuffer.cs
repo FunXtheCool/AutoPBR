@@ -1,10 +1,24 @@
+using System.Runtime.InteropServices;
+
 using Silk.NET.OpenGL;
 
 namespace AutoPBR.App.Rendering.OpenGL;
 
 internal sealed class GlMeshBuffer : IDisposable
 {
+    private const BufferTargetARB ParameterBufferTarget = (BufferTargetARB)0x80EE;
+
+    [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+    private unsafe delegate void MultiDrawElementsIndirectCountProc(
+        uint mode,
+        uint type,
+        void* indirect,
+        nint drawCountOffset,
+        int maxDrawCount,
+        int stride);
+
     private readonly GL _gl;
+    private readonly MultiDrawElementsIndirectCountProc? _multiDrawElementsIndirectCount;
     private readonly uint _vao;
     private readonly uint _vbo;
     private readonly uint _ebo;
@@ -22,7 +36,15 @@ internal sealed class GlMeshBuffer : IDisposable
         _vao = _gl.GenVertexArray();
         _vbo = _gl.GenBuffer();
         _ebo = _gl.GenBuffer();
+        if (_gl.Context.TryGetProcAddress("glMultiDrawElementsIndirectCount", out var proc) ||
+            _gl.Context.TryGetProcAddress("glMultiDrawElementsIndirectCountARB", out proc))
+        {
+            _multiDrawElementsIndirectCount =
+                Marshal.GetDelegateForFunctionPointer<MultiDrawElementsIndirectCountProc>(proc);
+        }
     }
+
+    public bool SupportsIndirectCount => _multiDrawElementsIndirectCount is not null;
 
     public void Upload(float[] interleavedVertices, uint[] indices, int floatsPerVertex = 12)
     {
@@ -190,6 +212,149 @@ internal sealed class GlMeshBuffer : IDisposable
         {
             UnbindVertexArray();
         }
+    }
+
+    public void DrawIndirect(
+        GlIndirectDrawCommandBuffer commands,
+        int commandIndex,
+        bool patches = false,
+        bool keepBound = false)
+    {
+        if (!commands.IsValid || commandIndex < 0 || commandIndex >= commands.CommandCount)
+        {
+            return;
+        }
+
+        if (!keepBound)
+        {
+            BindVertexArray();
+        }
+        else if (!_vaoBound)
+        {
+            BindVertexArray();
+        }
+
+        if (patches)
+        {
+            _gl.PatchParameter(PatchParameterName.Vertices, 3);
+        }
+
+        commands.Bind();
+        unsafe
+        {
+            var byteOffset = commandIndex * GlIndirectDrawCommandBuffer.CommandByteSize;
+            _gl.DrawElementsIndirect(
+                patches ? PrimitiveType.Patches : PrimitiveType.Triangles,
+                _indexElementType,
+                (void*)byteOffset);
+        }
+
+        commands.Unbind();
+
+        if (!keepBound)
+        {
+            UnbindVertexArray();
+        }
+    }
+
+    public void MultiDrawIndirect(
+        GlIndirectDrawCommandBuffer commands,
+        int firstCommand,
+        int commandCount,
+        bool patches = false,
+        bool keepBound = false)
+    {
+        if (!commands.IsValid ||
+            commandCount <= 0 ||
+            firstCommand < 0 ||
+            firstCommand >= commands.CommandCount)
+        {
+            return;
+        }
+
+        commandCount = Math.Min(commandCount, commands.CommandCount - firstCommand);
+        if (commandCount <= 0)
+        {
+            return;
+        }
+
+        if (!keepBound)
+        {
+            BindVertexArray();
+        }
+        else if (!_vaoBound)
+        {
+            BindVertexArray();
+        }
+
+        if (patches)
+        {
+            _gl.PatchParameter(PatchParameterName.Vertices, 3);
+        }
+
+        commands.Bind();
+        unsafe
+        {
+            var byteOffset = firstCommand * GlIndirectDrawCommandBuffer.CommandByteSize;
+            _gl.MultiDrawElementsIndirect(
+                patches ? PrimitiveType.Patches : PrimitiveType.Triangles,
+                _indexElementType,
+                (void*)byteOffset,
+                (uint)commandCount,
+                GlIndirectDrawCommandBuffer.CommandByteSize);
+        }
+
+        commands.Unbind();
+
+        if (!keepBound)
+        {
+            UnbindVertexArray();
+        }
+    }
+
+    public unsafe bool MultiDrawIndirectCount(
+        GlIndirectDrawCommandBuffer commands,
+        uint countBuffer,
+        int maxDrawCount,
+        bool patches = false,
+        bool keepBound = false)
+    {
+        if (_multiDrawElementsIndirectCount is null ||
+            !commands.IsValid ||
+            countBuffer == 0 ||
+            maxDrawCount <= 0)
+        {
+            return false;
+        }
+
+        if (!keepBound || !_vaoBound)
+        {
+            BindVertexArray();
+        }
+
+        if (patches)
+        {
+            _gl.PatchParameter(PatchParameterName.Vertices, 3);
+        }
+
+        commands.Bind();
+        _gl.BindBuffer(ParameterBufferTarget, countBuffer);
+        _multiDrawElementsIndirectCount(
+            (uint)(patches ? PrimitiveType.Patches : PrimitiveType.Triangles),
+            (uint)_indexElementType,
+            null,
+            0,
+            maxDrawCount,
+            GlIndirectDrawCommandBuffer.CommandByteSize);
+        _gl.BindBuffer(ParameterBufferTarget, 0);
+        commands.Unbind();
+
+        if (!keepBound)
+        {
+            UnbindVertexArray();
+        }
+
+        return true;
     }
 
     public int IndexCount => _indexCount;

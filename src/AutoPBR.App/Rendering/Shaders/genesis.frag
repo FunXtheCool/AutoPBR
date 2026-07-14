@@ -2,6 +2,7 @@
 #ifdef GENESIS_MATERIAL_DRAW_RECORD_SSBO
 #extension GL_ARB_shader_storage_buffer_object : require
 #endif
+#define GENESIS_FRAGMENT_STAGE 1
 // AutoPBR Genesis preview shader - fragment stage.
 // Algorithms inspired by LabPBR 1.3 spec (https://shaderlabs.org/wiki/LabPBR_Material_Standard)
 // and Glimmer Shaders (MIT, https://github.com/jbritain/glimmer-shaders).

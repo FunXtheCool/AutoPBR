@@ -119,6 +119,11 @@ public sealed partial class OpenGlPreviewBackend
             frame.EntityRebakeCtx.GpuPreparedBoneCount = bindGpuBoneCount;
             frame.EntityRebakeCtx.GpuBoundCpuMeshFingerprint =
                 frame.EntityRebakeCtx.PackConverterCpuMeshFingerprint;
+            var bindGpuBounds = PreviewGpuSkinnedBounds.TryBuild(
+                bindGpuBatches,
+                bindGpuVerts,
+                bindGpuIdx,
+                EntityEmulatedPreviewMeshLayout.SkinnedFloatsPerVertex);
             var bindGpuSubject = new PreviewModelSubject
             {
                 InterleavedVertices = bindGpuVerts,
@@ -134,6 +139,7 @@ public sealed partial class OpenGlPreviewBackend
                 VertexStrideFloats = EntityEmulatedPreviewMeshLayout.SkinnedFloatsPerVertex,
                 EntityGpuMeshSpaceLiftY = bindGpuLift,
                 EntityGpuVerticesInPreviewSpace = false,
+                GpuSkinnedBounds = bindGpuBounds,
                 EntityPreviewAnchorOffset = frame.BlockModel.EntityPreviewAnchorOffset,
                 EntityPreviewPlacementApplied = true,
                 MeshProvenance = frame.EntityRebakeCtx.MeshProvenance ?? frame.BlockModel.MeshProvenance
@@ -280,6 +286,11 @@ public sealed partial class OpenGlPreviewBackend
                 frame.EntityRebakeCtx.GpuPreparedBoneCount = gpuBoneCount;
                 frame.EntityRebakeCtx.GpuBoundCpuMeshFingerprint =
                     frame.EntityRebakeCtx.PackConverterCpuMeshFingerprint;
+                var gpuSkinnedBounds = PreviewGpuSkinnedBounds.TryBuild(
+                    gpuBatches!,
+                    gpuVerts!,
+                    gpuIdx!,
+                    EntityEmulatedPreviewMeshLayout.SkinnedFloatsPerVertex);
                 var liftedGpu = new PreviewModelSubject
                 {
                     InterleavedVertices = gpuVerts!,
@@ -295,6 +306,7 @@ public sealed partial class OpenGlPreviewBackend
                     VertexStrideFloats = EntityEmulatedPreviewMeshLayout.SkinnedFloatsPerVertex,
                     EntityGpuMeshSpaceLiftY = gpuLift,
                     EntityGpuVerticesInPreviewSpace = false,
+                    GpuSkinnedBounds = gpuSkinnedBounds,
                     EntityPreviewAnchorOffset = frame.BlockModel.EntityPreviewAnchorOffset,
                     EntityPreviewPlacementApplied = true,
                     MeshProvenance = frame.EntityRebakeCtx.MeshProvenance ?? frame.BlockModel.MeshProvenance
@@ -583,6 +595,8 @@ public sealed partial class OpenGlPreviewBackend
             }
         }
 
+        UpdateEntityGpuSkinnedBounds(ref frame);
+
         var bonePaletteUploaded = false;
         if (frame.BlockModel is { GpuEntityBoneSkinning: true } blockModel && _entityBoneUbo != 0)
         {
@@ -651,6 +665,30 @@ public sealed partial class OpenGlPreviewBackend
             _lastUploadedBoneCount = 0;
             _lastUploadedLiftY = 0f;
         }
+    }
+
+    private void UpdateEntityGpuSkinnedBounds(ref GlRenderFrame frame)
+    {
+        if (frame.BlockModel is not
+            {
+                GpuEntityBoneSkinning: true,
+                GpuSkinnedBounds: { } skinnedBounds
+            } model)
+        {
+            return;
+        }
+
+        if (!frame.EntityBoneSnapshotValid || frame.EntityBoneSnapshotCount <= 0)
+        {
+            PreviewGpuSkinnedBounds.ClearDrawBatchBounds(model.DrawBatches);
+            return;
+        }
+
+        skinnedBounds.UpdateDrawBatchBounds(
+            model.DrawBatches,
+            _entityBoneScratch.AsSpan(0, frame.EntityBoneSnapshotCount),
+            frame.EntityBoneSnapshotCount,
+            model.EntityGpuMeshSpaceLiftY);
     }
 
     private string? _parityCatalogCpuBindDiagKey;

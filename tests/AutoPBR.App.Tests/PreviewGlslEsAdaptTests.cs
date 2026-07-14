@@ -172,9 +172,58 @@ public class PreviewGlslEsAdaptTests
 
         var desktop = OpenGlPreviewBackend.TestBuildGenesisProgramDefines(
             entitySkinningSsbo: true,
-            materialDrawRecordSsbo: true);
+            materialDrawRecordSsbo: true,
+            drawRecordBaseInstance: true);
         Assert.Equal(1, desktop["GENESIS_ENTITY_SKINNING_SSBO"]);
         Assert.Equal(1, desktop["GENESIS_MATERIAL_DRAW_RECORD_SSBO"]);
+        Assert.Equal(1, desktop["GENESIS_DRAW_RECORD_BASE_INSTANCE"]);
+    }
+
+    [Theory]
+    [InlineData("genesis.vert", ShaderType.VertexShader, "gl_BaseInstanceARB", "flat out int vGenesisDrawRecordIndex")]
+    [InlineData("genesis.frag", ShaderType.FragmentShader, "vGenesisDrawRecordIndex", "flat in int vGenesisDrawRecordIndex")]
+    [InlineData("genesis_shadow.vert", ShaderType.VertexShader, "gl_BaseInstanceARB", "flat out int vGenesisDrawRecordIndex")]
+    [InlineData("genesis_shadow.frag", ShaderType.FragmentShader, "vGenesisDrawRecordIndex", "flat in int vGenesisDrawRecordIndex")]
+    public void DesktopPreparedGenesisDrawRecordBaseInstance_UsesShaderDrawParametersBridge(
+        string shaderFile,
+        ShaderType shaderType,
+        string expectedIndexSource,
+        string expectedVarying)
+    {
+        var prepared = GlslPreparedSourceCache.GetOrPrepare(
+            shaderFile,
+            shaderType,
+            useOpenGlEs: false,
+            new Dictionary<string, int>
+            {
+                ["GENESIS_MATERIAL_DRAW_RECORD_SSBO"] = 1,
+                ["GENESIS_DRAW_RECORD_BASE_INSTANCE"] = 1,
+            });
+
+        Assert.Contains("#define GENESIS_DRAW_RECORD_BASE_INSTANCE 1", prepared, StringComparison.Ordinal);
+        Assert.Contains(expectedIndexSource, prepared, StringComparison.Ordinal);
+        Assert.Contains(expectedVarying, prepared, StringComparison.Ordinal);
+        if (shaderType == ShaderType.VertexShader)
+        {
+            Assert.Contains("#extension GL_ARB_shader_draw_parameters : require", prepared, StringComparison.Ordinal);
+        }
+    }
+
+    [Fact]
+    public void DesktopPreparedIndirectCommandCompactor_UsesSsboAtomicPath()
+    {
+        var prepared = GlslPreparedSourceCache.GetOrPrepare(
+            "genesis_indirect_compact.comp",
+            ShaderType.ComputeShader,
+            useOpenGlEs: false);
+
+        Assert.StartsWith("#version 430 core", prepared.TrimStart(), StringComparison.Ordinal);
+        Assert.Contains("layout(local_size_x = 64", prepared, StringComparison.Ordinal);
+        Assert.Contains("layout(std430, binding = 0) readonly buffer SourceCommands", prepared, StringComparison.Ordinal);
+        Assert.Contains("layout(std430, binding = 4) readonly buffer BatchCullRecords", prepared, StringComparison.Ordinal);
+        Assert.Contains("uniform vec4 uFrustumPlanes[6]", prepared, StringComparison.Ordinal);
+        Assert.Contains("uniform uint uFirstCommand", prepared, StringComparison.Ordinal);
+        Assert.Contains("atomicAdd(uVisibleCommandCount", prepared, StringComparison.Ordinal);
     }
 
     [Fact]

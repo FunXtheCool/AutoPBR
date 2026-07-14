@@ -88,7 +88,13 @@ public static class PreviewSubjectPlacement
         {
             InterleavedVertices = vertices,
             Indices = subject.Indices,
-            DrawBatches = subject.DrawBatches,
+            DrawBatches = subject.GpuSkinnedBounds is not null
+                ? subject.DrawBatches
+                : PreviewDrawBatchBounds.WithComputedBounds(
+                    subject.DrawBatches,
+                    vertices,
+                    subject.Indices,
+                    subject.VertexStrideFloats > 0 ? subject.VertexStrideFloats : PreviewMesh.FloatsPerVertex),
             Materials = subject.Materials,
             MaterialArchivePaths = subject.MaterialArchivePaths,
             PrimaryMaterialIndex = subject.PrimaryMaterialIndex,
@@ -100,6 +106,7 @@ public static class PreviewSubjectPlacement
             VertexStrideFloats = subject.VertexStrideFloats,
             EntityGpuMeshSpaceLiftY = gpuLiftY,
             EntityGpuVerticesInPreviewSpace = subject.EntityGpuVerticesInPreviewSpace,
+            GpuSkinnedBounds = subject.GpuSkinnedBounds,
             EntityPreviewAnchorOffset = subject.EntityPreviewAnchorOffset,
             EntityPreviewPlacementApplied = subject.EntityPreviewPlacementApplied,
             MeshProvenance = subject.MeshProvenance

@@ -11,6 +11,17 @@ public readonly record struct PreviewDrawBatch(int FirstIndex, int IndexCount, i
 
     /// <summary>Whether height-map POM/tessellated protrusion should run for this batch.</summary>
     public bool EnableParallax { get; init; } = true;
+
+    /// <summary>Center of the static batch culling sphere, in the same preview space as the uploaded vertex positions.</summary>
+    public Vector3 BoundsCenter { get; init; } = Vector3.Zero;
+
+    /// <summary>Radius of the static batch culling sphere. Negative means "unknown; always visible".</summary>
+    public float BoundsRadius { get; init; } = -1f;
+
+    /// <summary>Optional far-distance LOD/culling cutoff. Values less than or equal to zero disable distance culling.</summary>
+    public float LodMaxDistance { get; init; } = 0f;
+
+    public bool HasBounds => BoundsRadius >= 0f && float.IsFinite(BoundsRadius);
 }
 
 /// <summary>
@@ -32,6 +43,9 @@ public sealed class PreviewModelSubject
     /// Bind VBO positions already include <c>W()</c> + lift (animation-off Explore path); shader uses CPU branch.
     /// </summary>
     public bool EntityGpuVerticesInPreviewSpace { get; init; }
+
+    /// <summary>Cached per-batch/per-bone bind bounds used to derive conservative animated culling spheres.</summary>
+    public PreviewGpuSkinnedBounds? GpuSkinnedBounds { get; init; }
 
     /// <summary>Anchor translation applied at bake (CPU) or to bind vertices (GPU XZ); shared policy with lift.</summary>
     public Vector3 EntityPreviewAnchorOffset { get; init; }

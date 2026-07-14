@@ -114,6 +114,9 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private GlPersistentMappedUploadBuffer? _entityPrevBoneUpload;
     private GlPersistentMappedUploadBuffer? _entityNormalBoneUpload;
     private GlPersistentMappedUploadBuffer? _genesisMaterialDrawRecordUpload;
+    private GlIndirectDrawCommandBuffer? _genesisIndirectDrawCommands;
+    private GlShaderProgram? _gpuDrawCommandCompactionProgram;
+    private GlGpuDrawCommandCompactor? _gpuDrawCommandCompactor;
     private uint _entityBoneUbo;
     private uint _entityPrevBoneUbo;
     private uint _entityNormalBoneUbo;
@@ -161,7 +164,14 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private bool _entitySkinningSsboCompileDisabled;
     private bool _genesisMaterialDrawRecordsUseSsbo;
     private bool _materialDrawRecordSsboCompileDisabled;
+    private bool _drawRecordBaseInstanceCompileDisabled;
     private bool _loggedMaterialDrawRecordOverflow;
+    private bool _loggedIndirectDrawCommandBuffer;
+    private bool _loggedMultiDrawIndirectGroups;
+    private bool _loggedGpuCompactedDrawSubmission;
+    private int _gpuCompactedSubmissionGroups;
+    private int _gpuCompactedSubmissionSourceCommands;
+    private bool _gpuDrawCommandCompactionCompileDisabled;
     private bool _genesisTessellationCompileDisabled;
     private bool _genesisTessellationFailureLogged;
     private int _appliedWglSwapInterval = int.MinValue;

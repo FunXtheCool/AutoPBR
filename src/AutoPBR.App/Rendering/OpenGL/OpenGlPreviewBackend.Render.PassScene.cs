@@ -292,6 +292,7 @@ public sealed partial class OpenGlPreviewBackend
             var blockModel = frame.BlockModel;
             var blockSlots = frame.BlockSlots;
             var useMaterialDrawRecords = TryUploadGenesisMaterialDrawRecords(ref frame);
+            var useIndirectDrawCommands = TryUploadGenesisIndirectDrawCommands(blockModel);
             if (useMaterialDrawRecords)
             {
                 BindGenesisMaterialDrawRecordBuffer();
@@ -390,6 +391,14 @@ public sealed partial class OpenGlPreviewBackend
                     entityBoneUniformsApplied = true;
                 }
 
+                var batchGroupCount = CountMainPassMultiDrawGroup(
+                    blockModel.DrawBatches,
+                    batchIndex,
+                    blockSlots.Length,
+                    frame.EntityBlendDraw,
+                    useIndirectDrawCommands &&
+                    CanUseGenesisMultiDrawGroups(useMaterialDrawRecords, _mainProgramUsesTessellation));
+
                 using (OpenGlPreviewLayerDepthState.Apply(frame.Gl, batch.LayerPolicy))
                 {
                     if (EntityPreviewDebugSettings.ShowDepthLayerDebug)
@@ -399,8 +408,32 @@ public sealed partial class OpenGlPreviewBackend
                             PreviewDrawLayerPolicy.GetDebugTint(batch.LayerPolicy.Kind));
                     }
 
-                    _mesh.DrawRange(batch.FirstIndex, batch.IndexCount, _mainProgramUsesTessellation, keepBound: true);
+                    var gpuCulledDrawn =
+                        batchGroupCount > 1 &&
+                        !batchBlend &&
+                        !_mainProgramUsesTessellation &&
+                        TryDrawGpuCulledBatchGroup(
+                            blockModel,
+                            batchIndex,
+                            batchGroupCount,
+                            frame.UnjitteredProj * frame.View,
+                            frame.Eye,
+                            frame.ModelMatrix,
+                            _program!,
+                            "main");
+                    if (!gpuCulledDrawn)
+                    {
+                        DrawPreviewBatchRange(
+                            batch,
+                            batchIndex,
+                            _mainProgramUsesTessellation,
+                            useIndirectDrawCommands,
+                            useMultiDrawGroups: batchGroupCount > 1,
+                            groupCount: batchGroupCount);
+                    }
                 }
+
+                batchIndex += batchGroupCount - 1;
             }
 
             _mesh.UnbindVertexArray();

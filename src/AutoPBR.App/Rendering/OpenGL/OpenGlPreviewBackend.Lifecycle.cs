@@ -945,6 +945,7 @@ public sealed partial class OpenGlPreviewBackend
         _shaderCtx = null;
 
         DisposeEntitySkinningUploadBuffers();
+        DisposeGenesisIndirectDrawCommands();
     }
 
     /// <summary>Drops managed references without issuing GL deletes (context already gone).</summary>
@@ -981,6 +982,7 @@ public sealed partial class OpenGlPreviewBackend
         _genesisMaterialDrawRecordSsbo = 0;
         _genesisMaterialDrawRecordUpload = null;
         _genesisMaterialDrawRecordsUseSsbo = false;
+        AbandonGenesisIndirectDrawCommands();
         DestroyAtmosphereResources();
         DestroyGodRayResources();
         DestroyVolumeResources();

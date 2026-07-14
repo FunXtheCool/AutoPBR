@@ -93,6 +93,13 @@ Raw texel coordinates (~16× too large) were the root cause of “exploded” pa
 - **`uEntityBindMesh = 1`**, **`uEntityGpuSkinning = 1`** when bone palette uploaded; bone UBO uploaded before draw.
 - Live foot lift: `ComputeLiveGpuLiftY` on bind vertices + current bones; lift applied via **`uEntityMeshLiftY`** (not per-frame mesh rebake).
 
+### Animated culling bounds
+
+- GPU bind preparation caches conservative bind-space AABBs per draw batch and bone index.
+- Each frame transforms only the cached box corners with the current bone palette, then applies the same `W()` + live lift as the vertex shader to derive batch culling spheres.
+- This bounds update is not a CPU display-skinning path and does not scan the full vertex buffer each frame.
+- Missing or invalid bone snapshots clear animated bounds to "unknown / always visible"; culling must never reuse stale animated bounds.
+
 ---
 
 ## Explore runtime wiring

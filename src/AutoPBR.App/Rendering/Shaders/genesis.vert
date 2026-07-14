@@ -2,6 +2,10 @@
 #if defined(GENESIS_ENTITY_SKINNING_SSBO) || defined(GENESIS_MATERIAL_DRAW_RECORD_SSBO)
 #extension GL_ARB_shader_storage_buffer_object : require
 #endif
+#ifdef GENESIS_DRAW_RECORD_BASE_INSTANCE
+#extension GL_ARB_shader_draw_parameters : require
+#endif
+#define GENESIS_VERTEX_STAGE 1
 //!include "common/genesis_draw_record.glsl"
 // AutoPBR Genesis preview shader - vertex stage.
 // Algorithms inspired by LabPBR 1.3 spec and Glimmer Shaders (MIT).
@@ -66,6 +70,8 @@ out vec4 vPrevClip;
 
 void main()
 {
+    genesisWriteDrawRecordIndexVarying();
+
     vec4 entityPos;
     vec4 prevEntityPos;
     vec3 entityN;

@@ -23,9 +23,54 @@ layout(std430, binding = 8) readonly buffer GenesisMaterialDrawRecords
 uniform int uGenesisUseMaterialDrawRecord;
 uniform int uGenesisDrawRecordIndex;
 
+#ifdef GENESIS_DRAW_RECORD_BASE_INSTANCE
+#ifdef GENESIS_VERTEX_STAGE
+flat out int vGenesisDrawRecordIndex;
+
+int genesisDrawRecordIndexValue()
+{
+    return int(gl_BaseInstanceARB);
+}
+
+void genesisWriteDrawRecordIndexVarying()
+{
+    vGenesisDrawRecordIndex = genesisDrawRecordIndexValue();
+}
+#elif defined(GENESIS_FRAGMENT_STAGE)
+flat in int vGenesisDrawRecordIndex;
+
+int genesisDrawRecordIndexValue()
+{
+    return vGenesisDrawRecordIndex;
+}
+
+void genesisWriteDrawRecordIndexVarying()
+{
+}
+#else
+int genesisDrawRecordIndexValue()
+{
+    return uGenesisDrawRecordIndex;
+}
+
+void genesisWriteDrawRecordIndexVarying()
+{
+}
+#endif
+#else
+int genesisDrawRecordIndexValue()
+{
+    return uGenesisDrawRecordIndex;
+}
+
+void genesisWriteDrawRecordIndexVarying()
+{
+}
+#endif
+
 GenesisMaterialDrawRecord genesisMaterialDrawRecord()
 {
-    return uGenesisMaterialDrawRecords[max(uGenesisDrawRecordIndex, 0)];
+    return uGenesisMaterialDrawRecords[max(genesisDrawRecordIndexValue(), 0)];
 }
 
 int genesisFlag(float value)

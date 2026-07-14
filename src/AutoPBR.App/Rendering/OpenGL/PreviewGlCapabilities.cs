@@ -19,6 +19,8 @@ internal sealed record PreviewGlCapabilities(
     bool ImageLoadStore,
     bool ShaderAtomics,
     bool MultiDrawIndirect,
+    bool IndirectParameters,
+    bool ShaderDrawParameters,
     bool TimerQuery,
     bool TextureArrays,
     bool BindlessTextures,
@@ -33,6 +35,19 @@ internal sealed record PreviewGlCapabilities(
 
     public bool CanUseComputeFroxelInject => !IsOpenGlEs && ComputeShaders && ImageLoadStore;
 
+    public bool CanUseIndirectDrawCommands => !IsOpenGlEs && MultiDrawIndirect;
+
+    public bool CanUseMultiDrawIndirectGroups =>
+        CanUseIndirectDrawCommands && ShaderDrawParameters && ShaderStorageBuffers;
+
+    public bool CanUseGpuCommandCompaction =>
+        !IsOpenGlEs && ComputeShaders && ShaderStorageBuffers && ShaderAtomics && MultiDrawIndirect;
+
+    public bool CanUseGpuBatchCulling => CanUseGpuCommandCompaction;
+
+    public bool CanUseGpuCompactedDrawSubmission =>
+        CanUseGpuBatchCulling && IndirectParameters && ShaderDrawParameters;
+
     public string UploadTransportLabel => CanUsePersistentUploadRing ? "persistent-mapped UBO uploads" : "BufferSubData uploads";
 
     public string FormatDiagnostic()
@@ -45,9 +60,15 @@ internal sealed record PreviewGlCapabilities(
                $"entitySsbo={(CanUseEntitySkinningSsbo ? "on" : "off")}, " +
                $"materialDrawSsbo={(CanUseMaterialDrawRecordSsbo ? "on" : "off")}, " +
                $"computeFroxels={(CanUseComputeFroxelInject ? "on" : "off")}, " +
+               $"indirectDraws={(CanUseIndirectDrawCommands ? "on" : "off")}, " +
+               $"multiDrawGroups={(CanUseMultiDrawIndirectGroups ? "on" : "off")}, " +
+               $"gpuCommandCompaction={(CanUseGpuCommandCompaction ? "on" : "off")}, " +
+               $"gpuBatchCulling={(CanUseGpuBatchCulling ? "on" : "off")}, " +
+               $"gpuCompactedDraws={(CanUseGpuCompactedDrawSubmission ? "on" : "off")}, " +
                $"compute={(ComputeShaders ? "yes" : "no")}, " +
                $"imageStore={(ImageLoadStore ? "yes" : "no")}, " +
                $"multiDrawIndirect={(MultiDrawIndirect ? "yes" : "no")}, " +
+               $"drawParameters={(ShaderDrawParameters ? "yes" : "no")}, " +
                $"timerQuery={(TimerQuery ? "yes" : "no")}, " +
                $"spirv={(SpirV ? "yes" : "no")}.";
     }
@@ -58,7 +79,10 @@ internal sealed record PreviewGlCapabilities(
         var entitySkinning = CanUseEntitySkinningSsbo ? "entity SSBO" : "entity UBO";
         var drawRecords = CanUseMaterialDrawRecordSsbo ? "draw SSBO" : "draw uniforms";
         var froxelInject = CanUseComputeFroxelInject ? "compute froxels" : "fragment froxels";
-        return $" · {upload} · {entitySkinning} · {drawRecords} · {froxelInject}";
+        var drawCommands = CanUseMultiDrawIndirectGroups
+            ? "multi-draw groups"
+            : CanUseIndirectDrawCommands ? "indirect draws" : "direct draws";
+        return $" · {upload} · {entitySkinning} · {drawRecords} · {froxelInject} · {drawCommands}";
     }
 
     public static PreviewGlCapabilities FromGl(GL gl, bool useOpenGlEs, string versionString)
@@ -93,6 +117,9 @@ internal sealed record PreviewGlCapabilities(
         var imageStore = !isEs && (VersionAtLeast(4, 2) || HasExtension("GL_ARB_shader_image_load_store"));
         var atomics = !isEs && (VersionAtLeast(4, 2) || HasExtension("GL_ARB_shader_atomic_counters"));
         var mdi = !isEs && (VersionAtLeast(4, 3) || HasExtension("GL_ARB_multi_draw_indirect"));
+        var indirectParameters = !isEs &&
+                                 (VersionAtLeast(4, 6) || HasExtension("GL_ARB_indirect_parameters"));
+        var drawParameters = !isEs && (VersionAtLeast(4, 6) || HasExtension("GL_ARB_shader_draw_parameters"));
         var timerQuery = isEs
             ? HasExtension("GL_EXT_disjoint_timer_query")
             : VersionAtLeast(3, 3) || HasExtension("GL_ARB_timer_query");
@@ -114,6 +141,8 @@ internal sealed record PreviewGlCapabilities(
             imageStore,
             atomics,
             mdi,
+            indirectParameters,
+            drawParameters,
             timerQuery,
             textureArrays,
             bindless,

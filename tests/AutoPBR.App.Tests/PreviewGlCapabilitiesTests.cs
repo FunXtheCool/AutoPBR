@@ -27,13 +27,25 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.False(caps.ComputeShaders);
         Assert.False(caps.CanUseComputeFroxelInject);
         Assert.False(caps.ImageLoadStore);
+        Assert.False(caps.CanUseIndirectDrawCommands);
+        Assert.False(caps.ShaderDrawParameters);
+        Assert.False(caps.CanUseMultiDrawIndirectGroups);
+        Assert.False(caps.CanUseGpuCommandCompaction);
+        Assert.False(caps.CanUseGpuBatchCulling);
+        Assert.False(caps.CanUseGpuCompactedDrawSubmission);
         Assert.Contains("persistentUpload=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
         Assert.Contains("entitySsbo=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
         Assert.Contains("materialDrawSsbo=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
         Assert.Contains("computeFroxels=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("indirectDraws=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("multiDrawGroups=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("gpuCommandCompaction=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("gpuBatchCulling=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("gpuCompactedDraws=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
         Assert.Contains("GLES-safe uploads", caps.FormatContextSuffix(), StringComparison.Ordinal);
         Assert.Contains("draw uniforms", caps.FormatContextSuffix(), StringComparison.Ordinal);
         Assert.Contains("fragment froxels", caps.FormatContextSuffix(), StringComparison.Ordinal);
+        Assert.Contains("direct draws", caps.FormatContextSuffix(), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -57,6 +69,10 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.False(caps.ComputeShaders);
         Assert.False(caps.CanUseComputeFroxelInject);
         Assert.False(caps.MultiDrawIndirect);
+        Assert.False(caps.CanUseIndirectDrawCommands);
+        Assert.False(caps.CanUseMultiDrawIndirectGroups);
+        Assert.False(caps.CanUseGpuCommandCompaction);
+        Assert.False(caps.CanUseGpuBatchCulling);
     }
 
     [Fact]
@@ -81,6 +97,10 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.False(caps.CanUseComputeFroxelInject);
         Assert.False(caps.ImageLoadStore);
         Assert.False(caps.SpirV);
+        Assert.False(caps.CanUseIndirectDrawCommands);
+        Assert.False(caps.CanUseMultiDrawIndirectGroups);
+        Assert.False(caps.CanUseGpuCommandCompaction);
+        Assert.False(caps.CanUseGpuBatchCulling);
     }
 
     [Fact]
@@ -104,6 +124,13 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.True(caps.CanUseComputeFroxelInject);
         Assert.True(caps.ShaderAtomics);
         Assert.True(caps.MultiDrawIndirect);
+        Assert.True(caps.CanUseIndirectDrawCommands);
+        Assert.True(caps.ShaderDrawParameters);
+        Assert.True(caps.CanUseMultiDrawIndirectGroups);
+        Assert.True(caps.CanUseGpuCommandCompaction);
+        Assert.True(caps.CanUseGpuBatchCulling);
+        Assert.True(caps.IndirectParameters);
+        Assert.True(caps.CanUseGpuCompactedDrawSubmission);
         Assert.True(caps.TimerQuery);
         Assert.True(caps.TextureArrays);
         Assert.True(caps.BindlessTextures);
@@ -113,9 +140,15 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.Contains("entitySsbo=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
         Assert.Contains("materialDrawSsbo=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
         Assert.Contains("computeFroxels=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("indirectDraws=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("multiDrawGroups=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("gpuCommandCompaction=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("gpuBatchCulling=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("gpuCompactedDraws=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
         Assert.Contains("persistent uploads", caps.FormatContextSuffix(), StringComparison.Ordinal);
         Assert.Contains("draw SSBO", caps.FormatContextSuffix(), StringComparison.Ordinal);
         Assert.Contains("compute froxels", caps.FormatContextSuffix(), StringComparison.Ordinal);
+        Assert.Contains("multi-draw groups", caps.FormatContextSuffix(), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -137,6 +170,45 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.True(caps.ImageLoadStore);
         Assert.True(caps.CanUseComputeFroxelInject);
         Assert.True(caps.MultiDrawIndirect);
+        Assert.True(caps.CanUseIndirectDrawCommands);
+        Assert.False(caps.ShaderDrawParameters);
+        Assert.False(caps.CanUseMultiDrawIndirectGroups);
+        Assert.True(caps.CanUseGpuCommandCompaction);
+        Assert.True(caps.CanUseGpuBatchCulling);
+        Assert.False(caps.CanUseGpuCompactedDrawSubmission);
         Assert.True(caps.SpirV);
+    }
+
+    [Fact]
+    public void DesktopGl43_ShaderDrawParametersExtensionEnablesMultiDrawGroups()
+    {
+        var caps = PreviewGlCapabilities.FromStrings(
+            "4.3.0 Mesa",
+            "Mesa",
+            "Renderer",
+            "GL_ARB_shader_draw_parameters",
+            forceOpenGlEs: false);
+
+        Assert.True(caps.MultiDrawIndirect);
+        Assert.True(caps.ShaderStorageBuffers);
+        Assert.True(caps.ShaderDrawParameters);
+        Assert.True(caps.CanUseMultiDrawIndirectGroups);
+        Assert.True(caps.CanUseGpuCommandCompaction);
+        Assert.True(caps.CanUseGpuBatchCulling);
+        Assert.False(caps.CanUseGpuCompactedDrawSubmission);
+    }
+
+    [Fact]
+    public void DesktopGl43_IndirectParameterExtensionsEnableGpuCompactedSubmission()
+    {
+        var caps = PreviewGlCapabilities.FromStrings(
+            "4.3.0 Mesa",
+            "Mesa",
+            "Renderer",
+            "GL_ARB_shader_draw_parameters GL_ARB_indirect_parameters",
+            forceOpenGlEs: false);
+
+        Assert.True(caps.IndirectParameters);
+        Assert.True(caps.CanUseGpuCompactedDrawSubmission);
     }
 }

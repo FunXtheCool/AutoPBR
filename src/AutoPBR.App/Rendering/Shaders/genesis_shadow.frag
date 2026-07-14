@@ -2,6 +2,7 @@
 #ifdef GENESIS_MATERIAL_DRAW_RECORD_SSBO
 #extension GL_ARB_shader_storage_buffer_object : require
 #endif
+#define GENESIS_FRAGMENT_STAGE 1
 //!include "common/genesis_draw_record.glsl"
 
 // AutoPBR Genesis preview shader - depth-only shadow fragment stage.

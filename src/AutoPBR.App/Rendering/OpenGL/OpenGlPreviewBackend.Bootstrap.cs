@@ -120,6 +120,7 @@ public sealed partial class OpenGlPreviewBackend
         _proceduralSkyProgram = null;
         DisposeEntitySkinningUploadBuffers();
         DisposeGenesisMaterialDrawRecordBuffer();
+        DisposeGenesisIndirectDrawCommands();
         _shaderCtx = null;
         _gpuInitTier = PreviewGpuInitTier.None;
         _shadowAwareGodRayInitAttempted = false;
@@ -147,10 +148,12 @@ public sealed partial class OpenGlPreviewBackend
                 var bootMask = GenesisShaderFeatureMaskBuilder.Build(_settings, entityEmulatedPreview: false);
                 var bootUseEntitySkinningSsbo = ShouldUseEntitySkinningSsbo();
                 var bootUseMaterialDrawRecordSsbo = ShouldUseMaterialDrawRecordSsbo();
+                var bootUseDrawRecordBaseInstance = bootUseMaterialDrawRecordSsbo && ShouldUseDrawRecordBaseInstance();
                 var bootDefines = BuildGenesisProgramDefines(
                     bootMask,
                     bootUseEntitySkinningSsbo,
-                    bootUseMaterialDrawRecordSsbo);
+                    bootUseMaterialDrawRecordSsbo,
+                    drawRecordBaseInstance: false);
                 if (!_useOpenGlEs)
                 {
                     _program = CreatePreviewProgram(
@@ -174,13 +177,33 @@ public sealed partial class OpenGlPreviewBackend
                     }
                 }
 
+                bootDefines = BuildGenesisProgramDefines(
+                    bootMask,
+                    bootUseEntitySkinningSsbo,
+                    bootUseMaterialDrawRecordSsbo,
+                    bootUseDrawRecordBaseInstance);
                 _program ??= CreatePreviewProgram("genesis.vert", "genesis.frag", out err, defines: bootDefines);
+                if (_program is { IsValid: false } && bootUseDrawRecordBaseInstance)
+                {
+                    _program.Dispose();
+                    _program = null;
+                    DisableDrawRecordBaseInstanceCompile(err);
+                    bootUseDrawRecordBaseInstance = false;
+                    bootDefines = BuildGenesisProgramDefines(
+                        bootMask,
+                        bootUseEntitySkinningSsbo,
+                        bootUseMaterialDrawRecordSsbo,
+                        drawRecordBaseInstance: false);
+                    _program = CreatePreviewProgram("genesis.vert", "genesis.frag", out err, defines: bootDefines);
+                }
+
                 if (_program is { IsValid: false } && bootUseMaterialDrawRecordSsbo)
                 {
                     _program.Dispose();
                     _program = null;
                     DisableMaterialDrawRecordSsboCompile(err);
                     bootUseMaterialDrawRecordSsbo = false;
+                    bootUseDrawRecordBaseInstance = false;
                     bootDefines = BuildGenesisProgramDefines(
                         bootMask,
                         bootUseEntitySkinningSsbo,
@@ -197,7 +220,8 @@ public sealed partial class OpenGlPreviewBackend
                     bootDefines = BuildGenesisProgramDefines(
                         bootMask,
                         entitySkinningSsbo: false,
-                        materialDrawRecordSsbo: bootUseMaterialDrawRecordSsbo);
+                        materialDrawRecordSsbo: bootUseMaterialDrawRecordSsbo,
+                        drawRecordBaseInstance: bootUseDrawRecordBaseInstance);
                     _program = CreatePreviewProgram("genesis.vert", "genesis.frag", out err, defines: bootDefines);
                 }
 
@@ -217,7 +241,8 @@ public sealed partial class OpenGlPreviewBackend
                     bootMask,
                     _mainProgramUsesTessellation,
                     bootUseEntitySkinningSsbo,
-                    bootUseMaterialDrawRecordSsbo);
+                    bootUseMaterialDrawRecordSsbo,
+                    !_mainProgramUsesTessellation && bootUseDrawRecordBaseInstance);
                 _genesisPrograms[_activeGenesisProgramKey] = _program;
                 _genesisProgramLru.AddFirst(_activeGenesisProgramKey);
                 return true;
@@ -225,18 +250,63 @@ public sealed partial class OpenGlPreviewBackend
             case 1:
                 var shadowUseEntitySkinningSsbo = ShouldUseEntitySkinningSsbo();
                 var shadowUseMaterialDrawRecordSsbo = ShouldUseMaterialDrawRecordSsbo();
+                var shadowUseDrawRecordBaseInstance =
+                    shadowUseMaterialDrawRecordSsbo && ShouldUseDrawRecordBaseInstance();
                 var shadowDefines = BuildGenesisProgramDefines(
                     GenesisShaderFeatureMask.None,
                     shadowUseEntitySkinningSsbo,
-                    shadowUseMaterialDrawRecordSsbo);
+                    shadowUseMaterialDrawRecordSsbo,
+                    shadowUseDrawRecordBaseInstance);
                 _shadowProgram = CreatePreviewProgram(
                     "genesis_shadow.vert",
                     "genesis_shadow.frag",
                     out var shadowErr,
                     defines: shadowDefines);
+                if (_shadowProgram is { IsValid: false } && shadowUseDrawRecordBaseInstance)
+                {
+                    var fallbackMainKey = _activeGenesisProgramKey with { DrawRecordBaseInstance = false };
+                    if (TryGetOrCreateGenesisProgram(fallbackMainKey, out var fallbackMainProgram, out var fallbackMainErr))
+                    {
+                        _shadowProgram.Dispose();
+                        _shadowProgram = null;
+                        DisableDrawRecordBaseInstanceCompile(shadowErr);
+                        if (_program is not null && !_genesisPrograms.ContainsValue(_program))
+                        {
+                            _program.Dispose();
+                        }
+
+                        _program = fallbackMainProgram;
+                        _activeGenesisProgramKey = fallbackMainKey;
+                        _mainProgramUsesTessellation = fallbackMainKey.Tessellation;
+                        _mainEntityUniformLocs = ResolveEntitySkinningUniformLocs(_program);
+                        _mainUniformLocs = ResolveMainProgramUniformLocs(_program);
+                        shadowUseDrawRecordBaseInstance = false;
+                        shadowDefines = BuildGenesisProgramDefines(
+                            GenesisShaderFeatureMask.None,
+                            shadowUseEntitySkinningSsbo,
+                            shadowUseMaterialDrawRecordSsbo,
+                            drawRecordBaseInstance: false);
+                        _shadowProgram = CreatePreviewProgram(
+                            "genesis_shadow.vert",
+                            "genesis_shadow.frag",
+                            out shadowErr,
+                            defines: shadowDefines);
+                    }
+                    else
+                    {
+                        EmitDiagnostic(
+                            "[3D preview] Multi-draw draw-record fallback main program failed: " +
+                            (fallbackMainErr ?? "link failed"));
+                    }
+                }
+
                 if (_shadowProgram is { IsValid: false } && shadowUseMaterialDrawRecordSsbo)
                 {
-                    var fallbackMainKey = _activeGenesisProgramKey with { MaterialDrawRecordSsbo = false };
+                    var fallbackMainKey = _activeGenesisProgramKey with
+                    {
+                        MaterialDrawRecordSsbo = false,
+                        DrawRecordBaseInstance = false
+                    };
                     if (TryGetOrCreateGenesisProgram(fallbackMainKey, out var fallbackMainProgram, out var fallbackMainErr))
                     {
                         _shadowProgram.Dispose();
@@ -253,6 +323,7 @@ public sealed partial class OpenGlPreviewBackend
                         _mainEntityUniformLocs = ResolveEntitySkinningUniformLocs(_program);
                         _mainUniformLocs = ResolveMainProgramUniformLocs(_program);
                         shadowUseMaterialDrawRecordSsbo = false;
+                        shadowUseDrawRecordBaseInstance = false;
                         shadowDefines = BuildGenesisProgramDefines(
                             GenesisShaderFeatureMask.None,
                             shadowUseEntitySkinningSsbo,
@@ -292,7 +363,8 @@ public sealed partial class OpenGlPreviewBackend
                         shadowDefines = BuildGenesisProgramDefines(
                             GenesisShaderFeatureMask.None,
                             entitySkinningSsbo: false,
-                            materialDrawRecordSsbo: shadowUseMaterialDrawRecordSsbo);
+                            materialDrawRecordSsbo: shadowUseMaterialDrawRecordSsbo,
+                            drawRecordBaseInstance: shadowUseDrawRecordBaseInstance);
                         _shadowProgram = CreatePreviewProgram(
                             "genesis_shadow.vert",
                             "genesis_shadow.frag",

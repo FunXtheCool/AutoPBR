@@ -8,7 +8,8 @@ public sealed partial class OpenGlPreviewBackend
         GenesisShaderFeatureMask Mask,
         bool Tessellation,
         bool EntitySkinningSsbo,
-        bool MaterialDrawRecordSsbo);
+        bool MaterialDrawRecordSsbo,
+        bool DrawRecordBaseInstance);
 
     private const int MaxGenesisProgramCacheEntries = 32;
 
@@ -56,6 +57,11 @@ public sealed partial class OpenGlPreviewBackend
         _materialDrawRecordSsboCompileDisabled = false;
     }
 
+    private void ResetDrawRecordBaseInstanceCompileState()
+    {
+        _drawRecordBaseInstanceCompileDisabled = false;
+    }
+
     private void EnsureGenesisProgramForFrame(ref GlRenderFrame frame)
     {
         if (_shaderCtx is null)
@@ -67,11 +73,13 @@ public sealed partial class OpenGlPreviewBackend
         var wantsTessellation = !_useOpenGlEs &&
                                 !_genesisTessellationCompileDisabled &&
                                 frame.EnableTessellationDisplacementEff;
+        var useMaterialDrawRecords = ShouldUseMaterialDrawRecordSsbo();
         var cacheKey = new GenesisProgramCacheKey(
             mask,
             wantsTessellation,
             ShouldUseEntitySkinningSsbo(),
-            ShouldUseMaterialDrawRecordSsbo());
+            useMaterialDrawRecords,
+            useMaterialDrawRecords && !wantsTessellation && ShouldUseDrawRecordBaseInstance());
         if (_program is { IsValid: true } && cacheKey == _activeGenesisProgramKey)
         {
             return;
@@ -118,10 +126,12 @@ public sealed partial class OpenGlPreviewBackend
         var defines = BuildGenesisProgramDefines(
             cacheKey.Mask,
             cacheKey.EntitySkinningSsbo,
-            cacheKey.MaterialDrawRecordSsbo);
+            cacheKey.MaterialDrawRecordSsbo,
+            cacheKey.DrawRecordBaseInstance);
         var debugSuffix = string.Concat(
             cacheKey.EntitySkinningSsbo ? "+entity-ssbo" : string.Empty,
-            cacheKey.MaterialDrawRecordSsbo ? "+draw-ssbo" : string.Empty);
+            cacheKey.MaterialDrawRecordSsbo ? "+draw-ssbo" : string.Empty,
+            cacheKey.DrawRecordBaseInstance ? "+draw-base-instance" : string.Empty);
         if (cacheKey.Tessellation)
         {
             program = CreatePreviewProgram(
@@ -196,6 +206,7 @@ public sealed partial class OpenGlPreviewBackend
         ResetGenesisTessellationCompileState();
         ResetEntitySkinningSsboCompileState();
         ResetMaterialDrawRecordSsboCompileState();
+        ResetDrawRecordBaseInstanceCompileState();
     }
 
     private void PrewarmCommonGenesisProgramsOnGpu()
@@ -218,7 +229,8 @@ public sealed partial class OpenGlPreviewBackend
                 mask,
                 Tessellation: false,
                 ShouldUseEntitySkinningSsbo(),
-                ShouldUseMaterialDrawRecordSsbo());
+                ShouldUseMaterialDrawRecordSsbo(),
+                DrawRecordBaseInstance: false);
             if (_genesisPrograms.ContainsKey(cacheKey))
             {
                 continue;
@@ -236,10 +248,15 @@ public sealed partial class OpenGlPreviewBackend
         !_materialDrawRecordSsboCompileDisabled &&
         _glCapabilities?.CanUseMaterialDrawRecordSsbo == true;
 
+    private bool ShouldUseDrawRecordBaseInstance() =>
+        !_drawRecordBaseInstanceCompileDisabled &&
+        _glCapabilities?.CanUseMultiDrawIndirectGroups == true;
+
     private static IReadOnlyDictionary<string, int> BuildGenesisProgramDefines(
         GenesisShaderFeatureMask mask,
         bool entitySkinningSsbo,
-        bool materialDrawRecordSsbo = false)
+        bool materialDrawRecordSsbo = false,
+        bool drawRecordBaseInstance = false)
     {
         var baseDefines = GenesisShaderFeatureMaskBuilder.ToDefines(mask);
         if (!entitySkinningSsbo && !materialDrawRecordSsbo)
@@ -256,6 +273,10 @@ public sealed partial class OpenGlPreviewBackend
         if (materialDrawRecordSsbo)
         {
             defines["GENESIS_MATERIAL_DRAW_RECORD_SSBO"] = 1;
+            if (drawRecordBaseInstance)
+            {
+                defines["GENESIS_DRAW_RECORD_BASE_INSTANCE"] = 1;
+            }
         }
 
         return defines;
@@ -276,7 +297,21 @@ public sealed partial class OpenGlPreviewBackend
         if (resolvedKey.Tessellation)
         {
             DisableGenesisTessellationCompile(error);
-            resolvedKey = resolvedKey with { Tessellation = false };
+            resolvedKey = resolvedKey with
+            {
+                Tessellation = false,
+                DrawRecordBaseInstance = resolvedKey.MaterialDrawRecordSsbo && ShouldUseDrawRecordBaseInstance()
+            };
+            if (TryGetOrCreateGenesisProgram(resolvedKey, out program, out error))
+            {
+                return true;
+            }
+        }
+
+        if (resolvedKey.DrawRecordBaseInstance)
+        {
+            DisableDrawRecordBaseInstanceCompile(error);
+            resolvedKey = resolvedKey with { DrawRecordBaseInstance = false };
             if (TryGetOrCreateGenesisProgram(resolvedKey, out program, out error))
             {
                 return true;
@@ -286,7 +321,7 @@ public sealed partial class OpenGlPreviewBackend
         if (resolvedKey.MaterialDrawRecordSsbo)
         {
             DisableMaterialDrawRecordSsboCompile(error);
-            resolvedKey = resolvedKey with { MaterialDrawRecordSsbo = false };
+            resolvedKey = resolvedKey with { MaterialDrawRecordSsbo = false, DrawRecordBaseInstance = false };
             if (TryGetOrCreateGenesisProgram(resolvedKey, out program, out error))
             {
                 return true;
@@ -328,5 +363,17 @@ public sealed partial class OpenGlPreviewBackend
         _materialDrawRecordSsboCompileDisabled = true;
         var detail = string.IsNullOrWhiteSpace(reason) ? "compile failed" : TrimTessellationFailureReason(reason);
         EmitDiagnostic("[3D preview] Material/draw record SSBO path disabled for this session; using uniform fallback. " + detail);
+    }
+
+    private void DisableDrawRecordBaseInstanceCompile(string? reason)
+    {
+        if (_drawRecordBaseInstanceCompileDisabled)
+        {
+            return;
+        }
+
+        _drawRecordBaseInstanceCompileDisabled = true;
+        var detail = string.IsNullOrWhiteSpace(reason) ? "compile failed" : TrimTessellationFailureReason(reason);
+        EmitDiagnostic("[3D preview] Multi-draw draw-record indexing disabled for this session; using per-batch draw-record uniforms. " + detail);
     }
 }

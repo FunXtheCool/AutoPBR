@@ -153,7 +153,11 @@ public static class EntityEmulatedPreviewRebaker
 
         interleavedVertices = verts;
         indices = idx;
-        drawBatches = batchesList.ToArray();
+        drawBatches = PreviewDrawBatchBounds.WithComputedBounds(
+            batchesList,
+            verts,
+            idx,
+            MinecraftModelBaker.FloatsPerVertex);
         return true;
     }
 

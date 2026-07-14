@@ -275,7 +275,11 @@ public static class ResourcePackPreviewRenderer
                         {
                             InterleavedVertices = verts,
                             Indices = indices,
-                            DrawBatches = batchesList.ToArray(),
+                            DrawBatches = PreviewDrawBatchBounds.WithComputedBounds(
+                                batchesList,
+                                verts,
+                                indices,
+                                MinecraftModelBaker.FloatsPerVertex),
                             Materials = materials,
                             MaterialArchivePaths = orderedModelTextures.ToArray(),
                             PrimaryMaterialIndex = primIdx,
