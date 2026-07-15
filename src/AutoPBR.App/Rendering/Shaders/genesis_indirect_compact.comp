@@ -32,6 +32,14 @@ layout(std430, binding = 2) buffer OutputCommands
 layout(std430, binding = 3) buffer OutputCounter
 {
     uint uVisibleCommandCount;
+    uint uExaminedCommands;
+    uint uWrittenCommands;
+    uint uFrustumCulledCommands;
+    uint uDistanceCulledCommands;
+    uint uEmptyCommands;
+    uint uVisibilityFlagCulledCommands;
+    uint uOverflowCommands;
+    uint uMaximumIndexCount;
 };
 
 struct BatchCullRecord
@@ -49,18 +57,21 @@ layout(std430, binding = 4) readonly buffer BatchCullRecords
 
 uniform uint uCommandCount;
 uniform uint uFirstCommand;
+uniform uint uOutputCapacity;
 uniform int uUseGpuCulling;
+uniform int uCollectDiagnostics;
 uniform vec3 uCameraPos;
 uniform vec4 uFrustumPlanes[6];
 
-bool batchSphereVisible(uint index)
+// 0 = visible, 1 = frustum culled, 2 = distance culled.
+uint batchCullReason(uint index)
 {
     BatchCullRecord record = uBatchCullRecords[index];
     vec3 center = record.centerRadius.xyz;
     float radius = record.centerRadius.w;
     if (radius < 0.0)
     {
-        return true;
+        return 0u;
     }
 
     for (int i = 0; i < 6; i++)
@@ -68,7 +79,7 @@ bool batchSphereVisible(uint index)
         vec4 plane = uFrustumPlanes[i];
         if (dot(plane.xyz, center) + plane.w < -radius)
         {
-            return false;
+            return 1u;
         }
     }
 
@@ -78,11 +89,11 @@ bool batchSphereVisible(uint index)
         float distanceToCamera = length(center - uCameraPos);
         if (distanceToCamera - radius > maxDistance)
         {
-            return false;
+            return 2u;
         }
     }
 
-    return true;
+    return 0u;
 }
 
 void main()
@@ -96,14 +107,64 @@ void main()
     uint index = uFirstCommand + localIndex;
 
     DrawElementsIndirectCommand command = uSourceCommands[index];
-    bool visible = uUseGpuCulling != 0
-        ? batchSphereVisible(index)
-        : uVisibilityFlags[index] != 0u;
-    if (!visible || command.count == 0u || command.instanceCount == 0u)
+    if (uCollectDiagnostics != 0)
     {
+        atomicAdd(uExaminedCommands, 1u);
+    }
+
+    if (command.count == 0u || command.instanceCount == 0u)
+    {
+        if (uCollectDiagnostics != 0)
+        {
+            atomicAdd(uEmptyCommands, 1u);
+        }
         return;
     }
 
+    uint cullReason = uUseGpuCulling != 0 ? batchCullReason(index) : 0u;
+    if (cullReason != 0u)
+    {
+        if (uCollectDiagnostics != 0)
+        {
+            if (cullReason == 1u)
+            {
+                atomicAdd(uFrustumCulledCommands, 1u);
+            }
+            else
+            {
+                atomicAdd(uDistanceCulledCommands, 1u);
+            }
+        }
+        return;
+    }
+
+    if (uUseGpuCulling == 0 && uVisibilityFlags[index] == 0u)
+    {
+        if (uCollectDiagnostics != 0)
+        {
+            atomicAdd(uVisibilityFlagCulledCommands, 1u);
+        }
+        return;
+    }
+
+    if (uCollectDiagnostics != 0)
+    {
+        atomicMax(uMaximumIndexCount, command.count);
+    }
+
     uint dst = atomicAdd(uVisibleCommandCount, 1u);
+    if (dst >= uOutputCapacity)
+    {
+        if (uCollectDiagnostics != 0)
+        {
+            atomicAdd(uOverflowCommands, 1u);
+        }
+        return;
+    }
+
     uOutputCommands[dst] = command;
+    if (uCollectDiagnostics != 0)
+    {
+        atomicAdd(uWrittenCommands, 1u);
+    }
 }

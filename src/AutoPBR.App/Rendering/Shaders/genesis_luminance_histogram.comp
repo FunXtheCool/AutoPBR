@@ -1,0 +1,40 @@
+#version 430 core
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(rgba8, binding = 0) readonly uniform image2D uSourceImage;
+
+layout(std430, binding = 0) buffer LuminanceHistogram
+{
+    uint uBins[64];
+    uint uSampleCount;
+    uint uOverflowCount;
+};
+
+uniform ivec2 uSourceSize;
+uniform int uSampleStride;
+uniform uint uSampleCapacity;
+
+void main()
+{
+    ivec2 sampleSize = (uSourceSize + ivec2(uSampleStride - 1)) / uSampleStride;
+    ivec2 sampleCoord = ivec2(gl_GlobalInvocationID.xy);
+    if (any(greaterThanEqual(sampleCoord, sampleSize)))
+    {
+        return;
+    }
+
+    uint ordinal = uint(sampleCoord.y * sampleSize.x + sampleCoord.x);
+    if (ordinal >= uSampleCapacity)
+    {
+        atomicAdd(uOverflowCount, 1u);
+        return;
+    }
+
+    ivec2 pixelCoord = min(sampleCoord * uSampleStride, uSourceSize - ivec2(1));
+    uvec3 rgb = uvec3(round(imageLoad(uSourceImage, pixelCoord).rgb * 255.0));
+    uint luminance = (54u * rgb.r + 183u * rgb.g + 19u * rgb.b + 128u) >> 8u;
+    uint binIndex = min(63u, (luminance * 64u) >> 8u);
+    atomicAdd(uBins[binIndex], 1u);
+    atomicAdd(uSampleCount, 1u);
+}

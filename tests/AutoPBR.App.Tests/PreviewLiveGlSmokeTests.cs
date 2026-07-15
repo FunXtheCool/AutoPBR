@@ -55,6 +55,11 @@ public sealed class PreviewLiveGlSmokeTests
                 CompareFragmentAndComputeFroxelInjectIfSupported(gl, caps, diagnostics);
                 UploadIndirectDrawCommandsIfSupported(gl, caps, diagnostics);
                 RunGpuCommandCompactorIfSupported(gl, caps, diagnostics);
+                RunImageHistogramIfSupported(gl, caps, diagnostics);
+                RunMaterialTextureArrayIfSupported(gl, caps, diagnostics);
+                RunGpuTimerQueryIfSupported(gl, caps, diagnostics);
+                EvaluateShaderToolchainPlan(caps, diagnostics);
+                RunSeparableProgramPipelineIfSupported(gl, caps, diagnostics);
 
                 return new LiveGlSmokeReport(
                     context.VersionString,
@@ -69,6 +74,12 @@ public sealed class PreviewLiveGlSmokeTests
                     caps.CanUseGpuCommandCompaction,
                     caps.CanUseGpuBatchCulling,
                     caps.CanUseGpuCompactedDrawSubmission,
+                    caps.CanUseGpuReductionDiagnostics,
+                    caps.CanUseImageHistogram,
+                    caps.CanUseMaterialTextureArrays,
+                    caps.CanUseGpuTimerQueries,
+                    caps.CanUseSpirVShaderBinaries,
+                    caps.CanUseSeparableShaderPrograms,
                     diagnostics.ToArray());
             }
         }, TimeSpan.FromSeconds(30));
@@ -82,6 +93,11 @@ public sealed class PreviewLiveGlSmokeTests
         Assert.Contains("gpuCommandCompaction=", report.CapabilityDiagnostic, StringComparison.Ordinal);
         Assert.Contains("gpuBatchCulling=", report.CapabilityDiagnostic, StringComparison.Ordinal);
         Assert.Contains("gpuCompactedDraws=", report.CapabilityDiagnostic, StringComparison.Ordinal);
+        Assert.Contains("gpuReductions=", report.CapabilityDiagnostic, StringComparison.Ordinal);
+        Assert.Contains("imageHistogram=", report.CapabilityDiagnostic, StringComparison.Ordinal);
+        Assert.Contains("materialTextureArrays=", report.CapabilityDiagnostic, StringComparison.Ordinal);
+        Assert.Contains("gpuTimers=", report.CapabilityDiagnostic, StringComparison.Ordinal);
+        Assert.Contains("separablePrograms=", report.CapabilityDiagnostic, StringComparison.Ordinal);
         if (report.ComputeFroxels)
         {
             Assert.Contains("compute froxels", report.ContextSuffix, StringComparison.OrdinalIgnoreCase);
@@ -104,7 +120,8 @@ public sealed class PreviewLiveGlSmokeTests
         var defines = OpenGlPreviewBackend.TestBuildGenesisProgramDefines(
             caps.CanUseEntitySkinningSsbo,
             caps.CanUseMaterialDrawRecordSsbo,
-            caps.CanUseMultiDrawIndirectGroups);
+            drawRecordBaseInstance: caps.CanUseMultiDrawIndirectGroups,
+            materialTextureArrays: caps.CanUseMaterialTextureArrays);
         var ctx = new GlShaderCompileContext(gl, useOpenGlEs: false, caps.Vendor, caps.Renderer);
         using var program = ctx.CreateProgram(
             "genesis.vert",
@@ -125,6 +142,175 @@ public sealed class PreviewLiveGlSmokeTests
 
         Assert.True(shadowProgram.IsValid, "Desktop Genesis shadow variant failed to compile: " + shadowError);
         diagnostics.Add("[3D preview] P4.1 desktop Genesis base-instance shadow variant compiled.");
+    }
+
+    private static void RunMaterialTextureArrayIfSupported(
+        GL gl,
+        PreviewGlCapabilities caps,
+        List<string> diagnostics)
+    {
+        if (!caps.CanUseMaterialTextureArrays)
+        {
+            diagnostics.Add("[3D preview] P7 material texture-array live check skipped (capability off).");
+            return;
+        }
+
+        using var array = new GlTexture2DArray(gl);
+        var rgba = new byte[]
+        {
+            255, 0, 0, 255, 0, 255, 0, 255,
+            0, 0, 255, 255, 255, 255, 0, 255,
+        };
+        Assert.True(array.UploadRgbaIfChanged(2, 1, 2, rgba, nearest: true));
+
+        var fbo = gl.GenFramebuffer();
+        try
+        {
+            gl.BindFramebuffer(FramebufferTarget.Framebuffer, fbo);
+            gl.FramebufferTextureLayer(
+                FramebufferTarget.Framebuffer,
+                FramebufferAttachment.ColorAttachment0,
+                array.Id,
+                0,
+                1);
+            Assert.Equal(GLEnum.FramebufferComplete, gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer));
+            gl.ReadBuffer(ReadBufferMode.ColorAttachment0);
+            var actual = new byte[8];
+            unsafe
+            {
+                fixed (byte* p = actual)
+                {
+                    gl.ReadPixels(0, 0, 2, 1, PixelFormat.Rgba, PixelType.UnsignedByte, p);
+                }
+            }
+
+            Assert.Equal(rgba.AsSpan(8, 8).ToArray(), actual);
+        }
+        finally
+        {
+            gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            gl.DeleteFramebuffer(fbo);
+        }
+
+        diagnostics.Add("[3D preview] P7 material texture-array upload/readback matched layer 1.");
+    }
+
+    private static void RunGpuTimerQueryIfSupported(
+        GL gl,
+        PreviewGlCapabilities caps,
+        List<string> diagnostics)
+    {
+        if (!caps.CanUseGpuTimerQueries)
+        {
+            diagnostics.Add("[3D preview] P8 GPU timer query live check skipped (capability off).");
+            return;
+        }
+
+        using var profiler = new GlGpuTimerProfiler(gl);
+        Assert.True(profiler.BeginFrame());
+        Assert.True(profiler.TryBeginScope(GlGpuTimerScope.Setup));
+        gl.ClearColor(0.02f, 0.03f, 0.04f, 1f);
+        gl.Clear(ClearBufferMask.ColorBufferBit);
+        profiler.EndScope(GlGpuTimerScope.Setup);
+        profiler.EndFrame();
+
+        gl.Finish();
+        Assert.True(profiler.BeginFrame());
+        profiler.EndFrame();
+        Assert.True(profiler.TryTakeLatestSnapshot(out var snapshot));
+        Assert.True(snapshot.SetupMs >= 0.0);
+        Assert.Contains("GPU ", snapshot.FormatHudLine(), StringComparison.Ordinal);
+        diagnostics.Add("[3D preview] P8 GPU timer query returned a non-blocking pass snapshot: " +
+                        snapshot.FormatDiagnostic() + ".");
+    }
+
+    private static void EvaluateShaderToolchainPlan(
+        PreviewGlCapabilities caps,
+        List<string> diagnostics)
+    {
+        var plan = GlShaderToolchainPlan.FromCapabilities(caps, GlSpirVShaderManifest.Empty.Count);
+        Assert.Equal(GlShaderToolchainPlan.PrimaryPath, "GLSL source + program binary cache");
+        Assert.Equal(caps.CanUseSeparableShaderPrograms, plan.CanEvaluateSeparablePrograms);
+        Assert.False(plan.CanUseSpirVAssets);
+        Assert.Equal(caps.CanUseSpirVShaderBinaries ? "no-assets" : "unsupported", plan.SpirVStatus);
+        diagnostics.Add(plan.FormatDiagnostic());
+        diagnostics.Add("[3D preview] P9 shader toolchain evaluation complete: " +
+                        $"spirv={plan.SpirVStatus}, separable={plan.SeparableProgramStatus}, primary=GLSL.");
+    }
+
+    private static void RunSeparableProgramPipelineIfSupported(
+        GL gl,
+        PreviewGlCapabilities caps,
+        List<string> diagnostics)
+    {
+        if (!caps.CanUseSeparableShaderPrograms)
+        {
+            diagnostics.Add("[3D preview] P9 separable program pipeline live check skipped (capability off).");
+            return;
+        }
+
+        const string vertexSource = """
+            #version 410 core
+            out gl_PerVertex
+            {
+                vec4 gl_Position;
+            };
+
+            void main()
+            {
+                vec2 p = vec2((gl_VertexID == 1) ? 3.0 : -1.0, (gl_VertexID == 2) ? 3.0 : -1.0);
+                gl_Position = vec4(p, 0.0, 1.0);
+            }
+            """;
+        const string fragmentSource = """
+            #version 410 core
+            layout(location = 0) out vec4 outColor;
+            void main()
+            {
+                outColor = vec4(0.25, 0.5, 1.0, 1.0);
+            }
+            """;
+
+        var vertexProgram = gl.CreateShaderProgram(ShaderType.VertexShader, 1, [vertexSource]);
+        var fragmentProgram = gl.CreateShaderProgram(ShaderType.FragmentShader, 1, [fragmentSource]);
+        var pipeline = 0u;
+        try
+        {
+            AssertLinked(gl, vertexProgram, "P9 separable vertex program");
+            AssertLinked(gl, fragmentProgram, "P9 separable fragment program");
+            pipeline = gl.GenProgramPipeline();
+            gl.UseProgramStages(pipeline, UseProgramStageMask.VertexShaderBit, vertexProgram);
+            gl.UseProgramStages(pipeline, UseProgramStageMask.FragmentShaderBit, fragmentProgram);
+            gl.ValidateProgramPipeline(pipeline);
+            gl.GetProgramPipeline(pipeline, (GLEnum)0x8B83, out int valid);
+            Assert.NotEqual(0, valid);
+            diagnostics.Add("[3D preview] P9 separable program pipeline validated with GLSL stage programs.");
+        }
+        finally
+        {
+            gl.BindProgramPipeline(0);
+            if (pipeline != 0)
+            {
+                gl.DeleteProgramPipeline(pipeline);
+            }
+
+            if (vertexProgram != 0)
+            {
+                gl.DeleteProgram(vertexProgram);
+            }
+
+            if (fragmentProgram != 0)
+            {
+                gl.DeleteProgram(fragmentProgram);
+            }
+        }
+    }
+
+    private static void AssertLinked(GL gl, uint program, string label)
+    {
+        Assert.NotEqual(0u, program);
+        gl.GetProgram(program, GLEnum.LinkStatus, out var linked);
+        Assert.True(linked != 0, $"{label}: {gl.GetProgramInfoLog(program)}");
     }
 
     private static void CompileComputeFroxelVariantIfSupported(
@@ -311,9 +497,19 @@ public sealed class PreviewLiveGlSmokeTests
 
         using var compactor = new GlGpuDrawCommandCompactor(gl);
         Assert.True(
-            compactor.Dispatch(program, source, [1u, 0u, 1u, 1u], readBackCounter: true),
+            compactor.Dispatch(
+                program,
+                source,
+                [1u, 0u, 1u, 1u],
+                readBackCounter: true,
+                collectDiagnostics: true),
             "GPU indirect command compaction dispatch failed.");
         Assert.Equal(2, compactor.LastVisibleCount);
+        var flagDiagnostics = compactor.ReadReductionDiagnostics();
+        Assert.Equal(
+            new GlGpuDrawReductionSnapshot(4, 2, 0, 0, 1, 1, 0, 12),
+            flagDiagnostics);
+        Assert.True(flagDiagnostics.IsConsistent);
 
         var dwords = compactor.ReadOutputCommandDwords(compactor.LastVisibleCount);
         Assert.Equal(
@@ -362,15 +558,47 @@ public sealed class PreviewLiveGlSmokeTests
             new( 0f,  0f, -1f, 1f),
         ];
         Assert.True(
-            compactor.DispatchWithGpuCulling(program, cullSource, cullBatches, planes, Vector3.Zero, readBackCounter: true),
+            compactor.DispatchWithGpuCulling(
+                program,
+                cullSource,
+                cullBatches,
+                planes,
+                Vector3.Zero,
+                readBackCounter: true,
+                collectDiagnostics: true),
             "GPU indirect command culling dispatch failed.");
         Assert.Equal(2, compactor.LastVisibleCount);
+        var cullDiagnostics = compactor.ReadReductionDiagnostics();
+        Assert.Equal(
+            new GlGpuDrawReductionSnapshot(5, 2, 1, 1, 1, 0, 0, 9),
+            cullDiagnostics);
+        Assert.True(cullDiagnostics.IsConsistent);
 
         var culledDwords = compactor.ReadOutputCommandDwords(compactor.LastVisibleCount);
         Assert.Equal(
             [3u, 1u, 0u, 0u, 0u, 9u, 1u, 21u, 0u, 4u],
             culledDwords);
         diagnostics.Add("[3D preview] P5.1 GPU batch bounds culling passed (5 source commands -> 2 visible commands).");
+
+        if (caps.CanUseGpuReductionDiagnostics)
+        {
+            Assert.True(compactor.Dispatch(
+                program,
+                source,
+                [1u, 1u, 1u, 1u],
+                readBackCounter: true,
+                collectDiagnostics: true,
+                outputCapacity: 1));
+            Assert.Equal(1, compactor.LastVisibleCount);
+            var overflowDiagnostics = compactor.ReadReductionDiagnostics();
+            Assert.Equal(
+                new GlGpuDrawReductionSnapshot(4, 1, 0, 0, 1, 0, 2, 12),
+                overflowDiagnostics);
+            Assert.True(overflowDiagnostics.IsConsistent);
+            diagnostics.Add(
+                "[3D preview] P6.0 bounded GPU draw reductions passed: " +
+                overflowDiagnostics.FormatDiagnostic() + ".");
+        }
 
         if (caps.CanUseGpuCompactedDrawSubmission)
         {
@@ -408,6 +636,79 @@ public sealed class PreviewLiveGlSmokeTests
             diagnostics.Add(
                 "[3D preview] P5.2 GPU indirect-count submission executed without CPU counter readback " +
                 "(4 source commands -> 3 submitted draws).");
+        }
+    }
+
+    private static void RunImageHistogramIfSupported(
+        GL gl,
+        PreviewGlCapabilities caps,
+        List<string> diagnostics)
+    {
+        if (!caps.CanUseImageHistogram)
+        {
+            diagnostics.Add("[3D preview] P6.1 image histogram skipped; capability gate is off.");
+            return;
+        }
+
+        const int width = 16;
+        const int height = 8;
+        var rgba = new byte[width * height * 4];
+        for (var i = 0; i < width * height; i++)
+        {
+            rgba[i * 4] = (byte)(i * 17);
+            rgba[i * 4 + 1] = (byte)(255 - i * 11);
+            rgba[i * 4 + 2] = (byte)(i * 29);
+            rgba[i * 4 + 3] = 255;
+        }
+
+        var texture = gl.GenTexture();
+        var fbo = gl.GenFramebuffer();
+        try
+        {
+            gl.BindTexture(TextureTarget.Texture2D, texture);
+            unsafe
+            {
+                fixed (byte* ptr = rgba)
+                {
+                    gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgba8, width, height, 0,
+                        PixelFormat.Rgba, PixelType.UnsignedByte, ptr);
+                }
+            }
+            gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Nearest);
+            gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Nearest);
+
+            gl.BindFramebuffer(FramebufferTarget.Framebuffer, fbo);
+            gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0,
+                TextureTarget.Texture2D, texture, 0);
+            Assert.Equal(GLEnum.FramebufferComplete, gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer));
+            gl.ReadBuffer(ReadBufferMode.ColorAttachment0);
+            var rgb = GlFramebufferReadback.TryReadRgb8(gl, 0, 0, width, height);
+            Assert.NotNull(rgb);
+            var cpu = GlLuminanceHistogramSnapshot.FromRgb8(rgb!, width, height);
+            gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            gl.BindTexture(TextureTarget.Texture2D, 0);
+
+            var ctx = new GlShaderCompileContext(gl, useOpenGlEs: false, caps.Vendor, caps.Renderer);
+            using var program = ctx.CreateComputeProgram(
+                "genesis_luminance_histogram.comp",
+                out var error,
+                "p61-smoke-luminance-histogram");
+            Assert.True(program.IsValid, "P6.1 image histogram failed to compile: " + error);
+
+            using var histogram = new GlImageLuminanceHistogram(gl);
+            Assert.True(histogram.Dispatch(program, texture, width, height, out var gpu));
+            Assert.Equal(cpu.SampleCount, gpu.SampleCount);
+            Assert.Equal(cpu.OverflowCount, gpu.OverflowCount);
+            Assert.Equal(cpu.Bins, gpu.Bins);
+            diagnostics.Add("[3D preview] P6.1 GPU image histogram matched FBO/readback fallback: " +
+                            gpu.FormatDiagnostic() + ".");
+        }
+        finally
+        {
+            gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            gl.BindTexture(TextureTarget.Texture2D, 0);
+            gl.DeleteFramebuffer(fbo);
+            gl.DeleteTexture(texture);
         }
     }
 
@@ -632,6 +933,12 @@ public sealed class PreviewLiveGlSmokeTests
             $"gpuCommandCompaction: {(report.GpuCommandCompaction ? "on" : "off")}",
             $"gpuBatchCulling: {(report.GpuBatchCulling ? "on" : "off")}",
             $"gpuCompactedDraws: {(report.GpuCompactedDraws ? "on" : "off")}",
+            $"gpuReductions: {(report.GpuReductions ? "on" : "off")}",
+            $"imageHistogram: {(report.ImageHistogram ? "on" : "off")}",
+            $"materialTextureArrays: {(report.MaterialTextureArrays ? "on" : "off")}",
+            $"gpuTimers: {(report.GpuTimers ? "on" : "off")}",
+            $"spirvShaderBinaries: {(report.SpirVShaderBinaries ? "on" : "off")}",
+            $"separableShaderPrograms: {(report.SeparableShaderPrograms ? "on" : "off")}",
             "",
             "Diagnostics:",
             .. report.Diagnostics,
@@ -678,5 +985,11 @@ public sealed class PreviewLiveGlSmokeTests
         bool GpuCommandCompaction,
         bool GpuBatchCulling,
         bool GpuCompactedDraws,
+        bool GpuReductions,
+        bool ImageHistogram,
+        bool MaterialTextureArrays,
+        bool GpuTimers,
+        bool SpirVShaderBinaries,
+        bool SeparableShaderPrograms,
         string[] Diagnostics);
 }

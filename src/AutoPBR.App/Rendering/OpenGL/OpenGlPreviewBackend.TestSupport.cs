@@ -58,11 +58,13 @@ public sealed partial class OpenGlPreviewBackend
     internal static IReadOnlyDictionary<string, int> TestBuildGenesisProgramDefines(
         bool entitySkinningSsbo,
         bool materialDrawRecordSsbo,
-        bool drawRecordBaseInstance = false) =>
+        bool drawRecordBaseInstance = false,
+        bool materialTextureArrays = false) =>
         BuildGenesisProgramDefines(
             GenesisShaderFeatureMask.None,
             entitySkinningSsbo,
             materialDrawRecordSsbo,
+            materialTextureArrays,
             drawRecordBaseInstance);
 
     internal static bool TestTryResolveEntitySkinningDrawState(

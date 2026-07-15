@@ -9,6 +9,7 @@ public sealed partial class OpenGlPreviewBackend
         bool Tessellation,
         bool EntitySkinningSsbo,
         bool MaterialDrawRecordSsbo,
+        bool MaterialTextureArrays,
         bool DrawRecordBaseInstance);
 
     private const int MaxGenesisProgramCacheEntries = 32;
@@ -74,11 +75,13 @@ public sealed partial class OpenGlPreviewBackend
                                 !_genesisTessellationCompileDisabled &&
                                 frame.EnableTessellationDisplacementEff;
         var useMaterialDrawRecords = ShouldUseMaterialDrawRecordSsbo();
+        var useMaterialTextureArrays = !wantsTessellation && ShouldUseMaterialTextureArrays();
         var cacheKey = new GenesisProgramCacheKey(
             mask,
             wantsTessellation,
             ShouldUseEntitySkinningSsbo(),
             useMaterialDrawRecords,
+            useMaterialTextureArrays,
             useMaterialDrawRecords && !wantsTessellation && ShouldUseDrawRecordBaseInstance());
         if (_program is { IsValid: true } && cacheKey == _activeGenesisProgramKey)
         {
@@ -127,10 +130,12 @@ public sealed partial class OpenGlPreviewBackend
             cacheKey.Mask,
             cacheKey.EntitySkinningSsbo,
             cacheKey.MaterialDrawRecordSsbo,
+            cacheKey.MaterialTextureArrays,
             cacheKey.DrawRecordBaseInstance);
         var debugSuffix = string.Concat(
             cacheKey.EntitySkinningSsbo ? "+entity-ssbo" : string.Empty,
             cacheKey.MaterialDrawRecordSsbo ? "+draw-ssbo" : string.Empty,
+            cacheKey.MaterialTextureArrays ? "+tex-array" : string.Empty,
             cacheKey.DrawRecordBaseInstance ? "+draw-base-instance" : string.Empty);
         if (cacheKey.Tessellation)
         {
@@ -206,6 +211,7 @@ public sealed partial class OpenGlPreviewBackend
         ResetGenesisTessellationCompileState();
         ResetEntitySkinningSsboCompileState();
         ResetMaterialDrawRecordSsboCompileState();
+        ResetMaterialTextureArraysCompileState();
         ResetDrawRecordBaseInstanceCompileState();
     }
 
@@ -230,6 +236,7 @@ public sealed partial class OpenGlPreviewBackend
                 Tessellation: false,
                 ShouldUseEntitySkinningSsbo(),
                 ShouldUseMaterialDrawRecordSsbo(),
+                ShouldUseMaterialTextureArrays(),
                 DrawRecordBaseInstance: false);
             if (_genesisPrograms.ContainsKey(cacheKey))
             {
@@ -256,10 +263,11 @@ public sealed partial class OpenGlPreviewBackend
         GenesisShaderFeatureMask mask,
         bool entitySkinningSsbo,
         bool materialDrawRecordSsbo = false,
+        bool materialTextureArrays = false,
         bool drawRecordBaseInstance = false)
     {
         var baseDefines = GenesisShaderFeatureMaskBuilder.ToDefines(mask);
-        if (!entitySkinningSsbo && !materialDrawRecordSsbo)
+        if (!entitySkinningSsbo && !materialDrawRecordSsbo && !materialTextureArrays)
         {
             return baseDefines;
         }
@@ -277,6 +285,11 @@ public sealed partial class OpenGlPreviewBackend
             {
                 defines["GENESIS_DRAW_RECORD_BASE_INSTANCE"] = 1;
             }
+        }
+
+        if (materialTextureArrays && materialDrawRecordSsbo)
+        {
+            defines["GENESIS_MATERIAL_TEXTURE_ARRAYS"] = 1;
         }
 
         return defines;
@@ -300,6 +313,7 @@ public sealed partial class OpenGlPreviewBackend
             resolvedKey = resolvedKey with
             {
                 Tessellation = false,
+                MaterialTextureArrays = ShouldUseMaterialTextureArrays(),
                 DrawRecordBaseInstance = resolvedKey.MaterialDrawRecordSsbo && ShouldUseDrawRecordBaseInstance()
             };
             if (TryGetOrCreateGenesisProgram(resolvedKey, out program, out error))
@@ -318,10 +332,25 @@ public sealed partial class OpenGlPreviewBackend
             }
         }
 
+        if (resolvedKey.MaterialTextureArrays)
+        {
+            DisableMaterialTextureArraysCompile(error);
+            resolvedKey = resolvedKey with { MaterialTextureArrays = false };
+            if (TryGetOrCreateGenesisProgram(resolvedKey, out program, out error))
+            {
+                return true;
+            }
+        }
+
         if (resolvedKey.MaterialDrawRecordSsbo)
         {
             DisableMaterialDrawRecordSsboCompile(error);
-            resolvedKey = resolvedKey with { MaterialDrawRecordSsbo = false, DrawRecordBaseInstance = false };
+            resolvedKey = resolvedKey with
+            {
+                MaterialDrawRecordSsbo = false,
+                MaterialTextureArrays = false,
+                DrawRecordBaseInstance = false
+            };
             if (TryGetOrCreateGenesisProgram(resolvedKey, out program, out error))
             {
                 return true;

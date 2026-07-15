@@ -48,6 +48,20 @@ internal sealed record PreviewGlCapabilities(
     public bool CanUseGpuCompactedDrawSubmission =>
         CanUseGpuBatchCulling && IndirectParameters && ShaderDrawParameters;
 
+    public bool CanUseGpuReductionDiagnostics => CanUseGpuCommandCompaction;
+
+    public bool CanUseImageHistogram =>
+        !IsOpenGlEs && ComputeShaders && ImageLoadStore && ShaderStorageBuffers && ShaderAtomics;
+
+    public bool CanUseMaterialTextureArrays =>
+        !IsOpenGlEs && TextureArrays && ShaderStorageBuffers;
+
+    public bool CanUseGpuTimerQueries => !IsOpenGlEs && TimerQuery;
+
+    public bool CanUseSpirVShaderBinaries => !IsOpenGlEs && SpirV;
+
+    public bool CanUseSeparableShaderPrograms => !IsOpenGlEs && SeparablePrograms;
+
     public string UploadTransportLabel => CanUsePersistentUploadRing ? "persistent-mapped UBO uploads" : "BufferSubData uploads";
 
     public string FormatDiagnostic()
@@ -65,12 +79,17 @@ internal sealed record PreviewGlCapabilities(
                $"gpuCommandCompaction={(CanUseGpuCommandCompaction ? "on" : "off")}, " +
                $"gpuBatchCulling={(CanUseGpuBatchCulling ? "on" : "off")}, " +
                $"gpuCompactedDraws={(CanUseGpuCompactedDrawSubmission ? "on" : "off")}, " +
+               $"gpuReductions={(CanUseGpuReductionDiagnostics ? "on" : "off")}, " +
+               $"imageHistogram={(CanUseImageHistogram ? "on" : "off")}, " +
+               $"materialTextureArrays={(CanUseMaterialTextureArrays ? "on" : "off")}, " +
+               $"gpuTimers={(CanUseGpuTimerQueries ? "on" : "off")}, " +
                $"compute={(ComputeShaders ? "yes" : "no")}, " +
                $"imageStore={(ImageLoadStore ? "yes" : "no")}, " +
                $"multiDrawIndirect={(MultiDrawIndirect ? "yes" : "no")}, " +
                $"drawParameters={(ShaderDrawParameters ? "yes" : "no")}, " +
                $"timerQuery={(TimerQuery ? "yes" : "no")}, " +
-               $"spirv={(SpirV ? "yes" : "no")}.";
+               $"spirv={(SpirV ? "yes" : "no")}, " +
+               $"separablePrograms={(SeparablePrograms ? "yes" : "no")}.";
     }
 
     public string FormatContextSuffix()
@@ -78,11 +97,13 @@ internal sealed record PreviewGlCapabilities(
         var upload = CanUsePersistentUploadRing ? "persistent uploads" : "GLES-safe uploads";
         var entitySkinning = CanUseEntitySkinningSsbo ? "entity SSBO" : "entity UBO";
         var drawRecords = CanUseMaterialDrawRecordSsbo ? "draw SSBO" : "draw uniforms";
+        var materialTextures = CanUseMaterialTextureArrays ? "material arrays" : "material samplers";
         var froxelInject = CanUseComputeFroxelInject ? "compute froxels" : "fragment froxels";
+        var gpuTimers = CanUseGpuTimerQueries ? "GPU timers" : "no GPU timers";
         var drawCommands = CanUseMultiDrawIndirectGroups
             ? "multi-draw groups"
             : CanUseIndirectDrawCommands ? "indirect draws" : "direct draws";
-        return $" · {upload} · {entitySkinning} · {drawRecords} · {froxelInject} · {drawCommands}";
+        return $" · {upload} · {entitySkinning} · {drawRecords} · {materialTextures} · {froxelInject} · {drawCommands} · {gpuTimers}";
     }
 
     public static PreviewGlCapabilities FromGl(GL gl, bool useOpenGlEs, string versionString)

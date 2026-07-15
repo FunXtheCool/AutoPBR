@@ -14,6 +14,10 @@
 layout(location = 0) out vec4 fragColor;
 
 uniform sampler2D uAlbedo;
+#ifdef GENESIS_MATERIAL_TEXTURE_ARRAYS
+uniform sampler2DArray uAlbedoArray;
+uniform int uGenesisUseMaterialTextureArray;
+#endif
 
 uniform int uSceneKind;
 
@@ -25,9 +29,20 @@ uniform int uEntityAlphaMode;
 
 in vec2 vUv;
 
+float sampleShadowAlpha(vec2 uv)
+{
+#ifdef GENESIS_MATERIAL_TEXTURE_ARRAYS
+    if (uGenesisUseMaterialTextureArray > 0)
+    {
+        return texture(uAlbedoArray, vec3(uv, float(genesisMaterialTextureLayer(0)))).a;
+    }
+#endif
+    return texture(uAlbedo, uv).a;
+}
+
 void main()
 {
-    float aTex = texture(uAlbedo, vUv).a;
+    float aTex = sampleShadowAlpha(vUv);
 
     if (uSceneKind == 1)
     {

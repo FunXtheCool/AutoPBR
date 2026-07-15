@@ -173,10 +173,41 @@ public class PreviewGlslEsAdaptTests
         var desktop = OpenGlPreviewBackend.TestBuildGenesisProgramDefines(
             entitySkinningSsbo: true,
             materialDrawRecordSsbo: true,
-            drawRecordBaseInstance: true);
+            drawRecordBaseInstance: true,
+            materialTextureArrays: true);
         Assert.Equal(1, desktop["GENESIS_ENTITY_SKINNING_SSBO"]);
         Assert.Equal(1, desktop["GENESIS_MATERIAL_DRAW_RECORD_SSBO"]);
         Assert.Equal(1, desktop["GENESIS_DRAW_RECORD_BASE_INSTANCE"]);
+        Assert.Equal(1, desktop["GENESIS_MATERIAL_TEXTURE_ARRAYS"]);
+
+        var impossible = OpenGlPreviewBackend.TestBuildGenesisProgramDefines(
+            entitySkinningSsbo: false,
+            materialDrawRecordSsbo: false,
+            materialTextureArrays: true);
+        Assert.DoesNotContain("GENESIS_MATERIAL_TEXTURE_ARRAYS", impossible.Keys);
+    }
+
+    [Theory]
+    [InlineData("genesis.frag", ShaderType.FragmentShader)]
+    [InlineData("genesis_shadow.frag", ShaderType.FragmentShader)]
+    public void DesktopPreparedGenesisMaterialTextureArrays_DefinesArraySamplers(
+        string shaderFile,
+        ShaderType shaderType)
+    {
+        var prepared = GlslPreparedSourceCache.GetOrPrepare(
+            shaderFile,
+            shaderType,
+            useOpenGlEs: false,
+            new Dictionary<string, int>
+            {
+                ["GENESIS_MATERIAL_DRAW_RECORD_SSBO"] = 1,
+                ["GENESIS_MATERIAL_TEXTURE_ARRAYS"] = 1,
+            });
+
+        Assert.Contains("#define GENESIS_MATERIAL_TEXTURE_ARRAYS 1", prepared, StringComparison.Ordinal);
+        Assert.Contains("sampler2DArray", prepared, StringComparison.Ordinal);
+        Assert.Contains("uGenesisUseMaterialTextureArray", prepared, StringComparison.Ordinal);
+        Assert.Contains("genesisMaterialTextureLayer", prepared, StringComparison.Ordinal);
     }
 
     [Theory]
@@ -223,6 +254,9 @@ public class PreviewGlslEsAdaptTests
         Assert.Contains("layout(std430, binding = 4) readonly buffer BatchCullRecords", prepared, StringComparison.Ordinal);
         Assert.Contains("uniform vec4 uFrustumPlanes[6]", prepared, StringComparison.Ordinal);
         Assert.Contains("uniform uint uFirstCommand", prepared, StringComparison.Ordinal);
+        Assert.Contains("uint uExaminedCommands", prepared, StringComparison.Ordinal);
+        Assert.Contains("uniform uint uOutputCapacity", prepared, StringComparison.Ordinal);
+        Assert.Contains("uniform int uCollectDiagnostics", prepared, StringComparison.Ordinal);
         Assert.Contains("atomicAdd(uVisibleCommandCount", prepared, StringComparison.Ordinal);
     }
 
@@ -256,6 +290,23 @@ public class PreviewGlslEsAdaptTests
         var defineIdx = prepared.IndexOf("#define GENESIS_VOLUME_COMPUTE_INJECT 1", StringComparison.Ordinal);
         Assert.True(versionIdx >= 0);
         Assert.True(defineIdx > versionIdx, "compute defines must follow #version");
+    }
+
+    [Fact]
+    public void DesktopPreparedLuminanceHistogram_UsesBoundedImageAtomicPath()
+    {
+        var prepared = GlslPreparedSourceCache.GetOrPrepare(
+            "genesis_luminance_histogram.comp",
+            ShaderType.ComputeShader,
+            useOpenGlEs: false);
+
+        Assert.StartsWith("#version 430 core", prepared.TrimStart(), StringComparison.Ordinal);
+        Assert.Contains("readonly uniform image2D uSourceImage", prepared, StringComparison.Ordinal);
+        Assert.Contains("layout(std430, binding = 0) buffer LuminanceHistogram", prepared, StringComparison.Ordinal);
+        Assert.Contains("uniform uint uSampleCapacity", prepared, StringComparison.Ordinal);
+        Assert.Contains("atomicAdd(uBins[binIndex]", prepared, StringComparison.Ordinal);
+        Assert.Contains("atomicAdd(uOverflowCount", prepared, StringComparison.Ordinal);
+        Assert.DoesNotContain("#define GENESIS_GLES 1", prepared, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -426,11 +477,11 @@ public class PreviewGlslEsAdaptTests
         var adapted = GlslSourceAdapter.Adapt(src, ShaderType.FragmentShader, useOpenGlEs: true);
 
         Assert.Contains("textureGrad(heightTex", adapted, StringComparison.Ordinal);
-        Assert.Contains("textureGrad(uAlbedo, uv, uvDx, uvDy)", adapted, StringComparison.Ordinal);
-        Assert.Contains("texture(uAlbedo, vUv)", adapted, StringComparison.Ordinal);
+        Assert.Contains("sampleGenesisAlbedoGrad(uv, uvDx, uvDy)", adapted, StringComparison.Ordinal);
+        Assert.Contains("sampleGenesisAlbedo(vUv)", adapted, StringComparison.Ordinal);
         Assert.Contains("pomActiveEarly", adapted, StringComparison.Ordinal);
-        Assert.Contains("textureGrad(uNormal, uv, dx, dy)", adapted, StringComparison.Ordinal);
-        Assert.Contains("textureGrad(uSpecular, uv, uvDx, uvDy)", adapted, StringComparison.Ordinal);
+        Assert.Contains("sampleGenesisNormalGrad(uv, dx, dy)", adapted, StringComparison.Ordinal);
+        Assert.Contains("sampleGenesisSpecularGrad(uv, uvDx, uvDy)", adapted, StringComparison.Ordinal);
         Assert.Contains("pomTileUv(tileBase", adapted, StringComparison.Ordinal);
         Assert.Contains("tileBase + fract(localUv)", adapted, StringComparison.Ordinal);
         Assert.Contains("uParallaxTraceLayers", adapted, StringComparison.Ordinal);

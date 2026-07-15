@@ -85,7 +85,8 @@ public sealed partial class OpenGlPreviewBackend
                 records.Slice(i * GenesisMaterialDrawRecordFloats, GenesisMaterialDrawRecordFloats),
                 ref frame,
                 batch,
-                slot);
+                slot,
+                batch.MaterialIndex);
         }
 
         _genesisMaterialDrawRecordUpload.Upload(_genesisMaterialDrawRecordScratch.AsSpan(0, byteCount));
@@ -96,7 +97,8 @@ public sealed partial class OpenGlPreviewBackend
         Span<float> record,
         ref GlRenderFrame frame,
         PreviewDrawBatch batch,
-        PreviewMaterial slot)
+        PreviewMaterial slot,
+        int materialIndex)
     {
         var hasNormal = slot.NormalRgba is { Length: > 0 };
         var hasSpecular = slot.SpecularRgba is { Length: > 0 };
@@ -120,6 +122,7 @@ public sealed partial class OpenGlPreviewBackend
         record[2] = textureAtlasScale.Y;
         record[3] = heightTexSize.X;
         record[4] = heightTexSize.Y;
+        record[5] = materialIndex;
         record[8] = batchParallax ? 1f : 0f;
         record[9] = batchParallax && frame.EnableParallaxAoEff ? 1f : 0f;
         record[10] = batchParallax && frame.EnableParallaxShadowEff ? 1f : 0f;

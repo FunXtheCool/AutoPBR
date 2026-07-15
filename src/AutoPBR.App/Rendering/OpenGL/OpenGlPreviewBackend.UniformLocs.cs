@@ -65,6 +65,10 @@ public sealed partial class OpenGlPreviewBackend
         int Normal,
         int Specular,
         int Height,
+        int AlbedoArray,
+        int NormalArray,
+        int SpecularArray,
+        int HeightArray,
         int ShadowMap,
         int ShadowMapNear,
         int LightViewProjNear,
@@ -73,6 +77,7 @@ public sealed partial class OpenGlPreviewBackend
         int CascadeBlendWidth,
         int AtmoSkyViewLut,
         int GenesisUseMaterialDrawRecord,
+        int GenesisUseMaterialTextureArray,
         int GenesisDrawRecordIndex);
 
     private readonly record struct ShadowProgramUniformLocs(
@@ -82,8 +87,10 @@ public sealed partial class OpenGlPreviewBackend
         int EntityAlphaMode,
         int ItemAlphaBlend,
         int Albedo,
+        int AlbedoArray,
         int AlphaCutoff,
         int GenesisUseMaterialDrawRecord,
+        int GenesisUseMaterialTextureArray,
         int GenesisDrawRecordIndex);
 
     private readonly record struct LineProgramUniformLocs(int Mvp);
@@ -170,6 +177,10 @@ public sealed partial class OpenGlPreviewBackend
             program.GetUniformLocation("uNormal"),
             program.GetUniformLocation("uSpecular"),
             program.GetUniformLocation("uHeight"),
+            program.GetUniformLocation("uAlbedoArray"),
+            program.GetUniformLocation("uNormalArray"),
+            program.GetUniformLocation("uSpecularArray"),
+            program.GetUniformLocation("uHeightArray"),
             program.GetUniformLocation("uShadowMap"),
             program.GetUniformLocation("uShadowMapNear"),
             program.GetUniformLocation("uLightViewProjNear"),
@@ -178,6 +189,7 @@ public sealed partial class OpenGlPreviewBackend
             program.GetUniformLocation("uCascadeBlendWidth"),
             program.GetUniformLocation("uAtmoSkyViewLut"),
             program.GetUniformLocation("uGenesisUseMaterialDrawRecord"),
+            program.GetUniformLocation("uGenesisUseMaterialTextureArray"),
             program.GetUniformLocation("uGenesisDrawRecordIndex"));
 
     private static ShadowProgramUniformLocs ResolveShadowProgramUniformLocs(GlShaderProgram program) =>
@@ -188,8 +200,10 @@ public sealed partial class OpenGlPreviewBackend
             program.GetUniformLocation("uEntityAlphaMode"),
             program.GetUniformLocation("uItemAlphaBlend"),
             program.GetUniformLocation("uAlbedo"),
+            program.GetUniformLocation("uAlbedoArray"),
             program.GetUniformLocation("uAlphaCutoff"),
             program.GetUniformLocation("uGenesisUseMaterialDrawRecord"),
+            program.GetUniformLocation("uGenesisUseMaterialTextureArray"),
             program.GetUniformLocation("uGenesisDrawRecordIndex"));
 
     private static LineProgramUniformLocs ResolveLineProgramUniformLocs(GlLineShaderProgram program) =>

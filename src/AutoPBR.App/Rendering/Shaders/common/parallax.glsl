@@ -38,6 +38,10 @@ uniform float uParallaxShadowSoftness;
 uniform float uParallaxMaxUvShift;
 uniform float uParallaxUvScale;
 uniform vec2 uParallaxHeightTexSize;
+#ifdef GENESIS_MATERIAL_TEXTURE_ARRAYS
+uniform sampler2DArray uHeightArray;
+uniform int uGenesisUseMaterialTextureArray;
+#endif
 
 vec2 pomTileLocal(vec2 uv)
 {
@@ -51,6 +55,12 @@ vec2 pomTileUv(vec2 tileBase, vec2 localUv)
 
 float sampleHeight01Grad(sampler2D heightTex, vec2 uv, vec2 dx, vec2 dy)
 {
+#ifdef GENESIS_MATERIAL_TEXTURE_ARRAYS
+    if (uGenesisUseMaterialTextureArray > 0)
+    {
+        return 1.0 - textureGrad(uHeightArray, vec3(uv, float(genesisMaterialTextureLayer(0))), dx, dy).r;
+    }
+#endif
     return 1.0 - textureGrad(heightTex, uv, dx, dy).r;
 }
 

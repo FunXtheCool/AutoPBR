@@ -31,6 +31,12 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private GlTexture2D? _normal;
     private GlTexture2D? _spec;
     private GlTexture2D? _height;
+    private GlTexture2DArray? _materialAlbedoArray;
+    private GlTexture2DArray? _materialNormalArray;
+    private GlTexture2DArray? _materialSpecArray;
+    private GlTexture2DArray? _materialHeightArray;
+    private GenesisMaterialTextureArrayPlan? _materialTextureArrayPlan;
+    private byte[]? _materialTextureArrayScratch;
     private byte[]? _rgbaUploadScratch;
     private GlMeshBuffer? _mesh;
     private GlMeshBuffer? _groundMesh;
@@ -117,6 +123,7 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private GlIndirectDrawCommandBuffer? _genesisIndirectDrawCommands;
     private GlShaderProgram? _gpuDrawCommandCompactionProgram;
     private GlGpuDrawCommandCompactor? _gpuDrawCommandCompactor;
+    private GlGpuTimerProfiler? _gpuTimerProfiler;
     private uint _entityBoneUbo;
     private uint _entityPrevBoneUbo;
     private uint _entityNormalBoneUbo;
@@ -160,15 +167,21 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private string? _lastError;
     private bool _gpuAlive;
     private PreviewGlCapabilities? _glCapabilities;
+    private GlShaderToolchainPlan? _shaderToolchainPlan;
     private bool _entitySkinningUsesSsbo;
     private bool _entitySkinningSsboCompileDisabled;
     private bool _genesisMaterialDrawRecordsUseSsbo;
     private bool _materialDrawRecordSsboCompileDisabled;
+    private bool _materialTextureArraysCompileDisabled;
     private bool _drawRecordBaseInstanceCompileDisabled;
     private bool _loggedMaterialDrawRecordOverflow;
+    private bool _loggedMaterialTextureArraysReady;
+    private string? _loggedMaterialTextureArrayFallbackReason;
     private bool _loggedIndirectDrawCommandBuffer;
     private bool _loggedMultiDrawIndirectGroups;
     private bool _loggedGpuCompactedDrawSubmission;
+    private bool _loggedGpuTimerProfilerActive;
+    private bool _loggedGpuTimerProfilerFallback;
     private int _gpuCompactedSubmissionGroups;
     private int _gpuCompactedSubmissionSourceCommands;
     private bool _gpuDrawCommandCompactionCompileDisabled;
@@ -187,6 +200,8 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
     private int _settingsRevision;
     private int _lastMainPassAppliedSettingsRevision = -1;
     private string? _entityBindPosePrepDiagKey;
+    private string? _latestGpuTimingHudText;
+    private double _lastGpuTimingDiagnosticSeconds = double.NegativeInfinity;
 
     /// <summary>Orbit camera is re-synced from the scene only when this changes (block vs item), so texture swaps keep user framing.</summary>
     private string? _orbitSyncedKey;
@@ -229,6 +244,17 @@ public sealed partial class OpenGlPreviewBackend : IRenderPreviewBackend
 
     public string BackendName => "OpenGL";
     public bool IsInitialized => _gpuAlive && _program?.IsValid == true;
+
+    public string? LatestGpuTimingHudText
+    {
+        get
+        {
+            lock (_sync)
+            {
+                return _latestGpuTimingHudText;
+            }
+        }
+    }
     public string? LastErrorMessage => _lastError;
 
     public bool NeedsContinuousRendering

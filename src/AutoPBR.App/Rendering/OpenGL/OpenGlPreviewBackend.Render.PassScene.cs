@@ -216,6 +216,7 @@ public sealed partial class OpenGlPreviewBackend
             SetIntLoc(u.SceneKind, 0);
             SetIntLoc(u.IsGroundPass, 1);
             SetIntLoc(u.EntityAlphaMode, 0);
+            SetIntLoc(u.GenesisUseMaterialTextureArray, 0);
             ApplyEntitySkinningUniforms(_program, 0, 0, 0f);
             SetIntLoc(u.HasNormal, _grassGroundHasNormal ? 1 : 0);
             SetIntLoc(u.HasSpecular, _grassGroundHasSpecular ? 1 : 0);
@@ -262,6 +263,7 @@ public sealed partial class OpenGlPreviewBackend
         SetIntLoc(u.IsGroundPass, 0);
         SetIntLoc(u.EntityAlphaMode, frame.EntityAlphaModeUniform);
         SetIntLoc(u.GenesisUseMaterialDrawRecord, 0);
+        SetIntLoc(u.GenesisUseMaterialTextureArray, 0);
         SetIntLoc(u.GenesisDrawRecordIndex, 0);
 
         if (!frame.Settings.DrawPreviewSubject || _mesh.IndexCount <= 0)
@@ -293,12 +295,19 @@ public sealed partial class OpenGlPreviewBackend
             var blockSlots = frame.BlockSlots;
             var useMaterialDrawRecords = TryUploadGenesisMaterialDrawRecords(ref frame);
             var useIndirectDrawCommands = TryUploadGenesisIndirectDrawCommands(blockModel);
+            var useMaterialTextureArrays =
+                TryEnsureMaterialTextureArrays(ref frame, useMaterialDrawRecords, out _);
             if (useMaterialDrawRecords)
             {
                 BindGenesisMaterialDrawRecordBuffer();
             }
 
             SetIntLoc(u.GenesisUseMaterialDrawRecord, useMaterialDrawRecords ? 1 : 0);
+            SetIntLoc(u.GenesisUseMaterialTextureArray, useMaterialTextureArrays ? 1 : 0);
+            if (useMaterialTextureArrays)
+            {
+                BindMainPassMaterialTextureArrays(u);
+            }
             if (frame.EntityBonePaletteUploaded)
             {
                 BindEntityBoneSkinningUboBlocks();
@@ -340,7 +349,7 @@ public sealed partial class OpenGlPreviewBackend
 
                 var slot = blockSlots[batch.MaterialIndex];
                 var materialChanged = batch.MaterialIndex != uploadedMaterialIndex;
-                if (materialChanged)
+                if (materialChanged && !useMaterialTextureArrays)
                 {
                     UploadMaterial(frame.Gl, slot, nearest: true);
                     uploadedMaterialIndex = batch.MaterialIndex;
@@ -449,6 +458,7 @@ public sealed partial class OpenGlPreviewBackend
 
             SetIntLoc(u.EntityAlphaMode, frame.EntityAlphaModeUniform);
             SetIntLoc(u.GenesisUseMaterialDrawRecord, 0);
+            SetIntLoc(u.GenesisUseMaterialTextureArray, 0);
             SetIntLoc(u.GenesisDrawRecordIndex, 0);
         }
         else
@@ -474,6 +484,7 @@ public sealed partial class OpenGlPreviewBackend
             SetIntLoc(u.Normal, 1);
             SetIntLoc(u.Specular, 2);
             SetIntLoc(u.Height, 3);
+            SetIntLoc(u.GenesisUseMaterialTextureArray, 0);
             if (!_loggedMeshReady)
             {
                 EmitDiagnostic(

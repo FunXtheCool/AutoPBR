@@ -912,6 +912,11 @@ public partial class MainWindowViewModel
 
         var fps = _glPreview.SmoothedPreviewFps;
         var text = fps > 0.5 ? $"{fps:0} FPS" : "— FPS";
+        if (!string.IsNullOrWhiteSpace(_glPreview.LatestGpuTimingHudText))
+        {
+            text += '\n' + _glPreview.LatestGpuTimingHudText;
+        }
+
         if (text != Preview3DFpsCounterText)
         {
             Preview3DFpsCounterText = text;

@@ -333,11 +333,38 @@ public sealed partial class OpenGlPreviewBackend
             MaterialDirty = materialDirty,
         };
 
-        GlRenderPassSetup(ref frame);
-        GlRenderPassShadow(ref frame);
-        GlRenderPassScene(ref frame);
-        GlRenderPassPost(ref frame);
-        DrawNativeWglOverlayIfNeeded(gl, vw, vh);
+        _ = BeginGpuTimerFrame(gl);
+        try
+        {
+            using (BeginGpuTimerScope(GlGpuTimerScope.Setup))
+            {
+                GlRenderPassSetup(ref frame);
+            }
+
+            using (BeginGpuTimerScope(GlGpuTimerScope.Shadow))
+            {
+                GlRenderPassShadow(ref frame);
+            }
+
+            using (BeginGpuTimerScope(GlGpuTimerScope.Scene))
+            {
+                GlRenderPassScene(ref frame);
+            }
+
+            using (BeginGpuTimerScope(GlGpuTimerScope.Post))
+            {
+                GlRenderPassPost(ref frame);
+            }
+
+            using (BeginGpuTimerScope(GlGpuTimerScope.Overlay))
+            {
+                DrawNativeWglOverlayIfNeeded(gl, vw, vh);
+            }
+        }
+        finally
+        {
+            EndGpuTimerFrame(renderTime);
+        }
     }
 
     private static void ClearPresentationFramebuffer(GlInterface glInterface, int framebuffer, int width, int height)

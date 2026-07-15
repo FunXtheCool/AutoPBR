@@ -94,5 +94,16 @@ public sealed partial class OpenGlPreviewBackend
 
         var fingerprint = PreviewFramebufferFingerprint.Compute(pixels, readW, readH);
         EmitDiagnostic($"[3D preview] Frame fingerprint {fingerprint:X8} ({readW}x{readH} center crop)");
+
+        if (TryCaptureGpuLuminanceHistogram(out var gpuHistogram))
+        {
+            EmitDiagnostic("[3D preview] P6.1 luminance histogram GPU image path: " +
+                           gpuHistogram.FormatDiagnostic() + ".");
+            return;
+        }
+
+        var cpuHistogram = GlLuminanceHistogramSnapshot.FromRgb8(pixels, readW, readH);
+        EmitDiagnostic("[3D preview] P6.1 luminance histogram framebuffer fallback: " +
+                       cpuHistogram.FormatDiagnostic() + ".");
     }
 }

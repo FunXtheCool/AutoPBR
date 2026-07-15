@@ -30,6 +30,18 @@ public sealed class GlIndirectDrawCommandBufferTests
     }
 
     [Fact]
+    public void DrawReductionSnapshot_ParsesBoundedCounterAbi()
+    {
+        var snapshot = GlGpuDrawReductionSnapshot.FromDwords([8u, 2u, 1u, 1u, 1u, 1u, 2u, 36u]);
+
+        Assert.Equal(8u, snapshot.ExaminedCommands);
+        Assert.Equal(8u, snapshot.AccountedCommands);
+        Assert.True(snapshot.IsConsistent);
+        Assert.Equal(2u, snapshot.OverflowCommands);
+        Assert.Contains("maxIndices=36", snapshot.FormatDiagnostic(), StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void CountMainPassMultiDrawGroup_GroupsOnlyCompatibleConsecutiveBatches()
     {
         PreviewDrawBatch[] batches =

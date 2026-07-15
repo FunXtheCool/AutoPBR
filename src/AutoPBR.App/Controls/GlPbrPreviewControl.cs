@@ -155,6 +155,8 @@ public sealed class GlPbrPreviewControl : UserControl, ICustomHitTest, IDisposab
     /// <summary>Frames per second averaged over the last ~0.5s of rendered preview frames.</summary>
     public double SmoothedPreviewFps => Volatile.Read(ref _smoothedFps);
 
+    public string? LatestGpuTimingHudText => _backend.LatestGpuTimingHudText;
+
     public bool TryGetPreviewViewportInfo(out int pixelWidth, out int pixelHeight,
         out double logicalWidth, out double logicalHeight, out double renderScale)
     {

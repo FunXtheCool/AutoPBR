@@ -19,6 +19,7 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.Equal(0, caps.Minor);
         Assert.True(caps.TextureArrays);
         Assert.True(caps.TimerQuery);
+        Assert.False(caps.CanUseGpuTimerQueries);
         Assert.False(caps.BufferStorage);
         Assert.False(caps.CanUsePersistentUploadRing);
         Assert.False(caps.ShaderStorageBuffers);
@@ -33,6 +34,11 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.False(caps.CanUseGpuCommandCompaction);
         Assert.False(caps.CanUseGpuBatchCulling);
         Assert.False(caps.CanUseGpuCompactedDrawSubmission);
+        Assert.False(caps.CanUseGpuReductionDiagnostics);
+        Assert.False(caps.CanUseImageHistogram);
+        Assert.False(caps.CanUseMaterialTextureArrays);
+        Assert.False(caps.CanUseSpirVShaderBinaries);
+        Assert.False(caps.CanUseSeparableShaderPrograms);
         Assert.Contains("persistentUpload=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
         Assert.Contains("entitySsbo=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
         Assert.Contains("materialDrawSsbo=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
@@ -42,10 +48,17 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.Contains("gpuCommandCompaction=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
         Assert.Contains("gpuBatchCulling=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
         Assert.Contains("gpuCompactedDraws=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("gpuReductions=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("imageHistogram=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("materialTextureArrays=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("gpuTimers=off", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("separablePrograms=no", caps.FormatDiagnostic(), StringComparison.Ordinal);
         Assert.Contains("GLES-safe uploads", caps.FormatContextSuffix(), StringComparison.Ordinal);
         Assert.Contains("draw uniforms", caps.FormatContextSuffix(), StringComparison.Ordinal);
+        Assert.Contains("material samplers", caps.FormatContextSuffix(), StringComparison.Ordinal);
         Assert.Contains("fragment froxels", caps.FormatContextSuffix(), StringComparison.Ordinal);
         Assert.Contains("direct draws", caps.FormatContextSuffix(), StringComparison.Ordinal);
+        Assert.Contains("no GPU timers", caps.FormatContextSuffix(), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -61,11 +74,15 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.False(caps.IsOpenGlEs);
         Assert.True(caps.TextureArrays);
         Assert.True(caps.TimerQuery);
+        Assert.True(caps.CanUseGpuTimerQueries);
+        Assert.False(caps.CanUseSpirVShaderBinaries);
+        Assert.False(caps.CanUseSeparableShaderPrograms);
         Assert.False(caps.BufferStorage);
         Assert.False(caps.CanUsePersistentUploadRing);
         Assert.False(caps.ShaderStorageBuffers);
         Assert.False(caps.CanUseEntitySkinningSsbo);
         Assert.False(caps.CanUseMaterialDrawRecordSsbo);
+        Assert.False(caps.CanUseMaterialTextureArrays);
         Assert.False(caps.ComputeShaders);
         Assert.False(caps.CanUseComputeFroxelInject);
         Assert.False(caps.MultiDrawIndirect);
@@ -88,15 +105,19 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.False(caps.IsOpenGlEs);
         Assert.True(caps.TextureArrays);
         Assert.True(caps.TimerQuery);
+        Assert.True(caps.CanUseGpuTimerQueries);
         Assert.False(caps.BufferStorage);
         Assert.False(caps.CanUsePersistentUploadRing);
         Assert.False(caps.ShaderStorageBuffers);
         Assert.False(caps.CanUseEntitySkinningSsbo);
         Assert.False(caps.CanUseMaterialDrawRecordSsbo);
+        Assert.False(caps.CanUseMaterialTextureArrays);
         Assert.False(caps.ComputeShaders);
         Assert.False(caps.CanUseComputeFroxelInject);
         Assert.False(caps.ImageLoadStore);
         Assert.False(caps.SpirV);
+        Assert.False(caps.CanUseSpirVShaderBinaries);
+        Assert.False(caps.CanUseSeparableShaderPrograms);
         Assert.False(caps.CanUseIndirectDrawCommands);
         Assert.False(caps.CanUseMultiDrawIndirectGroups);
         Assert.False(caps.CanUseGpuCommandCompaction);
@@ -119,6 +140,7 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.True(caps.ShaderStorageBuffers);
         Assert.True(caps.CanUseEntitySkinningSsbo);
         Assert.True(caps.CanUseMaterialDrawRecordSsbo);
+        Assert.True(caps.CanUseMaterialTextureArrays);
         Assert.True(caps.ComputeShaders);
         Assert.True(caps.ImageLoadStore);
         Assert.True(caps.CanUseComputeFroxelInject);
@@ -131,11 +153,16 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.True(caps.CanUseGpuBatchCulling);
         Assert.True(caps.IndirectParameters);
         Assert.True(caps.CanUseGpuCompactedDrawSubmission);
+        Assert.True(caps.CanUseGpuReductionDiagnostics);
+        Assert.True(caps.CanUseImageHistogram);
         Assert.True(caps.TimerQuery);
+        Assert.True(caps.CanUseGpuTimerQueries);
         Assert.True(caps.TextureArrays);
         Assert.True(caps.BindlessTextures);
         Assert.True(caps.SpirV);
+        Assert.True(caps.CanUseSpirVShaderBinaries);
         Assert.True(caps.SeparablePrograms);
+        Assert.True(caps.CanUseSeparableShaderPrograms);
         Assert.Contains("persistentUpload=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
         Assert.Contains("entitySsbo=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
         Assert.Contains("materialDrawSsbo=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
@@ -145,10 +172,17 @@ public sealed class PreviewGlCapabilitiesTests
         Assert.Contains("gpuCommandCompaction=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
         Assert.Contains("gpuBatchCulling=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
         Assert.Contains("gpuCompactedDraws=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("gpuReductions=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("imageHistogram=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("materialTextureArrays=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("gpuTimers=on", caps.FormatDiagnostic(), StringComparison.Ordinal);
+        Assert.Contains("separablePrograms=yes", caps.FormatDiagnostic(), StringComparison.Ordinal);
         Assert.Contains("persistent uploads", caps.FormatContextSuffix(), StringComparison.Ordinal);
         Assert.Contains("draw SSBO", caps.FormatContextSuffix(), StringComparison.Ordinal);
+        Assert.Contains("material arrays", caps.FormatContextSuffix(), StringComparison.Ordinal);
         Assert.Contains("compute froxels", caps.FormatContextSuffix(), StringComparison.Ordinal);
         Assert.Contains("multi-draw groups", caps.FormatContextSuffix(), StringComparison.Ordinal);
+        Assert.Contains("GPU timers", caps.FormatContextSuffix(), StringComparison.Ordinal);
     }
 
     [Fact]

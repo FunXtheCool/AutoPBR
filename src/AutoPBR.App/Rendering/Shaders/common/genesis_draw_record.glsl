@@ -7,7 +7,7 @@ struct GenesisMaterialDrawRecord
 {
     // x: parallax UV scale, y/z: texture atlas scale, w: height texture width
     vec4 params0;
-    // x: height texture height, yzw: reserved
+    // x: height texture height, y: material texture-array layer, zw: reserved
     vec4 params1;
     // x: parallax, y: parallax AO, z: parallax shadow, w: tessellation displacement
     vec4 flags0;
@@ -207,6 +207,17 @@ int genesisEntityAlphaMode(int fallbackValue)
     if (genesisUsesMaterialDrawRecord())
     {
         return genesisFlag(genesisMaterialDrawRecord().flags1.w);
+    }
+#endif
+    return fallbackValue;
+}
+
+int genesisMaterialTextureLayer(int fallbackValue)
+{
+#ifdef GENESIS_MATERIAL_DRAW_RECORD_SSBO
+    if (genesisUsesMaterialDrawRecord())
+    {
+        return genesisFlag(genesisMaterialDrawRecord().params1.y);
     }
 #endif
     return fallbackValue;

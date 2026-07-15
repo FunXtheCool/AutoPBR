@@ -770,6 +770,7 @@ public sealed partial class OpenGlPreviewBackend
         _useOpenGlEs = sidecar is null &&
                        versionStr.Contains("OpenGL ES", StringComparison.OrdinalIgnoreCase);
         _glCapabilities = PreviewGlCapabilities.FromGl(_gl, _useOpenGlEs, _glVersionString);
+        _shaderToolchainPlan = GlShaderToolchainPlan.FromCapabilities(_glCapabilities, GlSpirVShaderManifest.Empty.Count);
         _gpuBootstrap = new GpuBootstrapRunner();
         _gpuBootstrapAborted = false;
         RaiseGpuInitProgress(PreviewGpuInitPhases.Preparing, _settings);
@@ -887,6 +888,7 @@ public sealed partial class OpenGlPreviewBackend
             DisposeAllGpuObjectsLocked();
             DisposeEntityRebakeWorker();
             _gl = null;
+            _shaderToolchainPlan = null;
             _nativeWglPresenterActive = false;
             _gpuInitTier = PreviewGpuInitTier.None;
             _shadowAwareGodRayInitAttempted = false;
@@ -924,6 +926,8 @@ public sealed partial class OpenGlPreviewBackend
         _spec = null;
         _height?.Dispose();
         _height = null;
+        DisposeMaterialTextureArrays();
+        DisposeGpuTimerProfiler();
         DestroyGenesisProgramCache();
         _program?.Dispose();
         _program = null;
@@ -934,6 +938,7 @@ public sealed partial class OpenGlPreviewBackend
         _shadowTargetCascadeNear?.Dispose();
         _shadowTargetCascadeNear = null;
         DestroyAtmosphereResources();
+        DestroyImageHistogramResources();
         DestroyGodRayResources();
         DestroyVolumeResources();
         DestroyVolumetricCloudResources();
@@ -943,8 +948,10 @@ public sealed partial class OpenGlPreviewBackend
         DestroyNativeWglOverlay();
         DestroySunDebugOverlay();
         _shaderCtx = null;
+        _shaderToolchainPlan = null;
 
         DisposeEntitySkinningUploadBuffers();
+        DisposeGenesisMaterialDrawRecordBuffer();
         DisposeGenesisIndirectDrawCommands();
     }
 
@@ -966,6 +973,8 @@ public sealed partial class OpenGlPreviewBackend
         _normal = null;
         _spec = null;
         _height = null;
+        AbandonMaterialTextureArrays();
+        AbandonGpuTimerProfiler();
         _genesisPrograms.Clear();
         _genesisProgramLru.Clear();
         _program = null;
@@ -973,6 +982,7 @@ public sealed partial class OpenGlPreviewBackend
         _shadowTarget = null;
         _shadowTargetCascadeNear = null;
         _shaderCtx = null;
+        _shaderToolchainPlan = null;
         _entityBoneUbo = 0;
         _entityPrevBoneUbo = 0;
         _entityNormalBoneUbo = 0;
@@ -983,6 +993,7 @@ public sealed partial class OpenGlPreviewBackend
         _genesisMaterialDrawRecordUpload = null;
         _genesisMaterialDrawRecordsUseSsbo = false;
         AbandonGenesisIndirectDrawCommands();
+        AbandonImageHistogramResources();
         DestroyAtmosphereResources();
         DestroyGodRayResources();
         DestroyVolumeResources();

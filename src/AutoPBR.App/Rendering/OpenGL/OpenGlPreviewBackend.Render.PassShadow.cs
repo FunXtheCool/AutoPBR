@@ -138,48 +138,6 @@ public sealed partial class OpenGlPreviewBackend
 
 
 
-        frame.EntityAlphaModeUniform = PreviewSubjectAlphaPolicy.ResolveAlphaModeUniform(
-
-            frame.Scene.SceneKind,
-
-            frame.EntityEmulatedPreview,
-
-            frame.Settings.EntityAlphaMode);
-
-        frame.EntityBlendDraw =
-
-            frame.EntityEmulatedPreview &&
-
-            frame.Scene.SceneKind == PreviewSceneKind.BlockModel &&
-
-            frame.Settings.EntityAlphaMode == PreviewEntityAlphaMode.Blend;
-
-        frame.EnableParallaxEff = PreviewEntityEmulatedShaderGating.EffectiveParallax(
-
-            frame.Settings.EnableParallax, frame.EntityEmulatedPreview, frame.Settings.EnableEntityParallax);
-
-        frame.EnableParallaxAoEff = PreviewEntityEmulatedShaderGating.EffectiveParallaxAo(
-
-            frame.Settings.EnableParallaxAo, frame.EntityEmulatedPreview, frame.Settings.EnableEntityParallax);
-
-        frame.EnableNormalMapEff = PreviewEntityEmulatedShaderGating.EffectiveNormalMap(
-
-            frame.Settings.EnableNormalMap, frame.EntityEmulatedPreview, frame.Settings.EnableEntityLabPbrShading);
-
-        frame.EnableSpecularMapEff = PreviewEntityEmulatedShaderGating.EffectiveSpecularMap(
-
-            frame.Settings.EnableSpecularMap, frame.EntityEmulatedPreview, frame.Settings.EnableEntityLabPbrShading);
-
-        frame.EnableParallaxShadowEff = PreviewEntityEmulatedShaderGating.EffectiveParallaxShadow(
-
-            frame.Settings.EnableParallaxShadow, frame.EntityEmulatedPreview, frame.Settings.EnableEntityParallax);
-
-        frame.EnableTessellationDisplacementEff = PreviewEntityEmulatedShaderGating.EffectiveTessellationDisplacement(
-
-            frame.Settings.EnableTessellationDisplacement, frame.EntityEmulatedPreview);
-
-
-
         frame.ShadowAvailable = frame.Settings.EnableShadows && _shadowProgram?.IsValid == true && _shadowTarget is not null;
 
         if (!frame.ShadowAvailable)
@@ -470,6 +428,7 @@ public sealed partial class OpenGlPreviewBackend
             SetFloatOnProgramLoc(_shadowProgram!, su.AlphaCutoff, frame.Settings.AlphaCutoff);
 
             SetIntOnProgramLoc(_shadowProgram!, su.ItemAlphaBlend, frame.Settings.ItemUseAlphaBlend ? 1 : 0);
+            SetIntOnProgramLoc(_shadowProgram!, su.GenesisUseMaterialTextureArray, 0);
 
             frame.Gl.ActiveTexture(TextureUnit.Texture0);
 
@@ -510,12 +469,19 @@ public sealed partial class OpenGlPreviewBackend
             var blockSlots = frame.BlockSlots;
             var useMaterialDrawRecords = TryUploadGenesisMaterialDrawRecords(ref frame);
             var useIndirectDrawCommands = TryUploadGenesisIndirectDrawCommands(blockModel);
+            var useMaterialTextureArrays =
+                TryEnsureMaterialTextureArrays(ref frame, useMaterialDrawRecords, out _);
             if (useMaterialDrawRecords)
             {
                 BindGenesisMaterialDrawRecordBuffer();
             }
 
             SetIntOnProgramLoc(_shadowProgram!, su.GenesisUseMaterialDrawRecord, useMaterialDrawRecords ? 1 : 0);
+            SetIntOnProgramLoc(_shadowProgram!, su.GenesisUseMaterialTextureArray, useMaterialTextureArrays ? 1 : 0);
+            if (useMaterialTextureArrays)
+            {
+                BindShadowPassMaterialTextureArray(su);
+            }
 
             _mesh.BindVertexArray();
 
@@ -546,7 +512,7 @@ public sealed partial class OpenGlPreviewBackend
 
 
 
-                if (batch.MaterialIndex != uploadedMaterialIndex)
+                if (batch.MaterialIndex != uploadedMaterialIndex && !useMaterialTextureArrays)
 
                 {
 
@@ -632,6 +598,7 @@ public sealed partial class OpenGlPreviewBackend
 
             _mesh.UnbindVertexArray();
             SetIntOnProgramLoc(_shadowProgram!, su.GenesisUseMaterialDrawRecord, 0);
+            SetIntOnProgramLoc(_shadowProgram!, su.GenesisUseMaterialTextureArray, 0);
             SetIntOnProgramLoc(_shadowProgram!, su.GenesisDrawRecordIndex, 0);
 
         }
@@ -658,6 +625,7 @@ public sealed partial class OpenGlPreviewBackend
 
 
 
+            SetIntOnProgramLoc(_shadowProgram!, su.GenesisUseMaterialTextureArray, 0);
             SetIntOnProgramLoc(_shadowProgram!, su.EntityAlphaMode, alphaMode);
 
             ApplyEntitySkinningUniforms(_shadowProgram!, 0, 0, 0f);

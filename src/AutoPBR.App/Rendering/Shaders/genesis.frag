@@ -32,6 +32,11 @@ uniform sampler2D uAlbedo;
 uniform sampler2D uNormal;
 uniform sampler2D uSpecular;
 uniform sampler2D uHeight;
+#ifdef GENESIS_MATERIAL_TEXTURE_ARRAYS
+uniform sampler2DArray uAlbedoArray;
+uniform sampler2DArray uNormalArray;
+uniform sampler2DArray uSpecularArray;
+#endif
 uniform sampler2D uAtmoSkyViewLut;
 uniform sampler2DShadow uShadowMap;
 uniform sampler2DShadow uShadowMapNear;
@@ -90,6 +95,66 @@ uniform float uShadowSoftnessTexels;
 layout(location = 0) out vec4 FragColor;
 layout(location = 1) out vec4 TaaSignal;
 
+vec3 genesisMaterialTextureCoord(vec2 uv)
+{
+    return vec3(uv, float(genesisMaterialTextureLayer(0)));
+}
+
+vec4 sampleGenesisAlbedo(vec2 uv)
+{
+#ifdef GENESIS_MATERIAL_TEXTURE_ARRAYS
+    if (uGenesisUseMaterialTextureArray > 0)
+    {
+        return texture(uAlbedoArray, genesisMaterialTextureCoord(uv));
+    }
+#endif
+    return texture(uAlbedo, uv);
+}
+
+vec4 sampleGenesisAlbedoGrad(vec2 uv, vec2 dx, vec2 dy)
+{
+#ifdef GENESIS_MATERIAL_TEXTURE_ARRAYS
+    if (uGenesisUseMaterialTextureArray > 0)
+    {
+        return textureGrad(uAlbedoArray, genesisMaterialTextureCoord(uv), dx, dy);
+    }
+#endif
+    return textureGrad(uAlbedo, uv, dx, dy);
+}
+
+vec4 sampleGenesisNormalGrad(vec2 uv, vec2 dx, vec2 dy)
+{
+#ifdef GENESIS_MATERIAL_TEXTURE_ARRAYS
+    if (uGenesisUseMaterialTextureArray > 0)
+    {
+        return textureGrad(uNormalArray, genesisMaterialTextureCoord(uv), dx, dy);
+    }
+#endif
+    return textureGrad(uNormal, uv, dx, dy);
+}
+
+vec4 sampleGenesisSpecularGrad(vec2 uv, vec2 dx, vec2 dy)
+{
+#ifdef GENESIS_MATERIAL_TEXTURE_ARRAYS
+    if (uGenesisUseMaterialTextureArray > 0)
+    {
+        return textureGrad(uSpecularArray, genesisMaterialTextureCoord(uv), dx, dy);
+    }
+#endif
+    return textureGrad(uSpecular, uv, dx, dy);
+}
+
+float sampleGenesisHeightGrad(vec2 uv, vec2 dx, vec2 dy)
+{
+#ifdef GENESIS_MATERIAL_TEXTURE_ARRAYS
+    if (uGenesisUseMaterialTextureArray > 0)
+    {
+        return textureGrad(uHeightArray, genesisMaterialTextureCoord(uv), dx, dy).r;
+    }
+#endif
+    return textureGrad(uHeight, uv, dx, dy).r;
+}
+
 vec3 sampleNormal(vec2 uv, vec2 dx, vec2 dy, vec3 Nw, vec3 Tw, vec3 Bw)
 {
 #if defined(GENESIS_ENABLE_NORMAL_MAP)
@@ -98,7 +163,7 @@ vec3 sampleNormal(vec2 uv, vec2 dx, vec2 dy, vec3 Nw, vec3 Tw, vec3 Bw)
         return normalize(Nw);
     }
 
-    vec3 tn = textureGrad(uNormal, uv, dx, dy).xyz * 2.0 - 1.0;
+    vec3 tn = sampleGenesisNormalGrad(uv, dx, dy).xyz * 2.0 - 1.0;
     tn.xy *= uNormalStrength;
     tn = normalize(tn);
     return normalize(mat3(Tw, Bw, Nw) * tn);
@@ -133,11 +198,11 @@ void main()
 #if defined(GENESIS_ENABLE_POM)
     bool  pomActiveEarly = (genesisEnableParallax(uEnableParallax) > 0 && genesisHasHeight(uHasHeight) > 0 && uHeightStrength > 0.0);
     vec4 albRaw = pomActiveEarly
-        ? textureGrad(uAlbedo, vUv, uvDx, uvDy)
-        : texture(uAlbedo, vUv);
+        ? sampleGenesisAlbedoGrad(vUv, uvDx, uvDy)
+        : sampleGenesisAlbedo(vUv);
 #else
     bool  pomActiveEarly = false;
-    vec4 albRaw = texture(uAlbedo, vUv);
+    vec4 albRaw = sampleGenesisAlbedo(vUv);
 #endif
     if (uSceneKind == 1)
     {
@@ -179,7 +244,7 @@ void main()
 #endif
 
     // Re-sample albedo at displaced UV when POM is on.
-    vec4 alb = pomActive ? textureGrad(uAlbedo, uv, uvDx, uvDy) : albRaw;
+    vec4 alb = pomActive ? sampleGenesisAlbedoGrad(uv, uvDx, uvDy) : albRaw;
     if (genesisEntityAlphaMode(uEntityAlphaMode) == 1 && alb.a < uAlphaCutoff)
     {
         discard;
@@ -202,7 +267,7 @@ void main()
 #if defined(GENESIS_ENABLE_SPECULAR_MAP)
     if (genesisHasSpecular(uHasSpecular) > 0 && uEnableSpecularMap > 0)
     {
-        vec4 sp = textureGrad(uSpecular, uv, uvDx, uvDy);
+        vec4 sp = sampleGenesisSpecularGrad(uv, uvDx, uvDy);
         mat = decodeLabPbrSpec(sp, albedoLinear, uRoughnessScale, uSpecularStrength);
     }
     else

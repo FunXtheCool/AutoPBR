@@ -46,7 +46,9 @@ internal sealed class GlGpuDrawCommandCompactor : IDisposable
         GlShaderProgram program,
         GlIndirectDrawCommandBuffer sourceCommands,
         ReadOnlySpan<uint> visibilityFlags,
-        bool readBackCounter = false)
+        bool readBackCounter = false,
+        bool collectDiagnostics = false,
+        int outputCapacity = 0)
     {
         if (_disposed ||
             program is not { IsValid: true } ||
@@ -59,7 +61,8 @@ internal sealed class GlGpuDrawCommandCompactor : IDisposable
         }
 
         var commandCount = sourceCommands.CommandCount;
-        if (!_outputCommands.EnsureCommandCapacity(commandCount))
+        outputCapacity = ResolveOutputCapacity(commandCount, outputCapacity);
+        if (!_outputCommands.EnsureCommandCapacity(outputCapacity))
         {
             LastVisibleCount = 0;
             return false;
@@ -82,17 +85,19 @@ internal sealed class GlGpuDrawCommandCompactor : IDisposable
 
         SetUseGpuCulling(program, false);
         SetFirstCommand(program, 0);
+        SetOutputCapacity(program, outputCapacity);
+        SetCollectDiagnostics(program, collectDiagnostics);
         _gl.DispatchCompute((uint)((commandCount + LocalSizeX - 1) / LocalSizeX), 1, 1);
         _gl.MemoryBarrier(ShaderStorageBarrierBit | CommandBarrierBit | BufferUpdateBarrierBit);
 
         if (readBackCounter)
         {
-            LastVisibleCount = ReadCounter();
+            LastVisibleCount = Math.Min(ReadCounter(), outputCapacity);
             _outputCommands.SetCommandCount(LastVisibleCount);
         }
         else
         {
-            LastVisibleCount = commandCount;
+            LastVisibleCount = outputCapacity;
         }
 
         _gl.BindBufferBase(BufferTargetARB.ShaderStorageBuffer, SourceCommandsBinding, 0);
@@ -109,7 +114,9 @@ internal sealed class GlGpuDrawCommandCompactor : IDisposable
         IReadOnlyList<PreviewDrawBatch> batches,
         ReadOnlySpan<Vector4> frustumPlanes,
         Vector3 cameraPosition,
-        bool readBackCounter = false) =>
+        bool readBackCounter = false,
+        bool collectDiagnostics = false,
+        int outputCapacity = 0) =>
         DispatchWithGpuCulling(
             program,
             sourceCommands,
@@ -119,7 +126,9 @@ internal sealed class GlGpuDrawCommandCompactor : IDisposable
             Matrix4x4.Identity,
             0,
             sourceCommands.CommandCount,
-            readBackCounter);
+            readBackCounter,
+            collectDiagnostics,
+            outputCapacity);
 
     public bool DispatchWithGpuCulling(
         GlShaderProgram program,
@@ -130,7 +139,9 @@ internal sealed class GlGpuDrawCommandCompactor : IDisposable
         Matrix4x4 modelMatrix,
         int firstCommand,
         int commandCount,
-        bool readBackCounter = false)
+        bool readBackCounter = false,
+        bool collectDiagnostics = false,
+        int outputCapacity = 0)
     {
         if (_disposed ||
             program is not { IsValid: true } ||
@@ -146,7 +157,8 @@ internal sealed class GlGpuDrawCommandCompactor : IDisposable
             return false;
         }
 
-        if (!_outputCommands.EnsureCommandCapacity(commandCount))
+        outputCapacity = ResolveOutputCapacity(commandCount, outputCapacity);
+        if (!_outputCommands.EnsureCommandCapacity(outputCapacity))
         {
             LastVisibleCount = 0;
             return false;
@@ -171,6 +183,8 @@ internal sealed class GlGpuDrawCommandCompactor : IDisposable
 
         SetUseGpuCulling(program, true);
         SetFirstCommand(program, firstCommand);
+        SetOutputCapacity(program, outputCapacity);
+        SetCollectDiagnostics(program, collectDiagnostics);
         SetCameraPosition(program, cameraPosition);
         SetFrustumPlanes(program, frustumPlanes[..6]);
 
@@ -179,12 +193,12 @@ internal sealed class GlGpuDrawCommandCompactor : IDisposable
 
         if (readBackCounter)
         {
-            LastVisibleCount = ReadCounter();
+            LastVisibleCount = Math.Min(ReadCounter(), outputCapacity);
             _outputCommands.SetCommandCount(LastVisibleCount);
         }
         else
         {
-            LastVisibleCount = commandCount;
+            LastVisibleCount = outputCapacity;
         }
 
         _gl.BindBufferBase(BufferTargetARB.ShaderStorageBuffer, SourceCommandsBinding, 0);
@@ -193,6 +207,20 @@ internal sealed class GlGpuDrawCommandCompactor : IDisposable
         _gl.BindBufferBase(BufferTargetARB.ShaderStorageBuffer, OutputCounterBinding, 0);
         _gl.BindBufferBase(BufferTargetARB.ShaderStorageBuffer, BatchCullRecordsBinding, 0);
         return true;
+    }
+
+    public GlGpuDrawReductionSnapshot ReadReductionDiagnostics()
+    {
+        if (_disposed || _counterBuffer == 0)
+        {
+            return default;
+        }
+
+        Span<uint> dwords = stackalloc uint[GlGpuDrawReductionSnapshot.DwordCount];
+        _gl.BindBuffer(BufferTargetARB.ShaderStorageBuffer, _counterBuffer);
+        _gl.GetBufferSubData<uint>(BufferTargetARB.ShaderStorageBuffer, sizeof(uint), dwords);
+        _gl.BindBuffer(BufferTargetARB.ShaderStorageBuffer, 0);
+        return GlGpuDrawReductionSnapshot.FromDwords(dwords);
     }
 
     public uint[] ReadOutputCommandDwords(int commandCount)
@@ -329,6 +357,24 @@ internal sealed class GlGpuDrawCommandCompactor : IDisposable
         }
     }
 
+    private void SetOutputCapacity(GlShaderProgram program, int outputCapacity)
+    {
+        var loc = program.GetUniformLocation("uOutputCapacity");
+        if (loc >= 0)
+        {
+            _gl.Uniform1(loc, (uint)outputCapacity);
+        }
+    }
+
+    private void SetCollectDiagnostics(GlShaderProgram program, bool enabled)
+    {
+        var loc = program.GetUniformLocation("uCollectDiagnostics");
+        if (loc >= 0)
+        {
+            _gl.Uniform1(loc, enabled ? 1 : 0);
+        }
+    }
+
     private void SetCameraPosition(GlShaderProgram program, Vector3 cameraPosition)
     {
         var loc = program.GetUniformLocation("uCameraPos");
@@ -355,12 +401,18 @@ internal sealed class GlGpuDrawCommandCompactor : IDisposable
 
     private void ResetCounter()
     {
-        Span<uint> zero = stackalloc uint[1];
+        Span<uint> zero = stackalloc uint[1 + GlGpuDrawReductionSnapshot.DwordCount];
+        zero.Clear();
         _counterBuffer = _counterBuffer == 0 ? _gl.GenBuffer() : _counterBuffer;
         _gl.BindBuffer(BufferTargetARB.ShaderStorageBuffer, _counterBuffer);
         _gl.BufferData<uint>(BufferTargetARB.ShaderStorageBuffer, zero, BufferUsageARB.DynamicDraw);
         _gl.BindBuffer(BufferTargetARB.ShaderStorageBuffer, 0);
     }
+
+    private static int ResolveOutputCapacity(int commandCount, int requestedCapacity) =>
+        requestedCapacity <= 0
+            ? commandCount
+            : Math.Clamp(requestedCapacity, 1, commandCount);
 
     private int ReadCounter()
     {

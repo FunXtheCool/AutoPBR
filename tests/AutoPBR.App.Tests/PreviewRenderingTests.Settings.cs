@@ -118,6 +118,66 @@ public sealed partial class PreviewRenderingTests
     }
 
     [Fact]
+    public void SetupPass_ComputesEffectiveShaderFlagsBeforeSceneProgramSelection()
+    {
+        var setup = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "OpenGlPreviewBackend.Render.PassSetup.cs");
+        var shadow = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "OpenGlPreviewBackend.Render.PassShadow.cs");
+        var render = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "OpenGlPreviewBackend.Render.cs");
+        var scene = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "OpenGlPreviewBackend.Render.PassScene.cs");
+
+        Assert.Contains("ApplyEffectiveFrameRenderFlags(ref frame);", setup, StringComparison.Ordinal);
+        Assert.Contains("frame.EnableTessellationDisplacementEff = PreviewEntityEmulatedShaderGating.EffectiveTessellationDisplacement", setup, StringComparison.Ordinal);
+        Assert.DoesNotContain("EffectiveTessellationDisplacement", shadow, StringComparison.Ordinal);
+        Assert.True(
+            render.IndexOf("GlRenderPassSetup(ref frame);", StringComparison.Ordinal) <
+            render.IndexOf("GlRenderPassScene(ref frame);", StringComparison.Ordinal));
+        Assert.True(
+            scene.IndexOf("EnsureGenesisProgramForFrame(ref frame);", StringComparison.Ordinal) <
+            scene.IndexOf("SyncGodRayToggleState", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Lifecycle_DisposesRoadmapGpuBuffersOnFullTeardown()
+    {
+        var lifecycle = LoadSource(ThisFilePath(),
+            "src",
+            "AutoPBR.App",
+            "Rendering",
+            "OpenGL",
+            "OpenGlPreviewBackend.Lifecycle.cs");
+
+        Assert.Contains("DisposeMaterialTextureArrays();", lifecycle, StringComparison.Ordinal);
+        Assert.Contains("DisposeGpuTimerProfiler();", lifecycle, StringComparison.Ordinal);
+        Assert.Contains("DestroyImageHistogramResources();", lifecycle, StringComparison.Ordinal);
+        Assert.Contains("DisposeGenesisMaterialDrawRecordBuffer();", lifecycle, StringComparison.Ordinal);
+        Assert.Contains("DisposeGenesisIndirectDrawCommands();", lifecycle, StringComparison.Ordinal);
+        Assert.Contains("AbandonMaterialTextureArrays();", lifecycle, StringComparison.Ordinal);
+        Assert.Contains("AbandonGpuTimerProfiler();", lifecycle, StringComparison.Ordinal);
+        Assert.Contains("AbandonImageHistogramResources();", lifecycle, StringComparison.Ordinal);
+        Assert.Contains("AbandonGenesisIndirectDrawCommands();", lifecycle, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void ProjectionJitter_ShiftsClipSpaceBySubpixelNdc()
     {
         var projection = PreviewGlMatrices.CreatePerspectiveFieldOfViewOpenGl(

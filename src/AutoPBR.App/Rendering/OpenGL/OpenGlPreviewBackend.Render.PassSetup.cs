@@ -665,6 +665,32 @@ public sealed partial class OpenGlPreviewBackend
             _lastUploadedBoneCount = 0;
             _lastUploadedLiftY = 0f;
         }
+
+        ApplyEffectiveFrameRenderFlags(ref frame);
+    }
+
+    private static void ApplyEffectiveFrameRenderFlags(ref GlRenderFrame frame)
+    {
+        frame.EntityAlphaModeUniform = PreviewSubjectAlphaPolicy.ResolveAlphaModeUniform(
+            frame.Scene.SceneKind,
+            frame.EntityEmulatedPreview,
+            frame.Settings.EntityAlphaMode);
+        frame.EntityBlendDraw =
+            frame.EntityEmulatedPreview &&
+            frame.Scene.SceneKind == PreviewSceneKind.BlockModel &&
+            frame.Settings.EntityAlphaMode == PreviewEntityAlphaMode.Blend;
+        frame.EnableParallaxEff = PreviewEntityEmulatedShaderGating.EffectiveParallax(
+            frame.Settings.EnableParallax, frame.EntityEmulatedPreview, frame.Settings.EnableEntityParallax);
+        frame.EnableParallaxAoEff = PreviewEntityEmulatedShaderGating.EffectiveParallaxAo(
+            frame.Settings.EnableParallaxAo, frame.EntityEmulatedPreview, frame.Settings.EnableEntityParallax);
+        frame.EnableNormalMapEff = PreviewEntityEmulatedShaderGating.EffectiveNormalMap(
+            frame.Settings.EnableNormalMap, frame.EntityEmulatedPreview, frame.Settings.EnableEntityLabPbrShading);
+        frame.EnableSpecularMapEff = PreviewEntityEmulatedShaderGating.EffectiveSpecularMap(
+            frame.Settings.EnableSpecularMap, frame.EntityEmulatedPreview, frame.Settings.EnableEntityLabPbrShading);
+        frame.EnableParallaxShadowEff = PreviewEntityEmulatedShaderGating.EffectiveParallaxShadow(
+            frame.Settings.EnableParallaxShadow, frame.EntityEmulatedPreview, frame.Settings.EnableEntityParallax);
+        frame.EnableTessellationDisplacementEff = PreviewEntityEmulatedShaderGating.EffectiveTessellationDisplacement(
+            frame.Settings.EnableTessellationDisplacement, frame.EntityEmulatedPreview);
     }
 
     private void UpdateEntityGpuSkinnedBounds(ref GlRenderFrame frame)
