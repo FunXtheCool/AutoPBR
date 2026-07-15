@@ -387,6 +387,10 @@ public sealed class LocalizedStrings
     public static string Preview3DMoonWorldLightIntensityTooltip => Resources.Preview3DMoonWorldLightIntensityTooltip;
     public static string Preview3DShowCelestialDebug => Resources.Preview3DShowCelestialDebug;
     public static string Preview3DShowCelestialDebugTooltip => Resources.Preview3DShowCelestialDebugTooltip;
+    public static string Preview3DLogGpuPassTimings => Resources.Preview3DLogGpuPassTimings;
+    public static string Preview3DLogGpuPassTimingsTooltip => Resources.Preview3DLogGpuPassTimingsTooltip;
+    public static string Preview3DShowExpandedGpuTimingHud => Resources.Preview3DShowExpandedGpuTimingHud;
+    public static string Preview3DShowExpandedGpuTimingHudTooltip => Resources.Preview3DShowExpandedGpuTimingHudTooltip;
     public static string Preview3DHorizonFogStrength => Resources.Preview3DHorizonFogStrength;
     public static string Preview3DHorizonFogStrengthTooltip => Resources.Preview3DHorizonFogStrengthTooltip;
     public static string Preview3DVolumetricSection => Resources.Preview3DVolumetricSection;

@@ -44,6 +44,16 @@
                                                   ToolTip.Tip="{Binding Strings.Preview3DShowCelestialDebugTooltip}">
                                             <TextBlock Text="{Binding Strings.Preview3DShowCelestialDebug}" TextWrapping="Wrap" />
                                         </CheckBox>
+                                        <CheckBox IsChecked="{Binding Preview3DLogGpuPassTimings, Mode=TwoWay}"
+                                                  IsVisible="{Binding IsPreview3D}"
+                                                  ToolTip.Tip="{Binding Strings.Preview3DLogGpuPassTimingsTooltip}">
+                                            <TextBlock Text="{Binding Strings.Preview3DLogGpuPassTimings}" TextWrapping="Wrap" />
+                                        </CheckBox>
+                                        <CheckBox IsChecked="{Binding Preview3DShowExpandedGpuTimingHud, Mode=TwoWay}"
+                                                  IsVisible="{Binding IsPreview3D}"
+                                                  ToolTip.Tip="{Binding Strings.Preview3DShowExpandedGpuTimingHudTooltip}">
+                                            <TextBlock Text="{Binding Strings.Preview3DShowExpandedGpuTimingHud}" TextWrapping="Wrap" />
+                                        </CheckBox>
                                         <ctrls:FlyoutSection Header="{Binding Strings.Preview3DGodRayDebugSection}" FlyoutMaxWidth="720">
                                             <StackPanel Spacing="8">
                                                 <CheckBox IsChecked="{Binding Preview3DGodRayStabilizeDebug, Mode=TwoWay}"

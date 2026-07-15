@@ -1345,6 +1345,18 @@
   <data name="Preview3DShowCelestialDebugTooltip" xml:space="preserve">
     <value>Draw square and crosshair markers at the sun and moon disc positions.</value>
   </data>
+  <data name="Preview3DLogGpuPassTimings" xml:space="preserve">
+    <value>Log GPU pass timings</value>
+  </data>
+  <data name="Preview3DLogGpuPassTimingsTooltip" xml:space="preserve">
+    <value>Write periodic P8 GPU pass timings to the log. Off by default to avoid flooding the log pane.</value>
+  </data>
+  <data name="Preview3DShowExpandedGpuTimingHud" xml:space="preserve">
+    <value>Expanded GPU timing overlay</value>
+  </data>
+  <data name="Preview3DShowExpandedGpuTimingHudTooltip" xml:space="preserve">
+    <value>Show per-pass GPU timings in the FPS overlay instead of total GPU milliseconds only.</value>
+  </data>
   <data name="Preview3DHorizonFogStrength" xml:space="preserve">
     <value>Horizon fog</value>
   </data>

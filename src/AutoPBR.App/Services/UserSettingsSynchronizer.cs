@@ -59,6 +59,8 @@ internal static class UserSettingsSynchronizer
             1.0);
         vm.Preview3DShowAxes = settings.Preview3DShowAxes;
         vm.Preview3DShowFpsCounter = settings.Preview3DShowFpsCounter;
+        vm.Preview3DLogGpuPassTimings = settings.Preview3DLogGpuPassTimings;
+        vm.Preview3DShowExpandedGpuTimingHud = settings.Preview3DShowExpandedGpuTimingHud;
         vm.Preview3DVSyncEnabled = settings.Preview3DVSyncEnabled ?? settings.Preview3DCapFpsAt60;
         vm.Preview3DEnableParallax = settings.Preview3DEnableParallax;
         vm.Preview3DEnableNormalMap = settings.Preview3DEnableNormalMap;
@@ -381,6 +383,8 @@ internal static class UserSettingsSynchronizer
         settings.Preview3DGrassColormapDownfall = Math.Clamp(vm.Preview3DGrassColormapDownfall, 0.0, 1.0);
         settings.Preview3DShowAxes = vm.Preview3DShowAxes;
         settings.Preview3DShowFpsCounter = vm.Preview3DShowFpsCounter;
+        settings.Preview3DLogGpuPassTimings = vm.Preview3DLogGpuPassTimings;
+        settings.Preview3DShowExpandedGpuTimingHud = vm.Preview3DShowExpandedGpuTimingHud;
         settings.Preview3DVSyncEnabled = vm.Preview3DVSyncEnabled;
         settings.Preview3DCapFpsAt60 = false;
         settings.Preview3DEnableParallax = vm.Preview3DEnableParallax;

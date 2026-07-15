@@ -99,6 +99,8 @@ public readonly struct PreviewRenderSettingsSnapshot
     public bool CloudFreezeWind { get; init; }
     public bool LogVolumetricTiming { get; init; }
     public bool LogPreviewTaaDiagnostics { get; init; }
+    public bool LogGpuPassTimings { get; init; }
+    public bool ShowExpandedGpuTimingHud { get; init; }
     public bool EnablePreviewTaa { get; init; }
     public int PreviewTaaMode { get; init; }
     public float PreviewTaaTemporalScale { get; init; }
@@ -210,6 +212,8 @@ public readonly struct PreviewRenderSettingsSnapshot
         CloudFreezeWind = s.CloudFreezeWind,
         LogVolumetricTiming = s.LogVolumetricTiming,
         LogPreviewTaaDiagnostics = s.LogPreviewTaaDiagnostics,
+        LogGpuPassTimings = s.LogGpuPassTimings,
+        ShowExpandedGpuTimingHud = s.ShowExpandedGpuTimingHud,
         EnablePreviewTaa = s.EnablePreviewTaa,
         PreviewTaaMode = s.PreviewTaaMode,
         PreviewTaaTemporalScale = s.PreviewTaaTemporalScale,

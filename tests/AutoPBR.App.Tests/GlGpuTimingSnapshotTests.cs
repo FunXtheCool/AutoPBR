@@ -5,7 +5,7 @@ namespace AutoPBR.App.Tests;
 public sealed class GlGpuTimingSnapshotTests
 {
     [Fact]
-    public void FormatHudLine_IncludesTotalAndScopes()
+    public void FormatHudLine_DefaultsToTotalOnly()
     {
         var snapshot = new GlGpuTimingSnapshot(
             SetupMs: 0.125,
@@ -15,7 +15,21 @@ public sealed class GlGpuTimingSnapshotTests
             OverlayMs: 0.0625);
 
         Assert.Equal(2.3125, snapshot.TotalMs, precision: 6);
-        var hud = snapshot.FormatHudLine();
+        Assert.Equal("GPU 2.3 ms", snapshot.FormatHudLine());
+        Assert.DoesNotContain("|", snapshot.FormatHudLine(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void FormatHudLine_ExpandedIncludesPassScopes()
+    {
+        var snapshot = new GlGpuTimingSnapshot(
+            SetupMs: 0.125,
+            ShadowMs: 0.25,
+            SceneMs: 1.5,
+            PostMs: 0.375,
+            OverlayMs: 0.0625);
+
+        var hud = snapshot.FormatHudLine(expanded: true);
         Assert.Contains("GPU 2.3 ms", hud, StringComparison.Ordinal);
         Assert.Contains("set 0.1", hud, StringComparison.Ordinal);
         Assert.Contains("sh 0.3", hud, StringComparison.Ordinal);

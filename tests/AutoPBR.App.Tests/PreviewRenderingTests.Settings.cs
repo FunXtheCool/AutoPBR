@@ -76,6 +76,8 @@ public sealed partial class PreviewRenderingTests
         Assert.Equal(0.45f, s.GodRayStrength);
         Assert.False(s.LogVolumetricTiming);
         Assert.False(s.LogPreviewTaaDiagnostics);
+        Assert.False(s.LogGpuPassTimings);
+        Assert.False(s.ShowExpandedGpuTimingHud);
     }
 
     [Fact]

@@ -221,6 +221,12 @@ public sealed class UserSettings
     /// <summary>Show a frames-per-second readout in the top-right corner of the 3D preview.</summary>
     public bool Preview3DShowFpsCounter { get; set; }
 
+    /// <summary>When true, write periodic P8 GPU pass timings to the preview log (Debug tab).</summary>
+    public bool Preview3DLogGpuPassTimings { get; set; }
+
+    /// <summary>When true, FPS overlay shows per-pass GPU timings instead of total GPU ms only.</summary>
+    public bool Preview3DShowExpandedGpuTimingHud { get; set; }
+
     /// <summary>Synchronize native WGL preview presentation to the current display refresh rate.</summary>
     public bool? Preview3DVSyncEnabled { get; set; }
 

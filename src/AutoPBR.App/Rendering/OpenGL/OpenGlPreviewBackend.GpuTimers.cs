@@ -82,8 +82,9 @@ public sealed partial class OpenGlPreviewBackend
                 return;
             }
 
-            SetLatestGpuTimingHudText(snapshot.FormatHudLine());
-            if (renderTimeSeconds - _lastGpuTimingDiagnosticSeconds >= 2.0)
+            SetLatestGpuTimingHudText(snapshot.FormatHudLine(_settings.ShowExpandedGpuTimingHud));
+            if (_settings.LogGpuPassTimings &&
+                renderTimeSeconds - _lastGpuTimingDiagnosticSeconds >= 2.0)
             {
                 _lastGpuTimingDiagnosticSeconds = renderTimeSeconds;
                 EmitDiagnostic("[3D preview] P8 GPU timings: " + snapshot.FormatDiagnostic() + ".");

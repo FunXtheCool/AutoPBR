@@ -91,6 +91,8 @@ public partial class MainWindowViewModel
     [ObservableProperty] private double _preview3DMoonWorldLightIntensity = 1.0;
     [ObservableProperty] private double _preview3DHorizonFogStrength = 1.0;
     [ObservableProperty] private bool _preview3DShowCelestialDebug;
+    [ObservableProperty] private bool _preview3DLogGpuPassTimings;
+    [ObservableProperty] private bool _preview3DShowExpandedGpuTimingHud;
     [ObservableProperty] private double _preview3DTimeOfDayHours = 12.0;
     [ObservableProperty] private bool _preview3DAnimateTimeOfDay;
     [ObservableProperty] private double _preview3DTimeOfDaySpeed = 1.0;
@@ -370,6 +372,8 @@ public partial class MainWindowViewModel
     partial void OnPreview3DMoonWorldLightIntensityChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DHorizonFogStrengthChanged(double value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DShowCelestialDebugChanged(bool value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DLogGpuPassTimingsChanged(bool value) => OnPreview3DGpuSettingChanged(value);
+    partial void OnPreview3DShowExpandedGpuTimingHudChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DTimeOfDayHoursChanged(double value) => OnPreview3DTimeOfDayChanged(value);
     partial void OnPreview3DAnimateTimeOfDayChanged(bool value) => OnPreview3DGpuSettingChanged(value);
     partial void OnPreview3DTimeOfDaySpeedChanged(double value) => OnPreview3DGpuSettingChanged(value);
@@ -711,6 +715,8 @@ public partial class MainWindowViewModel
             CloudQuality = PreviewVolumetricQuality.Resolve(Math.Clamp(Preview3DVolumetricQuality, 0, 2)).CloudQuality,
             LogVolumetricTiming = DebugMode,
             LogPreviewTaaDiagnostics = DebugMode,
+            LogGpuPassTimings = Preview3DLogGpuPassTimings,
+            ShowExpandedGpuTimingHud = Preview3DShowExpandedGpuTimingHud,
             ShowSunProjectionDebug = Preview3DShowCelestialDebug
         };
     }

@@ -22,16 +22,21 @@ internal readonly record struct GlGpuTimingSnapshot(
 {
     public double TotalMs => SetupMs + ShadowMs + SceneMs + PostMs + OverlayMs;
 
-    public string FormatHudLine() =>
-        string.Format(
-            CultureInfo.InvariantCulture,
-            "GPU {0:0.0} ms | set {1:0.0} sh {2:0.0} scn {3:0.0} post {4:0.0} ovl {5:0.0}",
-            TotalMs,
-            SetupMs,
-            ShadowMs,
-            SceneMs,
-            PostMs,
-            OverlayMs);
+    public string FormatHudLine(bool expanded = false) =>
+        expanded
+            ? string.Format(
+                CultureInfo.InvariantCulture,
+                "GPU {0:0.0} ms | set {1:0.0} sh {2:0.0} scn {3:0.0} post {4:0.0} ovl {5:0.0}",
+                TotalMs,
+                SetupMs,
+                ShadowMs,
+                SceneMs,
+                PostMs,
+                OverlayMs)
+            : string.Format(
+                CultureInfo.InvariantCulture,
+                "GPU {0:0.0} ms",
+                TotalMs);
 
     public string FormatDiagnostic() =>
         string.Format(

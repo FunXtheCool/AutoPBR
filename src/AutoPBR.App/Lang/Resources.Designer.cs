@@ -409,6 +409,10 @@ public static class Resources
     public static string Preview3DMoonWorldLightIntensityTooltip => GetString("Preview3DMoonWorldLightIntensityTooltip");
     public static string Preview3DShowCelestialDebug => GetString("Preview3DShowCelestialDebug");
     public static string Preview3DShowCelestialDebugTooltip => GetString("Preview3DShowCelestialDebugTooltip");
+    public static string Preview3DLogGpuPassTimings => GetString("Preview3DLogGpuPassTimings");
+    public static string Preview3DLogGpuPassTimingsTooltip => GetString("Preview3DLogGpuPassTimingsTooltip");
+    public static string Preview3DShowExpandedGpuTimingHud => GetString("Preview3DShowExpandedGpuTimingHud");
+    public static string Preview3DShowExpandedGpuTimingHudTooltip => GetString("Preview3DShowExpandedGpuTimingHudTooltip");
     public static string Preview3DHorizonFogStrength => GetString("Preview3DHorizonFogStrength");
     public static string Preview3DHorizonFogStrengthTooltip => GetString("Preview3DHorizonFogStrengthTooltip");
     public static string Preview3DVolumetricSection => GetString("Preview3DVolumetricSection");

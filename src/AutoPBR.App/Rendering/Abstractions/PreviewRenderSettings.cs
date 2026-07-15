@@ -276,6 +276,12 @@ public sealed class PreviewRenderSettings
     /// <summary>When true, emit periodic TXAA resolve/readback diagnostics (Debug tab only; expensive on the render thread).</summary>
     public bool LogPreviewTaaDiagnostics { get; init; }
 
+    /// <summary>When true, emit periodic P8 GPU pass timings to the preview log (Debug tab; off by default).</summary>
+    public bool LogGpuPassTimings { get; init; }
+
+    /// <summary>When true, FPS overlay shows per-pass GPU timings; otherwise only total GPU ms.</summary>
+    public bool ShowExpandedGpuTimingHud { get; init; }
+
     /// <summary>Final full-res TAA on the composited preview frame (uses shared temporal reprojection).</summary>
     public bool EnablePreviewTaa { get; init; } = true;
 
